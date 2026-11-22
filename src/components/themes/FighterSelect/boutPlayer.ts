@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useLatest } from '@/hooks/useLatest'
 import { lastBeat, nextBeat, type Beat } from './bout'
 
 // Plays a bout once its scene is on: each beat holds for its ms, then the next shows, until the last,
@@ -13,11 +14,8 @@ export function useBout(beats: readonly Beat[], on: boolean, reduced: boolean, o
   // The first render with the scene on starts the bout, in that render rather than an effect after it.
   if (on && index === -1) setIndex(0)
 
-  // The latest onBeat, held in a ref a layout effect writes, so a new one each render never restarts the clock.
-  const beatRef = useRef(onBeat)
-  useLayoutEffect(() => {
-    beatRef.current = onBeat
-  })
+  // The latest onBeat, so a new one each render never restarts the clock.
+  const beatRef = useLatest(onBeat)
 
   useEffect(() => {
     if (index < 0 || index >= lastBeat(beats)) return
@@ -28,7 +26,7 @@ export function useBout(beats: readonly Beat[], on: boolean, reduced: boolean, o
       beatRef.current?.(beats[next])
     }, beats[index].ms)
     return () => window.clearTimeout(timer)
-  }, [index, beats])
+  }, [index, beats, beatRef])
 
   const replay = useCallback(() => {
     if (reduced) return

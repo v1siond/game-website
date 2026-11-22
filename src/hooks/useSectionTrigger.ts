@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useLatest } from '@/hooks/useLatest'
 import { usePreview } from '@/themes/PreviewContext'
 
 // Whether a section is on screen, from an IntersectionObserver on the element `ref` is set on. With
@@ -55,13 +56,8 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
   // fires, force everything "triggered" so the hero renders instead of staying blank.
   const isPreview = usePreview()
 
-  // The latest onEnter, held in a ref so a new one each render never rebuilds the observer. A layout
-  // effect writes it before any observer callback of that commit can run. (Next 15's own React has no
-  // useEffectEvent, so this is the stable pattern it stands for.)
-  const enterRef = useRef(onEnter)
-  useLayoutEffect(() => {
-    enterRef.current = onEnter
-  })
+  // The latest onEnter, so a new one each render never rebuilds the observer.
+  const enterRef = useLatest(onEnter)
 
   const setRef = useCallback((element: HTMLElement | null) => {
     // Cleanup previous observer
@@ -95,7 +91,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
     )
 
     observerRef.current.observe(element)
-  }, [threshold, rootMargin, triggerOnce])
+  }, [threshold, rootMargin, triggerOnce, enterRef])
 
   // Cleanup on unmount
   useEffect(() => {
