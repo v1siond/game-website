@@ -122,7 +122,7 @@ export function ShopCounter({ on, reduced, profession, children }: { on: boolean
           <path d="M22 38 Q30 44 38 38" fill="none" stroke={HOSE.ink} strokeWidth={2} />
         </svg>
       </div>
-      <div className={`h-3 rounded-sm bg-[var(--hose-shadowDark)] ${world.inked}`} aria-hidden="true" />
+      <div className={`h-3 rounded-sm bg-[color:var(--hose-shadow-dark)] ${world.inked}`} aria-hidden="true" />
       <div className={`p-4 sm:p-6 ${world.poster} ${world.posterWide} ${stage.shelf}`}>{children}</div>
     </div>
   )
