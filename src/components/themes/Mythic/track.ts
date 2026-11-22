@@ -11,14 +11,14 @@ import type { SpriteMotion } from './sprite'
 // A scene's prop moving in time with one of his moves: the prop's keyframes (offsets 0 to 1) play over
 // the move's length from rig.ts each time the take changes, so the foe he lifts or the blade he throws
 // keeps to his hands. Take 0 is nothing played yet; reduced motion plays nothing and the scene shows its
-// end state through its own markup.
+// end state through its own markup. A prop with no keyframes for this move (undefined) plays nothing.
 
-export function useTrack(ref: RefObject<Element | null>, frames: Keyframe[], ms: number, take: number) {
+export function useTrack(ref: RefObject<Element | null>, frames: Keyframe[] | undefined, ms: number, take: number) {
   const reduced = useReducedMotion()
 
   useEffect(() => {
     const element = ref.current
-    if (!element || take === 0 || reduced || typeof element.animate !== 'function') return
+    if (!element || !frames || take === 0 || reduced || typeof element.animate !== 'function') return
     const animation = element.animate(frames, { duration: ms, fill: 'forwards' })
     return () => animation.cancel()
   }, [ref, frames, ms, take, reduced])

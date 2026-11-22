@@ -54,10 +54,8 @@ const GIANT_TRACK: Record<Strike, Keyframe[]> = {
   ],
 }
 
-const EYE_TRACK: Record<Strike, Keyframe[]> = {
-  knee: [{ opacity: 0 }, { opacity: 0 }],
-  elbow: [{ opacity: 0 }, { opacity: 0 }],
-  kick: [{ opacity: 0 }, { opacity: 0 }],
+// Only the roar lights his eye; the other strikes leave it dark, as it is drawn.
+const EYE_TRACK: Partial<Record<Strike, Keyframe[]>> = {
   roar: [
     { offset: 0, opacity: 0 },
     { offset: 0.3, opacity: 1 },
