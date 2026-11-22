@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
@@ -8,7 +8,7 @@ import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { TagList } from '@/components/cv/TagList'
-import { BULLETS, CHIPS } from './cards'
+import { BULLETS, CaseCard, CHIPS } from './cards'
 import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -32,7 +32,7 @@ import { projectCard } from '@/lib/cv/cvView'
 // under reduced motion the dialog opens on the finish. The native <dialog> with showModal keeps focus
 // inside and the page inert; closing hands focus back to the card that opened it.
 
-type Phase = 'rush' | 'finish'
+type Phase = 'closed' | 'rush' | 'finish'
 
 const RUSH_MS = 1900
 
@@ -120,7 +120,8 @@ function Rush() {
   )
 }
 
-function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: string; onClose: () => void }) {
+/** The project's finish card; `focus` puts the focus on its close button as it mounts in the open dialog. */
+function FinishCard({ slot, titleId, onClose, focus = false }: SceneProps & { focus?: boolean }) {
   const labels = useLabels()
   const { links, noLink } = slot
   const project = projectCard(slot.project, labels)
@@ -143,7 +144,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
       <article className={`relative w-full max-w-2xl p-6 sm:p-8 ${world.slab} ${world.finish}`}>
         <button
           type="button"
-          autoFocus
+          autoFocus={focus}
           onClick={onClose}
           aria-label={fillLabel(labels.actions.close, { name: project.name })}
           className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center bg-[color:var(--noir-red)] text-2xl text-[color:var(--noir-paper)] transition-transform hover:rotate-12 hover:scale-110 motion-reduce:transition-none"
@@ -186,32 +187,40 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
 
 interface AllOutProps {
   slot: ProjectSlot
-  trigger: HTMLElement
-  onClose: () => void
+  phase: Phase
+  /** The case card's button that opened the file, focused again once the file has closed. */
+  trigger: RefObject<HTMLElement | null>
+  onPhase: (phase: Phase) => void
 }
 
-export function AllOutAttack({ slot, trigger, onClose }: AllOutProps) {
+/**
+ * The dialog is always in the page, closed until the case card is pressed, so the server HTML carries every
+ * project's finish card. Each open mounts the rush (or, under reduced motion, the finish) fresh.
+ */
+function AllOutAttack({ slot, phase, trigger, onPhase }: AllOutProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
-  const [phase, setPhase] = useState<Phase>(() => (prefersReducedMotion() ? 'finish' : 'rush'))
+  const open = phase !== 'closed'
 
   useEffect(() => {
+    if (!open) return
     const dialog = dialogRef.current
-    if (!dialog) return
-    dialog.showModal()
+    const opener = trigger.current
+    dialog?.showModal()
     return () => {
-      dialog.close()
-      trigger.focus()
+      dialog?.close()
+      opener?.focus()
     }
-  }, [trigger])
+  }, [open, trigger])
 
   useEffect(() => {
     if (phase !== 'rush') return
-    const timer = window.setTimeout(() => setPhase('finish'), RUSH_MS)
+    const timer = window.setTimeout(() => onPhase('finish'), RUSH_MS)
     return () => window.clearTimeout(timer)
-  }, [phase])
+  }, [phase, onPhase])
 
-  const skip = () => setPhase('finish')
+  const skip = () => onPhase('finish')
+  const close = () => onPhase('closed')
 
   return (
     <dialog
@@ -222,23 +231,55 @@ export function AllOutAttack({ slot, trigger, onClose }: AllOutProps) {
         event.preventDefault()
         // Escape during the rush skips to the finish card; on the card it closes the file.
         if (phase === 'rush') return skip()
-        onClose()
+        close()
       }}
       onClick={phase === 'rush' ? skip : undefined}
       onKeyDown={phase === 'rush' ? skip : undefined}
     >
-      {phase === 'rush' ? (
-        <>
-          <Rush />
-          <h2 id={titleId} className="sr-only">
-            {slot.project.name}
-          </h2>
-        </>
-      ) : (
-        <div className="h-full overflow-y-auto overscroll-contain">
-          <FinishCard slot={slot} titleId={titleId} onClose={onClose} />
-        </div>
-      )}
+      {SCENES[phase]({ slot, titleId, onClose: close })}
     </dialog>
+  )
+}
+
+interface SceneProps {
+  slot: ProjectSlot
+  titleId: string
+  onClose: () => void
+}
+
+// What the dialog holds in each phase. Closed, it is the finish card the server renders, out of sight; open, the
+// finish sits in its own scroll box, a new mount that focuses its close button.
+const SCENES: Record<Phase, (props: SceneProps) => ReactNode> = {
+  closed: ({ slot, titleId, onClose }) => <FinishCard slot={slot} titleId={titleId} onClose={onClose} />,
+  rush: ({ slot, titleId }) => (
+    <>
+      <Rush />
+      <h2 id={titleId} className="sr-only">
+        {slot.project.name}
+      </h2>
+    </>
+  ),
+  finish: ({ slot, titleId, onClose }) => (
+    <div className="h-full overflow-y-auto overscroll-contain">
+      <FinishCard slot={slot} titleId={titleId} onClose={onClose} focus />
+    </div>
+  ),
+}
+
+/** A project's case card and its file, the dialog the all-out rush plays in. */
+export function ProjectCase({ slot, index }: { slot: ProjectSlot; index: number }) {
+  const [phase, setPhase] = useState<Phase>('closed')
+  const trigger = useRef<HTMLElement | null>(null)
+
+  const onOpen = (_: ProjectSlot, button: HTMLButtonElement) => {
+    trigger.current = button
+    setPhase(prefersReducedMotion() ? 'finish' : 'rush')
+  }
+
+  return (
+    <>
+      <CaseCard slot={slot} index={index} onOpen={onOpen} />
+      <AllOutAttack slot={slot} phase={phase} trigger={trigger} onPhase={setPhase} />
+    </>
   )
 }
