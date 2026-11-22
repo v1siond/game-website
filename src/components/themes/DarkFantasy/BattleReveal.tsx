@@ -312,11 +312,11 @@ export const BattleReveal = memo(function BattleReveal({
     <>
       <div
         ref={stageRef}
-        className={`relative w-full min-h-[300px] flex items-center justify-center ${flags.shake ? battle.shaking : ''}`}
+        className="relative w-full min-h-[300px] flex items-center justify-center"
       >
         {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on COMBAT_GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
-        <FixedCombatLayer inView={inView}>
+        <FixedCombatLayer inView={inView} shake={flags.shake}>
         {/* Knight - CLOSER to center */}
         {showKnight && (
           <div
