@@ -59,7 +59,6 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
     landing.current = window.setTimeout(() => setPose('act'), LAND_MS)
   }
 
-  const { achievements } = martialArts.primary
   const fall = flipped ? shade.fallUp : shade.fallDown
 
   return (
@@ -88,11 +87,11 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
               achievements: 'space-y-2',
               achievement: 'text-sm text-[color:var(--sh-muted-text)]',
             }}
-            renderAchievement={(achievement) => (
+            renderAchievement={(achievement, index) => (
               <span
                 key={flips}
                 className={`flex items-start gap-1.5 border-l-2 border-[color:var(--sh-rim)] bg-[color:var(--sh-night)] p-2 ${triggered ? fall : 'opacity-0'}`}
-                style={{ '--i': achievements.indexOf(achievement) } as CSSProperties}
+                style={{ '--i': index } as CSSProperties}
               >
                 <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
                   -

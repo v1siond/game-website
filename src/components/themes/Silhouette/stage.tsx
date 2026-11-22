@@ -71,8 +71,8 @@ export function ShockStage({ bands }: { bands: Band[] }) {
       <BandList
         bands={bands}
         className="relative grid gap-6 pl-8 sm:grid-cols-2 lg:grid-cols-4 lg:pl-0"
-        renderBand={({ band, years, linkProps }) => (
-          <Plate index={bands.indexOf(band)} link={linkProps}>
+        renderBand={({ band, years, linkProps }, index) => (
+          <Plate index={index} link={linkProps}>
             <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)] group-hover:underline">{band.name}</h3>
             <p className="mt-1 text-sm tracking-wider text-[color:var(--sh-muted-text)]">
               {band.role}
