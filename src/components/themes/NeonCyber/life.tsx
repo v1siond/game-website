@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import type { Company, MartialArts } from '@/lib/cv/content'
-import type { SectionsOf } from '@/lib/cv/cvView'
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import type { CVData, MartialArts } from '@/lib/cv/content'
+import { aboutBlock, ventureCard, type SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -42,15 +42,15 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 /** The bio is the plan's; the tags read the rest of the summary (education, languages, every highlight). */
 export function ScanAbout({ bio }: { bio: string }) {
-  const { professionalSummary } = useCVData()
+  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
   const { sections, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('japantown')
   const [arrived, setArrived] = useState(false)
   const motion = stillWhen(reduced, arrived ? 'scan' : 'walk')
   const tags = [
-    { label: cyber.tagEducation, value: professionalSummary.education },
-    { label: cyber.tagLanguages, value: professionalSummary.languages },
-    ...professionalSummary.highlights.map((value) => ({ label: cyber.tagHighlight, value })),
+    { label: cyber.tagEducation, value: education },
+    { label: cyber.tagLanguages, value: languages },
+    ...highlights.map((value) => ({ label: cyber.tagHighlight, value })),
   ].filter((tag) => tag.value)
 
   return (
@@ -175,8 +175,9 @@ function BladesPass({ onPassed }: { onPassed: () => void }) {
 // gold tag under the contract number; the other ventures follow three to a row. Pointing at or focusing
 // a contract rings its pin on the map: the ring is written straight on the pins' data-hot, so a hover
 // re-renders none of the contracts.
-export function FixerContracts({ companies }: { companies: Company[] }) {
+export function FixerContracts({ companies: entries }: { companies: CVData['companies'] }) {
   const { sections, links, cyber, cards } = useLabels()
+  const companies = useMemo(() => entries.map(ventureCard), [entries])
   const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
   const preview = usePreview()
   const mapRef = useRef<SVGSVGElement>(null)
@@ -239,6 +240,13 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
                     <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
                     <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
                   </a>
+                  {company.services.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap gap-1" aria-label={sections.services}>
+                      {company.services.map((service) => (
+                        <DataChip key={service}>{service}</DataChip>
+                      ))}
+                    </ul>
+                  )}
                 </Scannable>
               </li>
             ))}
