@@ -1,8 +1,7 @@
 import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { fillLabel } from '@/lib/cv/labels'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { AtomicChip, PlusRow } from './controls'
 import atomic from './atomic.module.css'
@@ -26,18 +25,19 @@ function QuestState({ current }: { current: boolean }) {
   )
 }
 
-function QuestCard({ job, index }: { job: Job; index: number }) {
+function QuestCard({ job: entry, index }: { job: Job; index: number }) {
   const { years, cards } = useLabels()
-  const { start, end } = jobYears(job, years.present)
+  const job = jobCard(entry, years)
 
   return (
     <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={cssVars({ '--i': index })}>
-      <QuestState current={job.current} />
+      <QuestState current={entry.current} />
       <h3 className="mt-3 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{job.title}</h3>
       <p className="mt-1 text-base text-atomic-yellow">
         <SlashBreaks text={job.company} />
       </p>
-      <p className="mt-1 text-sm text-atomic-phosphor-dim-text">{fillLabel(years.range, { start, end })}</p>
+      <p className="mt-1 text-sm text-atomic-phosphor-dim-text">{job.years}</p>
+      {job.location && <p className="mt-1 text-sm text-atomic-ash">{job.location}</p>}
 
       {job.description && <p className="mt-3 text-sm leading-relaxed text-atomic-ash">{job.description}</p>}
 
