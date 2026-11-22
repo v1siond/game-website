@@ -8,9 +8,6 @@ import map from './map.module.css'
 // MapDefs (rendered once on the root, so every map shares one set of ids): the parchment and its folds,
 // the level tile in its three states, the dotted trail, hills, tree clumps, waves and clouds.
 
-// Re-exported for the map and level files that take their drawing pieces from this module.
-export { cssVars }
-
 export function MapDefs() {
   return (
     <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
