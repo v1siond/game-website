@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@/themes/themes'
+import { cssVars } from '@/lib/cssVars'
 import { readStored } from '@/lib/storage'
 
 /**
@@ -47,10 +48,10 @@ export interface ErrorScreenProps {
   technical?: string
 }
 
-/** The custom properties the stylesheet paints from. Typed as CSSProperties so React accepts the vars. */
-function paletteVars(theme: Theme): CSSProperties {
+/** The custom properties error-screen.css paints from. */
+function errorVars(theme: Theme) {
   const { colors } = theme
-  return {
+  return cssVars({
     '--err-bg': colors.background,
     '--err-surface': colors.surface,
     '--err-text': colors.text,
@@ -58,7 +59,7 @@ function paletteVars(theme: Theme): CSSProperties {
     '--err-accent': colors.accent,
     '--err-border': colors.border,
     '--err-font': theme.font,
-  } as CSSProperties
+  })
 }
 
 /**
@@ -83,7 +84,7 @@ export function ErrorScreen({ status, headline, detail, actions, technical }: Er
   const theme = useStoredWorld()
 
   return (
-    <main className="c-error" style={paletteVars(theme)} role="main">
+    <main className="c-error" style={errorVars(theme)} role="main">
       <div className="c-error__body">
         {status !== undefined && (
           <p className="c-error__status" aria-label={`HTTP status ${status}`}>

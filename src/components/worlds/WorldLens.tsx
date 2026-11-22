@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type MouseEvent, type PointerEvent, type RefObject } from 'react'
 import Image from 'next/image'
 import { matchesMedia } from '@/hooks/useMediaQuery'
+import { cssVars } from '@/lib/cssVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { STILL_HEIGHT, lensFocus, lensStill, type LensWidth } from '@/lib/worlds/lens'
 import { useWorldsLabels } from './WorldsLabels'
@@ -207,7 +208,7 @@ export default function WorldLens({ mode, nextId, nextName, onGo, style }: World
 
   const width: LensWidth = wide ? 1440 : 390
   const point = lensFocus(focusMap, nextId, width)
-  const stillVars = { '--lens-x': point.x, '--lens-y': point.y } as CSSProperties
+  const stillVars = cssVars({ '--lens-x': point.x, '--lens-y': point.y })
   const caption = CAPTION_OF[mode]
   return (
     <div
