@@ -195,6 +195,45 @@ export function collectMotion(from: number, to: number, moving: boolean): Motion
   return { pose: 'run', from: onRow(from), to: onRow(to), ms: COLLECT.glideMs }
 }
 
+// Bands: he runs to each band's box in turn and drums a roll of five beats on its lid with his sticks; on
+// the fifth the lid springs open (research part 2 [7], the box bounced five times). The travel is 0.3 s
+// and a beat 0.16 s, both shorter when there are many bands, so the whole set ends within 4.6 s.
+const BAND_SPAN_MS = 4600
+const TRAVEL_MAX_MS = 300
+const TRAVEL_SHARE = 0.5
+const BEAT_MAX_MS = 160
+const HITS = 5
+
+export function bandTiming(count: number): { travelMs: number; beatMs: number } {
+  const perBox = BAND_SPAN_MS / count
+  const travelMs = Math.min(TRAVEL_MAX_MS, Math.floor(perBox * TRAVEL_SHARE))
+  return { travelMs, beatMs: Math.min(BEAT_MAX_MS, Math.floor((perBox - travelMs) / HITS)) }
+}
+
+/** Where box `index` of `count` stands along the strip, in %. */
+export const boxX = (index: number, count: number): number => (count === 1 ? 50 : 16 + (index * 70) / (count - 1))
+
+// He drums standing just left of the box.
+const BESIDE_BOX = 7
+
+export function bandScene(count: number): Scene {
+  const { travelMs, beatMs } = bandTiming(count)
+  const beats = Array.from({ length: count }, (_, index): Beat[] => {
+    const at: Spot = { x: boxX(index, count) - BESIDE_BOX, lift: 0 }
+    return [
+      { name: `travel-${index}`, pose: 'run', ms: travelMs, to: at },
+      { name: `roll-${index}`, pose: 'drum', ms: HITS * beatMs, to: at },
+    ]
+  }).flat()
+  return { start: { x: 0, lift: 0 }, beats, rest: 'idle' }
+}
+
+/** When lid `index` of `count` springs open: the fifth beat of its roll, counted from the scene's start. */
+export function lidAt(index: number, count: number): number {
+  const { travelMs, beatMs } = bandTiming(count)
+  return (index + 1) * (travelMs + HITS * beatMs)
+}
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3

@@ -5,6 +5,7 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { sectionPlan, type SectionId } from '@/lib/cv/sectionPlan'
+import { BounceBoxLevel } from './bounceBoxes'
 import { CheckpointLevel } from './checkpoints'
 import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
@@ -68,7 +69,9 @@ const FRAMES: SectionFrames = {
   ventures: function VenturesFrame({ slot }) {
     return <GemLevel companies={slot.companies} />
   },
-  bands: () => <Level id="bands" />,
+  bands: function BandsFrame({ slot }) {
+    return <BounceBoxLevel bands={slot.bands} musician={slot.musician} />
+  },
   muayThai: () => <Level id="muayThai" />,
 }
 

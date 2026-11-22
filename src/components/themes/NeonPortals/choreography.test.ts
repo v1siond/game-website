@@ -1,4 +1,4 @@
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, breakAt, collectMotion, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -186,5 +186,33 @@ describe('Ventures: collecting the gems', () => {
   it('moves him from where he stands to the gem while he runs, and holds him there after', () => {
     expect(collectMotion(10, 70, true)).toEqual({ pose: 'run', from: { x: 10, lift: 0 }, to: { x: 70, lift: 0 }, ms: COLLECT.glideMs })
     expect(collectMotion(10, 70, false)).toEqual({ pose: 'idle', from: { x: 70, lift: 0 }, to: { x: 70, lift: 0 }, ms: 0 })
+  })
+})
+
+describe('Bands: the drum roll on each box', () => {
+  it('plays five beats of 0.16 s per box with 0.3 s to get to it, for four bands', () => {
+    expect(bandTiming(4)).toEqual({ travelMs: 300, beatMs: 160 })
+    expect(sceneMs(bandScene(4))).toBe(4400)
+  })
+
+  it.each([1, 2, 4, 6, 10, 16, 30])('ends the roll on every one of %i boxes within 5 s', (count) => {
+    const { travelMs, beatMs } = bandTiming(count)
+    expect(travelMs).toBeGreaterThan(0)
+    expect(beatMs).toBeGreaterThan(0)
+    expect(sceneMs(bandScene(count))).toBeLessThanOrEqual(FIVE_S)
+  })
+
+  it('travels to a box, then rolls on it, box after box, left to right', () => {
+    const scene = bandScene(3)
+    expect(scene.beats.map((beat) => beat.pose)).toEqual(['run', 'drum', 'run', 'drum', 'run', 'drum'])
+    expect(boxX(0, 3)).toBeLessThan(boxX(1, 3))
+    expect(boxX(1, 3)).toBeLessThan(boxX(2, 3))
+    expect(boxX(0, 1)).toBe(50)
+  })
+
+  it('springs each lid open on the fifth beat of its roll, and the last as the scene ends', () => {
+    const scene = bandScene(4)
+    expect(lidAt(0, 4)).toBe(beatStart(scene, 'roll-0') + 5 * bandTiming(4).beatMs)
+    expect(lidAt(3, 4)).toBe(sceneMs(scene))
   })
 })

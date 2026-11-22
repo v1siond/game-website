@@ -1,0 +1,145 @@
+/*
+ * The bounce boxes and the band cards (bounceBoxes.tsx). Box i stands on the stage floor at --x % and its
+ * lid springs open at --lid ms once the section runs (data-run), the moment his fifth beat lands on it; a
+ * spark flashes once over it. Card i's gold frame lights at the same --lid; the cards sit outside the
+ * keyed scene, so a replay swaps between two identical keyframes (data-round). Every lid stays open and
+ * every frame stays lit (BD29). Transforms and opacity only.
+ *
+ * Animated: the lids (one class), the sparks, the card frames (one class).
+ * Reduced motion and the preview (data-still): every lid open, every frame lit, no spark.
+ */
+
+.box {
+  position: absolute;
+  bottom: 10%;
+  left: calc(var(--x) * 1%);
+  z-index: 1;
+  width: 13%;
+  max-width: 96px;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+}
+
+.box svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.lid {
+  transform-origin: left bottom;
+}
+
+.burst {
+  opacity: 0;
+}
+
+[data-run='true'] .lid {
+  animation: spring 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--lid) * 1ms) both;
+}
+
+[data-run='true'] .burst {
+  animation: burst 0.5s ease-out calc(var(--lid) * 1ms) both;
+}
+
+@keyframes spring {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(-14px) rotate(-28deg);
+  }
+}
+
+@keyframes burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.frame {
+  position: absolute;
+  inset: -6px;
+  border: 4px solid var(--np-gold);
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px var(--np-ink);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cards[data-run='true'] .frame {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-delay: calc(var(--lid) * 1ms);
+  animation-fill-mode: both;
+}
+
+.cards[data-run='true'][data-round='0'] .frame {
+  animation-name: frame-a;
+}
+
+.cards[data-run='true'][data-round='1'] .frame {
+  animation-name: frame-b;
+}
+
+@keyframes frame-a {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes frame-b {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-still] .lid {
+  animation: none !important;
+  transform: translateY(-14px) rotate(-28deg);
+}
+
+[data-still] .burst {
+  animation: none !important;
+  opacity: 0;
+}
+
+[data-still] .frame {
+  animation: none !important;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lid {
+    animation: none !important;
+    transform: translateY(-14px) rotate(-28deg);
+  }
+
+  .burst {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  .frame {
+    animation: none !important;
+    opacity: 1;
+  }
+}
