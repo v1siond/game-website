@@ -8,7 +8,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { Bonfire } from './bonfire'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
+import { useRunActions } from './run'
 import { BUTTON_LIT, CVLink, EngineLink } from './links'
 import { AreaTitle } from './menu'
 import { CARVED } from './palette'
@@ -25,7 +25,7 @@ const KINDLE_SOULS = 500
 const WALK_MS = 2400
 
 export function LastFire({ profession }: { profession: Profession }) {
-  const run = useRun()
+  const run = useRunActions()
   const { sections, souls: words } = useLabels()
   const [lit, setLit] = useState(false)
   const script = usePoseScript('idle')

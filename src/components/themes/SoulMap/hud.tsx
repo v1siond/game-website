@@ -5,7 +5,7 @@ import { useRolling } from '../shared/finds'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
-import { MAX_FLASKS, MAX_HP, MAX_STAMINA, useRun, type BannerKind } from './run'
+import { MAX_FLASKS, MAX_HP, MAX_STAMINA, useRunActions, useRunState, type BannerKind } from './run'
 import { CARVED } from './palette'
 import souls from './souls.module.css'
 
@@ -28,7 +28,7 @@ const BANNER_TEXT: Record<BannerKind, string> = {
 }
 
 function BannerBand() {
-  const { banner } = useRun()
+  const { banner } = useRunState()
   return (
     <div className="pointer-events-none fixed inset-x-0 top-1/2 z-50 -translate-y-1/2" role="status" aria-live="polite">
       {banner && (
@@ -45,7 +45,7 @@ function BannerBand() {
 }
 
 function ItemBoxPopup() {
-  const { item } = useRun()
+  const { item } = useRunState()
   const { souls: words } = useLabels()
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-16 z-50 flex justify-center px-4 sm:bottom-10" role="status" aria-live="polite">
@@ -87,7 +87,8 @@ function FlaskIcon({ full }: { full: boolean }) {
 }
 
 function FlaskButton() {
-  const { flasks, hp, drink } = useRun()
+  const { flasks, hp } = useRunState()
+  const { drink } = useRunActions()
   const { souls: words } = useLabels()
   const reason = flasks === 0 ? words.flaskEmpty : hp >= MAX_HP ? words.healthFull : ''
   const name = fillLabel(words.drink, { count: flasks })
@@ -110,7 +111,7 @@ function FlaskButton() {
 }
 
 function SoulsCounter() {
-  const { souls: total } = useRun()
+  const { souls: total } = useRunState()
   const { souls: words } = useLabels()
   const shown = useRolling(total)
   const [gain, setGain] = useState<{ count: number; key: number } | null>(null)
@@ -139,7 +140,7 @@ function SoulsCounter() {
 }
 
 function Gauges() {
-  const { hp, stamina } = useRun()
+  const { hp, stamina } = useRunState()
   const { hud, souls: words } = useLabels()
   return (
     <section aria-label={words.runStatus} className={`${souls.gauges} flex items-center gap-2 sm:fixed sm:bottom-4 sm:left-4 sm:z-40 sm:block sm:px-3 sm:py-2`}>

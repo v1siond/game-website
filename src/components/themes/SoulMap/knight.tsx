@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { SOUL } from './palette'
@@ -418,7 +418,9 @@ interface KnightProps {
 const placement = (place: KnightPlace | undefined) =>
   place && { x: place.x, y: place.y - place.height, height: place.height, width: (place.height * 60) / 96 }
 
-export function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false, className = '' }: KnightProps) {
+// Memoised: his props are plain values, so a scene that re-renders around him (the arena on every stamina
+// tick) leaves the sprite alone until his pose or gear changes.
+export const Knight = memo(function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false, className = '' }: KnightProps) {
   const id = useId().replace(/:/g, '')
   const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
   const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
@@ -472,4 +474,4 @@ export function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false,
       </g>
     </svg>
   )
-}
+})

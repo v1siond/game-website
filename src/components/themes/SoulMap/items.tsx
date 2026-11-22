@@ -11,7 +11,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
+import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
@@ -73,7 +73,7 @@ function SummonedPhantom({ summoned }: { summoned: boolean }) {
 }
 
 function PickUp({ project, picked, onPick }: { project: Project; picked: boolean; onPick: () => void }) {
-  const run = useRun()
+  const run = useRunActions()
   const { souls: words } = useLabels()
 
   const pickUp = () => {

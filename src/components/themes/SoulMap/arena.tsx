@@ -8,7 +8,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { MartialArts } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
+import { useRunActions, useRunState } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { Panel } from './menu'
 import { CARVED, SOUL } from './palette'
@@ -112,7 +112,8 @@ function BossBar({ hp }: { hp: number }) {
 }
 
 function useBout() {
-  const run = useRun()
+  const { hp: health } = useRunState()
+  const { announce, hurt, spend, rest, earn } = useRunActions()
   const { souls: words } = useLabels()
   const me = usePoseScript('idle')
   const partner = usePoseScript('idle')
@@ -120,14 +121,14 @@ function useBout() {
   const [partnerHp, setPartnerHp] = useState(PARTNER_HP)
   const partnerLeft = useRef(PARTNER_HP)
   const [notice, setNotice] = useState('')
-  const hp = useRef(run.hp)
+  const hp = useRef(health)
   const guarding = useRef(false)
   const strikes = useRef(0)
   const timers = useRef<number[]>([])
 
   useEffect(() => {
-    hp.current = run.hp
-  }, [run.hp])
+    hp.current = health
+  }, [health])
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
@@ -143,7 +144,6 @@ function useBout() {
     [later],
   )
 
-  const { announce, hurt, spend, rest, earn } = run
   const { hold: holdMe, play: playMe } = me
   const { hold: holdPartner, play: playPartner } = partner
 

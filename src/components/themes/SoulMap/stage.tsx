@@ -10,7 +10,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Band } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { usePoseScript, type PoseStep } from './poses'
-import { useRun } from './run'
+import { useRunActions } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_META, CARD_TITLE } from './menu'
 import { SOUL } from './palette'
@@ -45,7 +45,7 @@ function WarDrum() {
 }
 
 function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: BandSlot }) {
-  const run = useRun()
+  const run = useRunActions()
   const reduced = useReducedMotion()
   const { souls: words, links } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.35 })

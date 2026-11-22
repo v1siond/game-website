@@ -9,7 +9,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { Bonfire, type FireState } from './bonfire'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
+import { useRunActions } from './run'
 import { CVLink, EngineLink, HeroActions } from './links'
 import { CARVED, SOUL } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -168,7 +168,7 @@ function Ruins() {
 }
 
 export function ShrineHero() {
-  const run = useRun()
+  const run = useRunActions()
   const { souls: words } = useLabels()
   const phase = useLighting(() => run.announce('kindled', words.kindled))
   const script = usePoseScript('idle')

@@ -10,7 +10,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
 import { VentureList, type VentureSlot } from '@/components/cv/VentureList'
 import { Knight } from './knight'
-import { useRun } from './run'
+import { useRunActions } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_BODY, TAG } from './menu'
 import { CARVED } from './palette'
@@ -45,7 +45,7 @@ function Scribe({ writing }: { writing: boolean }) {
 }
 
 function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) {
-  const run = useRun()
+  const run = useRunActions()
   const { souls: words, links, cards } = useLabels()
   const [appraised, setAppraised] = useState(false)
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
