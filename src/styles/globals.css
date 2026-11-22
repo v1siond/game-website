@@ -335,30 +335,3 @@ textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .wp-root { display: none !important; }
 }
-
-/* Profession background ornaments live in the side gutters. Below ~1024px there are no
-   gutters, so hide them entirely to protect content readability. */
-@media (max-width: 1024px) {
-  .ornament-layer { display: none !important; }
-}
-
-/* Soul motes: soft drifting specks (GPU transform/opacity). */
-.hk-mote {
-  position: absolute;
-  border-radius: 9999px;
-  opacity: 0;
-  animation-name: hk-drift;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  will-change: transform, opacity;
-}
-@keyframes hk-drift {
-  0% { transform: translate3d(0, 0, 0); opacity: 0; }
-  15% { opacity: 0.6; }
-  50% { transform: translate3d(8px, -26px, 0); opacity: 0.75; }
-  85% { opacity: 0.5; }
-  100% { transform: translate3d(-6px, -52px, 0); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hk-mote { animation: none; opacity: 0.35; }
-}

@@ -446,7 +446,7 @@ const VoidDepths = memo(function VoidDepths() {
       {motes.map((m, i) => (
         <span
           key={i}
-          className="hk-mote"
+          className={world.mote}
           style={{
             left: `${m.left}%`,
             top: `${m.top}%`,
@@ -629,7 +629,7 @@ function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`df-card bg-df-panel relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
+        className={`df-card bg-[color:var(--df-panel)] relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
         style={{ animation: isReceivingEnergy ? `${world.nodeArrival} 400ms ease-out` : undefined }}
@@ -856,7 +856,7 @@ const VoidFrame = memo(function VoidFrame({
       aria-labelledby={sectionHeadingId}
     >
       {/* Main dialogue box container */}
-      <div className="df-panel bg-df-panel relative">
+      <div className="df-panel bg-[color:var(--df-panel)] relative">
         {/* Top decorative flourish - elegant vine-like pattern */}
         <DialogueFlourish position="top" width={220} />
 
