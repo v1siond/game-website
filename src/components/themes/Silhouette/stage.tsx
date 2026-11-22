@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { HeroCharacter } from './character'
 import { SHADE } from './palette'
 import world from './world.module.css'
@@ -54,8 +53,6 @@ function OilDrum() {
 }
 
 export function ShockStage({ bands }: { bands: Band[] }) {
-  const { links } = useLabels()
-
   return (
     <div className="relative">
       <div className="mb-2 flex items-end gap-0.5 lg:mb-6" aria-hidden="true">
@@ -69,7 +66,7 @@ export function ShockStage({ bands }: { bands: Band[] }) {
       <BandList
         bands={bands}
         className="relative grid gap-6 pl-8 sm:grid-cols-2 lg:grid-cols-4 lg:pl-0"
-        renderBand={({ band, years, linkProps }, index) => (
+        renderBand={({ band, years, linkProps, release }, index) => (
           <Plate index={index} link={linkProps}>
             <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)] group-hover:underline">{band.name}</h3>
             <p className="mt-1 text-sm tracking-wider text-[color:var(--sh-muted-text)]">
@@ -77,9 +74,9 @@ export function ShockStage({ bands }: { bands: Band[] }) {
               {years && <span aria-hidden="true"> | </span>}
               {years}
             </p>
-            {band.release && (
+            {release && (
               <p className="mt-2 text-sm text-[color:var(--sh-text)]">
-                {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+                {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
               </p>
             )}
           </Plate>
