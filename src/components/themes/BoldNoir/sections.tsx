@@ -70,7 +70,7 @@ function Projects({ projects }: { projects: SectionsOf<'engineer'>['projects'] }
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <CaseCard slot={slot} index={projects.indexOf(slot.project)} onOpen={(picked, trigger) => setOpened({ slot: picked, trigger })} />}
+        renderProject={(slot, index) => <CaseCard slot={slot} index={index} onOpen={(picked, trigger) => setOpened({ slot: picked, trigger })} />}
       />
       {opened && <AllOutAttack slot={opened.slot} trigger={opened.trigger} onClose={() => setOpened(null)} />}
     </Stage>
@@ -153,7 +153,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <svg viewBox="0 0 600 40" preserveAspectRatio="none" className={`pointer-events-none absolute inset-x-0 top-10 h-16 w-full ${world.trail}`} aria-hidden="true" focusable="false">
           <path d={TRAIL} fill={NOIR.red} />
         </svg>
-        <BandList bands={bands} className={`relative ${MASONRY_LIST}`} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandPanel slot={slot} index={bands.indexOf(slot.band)} />} />
+        <BandList bands={bands} className={`relative ${MASONRY_LIST}`} itemClassName={MASONRY_ITEM} renderBand={(slot, index) => <BandPanel slot={slot} index={index} />} />
       </div>
       <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
     </Stage>
@@ -162,7 +162,6 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
-  const { achievements } = martialArts.primary
   const labels = useLabels()
 
   return (
@@ -178,8 +177,8 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
           achievements: `space-y-4 ${world.copy}`,
           achievement: 'text-base text-[color:var(--noir-paper)]',
         }}
-        renderAchievement={(achievement) => (
-          <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': achievements.indexOf(achievement) } as CSSProperties}>
+        renderAchievement={(achievement, index) => (
+          <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': index } as CSSProperties}>
             <span className={`relative block h-12 w-12 flex-shrink-0 ${world.burst}`} aria-hidden="true">
               <HitStar className={`h-full w-full ${world.burstHover}`} />
             </span>
