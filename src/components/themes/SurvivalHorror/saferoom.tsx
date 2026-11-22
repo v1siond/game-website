@@ -3,6 +3,7 @@
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
+import { InView } from '@/components/themes/shared/held'
 import { CARD_BUTTON, ContactPlates } from './actions'
 import { PANEL_HEADING, sectionHeadingId } from './panels'
 import { useStageState } from './stage'
@@ -12,8 +13,8 @@ import look from './world.module.css'
 // Contact as the safe room. Behind the page he runs from the pursuer down the last corridor, gets through
 // the safe door and shuts it, the pursuer pounds on it and goes, and inside he sits at the typewriter
 // (./stage). Here the typewriter has typed his line on the paper, and Save spends one of three ink
-// ribbons, the genre's limited save, and he types again behind the page. The ways to reach him are under
-// the paper.
+// ribbons, the genre's limited save, and he types again behind the page. The paper's typing plays once it
+// scrolls into view. The ways to reach him are under the paper.
 
 const RIBBONS = 3
 
@@ -25,10 +26,11 @@ function SaveDesk({ line }: { line: string }) {
 
   return (
     <div className="mt-4 grid gap-4 md:grid-cols-[2fr_1fr]">
-      <div className="relative overflow-hidden bg-[color:var(--sh-ivory)] p-4">
+      {/* the line is in the page from the start, read by a screen reader under the aria hidden cover; the typing only reveals it to the eye, once the paper is in view */}
+      <InView className="relative overflow-hidden bg-[color:var(--sh-ivory)] p-4">
         <p className={`text-base text-[color:var(--sh-void)] ${look.typed}`}>{line}</p>
         <span className={`${horror.typeCover} ${horror.typeCoverPaper} ${horror.typeIn}`} aria-hidden="true" />
-      </div>
+      </InView>
       <div className="flex flex-col gap-2">
         <button
           type="button"
