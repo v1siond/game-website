@@ -1,4 +1,4 @@
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskSpot, maskSteps, MASK_GUARD, pipAt, postAt, postX, restSpot, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskMotion, maskScene, maskSpot, maskSteps, MASK_GUARD, MASK_STEP_MS, pipAt, postAt, postX, restSpot, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -244,6 +244,24 @@ describe('Muay Thai: the carved mask', () => {
 
   it('stays at its start when there is no achievement', () => {
     expect(maskSpot(0, 0)).toEqual(maskSpot(0, 3))
+  })
+
+  it('plays one beat of 1 s per step, his guard braced on each and the victory knee on the last', () => {
+    const scene = maskScene(3)
+    expect(scene.beats.map((beat) => beat.name)).toEqual(['step-1', 'step-2', 'step-3'])
+    expect(scene.beats.map((beat) => beat.pose)).toEqual(['guard', 'guard', 'knee'])
+    expect(scene.beats.every((beat) => beat.ms === MASK_STEP_MS && beat.to.x === MASK_GUARD.x)).toBe(true)
+    expect(maskScene(1).beats.map((beat) => beat.pose)).toEqual(['knee'])
+    expect(maskScene(0).beats).toEqual([])
+  })
+
+  it('shows the step playing while it moves, then holds that step his pose without moving', () => {
+    const scene = maskScene(3)
+    expect(maskMotion(scene, 2, true)).toMatchObject({ pose: 'guard', ms: MASK_STEP_MS })
+    expect(maskMotion(scene, 3, true)).toMatchObject({ pose: 'knee', ms: MASK_STEP_MS })
+    expect(maskMotion(scene, 3, false)).toMatchObject({ pose: 'knee', ms: 0 })
+    expect(maskMotion(scene, 1, false)).toMatchObject({ pose: 'guard', ms: 0 })
+    expect(maskMotion(scene, 0, false)).toMatchObject({ pose: 'guard', ms: 0 })
   })
 })
 

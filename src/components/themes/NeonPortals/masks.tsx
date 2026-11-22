@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type TransitionEvent } from 'react'
+import { useEffect, useMemo, useState, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -11,7 +11,7 @@ import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { BODY, CARD_TITLE, PANEL } from './cards'
-import { MASK_GUARD, maskSpot, maskSteps, type Motion } from './choreography'
+import { MASK_STEP_MS, maskMotion, maskScene, maskSpot, maskSteps } from './choreography'
 import { findId } from './finds'
 import { ERA, PORTAL, type Era } from './palette'
 import { Region, Rig, Strip } from './stage'
@@ -19,14 +19,12 @@ import css from './masks.module.css'
 
 // Muay Thai in the lava age: an original carved mask of black rock with horns and lava eyes (not the
 // source's feather face) stands at the far end of the strip. He takes his guard; when the section shows
-// the mask comes one step toward him, and "Next" brings it one step more, a step per achievement, three
+// the mask comes one step toward him, and "Next" brings it one step more once the last has landed, a step per achievement, three
 // at most. Each step lights that achievement's mark in the record under the strip. On the last step the
 // mask covers his face in its glow and he ends on the victory knee. Each step the mask takes is a find.
 //
 // Animated: him (the guard's brace each step, the knee at the last), the mask's step, the glow.
 // Reduced motion and the preview: the mask on his face with its glow, him on the knee, every mark lit.
-
-const AT_GUARD = { x: MASK_GUARD.x, lift: 0 }
 
 const RECORD_LOOK = {
   facts: 'grid gap-3 sm:grid-cols-2',
@@ -71,36 +69,38 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
   const preview = usePreview()
   const still = reduced || preview
   const steps = maskSteps(martialArts.primary.achievements.length)
+  const scene = useMemo(() => maskScene(steps), [steps])
   const [asked, setAsked] = useState(0)
+  const [settled, setSettled] = useState(0)
   const step = still ? steps : Math.min(steps, Math.max(asked, on ? 1 : 0))
-  const last = steps > 0 && step === steps
-  const motion: Motion = { pose: last ? 'knee' : 'guard', from: AT_GUARD, to: AT_GUARD, ms: 0 }
+  const moving = !still && settled < step
   const spot = maskSpot(step, steps)
 
-  const arrived = (event: TransitionEvent<HTMLDivElement>) => {
-    if (event.target !== event.currentTarget || event.propertyName !== 'transform') return
+  // A step counts the moment it starts, so no later press or scroll can lose it.
+  useEffect(() => {
+    if (step === 0 || still) return
     find(findId('muayThai', String(step)), active)
+  }, [step, still, find, active])
+
+  const stepped = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    setSettled(step)
   }
 
   return (
     <Region title={sections.muayThai} stageRef={ref} on={on} tally>
       <Strip size="h-56">
         <div className="absolute inset-0" data-still={still || undefined}>
-          <div
-            className={css.track}
-            data-last={last}
-            style={cssVars({ '--mask-x': spot.x, '--mask-lift': spot.lift, '--mask-scale': spot.scale })}
-            onTransitionEnd={arrived}
-          >
+          <div className={css.track} data-last={steps > 0 && step === steps} style={cssVars({ '--mask-x': spot.x, '--mask-lift': spot.lift, '--mask-scale': spot.scale, '--step-ms': MASK_STEP_MS })}>
             <span className={css.glow} />
             <div className={css.mask}>
               <CarvedMask />
             </div>
           </div>
-          <Rig motion={motion} step={step} run={on} size="strip" />
+          <Rig motion={maskMotion(scene, step, moving)} step={step} run={on} size="strip" onAnimationEnd={stepped} />
         </div>
       </Strip>
-      {!still && <SceneButton label={actions.next} onPress={() => setAsked(step + 1)} disabled={step >= steps} className="-mt-2 mb-6" />}
+      {!still && <SceneButton label={actions.next} onPress={() => setAsked(step + 1)} disabled={moving || step >= steps} className="-mt-2 mb-6" />}
       <h3 className={`${CARD_TITLE} mb-4 text-2xl text-[color:var(--np-gold)]`}>{martialArts.primary.title}</h3>
       <div className={BODY}>
         <MuayThaiRecord martialArts={martialArts} classNames={RECORD_LOOK} renderAchievement={(text, index) => <Mark text={text} lit={index < step} />} />

@@ -256,6 +256,30 @@ export const maskSpot = (step: number, steps: number): typeof MASK_GUARD => {
   }
 }
 
+/** Each mask step takes 1 s: his rig's beat and the mask's own move (masks.module.css reads --step-ms). */
+export const MASK_STEP_MS = 1000
+
+const AT_GUARD: Spot = { x: MASK_GUARD.x, lift: 0 }
+
+/** The mask's steps as beats: his guard braced on each, the victory knee on the last. */
+export const maskScene = (steps: number): Scene => ({
+  start: AT_GUARD,
+  beats: Array.from({ length: steps }, (_, index) => ({
+    name: `step-${index + 1}`,
+    pose: index === steps - 1 ? 'knee' : 'guard',
+    ms: MASK_STEP_MS,
+    to: AT_GUARD,
+  })),
+  rest: steps > 0 ? 'knee' : 'guard',
+})
+
+/** His rig at a mask step: the step's beat while the mask moves, then that beat's pose held still. */
+export const maskMotion = (scene: Scene, step: number, moving: boolean): Motion => {
+  if (moving) return motionAt(scene, step - 1)
+  const pose = scene.beats[step - 1]?.pose ?? 'guard'
+  return { pose, from: AT_GUARD, to: AT_GUARD, ms: 0 }
+}
+
 // Contact: he walks to the save monitor and presses it. A full tally ends on the hologram turning into the
 // gem, the flash and his victory dance (under 2 s); a tally not yet full ends on the screen blinking once.
 const AT_MONITOR: Spot = { x: 56, lift: 0 }
