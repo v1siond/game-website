@@ -169,8 +169,10 @@
     repeating-linear-gradient(90deg, var(--ap-fort-gold) 0 28px, var(--ap-fort-gold-dark) 28px 32px);
 }
 
-/* A card shown once the level's action reaches it ([data-shown] on an ancestor), at its --delay. */
-.popCard {
+/* A card shown once the level's action reaches it ([data-shown] on an ancestor), at its --delay. It
+ * waits hidden only under html[data-intro] (src/themes/introFlag.ts), so the server HTML shows it to a
+ * visitor with no JavaScript or under reduced motion. */
+:global(html[data-intro]) .popCard {
   opacity: 0;
   transform: translate3d(0, 18px, 0) scale(0.92);
 }
@@ -296,10 +298,14 @@
   }
 }
 
-/* The message window opens from its top edge in six steps, as the game's text box does. */
+/* The message window opens from its top edge in six steps, as the game's text box does; hidden before
+ * that only under html[data-intro], like .popCard. */
 .unfold {
-  opacity: 0;
   transform-origin: 50% 0;
+}
+
+:global(html[data-intro]) .unfold {
+  opacity: 0;
 }
 
 [data-hit='true'] .unfold {
@@ -951,6 +957,11 @@
   .popCard,
   .unfold {
     animation: none !important;
+  }
+
+  /* Reduced motion asked for after the entrance was marked: the pieces stand at rest, shown. */
+  :global(html[data-intro]) .popCard,
+  :global(html[data-intro]) .unfold {
     opacity: 1;
     transform: none;
   }
