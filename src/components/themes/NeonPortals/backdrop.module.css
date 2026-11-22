@@ -1,7 +1,8 @@
 /*
  * The night behind the page (backdrop.tsx): the sky, the stars, the sea and one layer per era, crossfaded
- * by the root's data-zone. An era's own element plays a few times as its era comes in, then holds still;
- * the stars and the swell play once on arrival. Transforms and opacity only; nothing loops (BD29).
+ * by the root's data-zone. An era's own element plays a few times the first time its era comes in, then
+ * holds still: once the page leaves an era, the backdrop marks it data-played and its element never plays
+ * again, so scrolling back shows it at rest (BD29). The stars and the swell play once on arrival. Transforms and opacity only; nothing loops (BD29).
  *
  * Animated: the stars (one class), the swell, the crossfade, the beacon, the flames, the motes, the
  * banners, the ring, the weed, the lamps, the lava.
@@ -69,39 +70,45 @@
   opacity: 1;
 }
 
-.world[data-zone='hub'] .beacon {
+.world[data-zone='hub'] [data-era='hub']:not([data-played]) .beacon {
   animation: pulse 1.4s ease-in-out 3;
 }
 
-.world[data-zone='medieval'] .flame {
+.world[data-zone='medieval'] [data-era='medieval']:not([data-played]) .flame {
   transform-origin: 50% 100%;
   animation: flicker 0.45s ease-in-out 8;
 }
 
-.world[data-zone='tomb'] .mote {
+/* A mote rests where its drift ends, so the tomb shows the same after its one play. */
+.mote {
+  opacity: 0.6;
+  transform: translate(30px, -70px);
+}
+
+.world[data-zone='tomb'] [data-era='tomb']:not([data-played]) .mote {
   animation: drift 3.2s ease-out calc(var(--i, 0) * 0.25s) 1 both;
 }
 
-.world[data-zone='wall'] .banner {
+.world[data-zone='wall'] [data-era='wall']:not([data-played]) .banner {
   transform-origin: 0 50%;
   animation: flap 0.6s ease-in-out 6;
 }
 
-.world[data-zone='future'] .ring {
+.world[data-zone='future'] [data-era='future']:not([data-played]) .ring {
   transform-origin: center;
   animation: turn 1.8s ease-in-out 2;
 }
 
-.world[data-zone='underwater'] .weed {
+.world[data-zone='underwater'] [data-era='underwater']:not([data-played]) .weed {
   transform-origin: 50% 100%;
   animation: sway 2.2s ease-in-out calc(var(--i, 0) * 0.15s) 2;
 }
 
-.world[data-zone='arabian'] .lamp {
+.world[data-zone='arabian'] [data-era='arabian']:not([data-played]) .lamp {
   animation: pulse 0.9s ease-in-out 4;
 }
 
-.world[data-zone='prehistoric'] .lava {
+.world[data-zone='prehistoric'] [data-era='prehistoric']:not([data-played]) .lava {
   animation: pulse 1.6s ease-in-out 3;
 }
 

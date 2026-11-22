@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useZoneAttribute, type ValueStore } from '@/hooks/useZoneStage'
 import { staggerAt } from '../shared/stagger'
 import { ERA, PORTAL, type Era } from './palette'
@@ -15,7 +15,7 @@ import css from './backdrop.module.css'
 // Bands and the prehistoric rocks for Muay Thai.
 //
 // Animated: the stars twinkling and the sea's swell (once on arrival), the crossfade between two eras,
-// and the one element of each of those two eras, played once as its era comes in: the hub's beacon, the
+// and the one element of each of those two eras, played only the first time its era comes in: the hub's beacon, the
 // torch flames, the sand motes in the light shaft, the banners, the neon ring, the weed, the lamps, the
 // lava's glow. At most 5 at once, none looping (BD29).
 // Reduced motion and the preview: the eras swap with no fade and nothing moves.
@@ -193,6 +193,15 @@ const SCENERY: Record<Era, ReactNode> = {
 export function Backdrop({ zones, still }: { zones: ValueStore<Era>; still: boolean }) {
   const root = useRef<HTMLDivElement>(null)
   useZoneAttribute(zones, root)
+
+  // An era the page leaves has had its one play: marked, its element stays at rest when the page comes back.
+  useEffect(() => {
+    let shown = zones.read()
+    return zones.subscribe(() => {
+      root.current?.querySelector(`[data-era='${shown}']`)?.setAttribute('data-played', '')
+      shown = zones.read()
+    })
+  }, [zones])
 
   return (
     <div ref={root} data-zone={zones.first()} data-still={still || undefined} className={`pointer-events-none fixed inset-0 z-0 overflow-hidden ${css.world}`} aria-hidden="true">
