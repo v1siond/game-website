@@ -152,7 +152,7 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
                 </h3>
                 {project.years && <span className="whitespace-nowrap text-sm text-[color:var(--deco-sepia)]">{project.years}</span>}
               </div>
-              <p className="mt-1 text-sm font-bold text-[color:var(--deco-blood)]">{project.role}</p>
+              <p className="mt-1 text-sm font-bold text-[color:var(--deco-blood-dark)]">{project.role}</p>
               <p className="mt-2 text-sm leading-relaxed text-[color:var(--deco-abyss)]">{project.tagline}</p>
               {project.description && <p className="mt-2 text-sm leading-relaxed text-[color:var(--deco-sepia)]">{project.description}</p>}
               <MarkedLines items={project.details} label={cards.details} look={BLOOD_DIAMONDS} />
