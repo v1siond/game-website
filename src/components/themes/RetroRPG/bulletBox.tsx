@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { PIXEL, RPG } from './palette'
 import { Soul, SoulHalves } from './soul'
 import world from './world.module.css'
@@ -150,10 +151,11 @@ export function BulletBox({ profession }: { profession: Profession }) {
   useEffect(() => {
     const el = box.current
     if (!el) return
+    const { soul, pellet } = MODES[profession]
     // The layout size, not getBoundingClientRect: the wrapper's open animation scales the box, so its rect
     // is about 4 % of the box on mount. A resize (rotation, a wider window) measures again.
     const size = { w: el.offsetWidth, h: el.offsetHeight }
-    const soulAt = () => mode.soul(pointer.current ?? { x: size.w / 2, y: size.h / 2 }, size.w, size.h)
+    const soulAt = () => soul(pointer.current ?? { x: size.w / 2, y: size.h / 2 }, size.w, size.h)
     const guard = () => sideOf(pointer.current ?? { x: size.w / 2, y: 0 }, size.w, size.h)
     const drawShield = () => {
       const side = guard()
@@ -162,7 +164,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
     const drawStill = () => {
       place(heart.current, soulAt(), HEART)
       drawShield()
-      pellets.current.forEach((p, i) => place(p, mode.pellet(i, 0, size.w, size.h), PELLET))
+      pellets.current.forEach((p, i) => place(p, pellet(i, 0, size.w, size.h), PELLET))
     }
 
     const playing = inView && !reduced
@@ -210,8 +212,8 @@ export function BulletBox({ profession }: { profession: Profession }) {
             if (arrived && now > safeUntil && guard() !== i % SIDES) landed(now)
           }
         : (_i, _t, at, now) => {
-            const soul = soulAt()
-            if (now > safeUntil && Math.hypot(at.x - soul.x, at.y - soul.y) < HIT_RADIUS) landed(now)
+            const heartAt = soulAt()
+            if (now > safeUntil && Math.hypot(at.x - heartAt.x, at.y - heartAt.y) < HIT_RADIUS) landed(now)
           }
 
     // Nothing lands before the visitor plays: until a pointer or a finger is on the box, the pellets pass.
@@ -226,7 +228,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
       place(heart.current, soulAt(), HEART)
       drawShield()
       pellets.current.forEach((p, i) => {
-        const at = mode.pellet(i, t, size.w, size.h)
+        const at = pellet(i, t, size.w, size.h)
         place(p, at, PELLET)
         check(i, t, at, now)
       })
@@ -237,9 +239,9 @@ export function BulletBox({ profession }: { profession: Profession }) {
       cancelAnimationFrame(frame)
       resized.disconnect()
     }
-  }, [profession, mode, inView, reduced])
+  }, [profession, inView, reduced])
 
-  const follow = (event: React.PointerEvent<HTMLDivElement>) => {
+  const follow = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     pointer.current = { x: event.clientX - rect.left, y: event.clientY - rect.top }
   }
@@ -247,7 +249,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
   return (
     <div ref={watch} className="mx-auto mb-10 w-full" aria-hidden="true">
       {/* the open plays on the wrapper and the hit shake on the box, so a hit never restarts the open */}
-      <div key={profession} className={world.resize}>
+      <div className={world.resize}>
         <div
           ref={box}
           data-hit={hurt}
@@ -280,7 +282,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
       <div className={`mx-auto mt-3 flex w-full items-center justify-center gap-3 text-sm text-[color:var(--rpg-text)] ${PIXEL}`}>
         <span>{hud.hp}</span>
         <span className="relative h-4 w-24 bg-[color:var(--rpg-hp-back)]">
-          <span className={`absolute inset-0 origin-left bg-[color:var(--rpg-gold)] ${world.hpFill}`} style={{ '--hp': hp / MAX_HP } as React.CSSProperties} />
+          <span className={`absolute inset-0 origin-left bg-[color:var(--rpg-gold)] ${world.hpFill}`} style={cssVars({ '--hp': hp / MAX_HP })} />
         </span>
         <span className="tabular-nums">
           {hp} / {MAX_HP}
