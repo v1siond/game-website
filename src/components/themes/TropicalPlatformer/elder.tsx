@@ -9,6 +9,7 @@ import { usePlayedOut } from './playedOut'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
 import yard from './elder.module.css'
+import motion from './motion.module.css'
 
 // About in the old timer's yard. A barrel cannon at the left fires him in rolled into a ball; he lands,
 // stands and pounds his chest, and the about board unfolds under him from its top edge. At the right the
@@ -24,7 +25,7 @@ export function OldTimer() {
   return (
     <svg viewBox="0 0 100 110" className="block h-auto w-full" aria-hidden="true" focusable="false">
       <ellipse cx="52" cy="106" rx="40" ry="3.5" fill={C.shadow} opacity="0.35" />
-      <g className={yard.rock}>
+      <g className={motion.rock}>
         <path d="M8 98 Q50 112 94 96" fill="none" stroke={C.barkDark} strokeWidth="5" strokeLinecap="round" />
         <path d="M30 100 V84 M76 98 V84" stroke={C.bark} strokeWidth="4" />
         {[58, 66, 74, 82].map((x, i) => (

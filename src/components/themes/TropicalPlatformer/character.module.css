@@ -104,12 +104,6 @@
     animation: knuckle-plant 0.3s ease-in-out -0.3s infinite alternate;
   }
 
-  /* ---- roll: the spinning ball ---- */
-
-  .figure[data-pose='roll'] .ball {
-    animation: roll-spin 0.45s linear infinite;
-  }
-
   /* ---- throw: hoist the barrel, wind back, throw it, settle (once) ---- */
 
   .figure[data-pose='throw'] .body {
@@ -295,12 +289,6 @@
   }
   to {
     transform: translate(0, -5px) rotate(16deg);
-  }
-}
-
-@keyframes roll-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 

@@ -13,6 +13,7 @@ import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
 import grove from './vines.module.css'
+import motion from './motion.module.css'
 
 // The bands as a grove of hanging planks in the cave of the hoard: each band hangs from two leafy vines
 // and sways when pointed at or focused. He hangs by one hand from the vine of the band he is at, legs
@@ -40,12 +41,14 @@ interface CardProps {
   slot: BandSlot
   index: number
   here: boolean
+  // Whether the grove has scrolled in: from then on he swings in on each band he moves to.
+  entered: boolean
   // The swing count keys his swing in, so only the card he hangs from gets it; the others get 0.
   swings: number
   onSwing: (index: number) => void
 }
 
-const HangingBand = memo(function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
+const HangingBand = memo(function HangingBand({ slot, index, here, entered, swings, onSwing }: CardProps) {
   const { jungle } = useLabels()
   const { band, years, linkProps, release } = slot
 
@@ -54,7 +57,7 @@ const HangingBand = memo(function HangingBand({ slot, index, here, swings, onSwi
       <article data-here={here || undefined} className={`relative rounded-3xl p-5 ${look.board} ${grove.card}`}>
         <Vines />
         {here && (
-          <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${grove.swinger}`} aria-hidden="true">
+          <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${entered ? motion.swingIn : motion.swing}`} aria-hidden="true">
             <HeroCharacter profession="drummer" pose="swing" className="block h-auto w-full" />
           </div>
         )}
@@ -108,7 +111,7 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={`${MASONRY_ITEM} pt-6`}
-        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={index === at ? swings : 0} onSwing={swingTo} />}
+        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} entered={triggered} swings={index === at ? swings : 0} onSwing={swingTo} />}
       />
       <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}

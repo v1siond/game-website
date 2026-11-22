@@ -32,6 +32,9 @@ import run from './cannons.module.css'
 // arc itself is CSS (a linear horizontal layer over an eased vertical one). Reduced motion moves him at
 // once.
 
+// An empty barrel turns a full turn every 2.4 s, as the source's auto barrels do; still under reduced motion.
+const TURNING = 'motion-safe:animate-[spin_2.4s_linear_infinite]'
+
 const AIM_MS = 280
 const FLIGHT_MS = 820
 // How far above the higher barrel the arc peaks, in px.
@@ -106,13 +109,13 @@ const Platform = memo(function Platform({ entry, coins, index, armed, occupied, 
             onClick={onBlast}
             aria-disabled={!occupied || undefined}
             aria-label={fillLabel(jungle.blastTo, { job: nextName })}
-            className={`block w-full rounded-full ${look.focus} ${occupied ? '' : run.idle}`}
+            className={`block w-full rounded-full ${look.focus} ${occupied ? '' : TURNING}`}
           >
             {cannon}
           </button>
         )}
         {!armed && (
-          <span ref={barrelRef} className={`block ${run.idle}`} aria-hidden="true">
+          <span ref={barrelRef} className={`block ${TURNING}`} aria-hidden="true">
             {cannon}
           </span>
         )}

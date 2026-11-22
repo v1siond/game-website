@@ -265,7 +265,7 @@ function HeldBarrel() {
 // Tucked into the roll: a ball of fur with his hair, his beard and the end of the tie flying round it.
 function RollBall({ look, paints, profession }: PartProps) {
   return (
-    <g className={sprite.ball}>
+    <g className={`${sprite.ball} motion-safe:animate-[spin_0.45s_linear_infinite]`}>
       <circle cx="51.5" cy="80" r="31" fill={look.rim} opacity="0.85" />
       <circle cx="50" cy="81" r="31" fill={`url(#${paints.fur})`} />
       <path d="M50 50 C56 46 62 47 66 52 C60 52 55 53 50 56 Z" fill={look.hair} />

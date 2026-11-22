@@ -2,7 +2,7 @@
  * The old timer's yard (elder.tsx), off one data-on: the cannon recoils, he flies across rolled into a
  * ball (0 to 0.8 s, a full width layer sliding 32% of the yard over an eased arc), the ball hides and he stands at 0.8 s,
  * and the about board unfolds down from its top edge from 0.9 s. The old timer rocks all the while
- * (2.4 s), his rocker as the pivot. Transform and opacity only.
+ * (2.4 s, motion.module.css). Transform and opacity only.
  */
 
 .cannon {
@@ -79,22 +79,6 @@
   }
 }
 
-.rock {
-  transform-box: view-box;
-  transform-origin: 52px 104px;
-  animation: chair-rock 2.4s ease-in-out infinite;
-}
-
-@keyframes chair-rock {
-  0%,
-  100% {
-    transform: rotate(-4deg);
-  }
-  50% {
-    transform: rotate(4deg);
-  }
-}
-
 .bubble {
   background: var(--tp-parchment);
   border: 3px solid var(--tp-bark-dark);
@@ -135,8 +119,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .yard[data-on] .cannon,
-  .rock {
+  .yard[data-on] .cannon {
     animation: none;
   }
 

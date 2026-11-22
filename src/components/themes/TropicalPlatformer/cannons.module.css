@@ -1,6 +1,7 @@
 /*
  * The barrel run (cannons.tsx). The platforms rise in one after another when the list scrolls in
- * (data-on, staggered by --i). The empty barrels turn a full turn every 2.4 s; his barrel turns to --aim
+ * (data-on, staggered by --i). The empty barrels turn a full turn every 2.4 s (cannons.tsx, Tailwind's
+ * spin); his barrel turns to --aim
  * (0.25 s) before it fires. The flight starts at the stage point --sx, --sy: the outer layer moves --dx
  * at an even pace, the inner one climbs to --peak and falls to --dy, so together they draw the arc. The
  * platform he lands on is remounted with data-landed and bounces. Transform and opacity only.
@@ -50,16 +51,6 @@
   transform-origin: 50% 100%;
 }
 
-.idle {
-  animation: barrel-turn 2.4s linear infinite;
-}
-
-@keyframes barrel-turn {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .flyX {
   animation: fly-across 0.82s linear both;
 }
@@ -102,9 +93,5 @@
 
   .cannon {
     transition: none;
-  }
-
-  .idle {
-    animation: none;
   }
 }
