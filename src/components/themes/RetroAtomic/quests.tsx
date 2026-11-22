@@ -5,6 +5,7 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { AtomicChip, PlusRow } from './controls'
 import atomic from './atomic.module.css'
 
 // Experience as the terminal's quest log: each job an entry with its state box (the current one a
@@ -43,12 +44,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       {job.highlights.length > 0 && (
         <ul className="mt-4 space-y-1 border-t border-atomic-phosphor/30 pt-3" aria-label={cards.keyAchievements}>
           {job.highlights.map((highlight) => (
-            <li key={highlight} className={`relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`}>
-              <span className="relative" aria-hidden="true">
-                +
-              </span>
-              <span className="relative">{highlight}</span>
-            </li>
+            <PlusRow key={highlight}>{highlight}</PlusRow>
           ))}
         </ul>
       )}
@@ -56,9 +52,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
           {job.skills.map((skill) => (
-            <li key={skill} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-              {skill}
-            </li>
+            <AtomicChip key={skill}>{skill}</AtomicChip>
           ))}
         </ul>
       )}

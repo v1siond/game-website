@@ -11,6 +11,7 @@ import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
 import { DwellerSprite, type DwellerMotion } from './dweller'
+import { AtomicChip, PHOSPHOR_BUTTON, PlusRow } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 
@@ -149,16 +150,14 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
         <Part tag={cards.tech}>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.slice(0, 5).map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-                {tech}
-              </li>
+              <AtomicChip key={tech}>{tech}</AtomicChip>
             ))}
           </ul>
         </Part>
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button ref={buttonRef} type="button" onClick={fire} className={`relative min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+        <button ref={buttonRef} type="button" onClick={fire} className={PHOSPHOR_BUTTON}>
           <span className="relative">{actions.readFile}</span>
         </button>
         {links.map(({ kind, label, linkProps }) => (
@@ -217,7 +216,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
             </h3>
             <p className="mt-1 text-base text-atomic-yellow">{[project.role, years].filter(Boolean).join(' / ')}</p>
           </div>
-          <button type="button" autoFocus onClick={onClose} className={`relative min-h-[44px] shrink-0 border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+          <button type="button" autoFocus onClick={onClose} className={`${PHOSPHOR_BUTTON} shrink-0`}>
             <span className="relative">{actions.closeFile}</span>
           </button>
         </div>
@@ -228,12 +227,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
         {project.details.length > 0 && (
           <ul className="mt-5 space-y-1" aria-label={cards.keyAchievements}>
             {project.details.map((detail) => (
-              <li key={detail} className={`relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`}>
-                <span className="relative" aria-hidden="true">
-                  +
-                </span>
-                <span className="relative">{detail}</span>
-              </li>
+              <PlusRow key={detail}>{detail}</PlusRow>
             ))}
           </ul>
         )}
@@ -241,9 +235,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
         {project.techStack.length > 0 && (
           <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-                {tech}
-              </li>
+              <AtomicChip key={tech}>{tech}</AtomicChip>
             ))}
           </ul>
         )}
@@ -251,7 +243,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
         {links.length > 0 && (
           <div className="mt-5 flex flex-wrap gap-3">
             {links.map(({ kind, label, linkProps }) => (
-              <a key={kind} {...linkProps} className={`relative inline-flex min-h-[44px] items-center border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+              <a key={kind} {...linkProps} className={`${PHOSPHOR_BUTTON} inline-flex items-center`}>
                 <span className="relative">{label}</span>
               </a>
             ))}

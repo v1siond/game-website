@@ -6,7 +6,7 @@ import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
-import { ActionMenu } from './controls'
+import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { DoorArt } from './vaultDoor'
 import { atomicId } from './anchors'
@@ -171,7 +171,7 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
           {state.status === 'locked' && (
             <div className="mt-3">
               <p className="text-base font-bold uppercase tracking-widest text-atomic-red-light">{hud.terminalLocked}</p>
-              <button type="button" onClick={onReboot} className={`relative mt-2 min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+              <button type="button" onClick={onReboot} className={`${PHOSPHOR_BUTTON} mt-2`}>
                 <span className="relative">{hud.reboot}</span>
               </button>
             </div>
