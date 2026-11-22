@@ -5,6 +5,7 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Labels } from '@/lib/cv/labels'
 import { muayThaiFacts } from '@/lib/cv/sectionText'
 import { ramp } from '@/lib/scroll/stage'
+import { walkAlong } from '@/lib/scroll/walkAlong'
 import { clamp01, fadeTo, fx, lerp, r1, reached, spread, transformTo } from '../shared/stageNodes'
 import type { District } from './city'
 import { NEON } from './palette'
@@ -79,32 +80,10 @@ const NONE = (): ReactNode => null
 
 const fxs = (stage: StageNodes, name: string, count: number): Array<Element | null> => Array.from({ length: count }, (_, i) => fx(stage, `${name}-${i}`))
 
-interface Travel {
-  x: number
-  /** The prop he is at or walking from. */
-  at: number
-  /** 1 midway between props (walking), 0 at one (acting). */
-  moving: number
-  /** How far into his act he is: 0 until he reaches the first prop. */
-  act: number
-}
-
 // He comes in from this far left of the first prop as its card nears the reading line.
 const ENTRY = 200
 
-/** Where he is along the props for f, standing `offset` from each, walking between; never back. */
-function travel(xs: readonly number[], f: number, offset: number): Travel {
-  const last = xs.length - 1
-  if (f < 0.5) {
-    const entry = clamp01(f / 0.5)
-    return { x: xs[0] + offset - ENTRY * (1 - entry), at: 0, moving: Math.sin(Math.PI * entry) * Math.min(1, f * 8), act: ramp(f, 0.3, 0.5) }
-  }
-  const along = Math.min(last, f - 0.5)
-  const at = Math.floor(along)
-  const seg = along - at
-  const moving = at < last ? Math.sin(Math.PI * seg) : 0
-  return { x: lerp(xs[at], xs[Math.min(last, at + 1)], seg) + offset, at, moving, act: 1 - moving }
-}
+const travel = (xs: readonly number[], f: number, offset: number) => walkAlong(xs, f, offset, ENTRY)
 
 const merc = (x: number, pose: MercPose, k = K, y = GROUND, opacity = 1): MercState => ({ x, y, k, pose, opacity })
 
