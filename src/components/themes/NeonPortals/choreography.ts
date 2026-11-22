@@ -29,7 +29,8 @@ export interface Beat {
   name: string
   pose: Pose
   ms: number
-  /** Where he is when the beat ends (lift in % of the stage's height); the beat moves him there from where the last one ended. */
+  /** Where he is when the beat ends (lift in % of the stage's height); the beat moves him there from where
+   *  the last one ended. */
   to: Spot
 }
 
@@ -169,6 +170,17 @@ const AIM_SPAN_DEG = 150
 const AIM_OUT_DEG = 20
 
 export const aimAt = (share: number): number => (0.5 - Math.min(1, Math.max(0, share))) * AIM_SPAN_DEG - AIM_OUT_DEG
+
+const AT_ROW_CENTRE: Spot = { x: 50, lift: 0 }
+
+/** His one beat in Projects: idle in the row's middle, or pointing from there while a card is aimed at
+ *  (the aim in degrees, null for none). */
+export const pointMotion = (aim: number | null): Motion => ({
+  pose: aim === null ? 'idle' : 'point',
+  from: AT_ROW_CENTRE,
+  to: AT_ROW_CENTRE,
+  ms: 0,
+})
 
 // Ventures: he runs into the row above the cards when the section shows; pressing a venture's "Collect"
 // runs him to its gem, and once he is there the gem flies up into the tally.

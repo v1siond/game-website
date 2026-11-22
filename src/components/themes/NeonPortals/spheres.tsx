@@ -7,7 +7,7 @@ import { createValueStore, useStoreValue, useZoneStage, type ValueStore } from '
 import { cssVars } from '@/lib/cssVars'
 import type { Project } from '@/lib/cv/content'
 import { BODY, FACE, Fact, Points, Tags } from './cards'
-import { aimAt, type Motion } from './choreography'
+import { aimAt, pointMotion } from './choreography'
 import type { Era } from './palette'
 import { FigureRow, Region, Rig } from './stage'
 import css from './spheres.module.css'
@@ -25,14 +25,11 @@ import css from './spheres.module.css'
 /** The aim: his arm's turn toward the card pointed at, or null when no card is. */
 type Aim = number | null
 
-const AT_CENTRE = { x: 50, lift: 0 }
-
 function PointingFigure({ aim }: { aim: ValueStore<Aim> }) {
   const angle = useStoreValue(aim)
-  const motion: Motion = { pose: angle === null ? 'idle' : 'point', from: AT_CENTRE, to: AT_CENTRE, ms: 0 }
   return (
     <div className="absolute inset-0" style={cssVars({ '--aim': `${angle ?? 0}deg` })}>
-      <Rig motion={motion} step={0} run size="row" />
+      <Rig motion={pointMotion(angle)} step={0} run size="row" />
     </div>
   )
 }

@@ -1,8 +1,9 @@
 /*
  * The carved mask and the achievement marks (masks.tsx). The mask's track spans the strip, so a translate
  * in % is a share of the strip: each step moves it to --mask-x, --mask-lift and grows it to --mask-scale
- * over --step-ms (1 s, the same as his beat). On the last step (data-last) its glow opens behind it. Each achievement's mark lights once its
- * step is reached. Nothing loops; every state holds (BD29). Transforms and opacity only.
+ * over --step-ms (1 s, the same as his beat). On the last step (data-last) its glow opens behind it.
+ * Each achievement's mark lights once its step is reached. Nothing loops; every state holds (BD29).
+ * Transforms and opacity only.
  *
  * Animated: the mask's step, the glow, the marks (one class).
  * Reduced motion and the preview (data-still): the mask on his face, the glow open, no transition.

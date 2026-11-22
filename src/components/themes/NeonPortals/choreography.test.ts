@@ -1,5 +1,5 @@
 import { restSpot } from '@/lib/motion/course'
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskMotion, maskScene, maskSpot, maskSteps, MASK_GUARD, MASK_STEP_MS, pipAt, postAt, postX, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, pointMotion, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskMotion, maskScene, maskSpot, maskSteps, MASK_GUARD, MASK_STEP_MS, pipAt, postAt, postX, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -156,6 +156,12 @@ describe('Services: the iron box', () => {
 })
 
 describe('Projects: pointing at a sphere', () => {
+  it('stands idle in the middle of his row until a card is pointed at, then points from the same spot', () => {
+    expect(pointMotion(null)).toEqual({ pose: 'idle', from: { x: 50, lift: 0 }, to: { x: 50, lift: 0 }, ms: 0 })
+    expect(pointMotion(-20)).toEqual({ pose: 'point', from: { x: 50, lift: 0 }, to: { x: 50, lift: 0 }, ms: 0 })
+    expect(pointMotion(0).pose).toBe('point')
+  })
+
   it('turns his arm toward the card the visitor points at: across his body for the left column, out for the right', () => {
     expect(aimAt(0)).toBeGreaterThan(aimAt(0.5))
     expect(aimAt(0.5)).toBeGreaterThan(aimAt(1))
