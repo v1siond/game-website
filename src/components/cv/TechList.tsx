@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import type { CVData } from '@/lib/cv/content'
 import { fillLabel } from '@/lib/cv/labels'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -15,8 +16,9 @@ interface TechListProps {
   itemsClassName: string
   itemClassName: string
   renderItem: (tech: string) => ReactNode
-  /** A category item's own style by its place, for a world that times each category (CSS variables only). */
-  categoryStyle?: (index: number) => CSSProperties
+  /** A category item's own CSS variables by its place, for a world that times each category; the only
+   *  inline style the list writes. */
+  categoryStyle?: (index: number) => Record<`--${string}`, string | number>
 }
 
 export function TechList({ categories, headingClassName, iconClassName, itemsClassName, itemClassName, renderItem, categoryStyle }: TechListProps) {
@@ -25,7 +27,7 @@ export function TechList({ categories, headingClassName, iconClassName, itemsCla
   return (
     <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category, index) => (
-        <li key={category.id} className={MASONRY_ITEM} style={categoryStyle?.(index)}>
+        <li key={category.id} className={MASONRY_ITEM} style={categoryStyle && cssVars(categoryStyle(index))}>
           <h3 className={headingClassName}>
             <span className={iconClassName} aria-hidden="true">
               {category.icon}

@@ -30,7 +30,7 @@ import css from './techBoxes.module.css'
 type Categories = SectionsOf<'engineer'>['techStack']
 
 /** Box i's place, which its break waits on (--i times --step), for any number of categories. */
-const boxAt = (index: number) => cssVars({ '--i': index })
+const boxAt = (index: number) => ({ '--i': index })
 
 function SpinScene({ count, run, still, onDone }: { count: number; run: boolean; still: boolean; onDone: () => void }) {
   const scene = useScene(useMemo(() => techScene(count), [count]), { still, onDone })
