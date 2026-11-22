@@ -100,7 +100,7 @@ function XpBar({ read, total }: { read: number; total: number }) {
 }
 
 export function BountyBoard({ jobs }: { jobs: Job[] }) {
-  const [read, setRead] = useState<ReadonlySet<string>>(new Set())
+  const [read, setRead] = useState<ReadonlySet<string>>(() => new Set())
 
   const markRead = useCallback((id: string) => {
     setRead((current) => (current.has(id) ? current : new Set(current).add(id)))

@@ -76,7 +76,7 @@ function Mesa() {
 export function FreezeIntro({ profession, reduced }: { profession: Profession; reduced: boolean }) {
   const { hud, navigation } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.05, rootMargin: '0px' })
-  const [reached, setReached] = useState<ReadonlySet<Phase>>(new Set())
+  const [reached, setReached] = useState<ReadonlySet<Phase>>(() => new Set())
   const done = reduced || reached.has('done')
   const shown = done ? ALL_PHASES : reached
 
