@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
@@ -163,16 +164,18 @@ export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
 // on the record, his role, the years and the release.
 export function BandRecord({ band, years, linkProps }: BandSlot) {
   const labels = useLabels()
+  // The disc's sheen, one id per record so no two cards share it.
+  const sheen = useId()
   const content = (
-    <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`} tabIndex={linkProps ? undefined : -1}>
+    <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`}>
       <svg viewBox="0 0 48 48" className={`absolute -right-3 -top-3 h-14 w-14 ${styles.disc}`} aria-hidden="true" focusable="false">
         <defs>
-          <radialGradient id="hose-disc-sheen" cx="0.35" cy="0.3" r="0.8">
+          <radialGradient id={sheen} cx="0.35" cy="0.3" r="0.8">
             <stop offset="0" stopColor={HOSE.inkSoft} />
             <stop offset="1" stopColor={HOSE.ink} />
           </radialGradient>
         </defs>
-        <circle cx={24} cy={24} r={23} fill="url(#hose-disc-sheen)" />
+        <circle cx={24} cy={24} r={23} fill={`url(#${sheen})`} />
         <path d="M10 14 Q16 8 24 7" fill="none" stroke={HOSE.shadow} strokeWidth={1.4} strokeLinecap="round" />
         <circle cx={24} cy={24} r={16} fill="none" stroke={HOSE.inkSoft} strokeWidth={1} />
         <circle cx={24} cy={24} r={8} fill={HOSE.redDark} />
