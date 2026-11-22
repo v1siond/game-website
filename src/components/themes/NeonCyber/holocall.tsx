@@ -47,7 +47,7 @@ export function HoloCall({ profession }: { profession: Profession }) {
                   />
                 ))}
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-[color:var(--neon-data)] bg-[color:var(--neon-ink)]">
-                  <MercSprite profession={profession} motion={triggered ? 'scan' : 'idle'} className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
+                  <MercSprite profession={profession} motion={triggered ? 'scan' : 'still'} className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,color-mix(in_srgb,var(--neon-data)_14%,transparent)_2px_3px)]" />
                   <div className="absolute inset-0 flex flex-col">
                     {PORTRAIT_LINES.map((i) => (

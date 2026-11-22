@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { Rig } from './rigs'
 import world from './world.module.css'
 
@@ -45,6 +46,8 @@ const TEARS = [
 
 export function QuickhackMenu({ active }: { active: Profession }) {
   const { navigation, professionFields, cyber } = useLabels()
+  // The rig sits under the boot hero, so its entrance and its motions wait for it to scroll in.
+  const { ref, triggered } = useSectionTrigger()
 
   return (
     <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-6">
@@ -84,9 +87,9 @@ export function QuickhackMenu({ active }: { active: Profession }) {
         />
       </div>
 
-      <div key={active} className="relative">
+      <div key={active} ref={ref} data-on={triggered || undefined} className={`relative ${world.hackStage}`}>
         <div className={world.rigIn}>
-          <Rig profession={active} />
+          <Rig profession={active} on={triggered} />
         </div>
         {TEARS.map(({ y, h, x, color }) => (
           <span

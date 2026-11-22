@@ -465,6 +465,11 @@
   animation: fadeIn 0.2s steps(2) calc(1.4s + var(--i) * 0.9s) both;
 }
 
+.hackStage:not([data-on]) * {
+  /* The quickhack rig, its entrance and its tears wait for the menu to scroll in (quickhack.tsx). */
+  animation-play-state: paused;
+}
+
 .rigIn {
   animation: rigIn 0.36s steps(6) 0.52s both;
 }
