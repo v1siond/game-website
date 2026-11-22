@@ -7,7 +7,7 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { SectionHeader } from './cards'
+import { AboutFacts, SectionHeader } from './cards'
 import { ChaseAbout } from './chase'
 import { HangingJobs } from './ropes'
 import { FloatingCrates } from './crates'
@@ -49,6 +49,7 @@ const FRAMES: SectionFrames = {
     return (
       <Block titleKey="about">
         <ChaseAbout bio={slot.bio} />
+        <AboutFacts />
       </Block>
     )
   },

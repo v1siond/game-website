@@ -1,8 +1,9 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ventureCard } from '@/lib/cv/cvView'
 import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -88,8 +89,9 @@ function Rooftops({ light, children }: { light: SkyLight; children: ReactNode })
   )
 }
 
-export function VentureSigns({ companies }: { companies: CVData['companies'] }) {
-  const { links, cards } = useLabels()
+export function VentureSigns({ companies: entries }: { companies: CVData['companies'] }) {
+  const { links, cards, sections } = useLabels()
+  const companies = useMemo(() => entries.map(ventureCard), [entries])
   const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
 
   return (
@@ -126,6 +128,15 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
                 </h3>
                 <p className={`mt-1 ${META}`}>{company.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-text)]">{company.description}</p>
+                {company.services.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
+                    {company.services.map((service) => (
+                      <li key={service} className={`border border-[color:var(--sh-rim)] px-1.5 py-0.5 uppercase ${META}`}>
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </Sign>
             </li>
           ))}
