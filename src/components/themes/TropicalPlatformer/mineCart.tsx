@@ -86,14 +86,14 @@ export function CartLine({ stops, profession, children }: CartLineProps) {
   const [stop, setStop] = useState(0)
   const [ride, setRide] = useState({ count: 0, hops: 0 })
   const [riding, setRiding] = useState(false)
-  const [status, setStatus] = useState('')
+  const [moved, setMoved] = useState(false)
   const timer = useRef(0)
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
   const rideTo = (index: number) => {
     if (index === stop) return
-    setStatus(fillLabel(labels.jungle.cartAt, { stop: stops[index] }))
+    setMoved(true)
     setStop(index)
     if (prefersReducedMotion()) return
     setRide((current) => ({ count: current.count + 1, hops: Math.abs(index - stop) }))
@@ -103,6 +103,7 @@ export function CartLine({ stops, profession, children }: CartLineProps) {
   }
 
   if (stops.length === 0) return null
+  const status = moved ? fillLabel(labels.jungle.cartAt, { stop: stops[stop] }) : ''
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={cart.line}>

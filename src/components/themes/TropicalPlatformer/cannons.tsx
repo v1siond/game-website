@@ -162,7 +162,6 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
   const [aim, setAim] = useState<number | null>(null)
   const [flight, setFlight] = useState<Flight | null>(null)
   const [landings, setLandings] = useState<Record<number, number>>({})
-  const [status, setStatus] = useState('')
   const stage = useRef<HTMLDivElement>(null)
   const barrels = useRef<Array<HTMLElement | null>>([])
   const timers = useRef<number[]>([])
@@ -182,7 +181,6 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
     setAim(null)
     setFlight(null)
     setLandings((count) => ({ ...count, [to]: (count[to] ?? 0) + 1 }))
-    setStatus(fillLabel(labels.jungle.landedAt, { job: jobName(jobs[to], labels) }))
     focusAfterLanding.current = true
   }
 
@@ -215,6 +213,8 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   if (jobs.length === 0) return null
   const nextName = jobName(jobs[(at + 1) % jobs.length], labels)
+  // The status says where he landed last; before his first blast he has landed nowhere.
+  const status = landings[at] ? fillLabel(labels.jungle.landedAt, { job: jobName(jobs[at], labels) }) : ''
   // He starts in the first job's barrel, so its letter is found as the run opens.
   const reached = (job: number) => visited.has(job) || (triggered && job === 0)
   const found = new Set(holders.flatMap((holder, index) => (reached(holder) ? [index] : [])))

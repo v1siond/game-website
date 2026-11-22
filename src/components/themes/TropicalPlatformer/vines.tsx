@@ -93,16 +93,16 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
   const { ref, triggered } = useSectionTrigger()
   const [at, setAt] = useState(0)
   const [swings, setSwings] = useState(0)
-  const [status, setStatus] = useState('')
 
   const swingTo = (index: number) => {
     if (index === at) return
     setAt(index)
     setSwings((count) => count + 1)
-    setStatus(fillLabel(labels.jungle.swingAt, { band: bands[index].name }))
   }
 
   if (bands.length === 0) return null
+  // Each swing lands him on `at`; before the first he has swung to nothing.
+  const status = swings > 0 ? fillLabel(labels.jungle.swingAt, { band: bands[at].name }) : ''
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={grove.grove}>
