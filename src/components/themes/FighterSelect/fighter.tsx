@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, type CSSProperties, type ReactNode } from 'react'
+import { memo, useId, type CSSProperties, type ReactNode } from 'react'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { FS } from './palette'
@@ -81,8 +81,17 @@ const GEAR: Record<Profession, Omit<Costume, keyof Look>> = {
 }
 
 // The partner always spars in his gi and wraps, whatever his opponent's profession.
-const costumeOf = (who: Who, profession: Profession): Costume =>
-  who === 'partner' ? { ...LOOKS.partner, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' } : { ...LOOKS.hero, ...GEAR[profession] }
+const PARTNER: Costume = { ...LOOKS.partner, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' }
+
+// Every costume built once at module scope, so a fighter's frames get the same object on every render.
+const COSTUME: Record<Who, Record<Profession, Costume>> = {
+  hero: {
+    engineer: { ...LOOKS.hero, ...GEAR.engineer },
+    drummer: { ...LOOKS.hero, ...GEAR.drummer },
+    fighter: { ...LOOKS.hero, ...GEAR.fighter },
+  },
+  partner: { engineer: PARTNER, drummer: PARTNER, fighter: PARTNER },
+}
 
 // ---- geometry ----
 
@@ -599,10 +608,12 @@ interface FighterProps {
   onMoveEnd?: () => void
 }
 
-export function Fighter({ profession, pose, who = 'hero', take = 0, className = '', still = false, onMoveEnd }: FighterProps) {
+// Memoised: its props are plain values and a stable onMoveEnd, so a parent render that leaves them as they
+// are (a zone crossing, a beat that keeps his pose) skips the frames' geometry.
+export const Fighter = memo(function Fighter({ profession, pose, who = 'hero', take = 0, className = '', still = false, onMoveEnd }: FighterProps) {
   const clip = `fs-${useId().replace(/:/g, '')}`
   const motion = motionFor(pose, profession)
-  const costume = costumeOf(who, profession)
+  const costume = COSTUME[who][profession]
   const vars = {
     '--cycle': `${motion.cycleMs}ms`,
     '--key': motion.key,
@@ -635,4 +646,4 @@ export function Fighter({ profession, pose, who = 'hero', take = 0, className = 
       {motion.ball && <KiBall key={`${pose}-${take}`} kind={motion.ball} />}
     </svg>
   )
-}
+})
