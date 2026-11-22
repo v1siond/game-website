@@ -189,11 +189,8 @@ export function MusicianSections({
     index: number;
     take: number;
   } | null>(null);
-  const ring = (id: string) =>
-    setRinging((now) => ({
-      index: bands.findIndex((band) => band.id === id),
-      take: (now?.take ?? 0) + 1,
-    }));
+  const ring = (index: number) =>
+    setRinging((now) => ({ index, take: (now?.take ?? 0) + 1 }));
 
   return (
     <Block
@@ -211,10 +208,10 @@ export function MusicianSections({
           bands={bands}
           className={MASONRY_LIST}
           itemClassName={MASONRY_ITEM}
-          renderBand={(slot) => (
+          renderBand={(slot, index) => (
             <div
-              onPointerEnter={() => ring(slot.band.id)}
-              onFocus={() => ring(slot.band.id)}
+              onPointerEnter={() => ring(index)}
+              onFocus={() => ring(index)}
             >
               <BandCard {...slot} />
             </div>
