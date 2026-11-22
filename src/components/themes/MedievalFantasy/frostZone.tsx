@@ -4,6 +4,7 @@ import { memo, useMemo, type CSSProperties } from 'react'
 import { FrostHero } from './hero'
 import { REALM } from './palette'
 import frost from './frostZone.module.css'
+import { pulse } from './pulse'
 
 // The frost zone backdrop: snow layers, frost wind and the ice field.
 
@@ -380,9 +381,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </defs>
 
         {/* Ghostly aura around entire horse */}
-        <ellipse cx="110" cy="180" rx="100" ry="70" fill={REALM.frostIceMid} opacity="0.08" filter="url(#frostGlowHorse)">
-          <animate attributeName="opacity" values="0.05;0.12;0.05" dur="4s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse cx="110" cy="180" rx="100" ry="70" fill={REALM.frostIceMid} opacity="0.08" filter="url(#frostGlowHorse)" {...pulse(0.05, 0.12, 4)} />
 
         {/* === BACK LEGS with SMOKE === */}
         <g>
@@ -390,9 +389,9 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="160,250 150,252 148,260 158,262" fill={REALM.stone7} />
           {/* Blue smoke from back left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} opacity="0.25" className={frost.drift} style={{ '--drift-dur': '2s', '--drift-y': '-10px', '--drift-sy': 1.875 } as CSSProperties}>
-              <animate attributeName="opacity" values="0.25;0.1;0.25" dur="2s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.25" {...pulse(0.25, 0.1, 2)}>
+              <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} className={frost.drift} style={{ '--drift-dur': '2s', '--drift-y': '-10px', '--drift-sy': 1.875 } as CSSProperties} />
+            </g>
           </g>
         </g>
         <g>
@@ -400,9 +399,9 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="184,245 174,248 172,256 182,258" fill={REALM.stone7} />
           {/* Blue smoke from back right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} opacity="0.2" className={frost.drift} style={{ '--drift-dur': '2.3s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
-              <animate attributeName="opacity" values="0.2;0.08;0.2" dur="2.3s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.2" {...pulse(0.2, 0.08, 2.3)}>
+              <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} className={frost.drift} style={{ '--drift-dur': '2.3s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties} />
+            </g>
           </g>
         </g>
 
@@ -412,9 +411,9 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="34,255 44,257 46,265 36,267" fill={REALM.stone7} />
           {/* Blue smoke from front left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} opacity="0.3" className={frost.drift} style={{ '--drift-dur': '1.8s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
-              <animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.8s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.3" {...pulse(0.3, 0.1, 1.8)}>
+              <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} className={frost.drift} style={{ '--drift-dur': '1.8s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties} />
+            </g>
           </g>
         </g>
         <g>
@@ -422,9 +421,9 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="55,250 65,252 67,260 57,262" fill={REALM.stone7} />
           {/* Blue smoke from front right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} opacity="0.22" className={frost.drift} style={{ '--drift-dur': '2.1s', '--drift-y': '-13px', '--drift-sy': 2 } as CSSProperties}>
-              <animate attributeName="opacity" values="0.22;0.08;0.22" dur="2.1s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.22" {...pulse(0.22, 0.08, 2.1)}>
+              <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} className={frost.drift} style={{ '--drift-dur': '2.1s', '--drift-y': '-13px', '--drift-sy': 2 } as CSSProperties} />
+            </g>
           </g>
         </g>
 
@@ -437,9 +436,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* ARMOR PLATE */}
         <path d="M75,100 Q125,80 175,105 L168,118 Q125,100 82,118 Z" fill={REALM.night15a} />
         <path d="M85,108 Q125,95 165,110" stroke={REALM.frostIceMid} strokeWidth="2" opacity="0.3" fill="none" />
-        <circle cx="125" cy="102" r="5" fill="none" stroke={REALM.frostIceMid} strokeWidth="1.5" opacity="0.5">
-          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite" />
-        </circle>
+        <circle cx="125" cy="102" r="5" fill="none" stroke={REALM.frostIceMid} strokeWidth="1.5" opacity="0.5" {...pulse(0.3, 0.7, 3)} />
 
         {/* NECK */}
         <polygon points="50,115 25,80 10,55 30,45 50,65 65,105" fill="url(#horseBody)" />
@@ -453,27 +450,25 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
 
           {/* GLOWING EYES - intense blue */}
           <ellipse cx="0" cy="-22" rx="7" ry="5" fill={REALM.stone5a} />
-          <ellipse cx="0" cy="-22" rx="5" ry="4" fill={REALM.frostIceBright} filter="url(#frostGlowHorse)">
-            <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
-          </ellipse>
+          <ellipse cx="0" cy="-22" rx="5" ry="4" fill={REALM.frostIceBright} filter="url(#frostGlowHorse)" {...pulse(0.7, 1, 1.5)} />
           <ellipse cx="0" cy="-22" rx="2" ry="1.5" fill={REALM.ash100} opacity="0.8" />
 
           {/* BLUE SMOKE from eyes */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} opacity="0.35" className={frost.drift} style={{ '--drift-dur': '2s', '--drift-x': '10px' } as CSSProperties}>
-              <animate attributeName="opacity" values="0.35;0.1;0.35" dur="2s" repeatCount="indefinite" />
-            </ellipse>
-            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} opacity="0.2" className={frost.drift} style={{ '--drift-dur': '2.5s', '--drift-x': '13px' } as CSSProperties}>
-              <animate attributeName="opacity" values="0.2;0.05;0.2" dur="2.5s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.35" {...pulse(0.35, 0.1, 2)}>
+              <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} className={frost.drift} style={{ '--drift-dur': '2s', '--drift-x': '10px' } as CSSProperties} />
+            </g>
+            <g opacity="0.2" {...pulse(0.2, 0.05, 2.5)}>
+              <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} className={frost.drift} style={{ '--drift-dur': '2.5s', '--drift-x': '13px' } as CSSProperties} />
+            </g>
           </g>
 
           {/* BLUE SMOKE from nostrils */}
           <ellipse cx="-28" cy="-45" rx="3" ry="4" fill={REALM.stone4a} />
           <g filter="url(#smokeBlur)">
-            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} opacity="0.3" className={frost.drift} style={{ '--drift-dur': '3s', '--drift-y': '-13px' } as CSSProperties}>
-              <animate attributeName="opacity" values="0.3;0.08;0.3" dur="3s" repeatCount="indefinite" />
-            </ellipse>
+            <g opacity="0.3" {...pulse(0.3, 0.08, 3)}>
+              <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} className={frost.drift} style={{ '--drift-dur': '3s', '--drift-y': '-13px' } as CSSProperties} />
+            </g>
           </g>
 
           <polygon points="12,-35 18,-55 26,-42 18,-32" fill="url(#horseBody)" />
@@ -766,12 +761,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* Hunched ghoul silhouette */}
         <path d="M18,10 Q25,8 22,18 L20,25 Q25,30 23,40 L20,55 L15,55 L12,40 Q10,30 15,25 L13,18 Q10,8 18,10" fill={REALM.night15a} />
         {/* Glowing eyes */}
-        <ellipse cx="14" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4">
-          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="20" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4">
-          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse cx="14" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" {...pulse(0.3, 0.6, 2)} />
+        <ellipse cx="20" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" {...pulse(0.3, 0.6, 2)} />
       </svg>
 
       {/* Undead ghoul 2 - far background */}
