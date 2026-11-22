@@ -223,7 +223,8 @@
 
 .fileDropped {
   animation: file-drop 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-  animation-delay: calc(var(--i, 0) * 120ms);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation-delay: min(calc(var(--i, 0) * 120ms), 4.4s);
 }
 
 @keyframes file-drop {
@@ -239,7 +240,8 @@
 
 .cellDropped {
   animation: cell-drop 0.5s ease-out both;
-  animation-delay: calc(0.5s + var(--i, 0) * 100ms);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation-delay: calc(0.5s + min(calc(var(--i, 0) * 100ms), 4s));
 }
 
 @keyframes cell-drop {
@@ -365,7 +367,8 @@
 
 .stamped {
   animation: stamp 0.45s cubic-bezier(0.5, 0, 0.75, 0) both;
-  animation-delay: calc(0.6s + var(--i, 0) * 220ms);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation-delay: calc(0.6s + min(calc(var(--i, 0) * 220ms), 3.95s));
 }
 
 @keyframes stamp {
