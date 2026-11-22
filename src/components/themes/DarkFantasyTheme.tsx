@@ -1266,7 +1266,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
               left: p.x,
               top: p.y,
               background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: cycles(world.spiritFloat, 8 + i * 2, 'ease-in-out'),
+              animation: cycles(world.spiritFloat, 8 + i * 2, 'ease-in-out', i * -2),
               animationDelay: `${i * -2}s`,
             }}
           />
