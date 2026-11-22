@@ -103,6 +103,34 @@ const SHADOW_TIMING = '400ms ease-out'
 // Tailwind's lg breakpoint, where the fight moves from the page to the pinned layer.
 const LG_UP = '(min-width: 1024px)'
 
+// How fast the bug's legs cycle per millisecond: a scramble as it hits, a slow paddle as it floats.
+const LEG_SPEED: Record<AnimationPhase, number> = {
+  'idle': 0.006,
+  'alex-enters': 0.006,
+  'bug-appears': 0.006,
+  'bug-hits': 0.015,
+  'alex-blocks': 0.006,
+  'attack-stance': 0.003,
+  'complete': 0.006,
+}
+
+// The projects panel, dragged in from the right by the bug and settled once he blocks it.
+const CONTENT_HIDDEN: CSSProperties = { transform: 'translateX(100%)', opacity: 0 }
+const CONTENT_SETTLED: CSSProperties = {
+  transform: 'translateX(0)',
+  opacity: 1,
+  transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)'),
+}
+const CONTENT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': CONTENT_HIDDEN,
+  'alex-enters': CONTENT_HIDDEN,
+  'bug-appears': { transform: 'translateX(55%)', opacity: 0.7, transition: moveAndFade('350ms ease-out') },
+  'bug-hits': { transform: 'translateX(15%)', opacity: 0.95, transition: moveAndFade('300ms ease-out') },
+  'alex-blocks': CONTENT_SETTLED,
+  'attack-stance': CONTENT_SETTLED,
+  'complete': CONTENT_SETTLED,
+}
+
 export const BugPullReveal = memo(function BugPullReveal({
   children,
   triggered,
@@ -124,8 +152,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       if (!lastTime) lastTime = time
       const delta = time - lastTime
       lastTime = time
-      const speed = phase === 'bug-hits' ? 0.015 : phase === 'attack-stance' ? 0.003 : 0.006
-      setLegPhase(prev => (prev + delta * speed) % 1)
+      setLegPhase(prev => (prev + delta * LEG_SPEED[phase]) % 1)
       rafId = requestAnimationFrame(animate)
     }
 
@@ -174,36 +201,6 @@ export const BugPullReveal = memo(function BugPullReveal({
     opacity: bug.opacity,
     transition: bug.timing && moveAndFade(bug.timing),
     animation: isFloating ? BUG_FLOAT : undefined,
-  }
-
-  const getContentStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-      case 'alex-enters':
-        return { transform: 'translateX(100%)', opacity: 0 }
-      case 'bug-appears':
-        return {
-          transform: 'translateX(55%)',
-          opacity: 0.7,
-          transition: moveAndFade('350ms ease-out')
-        }
-      case 'bug-hits':
-        return {
-          transform: 'translateX(15%)',
-          opacity: 0.95,
-          transition: moveAndFade('300ms ease-out')
-        }
-      case 'alex-blocks':
-      case 'attack-stance':
-      case 'complete':
-        return {
-          transform: 'translateX(0)',
-          opacity: 1,
-          transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)')
-        }
-      default:
-        return { transform: 'translateX(0)', opacity: 1 }
-    }
   }
 
   const showBug = phase !== 'idle' && phase !== 'alex-enters'
@@ -284,7 +281,7 @@ export const BugPullReveal = memo(function BugPullReveal({
         </FixedCombatLayer>
       )}
 
-      <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
+      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]}>
         {children}
       </div>
     </div>

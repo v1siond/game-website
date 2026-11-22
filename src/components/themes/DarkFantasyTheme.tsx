@@ -175,6 +175,7 @@ const EtherealRain = memo(function EtherealRain() {
 })
 
 // Spirit particles - optimized: no box-shadow, fewer elements
+const SPIRIT_COLORS = [DARK_FANTASY.spiritGold, DARK_FANTASY.ethereal, DARK_FANTASY.forestGreen]
 const SpiritParticles = memo(function SpiritParticles() {
   const particles = useMemo(() =>
     Array.from({ length: 6 }, (_, i) => ({
@@ -185,7 +186,7 @@ const SpiritParticles = memo(function SpiritParticles() {
       opacity: Math.random() * 0.4 + 0.2,
       speed: Math.random() * 30 + 20,
       delay: Math.random() * -25,
-      color: i % 3 === 0 ? DARK_FANTASY.spiritGold : i % 3 === 1 ? DARK_FANTASY.ethereal : DARK_FANTASY.forestGreen,
+      color: SPIRIT_COLORS[i % SPIRIT_COLORS.length],
     })),
     []
   )

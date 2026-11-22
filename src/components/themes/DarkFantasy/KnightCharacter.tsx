@@ -290,6 +290,28 @@ const PHASE_TIMING = {
   'complete': 1300,
 }
 
+// His pose in each phase: he steps in from the right, raises, slashes and backs off to rest beside the panel.
+const KNIGHT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': { transform: 'translateX(120px)', opacity: 0 },
+  'knight-enter': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') },
+  'knight-raise': { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') },
+  'slash': { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') },
+  'content-reveal': { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') },
+  // He rests closer to the content, to its left
+  'complete': { transform: `translateX(-${REST_SHIFT_PX}px)`, opacity: 0.7, transition: moveAndFade('300ms ease-out') },
+}
+
+// The panel waits off to the right until his slash, then slides in.
+const CONTENT_HIDDEN: CSSProperties = { transform: 'translateX(100%)', opacity: 0 }
+const CONTENT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': CONTENT_HIDDEN,
+  'knight-enter': CONTENT_HIDDEN,
+  'knight-raise': CONTENT_HIDDEN,
+  'slash': CONTENT_HIDDEN,
+  'content-reveal': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') },
+  'complete': { transform: 'translateX(0)', opacity: 1 },
+}
+
 export const KnightSlashReveal = memo(function KnightSlashReveal({
   children,
   triggered,
@@ -342,47 +364,6 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
     }
   }, [triggered])
 
-  const getKnightStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { transform: 'translateX(120px)', opacity: 0 }
-      case 'knight-enter':
-        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') }
-      case 'knight-raise':
-        return { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') }
-      case 'slash':
-        return { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') }
-      case 'content-reveal':
-        return { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') }
-      case 'complete':
-        // Knight rests closer to content (more to the left)
-        return {
-          transform: `translateX(-${REST_SHIFT_PX}px)`,
-          opacity: 0.7,
-          transition: moveAndFade('300ms ease-out'),
-        }
-      default:
-        return { transform: 'translateX(120px)', opacity: 0 }
-    }
-  }
-
-  const getContentStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { transform: 'translateX(100%)', opacity: 0 }
-      case 'knight-enter':
-      case 'knight-raise':
-      case 'slash':
-        return { transform: 'translateX(100%)', opacity: 0 }
-      case 'content-reveal':
-        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') }
-      case 'complete':
-        return { transform: 'translateX(0)', opacity: 1 }
-      default:
-        return { transform: 'translateX(0)', opacity: 1 }
-    }
-  }
-
   const showKnight = phase !== 'idle'
   const isAttacking = phase === 'knight-raise' || phase === 'slash'
 
@@ -400,7 +381,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
 
       {/* COMBAT_Z.content: the transform from getContentStyle() makes this a stacking context;
           without an explicit z-index it sinks below the fixed z-[1..8] background and the fighters */}
-      <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
+      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]}>
         {children}
       </div>
 
@@ -409,7 +390,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         <div
           data-worlds-figure=""
           className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top)_-_var(--frame-inset)_-_var(--sole-drop))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
-          style={getKnightStyle()}
+          style={KNIGHT_POSES[phase]}
           aria-hidden="true"
         >
           <KnightCharacter
@@ -428,7 +409,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           <div
             data-worlds-figure=""
             className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none max-lg:hidden"
-            style={getKnightStyle()}
+            style={KNIGHT_POSES[phase]}
           >
             <KnightCharacter
               scale={SLASH_KNIGHT_SCALE}

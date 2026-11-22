@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, memo, ReactNode } from 'react'
+import { useState, useEffect, useRef, memo, type CSSProperties, type ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
@@ -113,6 +113,87 @@ const DEAD_POSE = `${DEAD_LIE} rotateZ(540deg) scale(${DEAD_SCALE})`
 // The blood pool's pulse keyframes (battle.module.css) start from the same offset.
 const DEAD_LIE_VAR = cssVars({ '--dead-lie': DEAD_LIE })
 
+// The knight's place in each phase: he walks in, dashes at the bug and holds just short of it while it dies.
+const KNIGHT_STRIKE: CSSProperties = { transform: 'translateX(140px)', opacity: 1, transition: 'transform 200ms ease-out' }
+const KNIGHT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': { transform: 'translateX(-200px)', opacity: 0 },
+  'bug-wander': { transform: 'translateX(0)', opacity: 1, transition: 'transform 500ms ease-out, opacity 300ms ease-out' },
+  'knight-dash': { transform: 'translateX(180px)', opacity: 1, transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)' },
+  'slash': KNIGHT_STRIKE,
+  'bug-hit': KNIGHT_STRIKE,
+  'bug-tremble': KNIGHT_STRIKE,
+  'bug-death': KNIGHT_STRIKE,
+  'bug-fall': KNIGHT_STRIKE,
+  'content-drop': KNIGHT_STRIKE,
+  'content-settled': KNIGHT_STRIKE,
+  // He stays closer to the content, his cloak breathing
+  'complete': { transform: 'translateX(140px)', opacity: 1 },
+}
+
+// The bug's pose in each phase, from right-[18%] on COMBAT_GROUND. The hit burst, the splatter and the death
+// burst are its children, so they follow it.
+const BUG_EASE = 'transform 200ms ease-out, opacity 200ms ease-out'
+const BUG_RECOIL: CSSProperties = {
+  transform: 'translateX(20px) translateY(-10px) rotateZ(-10deg) scale(0.95)',
+  opacity: 1,
+  transition: 'transform 100ms ease-out',
+}
+const BUG_LYING: CSSProperties = { transition: BUG_EASE, transform: DEAD_POSE, opacity: 0.55 }
+const BUG_POSES: Record<AnimationPhase, CSSProperties> = {
+  // Hidden, slightly offset
+  'idle': { transition: BUG_EASE, transform: 'translateX(-20px) translateY(-60px) rotateZ(0deg)', opacity: 0 },
+  // It enters and hovers at its base place
+  'bug-wander': {
+    transform: 'translateX(0) translateY(0) rotateZ(0deg)',
+    opacity: 1,
+    transition: moveAndFade('500ms ease-out'),
+    animation: `${battle.bugWander} 600ms ease-in-out infinite`,
+  },
+  'knight-dash': { transition: BUG_EASE, transform: 'translateX(0) translateY(0) rotateZ(0deg)', opacity: 1 },
+  'slash': BUG_RECOIL,
+  'bug-hit': BUG_RECOIL,
+  // It trembles before it explodes
+  'bug-tremble': {
+    transform: 'translateX(20px) translateY(-8px) rotateZ(-8deg) scale(0.95)',
+    opacity: 1,
+    animation: `${battle.bugTremble} 50ms ease-in-out infinite`,
+    transition: 'none',
+  },
+  // It pops up and flips as the death burst goes off
+  'bug-death': {
+    transform: 'translateX(-20px) translateY(-40px) rotateZ(180deg) scale(0.9)',
+    opacity: 0.9,
+    transition: 'transform 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+  },
+  // It tumbles to the ground like a boulder
+  'bug-fall': { transform: DEAD_POSE, opacity: 0.7, transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' },
+  'content-drop': BUG_LYING,
+  'content-settled': BUG_LYING,
+  // Dead and still, its blood dripping in DeadBugCreature
+  'complete': { transition: BUG_EASE, transform: DEAD_POSE, opacity: 0.6 },
+}
+
+// The contact section waits above the screen through the whole battle and drops in once the bug is down.
+const CONTENT_HIDDEN: CSSProperties = { transform: 'translateY(-100vh)', opacity: 0 }
+const CONTENT_DROPPING: CSSProperties = {
+  transform: 'translateY(0)',
+  opacity: 1,
+  animation: `${battle.contentDrop} 400ms cubic-bezier(0.34, 1.56, 0.64, 1)`,
+}
+const CONTENT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': CONTENT_HIDDEN,
+  'bug-wander': CONTENT_HIDDEN,
+  'knight-dash': CONTENT_HIDDEN,
+  'slash': CONTENT_HIDDEN,
+  'bug-hit': CONTENT_HIDDEN,
+  'bug-tremble': CONTENT_HIDDEN,
+  'bug-death': CONTENT_HIDDEN,
+  'bug-fall': CONTENT_HIDDEN,
+  'content-drop': CONTENT_DROPPING,
+  'content-settled': CONTENT_DROPPING,
+  'complete': { transform: 'translateY(0)', opacity: 1 },
+}
+
 export const BattleReveal = memo(function BattleReveal({
   children,
   triggered
@@ -217,167 +298,6 @@ export const BattleReveal = memo(function BattleReveal({
     }
   }, [triggered])
 
-  // Calculate positions based on phase
-  const getKnightStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return {
-          transform: 'translateX(-200px)',
-          opacity: 0
-        }
-      case 'bug-wander':
-        return {
-          transform: 'translateX(0)',
-          opacity: 1,
-          transition: 'transform 500ms ease-out, opacity 300ms ease-out'
-        }
-      case 'knight-dash':
-        return {
-          transform: 'translateX(180px)',
-          opacity: 1,
-          transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-        }
-      case 'complete':
-        // Knight stays closer to content, breathing handled by cloak
-        return {
-          transform: 'translateX(140px)',
-          opacity: 1,
-        }
-      default:
-        return {
-          transform: 'translateX(140px)',
-          opacity: 1,
-          transition: 'transform 200ms ease-out'
-        }
-    }
-  }
-
-  const getBugStyle = (): React.CSSProperties => {
-    const baseStyle = {
-      transition: 'transform 200ms ease-out, opacity 200ms ease-out',
-    }
-
-    // Bug base: right-[18%] on COMBAT_GROUND
-    // All effects (explosion, blood) are now CHILDREN of bug container,
-    // so they automatically follow the bug's position
-
-    switch (phase) {
-      case 'idle':
-        // Hidden, slightly offset
-        return {
-          ...baseStyle,
-          transform: 'translateX(-20px) translateY(-60px) rotateZ(0deg)',
-          opacity: 0
-        }
-      case 'bug-wander':
-        // Bug enters and hovers at base position
-        return {
-          ...baseStyle,
-          transform: 'translateX(0) translateY(0) rotateZ(0deg)',
-          opacity: 1,
-          transition: moveAndFade('500ms ease-out'),
-          animation: `${battle.bugWander} 600ms ease-in-out infinite`
-        }
-      case 'knight-dash':
-        return {
-          ...baseStyle,
-          transform: 'translateX(0) translateY(0) rotateZ(0deg)',
-          opacity: 1
-        }
-      case 'slash':
-      case 'bug-hit':
-        // Recoil from hit
-        return {
-          ...baseStyle,
-          transform: 'translateX(20px) translateY(-10px) rotateZ(-10deg) scale(0.95)',
-          opacity: 1,
-          transition: 'transform 100ms ease-out'
-        }
-      case 'bug-tremble':
-        // Tremble before explosion
-        return {
-          ...baseStyle,
-          transform: 'translateX(20px) translateY(-8px) rotateZ(-8deg) scale(0.95)',
-          opacity: 1,
-          animation: `${battle.bugTremble} 50ms ease-in-out infinite`,
-          transition: 'none'
-        }
-      case 'bug-death':
-        // Bug pops up and flips (explosion particles appear here)
-        return {
-          ...baseStyle,
-          transform: 'translateX(-20px) translateY(-40px) rotateZ(180deg) scale(0.9)',
-          opacity: 0.9,
-          transition: 'transform 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
-        }
-      case 'bug-fall':
-        // Bug tumbles/rolls to the RIGHT like a boulder after explosion
-        return {
-          ...baseStyle,
-          transform: DEAD_POSE,
-          opacity: 0.7,
-          transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-        }
-      case 'content-drop':
-      case 'content-settled':
-        // Dead on the ground - rolled/tumbled to the right
-        return {
-          ...baseStyle,
-          transform: DEAD_POSE,
-          opacity: 0.55,
-        }
-      case 'complete':
-        // Dead on the ground - no twitch, just static (blood drips handled in DeadBugCreature SVG)
-        return {
-          ...baseStyle,
-          transform: DEAD_POSE,
-          opacity: 0.6,
-        }
-      default:
-        return baseStyle
-    }
-  }
-
-  const getContentStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        // Content HIDDEN when not triggered (ready to drop in)
-        return {
-          transform: 'translateY(-100vh)',
-          opacity: 0
-        }
-      case 'bug-wander':
-      case 'knight-dash':
-      case 'slash':
-      case 'bug-hit':
-      case 'bug-tremble':
-      case 'bug-death':
-      case 'bug-fall':
-        // Content hidden during entire battle, drops only after bug dies
-        return {
-          transform: 'translateY(-100vh)',
-          opacity: 0
-        }
-      case 'content-drop':
-      case 'content-settled':
-        return {
-          transform: 'translateY(0)',
-          opacity: 1,
-          animation: `${battle.contentDrop} 400ms cubic-bezier(0.34, 1.56, 0.64, 1)`
-        }
-      case 'complete':
-        return {
-          transform: 'translateY(0)',
-          opacity: 1
-        }
-      default:
-        return {
-          transform: 'translateY(0)',
-          opacity: 1
-        }
-    }
-  }
-
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'
   const showContent = phase === 'content-drop' || phase === 'content-settled' || phase === 'complete'
@@ -396,7 +316,7 @@ export const BattleReveal = memo(function BattleReveal({
         {showKnight && (
           <div
             className={`absolute left-[15%] ${COMBAT_GROUND} z-20`}
-            style={getKnightStyle()}
+            style={KNIGHT_POSES[phase]}
           >
             <div className={phase === 'slash' ? battle.slashing : ''}>
               <KnightCharacter
@@ -443,7 +363,7 @@ export const BattleReveal = memo(function BattleReveal({
         {showBug && (
           <div
             className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${flags.tremble ? battle.trembling : ''}`}
-            style={getBugStyle()}
+            style={BUG_POSES[phase]}
           >
             {/* Impact Burst - centered on bug */}
             {flags.impact && (
@@ -502,7 +422,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Content - center, drops from above */}
         <div
           className={`relative ${COMBAT_Z.content}`}
-          style={getContentStyle()}
+          style={CONTENT_POSES[phase]}
         >
           {/* Drop shadow that appears as content falls */}
           {showContent && (
