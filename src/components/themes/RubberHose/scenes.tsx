@@ -94,9 +94,6 @@ export function Reveal({ children, className = '' }: { children: (look: RevealLo
   )
 }
 
-// Re-exported for the sections and the root, which take their scene pieces from this module.
-export { staggerAt } from '../shared/stagger'
-
 // A stop's place along the bar, 0 to 1, as the --at variable its flag reads.
 const stopAt = (index: number, stops: number) => cssVars({ '--at': stops > 1 ? index / (stops - 1) : 1 })
 
