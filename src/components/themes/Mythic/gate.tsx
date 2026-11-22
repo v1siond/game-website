@@ -57,7 +57,7 @@ export function LastGate({ profession }: { profession: Profession }) {
           <path d="M0 10 L400 10 L400 40 L0 40 Z" fill={MYTH.styxHigh} stroke={MYTH.inkLine} strokeWidth={3} />
         </svg>
         <div className={`absolute bottom-6 left-1/2 h-48 w-40 -translate-x-1/2 ${u.walker}`}>
-          <SpartanSprite profession={profession} motion={phase === 'through' ? 'walk' : pose} onDone={pushed} className="h-full w-full" take={take} />
+          <SpartanSprite profession={profession} motion={phase === 'through' ? 'walk' : pose} onDone={pushed} className="h-full w-full" take={take} waiting={!on} />
         </div>
       </div>
 

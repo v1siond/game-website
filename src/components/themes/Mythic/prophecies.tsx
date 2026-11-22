@@ -105,7 +105,7 @@ function Arena() {
       <svg viewBox={`0 0 ${SCENE.width} ${SCENE.height}`} className="h-64 w-full max-w-[19rem]" aria-hidden="true">
         <path d={`M0 ${SCENE.height - 6} L${SCENE.width} ${SCENE.height - 6}`} stroke={MYTH.goldDeep} strokeWidth={3} />
         <Ring strike={last ?? 'knee'} take={last ? take : 0} />
-        <SpartanSprite profession="fighter" motion={pose} place={HIM} onDone={settle} take={take} />
+        <SpartanSprite profession="fighter" motion={pose} place={HIM} onDone={settle} take={take} waiting={take === 0} />
       </svg>
       <SlabButton tone="blood" className="mt-4" onClick={strike}>
         {myth.strike}

@@ -421,8 +421,8 @@
   transform-box: view-box;
 }
 
-/* The serpent sways once in the storm and stands upright; the arena's storm (its rain is the depths'
-   .rain below) waits for the first fight (data-on, trials.tsx). */
+/* The serpent sways once in the storm and stands upright; the work arena's storm (stormStage, its rain is
+   the depths' .rain below) waits for the first fight (data-on, trials.tsx). */
 .serpent {
   transform-box: view-box;
   transform-origin: 284px 160px;
@@ -435,8 +435,8 @@
   75% { transform: rotate(3deg); }
 }
 
-.arena:not([data-on]) .serpent,
-.arena:not([data-on]) .rain {
+.stormStage:not([data-on]) .serpent,
+.stormStage:not([data-on]) .rain {
   animation-play-state: paused;
 }
 
