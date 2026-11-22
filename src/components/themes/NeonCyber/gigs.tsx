@@ -261,7 +261,7 @@ function GigCard({ project, years, links, noLink }: ProjectSlot) {
           {project.impact && <p className="mt-2 text-sm text-[color:var(--neon-hack)]">{project.impact}</p>}
           {project.techStack.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.technologiesUsed}>
-              {project.techStack.slice(0, 5).map((tech) => (
+              {project.techStack.map((tech) => (
                 <DataChip key={tech}>{tech}</DataChip>
               ))}
             </ul>

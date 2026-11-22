@@ -127,7 +127,7 @@ function JobStop({ job, order }: { job: Job; order: number }) {
         )}
         {job.skills.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-1.5">
-            {job.skills.slice(0, 5).map((skill) => (
+            {job.skills.map((skill) => (
               <li key={skill} className={TAG}>
                 {skill}
               </li>

@@ -96,7 +96,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
             ))}
           </ul>
         )}
-        {entry.skills.length > 0 && <Chips items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />}
+        {entry.skills.length > 0 && <Chips items={entry.skills} label={cards.skillsUsed} />}
       </article>
     </div>
   )

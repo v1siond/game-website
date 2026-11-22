@@ -37,7 +37,7 @@ function Chips({ items, label }: { items: string[]; label: string }) {
 
   return (
     <ul className="mt-3 flex flex-wrap gap-1" aria-label={label}>
-      {items.slice(0, 4).map((item) => (
+      {items.map((item) => (
         <li key={item} className={CHIP}>
           {item}
         </li>

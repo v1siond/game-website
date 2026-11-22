@@ -98,11 +98,15 @@ function TechBlocks({ items, colour, pressed, label }: { items: string[]; colour
   )
 }
 
-/** The message box the switch opens: the project's story, from its centre outward. */
-function MessageBox({ project, id }: { project: Project; id: string }) {
+/**
+ * The message box the switch opens: the project's story, from its centre outward. It is always in the
+ * markup, hidden until the switch is pressed, so the server HTML carries every description; leaving
+ * `display: none` restarts `.messageBox`'s open animation on each press.
+ */
+function MessageBox({ project, id, hidden }: { project: Project; id: string; hidden: boolean }) {
   const { cards } = useLabels()
   return (
-    <div id={id} className={`mt-4 rounded-sm border-4 border-double border-[color:var(--ap-ink)] bg-[color:var(--ap-ink)] p-4 text-[color:var(--ap-page)] ${map.messageBox}`}>
+    <div id={id} hidden={hidden} className={`mt-4 rounded-sm border-4 border-double border-[color:var(--ap-ink)] bg-[color:var(--ap-ink)] p-4 text-[color:var(--ap-page)] ${map.messageBox}`}>
       {project.description && <p className="text-sm">{project.description}</p>}
       {project.details.length > 0 && (
         <ul className="mt-2 space-y-1.5" aria-label={cards.details}>
@@ -147,7 +151,7 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
       {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
       <TechBlocks items={project.techStack} colour={colour} pressed={pressed || filled} label={cards.technologiesUsed} />
-      {pressed && <MessageBox project={project} id={boxId} />}
+      <MessageBox project={project} id={boxId} hidden={!pressed} />
       {main && (
         <div className="mt-4 flex flex-wrap gap-2">
           <a {...main.linkProps} className={`${LINK} bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]`}>

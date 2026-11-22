@@ -118,7 +118,7 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
           )}
           {project.techStack.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
-              {project.techStack.slice(0, 4).map((tech) => (
+              {project.techStack.map((tech) => (
                 <li key={tech} className={`px-2 py-0.5 text-sm ${camera.tech}`}>
                   {tech}
                 </li>

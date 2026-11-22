@@ -75,7 +75,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       )}
       {entry.skills.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {entry.skills.slice(0, 5).map((skill) => (
+          {entry.skills.map((skill) => (
             <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]">
               {skill}
             </span>
@@ -104,7 +104,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </p>
       )}
       <div className="mt-2 flex flex-wrap gap-1.5">
-        {project.techStack.slice(0, 4).map((tech) => (
+        {project.techStack.map((tech) => (
           <span key={tech} className="bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]">
             {tech}
           </span>

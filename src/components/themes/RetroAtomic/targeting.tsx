@@ -150,7 +150,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
       {project.techStack.length > 0 && (
         <Part tag={cards.tech}>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
-            {project.techStack.slice(0, 5).map((tech) => (
+            {project.techStack.map((tech) => (
               <AtomicChip key={tech}>{tech}</AtomicChip>
             ))}
           </ul>
