@@ -247,7 +247,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
           data-hit={hurt}
           onPointerMove={follow}
           onPointerDown={follow}
-          className={`relative mx-auto w-full cursor-none touch-none overflow-hidden ${mode.box} ${world.box} ${world.hitBox}`}
+          className={`relative mx-auto w-full cursor-none touch-pan-y overflow-hidden ${mode.box} ${world.box} ${world.hitBox}`}
         >
           {profession === 'drummer' &&
             STRING_TOPS.map((top) => <span key={top} className={`absolute inset-x-0 h-px bg-[color:var(--rpg-purple)] opacity-60 ${top}`} />)}

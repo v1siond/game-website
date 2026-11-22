@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { useRef, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
@@ -129,7 +129,7 @@ export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
     aimedAt.current = performance.now()
   }
 
-  const strike = (event: PointerEvent<HTMLElement>) => {
+  const strike = (event: MouseEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('a') || prefersReducedMotion()) return
     const line = ((performance.now() - aimedAt.current) % METER_MS) / METER_MS
     const critical = Math.abs(line - 0.5) < CRITICAL
@@ -140,7 +140,7 @@ export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
   }
 
   return (
-    <article className={`relative overflow-hidden ${world.target}`} onPointerEnter={aim} onPointerDown={strike}>
+    <article className={`relative overflow-hidden ${world.target}`} onPointerEnter={aim} onClick={strike}>
       <div ref={body} className={`p-4 sm:p-5 ${world.box}`}>
         <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
           <h3 className={`flex min-w-0 items-start gap-2 ${TITLE}`}>
