@@ -12,17 +12,30 @@
 // that exits 1 leaves it as it was. Run it again after changing a hero and commit stamp.json with the
 // previews; scripts/check-world-previews.mjs fails the build until then.
 // One headless browser on the box at a time: it refuses to start while another one runs, and closes its own.
-// Usage: node scripts/capture-world-previews.mjs [base]   (default http://localhost:4100)
+// With world ids after the base it shoots only those worlds, and focus.json and stamp.json change only their
+// lines (writeStamp(ids)), so a world stale elsewhere stays named by the check; with none it shoots them all.
+// Usage: node scripts/capture-world-previews.mjs [base] [id ...]   (default http://localhost:4100, every world)
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 import { readWorlds, writeStamp } from './check-world-previews.mjs'
 
-const BASE = process.argv[2] ?? 'http://localhost:4100'
+const [BASE = 'http://localhost:4100', ...ONLY] = process.argv.slice(2)
 const OUT = fileURLToPath(new URL('../public/world-previews/', import.meta.url))
 const PORTRAITS = join(OUT, 'portraits')
+const FOCUS = join(OUT, 'focus.json')
+
+/** The worlds this run shoots: the ids it was given, in registry order, or every world. */
+const worldsToShoot = () => {
+  const worlds = readWorlds()
+  if (ONLY.length === 0) return worlds
+  return worlds.filter(({ id }) => ONLY.includes(id))
+}
+
+/** focus.json as it stands, which a run over some worlds keeps for the others. */
+const readFocus = () => (existsSync(FOCUS) ? JSON.parse(readFileSync(FOCUS, 'utf8')) : {})
 
 // The heroes run their entrance reveals in their first seconds; the shot waits for them to end.
 const SETTLE_MS = 4500
@@ -350,23 +363,30 @@ async function main() {
     console.error('A headless browser is already running on this box; wait for it to end, then run the capture again.')
     return 1
   }
+  const worlds = worldsToShoot()
+  const unknown = ONLY.filter((id) => !worlds.some((world) => world.id === id))
+  if (unknown.length > 0) {
+    console.error(`no such world: ${unknown.join(', ')}`)
+    return 1
+  }
   mkdirSync(PORTRAITS, { recursive: true })
   const browser = await chromium.launch()
   try {
     const encoder = await browser.newPage()
-    const focus = {}
+    const focus = ONLY.length === 0 ? {} : readFocus()
     const missing = []
     const stillless = []
-    for (const { id } of readWorlds()) {
+    for (const { id } of worlds) {
       console.log(`capturing ${id}`)
       const result = await captureWorld(browser, encoder, id)
+      delete focus[id]
       if (Object.keys(result.focus).length > 0) focus[id] = result.focus
       if (!result.portrait) missing.push(id)
       if (result.noStill.length > 0) stillless.push(`${id} (${result.noStill.join(' and ')})`)
     }
-    writeFileSync(join(OUT, 'focus.json'), `${JSON.stringify(focus, null, 2)}\n`)
+    writeFileSync(FOCUS, `${JSON.stringify(focus, null, 2)}\n`)
     if (missing.length === 0 && stillless.length === 0) {
-      writeStamp()
+      writeStamp(ONLY.length === 0 ? undefined : ONLY)
       console.log(`done: ${OUT}`)
       return 0
     }
