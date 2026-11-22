@@ -1,7 +1,8 @@
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
+import type { VentureSlot } from '@/components/cv/VentureList'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -130,17 +131,11 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
 
 // A venture as a vintage advertisement, the whole poster its link. One of his own products (featured)
 // is a wider poster with an inked roundel over the name, the way a 1930s bill shouts its headliner.
-export function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
+  const { cards } = useLabels()
 
   return (
-    <a
-      href={company.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-    >
+    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (

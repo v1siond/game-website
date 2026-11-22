@@ -2,6 +2,7 @@
 
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
+import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
@@ -164,13 +165,13 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <section aria-labelledby={HEADING.ventures}>
             <CurlBanner id={HEADING.ventures}>{titles.ventures}</CurlBanner>
             <StageCurtains on={on} profession="engineer">
-              <ul className="grid gap-4 md:grid-cols-6">
-                {sections.companies.map((company) => (
-                  <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
-                    <CompanyPoster company={company} />
-                  </li>
-                ))}
-              </ul>
+              <VentureList
+                companies={sections.companies}
+                className="grid gap-4 md:grid-cols-6"
+                itemClassName="md:col-span-2"
+                featuredItemClassName="md:col-span-3"
+                renderVenture={(slot) => <CompanyPoster {...slot} />}
+              />
             </StageCurtains>
           </section>
         )}
