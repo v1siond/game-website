@@ -336,6 +336,7 @@ export const ARENA = {
   brass: '#ffd36b',
   brassEdge: '#a87a1a',
   stand: '#c9c2e0',
+  throne: '#1a0a2e',
   stick: '#f5deb3',
   crowd: '#06020d',
   cyan: '#55f2ff',

@@ -27,6 +27,9 @@ const glyphs = (seed: number): string => {
 
 const tabletsAt = (count: number): number[] => spread(count, 520, 1080)
 
+// A tablet's height on the wall: over the door's arch in the middle, down to his torch's reach at the sides.
+const tabletY = (x: number): number => 350 + 150 * Math.min(1, Math.abs(x - 800) / 300)
+
 const carryPose = (xs: readonly number[], p: number, f: number): Partial<Pose> => {
   const x = walkOn(lerp(xs[0] - 40, xs[xs.length - 1] + 30, clamp01(f / Math.max(1, xs.length))), p)
   return { x, y: 905, scale: 1.2, ...gaitAt(x, 1.2, 0.7), shF: 150, elF: 20, head: -4 }
@@ -37,7 +40,7 @@ export const tomb: Era = {
     const xs = tabletsAt(count)
     const tablets = xs
       .map(
-        (x, i) => `<g transform="translate(${r1(x)} 330)">
+        (x, i) => `<g transform="translate(${r1(x)} ${r1(tabletY(x))})">
     <g data-fx="tglow-${i}" opacity="0">${defs(radial(`tc-g-${i}`, [[0, TOMB.glyph, 0.8], [1, TOMB.glyph, 0]]))}<circle cy="-40" r="80" fill="url(#tc-g-${i})"/></g>
     <rect x="-28" y="-86" width="56" height="92" rx="6" fill="${TOMB.tablet}" stroke="${TOMB.goldDim}" stroke-width="3"/>
     <g data-fx="glyph-${i}" stroke="${TOMB.glyph}" fill="none" stroke-width="3" opacity="0.2">${glyphs(40 + i)}</g></g>`,
