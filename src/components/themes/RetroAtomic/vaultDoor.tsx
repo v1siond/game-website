@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { usePreview } from '@/themes/PreviewContext'
 import { BRASS, INK, SHELTER_YELLOW, STEEL, STEEL_EDGE, STEEL_LIGHT, WARNING_RED, CHROME, RUBBER } from './palette'
 import atomic from './atomic.module.css'
 
@@ -15,8 +14,8 @@ import atomic from './atomic.module.css'
 //   roll     1300 ms  it rolls aside on its track, turning as it goes (1100 ms, ease in out)
 //   enter    2350 ms  the light from the opening floods the screen and the wall falls away past the camera
 //   done     2850 ms  the overlay is gone; the wrist terminal boots
-// A click, a key or the skip button jumps to done, so a recruiter is never held. Reduced motion and the
-// World Select preview start at done. It plays once per visit of the world.
+// A click, a key or the skip button jumps to done, so a recruiter is never held. Reduced motion starts at
+// done. It plays once per visit of the world.
 
 type DoorPhase = 'sealed' | 'unbolt' | 'pull' | 'roll' | 'enter' | 'done'
 
@@ -118,11 +117,10 @@ interface VaultEntranceProps {
 
 export function VaultEntrance({ onOpened }: VaultEntranceProps) {
   const { hud } = useLabels()
-  const preview = usePreview()
-  const [phase, setPhase] = useState<DoorPhase>(preview ? 'done' : 'sealed')
+  const [phase, setPhase] = useState<DoorPhase>('sealed')
   const opened = useRef(false)
 
-  // The door's one way out, whichever way it got there (the last timer, a key, a click, the preview): it
+  // The door's one way out, whichever way it got there (the last timer, a key, a click): it
   // drops the door and reports done exactly once.
   const finish = useCallback(() => {
     setPhase('done')
@@ -132,10 +130,6 @@ export function VaultEntrance({ onOpened }: VaultEntranceProps) {
   }, [onOpened])
 
   useEffect(() => {
-    if (preview) {
-      finish()
-      return
-    }
     const timers = PHASES.map(([next, at]) => window.setTimeout(() => setPhase(next), at))
     timers.push(window.setTimeout(finish, OPEN_AT_MS))
     window.addEventListener('keydown', finish)
@@ -143,7 +137,7 @@ export function VaultEntrance({ onOpened }: VaultEntranceProps) {
       timers.forEach((timer) => window.clearTimeout(timer))
       window.removeEventListener('keydown', finish)
     }
-  }, [preview, finish])
+  }, [finish])
 
   if (phase === 'done') return null
 

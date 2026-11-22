@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
-import { usePreview } from '@/themes/PreviewContext'
 import { FS } from './palette'
 import wreck from './wreck.module.css'
 
@@ -10,8 +9,7 @@ import wreck from './wreck.module.css'
 // once and rolls off fading (700 ms); the summary jolts down and back in steps as it lands (240 ms at
 // 300 ms). Pattern: mounted on the wreck, keyed on the take the wreck beat played in (CarSmash works it
 // out, every beat bumps the take), so a replay of the bout throws it again and the win beat after it does not, and unmounted on its own animationend. The summary is never hidden. CarSmash passes wrecked as
-// false under reduced motion and a World Select preview leaves it out, so neither shows the wheel or the
-// jolt. Transforms and opacity only (wreck.module.css).
+// false under reduced motion, so it shows neither the wheel nor the jolt. Transforms and opacity only (wreck.module.css).
 
 function Wheel({ onDone }: { onDone: () => void }) {
   return (
@@ -28,13 +26,12 @@ function Wheel({ onDone }: { onDone: () => void }) {
 }
 
 export function WheelStrike({ wrecked, take, children }: { wrecked: boolean; take: number; children: ReactNode }) {
-  const preview = usePreview()
   const [landed, setLanded] = useState(-1)
-  const flying = wrecked && !preview && landed !== take
+  const flying = wrecked && landed !== take
 
   return (
     <div className="relative">
-      <div key={`summary-${take}`} className={wrecked && !preview ? wreck.jolt : ''}>
+      <div key={`summary-${take}`} className={wrecked ? wreck.jolt : ''}>
         {children}
       </div>
       {flying && <Wheel key={`wheel-${take}`} onDone={() => setLanded(take)} />}

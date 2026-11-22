@@ -14,8 +14,8 @@ import upper from './uppercut.module.css'
 //   rise   600 to 1360 ms  the uppercut; at 760 ms the burst flashes at his fist and the hidden cards are
 //                          launched up into place together (420 ms)
 //   leave  1360 to 1660 ms he lands in his stance and fades
-// Then he unmounts and the cards rest exactly as they did without him. Reduced motion and a World Select
-// preview show the cards in place with no fighter. Transforms and opacity only (uppercut.module.css).
+// Then he unmounts and the cards rest exactly as they did without him. Reduced motion shows the cards in
+// place with no fighter. Transforms and opacity only (uppercut.module.css).
 
 type Beat = 'walk' | 'rise' | 'leave'
 

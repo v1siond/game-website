@@ -13,8 +13,8 @@ import jack from './jackin.module.css'
 //   jack   700 to 1400 ms  the hack pose, cable out; the panel boots from its top line at 760 ms with
 //                          two flickers and is whole at 1160 ms
 //   leave  1400 to 1800 ms he hops off up and right and fades
-// Then he unmounts and the panel rests exactly as it did without him. Reduced motion and a World Select
-// preview show the panel in place with no figure. Transforms and opacity only (jackin.module.css).
+// Then he unmounts and the panel rests exactly as it did without him. Reduced motion shows the panel in
+// place with no figure. Transforms and opacity only (jackin.module.css).
 
 type Beat = 'land' | 'jack' | 'leave'
 
