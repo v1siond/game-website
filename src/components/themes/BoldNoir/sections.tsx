@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -9,8 +10,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import type { Project } from '@/lib/cv/content'
 import { HitStar } from './backdrop'
 import { BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
 import { AllOutAttack } from './allOut'
@@ -23,6 +23,7 @@ import world from './world.module.css'
 // item's own entrance off it, staggered by --i (the speech box wobble, the rank flip and year stamp, the
 // result slide over the red line, the hit slam). The long lists are masonry. Two sections the detective
 // works on himself (./evidence): he slaps the about statement down and stamps the services as a closed case.
+// The shared plan picks which sections a profession shows and in which order.
 
 const LEAD = `text-base text-[color:var(--noir-paper-dim)] ${world.copy}`
 
@@ -72,7 +73,7 @@ function About({ bio }: { bio: string }) {
   )
 }
 
-function Projects({ projects }: { projects: SectionsOf<'engineer'>['projects'] }) {
+function Projects({ projects }: { projects: Project[] }) {
   const [opened, setOpened] = useState<{ slot: ProjectSlot; trigger: HTMLElement } | null>(null)
   const { sections } = useLabels()
 
@@ -89,112 +90,114 @@ function Projects({ projects }: { projects: SectionsOf<'engineer'>['projects'] }
   )
 }
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const titles = useLabels().sections
+// The uneven red line of the victory screen, drawn behind the band panels, in a 600 by 40 box.
+const TRAIL = 'M0 22 L70 14 L120 26 L190 8 L260 24 L330 12 L380 30 L450 10 L520 22 L600 6 L600 18 L520 34 L450 22 L380 42 L330 24 L260 36 L190 20 L120 38 L70 26 L0 34 Z'
 
-  return (
-    <>
-      <About bio={professionalSummary.bio} />
-
-      {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience}>
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return <About bio={slot.bio} />
+  },
+  work: function WorkFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]}>
+        <ul className={MASONRY_LIST}>
+          {slot.jobs.map((entry, index) => (
+            <li key={entry.id} className={MASONRY_ITEM}>
+              <RankCard entry={entry} index={index} />
+            </li>
+          ))}
+        </ul>
+      </Stage>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Section title={titles[slot.titleKey]}>
+        <TechStackBoard categories={slot.categories} />
+      </Section>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Section title={titles[slot.titleKey]}>
+        <StampedCase>
           <ul className={MASONRY_LIST}>
-            {sections.jobs.map((entry, index) => (
-              <li key={entry.id} className={MASONRY_ITEM}>
-                <RankCard entry={entry} index={index} />
+            {slot.services.map((service) => (
+              <li key={service.id} className={MASONRY_ITEM}>
+                <ServiceSlab service={service} />
               </li>
             ))}
           </ul>
-        </Stage>
-      )}
-
-      <Section title={titles.techStack}>
-        <TechStackBoard categories={sections.techStack} />
+        </StampedCase>
       </Section>
-
-      {sections.services.length > 0 && (
-        <Section title={titles.services}>
-          <StampedCase>
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={MASONRY_ITEM}>
-                  <ServiceSlab service={service} />
-                </li>
-              ))}
-            </ul>
-          </StampedCase>
-        </Section>
-      )}
-
-      <Projects projects={sections.projects} />
-
-      <Section title={titles.ventures}>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return <Projects projects={slot.projects} />
+  },
+  ventures: function VenturesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Section title={titles[slot.titleKey]}>
         <ul className="grid gap-8 md:grid-cols-6">
-          {sections.companies.map((company) => (
+          {slot.companies.map((company) => (
             <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
               <CompanyTag company={company} />
             </li>
           ))}
         </ul>
       </Section>
-    </>
-  )
-}
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const labels = useLabels()
+    const { musician, bands } = slot
 
-// The uneven red line of the victory screen, drawn behind the band panels, in a 600 by 40 box.
-const TRAIL = 'M0 22 L70 14 L120 26 L190 8 L260 24 L330 12 L380 30 L450 10 L520 22 L600 6 L600 18 L520 34 L450 22 L380 42 L330 24 L260 36 L190 20 L120 38 L70 26 L0 34 Z'
+    return (
+      <Stage title={labels.sections[slot.titleKey]}>
+        <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
+        <div className="relative">
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none" className={`pointer-events-none absolute inset-x-0 top-10 h-16 w-full ${world.trail}`} aria-hidden="true" focusable="false">
+            <path d={TRAIL} fill={NOIR.red} />
+          </svg>
+          <BandList bands={bands} className={`relative ${MASONRY_LIST}`} itemClassName={MASONRY_ITEM} renderBand={(panel, index) => <BandPanel slot={panel} index={index} />} />
+        </div>
+        <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
+      </Stage>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const { martialArts } = slot
+    const titles = useLabels().sections
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const labels = useLabels()
-  const { musician, bands } = sections
-
-  return (
-    <Stage title={labels.sections.bands}>
-      <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
-      <div className="relative">
-        <svg viewBox="0 0 600 40" preserveAspectRatio="none" className={`pointer-events-none absolute inset-x-0 top-10 h-16 w-full ${world.trail}`} aria-hidden="true" focusable="false">
-          <path d={TRAIL} fill={NOIR.red} />
-        </svg>
-        <BandList bands={bands} className={`relative ${MASONRY_LIST}`} itemClassName={MASONRY_ITEM} renderBand={(slot, index) => <BandPanel slot={slot} index={index} />} />
-      </div>
-      <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
-    </Stage>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-  const labels = useLabels()
-
-  return (
-    <Stage title={labels.sections.muayThai}>
-      <h3 className="mb-5 text-3xl tracking-wide">{martialArts.primary.title}</h3>
-      <MuayThaiRecord
-        martialArts={martialArts}
-        classNames={{
-          facts: `mb-8 grid gap-4 sm:grid-cols-2 ${world.copy}`,
-          fact: `p-5 ${world.slab}`,
-          term: 'text-sm font-bold uppercase tracking-widest text-[color:var(--noir-fog)]',
-          value: 'mt-1 text-sm text-[color:var(--noir-paper)]',
-          achievements: `space-y-4 ${world.copy}`,
-          achievement: 'text-base text-[color:var(--noir-paper)]',
-        }}
-        renderAchievement={(achievement, index) => (
-          <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': index } as CSSProperties}>
-            <span className={`relative block h-12 w-12 flex-shrink-0 ${world.burst}`} aria-hidden="true">
-              <HitStar className={`h-full w-full ${world.burstHover}`} />
+    return (
+      <Stage title={titles[slot.titleKey]}>
+        <h3 className="mb-5 text-3xl tracking-wide">{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: `mb-8 grid gap-4 sm:grid-cols-2 ${world.copy}`,
+            fact: `p-5 ${world.slab}`,
+            term: 'text-sm font-bold uppercase tracking-widest text-[color:var(--noir-fog)]',
+            value: 'mt-1 text-sm text-[color:var(--noir-paper)]',
+            achievements: `space-y-4 ${world.copy}`,
+            achievement: 'text-base text-[color:var(--noir-paper)]',
+          }}
+          renderAchievement={(achievement, index) => (
+            <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': index } as CSSProperties}>
+              <span className={`relative block h-12 w-12 flex-shrink-0 ${world.burst}`} aria-hidden="true">
+                <HitStar className={`h-full w-full ${world.burstHover}`} />
+              </span>
+              <span className={`block flex-1 px-4 py-3 ${world.slab} ${world.hit}`}>{achievement}</span>
             </span>
-            <span className={`block flex-1 px-4 py-3 ${world.slab} ${world.hit}`}>{achievement}</span>
-          </span>
-        )}
-      />
-    </Stage>
-  )
+          )}
+        />
+      </Stage>
+    )
+  },
 }
 
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)
