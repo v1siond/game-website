@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
@@ -25,7 +25,8 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { drumsSince, headingId, jobYears, newTabName } from '@/lib/cv/sectionText'
+import { drumsSince, headingId, newTabName } from '@/lib/cv/sectionText'
+import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -963,19 +964,21 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
   )
 })
 
-// Project card - his role, the years, the result and the links
-const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
-  const { cards } = useLabels()
+// Project card: every field of the project's card, and the links with their names from the slot.
+const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } }: { slot: ProjectSlot }) {
+  const labels = useLabels()
+  const { cards } = labels
+  const project = projectCard(entry, labels)
   return (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
-        border: `1px solid ${project.featured ? DARK_FANTASY.spiritGold : DARK_FANTASY.stoneDark}`,
+        border: `1px solid ${entry.featured ? DARK_FANTASY.spiritGold : DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
     >
-      {project.featured && (
+      {entry.featured && (
         <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DARK_FANTASY.spiritGold }}>
           <span aria-hidden="true">* </span>{cards.featured}
         </span>
@@ -985,23 +988,28 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
       </h3>
       <p className="text-sm mt-1" style={{ color: DARK_FANTASY.ethereal }}>
         {project.role}
-        {years && <span aria-hidden="true"> | </span>}
-        {years}
+        {project.years && <span aria-hidden="true"> | </span>}
+        {project.years}
       </p>
       <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>{project.tagline}</p>
+      {project.description && <p className="text-sm mt-2 text-[color:var(--df-silver-text)]">{project.description}</p>}
+      {project.details.length > 0 && (
+        <ul className="space-y-1 mt-2" aria-label={cards.details}>
+          {project.details.map((detail) => (
+            <li key={detail} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
+              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+              {detail}
+            </li>
+          ))}
+        </ul>
+      )}
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">{cards.impact}: </span>{project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1 mt-3" role="list" aria-label={cards.technologiesUsed}>
-        {project.techStack.map((tech) => (
-          <span key={tech} role="listitem" className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silverText }}>
-            {tech}
-          </span>
-        ))}
-      </div>
+      <TagList label={cards.technologiesUsed} tags={project.techStack} className="mt-3" />
       {links.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -1022,8 +1030,9 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
 // Company card
 // His own products (featured) take the first row two to a row, a wider card with a gold plaque over
 // the name; the other ventures follow three to a row.
-const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVData['companies'][number] }) {
+  const { links, cards, sections } = useLabels()
+  const company = ventureCard(entry)
   return (
     <a
       href={company.url}
@@ -1052,6 +1061,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
         </div>
       </div>
       <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
+      {company.services.length > 0 && <TagList label={sections.services} tags={company.services} className="mt-3" />}
     </a>
   )
 })
@@ -1094,30 +1104,44 @@ const BandCard = memo(function BandCard({ band, years, linkProps, release }: Ban
   )
 })
 
-// Work experience card. Dates are date only strings (UTC midnight), so the year is read in UTC: a
-// January start keeps its own year west of UTC.
+// A row of tags in the soul light, the look the project cards give their technologies (the ethereal at alpha
+// 0x12, 18 of 255).
+function TagList({ label, tags, className = '' }: { label: string; tags: string[]; className?: string }) {
+  return (
+    <ul className={`flex flex-wrap gap-1 ${className}`} aria-label={label}>
+      {tags.map((tag) => (
+        <li key={tag} className="text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]">
+          {tag}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// Work experience card: every field of the job's card, the years in the label ("2019 to 2022").
 const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
   const { years, cards } = useLabels()
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, years.present)
+  const job = jobCard(entry, years)
 
   return (
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div className="min-w-0">
-          <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}><SlashBreaks text={entry.company} /></p>
+          <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{job.title}</h3>
+          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}><SlashBreaks text={job.company} /></p>
+          {job.location && <p className="text-sm text-[color:var(--df-silver-text)]">{job.location}</p>}
         </div>
         <span
           className="text-sm"
           style={{ color: DARK_FANTASY.spiritGold }}
         >
-          <time>{startDisplay}</time> - <time>{endDisplay}</time>
+          {job.years}
         </span>
       </div>
-      {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
+      {job.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{job.description}</p>}
+      {job.highlights.length > 0 && (
         <ul className="space-y-1" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight) => (
+          {job.highlights.map((highlight) => (
             <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
               <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
               {highlight}
@@ -1125,6 +1149,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
           ))}
         </ul>
       )}
+      {job.skills.length > 0 && <TagList label={cards.skillsUsed} tags={job.skills} className="mt-3" />}
       {!isLast && (
         <div
           className="mt-4"
@@ -1538,11 +1563,24 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 // sections a profession shows and in which order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections } = useLabels()
+    const { sections, cards } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <>
         <FramedSection title={sections[slot.titleKey]}>
           <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
+          {highlights.length > 0 && (
+            <ul className="max-w-prose mx-auto mt-4 space-y-1" aria-label={cards.keyAchievements}>
+              {highlights.map((highlight) => (
+                <li key={highlight} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
+                  <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+                  {highlight}
+                </li>
+              ))}
+            </ul>
+          )}
+          {education && <p className="max-w-prose mx-auto mt-4 text-sm text-[color:var(--df-silver-text)]">{education}</p>}
+          {languages && <p className="max-w-prose mx-auto mt-1 text-sm text-[color:var(--df-silver-text)]">{languages}</p>}
         </FramedSection>
 
         {/* Art Section 1 - Spirits and Gears */}
