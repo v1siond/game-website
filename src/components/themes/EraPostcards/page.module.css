@@ -306,6 +306,19 @@
   gap: 26px;
 }
 
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.techList > ul {
+  columns: 1;
+}
+
 .grid {
   display: grid;
   gap: 22px;
@@ -328,6 +341,11 @@
   box-shadow:
     0 24px 60px -30px rgb(0 0 0 / 0.9),
     inset 0 0 0 6px color-mix(in srgb, var(--era-card) 70%, black);
+}
+
+.techList > ul > li {
+  margin-bottom: 22px;
+  break-inside: avoid;
 }
 
 .cardTitle {
@@ -526,6 +544,11 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .techList > ul {
+    columns: 2;
+    column-gap: 22px;
+  }
+
   .grid .cardTitle {
     padding-right: 0;
     font-size: 1.9rem;
@@ -555,10 +578,15 @@
     padding: 88px 16px 7svh;
   }
 
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
   .wardrobe {
-    right: 16px;
-    bottom: auto;
-    top: 96px;
+    position: static;
+    margin-top: 24px;
   }
 
   .era {
@@ -576,6 +604,10 @@
 
   .card {
     padding: 20px 18px;
+  }
+
+  .stone {
+    padding-left: 52px;
   }
 
   .cardTitle {
@@ -603,6 +635,11 @@
 
 .still .head {
   min-height: 100svh;
+}
+
+/* The ledger follows the scroll engine, which does not run here. */
+.still .ledgerText {
+  display: none;
 }
 
 .still .beacon {

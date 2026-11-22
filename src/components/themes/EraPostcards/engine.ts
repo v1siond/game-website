@@ -121,6 +121,6 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
     [mark],
   )
 
-  const mainRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw })
+  const mainRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   return { theatreRef, mainRef, placeRef, countRef }
 }

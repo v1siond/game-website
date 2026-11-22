@@ -53,7 +53,7 @@ function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
   const { cards, years } = useLabels()
   return (
     <div data-era-items="list">
-      <ul className={css.grid}>
+      <ul className={css.stack}>
         {slot.jobs.map((job) => {
           const card = jobCard(job, years)
           return (
@@ -110,7 +110,7 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
     <div data-era-items="list">
       <ProjectList
         projects={slot.projects}
-        className={css.grid}
+        className={css.stack}
         itemClassName={css.card}
         renderProject={({ project, years, links, noLink }) => (
           <>
@@ -149,7 +149,7 @@ function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
     <div data-era-items="list">
       <VentureList
         companies={slot.companies}
-        className={css.grid}
+        className={css.stack}
         itemClassName={css.card}
         featuredItemClassName={`${css.card} ${css.featured}`}
         renderVenture={({ venture, linkProps, nameFor }) => (
@@ -191,7 +191,7 @@ function BandCards({ slot }: { slot: SlotOf<'bands'> }) {
       <div data-era-items="list">
         <BandList
           bands={slot.bands}
-          className={css.grid}
+          className={css.stack}
           itemClassName={css.card}
           renderBand={({ band, years: span, linkProps, nameFor, release }) => (
             <>

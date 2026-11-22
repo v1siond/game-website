@@ -3,7 +3,7 @@
 import { useLayoutEffect, useMemo, useRef, type Ref } from 'react'
 import { cssVars } from '@/lib/cssVars'
 import { layerTransform } from '@/lib/scroll/stage'
-import { LAYERS } from './eras/era'
+import { LAYERS, type Layer } from './eras/era'
 import { LAYER_MOTION, lookVars, type Scene } from './scenes'
 import css from './eras.module.css'
 
@@ -15,8 +15,15 @@ import css from './eras.module.css'
 /** The progress a settled stage is drawn at: the middle of its scene, its picture at rest. */
 const SETTLED_PROGRESS = 0.5
 
+// React 19 sets innerHTML again whenever the dangerouslySetInnerHTML object is a new one, which would swap
+// out the nodes the engine has bound; so each layer's object is built once per scene and kept.
+const htmlOf = (scene: Scene): Record<Layer, { __html: string }> => {
+  const layers = scene.era.build(scene.input)
+  return Object.fromEntries(LAYERS.map((name) => [name, { __html: layers[name] }])) as Record<Layer, { __html: string }>
+}
+
 export function Stage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  const layers = useMemo(() => scene.era.build(scene.input), [scene])
+  const html = useMemo(() => htmlOf(scene), [scene])
   const ref = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
@@ -31,7 +38,7 @@ export function Stage({ scene, settled = false }: { scene: Scene; settled?: bool
   return (
     <div ref={ref} data-stage={scene.id} className={settled ? css.settled : css.stage} style={cssVars(lookVars(scene.look))} aria-hidden="true">
       {LAYERS.map((name) => (
-        <div key={name} data-layer={name} className={css.layer} dangerouslySetInnerHTML={{ __html: layers[name] }} />
+        <div key={name} data-layer={name} className={css.layer} dangerouslySetInnerHTML={html[name]} />
       ))}
       <div data-veil="" className={css.veil} />
     </div>
