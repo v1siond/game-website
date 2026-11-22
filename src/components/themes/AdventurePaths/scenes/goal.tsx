@@ -18,9 +18,9 @@ const CASTLE_SCALE = 4
 const DOOR_X = CASTLE_X + 32 * CASTLE_SCALE
 const FLAG_TOP = POLE_TOP + 20
 const BURSTS: ReadonlyArray<readonly [number, number, number]> = [
-  [CASTLE_X + 60, 200, 0.82],
-  [CASTLE_X + 200, 150, 0.88],
-  [CASTLE_X + 120, 90, 0.94],
+  [CASTLE_X + 40, 420, 0.82],
+  [CASTLE_X + 230, 360, 0.88],
+  [CASTLE_X + 130, 300, 0.94],
 ]
 
 type Beat = { x: number; y: number; pose: string; left?: boolean; seen?: number }

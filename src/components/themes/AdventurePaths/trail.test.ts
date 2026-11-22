@@ -24,7 +24,7 @@ describe('expedition trail geometry', () => {
     const dots = dotsAlong(straight, 20)
     expect(dots).toHaveLength(9)
     expect(dots[0].x).toBeCloseTo(20, 0)
-    expect(dots[dots.length - 1].at).toBeCloseTo(0.9, 2)
+    expect(dots[dots.length - 1].x).toBeCloseTo(180, 0)
   })
 
   it('refuses a trail of one stop', () => {

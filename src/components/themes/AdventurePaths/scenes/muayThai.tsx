@@ -1,7 +1,7 @@
 import { ramp } from '@/lib/scroll/stage'
 import { clamp01, fadeTo, frames, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Canvas, FoeRig, GROUND, HeroRig, PX, TileGround, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
+import { Canvas, FoeRig, GROUND, HeroRig, PX, TileGround, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
 import { beatOf, type Level } from './level'
 import { GoldBlock } from './pieces'
 
