@@ -75,12 +75,6 @@
   box-shadow: inset 0 0 24px color-mix(in srgb, var(--sh-void) 70%, transparent);
 }
 
-/* One focus ring for every control in the world: the lamp flame. */
-.focus:focus-visible {
-  outline: 2px solid var(--sh-flame);
-  outline-offset: 2px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .grain {
     animation: none;

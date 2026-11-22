@@ -69,7 +69,7 @@ function ItemSlot({ option, onTake }: { option: ProfessionOption; onTake: () => 
       type="button"
       {...option.optionProps}
       onClick={onTake}
-      className={`relative flex min-h-[44px] min-w-0 flex-col items-center justify-center gap-2 border-2 p-2 ${look.slot} ${look.focus} ${slot.frame}`}
+      className={`relative flex min-h-[44px] min-w-0 flex-col items-center justify-center gap-2 border-2 p-2 ${look.slot} ${slot.frame}`}
     >
       {CORNER_MARKS.map((place) => (
         <span key={place} className={`absolute h-3 w-3 ${place} ${slot.corner}`} aria-hidden="true" />

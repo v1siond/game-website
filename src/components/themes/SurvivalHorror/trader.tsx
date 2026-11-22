@@ -29,7 +29,7 @@ function Ware({ company }: { company: Company }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
-      className={`relative block p-4 ${look.file} ${look.focus} ${horror.ware}`}
+      className={`relative block p-4 ${look.file} ${horror.ware}`}
     >
       <span className="absolute -top-2 left-1/2 h-4 w-1 -translate-x-1/2 bg-[color:var(--sh-brass)]" aria-hidden="true" />
       {company.featured && (

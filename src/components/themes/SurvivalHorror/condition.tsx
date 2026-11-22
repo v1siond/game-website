@@ -48,7 +48,7 @@ function HerbSlot({ herb, label, used, waiting, onUse }: { herb: Herb; label: st
       onClick={use}
       aria-disabled={spent}
       title={waiting ? words.herbHint : undefined}
-      className={`relative flex min-h-[44px] items-center gap-3 border-2 p-2 pr-4 text-sm ${look.slot} ${look.focus} ${used ? 'border-[color:var(--sh-wood)] opacity-60' : 'border-[color:var(--sh-brass)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)]'} aria-disabled:cursor-default`}
+      className={`relative flex min-h-[44px] items-center gap-3 border-2 p-2 pr-4 text-sm ${look.slot} ${used ? 'border-[color:var(--sh-wood)] opacity-60' : 'border-[color:var(--sh-brass)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)]'} aria-disabled:cursor-default`}
     >
       {CORNER_MARKS.map((place) => (
         <span key={place} className={`absolute h-2.5 w-2.5 border-[color:var(--sh-brass)] ${place}`} aria-hidden="true" />
