@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { PIXEL, RPG } from './palette'
 import { Soul, SoulHalves } from './soul'
 import world from './world.module.css'
@@ -18,9 +19,10 @@ import world from './world.module.css'
 // - Martial Artist, the green shield mode: the heart stays in the middle, a green shield turns to the side
 //   the pointer is on, and strikes fly in from the four sides; one that reaches an unguarded side hits.
 //
-// A hit costs 4 of 20 HP: the box shakes and the heart flickers for its invincible second. At 0 HP the
-// heart splits in two, then the HP refills and the turn goes on. The HP line under the box shows the bar
-// with its number.
+// The turn plays once the visitor does: until the pointer or a finger first reaches the box, the heart
+// waits in the middle and no attack lands. A hit costs 4 of 20 HP: the box shakes and the heart flickers
+// for its invincible second. At 0 HP the heart splits in two, then the HP refills and the turn goes on.
+// The HP line under the box shows the bar with its number.
 //
 // Pattern: one requestAnimationFrame loop, only while the box is on screen, writes --x, --y and --r on
 // the pellets, the heart and the shield (transform only, no React render per frame). Pellet positions
@@ -149,19 +151,31 @@ export function BulletBox({ profession }: { profession: Profession }) {
   useEffect(() => {
     const el = box.current
     if (!el) return
-    const { width: w, height: h } = el.getBoundingClientRect()
-    pointer.current = { x: w / 2, y: h / 2 }
-    const soulAt = () => mode.soul(pointer.current ?? { x: w / 2, y: h / 2 }, w, h)
-    const guard = () => sideOf(pointer.current ?? { x: w / 2, y: 0 }, w, h)
+    const { soul, pellet } = MODES[profession]
+    // The layout size, not getBoundingClientRect: the wrapper's open animation scales the box, so its rect
+    // is about 4 % of the box on mount. A resize (rotation, a wider window) measures again.
+    const size = { w: el.offsetWidth, h: el.offsetHeight }
+    const soulAt = () => soul(pointer.current ?? { x: size.w / 2, y: size.h / 2 }, size.w, size.h)
+    const guard = () => sideOf(pointer.current ?? { x: size.w / 2, y: 0 }, size.w, size.h)
     const drawShield = () => {
       const side = guard()
-      place(shield.current, SHIELD_AT[side](w, h), SHIELD_SIZE, side * 90)
+      place(shield.current, SHIELD_AT[side](size.w, size.h), SHIELD_SIZE, side * 90)
+    }
+    const drawStill = () => {
+      place(heart.current, soulAt(), HEART)
+      drawShield()
+      pellets.current.forEach((p, i) => place(p, pellet(i, 0, size.w, size.h), PELLET))
     }
 
-    place(heart.current, soulAt(), HEART)
-    drawShield()
-    pellets.current.forEach((p, i) => place(p, mode.pellet(i, 0, w, h), PELLET))
-    if (reduced || !inView) return
+    const playing = inView && !reduced
+    const resized = new ResizeObserver(() => {
+      size.w = el.offsetWidth
+      size.h = el.offsetHeight
+      if (!playing) drawStill()
+    })
+    resized.observe(el)
+    drawStill()
+    if (!playing) return () => resized.disconnect()
 
     let frame = 0
     let safeUntil = 0
@@ -189,7 +203,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
     }
 
     // The shield mode hits on arrival at an unguarded side; the other modes hit on touch.
-    const check: (i: number, t: number, at: Point, now: number) => void =
+    const lands: (i: number, t: number, at: Point, now: number) => void =
       profession === 'fighter'
         ? (i, t, _at, now) => {
             const p = strikeProgress(i, t)
@@ -198,9 +212,15 @@ export function BulletBox({ profession }: { profession: Profession }) {
             if (arrived && now > safeUntil && guard() !== i % SIDES) landed(now)
           }
         : (_i, _t, at, now) => {
-            const soul = soulAt()
-            if (now > safeUntil && Math.hypot(at.x - soul.x, at.y - soul.y) < HIT_RADIUS) landed(now)
+            const heartAt = soulAt()
+            if (now > safeUntil && Math.hypot(at.x - heartAt.x, at.y - heartAt.y) < HIT_RADIUS) landed(now)
           }
+
+    // Nothing lands before the visitor plays: until a pointer or a finger is on the box, the pellets pass.
+    const check = (i: number, t: number, at: Point, now: number) => {
+      if (!pointer.current) return
+      lands(i, t, at, now)
+    }
 
     const tick = (now: number) => {
       const t = now - start
@@ -208,56 +228,61 @@ export function BulletBox({ profession }: { profession: Profession }) {
       place(heart.current, soulAt(), HEART)
       drawShield()
       pellets.current.forEach((p, i) => {
-        const at = mode.pellet(i, t, w, h)
+        const at = pellet(i, t, size.w, size.h)
         place(p, at, PELLET)
         check(i, t, at, now)
       })
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [profession, mode, inView, reduced])
+    return () => {
+      cancelAnimationFrame(frame)
+      resized.disconnect()
+    }
+  }, [profession, inView, reduced])
 
-  const follow = (event: React.PointerEvent<HTMLDivElement>) => {
+  const follow = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     pointer.current = { x: event.clientX - rect.left, y: event.clientY - rect.top }
   }
 
   return (
     <div ref={watch} className="mx-auto mb-10 w-full" aria-hidden="true">
-      <div
-        key={profession}
-        ref={box}
-        data-hit={hurt}
-        onPointerMove={follow}
-        onPointerDown={follow}
-        className={`relative mx-auto w-full cursor-none touch-none overflow-hidden ${mode.box} ${world.box} ${world.resize} ${world.hitBox}`}
-      >
-        {profession === 'drummer' &&
-          STRING_TOPS.map((top) => <span key={top} className={`absolute inset-x-0 h-px bg-[color:var(--rpg-purple)] opacity-60 ${top}`} />)}
-        {Array.from({ length: PELLETS }, (_, i) => (
-          <span
-            key={i}
-            ref={(el) => {
-              pellets.current[i] = el
-            }}
-            className={`absolute left-0 top-0 h-2 w-2 ${mode.pelletClass} ${world.placed}`}
-          />
-        ))}
-        {profession === 'fighter' && <span ref={shield} className={`absolute left-0 top-0 h-5 w-5 border-t-4 border-[color:var(--rpg-green)] ${world.placed}`} />}
-        <div ref={heart} className={`absolute left-0 top-0 h-4 w-4 ${world.placed}`}>
-          {broken ? (
-            <SoulHalves className="h-4 w-4" color={mode.soulColor} leftClass={world.splitLeft} rightClass={world.splitRight} />
-          ) : (
-            <Soul className={`h-4 w-4 ${world.hurt}`} color={mode.soulColor} />
-          )}
+      {/* the open plays on the wrapper and the hit shake on the box, so a hit never restarts the open */}
+      <div className={world.resize}>
+        <div
+          ref={box}
+          data-hit={hurt}
+          onPointerMove={follow}
+          onPointerDown={follow}
+          className={`relative mx-auto w-full cursor-none touch-pan-y overflow-hidden ${mode.box} ${world.box} ${world.hitBox}`}
+        >
+          {profession === 'drummer' &&
+            STRING_TOPS.map((top) => <span key={top} className={`absolute inset-x-0 h-px bg-[color:var(--rpg-purple)] opacity-60 ${top}`} />)}
+          {Array.from({ length: PELLETS }, (_, i) => (
+            <span
+              key={i}
+              ref={(el) => {
+                pellets.current[i] = el
+              }}
+              className={`absolute left-0 top-0 h-2 w-2 ${mode.pelletClass} ${world.placed}`}
+            />
+          ))}
+          {profession === 'fighter' && <span ref={shield} className={`absolute left-0 top-0 h-5 w-5 border-t-4 border-[color:var(--rpg-green)] ${world.placed}`} />}
+          <div ref={heart} className={`absolute left-0 top-0 h-4 w-4 ${world.placed}`}>
+            {broken ? (
+              <SoulHalves className="h-4 w-4" color={mode.soulColor} leftClass={world.splitLeft} rightClass={world.splitRight} />
+            ) : (
+              <Soul className={`h-4 w-4 ${world.hurt}`} color={mode.soulColor} />
+            )}
+          </div>
         </div>
       </div>
 
       <div className={`mx-auto mt-3 flex w-full items-center justify-center gap-3 text-sm text-[color:var(--rpg-text)] ${PIXEL}`}>
         <span>{hud.hp}</span>
         <span className="relative h-4 w-24 bg-[color:var(--rpg-hp-back)]">
-          <span className={`absolute inset-0 origin-left bg-[color:var(--rpg-gold)] ${world.hpFill}`} style={{ '--hp': hp / MAX_HP } as React.CSSProperties} />
+          <span className={`absolute inset-0 origin-left bg-[color:var(--rpg-gold)] ${world.hpFill}`} style={cssVars({ '--hp': hp / MAX_HP })} />
         </span>
         <span className="tabular-nums">
           {hp} / {MAX_HP}
