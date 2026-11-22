@@ -179,6 +179,22 @@
   animation-name: pump;
 }
 
+/* A run scrubbed by scroll (the Work Experience path, data-scrub): the stride, the pump and the bob stand
+ * paused at the frame --scene-progress points to, six strides along the whole path, so his legs move only
+ * while the page moves. */
+[data-scrub='true'] .run .whole,
+[data-scrub='true'] .run .legBack,
+[data-scrub='true'] .run .armFront {
+  animation-play-state: paused;
+  animation-delay: calc(var(--scene-progress, 0) * -4.32s);
+}
+
+[data-scrub='true'] .run .legFront,
+[data-scrub='true'] .run .armBack {
+  animation-play-state: paused;
+  animation-delay: calc(var(--scene-progress, 0) * -4.32s - 0.36s);
+}
+
 @keyframes stride {
   0%,
   50%,

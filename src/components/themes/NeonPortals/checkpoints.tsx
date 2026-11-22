@@ -20,10 +20,11 @@ import css from './checkpoints.module.css'
 
 // Work Experience as a road through the medieval hills (research part 2 [9]): one checkpoint post per job
 // along a path he runs left to right, the current job first, as the view orders them. Scroll scrubs his
-// place along the path (useScrollScene: the shared scheduler writes --scene-progress, no render a frame);
-// post i lights halfway through its share of the path, as he passes it, stays whole and stays lit, and
-// the same moment that job's card lights the lantern hung on its corner. "Run" plays the whole path in 3 s, then scroll
-// takes over again. On a phone the strip is lower and each card carries its own small post.
+// place along the path and his stride with it (useScrollScene: the shared scheduler writes
+// --scene-progress, no render a frame, and character.module.css reads it under data-scrub). Post i lights
+// halfway through its share of the path, as he passes it, stays whole and stays lit, and at the same
+// moment that job's card lights the lantern hung on its corner. "Run" plays the whole path in 3 s, then
+// scroll takes over again. On a phone the strip is lower and each card carries its own small post.
 //
 // Animated: him, the lanterns of the posts and of the cards (one class, staggered by --t).
 // Reduced motion and the preview: the path run, him at its end, every post's and card's lantern lit.
@@ -109,7 +110,7 @@ export function CheckpointLevel({ jobs }: { jobs: Job[] }) {
 
   return (
     <Region title={sections.workExperience} stageRef={ref} on={on}>
-      <div ref={scroll.ref} className={css.path} data-running={running} style={PATH_VARS}>
+      <div ref={scroll.ref} className={css.path} data-running={running} data-scrub={!running} style={PATH_VARS}>
         <Strip size="h-40 md:h-auto md:aspect-[3/1]">
           <Road />
           {plates.map((card, index) => (
