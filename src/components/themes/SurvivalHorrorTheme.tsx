@@ -9,7 +9,6 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
-import { usePreview } from '@/themes/PreviewContext'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { SH_VARS } from './SurvivalHorror/palette'
 import { DoorProvider } from './SurvivalHorror/door'
@@ -37,7 +36,6 @@ export default function SurvivalHorrorTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const reduced = useReducedMotion()
-  const preview = usePreview()
   const rootRef = usePointerVars(!reduced)
   const { zones, stage } = useZoneStore<Zone>('hall', reduced)
   const [state] = useState(createStageState)
@@ -48,7 +46,7 @@ export default function SurvivalHorrorTheme() {
       <DoorProvider>
         <ZoneStageProvider value={stage}>
           <StageProvider value={state}>
-            <Stage zones={zones} profession={active} reduced={reduced} still={preview} />
+            <Stage zones={zones} profession={active} reduced={reduced} />
 
             <div className="relative z-10">
               <RoomWindow zone="hall">
