@@ -64,6 +64,29 @@ export const PANEL = '#121410'
 export const BUNKER = '#1b1d17'
 export const ASH = '#bcbdaa'
 
+// DOG: the shepherd at his heel, tan coat, black saddle, pale muzzle.
+export const DOG_COAT = '#c08a4e'
+export const DOG_SADDLE = '#1f1a14'
+export const DOG_MUZZLE = '#e2c08d'
+
+// WASTELAND: the hazy sky from top to horizon, the pale sun and the far ridge (journey.tsx).
+export const HAZE_TOP = '#8a9a6a'
+export const HAZE_MID = '#d9d099'
+export const HAZE_LOW = '#dec284'
+export const HAZE_SUN = '#fff0a6'
+export const FAR_RIDGE = '#a4986a'
+
+// TOWN: the dusk sky from top to horizon, the ruined blocks, the green shopfront, the cream signs, the
+// poles, the street and its lane line (journey.tsx).
+export const DUSK_TOP = '#1a1626'
+export const DUSK_MID = '#7a3a2a'
+export const DUSK_LOW = '#d8843f'
+export const RUIN = '#2a1e22'
+export const SHOP_GREEN = '#4b7a5a'
+export const SIGN_CREAM = '#e6d7a8'
+export const POLE = '#3a2a1c'
+export const STREET = '#3a2f26'
+export const STREET_LINE = '#5e5040'
 
 // The `atomic` Tailwind colour group, one entry per palette colour the page's classes and atomic.module.css paint.
 export const ATOMIC_COLORS = {
