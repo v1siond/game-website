@@ -22,11 +22,11 @@ import css from './bounceBoxes.module.css'
 // The bands on an Arabian night's stage as the game's bounce boxes (research part 2 [7], part 5 item 11):
 // one box per band, the current band first, as the view orders them. When the section shows he runs to
 // each box in turn and drums a roll of five beats on its lid with his sticks; on the fifth the lid
-// springs open and that band's card lights its frame. "Play" plays the set again. Each opened lid is a
+// springs open and that band's card jumps on the spring. "Play" plays the set again. Each opened lid is a
 // find. The cards sit under the strip, readable before, during and after.
 //
-// Animated: him, the lids (one class, each at its own --lid), the card frames (one class, same times).
-// Reduced motion and the preview: every lid open and every frame lit, him resting after the last box.
+// Animated: him, the lids (one class, each at its own --lid), the cards' jump (one class, same times).
+// Reduced motion and the preview: every lid open and the cards at rest, him resting after the last box.
 
 function BandBox() {
   return (
@@ -70,8 +70,7 @@ function SetScene({ bands, run, still, onDone, onLid }: { bands: Band[]; run: bo
 function BandCard({ slot, lid }: { slot: BandSlot; lid: number }) {
   const { band, years, linkProps, release } = slot
   return (
-    <article className={`${PANEL} ${BODY}`} style={cssVars({ '--lid': lid })}>
-      <span className={css.frame} aria-hidden="true" />
+    <article className={`${PANEL} ${BODY} ${css.card}`} style={cssVars({ '--lid': lid })}>
       <h3 className={CARD_TITLE}>
         {linkProps ? (
           <a {...linkProps} className="underline decoration-[color:var(--np-wood)] decoration-2 underline-offset-4">

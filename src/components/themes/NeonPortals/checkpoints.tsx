@@ -22,11 +22,11 @@ import css from './checkpoints.module.css'
 // along a path he runs left to right, the current job first, as the view orders them. Scroll scrubs his
 // place along the path (useScrollScene: the shared scheduler writes --scene-progress, no render a frame);
 // post i lights halfway through its share of the path, as he passes it, stays whole and stays lit, and
-// that job's card lights its frame at the same moment. "Run" plays the whole path in 3 s, then scroll
+// the same moment that job's card lights the lantern hung on its corner. "Run" plays the whole path in 3 s, then scroll
 // takes over again. On a phone the strip is lower and each card carries its own small post.
 //
-// Animated: him, the posts (one class, staggered by --t), the card frames (one class, staggered by --t).
-// Reduced motion and the preview: the path run, him at its end, every post and frame lit.
+// Animated: him, the lanterns of the posts and of the cards (one class, staggered by --t).
+// Reduced motion and the preview: the path run, him at its end, every post's and card's lantern lit.
 
 type RunMove = 'stand' | 'run'
 
@@ -36,11 +36,10 @@ const PATH_VARS = cssVars({ '--path-from': PATH.from, '--path-to': PATH.to, '--r
 
 const AT_START = { x: PATH.from, lift: 0 }
 
-/** A checkpoint post: a wooden post with its lantern, lit as he passes. */
-function PostArt({ className = '' }: { className?: string }) {
+/** The checkpoint's lantern: its roof, its dark glass and the light that comes on as he passes. */
+function Lantern() {
   return (
-    <svg viewBox="0 0 24 60" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <rect x={9} y={22} width={6} height={38} fill={PORTAL.WOOD} stroke={PORTAL.INK} strokeWidth={2} />
+    <>
       <path d="M4 14 H20 L18 26 H6 Z" fill={PORTAL.WOOD_DARK} stroke={PORTAL.INK} strokeWidth={2} strokeLinejoin="round" />
       <circle cx={12} cy={19} r={4} fill={PORTAL.BOARD} />
       <g className={css.lit}>
@@ -48,6 +47,16 @@ function PostArt({ className = '' }: { className?: string }) {
         <circle cx={12} cy={19} r={4} fill={PORTAL.LAMP} />
       </g>
       <path d="M6 10 L12 4 L18 10 Z" fill={ERA.medieval.cone} stroke={PORTAL.INK} strokeWidth={2} strokeLinejoin="round" />
+    </>
+  )
+}
+
+/** A checkpoint post: a wooden post with its lantern on top. */
+function PostArt({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 60" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+      <rect x={9} y={22} width={6} height={38} fill={PORTAL.WOOD} stroke={PORTAL.INK} strokeWidth={2} />
+      <Lantern />
     </svg>
   )
 }
@@ -66,7 +75,9 @@ function JobPlate({ card }: { card: JobCard }) {
   const { cards } = useLabels()
   return (
     <article className={`${PANEL} ${BODY} flex gap-3`}>
-      <span className={css.frame} aria-hidden="true" />
+      <svg viewBox="0 2 24 26" className="absolute -top-5 right-3 hidden h-10 w-9 overflow-visible md:block" aria-hidden="true" focusable="false">
+        <Lantern />
+      </svg>
       <PostArt className="h-14 w-6 shrink-0 md:hidden" />
       <div className="min-w-0">
         <h3 className={CARD_TITLE}>{card.title}</h3>

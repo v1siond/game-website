@@ -15,11 +15,12 @@ import css from './spheres.module.css'
 // Projects in the future city as the warp spheres of the promo art (research part 2 [39][24], part 5
 // item 6): each project framed in its own glass sphere card, one size for all, its year and stack on the
 // time trial's black board inside. He stands in the row above the grid and, when the visitor points at or
-// focuses a card, turns his arm toward it while its sphere lifts and glows. The aim lives in a small store
-// outside React state, so pointing from card to card re-renders only him, never the sixteen cards.
+// focuses a card, turns his arm toward it while its sphere lifts and a glint crosses its glass. The aim
+// lives in a small store outside React state, so pointing from card to card re-renders only him, never
+// the sixteen cards.
 //
-// Animated: him (the point), the lifted frame.
-// Reduced motion: he points with no swing and the frame lifts with no motion.
+// Animated: him (the point), the sphere's lift and glint.
+// Reduced motion: he points with no swing and the sphere lifts with no motion.
 
 /** The aim: his arm's turn toward the card pointed at, or null when no card is. */
 type Aim = number | null

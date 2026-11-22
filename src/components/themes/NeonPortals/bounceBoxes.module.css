@@ -1,12 +1,12 @@
 /*
  * The bounce boxes and the band cards (bounceBoxes.tsx). Box i stands on the stage floor at --x % and its
  * lid springs open at --lid ms once the section runs (data-run), the moment his fifth beat lands on it; a
- * spark flashes once over it. Card i's gold frame lights at the same --lid; the cards sit outside the
- * keyed scene, so a replay swaps between two identical keyframes (data-round). Every lid stays open and
- * every frame stays lit (BD29). Transforms and opacity only.
+ * spark flashes once over it. Card i jumps on that spring at the same --lid and settles back; the cards
+ * sit outside the keyed scene, so a replay swaps between two identical keyframes (data-round). Every lid
+ * stays open (BD29). Transforms and opacity only.
  *
- * Animated: the lids (one class), the sparks, the card frames (one class).
- * Reduced motion and the preview (data-still): every lid open, every frame lit, no spark.
+ * Animated: the lids (one class), the sparks, the cards' jump (one class).
+ * Reduced motion and the preview (data-still): every lid open, the cards at rest, no spark.
  */
 
 .box {
@@ -65,50 +65,45 @@
   }
 }
 
-.frame {
-  position: absolute;
-  inset: -6px;
-  border: 4px solid var(--np-gold);
-  border-radius: 12px;
-  box-shadow: 0 0 0 3px var(--np-ink);
-  pointer-events: none;
-  opacity: 0;
-}
-
-.cards[data-run='true'] .frame {
-  animation-duration: 0.3s;
+.cards[data-run='true'] .card {
+  animation-duration: 0.5s;
   animation-timing-function: ease-out;
   animation-delay: calc(var(--lid) * 1ms);
   animation-fill-mode: both;
 }
 
-.cards[data-run='true'][data-round='0'] .frame {
-  animation-name: frame-a;
+.cards[data-run='true'][data-round='0'] .card {
+  animation-name: jump-a;
 }
 
-.cards[data-run='true'][data-round='1'] .frame {
-  animation-name: frame-b;
+.cards[data-run='true'][data-round='1'] .card {
+  animation-name: jump-b;
 }
 
-@keyframes frame-a {
-  from {
-    opacity: 0;
-    transform: scale(1.04);
-  }
-  to {
-    opacity: 1;
+/* The card rides the lid's spring: up with it, a short drop past rest, then still. */
+@keyframes jump-a {
+  0%,
+  100% {
     transform: none;
   }
+  35% {
+    transform: translateY(-18px) rotate(-1.5deg);
+  }
+  70% {
+    transform: translateY(3px);
+  }
 }
 
-@keyframes frame-b {
-  from {
-    opacity: 0;
-    transform: scale(1.04);
-  }
-  to {
-    opacity: 1;
+@keyframes jump-b {
+  0%,
+  100% {
     transform: none;
+  }
+  35% {
+    transform: translateY(-18px) rotate(-1.5deg);
+  }
+  70% {
+    transform: translateY(3px);
   }
 }
 
@@ -122,9 +117,8 @@
   opacity: 0;
 }
 
-[data-still] .frame {
+[data-still] .card {
   animation: none !important;
-  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -138,8 +132,7 @@
     opacity: 0;
   }
 
-  .frame {
+  .card {
     animation: none !important;
-    opacity: 1;
   }
 }
