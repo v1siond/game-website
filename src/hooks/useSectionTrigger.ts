@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useEffectEvent, useRef, useCallback } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 
 // Whether a section is on screen, from an IntersectionObserver on the element `ref` is set on. With
@@ -55,8 +55,13 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
   // fires, force everything "triggered" so the hero renders instead of staying blank.
   const isPreview = usePreview()
 
-  // Held outside setRef's deps, so a new onEnter each render never rebuilds the observer.
-  const enter = useEffectEvent(() => onEnter?.())
+  // The latest onEnter, held in a ref so a new one each render never rebuilds the observer. A layout
+  // effect writes it before any observer callback of that commit can run. (Next 15's own React has no
+  // useEffectEvent, so this is the stable pattern it stands for.)
+  const enterRef = useRef(onEnter)
+  useLayoutEffect(() => {
+    enterRef.current = onEnter
+  })
 
   const setRef = useCallback((element: HTMLElement | null) => {
     // Cleanup previous observer
@@ -80,7 +85,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
         if (triggerOnce && !now) return
         setShown(now)
         if (triggerOnce) observerRef.current?.unobserve(element)
-        if (now && !wasShown) enter()
+        if (now && !wasShown) enterRef.current?.()
         wasShown = now
       },
       {
@@ -90,8 +95,6 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
     )
 
     observerRef.current.observe(element)
-    // `enter` is an Effect Event and never a dependency; eslint-plugin-react-hooks 5.2 predates them.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threshold, rootMargin, triggerOnce])
 
   // Cleanup on unmount
