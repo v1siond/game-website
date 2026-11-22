@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { POSTER_INK } from './palette'
 import j from './journey.module.css'
 
@@ -24,7 +25,8 @@ function Leg({ x, className }: { x: number; className: string }) {
   )
 }
 
-export function DogSprite({ motion, className = '' }: { motion: DogMotion; className?: string }) {
+// Memoised: its props are primitives, so a parent render that leaves them as they are draws nothing again.
+export const DogSprite = memo(function DogSprite({ motion, className = '' }: { motion: DogMotion; className?: string }) {
   return (
     <svg viewBox="0 0 120 80" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <g className={`${j.dog} ${MOTION_CLASS[motion]}`}>
@@ -54,4 +56,4 @@ export function DogSprite({ motion, className = '' }: { motion: DogMotion; class
       </g>
     </svg>
   )
-}
+})

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
@@ -437,8 +438,9 @@ interface DwellerProps {
   className?: string
 }
 
-/** Him as the shelter dweller of the posters, in a profession's kit, playing one motion. */
-export function DwellerSprite({ profession, motion, tone = 'poster', className = '' }: DwellerProps) {
+/** Him as the shelter dweller of the posters, in a profession's kit, playing one motion. Memoised: its props
+ *  are primitives, so a parent render that leaves them as they are draws nothing again. */
+export const DwellerSprite = memo(function DwellerSprite({ profession, motion, tone = 'poster', className = '' }: DwellerProps) {
   const inks = INKS[tone]
 
   return (
@@ -461,4 +463,4 @@ export function DwellerSprite({ profession, motion, tone = 'poster', className =
       </g>
     </svg>
   )
-}
+})
