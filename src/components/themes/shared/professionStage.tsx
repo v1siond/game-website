@@ -10,8 +10,9 @@ import { cssVars } from '@/lib/cssVars'
 import stage from './professionStage.module.css'
 import { svgNumber } from './svgNumber'
 
-// An idle loop's start offset, read by the stage's rules (professionStage.module.css) as --stage-delay, so the
-// loops of one kind run out of step.
+// An idle piece's start offset, read by the stage's rules (professionStage.module.css) as --stage-delay, so the
+// pieces of one kind start out of step; at most STAGE_SPREAD_S, so every piece ends within 5 s of the stage.
+const STAGE_SPREAD_S = 1.6
 const stageDelay = (delay: string) => cssVars({ '--stage-delay': delay })
 
 // Palette the boss-stage ornaments need (mirrors the 10 Dark Fantasy fields they reference).
@@ -150,7 +151,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   const codeCluster = (x: number, y: number, seed: number, k: string) => (
     <g key={k} aria-hidden="true">
       {[0, 1, 2].map((i) => (
-        <text key={i} x={x + (i - 1) * 24} y={y} className={stage.note} style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
+        <text key={i} x={x + (i - 1) * 24} y={y} className={stage.note} style={stageDelay(`${((seed + i * 1.3) % STAGE_SPREAD_S).toFixed(2)}s`)} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
       ))}
     </g>
   )
@@ -379,7 +380,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
           x={x + (i - 1) * 18}
           y={y}
           className={stage.note}
-          style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)}
+          style={stageDelay(`${((seed + i * 1.3) % STAGE_SPREAD_S).toFixed(2)}s`)}
           fill={i % 2 === 0 ? GLOW : RIM_H}
           fontSize="30"
           opacity="0"
@@ -637,7 +638,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const handWraps = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-120" r="4" fill={RIM} />
-      <g className={stage.sway} style={stageDelay('2s')}>
+      <g className={stage.sway} style={stageDelay('1.4s')}>
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke="url(#fgBrass)" strokeWidth="9" />
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.3" />
         <path d="M-18,-80 Q-30,-30 -14,10" fill="none" stroke={RIM} strokeWidth="6" opacity="0.6" />

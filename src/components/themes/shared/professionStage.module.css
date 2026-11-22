@@ -1,7 +1,9 @@
 /* The profession stage's idle motion, for Dark Fantasy and every world that draws the shared stage. GPU only
-   (transform and opacity). Each loop starts at its element's --stage-delay (0s unless the stage sets one), so the
-   loops of one kind run out of step. The appear and disappear effects start at opacity 0, so nothing shows until
-   its cycle begins. `transform-box: fill-box` puts each transform's origin on the glyph's own box. */
+   (transform and opacity). The stage shows with the page (and anew with each profession), so that is when its
+   motion plays: each piece once, or a set number of times, from its element's --stage-delay (0s unless the stage
+   sets one, at most 1.6s), so the pieces of one kind start out of step, and every piece has ended within 5 s and
+   holds its last frame. The appear and disappear effects start at opacity 0, so nothing shows until its cycle
+   begins, and end at opacity 0. `transform-box: fill-box` puts each transform's origin on the glyph's own box. */
 
 /* The ornaments live in the side gutters. Below 1024px there are none, so the layer hides to keep the content
    readable. */
@@ -21,10 +23,10 @@
   25%  { opacity: 0.85; }
   100% { opacity: 0; transform: translateY(-24px) scale(1.2); }
 }
-.note  { animation: noteFloat 3.4s ease-out infinite; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: center bottom; }
-.thump { animation: thump 2.4s ease-out infinite; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: center; }
+.note  { animation: noteFloat 3.4s ease-out 1 both; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: center bottom; }
+.thump { animation: thump 2.4s ease-out 1 both; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: center; }
 
-/* Muay Thai gym idle: heavy bags and gloves swing gently from their hang point */
+/* Muay Thai gym idle: heavy bags and gloves swing gently from their hang point, one swing each */
 @keyframes bagSwing {
   0%, 100% { transform: rotate(-3.2deg); }
   50%      { transform: rotate(3.2deg); }
@@ -33,10 +35,11 @@
   0%, 100% { transform: rotate(-5deg); }
   50%      { transform: rotate(5deg); }
 }
-.swing { animation: bagSwing 4.2s ease-in-out infinite; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: top center; }
-.sway  { animation: gloveSway 3.4s ease-in-out infinite; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: top center; }
+.swing { animation: bagSwing 4.2s ease-in-out 1 both; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: top center; }
+.sway  { animation: gloveSway 3.4s ease-in-out 1 both; animation-delay: var(--stage-delay, 0s); transform-box: fill-box; transform-origin: top center; }
 
-/* Engineer workstation idle: the monitors' glow flickers, the cursors and LEDs blink */
+/* Engineer workstation idle: the monitors' glow flickers once, the cursors and LEDs blink twice and stop lit
+   (2.4 cycles end inside the lit half of the third) */
 @keyframes screenFlicker {
   0%, 100% { opacity: 0.10; }
   45%      { opacity: 0.17; }
@@ -46,8 +49,8 @@
   0%, 49%   { opacity: 0.9; }
   50%, 100% { opacity: 0; }
 }
-.screen { animation: screenFlicker 3s ease-in-out infinite; }
-.cursor { animation: cursorBlink 1.1s steps(1) infinite; animation-delay: var(--stage-delay, 0s); }
+.screen { animation: screenFlicker 3s ease-in-out 1 both; }
+.cursor { animation: cursorBlink 1.1s steps(1) 2.4 both; animation-delay: var(--stage-delay, 0s); }
 
 @media (prefers-reduced-motion: reduce) {
   .note, .thump { animation: none; opacity: 0; }  /* appear and disappear effects hide */
