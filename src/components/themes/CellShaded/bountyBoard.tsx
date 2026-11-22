@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
+import { OrangePoints } from './stage'
 import cel from './cel.module.css'
 
 // Work Experience as the town's bounty board: each job a notice pinned to the planks, slapped on when it
@@ -24,7 +25,7 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
   const { reduced } = useZoneStageContext()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.4 })
   const on = triggered || reduced
-  const { start, end } = jobYears(job, years.present)
+  const card = jobCard(job, years)
 
   useEffect(() => {
     if (on) onRead(job.id)
@@ -38,30 +39,18 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
           {job.current ? navigation.active : hud.completed}
         </p>
         <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>
-          <SlashBreaks text={job.company} />
+          <SlashBreaks text={card.company} />
         </h3>
-        <p className="mt-1 text-base font-bold">{job.title}</p>
+        <p className="mt-1 text-base font-bold">{card.title}</p>
         <p className="text-sm font-bold text-[var(--cel-plank-shade)]">
-          {fillLabel(years.range, { start, end })}
-          {job.location && ` · ${job.location}`}
+          {card.years}
+          {card.location && ` · ${card.location}`}
         </p>
-        <p className="mt-3 text-base leading-relaxed">{job.description}</p>
-        {job.highlights.length > 0 && (
-          <>
-            <h4 className={`mt-4 text-base ${cel.display} [-webkit-text-stroke:0]`}>{cards.keyAchievements}</h4>
-            <ul className="mt-2 space-y-1.5">
-              {job.highlights.map((line) => (
-                <li key={line} className="flex gap-2 text-base">
-                  <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--cel-orange)]" aria-hidden="true" />
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        {job.skills.length > 0 && (
+        <p className="mt-3 text-base leading-relaxed">{card.description}</p>
+        <OrangePoints title={cards.keyAchievements} items={card.highlights} />
+        {card.skills.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-            {job.skills.map((skill) => (
+            {card.skills.map((skill) => (
               <li key={skill} className="border-2 border-[var(--cel-ink)] bg-[var(--cel-white)] px-2 py-0.5 text-sm font-bold">
                 {skill}
               </li>

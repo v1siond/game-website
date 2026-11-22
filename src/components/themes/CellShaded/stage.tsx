@@ -13,6 +13,25 @@ import cel from './cel.module.css'
 
 export const celHeadingId = (title: string) => headingId('cel', title)
 
+/** Lines marked with the orange diamond the bounty notices give a job's highlights, under their inked
+ *  heading: a job's highlights, a project's details, the About highlights. Nothing when there are none. */
+export function OrangePoints({ title, items }: { title: string; items: string[] }) {
+  if (items.length === 0) return null
+  return (
+    <>
+      <h4 className={`mt-4 text-base ${cel.display} [-webkit-text-stroke:0]`}>{title}</h4>
+      <ul className="mt-2 space-y-1.5">
+        {items.map((line) => (
+          <li key={line} className="flex gap-2 text-base">
+            <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--cel-orange)]" aria-hidden="true" />
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 export function SectionTitle({ title }: { title: string }) {
   return (
     <h2 id={celHeadingId(title)} className={`mb-8 text-3xl sm:text-4xl ${cel.display}`}>

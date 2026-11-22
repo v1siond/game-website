@@ -4,12 +4,14 @@ import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
+import { projectCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { compareStat, rarityOf, statsOf, type Rarity, type Stat, type StatKey, type Trend } from './loot'
 import { InkButton } from './buttons'
+import { OrangePoints } from './stage'
 import cel from './cel.module.css'
 
 // The projects as loot on the dusk field: each one drops in with a column of its rarity's light
@@ -84,8 +86,9 @@ interface LootCardProps {
 function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardProps) {
   const labels = useLabels()
   const { hud, cards } = labels
-  const { project, years, links } = slot
-  const rarity = rarityOf(project)
+  const { links } = slot
+  const rarity = rarityOf(slot.project)
+  const project = projectCard(slot.project, labels)
   const isEquipped = project.id === equippedId
 
   return (
@@ -105,13 +108,14 @@ function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardP
           </h3>
           <p className="mt-1 text-sm font-bold">
             {project.role}
-            {years && ` · ${years}`}
+            {project.years && ` · ${project.years}`}
           </p>
           {project.tagline && <p className="mt-2 text-base font-bold">{project.tagline}</p>}
-          <p className="mt-2 text-base leading-relaxed">{project.description}</p>
+          {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
+          <OrangePoints title={cards.details} items={project.details} />
 
           <dl className="mt-4 border-[3px] border-[var(--cel-ink)] bg-[var(--cel-white)] px-3 py-1">
-            {statsFor(project, labels).map((stat, statIndex) => (
+            {statsFor(slot.project, labels).map((stat, statIndex) => (
               <StatRow key={stat.key} stat={stat} equipped={equippedStats[statIndex].value} showCompare={!isEquipped} />
             ))}
           </dl>
