@@ -36,10 +36,6 @@ export const JungleDefs = memo(function JungleDefs() {
           <stop offset="0.65" stopColor={C.sunsetOrange} />
           <stop offset="0.9" stopColor={C.sunGold} />
         </linearGradient>
-        <linearGradient id="tp-leaf" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={C.fern} />
-          <stop offset="1" stopColor={C.moss} />
-        </linearGradient>
       </defs>
     </svg>
   )

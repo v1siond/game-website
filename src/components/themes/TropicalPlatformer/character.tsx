@@ -291,7 +291,7 @@ interface HeroCharacterProps {
 
 // Pure on primitive props, so a parent's render that changes none of them leaves him as he is.
 export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', onAnimationEnd }: HeroCharacterProps) {
-  const uid = useId().replace(/:/g, '')
+  const uid = useId()
   const look = silhouette ? SHADOW : OWN
   const paints: Paints = {
     fur: `${uid}-fur`,

@@ -308,8 +308,8 @@ const TREELINE_COPIES = [0, 400, 800, 1200, 1600, 2000]
 const WALL_SIDE = { left: 'left-0', right: 'right-0 -scale-x-100' } as const
 
 function Wall({ tile, side }: { tile: SceneArt['tile']; side: 'left' | 'right' }) {
-  // A pattern id that is safe inside url(#...): useId's own carries punctuation.
-  const id = `tp-wall-${useId().replace(/[^\w-]/g, '')}`
+  // React's ids are word characters and underscores, so they go straight into url(#...).
+  const id = `tp-wall-${useId()}`
   return (
     <svg className={`absolute inset-y-0 h-full w-[clamp(1.5rem,10vw,13rem)] ${WALL_SIDE[side]}`} aria-hidden="true" focusable="false">
       <defs>
