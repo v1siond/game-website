@@ -17,8 +17,7 @@ import u from './underworld.module.css'
 
 // Memoised: a strike re-renders the portraits, and only the card it flares needs to draw again.
 const BandCard = memo(function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; onStrike: (id: string) => void }) {
-  const { links } = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
   const strike = () => onStrike(band.id)
 
   return (
@@ -39,10 +38,10 @@ const BandCard = memo(function BandCard({ slot, flare, onStrike }: { slot: BandS
         </h3>
         <p className="mt-1 text-base">{band.role}</p>
         {years && <p className="text-sm text-[var(--myth-bone-shade)]">{years}</p>}
-        {band.release && (
+        {release && (
           <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">
-            <span className={`mr-2 text-sm not-italic text-[var(--myth-bone-shade)] ${u.display}`}>{links.released}</span>
-            {band.release}
+            <span className={`mr-2 text-sm not-italic text-[var(--myth-bone-shade)] ${u.display}`}>{release.label}</span>
+            {release.title}
           </p>
         )}
       </div>
