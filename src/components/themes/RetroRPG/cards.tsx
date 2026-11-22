@@ -7,7 +7,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { VentureSlot } from '@/components/cv/VentureList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
+import { jobCard, projectCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
@@ -46,7 +46,7 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
-function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+export function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <li className={`flex items-start gap-2 ${BODY} ${className}`} style={style}>
       <Mark />
@@ -60,11 +60,11 @@ const LINE_START_MS = 1400
 const LINE_GAP_MS = 300
 const lineDelay = (index: number) => cssVars({ '--show-delay': `${LINE_START_MS + index * LINE_GAP_MS}ms` })
 
-// Dates are date only strings (UTC midnight), so the year is read in UTC.
+// A job's box: every field of its card, the years in the label ("2019 to 2022").
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { cards, years } = useLabels()
-  const span = jobSpanCompact(entry, years)
-  const { ref, play } = usePlay(LINE_START_MS + entry.highlights.length * LINE_GAP_MS + 600)
+  const job = jobCard(entry, years)
+  const { ref, play } = usePlay(LINE_START_MS + job.highlights.length * LINE_GAP_MS + 600)
 
   return (
     // The play scope wraps the box: the box is scaled to a dot while idle, and a dot in the middle of a tall
@@ -75,18 +75,19 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           <SentryPortrait />
           <div className="min-w-0 flex-1">
             <h3 className={TITLE}>
-              <Typed delay="open">{entry.title}</Typed>
+              <Typed delay="open">{job.title}</Typed>
             </h3>
-            <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={entry.company} /></p>
+            <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={job.company} /></p>
+            {job.location && <p className={`mt-1 ${BODY} ${SHOW_AFTER.second}`}>{job.location}</p>}
           </div>
           <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
-            {span}
+            {job.years}
           </span>
         </div>
-        {entry.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{entry.description}</p>}
-        {entry.highlights.length > 0 && (
+        {job.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{job.description}</p>}
+        {job.highlights.length > 0 && (
           <ul className="space-y-2" aria-label={cards.keyAchievements}>
-            {entry.highlights.map((highlight, index) => (
+            {job.highlights.map((highlight, index) => (
               <SaidLine key={highlight} className={world.after} style={lineDelay(index)}>
                 {highlight}
               </SaidLine>
@@ -94,7 +95,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           </ul>
         )}
         <div className={SHOW_AFTER.last}>
-          <Tags items={entry.skills} label={cards.skillsUsed} />
+          <Tags items={job.skills} label={cards.skillsUsed} />
         </div>
       </article>
     </div>
@@ -118,8 +119,9 @@ const JUMP: Keyframe[] = [{ transform: 'translateY(0)' }, { transform: 'translat
 
 const stepped = (duration: number, frames: number, delay = 0): KeyframeAnimationOptions => ({ duration, delay, easing: `steps(${frames}, end)` })
 
-export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
+export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
   const labels = useLabels()
+  const project = projectCard(entry, labels)
   const aimedAt = useRef(0)
   const body = useRef<HTMLDivElement>(null)
   const slash = useRef<HTMLSpanElement>(null)
@@ -149,14 +151,25 @@ export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
               <SlashBreaks text={project.name} />
             </span>
           </h3>
-          {years && <span className={`whitespace-nowrap text-sm text-[color:var(--rpg-sky)] ${MONO}`}>{years}</span>}
+          {project.years && <span className={`whitespace-nowrap text-sm text-[color:var(--rpg-sky)] ${MONO}`}>{project.years}</span>}
         </div>
         <p className={`mb-2 ${META}`}>{project.role}</p>
         <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
+        {project.description && <p className={`mb-3 ${BODY}`}>{project.description}</p>}
+        {project.details.length > 0 && (
+          <ul className="mb-3 space-y-2" aria-label={labels.cards.details}>
+            {project.details.map((detail) => (
+              <SaidLine key={detail}>{detail}</SaidLine>
+            ))}
+          </ul>
+        )}
         {project.impact && (
           <p ref={impact} className={`flex items-start gap-2 text-sm text-[color:var(--rpg-green)] ${MONO}`}>
             <Mark />
-            {project.impact}
+            <span>
+              <span className="sr-only">{labels.cards.impact}: </span>
+              {project.impact}
+            </span>
           </p>
         )}
         <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
