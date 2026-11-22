@@ -42,15 +42,21 @@ function SlapHand() {
   )
 }
 
-function ParryStar({ parried, onParry, name }: { parried: boolean; onParry: () => void; name: string }) {
+// A parried star stays a mounted, focusable button marked aria-disabled, so keyboard focus stays on it.
+function ParryStar({ parried, onParry, label }: { parried: boolean; onParry: () => void; label: string }) {
+  const press = () => {
+    if (parried) return
+    onParry()
+  }
+
   return (
     <button
       type="button"
-      onClick={onParry}
-      disabled={parried}
+      onClick={press}
+      aria-disabled={parried}
       aria-pressed={parried}
-      aria-label={name}
-      className="absolute -left-4 -top-4 z-20 flex h-11 w-11 items-center justify-center"
+      aria-label={label}
+      className="absolute -left-4 -top-4 z-20 flex h-11 w-11 items-center justify-center aria-disabled:cursor-default"
     >
       <svg viewBox="0 0 24 24" className={`h-9 w-9 ${world.inked} ${parried ? styles.parryGone : styles.parryStar}`} aria-hidden="true" focusable="false">
         <path d="M12 1 L15 9 L23 9 L16.5 14 L19 22 L12 17 L5 22 L7.5 14 L1 9 L9 9 Z" fill={HOSE.parry} />
@@ -82,7 +88,11 @@ export function ParryBoard({ projects }: { projects: Project[] }) {
 
           return (
             <div className={`relative ${isParried ? styles.slap : ''}`}>
-              <ParryStar parried={isParried} onParry={() => parry(slot.project.id)} name={slot.project.name} />
+              <ParryStar
+                parried={isParried}
+                onParry={() => parry(slot.project.id)}
+                label={fillLabel(hud.parry, { name: slot.project.name })}
+              />
               {isParried && <SlapHand />}
               <VintagePoster {...slot} />
               {isParried && <span className={`pointer-events-none absolute inset-0 z-10 ${styles.pinkFlash}`} aria-hidden="true" />}
