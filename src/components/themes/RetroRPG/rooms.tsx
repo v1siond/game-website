@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
@@ -390,16 +390,31 @@ export function flowerSpots(count: number): Array<{ x: number; at: number }> {
   })
 }
 
+// Rings the flower of the band at an index again. The bridge owns which flower rings, so pointing at a band
+// redraws the bridge only, never the band cards: they read this stable setter from the context.
+const RingFlower = createContext<(index: number) => void>(() => {})
+
+/** A band on the bridge: pointing at it or focusing it rings its flower again. */
+export function RingsFlower({ index, children }: { index: number; children: ReactNode }) {
+  const ring = useContext(RingFlower)
+  return (
+    <div onPointerEnter={() => ring(index)} onFocus={() => ring(index)}>
+      {children}
+    </div>
+  )
+}
+
 interface BridgeRoomProps {
   profession: Profession
   /** How many bands, one flower each. */
   count: number
-  /** The band under the pointer, whose flower rings again; its take replays the ring. */
-  ringing: { index: number; take: number } | null
   children: ReactNode
 }
 
-export function BridgeRoom({ profession, count, ringing, children }: BridgeRoomProps) {
+export function BridgeRoom({ profession, count, children }: BridgeRoomProps) {
+  // The band under the pointer, whose flower rings again; its take replays the ring.
+  const [ringing, setRinging] = useState<{ index: number; take: number } | null>(null)
+  const ring = useCallback((index: number) => setRinging((now) => ({ index, take: (now?.take ?? 0) + 1 })), [])
   const art = (
     <>
       <rect width="320" height="80" fill={RPG.waterFloor} />
@@ -427,7 +442,7 @@ export function BridgeRoom({ profession, count, ringing, children }: BridgeRoomP
 
   return (
     <Room zone="water" beat={{ act: BRIDGE_MS, done: BRIDGE_MS + 100 }} art={art}>
-      {children}
+      <RingFlower.Provider value={ring}>{children}</RingFlower.Provider>
     </Room>
   )
 }

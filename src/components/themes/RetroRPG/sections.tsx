@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useCVData, useLabels } from "@/components/cv/CVDataProvider";
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
@@ -25,6 +25,7 @@ import {
   BridgeRoom,
   EncounterRoom,
   PuzzleRoom,
+  RingsFlower,
   SentryRoom,
   ShopRoom,
   SparRoom,
@@ -185,12 +186,6 @@ export function MusicianSections({
 }) {
   const labels = useLabels();
   const { musician, bands } = sections;
-  const [ringing, setRinging] = useState<{
-    index: number;
-    take: number;
-  } | null>(null);
-  const ring = (index: number) =>
-    setRinging((now) => ({ index, take: (now?.take ?? 0) + 1 }));
 
   return (
     <Block
@@ -203,18 +198,15 @@ export function MusicianSections({
       >
         {drumsSince(musician, labels.years)}
       </p>
-      <BridgeRoom profession="drummer" count={bands.length} ringing={ringing}>
+      <BridgeRoom profession="drummer" count={bands.length}>
         <BandList
           bands={bands}
           className={MASONRY_LIST}
           itemClassName={MASONRY_ITEM}
           renderBand={(slot, index) => (
-            <div
-              onPointerEnter={() => ring(index)}
-              onFocus={() => ring(index)}
-            >
+            <RingsFlower index={index}>
               <BandCard {...slot} />
-            </div>
+            </RingsFlower>
           )}
         />
         <p
