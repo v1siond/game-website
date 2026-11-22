@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -172,28 +172,44 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
   )
 })
 
-function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
+interface ProjectFileProps {
+  slot: ProjectSlot
+  /** The card's button that opened the file, focused again once the file has closed. */
+  opener: RefObject<HTMLElement | null>
+  onClose: () => void
+}
+
+function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
   const { actions, cards } = useLabels()
   const { project, years, links } = slot
-  const closeRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = `atomic-file-${project.id}`
 
+  // A modal dialog keeps Tab inside the file and leaves the page under it inert. It closes as it unmounts
+  // and only then hands focus back, since the opener is inert while the dialog is open.
   useEffect(() => {
-    closeRef.current?.focus()
-    const onKey = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+    const dialog = dialogRef.current
+    const trigger = opener.current
+    dialog?.showModal()
+    return () => {
+      dialog?.close()
+      trigger?.focus()
+    }
+  }, [opener])
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-atomic-ink/80 p-4" onClick={onClose} role="presentation">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        onClick={(event) => event.stopPropagation()}
-        className={`relative max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-[1.2rem] p-6 sm:p-8 ${atomic.tube} ${atomic.powerOn}`}
-      >
+    <dialog
+      ref={dialogRef}
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault()
+        onClose()
+      }}
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+      className={`m-auto max-h-[88vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-[1.2rem] p-0 text-inherit backdrop:bg-atomic-ink/80 ${atomic.tube} ${atomic.powerOn}`}
+    >
+      {/* the padding sits on this box, so a click on it is inside the file and only the backdrop closes it */}
+      <div className="p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 id={titleId} className={`text-2xl font-bold uppercase tracking-wide text-atomic-phosphor ${atomic.glow}`}>
@@ -201,7 +217,7 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
             </h3>
             <p className="mt-1 text-base text-atomic-yellow">{[project.role, years].filter(Boolean).join(' / ')}</p>
           </div>
-          <button ref={closeRef} type="button" onClick={onClose} className={`relative min-h-[44px] shrink-0 border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+          <button type="button" autoFocus onClick={onClose} className={`relative min-h-[44px] shrink-0 border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
             <span className="relative">{actions.closeFile}</span>
           </button>
         </div>
@@ -241,9 +257,9 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
             ))}
           </div>
         )}
-        <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
       </div>
-    </div>
+      <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
+    </dialog>
   )
 }
 
@@ -312,10 +328,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
     [spend, play],
   )
 
-  const onClose = useCallback(() => {
-    opener.current?.focus()
-    setOpened(null)
-  }, [])
+  const onClose = useCallback(() => setOpened(null), [])
 
   const locked = shot?.id ?? target
 
@@ -345,7 +358,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
       <span className={`pointer-events-none fixed inset-x-0 top-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxTop}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-x-0 bottom-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxBottom}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-0 z-[71] bg-atomic-cream ${atomic.shotFlash}`} data-on={shot?.phase === 'hit' ? 'on' : undefined} aria-hidden="true" />
-      {opened && <ProjectFile slot={opened} onClose={onClose} />}
+      {opened && <ProjectFile slot={opened} opener={opener} onClose={onClose} />}
     </div>
   )
 }
