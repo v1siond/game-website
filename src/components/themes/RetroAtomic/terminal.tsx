@@ -133,6 +133,9 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
   const [state, dispatch] = useReducer(reducer, undefined, initialHack)
   const half = Math.ceil(board.rows.length / 2)
   const columns = [board.rows.slice(0, half), board.rows.slice(half)]
+  // The last four log entries, each keyed by its place in the whole log, so the live region gets only the new line.
+  const shown = state.log.slice(-4)
+  const firstShown = state.log.length - shown.length
 
   return (
     <div className={atomic.hackScreen} data-status={state.status}>
@@ -161,8 +164,8 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
         </div>
         <div className="flex min-h-[8rem] flex-col justify-end border-t border-atomic-phosphor/30 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
           <ol className="space-y-2 text-atomic-phosphor" aria-live="polite">
-            {state.log.slice(-4).map((entry, index) => (
-              <LogLine key={`${state.log.length}-${index}`} entry={entry} />
+            {shown.map((entry, index) => (
+              <LogLine key={firstShown + index} entry={entry} />
             ))}
           </ol>
           {state.status === 'locked' && (
