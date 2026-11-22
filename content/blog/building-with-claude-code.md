@@ -87,7 +87,7 @@ Two more from September:
 
 November has 1,713 commits in 13 days. From 11-05 on, commits name the ticket they serve, like `fix(#250.11)`: 810 of them, across 118 tickets from #14 to #253. By type, November is 566 fixes, 257 performance changes and 240 features, and the rest are tests, docs and plain sentence subjects.
 
-That is the month the agent workflow in [my Claude Code skills](/blog/claude-code-skills) ran the work: a director agent sizes each ticket and other agents build, test and review it. The commits also got smaller than in the autumn before it: the median commit changed 152 lines in September, 95 in October and 70 in November. June and July sat at 83 and 84, so September was the peak and November the low, and part of the taller bar is smaller commits.
+That is the month the agent workflow in [my Claude Code skills](/blog/claude-code-skills) ran the work: a director agent sizes each ticket and other agents build, test and review it. The commits also got smaller: the median commit changed 152 lines in September, 95 in October and 70 in November. June and July sat at 83 and 84, so September was the peak and November the low, and part of the taller bar is smaller commits.
 
 ## Where it stands
 
