@@ -6,7 +6,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { NameWords } from '@/components/cv/NameWords'
-import { CVLink, HeroAction } from './actions'
+import { ContactActions } from './actions'
 import { MercSprite, type MercMotion } from './merc'
 import { ScanToggle } from './scanner'
 import world from './world.module.css'
@@ -144,10 +144,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                 </div>
 
                 <nav className={`mt-5 flex flex-wrap gap-3 ${world.fadeLate}`} aria-label={navigation.contactAndCv}>
-                  {actions.map((action) => (
-                    <HeroAction key={action.id} action={action} />
-                  ))}
-                  <CVLink />
+                  <ContactActions actions={actions} />
                 </nav>
                 <div className={`mt-4 ${world.fadeLate}`}>
                   <ScanToggle scanning={scanning} onToggle={onScan} />
