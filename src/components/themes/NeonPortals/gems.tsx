@@ -10,6 +10,7 @@ import { cssVars } from '@/lib/cssVars'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
@@ -80,7 +81,7 @@ interface GemCardProps {
 }
 
 function GemCard({ slot, colour, collected, flight, canCollect, onCollect, onLanded }: GemCardProps) {
-  const { actions, cards, sections } = useLabels()
+  const { actions, cards, sections, links } = useLabels()
   const { venture, linkProps } = slot
   const gem = useRef<HTMLDivElement>(null)
   const flying = flight?.id === venture.id
@@ -108,6 +109,7 @@ function GemCard({ slot, colour, collected, flight, canCollect, onCollect, onLan
         {linkProps ? (
           <a {...linkProps} className="underline decoration-[color:var(--np-wood)] decoration-2 underline-offset-4">
             {name}
+            <span className="sr-only"> {newTabHint(links)}</span>
           </a>
         ) : (
           name
@@ -169,7 +171,7 @@ export function GemLevel({ companies }: { companies: Companies }) {
           companies={companies}
           className={MASONRY_LIST}
           itemClassName={`${MASONRY_ITEM} pt-5`}
-          featuredItemClassName="[column-span:all]"
+          featuredItemClassName={`${MASONRY_ITEM} pt-5 [column-span:all]`}
           renderVenture={(slot, index) => (
             <GemCard
               slot={slot}

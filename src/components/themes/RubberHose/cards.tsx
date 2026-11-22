@@ -135,7 +135,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
   const company = ventureCard(venture)
 
   return (
-    <a {...linkProps} aria-label={undefined} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
+    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (

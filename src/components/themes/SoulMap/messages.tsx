@@ -103,7 +103,7 @@ export function FloorMessages({ companies }: { companies: CVData['companies'] })
       companies={companies}
       className={MASONRY_LIST}
       itemClassName={MASONRY_ITEM}
-      featuredItemClassName="[column-span:all]"
+      featuredItemClassName={`${MASONRY_ITEM} [column-span:all]`}
       renderVenture={(slot) => <Slab slot={slot} />}
     />
   )

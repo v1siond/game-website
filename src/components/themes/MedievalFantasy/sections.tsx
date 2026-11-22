@@ -216,7 +216,7 @@ const FRAMES: SectionFrames<FrameProps> = {
                 companies={slot.companies}
                 className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6"
                 itemClassName="grid lg:col-span-2"
-                featuredItemClassName="sm:col-span-2 lg:col-span-3"
+                featuredItemClassName="grid sm:col-span-2 lg:col-span-3"
                 renderVenture={(venture) => <VentureCard slot={venture} />}
               />
             </RealmFrame>

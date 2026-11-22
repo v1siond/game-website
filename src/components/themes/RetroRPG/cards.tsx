@@ -186,7 +186,6 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
   return (
     <a
       {...linkProps}
-      aria-label={undefined}
       className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick}`}
     >
       {company.featured && (
