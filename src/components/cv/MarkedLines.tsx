@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
+import { useId, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 
 // Lines behind a world's marker without a look: a job's highlights, a project's details, the About
 // highlights. The one owner of the empty list guard and the list's accessible name; the world passes its
@@ -30,12 +30,22 @@ interface MarkedLinesProps {
 
 const NO_LINE_PROPS = (): MarkedLineProps => ({})
 
+// A list under a visible heading is named by that heading, so a screen reader reads the label once; one
+// without a heading carries the label itself.
+const nameOf = (look: MarkedLinesLook, label: string, headingId: string) =>
+  look.heading ? { 'aria-labelledby': headingId } : { 'aria-label': label }
+
 export function MarkedLines({ items, label, look, lineProps = NO_LINE_PROPS }: MarkedLinesProps) {
+  const headingId = useId()
   if (items.length === 0) return null
   return (
     <>
-      {look.heading && <h4 className={look.heading}>{label}</h4>}
-      <ul className={look.list} aria-label={label}>
+      {look.heading && (
+        <h4 id={headingId} className={look.heading}>
+          {label}
+        </h4>
+      )}
+      <ul className={look.list} {...nameOf(look, label, headingId)}>
         {items.map((item, index) => {
           const { className = '', ...props } = lineProps(index)
           return (
