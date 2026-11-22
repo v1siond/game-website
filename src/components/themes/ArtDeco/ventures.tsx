@@ -19,7 +19,7 @@ import v from './ventures.module.css'
 // the catwalk is the lobby wall: an arched window onto the drowned city over each cord, a teal sconce
 // either side.
 //
-// Pattern: open banners are React state; the next furled banner is the one he works. His walk is a CSS
+// Pattern: open banners are React state; the next furled banner, read from them, is the one he works. His walk is a CSS
 // keyframe between two columns (--from and --to), keyed per trip, that ends on its own animationend; the
 // pull ends on the sprite's. On phones the banners stack in one column, so he stays by the one cord, the
 // walk plays in place and one yank drops every furled banner in a cascade down the stack (the column
@@ -115,7 +115,6 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
   const [open, setOpen] = useState<boolean[]>(() => companies.map(() => false))
   const [trip, setTrip] = useState({ from: -1, to: -1, count: 0 })
   const [act, setAct] = useState<Act>('rest')
-  const [target, setTarget] = useState(-1)
   const [wave, setWave] = useState<readonly number[]>(() => companies.map(() => 0))
   const list = useRef<HTMLUListElement>(null)
   const columns = Math.min(companies.length, COLUMNS)
@@ -124,7 +123,6 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
   useEffect(() => {
     if (!triggered || reduced || act !== 'rest' || next < 0) return
     const column = next % columns
-    setTarget(next)
     if (column === trip.to) {
       setAct('pull')
       return
@@ -146,7 +144,7 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
   // One column: the yank drops every furled banner, each a beat after the one above it.
   const pulled = () => {
     const all = stacked()
-    const dropping = open.map((isOpen, i) => !isOpen && (all || i === target))
+    const dropping = open.map((isOpen, i) => !isOpen && (all || i === next))
     setWave(dropping.map((drops, i) => (drops ? dropping.slice(0, i).filter(Boolean).length : 0)))
     setOpen((now) => now.map((isOpen, i) => isOpen || dropping[i]))
     setAct('rest')
