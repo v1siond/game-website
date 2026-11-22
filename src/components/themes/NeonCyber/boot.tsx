@@ -135,6 +135,8 @@ export function HeroSection({ scene, still, profession, scanning, onScan }: Hero
   return (
     <section data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-[14rem] pt-8 sm:px-6 sm:pt-16 lg:px-[6vw] lg:pb-16">
       {still && <NeonStage scene={scene} settled />}
+      {/* on a phone the first half screen is his: up on the fire escape landing over the street (scenes.tsx) */}
+      <div className="h-[44svh] md:hidden" aria-hidden="true" />
       <div className="max-w-[44rem] lg:max-w-[min(40rem,56vw)]">
         <BootHero profession={profession} scanning={scanning} onScan={onScan} />
         <section className="mt-6" aria-label={navigation.professionSelection}>

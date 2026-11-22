@@ -23,7 +23,7 @@ import { RIGHT_ARM, SIT, STAND, dash, drum, hack, hop, kick, mix, scan, slash, w
 // blades. Bands: the car radio's dial over the street, the needle on each band while he drums the neon
 // snare. Muay Thai: the ripperdoc installs each achievement while he sits in the chair, then he stands and
 // takes the gang punk with the roundhouse. Contact: he sits on his car's rear deck, then drives off into
-// the Badlands. The hero: him in Watson under the overpass.
+// the Badlands. The hero: him in Watson under the overpass, or up on a fire escape landing on a phone.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -110,12 +110,30 @@ const withCity =
 
 // ---------------------------------------------------------------- the hero
 
+// On a phone the HUD panel takes the screen below the first half, so he stands up on a fire escape landing
+// in the top half, over Watson's street, where the hero shows him before the panel.
+const LANDING_Y = 400
+
+function FireEscape() {
+  return (
+    <g>
+      <path d={`M560 ${LANDING_Y} H1040 V${LANDING_Y + 14} H560 Z`} fill={NEON.steel} stroke={NEON.ink} strokeWidth={3} />
+      <path d={`M560 ${LANDING_Y - 70} H1040 M580 ${LANDING_Y - 70} V${LANDING_Y} M1020 ${LANDING_Y - 70} V${LANDING_Y}`} stroke={NEON.steel} strokeWidth={6} fill="none" />
+      <path d={`M600 ${LANDING_Y + 14} L520 ${GROUND} M1000 ${LANDING_Y + 14} L1080 ${GROUND}`} stroke={NEON.steel} strokeWidth={8} />
+      <path d={`M560 ${LANDING_Y + 14} H1040`} stroke={NEON.data} strokeOpacity={0.6} strokeWidth={2} />
+    </g>
+  )
+}
+
 const hero: SceneDef = {
   district: 'watson',
   kit: null,
-  back: NONE,
+  back: ({ phone }) => (phone ? <FireEscape /> : null),
   front: NONE,
-  bind: withCity((_stage, { phone }) => (p) => merc(phone ? 800 : 1200, { ...STAND, rise: -1.5 * Math.sin(p * 12) }, phone ? 2 : 2.3)),
+  bind: withCity((_stage, { phone }) => (p) => {
+    const idle = { ...STAND, rise: -1.5 * Math.sin(p * 12) }
+    return phone ? merc(800, idle, 1.7, LANDING_Y) : merc(1200, idle, 2.3)
+  }),
 }
 
 // ---------------------------------------------------------------- About: the holo tags
