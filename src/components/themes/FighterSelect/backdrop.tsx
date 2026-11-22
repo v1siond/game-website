@@ -8,11 +8,12 @@ import living from './living.module.css'
 
 // The stage behind the page, the way the arcade tour moves from one country's stage to the next: the
 // castle rooftop under the moon behind his entrance, the select screen and the bonus stage; the street
-// market at noon, its crowd round the stalls and a rider crossing, behind his jobs and his move list;
+// market at noon, its crowd round the stalls and a rider crossing once, behind his jobs and his move list;
 // the harbour at sunset with the crowd dancing on the yacht's deck behind his projects, ventures and
 // bands; the temple ring with its crowd behind the Muay Thai record and the win quote. The page hands
-// the zone in view down (useZoneStage in each scene) and the stages cross fade. Each crowd loops a
-// two frame bob in groups, out of step; a stage out of view holds still.
+// the zone in view down (useZoneStage in each scene) and the stages cross fade. Each crowd bobs a two
+// frame step in groups, out of step, a few times the first time its stage is in view, then stands; a
+// stage out of view holds still.
 
 export type Zone = 'castle' | 'market' | 'harbour' | 'temple'
 
@@ -75,7 +76,7 @@ const CASTLE = (
 )
 
 // The street market at noon: shop fronts, lanterns swinging, stalls, the crowd along the street and a
-// rider crossing it now and then.
+// rider crossing it once.
 const MARKET = (
   <>
     <rect width={W} height={H} fill="#f6c46a" />

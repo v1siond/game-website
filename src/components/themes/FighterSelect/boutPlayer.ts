@@ -11,8 +11,12 @@ import { lastBeat, nextBeat, type Beat } from './bout'
 export function useBout(beats: readonly Beat[], on: boolean, reduced: boolean, onBeat?: (beat: Beat) => void) {
   const [index, setIndex] = useState(-1)
   const [take, setTake] = useState(0)
-  // The first render with the scene on starts the bout, in that render rather than an effect after it.
-  if (on && index === -1) setIndex(0)
+  // The first render with the scene on starts the bout, in that render rather than an effect after it, and
+  // a new take, so the sprites mounted before the scene came in play their first beat from here.
+  if (on && index === -1) {
+    setIndex(0)
+    setTake((now) => now + 1)
+  }
 
   // The latest onBeat, so a new one each render never restarts the clock.
   const beatRef = useLatest(onBeat)

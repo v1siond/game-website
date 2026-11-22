@@ -2,7 +2,9 @@
  * His sprite strip (fighter.tsx): the frames of one pose stand side by side, 160 units apart, and the
  * strip steps one cell at a time like a sprite sheet. --cycle, --runs and --key come from the motion
  * table in moves.ts. The stance plays its four frames there and back (the classic bounce), a walk back
- * plays the walk frames in reverse, everything else plays forward. Reduced motion holds the key frame.
+ * plays the walk frames in reverse, everything else plays forward. Every pose plays a bounded number of
+ * runs and rests on its key frame, the strip's own transform (BD29); a sprite under a cue that has not
+ * armed yet waits for it. Reduced motion holds the key frame.
  */
 
 .sprite {
@@ -32,6 +34,11 @@
 
   .sprite:not([data-still]) .ball {
     animation: ball var(--cycle) linear var(--runs);
+  }
+
+  [data-scene-phase='idle'] .sprite:not([data-still])[data-mode] .strip,
+  [data-scene-phase='idle'] .sprite:not([data-still]) .ball {
+    animation-play-state: paused;
   }
 }
 

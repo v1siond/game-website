@@ -378,14 +378,15 @@ export function SparRing({ profession }: { profession: Profession }) {
 const DECK_BOUT: Beat[] = [{ hero: 'act', partner: 'win', ms: 0 }]
 
 // He plays his flurry on the kit while his partner dances on the deck and the crowd along the rail
-// bobs; a pointer on a band's card ([data-band] in children) or the focus in it makes them cheer, jumping
-// higher and faster, all in CSS (living.module.css), so a band hover renders nothing.
+// bobs, from the moment the deck comes into view (data-on); a pointer on a band's card ([data-band] in
+// children) or the focus in it makes them cheer, jumping higher and faster, all in CSS (living.module.css),
+// so a band hover renders nothing.
 export function DeckShow({ children }: { children: ReactNode }) {
   const { ref, on, reduced } = useZoneStage<Zone>('harbour')
   const { beat, take } = useBout(DECK_BOUT, on, reduced)
 
   return (
-    <div ref={ref} className={living.deck}>
+    <div ref={ref} data-on={on || undefined} className={living.deck}>
       <Ring profession="drummer" stage="drummer" beat={beat} take={take} partnerAt="mid" className="mb-6 h-40 sm:h-52">
         <svg
           viewBox="0 0 640 60"
