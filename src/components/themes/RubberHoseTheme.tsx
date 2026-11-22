@@ -5,6 +5,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -69,9 +70,7 @@ export default function RubberHoseTheme() {
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${hoseLettering.variable}`} style={HOSE_VARS}>
-      <a href="#main-content" className={`sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${world.chip}`}>
-        {navigation.skipToContent}
-      </a>
+      <SkipLink className={`sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${world.chip}`} />
 
       <ZoneStageProvider value={stage}>
         <Isles zones={zones} />

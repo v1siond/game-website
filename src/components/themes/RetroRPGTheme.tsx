@@ -3,6 +3,7 @@
 import { useProfession } from "@/contexts/ProfessionContext";
 import { ProfessionSwitch } from "@/components/cv/ProfessionSwitch";
 import { useWorldView, useLabels } from "@/components/cv/CVDataProvider";
+import { SkipLink } from "@/components/themes/shared/SkipLink";
 import { RecruiterHero } from "@/components/cv/RecruiterHero";
 import { ProfessionSectionsView } from "@/components/cv/ProfessionSectionsView";
 import { ProfessionRegion } from "@/components/cv/ProfessionRegion";
@@ -66,12 +67,7 @@ export default function RetroRPGTheme() {
       >
         <Overworld zones={zones} />
 
-        <a
-          href="#main-content"
-          className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2"
-        >
-          {labels.navigation.skipToContent}
-        </a>
+        <SkipLink className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2" />
 
         {/* The encounter: him, the box, the stats line and the command row */}
         <header data-worlds-hero="" className="relative z-30 px-4 pb-6 pt-8 sm:px-6">

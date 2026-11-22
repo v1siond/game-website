@@ -2,7 +2,8 @@
 
 import { useLayoutEffect } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -49,7 +50,6 @@ export default function AdventurePathsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { fullName } = useCVData()
-  const { navigation } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointerRef = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<Zone>('plains', reducedMotion)
@@ -62,19 +62,14 @@ export default function AdventurePathsTheme() {
     >
       <LivingWorld zones={zones} />
       <MapDefs />
-      <a
-        href="#trail-main"
-        className="sr-only z-50 rounded-sm bg-[color:var(--ap-gold)] px-4 py-2 font-bold text-[color:var(--ap-ink)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
-      >
-        {navigation.skipToContent}
-      </a>
+      <SkipLink className="sr-only z-50 rounded-sm bg-[color:var(--ap-gold)] px-4 py-2 font-bold text-[color:var(--ap-ink)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4" />
 
       <header className="relative z-20">
         <ExpeditionHero name={fullName} />
       </header>
 
       <ZoneStageProvider value={stage}>
-        <main id="trail-main" className="relative z-10 pb-16">
+        <main id="main-content" className="relative z-10 pb-16">
           <ProfessionRegion>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </ProfessionRegion>
