@@ -1,5 +1,5 @@
 import type { Band, CVData, Job, MartialArts, Musician, Project, WorldCV } from './content'
-import type { ProfessionSections, SectionsOf } from './cvView'
+import { viewFor, type ProfessionSections, type SectionsOf } from './cvView'
 import type { Profession } from './professions'
 
 // Which sections a world shows for a profession and in which order, decided once for every world. Each
@@ -50,3 +50,11 @@ export function sectionPlan(sections: ProfessionSections, bio: string): SectionS
   const plan = PLAN_FOR[sections.profession] as (sections: ProfessionSections, bio: string) => SectionSlot[]
   return plan(sections, bio)
 }
+
+// The reading order of a page that shows every profession at once: the engineer's sections, then the
+// musician's, then the martial artist's.
+const READING_ORDER: readonly Profession[] = ['engineer', 'drummer', 'fighter']
+
+/** Every section of every profession on one page, each profession's world view of `year`, in reading order. */
+export const everySection = (cv: WorldCV, year: number): SectionSlot[] =>
+  READING_ORDER.flatMap((profession) => sectionPlan(viewFor(cv, profession, 'world', year).sections, cv.professionalSummary.bio))
