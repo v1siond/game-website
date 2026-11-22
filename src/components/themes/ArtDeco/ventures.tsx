@@ -15,17 +15,19 @@ import { SOLE_DROP, SurvivorSprite, type DecoMotion } from './sprite'
 import v from './ventures.module.css'
 
 // The ventures as the city's propaganda banners: red cloth with gold capitals, furled on the brass rod
-// under a catwalk. He walks the catwalk to each banner's release cord, reaches up, yanks it, and the
-// banner drops and unrolls under the rod (the cord jerks down with his hand), the next one only after the last has fallen. Each banner's
-// tassel is a button: a press furls that banner back up and he walks over to pull it down again. Behind
+// under a catwalk. He walks the catwalk to the first banner's release cord, reaches up, yanks it, and
+// every banner drops and unrolls under the rod in a cascade (the cord jerks down with his hand), all hung
+// within 5 s of the section showing for any count. Each banner's tassel is a button: a press furls that
+// banner back up and he walks over to pull it down again. Behind
 // the catwalk is the lobby wall: an arched window onto the drowned city over each cord, a teal sconce
 // either side.
 //
 // Pattern: open banners are React state; the next furled banner, read from them, is the one he works. His walk is a CSS
 // keyframe between two columns (--from and --to), keyed per trip, that ends on its own animationend; the
-// pull ends on the sprite's. On phones the banners stack in one column, so he stays by the one cord, the
-// walk plays in place and one yank drops every furled banner in a cascade down the stack (the column
-// count is read from the laid out list at the pull). Reduced motion: every banner hangs open, he stands
+// pull ends on the sprite's. The first yank drops every furled banner in a cascade; after that a yank drops
+// only the banner he walked to, except on phones, where the banners stack in one column, he stays by the
+// one cord, the walk plays in place and every yank cascades down the stack (the column count is read from
+// the laid out list at the pull). Reduced motion: every banner hangs open, he stands
 // still, the tassels do nothing.
 //
 // His own products (featured) hang in the first cords, each with a larger medal and a gold plate
@@ -152,9 +154,9 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
     return getComputedStyle(list.current).gridTemplateColumns.split(' ').length === 1
   }
 
-  // One column: the yank drops every furled banner, each a beat after the one above it.
+  // The first yank, or one column: the yank drops every furled banner, each a beat after the one before it.
   const pulled = () => {
-    const all = stacked()
+    const all = stacked() || open.every((isOpen) => !isOpen)
     const dropping = open.map((isOpen, i) => !isOpen && (all || i === next))
     setWave(dropping.map((drops, i) => (drops ? dropping.slice(0, i).filter(Boolean).length : 0)))
     setOpen((now) => now.map((isOpen, i) => isOpen || dropping[i]))

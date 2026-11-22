@@ -5,7 +5,7 @@ import atomic from './atomic.module.css'
 // Inside the shelter, behind the page: the riveted steel wall (CSS, atomic.module.css .shelterWall), the
 // far layer of pipe runs and bulkhead ribs, the near layer of the big pipe with its valve wheel and the
 // cable tray, the hazard stripe along the floor. The far and near layers slide apart with the pointer
-// (--mx and --my from usePointerVars on the root) for depth; the one lamp pulses. All of it is
+// (--mx and --my from usePointerVars on the root) for depth; the one lamp pulses once as the terminal boots. All of it is
 // decoration, aria-hidden and fixed, under the content; the contact section leaves it for the outside.
 
 function FarLayer() {

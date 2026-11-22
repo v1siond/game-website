@@ -2,7 +2,8 @@
  * The dweller's motion (dweller.tsx): transform and opacity only, in the bouncy overshoot timing of the
  * poster cartoons. Every part turns round its own joint in the viewBox's units, so a forearm turns at the
  * elbow wherever the shoulder took it. The kit classes set a profession's resting pose, a motion class
- * plays over it. The wink line, the reticle and the star rest hidden.
+ * plays over it. The wink line, the reticle and the star rest hidden. A looping motion plays a counted
+ * number of cycles, all inside 5 s of its pose starting, then rests in its pose (the reticle locked on).
  */
 
 .sprite * { transform-box: view-box; }
@@ -39,8 +40,8 @@
 
 /* ---------------------------------------------------------------- idle: the cartoon bounce and a blink */
 
-.idle .body { animation: bounce 1.6s ease-in-out infinite; }
-.idle .eyeOpen, .idle .eyeShut { animation: blink 4s step-end infinite; }
+.idle .body { animation: bounce 1.6s ease-in-out 3 both; }
+.idle .eyeOpen, .idle .eyeShut { animation: blink 4s step-end 1 both; }
 
 @keyframes bounce {
   0%, 100% { transform: scaleY(1); }
@@ -61,15 +62,15 @@
  * leg and the right arm the same keyframes half a cycle later (-0.35s). Overshoot timing on the lift.
  */
 
-.walk .body { animation: strut 0.7s ease-in-out infinite; }
-.walk .thighRight, .walk .thighLeft { animation: strut-knee 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
-.walk .shinRight { animation: strut-shin-right 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
-.walk .shinLeft { animation: strut-shin-left 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
-.walk .armRight, .walk .armLeft { animation: strut-arm 0.7s ease-in-out infinite; }
-.walk .foreRight, .walk .foreLeft { animation: strut-fore 0.7s ease-in-out infinite; }
+.walk .body { animation: strut 0.7s ease-in-out 7 both; }
+.walk .thighRight, .walk .thighLeft { animation: strut-knee 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 7 both; }
+.walk .shinRight { animation: strut-shin-right 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 7 both; }
+.walk .shinLeft { animation: strut-shin-left 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 7 both; }
+.walk .armRight, .walk .armLeft { animation: strut-arm 0.7s ease-in-out 7 both; }
+.walk .foreRight, .walk .foreLeft { animation: strut-fore 0.7s ease-in-out 7 both; }
 /* after the shorthands above, which reset the delay */
 .walk .thighLeft, .walk .shinLeft, .walk .armRight, .walk .foreRight { animation-delay: -0.35s; }
-.walk .head { animation: tilt 1.4s ease-in-out infinite; }
+.walk .head { animation: tilt 1.4s ease-in-out 3; }
 
 @keyframes strut {
   0%, 50%, 100% { transform: translateY(0); }
@@ -127,20 +128,20 @@
 .target .armLeft { animation: aim 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .target .armRight { animation: brace 0.5s ease-out both; }
 .target .foreRight { animation: brace-fore 0.5s ease-out both; }
-.target .reticle { animation: lock 1.2s steps(1) 0.4s infinite; }
+.target .reticle { animation: lock 1.2s steps(1) 0.4s 3 forwards; }
 
 @keyframes aim { to { transform: rotate(-80deg); } }
 @keyframes brace { to { transform: rotate(-60deg); } }
 @keyframes brace-fore { to { transform: rotate(-30deg); } }
-@keyframes lock { 0%, 60% { opacity: 1; } 80% { opacity: 0.3; } }
+@keyframes lock { 0%, 60%, 100% { opacity: 1; } 80% { opacity: 0.3; } }
 
 /* ---------------------------------------------------------------- System Engineer: raise the wrist terminal and key it in */
 
 .type .armLeft { animation: raise-left 0.5s ease-out both; }
 .type .foreLeft { animation: raise-fore 0.5s ease-out both; }
 .type .armRight { animation: reach 0.5s ease-out both; }
-.type .foreRight { animation: key 0.3s ease-in-out 0.5s infinite alternate both; }
-.type .screen { animation: flicker 0.4s steps(2) infinite; }
+.type .foreRight { animation: key 0.3s ease-in-out 0.5s 14 alternate both; }
+.type .screen { animation: flicker 0.4s steps(2) 12 both; }
 
 @keyframes raise-left { to { transform: rotate(25deg); } }
 @keyframes raise-fore { to { transform: rotate(85deg); } }
@@ -150,17 +151,17 @@
 
 /* ---------------------------------------------------------------- Musician: the drum roll */
 
-.drum .foreRight { animation: hit-right 0.3s ease-in infinite alternate; }
-.drum .foreLeft { animation: hit-left 0.3s ease-in -0.15s infinite alternate; }
-.drum .head { animation: tilt 0.6s ease-in-out infinite; }
+.drum .foreRight { animation: hit-right 0.3s ease-in 16 alternate both; }
+.drum .foreLeft { animation: hit-left 0.3s ease-in -0.15s 16 alternate both; }
+.drum .head { animation: tilt 0.6s ease-in-out 8; }
 
 @keyframes hit-right { from { transform: rotate(-40deg); } to { transform: rotate(-10deg); } }
 @keyframes hit-left { from { transform: rotate(40deg); } to { transform: rotate(10deg); } }
 
 /* ---------------------------------------------------------------- Martial Artist: the knee then the side kick */
 
-.strike .thighLeft { animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-.strike .shinLeft { animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.strike .thighLeft { animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) 2 both; }
+.strike .shinLeft { animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) 2 both; }
 
 @keyframes knee-kick {
   0%, 100% { transform: rotate(0deg); }
@@ -241,33 +242,33 @@
 .tune .foreRight { transform: rotate(-104deg) rotate(calc(var(--needle, 0) * 10deg)); transition: transform 620ms cubic-bezier(0.34, 1.3, 0.64, 1); }
 .tune .head { transform: rotate(-7deg) translateY(1px); }
 
-.sway .body { animation: sway-body 1.2s ease-in-out infinite; }
-.sway .head { animation: sway-head 1.2s ease-in-out infinite; }
-.sway .armRight { animation: sway-arm 1.2s ease-in-out infinite; }
+.sway .body { animation: sway-body 1.2s ease-in-out 4; }
+.sway .head { animation: sway-head 1.2s ease-in-out 4; }
+.sway .armRight { animation: sway-arm 1.2s ease-in-out 4; }
 .sway .foreRight { transform: rotate(-35deg); }
 
 @keyframes sway-body { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 @keyframes sway-head { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(-6deg); } }
 @keyframes sway-arm { 0%, 100% { transform: rotate(35deg); } 50% { transform: rotate(75deg); } }
 
-.twist .body { animation: twist-body 0.55s ease-in-out infinite; }
-.twist .thighRight, .twist .thighLeft { animation: twist-thigh 0.55s ease-in-out infinite; }
-.twist .shinRight, .twist .shinLeft { animation: twist-shin 0.55s ease-in-out infinite; }
+.twist .body { animation: twist-body 0.55s ease-in-out 9; }
+.twist .thighRight, .twist .thighLeft { animation: twist-thigh 0.55s ease-in-out 9; }
+.twist .shinRight, .twist .shinLeft { animation: twist-shin 0.55s ease-in-out 9; }
 .twist .armRight { transform: rotate(40deg); }
-.twist .foreRight { animation: twist-fore 0.55s ease-in-out infinite; }
+.twist .foreRight { animation: twist-fore 0.55s ease-in-out 9; }
 
 @keyframes twist-body { 0%, 100% { transform: translate(-2px, 4px); } 50% { transform: translate(2px, 4px); } }
 @keyframes twist-thigh { 0%, 100% { transform: rotate(16deg); } 50% { transform: rotate(-16deg); } }
 @keyframes twist-shin { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
 @keyframes twist-fore { 0%, 100% { transform: rotate(-70deg); } 50% { transform: rotate(-110deg); } }
 
-.shuffle .body { animation: shuffle-body 0.8s ease-in-out infinite; }
-.shuffle .thighRight { animation: shuffle-thigh-r 0.8s ease-in-out infinite; }
-.shuffle .shinRight { animation: shuffle-shin-r 0.8s ease-in-out infinite; }
-.shuffle .thighLeft { animation: shuffle-thigh-l 0.8s ease-in-out infinite; }
-.shuffle .shinLeft { animation: shuffle-shin-l 0.8s ease-in-out infinite; }
+.shuffle .body { animation: shuffle-body 0.8s ease-in-out 6; }
+.shuffle .thighRight { animation: shuffle-thigh-r 0.8s ease-in-out 6; }
+.shuffle .shinRight { animation: shuffle-shin-r 0.8s ease-in-out 6; }
+.shuffle .thighLeft { animation: shuffle-thigh-l 0.8s ease-in-out 6; }
+.shuffle .shinLeft { animation: shuffle-shin-l 0.8s ease-in-out 6; }
 .shuffle .armRight { transform: rotate(20deg); }
-.shuffle .foreRight { animation: shuffle-fore 0.4s ease-in-out infinite alternate; }
+.shuffle .foreRight { animation: shuffle-fore 0.4s ease-in-out 12 alternate; }
 
 @keyframes shuffle-body { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-3px); } }
 @keyframes shuffle-thigh-r { 0%, 50%, 100% { transform: rotate(0deg); } 25% { transform: rotate(32deg); } }
@@ -276,10 +277,10 @@
 @keyframes shuffle-shin-l { 0%, 50%, 100% { transform: rotate(0deg); } 75% { transform: rotate(-14deg); } }
 @keyframes shuffle-fore { from { transform: rotate(-60deg); } to { transform: rotate(-100deg); } }
 
-.bop .body { animation: bop-body 0.45s cubic-bezier(0.3, 0, 0.3, 1) infinite; }
-.bop .head { animation: bop-head 0.45s ease-in-out infinite; }
-.bop .armRight { animation: bop-arm 1.8s steps(1, end) infinite; }
-.bop .foreRight { animation: bop-fore 1.8s steps(1, end) infinite; }
+.bop .body { animation: bop-body 0.45s cubic-bezier(0.3, 0, 0.3, 1) 11; }
+.bop .head { animation: bop-head 0.45s ease-in-out 11; }
+.bop .armRight { animation: bop-arm 1.8s steps(1, end) 2; }
+.bop .foreRight { animation: bop-fore 1.8s steps(1, end) 2; }
 
 @keyframes bop-body { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } }
 @keyframes bop-head { 0%, 100% { transform: rotate(0deg); } 40% { transform: rotate(-8deg); } }
@@ -290,15 +291,16 @@
  * knee: both hands reach out to clinch the foe's neck at his left, the hips lean back and the left knee drives up
  * and across into the foe (contact at 32%, held to 65% while the foe reacts). kick: the roundhouse, chamber the
  * knee (18%), the leg snaps out level into the foe with the body leaning away and the right arm swinging down
- * for balance (contact at 32%, held to 65%). Both last 1.2s, 380ms to contact, and end in the guard. Checked as pictures in poses/spar-*.png. */
+ * for balance (contact at 32%, held to 65%). Both last 1.2s (--strike, the spar's pace), 380ms to contact, and
+ * end in the guard. Checked as pictures in poses/spar-*.png. */
 
-.knee .body { animation: knee-body 1.2s ease-out both; }
-.knee .armLeft { animation: clinch-arm-l 1.2s ease-out both; }
-.knee .foreLeft { animation: clinch-fore-l 1.2s ease-out both; }
-.knee .armRight { animation: clinch-arm-r 1.2s ease-out both; }
-.knee .foreRight { animation: clinch-fore-r 1.2s ease-out both; }
-.knee .thighLeft { animation: knee-thigh 1.2s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
-.knee .shinLeft { animation: knee-shin 1.2s ease-out both; }
+.knee .body { animation: knee-body var(--strike, 1.2s) ease-out both; }
+.knee .armLeft { animation: clinch-arm-l var(--strike, 1.2s) ease-out both; }
+.knee .foreLeft { animation: clinch-fore-l var(--strike, 1.2s) ease-out both; }
+.knee .armRight { animation: clinch-arm-r var(--strike, 1.2s) ease-out both; }
+.knee .foreRight { animation: clinch-fore-r var(--strike, 1.2s) ease-out both; }
+.knee .thighLeft { animation: knee-thigh var(--strike, 1.2s) cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.knee .shinLeft { animation: knee-shin var(--strike, 1.2s) ease-out both; }
 
 @keyframes knee-body { 0%, 100% { transform: rotate(0deg); } 32%, 65% { transform: rotate(-8deg) translateX(-2px); } }
 @keyframes clinch-arm-l { 0%, 100% { transform: rotate(-25deg); } 32%, 65% { transform: rotate(-105deg); } }
@@ -308,12 +310,12 @@
 @keyframes knee-thigh { 0%, 100% { transform: rotate(0deg); } 32%, 65% { transform: rotate(-105deg); } }
 @keyframes knee-shin { 0%, 100% { transform: rotate(0deg); } 32%, 65% { transform: rotate(115deg); } }
 
-.kick .body { animation: kick-body 1.2s ease-out both; }
-.kick .thighLeft { animation: kick-thigh 1.2s cubic-bezier(0.3, 1.3, 0.5, 1) both; }
-.kick .shinLeft { animation: kick-shin 1.2s cubic-bezier(0.3, 1.3, 0.5, 1) both; }
-.kick .thighRight { animation: kick-base 1.2s ease-out both; }
-.kick .armRight { animation: kick-arm-r 1.2s ease-out both; }
-.kick .foreRight { animation: kick-fore-r 1.2s ease-out both; }
+.kick .body { animation: kick-body var(--strike, 1.2s) ease-out both; }
+.kick .thighLeft { animation: kick-thigh var(--strike, 1.2s) cubic-bezier(0.3, 1.3, 0.5, 1) both; }
+.kick .shinLeft { animation: kick-shin var(--strike, 1.2s) cubic-bezier(0.3, 1.3, 0.5, 1) both; }
+.kick .thighRight { animation: kick-base var(--strike, 1.2s) ease-out both; }
+.kick .armRight { animation: kick-arm-r var(--strike, 1.2s) ease-out both; }
+.kick .foreRight { animation: kick-fore-r var(--strike, 1.2s) ease-out both; }
 
 @keyframes kick-body { 0%, 100% { transform: rotate(0deg); } 18% { transform: rotate(-6deg); } 32%, 65% { transform: rotate(-16deg) translateX(-4px); } }
 @keyframes kick-thigh { 0%, 100% { transform: rotate(0deg); } 18% { transform: rotate(-70deg); } 32%, 65% { transform: rotate(-96deg); } }

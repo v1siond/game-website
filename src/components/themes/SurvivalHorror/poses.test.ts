@@ -37,6 +37,15 @@ describe('the room scripts', () => {
     })
   })
 
+  // His rule: no animation lasts more than 5 s from its trigger. A beat ends when its move and its joints have
+  // eased there.
+  it.each(ZONES)('%s ends by 5000 ms, every move and joint eased in', (zone) => {
+    CONTEXTS.forEach((context) => {
+      const ends = scriptFor(zone, context).beats.map((beat) => beat.at + Math.max(beat.move ?? 0, beat.fmove ?? 0, beat.tempo ?? 0, beat.ftempo ?? 0))
+      expect(Math.max(...ends)).toBeLessThanOrEqual(5000)
+    })
+  })
+
   it('plays the item box again for a new profession, the gym for a new condition, the safe room for a save', () => {
     const context = { profession: 'engineer', condition: 'danger', saves: 0, entrance: 0 } as const
     expect(playKey('store', context)).not.toBe(playKey('store', { ...context, profession: 'drummer' }))

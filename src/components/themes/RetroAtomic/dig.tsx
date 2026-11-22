@@ -2,6 +2,7 @@
 
 import { useMemo, type ReactNode } from 'react'
 import { useTimedSteps } from '@/hooks/useTimedSteps'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DogSprite, type DogMotion } from './dog'
 import { DUST, DUST_DARK, POSTER_INK } from './palette'
@@ -12,8 +13,8 @@ import { cssVars } from '@/lib/cssVars'
 // over the first cassette's column, pitches nose down and digs with the clods flying off his paws; the
 // spot leaves its mound and that holotape rises out of the ground. Then the next spot, and the next; after
 // the last tape he trots past its mound and sits beside it, tail on the ground, looking up. The steps run
-// as the shared timed steps from the tape count (TROT_MS per move, DIG_MS per dig); `children` gets the dug
-// count. Under reduced motion all the tapes are up and he sits at the end.
+// as the shared timed steps from the tape count (TROT_MS per move, DIG_MS per dig, both quickened alike by
+// stepWithin when enough tapes would run the dig past 5 s); `children` gets the dug count. Under reduced motion all the tapes are up and he sits at the end.
 
 const TROT_MS = 700
 const DIG_MS = 1000
@@ -30,9 +31,11 @@ const SIT_PAST = 0.4
 
 /** Trot to each spot, dig it, then sit just past the last one. */
 function digSteps(tapes: number): Step[] {
+  const tape = TROT_MS + DIG_MS
+  const pace = stepWithin({ step: tape, count: tapes, fixed: TROT_MS, budget: STORY_MS }) / tape
   const perTape = Array.from({ length: tapes }, (_, spot) => [
-    { spot, motion: 'trot' as const, ms: TROT_MS },
-    { spot, motion: 'dig' as const, ms: DIG_MS },
+    { spot, motion: 'trot' as const, ms: Math.floor(TROT_MS * pace) },
+    { spot, motion: 'dig' as const, ms: Math.floor(DIG_MS * pace) },
   ]).flat()
   const end = Math.max(0, tapes - 1) + SIT_PAST
   return [...perTape, { spot: end, motion: 'trot', ms: TROT_MS }, { spot: end, motion: 'sit', ms: 0 }]

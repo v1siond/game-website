@@ -3,6 +3,8 @@
 import { useMemo, type ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useTimedSteps } from '@/hooks/useTimedSteps'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
+import { cssVars } from '@/lib/cssVars'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { MutantSprite, type MutantMotion } from './mutant'
@@ -34,14 +36,31 @@ const HITS: { him: DwellerMotion; foe: MutantMotion }[] = [
   { him: 'kick', foe: 'kicked' },
 ]
 
-/** Wind up, land and reset per achievement, then the mutant goes down. */
-function sparBeats(count: number): Beat[] {
+const ROUND_MS = CONTACT_MS + REACT_MS + GUARD_MS
+// Where his knee and kick land on the foe, as a share of the strike (dweller.module.css, 32%).
+const CONTACT_AT = 0.32
+
+/** How fast the spar plays: 1 while every round fits, less when enough achievements would run it past 5 s
+ * after the bell (GUARD_MS), the share stepWithin leaves a round. */
+const sparPace = (count: number) => stepWithin({ step: ROUND_MS, count, fixed: GUARD_MS, budget: STORY_MS }) / ROUND_MS
+
+/** A time of the spar at its pace. */
+const paced = (ms: number, pace: number) => Math.floor(ms * pace)
+
+/** The strike and the reaction at the spar's pace, for the sprites' CSS: the strike is timed so its contact
+ * (CONTACT_AT of it) lands as the contact beat ends, never after the foe starts to react. */
+const sparTiming = (pace: number) =>
+  cssVars({ '--strike': `${Math.floor(paced(CONTACT_MS, pace) / CONTACT_AT)}ms`, '--react': `${paced(REACT_MS, pace)}ms` })
+
+/** Wind up, land and reset per achievement, then the mutant goes down; every round at the spar's pace. */
+function sparBeats(count: number, pace: number): Beat[] {
+  const ms = (beat: number) => paced(beat, pace)
   const rounds = Array.from({ length: count }, (_, round) => {
     const hit = HITS[round % HITS.length]
     return [
-      { him: hit.him, foe: 'guard' as const, shown: round, ms: CONTACT_MS },
-      { him: hit.him, foe: hit.foe, shown: round + 1, ms: REACT_MS },
-      { him: 'idle' as const, foe: 'guard' as const, shown: round + 1, ms: GUARD_MS },
+      { him: hit.him, foe: 'guard' as const, shown: round, ms: ms(CONTACT_MS) },
+      { him: hit.him, foe: hit.foe, shown: round + 1, ms: ms(REACT_MS) },
+      { him: 'idle' as const, foe: 'guard' as const, shown: round + 1, ms: ms(GUARD_MS) },
     ]
   }).flat()
   return [...rounds, { him: 'thumbsUp', foe: 'down', shown: count, ms: 0 }]
@@ -63,12 +82,12 @@ function Burst() {
   )
 }
 
-function Ring({ beat, step, ringRef }: { beat: Beat; step: number; ringRef: (node: HTMLElement | null) => void }) {
+function Ring({ beat, step, pace, ringRef }: { beat: Beat; step: number; pace: number; ringRef: (node: HTMLElement | null) => void }) {
   const landed = beat.foe === 'kneed' || beat.foe === 'kicked'
   const striking = beat.him === 'knee' || beat.him === 'kick'
 
   return (
-    <div ref={ringRef} className="relative mb-8 h-48 overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream-shade sm:h-64" aria-hidden="true">
+    <div ref={ringRef} className="relative mb-8 h-48 overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream-shade sm:h-64" style={sparTiming(pace)} aria-hidden="true">
       {ROPES.map((top) => (
         <span key={top} className={`absolute inset-x-0 h-1.5 border-y-2 border-atomic-poster-ink bg-atomic-red ${top}`} />
       ))}
@@ -96,7 +115,8 @@ interface SparProps {
 
 export function Spar({ count, on, children }: SparProps) {
   const { reduced } = useZoneStageContext()
-  const beats = useMemo(() => sparBeats(count), [count])
+  const pace = sparPace(count)
+  const beats = useMemo(() => sparBeats(count, pace), [count, pace])
   const durations = useMemo(() => beats.map(({ ms }) => ms), [beats])
   // The bell rings once the ring itself is mostly in view: on a phone the record's facts come first.
   const { ref, triggered } = useSectionTrigger({ threshold: 0.6 })
@@ -104,5 +124,5 @@ export function Spar({ count, on, children }: SparProps) {
 
   const beat = reduced ? settled(count) : beats[step] ?? READY
 
-  return <>{children({ shown: beat.shown, ring: <Ring beat={beat} step={step} ringRef={ref} /> })}</>
+  return <>{children({ shown: beat.shown, ring: <Ring beat={beat} step={step} pace={pace} ringRef={ref} /> })}</>
 }

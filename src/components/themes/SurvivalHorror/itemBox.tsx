@@ -3,6 +3,7 @@
 import { useRef, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useOnChange } from '@/hooks/useOnChange'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
@@ -87,6 +88,8 @@ export function ItemBox() {
   const { navigation, professions, hud, horror: words } = useLabels()
   const door = useDoor()
   const taken = useRef(false)
+  // The item turns once the box is seen, then once more on each profession taken (keyed by it).
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   // A change that came from the keyboard, not a click: the door still plays over the new room, closing
   // before the new room paints.
@@ -108,13 +111,13 @@ export function ItemBox() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 sm:px-6" aria-label={navigation.professionSelection}>
+    <section ref={ref} className="mx-auto max-w-6xl px-4 sm:px-6" aria-label={navigation.professionSelection}>
       <div className={`mx-auto max-w-3xl p-4 sm:p-6 ${look.panel}`}>
         <div className="flex flex-col gap-4">
           <ConditionMonitor condition="fine" />
           <div className="flex items-center gap-4 border border-[color:var(--sh-sepia)] bg-[color:var(--sh-shadow)] p-3">
             <div className={horror.examineStage} aria-hidden="true">
-              <ItemIcon key={active} profession={active} className={`h-16 w-16 ${horror.examineTurn}`} />
+              <ItemIcon key={active} profession={active} className={`h-16 w-16 ${triggered ? horror.examineTurn : ''}`} />
             </div>
             <div className="min-w-0">
               <p className={`text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>{hud.equipped}</p>

@@ -43,10 +43,11 @@ function useBuildOnChange(profession: Profession): number {
 export function QuickChange({ profession }: { profession: Profession }) {
   const { navigation } = useLabels()
   const build = useBuildOnChange(profession)
-  const { ref } = useZoneStage<Zone>('noon')
+  // A stage like the sections, so the pad's glow and his idle wait until the booth is seen.
+  const { ref, on } = useZoneStage<Zone>('noon')
 
   return (
-    <section ref={ref} className="relative z-20 px-4 pb-10 pt-[var(--select-gap)] sm:px-6" aria-label={navigation.professionSelection}>
+    <section ref={ref} data-on={on || undefined} className={`relative z-20 px-4 pb-10 pt-[var(--select-gap)] sm:px-6 ${cel.stage}`} aria-label={navigation.professionSelection}>
       <div className={`mx-auto grid max-w-5xl items-center gap-6 p-3 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)] ${cel.darkPaper}`}>
         <div className="relative mx-auto h-64 w-44" aria-hidden="true">
           {/* the booth: its frame inked and hatched, the pad glowing under him */}

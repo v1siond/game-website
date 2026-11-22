@@ -24,7 +24,7 @@ import look from './SurvivalHorror/world.module.css'
 // Survival Horror: an old house at night, played the way the fixed camera survival horror games are played.
 // The page opens on the door loading screen (./SurvivalHorror/door). Behind the whole page is the house
 // (./SurvivalHorror/stage): one room per part of the page, cut to as that part scrolls into view, where he
-// and the pursuer act the room out once (./SurvivalHorror/scripts) and then hold, breathing, until the
+// and the pursuer act the room out once (./SurvivalHorror/scripts) and then hold still until the
 // visitor changes what the room shows. The parts themselves are the genre's screens: the hall's file card
 // (hall), the item box that changes profession (itemBox), the papers and files, the attache case, the
 // trader's wares, the suit doors, the herb recovery (views), and the safe room's typewriter (saferoom).

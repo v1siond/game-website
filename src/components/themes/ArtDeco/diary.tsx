@@ -11,6 +11,7 @@ import { jobCard } from '@/lib/cv/cvView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
+import { cssVars } from '@/lib/cssVars'
 import type { Job } from '@/lib/cv/content'
 import { DECO_COLORS as C } from './palette'
 import { SurvivorSprite } from './sprite'
@@ -18,7 +19,8 @@ import diary from './diary.module.css'
 
 // Work Experience as the city's audio diaries: each job is a reel to reel recorder left behind, arriving
 // with the gold glow the city gives the diaries that matter. Play runs the tape: the reels turn, the tape
-// counter runs and the highlights light one after another, a line every LINE_MS, then the tape stops.
+// counter runs and the highlights light one after another, a line every LINE_MS (quicker on a long diary,
+// so the whole tape runs inside TAPE_MS), then the tape stops.
 // One diary plays at a time; playing another stops the first. While a diary plays he steps up in
 // the card's corner and holds it by his face, listening, nodding with the voice; when the tape ends he is gone.
 // The newest diary starts on its own once a quarter of it is in view, so he is there as the visitor arrives.
@@ -29,6 +31,10 @@ import diary from './diary.module.css'
 // that is the content, not motion.
 
 const LINE_MS = 2200
+const TAPE_MS = 4800
+
+/** How long each line of a diary plays, so its whole tape ends inside TAPE_MS. */
+const lineMsFor = (lines: number) => Math.min(LINE_MS, TAPE_MS / lines)
 
 const SKILL_TAGS: TagListLook = { list: 'flex flex-wrap gap-2', tag: `px-2 py-1 text-sm ${diary.skill}` }
 
@@ -93,7 +99,7 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
     <article
       data-playing={isPlaying || undefined}
       className={`relative p-5 ${diary.card}`}
-      style={{ '--i': index, '--tape': `${lines * LINE_MS}ms` } as CSSProperties}
+      style={cssVars({ '--i': index, '--tape': `${lines * lineMsFor(lines)}ms` })}
     >
       <span className={`pointer-events-none absolute inset-0 ${diary.glow}`} aria-hidden="true" />
       {isPlaying && (
@@ -164,7 +170,7 @@ export function DiaryShelf({ jobs }: { jobs: Job[] }) {
     if (!playing) return
     const lines = Math.max(jobs.find((job) => job.id === playing.id)?.highlights.length ?? 1, 1)
     const next = playing.line + 1 < lines ? { id: playing.id, line: playing.line + 1 } : null
-    const timer = window.setTimeout(() => setPlaying(next), LINE_MS)
+    const timer = window.setTimeout(() => setPlaying(next), lineMsFor(lines))
     return () => window.clearTimeout(timer)
   }, [playing, jobs])
 

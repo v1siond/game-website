@@ -5,8 +5,9 @@
  * `atomic` Tailwind group that palette.ts feeds. Motion is transform and opacity only; state changes
  * come from data attributes the components set (data-phase, data-on, data-target, data-shot,
  * data-angle, data-booted, data-vats), so React flips a value and the browser runs the transition.
- * The few endless loops carry .ambient (or are named below) and freeze while the targeting system is
- * locked and under reduced motion.
+ * No loop is endless: each plays a counted number of cycles inside 5 s of its trigger and rests on a
+ * still frame. The few that live on the page carry .ambient (or are named below) and freeze while the
+ * targeting system is locked and under reduced motion.
  */
 
 /* ---- the page ---- */
@@ -25,6 +26,11 @@
 
 .stage {
   position: relative;
+}
+
+/* Nothing in a section plays before the section is seen: its loops wait, paused on their first frame. */
+.stage:not([data-on]) * {
+  animation-play-state: paused;
 }
 
 /* ---- the shelter wall behind everything (backdrop.tsx) ---- */
@@ -52,7 +58,12 @@
 .wallLamp {
   background: theme('colors.atomic.red-light');
   box-shadow: 0 0 18px 6px theme('colors.atomic.red / 0.45');
-  animation: lampPulse 2.6s ease-in-out infinite;
+  animation: lampPulse 2.6s ease-in-out both;
+}
+
+/* The lamp pulses once, when the door has opened and the tube is on. */
+.root:not(:has([data-booted])) .wallLamp {
+  animation-play-state: paused;
 }
 
 .hazardStripe {
@@ -237,6 +248,11 @@
   position: absolute;
 }
 
+/* His action plays once the tube is on, not behind the door. */
+.device:not([data-booted]) .statusFigure * {
+  animation-play-state: paused;
+}
+
 .statusCell {
   border: 1px solid theme('colors.atomic.phosphor / 0.4');
   background: theme('colors.atomic.phosphor / 0.06');
@@ -299,7 +315,7 @@
   margin-left: 0.15em;
   vertical-align: -0.12em;
   background: theme('colors.atomic.phosphor');
-  animation: blink 1s steps(1) infinite;
+  animation: blink 1s steps(1) 4;
 }
 
 /* The boot text: the full copy holds the layout unseen while the typed copy counts up over it. */
@@ -320,7 +336,12 @@
 
 .refreshBar {
   background: linear-gradient(180deg, transparent, theme('colors.atomic.phosphor / 0.07'), transparent);
-  animation: refresh 7s linear infinite;
+  transform: translateY(-100%);
+}
+
+/* One sweep down the tube once it is on, then the bar rests past its foot. */
+.device[data-booted] .refreshBar {
+  animation: refresh 4.8s linear both;
 }
 
 .vignette {
@@ -422,7 +443,8 @@
 }
 
 .stage[data-on] .cardOn {
-  animation: crtOn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 90ms) both;
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation: crtOn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) min(calc(var(--i, 0) * 90ms), 4.5s) both;
 }
 
 .questActive,
@@ -436,7 +458,7 @@
 .questActive {
   background: theme('colors.atomic.phosphor');
   transform: rotate(45deg);
-  animation: blink 1.2s steps(1) infinite;
+  animation: blink 1.2s steps(1) 4;
 }
 
 .questDone {
@@ -614,7 +636,7 @@
 }
 
 .waveSlide {
-  animation: waveRun var(--wave, 2s) linear infinite;
+  animation: waveRun var(--wave, 2s) linear var(--wave-loops, 2);
 }
 
 .waveHeight {
@@ -684,6 +706,11 @@
 /* A card shows when the spar's strike for it lands (spar.tsx sets data-shown). */
 .perkCard:not([data-shown]) {
   opacity: 0;
+}
+
+/* His pose on a card plays when the card is earned, not while it waits unseen. */
+.perkCard:not([data-shown]) * {
+  animation-play-state: paused;
 }
 
 .perkCard[data-shown] {
@@ -818,6 +845,11 @@
 .atDoor {
   opacity: 0;
   transform: translate3d(-70%, 0, 0);
+}
+
+/* His walk waits in the doorway for the section, so its strides are the ones seen. */
+.atDoor * {
+  animation-play-state: paused;
 }
 
 .walkOut {

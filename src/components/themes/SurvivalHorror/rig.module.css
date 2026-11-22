@@ -1,7 +1,8 @@
 /*
  * The rig's motion (rig.tsx): each bone turns round its own pivot, given in the figure's viewBox units
  * (transform-box: view-box), and eases to the next pose over the beat's tempo (--tempo, set by the stage
- * on the figure). The breath is the one thing that repeats, and only at rest: a slow rise of the chest.
+ * on the figure). The breath is the one thing that repeats: one slow rise and fall of the chest as the
+ * house first shows, then he stands still.
  * Transforms only; reduced motion holds every pose still.
  */
 
@@ -20,7 +21,7 @@
 .breath {
   transform-box: view-box;
   transform-origin: var(--ox) var(--oy);
-  animation: breath 4.8s ease-in-out infinite;
+  animation: breath 4.8s ease-in-out;
 }
 
 /* The hall's aim: both arms follow the visitor's pointer up and down (--my from the world root). */

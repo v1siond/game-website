@@ -1,7 +1,8 @@
 /*
  * His figure's motion (sprite.tsx): transform and opacity only. Every part turns round its own joint in
  * the viewBox's units (transform-box: view-box), so a forearm turns at the elbow wherever the shoulder
- * took it. The kit classes set a profession's resting pose; a motion class plays a cycle over it. A one
+ * took it. The kit classes set a profession's resting pose; a motion class plays a cycle over it, a
+ * counted number of times inside 5 s of the motion starting, then the kit pose rests. A one
  * shot motion also runs `clock` on the root group, whose end the component reports. Glows, the bolt, the
  * arc and the chamber rest at opacity 0 and show only inside a motion.
  */
@@ -56,11 +57,11 @@
 
 /* ---------------------------------------------------------------- idle: breath, blink, the wrench tap, the plasmid crawl */
 
-.idle .chest { animation: breathe 3.6s ease-in-out infinite; }
-.idle .eyes { animation: blink 4.6s step-end infinite; }
-.idle.kitWrench .foreBack { animation: tap 2.4s cubic-bezier(0.5, 0, 0.9, 0.4) infinite; }
-.idle .sparks { animation: crawl 1.9s steps(1) infinite; }
-.idle .veins { animation: pulse 2.8s ease-in-out infinite; }
+.idle .chest { animation: breathe 3.6s ease-in-out; }
+.idle .eyes { animation: blink 4.6s step-end; }
+.idle.kitWrench .foreBack { animation: tap 2.4s cubic-bezier(0.5, 0, 0.9, 0.4) 2; }
+.idle .sparks { animation: crawl 1.9s steps(1) 2; }
+.idle .veins { animation: pulse 2.8s ease-in-out; }
 
 @keyframes breathe {
   0%, 100% { transform: translateY(0) scaleY(1); }
@@ -97,13 +98,24 @@
  * each contact.
  */
 
-.walk .body { animation: bob 0.8s ease-in-out infinite; }
-.walk .thighBack { animation: thigh-a 0.8s ease-in-out infinite; }
-.walk .thighFront { animation: thigh-b 0.8s ease-in-out infinite; }
-.walk .armFront { animation: stride-a 0.8s ease-in-out infinite; }
-.walk .armBack { animation: stride-b 0.8s ease-in-out infinite; }
-.walk .shinBack { animation: knee 0.8s ease-in-out infinite; }
-.walk .shinFront { animation: knee 0.8s ease-in-out -0.4s infinite; }
+.walk .body { animation: bob 0.8s ease-in-out 6; }
+.walk .thighBack { animation: thigh-a 0.8s ease-in-out 6; }
+.walk .thighFront { animation: thigh-b 0.8s ease-in-out 6; }
+.walk .armFront { animation: stride-a 0.8s ease-in-out 6; }
+.walk .armBack { animation: stride-b 0.8s ease-in-out 6; }
+.walk .shinBack { animation: knee 0.8s ease-in-out 6; }
+.walk .shinFront { animation: knee 0.8s ease-in-out -0.4s 6; }
+
+/* A scrubbed walk (scrub, the glass tunnel): paused, each part on the stride --scene-progress reaches, the
+   six strides spread over the scroll, so his legs move only while the visitor scrolls him along. */
+.sprite.scrub.walk * { animation-play-state: paused; }
+.sprite.scrub.walk .body,
+.sprite.scrub.walk .thighBack,
+.sprite.scrub.walk .thighFront,
+.sprite.scrub.walk .armFront,
+.sprite.scrub.walk .armBack,
+.sprite.scrub.walk .shinBack { animation-delay: calc(var(--scene-progress, 0) * -4.8s); }
+.sprite.scrub.walk .shinFront { animation-delay: calc(-0.4s + var(--scene-progress, 0) * -4.8s); }
 
 @keyframes bob {
   0%, 50%, 100% { transform: translateY(0); }
@@ -280,9 +292,9 @@
 .listen .armFront { transform: rotate(-45deg); }
 .listen .foreFront { transform: rotate(-140deg); }
 .listen .recorder { opacity: 1; }
-.listen .head { animation: heed 2.6s ease-in-out infinite; }
-.listen .chest { animation: breathe 3.6s ease-in-out infinite; }
-.listen .veins { animation: pulse 2.8s ease-in-out infinite; }
+.listen .head { animation: heed 2.6s ease-in-out both; }
+.listen .chest { animation: breathe 3.6s ease-in-out; }
+.listen .veins { animation: pulse 2.8s ease-in-out; }
 
 @keyframes heed {
   0%, 100% { transform: rotate(4deg); }

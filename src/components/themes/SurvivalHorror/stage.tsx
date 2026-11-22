@@ -16,8 +16,8 @@ import stage from './stage.module.css'
 // The house behind the page, the way the genre is played: one fixed camera per room and a hard cut between
 // rooms. The stage is fixed under the whole page; each part of the page is a window onto it (RoomWindow,
 // a gap of bare stage above the part), and the part in view picks the room (useZoneStage). In each room
-// he, and the pursuer when the room has him, play the room's script once (./scripts) and then hold still,
-// breathing. The page's panels sit over the stage, so the figures are seen in the gaps as the visitor
+// he, and the pursuer when the room has him, play the room's script once (./scripts) and then hold still
+// (one breath as the house first shows, ./rig). The page's panels sit over the stage, so the figures are seen in the gaps as the visitor
 // scrolls, never over the text.
 //
 // Layers, back to front: the room (./rooms), the night behind the corridor glass, the pursuer far behind

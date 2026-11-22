@@ -16,9 +16,10 @@
 .shelf[data-on] .card {
   opacity: 1;
   transform: translate3d(0, 0, 0);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
   transition:
-    opacity 0.6s ease-out calc(var(--i) * 120ms),
-    transform 0.7s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--i) * 120ms);
+    opacity 0.6s ease-out min(calc(var(--i) * 120ms), 4.3s),
+    transform 0.7s cubic-bezier(0.45, 0, 0.25, 1) min(calc(var(--i) * 120ms), 4.3s);
 }
 
 .glow {
@@ -27,7 +28,8 @@
 }
 
 .shelf[data-on] .glow {
-  animation: glow 1.6s ease-in-out calc(0.3s + var(--i) * 120ms) both;
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation: glow 1.6s ease-in-out calc(0.3s + min(calc(var(--i) * 120ms), 3.1s)) both;
 }
 
 .card[data-playing] .glow {
@@ -58,7 +60,8 @@
 }
 
 .card[data-playing] .reel {
-  animation: reel 1.4s linear infinite;
+  /* four turns, the length of the longest tape (TAPE_MS in diary.tsx) */
+  animation: reel 1.2s linear 4;
 }
 
 @keyframes reel {

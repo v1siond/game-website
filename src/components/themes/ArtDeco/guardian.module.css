@@ -1,8 +1,10 @@
 /*
  * The guardian pair's street (guardian.tsx). The pair crosses from the right end to the left end as
  * --scene-progress runs 0 to 1 on the street. The giant stomps (legs swing at the hips, the body sinks
- * on each step), she skips at twice the pace. Provoked (a fresh svg under each press key): the red ports
- * flare over the amber, he rears back and the drill spins, then the red fades. Transform and opacity only.
+ * on each step), she skips at twice the pace; both are scrubbed by the same progress (paused, each on the
+ * frame the progress reaches, six stomps end to end), so they step only while the scroll carries them.
+ * Provoked (a fresh svg under each press key): the red ports flare over the amber, he rears back and the
+ * drill spins, then the red fades. Transform and opacity only.
  */
 
 .street {
@@ -27,10 +29,23 @@
   transform-box: view-box;
 }
 
-.legBack { transform-origin: 88px 112px; animation: stomp 1.4s ease-in-out infinite; }
-.legFront { transform-origin: 61px 112px; animation: stomp 1.4s ease-in-out -0.7s infinite; }
-.body { transform-origin: 74px 116px; animation: sink 0.7s ease-in-out infinite; }
-.sister { transform-origin: 146px 150px; animation: skip 0.7s ease-in-out infinite; }
+.legBack { transform-origin: 88px 112px; animation: stomp 1.4s ease-in-out 6 both; }
+.legFront { transform-origin: 61px 112px; animation: stomp 1.4s ease-in-out 7 both; }
+.body { transform-origin: 74px 116px; animation: sink 0.7s ease-in-out 12 both; }
+.sister { transform-origin: 146px 150px; animation: skip 0.7s ease-in-out 12 both; }
+
+/* Six stomps (8.4 s of the cycle) over the whole street; the front leg half a stomp behind the back. */
+.legBack,
+.legFront,
+.body,
+.sister {
+  animation-play-state: paused;
+  animation-delay: calc(var(--scene-progress, 0) * -8.4s);
+}
+
+.legFront {
+  animation-delay: calc(-0.7s + var(--scene-progress, 0) * -8.4s);
+}
 .drillArm { transform-origin: 46px 70px; }
 .drill { transform-origin: 22px 103px; }
 
@@ -58,7 +73,7 @@
 }
 
 .provoked .body {
-  animation: rear 1.2s cubic-bezier(0.3, 0, 0.3, 1) both, sink 0.7s ease-in-out 1.2s infinite;
+  animation: rear 1.2s cubic-bezier(0.3, 0, 0.3, 1) both;
 }
 
 .provoked .drill[data-angry] {

@@ -35,7 +35,7 @@ export function Drop({ by, children }: { by: number; children: ReactNode }) {
   )
 }
 
-/** The chest's slow rise and fall at rest, the only motion a figure keeps once its beat has played. */
+/** The chest's one slow rise and fall as the house first shows; after it the figure keeps only its pose. */
 export function Breath({ at, children }: { at: Point; children: ReactNode }) {
   return (
     <g className={rig.breath} style={{ '--ox': `${at[0]}px`, '--oy': `${at[1]}px` } as CSSProperties}>
