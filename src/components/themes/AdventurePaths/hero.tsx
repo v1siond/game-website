@@ -147,6 +147,8 @@ function useHub(active: Profession) {
   }, [act])
 
   const enter = useCallback((target: Profession) => {
+    // A second pick inside the dive restarts it, so the first pick's timer never cuts the new dive short.
+    window.clearTimeout(enterTimer.current)
     setEntering(target)
     enterTimer.current = window.setTimeout(() => setEntering(null), ENTER_MS)
   }, [])
