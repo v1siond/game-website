@@ -397,30 +397,18 @@ const GEAR: Record<KnightGear, Gear> = {
   },
 }
 
-// Where he stands inside a scene's own svg: his feet's left edge at x, the ground at y, and his height,
-// all in the scene's units, so he lines up with the art at every width.
-export interface KnightPlace {
-  x: number
-  y: number
-  height: number
-}
-
 interface KnightProps {
   gear: KnightGear
   pose?: KnightPose
-  place?: KnightPlace
   spirit?: KnightSpirit
   // Faces left instead of right (an opponent).
   facingLeft?: boolean
   className?: string
 }
 
-const placement = (place: KnightPlace | undefined) =>
-  place && { x: place.x, y: place.y - place.height, height: place.height, width: (place.height * 60) / 96 }
-
 // Memoised: his props are plain values, so a scene that re-renders around him (the arena on every stamina
 // tick) leaves the sprite alone until his pose or gear changes.
-export const Knight = memo(function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false, className = '' }: KnightProps) {
+export const Knight = memo(function Knight({ gear, pose = 'idle', spirit, facingLeft = false, className = '' }: KnightProps) {
   const id = useId()
   const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
   const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
@@ -428,7 +416,6 @@ export const Knight = memo(function Knight({ gear, pose = 'idle', place, spirit,
 
   return (
     <svg
-      {...placement(place)}
       viewBox="0 0 60 96"
       className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spirit ? SPIRIT_CLASS[spirit] : ''} ${facingLeft ? knight.facingLeft : ''} ${className}`}
       aria-hidden="true"

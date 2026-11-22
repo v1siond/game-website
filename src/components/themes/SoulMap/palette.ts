@@ -80,8 +80,6 @@ export const SOUL = {
   textSoft: '#e6d4ae',
 } as const
 
-export type SoulColor = keyof typeof SOUL
-
 export const SOUL_VARS = paletteVars('soul', SOUL)
 
 // One carved serif for every word of the world, the cut of the game's banners and menus.
