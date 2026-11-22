@@ -63,6 +63,9 @@ interface PlatformProps {
   entry: Job
   coins: Coin[]
   index: number
+  // His barrel: a button from his landing until he lands on the next one, so the pressed control keeps
+  // focus through the flight; occupied while he sits in it, empty and turning while he flies.
+  armed: boolean
   occupied: boolean
   landed: number
   aim: number | null
@@ -71,7 +74,7 @@ interface PlatformProps {
   barrelRef: (element: HTMLElement | null) => void
 }
 
-function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
+function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
   const { years, cards, jungle } = useLabels()
   const { start, end } = jobYears(entry, years.present)
   const cannon = (
@@ -92,11 +95,19 @@ function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlas
         </div>
       )}
       <div className="absolute -top-6 right-4 w-14">
-        {occupied ? (
-          <button ref={barrelRef} type="button" onClick={onBlast} aria-label={fillLabel(jungle.blastTo, { job: nextName })} className={`block w-full rounded-full ${look.focus}`}>
+        {armed && (
+          <button
+            ref={barrelRef}
+            type="button"
+            onClick={onBlast}
+            aria-disabled={!occupied || undefined}
+            aria-label={fillLabel(jungle.blastTo, { job: nextName })}
+            className={`block w-full rounded-full ${look.focus} ${occupied ? '' : run.idle}`}
+          >
             {cannon}
           </button>
-        ) : (
+        )}
+        {!armed && (
           <span ref={barrelRef} className={`block ${run.idle}`} aria-hidden="true">
             {cannon}
           </span>
@@ -228,6 +239,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
                 entry={entry}
                 coins={coinsOn(index)}
                 index={index}
+                armed={index === at}
                 occupied={index === at && !flight}
                 landed={landings[index] ?? 0}
                 aim={index === at ? aim : null}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'
@@ -13,7 +13,8 @@ import charge from './rhino.module.css'
 // as the charge passes each venture its card is knocked sideways and rocks back. Charge again runs it
 // once more.
 //
-// Pattern: a charge count remounts the trail and the cards, so the CSS plays again; no timers.
+// Pattern: a charge count remounts the runner and the cards, so the CSS plays again; no timers. The
+// root (its observer and data-charging) and the Charge button stay mounted, so focus stays on the button.
 
 // The rhino side on, facing right: grey hide, a big ivory horn, a small one behind it, four trotting legs.
 export function Rhino() {
@@ -49,16 +50,18 @@ export function RhinoCharge({ children }: { children: ReactNode }) {
   }, [triggered])
 
   return (
-    <div ref={ref} key={charges} data-charging={charges > 0 || undefined} className={charge.trail}>
-      <div className="relative mb-4 h-24 overflow-hidden sm:h-28" aria-hidden="true">
-        <div className={`absolute inset-0 ${charge.runner}`}>
-          <div className={`absolute bottom-1 left-0 w-28 sm:w-32 ${charge.gallop}`}>
-            <HeroCharacter profession="engineer" pose="run" className="absolute bottom-[52%] left-[22%] w-[42%]" />
-            <Rhino />
+    <div ref={ref} data-charging={charges > 0 || undefined} className={charge.trail}>
+      <Fragment key={charges}>
+        <div className="relative mb-4 h-24 overflow-hidden sm:h-28" aria-hidden="true">
+          <div className={`absolute inset-0 ${charge.runner}`}>
+            <div className={`absolute bottom-1 left-0 w-28 sm:w-32 ${charge.gallop}`}>
+              <HeroCharacter profession="engineer" pose="run" className="absolute bottom-[52%] left-[22%] w-[42%]" />
+              <Rhino />
+            </div>
           </div>
         </div>
-      </div>
-      <div className={charge.cards}>{children}</div>
+        <div className={charge.cards}>{children}</div>
+      </Fragment>
       <div className="mt-6 flex justify-center">
         <button type="button" onClick={() => setCharges((count) => count + 1)} className={`min-h-[44px] rounded-xl px-5 text-base ${look.button} ${look.buttonWood} ${look.focus}`}>
           {jungle.charge}
