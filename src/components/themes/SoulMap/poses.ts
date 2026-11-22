@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useSectionTrigger, type SectionTriggerReturn } from '@/hooks/useSectionTrigger'
 import type { KnightPose } from './knight'
 
 // Plays his knight (./knight) through a short script of poses, the way the game commits him to a move:
@@ -86,4 +88,30 @@ export function usePoseScript(rest: KnightPose): PoseScript {
   const busy = useCallback(() => running.current, [])
 
   return { pose: shown.pose, key: shown.key, busy, play, replay, hold }
+}
+
+export interface TriggeredScriptOptions {
+  threshold: number
+  // The pose he holds once the script ends (rest, 'idle', by default).
+  end?: KnightPose
+}
+
+export interface TriggeredScript extends SectionTriggerReturn {
+  script: PoseScript
+}
+
+// A scene that plays its script once, the moment the visitor reaches it: the section trigger's entry starts
+// it, so no effect relays `triggered` a commit later. Under reduced motion it never starts and the scene
+// shows its still frame. The latest steps are played, so a caller may build them on each render.
+export function useTriggeredScript(steps: PoseStep[], { threshold, end }: TriggeredScriptOptions): TriggeredScript {
+  const script = usePoseScript('idle')
+  const { play } = script
+  const trigger = useSectionTrigger({
+    threshold,
+    onEnter: () => {
+      if (prefersReducedMotion()) return
+      play(steps, end)
+    },
+  })
+  return { ...trigger, script }
 }

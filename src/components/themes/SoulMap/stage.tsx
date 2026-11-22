@@ -1,15 +1,14 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Band } from '@/lib/cv/content'
 import { Knight } from './knight'
-import { usePoseScript, type PoseStep } from './poses'
+import { useTriggeredScript, type PoseStep } from './poses'
 import { useRunActions } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_META, CARD_TITLE } from './menu'
@@ -48,16 +47,10 @@ function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: B
   const run = useRunActions()
   const reduced = useReducedMotion()
   const { souls: words, links } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.35 })
-  const script = usePoseScript('idle')
-  const { play, replay } = script
+  const { ref, triggered, script } = useTriggeredScript(WALK_IN, { threshold: 0.35 })
+  const { replay } = script
   const rewarded = useRef(false)
   const lit = triggered || reduced
-
-  useEffect(() => {
-    if (!triggered || reduced) return
-    play(WALK_IN)
-  }, [triggered, reduced, play])
 
   const encore = (playing: Band) => {
     replay(ENCORE)

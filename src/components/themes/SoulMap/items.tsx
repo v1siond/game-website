@@ -1,16 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { Knight } from './knight'
-import { usePoseScript } from './poses'
+import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
@@ -32,6 +31,12 @@ const RISE_MS = 1400
 const STAND_MS = 1800
 const FADE_MS = 900
 
+const summon = (sendHome: () => void): PoseStep[] => [
+  { pose: 'respawn', ms: RISE_MS },
+  { pose: 'idle', ms: STAND_MS },
+  { pose: 'idle', ms: FADE_MS, effect: sendHome },
+]
+
 function SummonSign({ lit }: { lit: boolean }) {
   return (
     <svg viewBox="0 0 120 24" className={`absolute inset-x-0 bottom-0 mx-auto h-6 w-32 ${souls.sigil} ${lit ? souls.sigilLit : ''}`} aria-hidden="true" focusable="false">
@@ -42,20 +47,8 @@ function SummonSign({ lit }: { lit: boolean }) {
   )
 }
 
-function SummonedPhantom({ summoned }: { summoned: boolean }) {
+function SummonedPhantom({ summoned, home, script }: { summoned: boolean; home: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
-  const script = usePoseScript('idle')
-  const { play } = script
-  const [home, setHome] = useState(false)
-
-  useEffect(() => {
-    if (!summoned || reduced) return
-    play([
-      { pose: 'respawn', ms: RISE_MS },
-      { pose: 'idle', ms: STAND_MS },
-      { pose: 'idle', ms: FADE_MS, effect: () => setHome(true) },
-    ])
-  }, [summoned, reduced, play])
 
   return (
     <div className="relative h-28" aria-hidden="true">
@@ -97,12 +90,13 @@ function PickUp({ project, picked, onPick }: { project: Project; picked: boolean
 }
 
 function ItemCard({ project, years, links }: ProjectSlot) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
+  const [home, setHome] = useState(false)
+  const { ref, triggered, script } = useTriggeredScript(summon(() => setHome(true)), { threshold: 0.25 })
   const [picked, setPicked] = useState(false)
 
   return (
     <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''} ${picked ? souls.itemPicked : ''}`}>
-      <SummonedPhantom summoned={triggered} />
+      <SummonedPhantom summoned={triggered} home={home} script={script} />
       <div className={`${souls.itemCard} ${ashen.panel} -mt-2 p-5`}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className={`min-w-0 ${CARD_TITLE}`}>
