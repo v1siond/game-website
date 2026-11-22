@@ -1,7 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
@@ -60,14 +61,43 @@ function Level({ slot, fade = false, children }: LevelProps) {
   return <FadeInScene>{chamber}</FadeInScene>
 }
 
+// One line of the About plate's facts, the label in the gold capitals; an empty fact leaves no line.
+function AboutFact({ label, value }: { label: string; value: string }) {
+  if (!value) return null
+  return (
+    <div className="flex flex-wrap gap-x-2">
+      <dt className="uppercase tracking-[0.15em] text-[color:var(--deco-gold-bright-text)]">{label}</dt>
+      <dd className="text-[color:var(--deco-mist)]">{value}</dd>
+    </div>
+  )
+}
+
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
+    const { cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <Level slot={slot} fade>
         <PoweredRoom>
           <BrassPanel>
             <p className="mx-auto max-w-prose text-base leading-relaxed text-[color:var(--deco-cream)]">{slot.bio}</p>
+            {highlights.length > 0 && (
+              <ul className="mx-auto mt-5 max-w-prose space-y-2" aria-label={cards.keyAchievements}>
+                {highlights.map((highlight) => (
+                  <li key={highlight} className="flex items-start gap-2 text-sm text-[color:var(--deco-cream)]">
+                    <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0 text-[color:var(--deco-gold)]" aria-hidden="true" focusable="false">
+                      <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
+                    </svg>
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <dl className="mx-auto mt-5 max-w-prose space-y-1 text-sm">
+              <AboutFact label={about.education} value={education} />
+              <AboutFact label={about.languages} value={languages} />
+            </dl>
           </BrassPanel>
         </PoweredRoom>
       </Level>

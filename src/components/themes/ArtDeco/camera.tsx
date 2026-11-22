@@ -6,6 +6,7 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
+import { projectCard } from '@/lib/cv/cvView'
 import type { Project } from '@/lib/cv/content'
 import { DECO_COLORS as C } from './palette'
 import camera from './camera.module.css'
@@ -83,8 +84,9 @@ function PlateArt({ index, projectId }: { index: number; projectId: Project['id'
 const BRACKETS = ['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2']
 
 function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
-  const { project, years, links, noLink } = slot
+  const { links, noLink } = slot
   const labels = useLabels()
+  const project = projectCard(slot.project, labels)
   const [snaps, setSnaps] = useState(0)
   const developed = snaps > 0
 
@@ -106,10 +108,23 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
             <h3 className={`min-w-0 text-lg leading-snug ${camera.title}`}>
               <SlashBreaks text={project.name} />
             </h3>
-            {years && <span className="whitespace-nowrap text-sm text-[color:var(--deco-sepia)]">{years}</span>}
+            {project.years && <span className="whitespace-nowrap text-sm text-[color:var(--deco-sepia)]">{project.years}</span>}
           </div>
           <p className="mt-1 text-sm font-bold text-[color:var(--deco-blood)]">{project.role}</p>
           <p className="mt-2 text-sm leading-relaxed text-[color:var(--deco-abyss)]">{project.tagline}</p>
+          {project.description && <p className="mt-2 text-sm leading-relaxed text-[color:var(--deco-sepia)]">{project.description}</p>}
+          {project.details.length > 0 && (
+            <ul className="mt-3 space-y-1" aria-label={labels.cards.details}>
+              {project.details.map((detail) => (
+                <li key={detail} className="flex items-start gap-2 text-sm text-[color:var(--deco-abyss)]">
+                  <svg viewBox="0 0 10 10" className="mt-1 h-2.5 w-2.5 flex-shrink-0 text-[color:var(--deco-blood)]" aria-hidden="true" focusable="false">
+                    <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
+                  </svg>
+                  {detail}
+                </li>
+              ))}
+            </ul>
+          )}
           {project.impact && (
             <p className={`mt-3 px-3 py-2 text-sm italic ${camera.impact}`}>
               <span className="mr-2 not-italic uppercase tracking-[0.12em]">{labels.cards.impact}</span>
