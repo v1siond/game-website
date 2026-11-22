@@ -29,10 +29,6 @@ import living from './living.module.css'
 //   flash, lighting its card, then answers with the uppercut.
 // - SparRing (Muay Thai): his roundhouse and jab put the partner down, K.O., then Perfect.
 
-export function useScene(zone: Zone) {
-  return useZoneStage<Zone>(zone)
-}
-
 // ---- About: the bonus stage car ----
 
 const CAR_BOUT: Beat[] = [
@@ -72,11 +68,13 @@ const DEBRIS: { d: string; fill: string; vars: CSSProperties }[] = [
 function Car({ damage }: { damage: number }) {
   const roofDrop = Math.min(damage, 3) * 5
   const wrecked = damage >= 3
+  // The sill the body stands on: low on its belly once wrecked.
+  const sill = wrecked ? 80 : 70
   return (
     <svg viewBox="0 0 200 90" className="h-full w-full overflow-visible" focusable="false">
       <ellipse cx={100} cy={86} rx={90} ry={4} fill={FS.ink} opacity={0.4} />
       <path
-        d={`M14 ${wrecked ? 80 : 70} L22 44 H58 L76 ${18 + roofDrop} H136 L156 44 H186 L190 ${wrecked ? 80 : 70} Z`}
+        d={`M14 ${sill} L22 44 H58 L76 ${18 + roofDrop} H136 L156 44 H186 L190 ${sill} Z`}
         fill={FS.p2}
         stroke={FS.ink}
         strokeWidth={3}
@@ -107,7 +105,7 @@ const WRECK_BEAT = CAR_BOUT.findIndex((beat) => beat.mark === 'wreck')
 
 export function CarSmash({ profession, children }: { profession: Profession; children: ReactNode }) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('castle')
+  const { ref, on, reduced } = useZoneStage<Zone>('castle')
   const { index, beat, take, started, replay } = useBout(CAR_BOUT, on, reduced)
   const wrecked = reached(CAR_BOUT, index, 'wreck')
   const damage = wrecked ? 3 : marksUpTo(CAR_BOUT, index, 'hit')
@@ -176,7 +174,7 @@ interface LitListProps<T> {
 
 export function BlastRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('market')
+  const { ref, on, reduced } = useZoneStage<Zone>('market')
   const bout = useMemo(() => blastBout(items.length), [items.length])
   const { index, beat, take, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
@@ -230,7 +228,7 @@ const superBout = (count: number): Beat[] => [
 export function SuperArt({ profession, count }: { profession: Profession; count: number }) {
   const { arcade } = useLabels()
   const land = useComboLand()
-  const { ref, on, reduced } = useScene('harbour')
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
   const bout = useMemo(() => superBout(count), [count])
   // Every hit of the super lands on the combo counter, once per beat, as the bout's clock reaches it.
   const { beat, take, started, replay } = useBout(bout, on, reduced, (next) => {
@@ -298,7 +296,7 @@ const parryBout = (count: number): Beat[] => [
 
 export function ParryRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('harbour')
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
   const bout = useMemo(() => parryBout(items.length), [items.length])
   const { index, beat, take, started, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
@@ -334,7 +332,7 @@ const SPAR_BOUT: Beat[] = [
 
 export function SparRing({ profession }: { profession: Profession }) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('temple')
+  const { ref, on, reduced } = useZoneStage<Zone>('temple')
   const { index, beat, take, started, replay } = useBout(SPAR_BOUT, on, reduced)
   const ko = reached(SPAR_BOUT, index, 'ko')
   const perfect = reached(SPAR_BOUT, index, 'perfect')
@@ -383,7 +381,7 @@ const DECK_BOUT: Beat[] = [{ hero: 'act', partner: 'win', ms: 0 }]
 // bobs; a pointer on a band's card ([data-band] in children) or the focus in it makes them cheer, jumping
 // higher and faster, all in CSS (living.module.css), so a band hover renders nothing.
 export function DeckShow({ children }: { children: ReactNode }) {
-  const { ref, on, reduced } = useScene('harbour')
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
   const { beat, take } = useBout(DECK_BOUT, on, reduced)
 
   return (

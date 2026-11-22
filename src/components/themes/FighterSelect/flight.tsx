@@ -7,7 +7,8 @@ import type { Job } from '@/lib/cv/content'
 import { FS } from './palette'
 import { headingTo, pinFor, type Pin } from './route'
 import { WorldMap } from './worldMap'
-import { useScene } from './scenes'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './backdrop'
 import look from './world.module.css'
 import living from './living.module.css'
 
@@ -49,7 +50,7 @@ function Plane({ at, heading }: { at: Pin; heading: number }) {
 }
 
 export function FlightMap({ jobs, children }: { jobs: Job[]; children: ReactNode }) {
-  const { ref } = useScene('market')
+  const { ref } = useZoneStage<Zone>('market')
   const [{ stop, from }, setLeg] = useState({ stop: 0, from: 0 })
   const pins = useMemo(() => jobs.map((job) => pinFor(job.location)), [jobs])
 

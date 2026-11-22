@@ -492,17 +492,18 @@ function Spark({ at: [x, y], r }: { at: Pt; r: number }) {
   )
 }
 
-const FX_DRAW: Record<Fx['kind'], (fx: Fx) => ReactNode> = {
-  charge: (fx) =>
-    fx.kind === 'charge' && (
-      <g>
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r + 3} fill={FS.p1} opacity={0.45} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r} fill={FS.cyan} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r * 0.45} fill={FS.flash} />
-      </g>
-    ),
+// One drawing per effect kind, each handed its own kind of effect.
+type FxDraw = { [Kind in Fx['kind']]: (fx: Extract<Fx, { kind: Kind }>) => ReactNode }
+
+const FX_DRAW: FxDraw = {
+  charge: (fx) => (
+    <g>
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r + 3} fill={FS.p1} opacity={0.45} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r} fill={FS.cyan} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r * 0.45} fill={FS.flash} />
+    </g>
+  ),
   flame: (fx) => {
-    if (fx.kind !== 'flame') return null
     const mid = lerp(fx.from, fx.to, 0.5)
     return (
       <g>
@@ -519,34 +520,35 @@ const FX_DRAW: Record<Fx['kind'], (fx: Fx) => ReactNode> = {
       </g>
     )
   },
-  spark: (fx) => fx.kind === 'spark' && <Spark at={fx.at} r={fx.r} />,
-  spin: (fx) =>
-    fx.kind === 'spin' && (
-      <ellipse
-        cx={58}
-        cy={88}
-        rx={40}
-        ry={9}
-        fill="none"
-        stroke={FS.flash}
-        strokeWidth={3}
-        strokeDasharray="46 160"
-        strokeDashoffset={fx.phase * -52}
-        opacity={0.75}
-      />
-    ),
-  kit: (fx) => fx.kind === 'kit' && <DrumKit swing={fx.swing} />,
+  spark: (fx) => <Spark at={fx.at} r={fx.r} />,
+  spin: (fx) => (
+    <ellipse
+      cx={58}
+      cy={88}
+      rx={40}
+      ry={9}
+      fill="none"
+      stroke={FS.flash}
+      strokeWidth={3}
+      strokeDasharray="46 160"
+      strokeDashoffset={fx.phase * -52}
+      opacity={0.75}
+    />
+  ),
+  kit: (fx) => <DrumKit swing={fx.swing} />,
   // The parry's blue flash: the whole body lit in a cold blue halo, a ring and a glint where the palm
   // turns the blow aside.
-  parry: (fx) =>
-    fx.kind === 'parry' && (
-      <g>
-        <ellipse cx={66} cy={100} rx={44} ry={66} fill={FS.parry} opacity={0.35} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={13} fill="none" stroke={FS.parry} strokeWidth={4} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
-      </g>
-    ),
+  parry: (fx) => (
+    <g>
+      <ellipse cx={66} cy={100} rx={44} ry={66} fill={FS.parry} opacity={0.35} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={13} fill="none" stroke={FS.parry} strokeWidth={4} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
+    </g>
+  ),
 }
+
+// The map is keyed by the same kind that narrows the effect, so this drawing takes this effect.
+const drawFx = (fx: Fx): ReactNode => (FX_DRAW[fx.kind] as (fx: Fx) => ReactNode)(fx)
 
 const BEHIND: ReadonlySet<Fx['kind']> = new Set(['flame', 'parry'])
 
@@ -556,7 +558,7 @@ function Effects({ fx = [], behind }: { fx?: Fx[]; behind: boolean }) {
       {fx
         .filter((item) => BEHIND.has(item.kind) === behind)
         .map((item, i) => (
-          <g key={`${item.kind}-${i}`}>{FX_DRAW[item.kind](item)}</g>
+          <g key={`${item.kind}-${i}`}>{drawFx(item)}</g>
         ))}
     </>
   )

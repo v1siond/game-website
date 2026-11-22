@@ -9,7 +9,8 @@ import { ScreenPanel } from './frames'
 import { StageBackdrop } from './stages'
 import { ArcadeLinks } from './actions'
 import { Fighter } from './fighter'
-import { useScene } from './scenes'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './backdrop'
 import living from './living.module.css'
 import { CallText } from './badges'
 import { Cue, HudCentre, LifeBar } from './hud'
@@ -52,7 +53,7 @@ function ChallengeClock() {
 
 export function ChallengerScene({ profession }: { profession: Profession }) {
   const { sections, arcade } = useLabels()
-  const { ref } = useScene('temple')
+  const { ref } = useZoneStage<Zone>('temple')
 
   return (
     <section aria-labelledby={CONTACT_HEADING} className="relative z-20 mx-auto mb-10 max-w-6xl px-4 sm:px-6">

@@ -68,7 +68,7 @@ function replayShake(element: HTMLElement) {
 }
 
 export function HitCard({ children }: { children: ReactNode }) {
-  const land = useContext(ComboContext)
+  const land = useComboLand()
   const [hit, setHit] = useState(0)
   const shaken = useRef<HTMLDivElement>(null)
 
