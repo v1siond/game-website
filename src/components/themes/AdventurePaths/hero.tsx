@@ -19,6 +19,7 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { JOURNAL_SERIF, TRAIL } from './palette'
 import { shareOf } from './trail'
 import { useTrailWalker, type WalkLeg } from './walk'
+import { ACT_MS, ENTRANCE_FIT, ENTRANCE_STEPS, WALK_AT, WALK_SPEED, type EntranceStep } from './entrance'
 import { TrailWalker } from './walker'
 import map from './map.module.css'
 import { heldUntil } from '@/components/themes/shared/held'
@@ -28,11 +29,14 @@ const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TR
 
 // The recruiter first screen and the profession pick, as the overworld map he arrives on.
 //
-//   unroll  0ms     the rolled map slides open to the right behind its wooden roller
-//   ink     950ms   the island, woods, hills and landmarks rise into place; the name plaque swings down
-//   trail   1500ms  the trail dots in one dot at a time, harbour to crossroads, then out to each landmark
-//   land    2700ms  he drops onto the harbour tile
-//   walk    3100ms  he walks the trail to the landmark of the shown profession; arriving makes it ready
+//   unroll  the rolled map slides open to the right behind its wooden roller
+//   ink     the island, woods, hills and landmarks rise into place; the name plaque swings down
+//   trail   the trail dots in one dot at a time, harbour to crossroads, then out to each landmark
+//   land    he drops onto the harbour tile
+//   walk    he walks the trail to the landmark of the shown profession; arriving makes it ready
+//
+// The beats' times, his pace and his act are entrance.ts, fitted so the whole entrance ends within 5 s of
+// the trigger; the root hands the fit to the map's transitions as --fit.
 //
 // Pattern: setTimeout phases as data attributes the CSS keys its transitions on (transform and opacity
 // only), and one requestAnimationFrame walker (walk.ts) for his steps. The resting frame is the plain
@@ -44,24 +48,9 @@ const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TR
 // change the profession at once and he walks after it. One walk at a time: a pick made while he walks
 // waits for him to arrive.
 
-type Step = 'unrolled' | 'inked' | 'trailed' | 'landed'
-
-const STEPS: ReadonlyArray<readonly [Step, number]> = [
-  ['unrolled', 0],
-  ['inked', 950],
-  ['trailed', 1500],
-  ['landed', 2700],
-]
-
-const WALK_AT = 3100
 const ENTER_MS = 900
-// How long he plays his profession's action after arriving at its landmark.
-const ACT_MS = 1800
-// Map units a second. The overworld walk is a steady 0.8125 px a frame on a 256 px screen, about a fifth of
-// the screen a second; the hub map is one screen wide, so a fifth of its width.
-const WALK_SPEED = 200
 
-type Reached = Record<Step, boolean>
+type Reached = Record<EntranceStep, boolean>
 
 const NONE: Reached = { unrolled: false, inked: false, trailed: false, landed: false }
 const ALL: Reached = { unrolled: true, inked: true, trailed: true, landed: true }
@@ -82,7 +71,7 @@ function useEntrance(onLanded: () => void) {
     }
     if (!triggered) return
     const timers = [
-      ...STEPS.map(([step, at]) => window.setTimeout(() => setReached((now) => ({ ...now, [step]: true })), at)),
+      ...ENTRANCE_STEPS.map(([step, at]) => window.setTimeout(() => setReached((now) => ({ ...now, [step]: true })), at)),
       window.setTimeout(() => landed.current(), WALK_AT),
     ]
     return () => timers.forEach(window.clearTimeout)
@@ -324,6 +313,7 @@ export function ExpeditionHero({ name }: { name: string }) {
       ref={entrance.ref}
       data-worlds-hero=""
       className={`relative px-4 pb-6 pt-14 sm:px-6 ${heldUntil(entrance.triggered || entrance.skip)}`}
+      style={cssVars({ '--fit': ENTRANCE_FIT })}
       data-unrolled={reached.unrolled}
       data-inked={reached.inked}
       data-trailed={reached.trailed}

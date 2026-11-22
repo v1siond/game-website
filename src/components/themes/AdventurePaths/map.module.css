@@ -11,7 +11,8 @@
  *
  * The map's life plays once the map shows (the hero holds it until then, heldUntil) and has ended within
  * 5 s: each two frame loop a set number of beats, ending on its first frame, the clouds the first 5 s of
- * their drift at their own pace; his frames a set number of beats from the moment he walks or acts.
+ * their drift at their own pace; his act frames a set number of beats, his step frames as many as his walk
+ * takes (walk.ts). The entrance's transitions are scaled by --fit (entrance.ts), so it ends within 5 s.
  */
 
 .root {
@@ -45,7 +46,7 @@
 /* The rolled part of the map slides off to the right with the wooden roller at its edge. */
 .cover {
   transform: translate3d(101%, 0, 0);
-  transition: transform 1100ms var(--glide);
+  transition: transform calc(1100ms * var(--fit, 1)) var(--glide);
 }
 
 :global(html[data-intro]) [data-unrolled='false'] .cover {
@@ -56,8 +57,8 @@
 /* The ink: coast, landmarks and the woods rise into place once the paper is flat, each on its --i. */
 .inked {
   transition:
-    opacity 380ms ease-out calc(var(--i, 0) * 90ms),
-    transform 380ms var(--pop) calc(var(--i, 0) * 90ms);
+    opacity calc(380ms * var(--fit, 1)) ease-out calc(var(--i, 0) * 90ms * var(--fit, 1)),
+    transform calc(380ms * var(--fit, 1)) var(--pop) calc(var(--i, 0) * 90ms * var(--fit, 1));
 }
 
 :global(html[data-intro]) [data-inked='false'] .inked {
@@ -69,7 +70,7 @@
 /* The trail appears one dot at a time in trail order (--at along the trail, --leg for its stretch), each
  * dot fading in on its own, as a new path appears tile by tile on the overworld map. */
 .dot {
-  transition: opacity 260ms ease-out calc((var(--leg, 0) + var(--at, 0)) * var(--trail-ms, 560ms));
+  transition: opacity calc(260ms * var(--fit, 1)) ease-out calc((var(--leg, 0) + var(--at, 0)) * var(--trail-ms, 560ms) * var(--fit, 1));
 }
 
 :global(html[data-intro]) [data-trailed='false'] .dot {
@@ -96,8 +97,8 @@
 .plaque {
   transform-origin: 50% -40px;
   transition:
-    transform 760ms var(--pop),
-    opacity 200ms ease-out;
+    transform calc(760ms * var(--fit, 1)) var(--pop),
+    opacity calc(200ms * var(--fit, 1)) ease-out;
 }
 
 :global(html[data-intro]) [data-inked='false'] .plaque {
@@ -108,7 +109,7 @@
 
 .plaqueSettle {
   transform-origin: 50% -40px;
-  animation: plaque-sway 1400ms ease-out 760ms 1 both;
+  animation: plaque-sway calc(1400ms * var(--fit, 1)) ease-out calc(760ms * var(--fit, 1)) 1 both;
 }
 
 [data-inked='false'] .plaqueSettle {
@@ -267,8 +268,8 @@
 
 .markerDrop {
   transition:
-    transform 420ms var(--pop),
-    opacity 120ms linear;
+    transform calc(420ms * var(--fit, 1)) var(--pop),
+    opacity calc(120ms * var(--fit, 1)) linear;
 }
 
 [data-landed='false'] .markerDrop {
@@ -307,19 +308,19 @@
 }
 
 [data-walking='true'] .frame[data-f$='-walkA'] {
-  animation: frame-first 280ms steps(1, end) 17 forwards;
+  animation: frame-first var(--walk-frame) steps(1, end) var(--walk-beats) forwards;
 }
 
 [data-walking='true'] .frame[data-f$='-walkB'] {
-  animation: frame-second 280ms steps(1, end) 17 forwards;
+  animation: frame-second var(--walk-frame) steps(1, end) var(--walk-beats) forwards;
 }
 
 [data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actA'] {
-  animation: frame-first 440ms steps(1, end) 5 forwards;
+  animation: frame-first 440ms steps(1, end) 4 forwards;
 }
 
 [data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actB'] {
-  animation: frame-second 440ms steps(1, end) 5 forwards;
+  animation: frame-second 440ms steps(1, end) 4 forwards;
 }
 
 [data-acting='true'][data-walking='true'] .frame[data-f='torso-actA'],
@@ -357,8 +358,14 @@
   animation: sprite-breath 1.8s steps(2, jump-none) 2.25 forwards;
 }
 
+/* While he walks he bobs a pixel on every step frame, the walk's own count (walk.ts sets --walk-frame and
+   --walk-beats); once he has walked he stands unbreathed, the breath at rest played only before the walk. */
 [data-walking='true'] .breath {
-  animation: sprite-bob 280ms steps(2, jump-none) 17.25 forwards;
+  animation: sprite-bob var(--walk-frame) steps(2, jump-none) var(--walk-beats) forwards;
+}
+
+[data-walking='false'] .breath {
+  animation: none;
 }
 
 @keyframes sprite-breath {
