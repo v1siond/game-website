@@ -21,23 +21,13 @@ export const cyclesIn = (seconds: number, room = PLAY_S) => Math.max(Math.floor(
 // cycle does not play: a count of 0 with `forwards` holds its 0% keyframe, the frame it would rest on.
 const MIN_PACE = 0.5
 
-/** A looping keyframe as whole cycles that end within PLAY_S of the start, `delay` (s) waited first, or,
- *  under a negative delay, at its own pace from where it is (underWay). */
+/** A looping keyframe as whole cycles that end within PLAY_S of the start, `delay` (s) waited first, so it
+ *  rests on its 0% frame. */
 export function cycles(name: string, seconds: number, timing: string, delay = 0): string {
-  if (delay < 0) return underWay(name, seconds, timing, -delay)
-  const room = PLAY_S - delay
+  const room = PLAY_S - Math.max(delay, 0)
   if (room < seconds * MIN_PACE) return `${name} ${secs(seconds)} ${timing} 0 forwards`
   const cycle = Math.min(seconds, room)
   return `${name} ${secs(cycle)} ${timing} ${cyclesIn(cycle, room)} forwards`
-}
-
-// A loop already `offset` s into its cycle when it shows (a negative delay, drawn to stagger it) keeps its own
-// pace: it plays on to the last cycle end that comes within PLAY_S and rests there, on its start frame; when
-// no cycle ends that soon, it plays the PLAY_S slice and holds where that leaves it.
-function underWay(name: string, seconds: number, timing: string, offset: number): string {
-  const ends = Math.floor((PLAY_S + offset) / seconds)
-  if (ends * seconds > offset) return `${name} ${secs(seconds)} ${timing} ${ends} forwards`
-  return slice(name, seconds, timing, -offset)
 }
 
 /** An `alternate` loop as whole there and back pairs that end within PLAY_S of the start, `delay` (s) waited

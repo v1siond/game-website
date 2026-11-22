@@ -28,12 +28,11 @@ describe('cycles', () => {
     expect(parts(cycles('breath', 3.6, 'ease-in-out', 2.5))).toEqual({ seconds: 2.5, count: 1 })
   })
 
-  it('keeps today\'s pace under a negative delay and ends by 5 s', () => {
-    for (const [seconds, delay] of [[10, -2], [12, -4], [14, -6], [3, -1]] as const) {
+  it('rests on its 0% frame for any delay, a whole count of cycles that ends by 5 s', () => {
+    for (const [seconds, delay] of [[10, -2], [14, -6], [4.1, 0.9], [4.4, 0.6], [5, 0]] as const) {
       const shorthand = cycles('spirit', seconds, 'ease-in-out', delay)
-      expect(parts(shorthand).seconds).toBe(seconds)
-      expect(endS(shorthand, delay)).toBeLessThanOrEqual(STORY_MS / 1000 + 1e-9)
-      expect(endS(shorthand, delay)).toBeGreaterThan(0)
+      expect(Number.isInteger(parts(shorthand).count)).toBe(true)
+      expect(endS(shorthand, Math.max(delay, 0))).toBeLessThanOrEqual(STORY_MS / 1000 + 1e-9)
     }
   })
 })
