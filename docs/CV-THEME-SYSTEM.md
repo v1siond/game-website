@@ -206,9 +206,18 @@ medal in Art Deco, whose cord columns stay three.
 | sectionText | `src/lib/cv/sectionText.ts` | Shared text: project links, year spans, job years, `jobSpan` ("2019 to 2022") and `jobSpanCompact` ("2019 - 2022"), Muay Thai facts, heading ids. |
 | jobCard, projectCard, ventureCard, aboutBlock | `src/lib/cv/cvView.ts` | The card view models: every field of a job, project, venture or the About block whole, with its strings formatted, so each world renders the same content in its own look. |
 | VentureList | `src/components/cv/VentureList.tsx` | The ventures without a look, in `viewFor`'s order, each with its link props and accessible names. |
+| TechList | `src/components/cv/TechList.tsx` | The tech stack without a look: one masonry item per category with its heading, icon and named list; the world passes its classes and draws each technology with `renderItem`. |
+| ContactLink, useSiteLinks, siteLinks | `src/components/cv/SiteLinks.tsx`, `src/lib/cv/siteLinks.ts` | The contact links without a look: the hero's email and LinkedIn slots and the CV and engine slots. `useSiteLinks(word)` gives the CV link (`/cv`) and the engine link (new tab, an accessible name that holds the visible word); the world picks the engine word (`engine`, `engineShort`, `portfolio`, `play`, `enter`) and passes `ContactLink` its class per link id. |
+| sectionViews, SectionFrames, sectionPlan | `src/components/cv/SectionPlanView.tsx`, `src/lib/cv/sectionPlan.ts` | The section plan: `sectionPlan` decides which sections a profession shows and in which order (about, work, tech, services, projects, ventures for the engineer, each left out when empty; bands; Muay Thai). A world writes one frame per section id and exports `SECTION_VIEWS = sectionViews(FRAMES)` for `ProfessionSectionsView`. |
 | FindProvider, useFind, useFindCount, useRolling | `src/components/themes/shared/finds.tsx`, `src/lib/finds.ts` | The find counter: `find(id, group)` marks a find, `useFindCount(group)` gives found and total, `useRolling` climbs the shown number; the reducer is in `src/lib/finds.ts`. |
 | RecruiterHero, ProfessionSwitch, ProfessionSectionsView | `src/components/cv/` | The hero, the profession switch, the per profession dispatch. |
-| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage, useYearNow | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it, the year a footer prints (the server's until hydration, then the visitor's, in UTC). |
+| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage, useYearNow | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it, the year a footer prints (the server's until hydration, then the visitor's, in UTC). The zone lives in a store outside React state: the page makes it with `useZoneStore`, the backdrop that draws the zone reads it with `useStoreValue`, and a root that only needs `data-zone` writes it with `useZoneAttribute`, so a zone crossing re-renders nothing else. |
+| useTimedSteps, useOnChange | `src/hooks/` | A scene played as a chain of timed steps, each timed from the commit of the one before (the last step from the start under reduced motion); a call on each change of a value after the first render, before or after paint. |
+| cssVars | `src/lib/cssVars.ts` | CSS custom properties for an element's `style`, the one inline style the site writes, with the one cast to `CSSProperties`. |
+| SectionCameo, LaneCameo | `src/components/themes/shared/` | A section his figure plays into once (in, the act, out) or crosses once along a lane above it, started by the section trigger, each beat ended by its own `animationend`; the world gives its beats, classes and figure. |
+| PixelRuns | `src/components/themes/shared/PixelRuns.tsx` | A pixel sprite's runs (`src/lib/pixelRuns.ts`) drawn as 1 px tall rects, coloured by key; the world wraps them in its own svg. |
+| staggerAt | `src/components/themes/shared/stagger.ts` | The stagger class of the item at an index (`[--i:0]` to `[--i:7]`), which a world's keyframes turn into a delay. |
+| CopyrightLine | `src/components/themes/shared/CopyrightLine.tsx` | The footer's copyright line: the sign, the year from `useYearNow` and his name; the world keeps its own footer around it. |
 | paletteVars | `src/components/themes/shared/paletteVars.ts` | Turns a palette into CSS variables (`paletteVars('tp', { leafDark })` sets `--tp-leaf-dark`). |
 | GlobalProfessionStage | `src/components/themes/shared/professionStage.tsx` | A recoloured profession stage for worlds that draw none of their own. |
 
@@ -292,8 +301,8 @@ for him is `HERO_IDENTITY`. The bar is Dark Fantasy's `KnightCharacter.tsx` and 
    `WORLDS_WITH_OWN_STAGE`, or skip that to use the shared `GlobalProfessionStage`.
 4. Load the world's lettering through `next/font/google` in `<Name>Theme.tsx`, set its `variable` class on
    the root and read the variable from the world's css.
-5. Write `sections.tsx`: one component per profession in a map for `ProfessionSectionsView`, text from
-   `sectionText.ts`, wrapped in `ScrollScene` or `FadeInScene`.
+5. Write `sections.tsx`: one frame per section id and `SECTION_VIEWS = sectionViews(FRAMES)` for
+   `ProfessionSectionsView`, text from `sectionText.ts`, wrapped in `ScrollScene` or `FadeInScene`.
 6. Write `<Name>Theme.tsx`: read `useWorldView()`, render `RecruiterHero`, `ProfessionSwitch` and the
    sections, set the palette on the root with `paletteVars`.
 7. Register it: an entry in `src/themes/themes.ts` that reads the palette, and one in `src/themes/worlds.ts`
