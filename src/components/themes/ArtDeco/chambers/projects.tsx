@@ -35,10 +35,13 @@ function Lab() {
   )
 }
 
-function Valve() {
+// The stem runs up to the flow pipe at FLOOR - 320 whatever the row's size.
+const STEM = 320
+
+function Valve({ size }: { size: number }) {
   return (
     <>
-      <rect x={-10} y={-320} width={20} height={320} fill={C.steelShade} />
+      <rect x={-10} y={-STEM / size} width={20} height={STEM / size} fill={C.steelShade} />
       <g data-wheel="">
         <circle cx={0} cy={-170} r={40} fill="none" stroke={C.blood} strokeWidth="9" />
         <path d="M-40 -170 H40 M0 -210 V-130" stroke={C.blood} strokeWidth="6" />
@@ -48,11 +51,11 @@ function Valve() {
   )
 }
 
-function Flowing() {
+function Flowing({ size }: { size: number }) {
   return (
     <>
       <circle cx={0} cy={-170} r={80} fill={C.tealLight} opacity="0.18" />
-      <rect x={-5} y={-320} width={10} height={320} fill={C.tealLight} opacity="0.8" />
+      <rect x={-5} y={-STEM / size} width={10} height={STEM / size} fill={C.tealLight} opacity="0.8" />
     </>
   )
 }
@@ -64,8 +67,8 @@ export const projects: Chamber = {
     <>
       <PropRow
         xs={xs}
-        art={() => <Valve />}
-        light={() => <Flowing />}
+        art={(_i, size) => <Valve size={size} />}
+        light={(_i, size) => <Flowing size={size} />}
       />
       <Walker xs={xs} profession={profession} />
     </>

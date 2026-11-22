@@ -131,6 +131,12 @@
   .heroCopy {
     justify-self: start;
   }
+
+  /* narrower than the column, against its right edge, so the lobby shows between it and his sign */
+  .machine {
+    max-width: 560px;
+    justify-self: end;
+  }
 }
 
 /* ---- a chamber: a tall head that holds the picture alone, then brings the plaque up, then the cards ---- */
