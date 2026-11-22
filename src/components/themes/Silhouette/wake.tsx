@@ -19,7 +19,8 @@ import shade from './shade.module.css'
 // black; an iris of light opens on the forest (four planes, ./depth); he lies in the grass, pushes up onto
 // his hands and stands; then his name and title fade in as a silent film intertitle above the scene and
 // the contact actions below it. setTimeout phases, once on mount; reduced motion and the World Select
-// preview start on the last frame. The layers lean to the pointer the whole time.
+// preview start on the last frame, from the first render (the motion-reduce utilities cover the server's
+// frame, which cannot read the setting). The layers lean to the pointer the whole time.
 //
 // Animated: the iris and the black, his parts, the rope, four layer leans, the two text blocks.
 
@@ -101,19 +102,19 @@ function Forest({ profession, pose }: { profession: Profession; pose: SpritePose
 function Iris({ phase }: { phase: WakePhase }) {
   const open = phase !== 'dark'
   return (
-    <div className={`pointer-events-none absolute inset-0 z-10 ${phase === 'done' ? 'hidden' : ''}`} aria-hidden="true">
+    <div className={`pointer-events-none absolute inset-0 z-10 motion-reduce:hidden ${phase === 'done' ? 'hidden' : ''}`} aria-hidden="true">
       <div className={`absolute inset-0 bg-[color:var(--sh-black)] ${open ? `opacity-0 ${shade.irisBlack}` : 'opacity-100'}`} />
       <div className={`${shade.iris} ${open ? shade.irisOpen : ''}`} />
     </div>
   )
 }
 
-const TEXT_SHOWN = (shown: boolean) => (shown ? `opacity-100 ${shade.titleIn}` : 'translate-y-2 opacity-0')
+const TEXT_SHOWN = (shown: boolean) => (shown ? `opacity-100 ${shade.titleIn}` : 'translate-y-2 opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100')
 
 export function WakeHero({ profession }: { profession: Profession }) {
   const { navigation } = useLabels()
   const preview = usePreview()
-  const [phase, setPhase] = useState<WakePhase>('dark')
+  const [phase, setPhase] = useState<WakePhase>(() => (preview || prefersReducedMotion() ? 'done' : 'dark'))
 
   useEffect(() => {
     if (preview || prefersReducedMotion()) {
