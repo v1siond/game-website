@@ -40,19 +40,17 @@ const OUTFIT_LOOK: WardrobeLook = { plate: INK, text: PHOSPHOR, ring: GLASS }
 
 /** How many characters of the text have been typed: all of it when off, counting up once started. */
 function useTyped(total: number, running: boolean, instant: boolean): number {
-  const [typed, setTyped] = useState(instant ? total : 0)
+  const [typed, setTyped] = useState(0)
+  const done = typed >= total
 
+  // The clock runs only while characters are left, so a typed hero wakes nothing.
   useEffect(() => {
-    if (instant) {
-      setTyped(total)
-      return
-    }
-    if (!running) return
-    const timer = window.setInterval(() => setTyped((count) => (count >= total ? count : count + 1)), TYPE_TICK_MS)
+    if (instant || !running || done) return
+    const timer = window.setInterval(() => setTyped((count) => Math.min(count + 1, total)), TYPE_TICK_MS)
     return () => window.clearInterval(timer)
-  }, [running, instant, total])
+  }, [running, instant, total, done])
 
-  return typed
+  return instant ? total : typed
 }
 
 /** One line of the boot text: the full text reserves the space, the typed part sits over it. */
