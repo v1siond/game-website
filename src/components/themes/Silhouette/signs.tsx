@@ -4,7 +4,7 @@ import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ventureCard } from '@/lib/cv/cvView'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'
@@ -30,11 +30,12 @@ const META = 'text-sm tracking-wider text-[color:var(--sh-muted-text)]'
 const ROOFTOPS =
   'M0 60 V34 H40 V22 H58 V34 H96 V14 H104 V6 H110 V14 H122 V30 H170 V18 H210 V40 H250 V26 H262 V10 H270 V26 H300 V36 H350 V20 H392 V44 H430 V28 H470 V16 H486 V28 H520 V38 H560 V24 H600 V60 Z'
 
+// A sign's link is named by its visible text (the plate, name, tagline, description and services), so a
+// screen reader reaches every field of the card, then hears that it opens a new tab.
 interface SignLink {
   href: string
   target: '_blank'
   rel: string
-  'aria-label': string
 }
 
 function Sign({ index, lit, href, children }: { index: number; lit: boolean; href?: SignLink; children: ReactNode }) {
@@ -110,7 +111,6 @@ export function VentureSigns({ companies: entries }: { companies: CVData['compan
                         href: company.url,
                         target: '_blank',
                         rel: 'noopener noreferrer',
-                        'aria-label': newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name),
                       }
                     : undefined
                 }
@@ -137,6 +137,7 @@ export function VentureSigns({ companies: entries }: { companies: CVData['compan
                     ))}
                   </ul>
                 )}
+                {company.url && <span className="sr-only"> {newTabHint(links)}</span>}
               </Sign>
             </li>
           ))}
