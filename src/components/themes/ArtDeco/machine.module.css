@@ -124,11 +124,6 @@
   transform: translate3d(0.25rem, 0, 0);
 }
 
-.row:focus-visible {
-  outline: 2px solid var(--deco-gold-bright);
-  outline-offset: 3px;
-}
-
 .row[aria-checked='true'] {
   border-color: var(--deco-gold-bright);
   background: linear-gradient(180deg, var(--deco-gold-bright-text), var(--deco-gold-pick));

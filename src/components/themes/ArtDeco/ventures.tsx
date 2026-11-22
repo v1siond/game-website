@@ -76,7 +76,7 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
             rel="noopener noreferrer"
             tabIndex={open ? undefined : -1}
             aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-            className="block text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--deco-gold-bright)]"
+            className="block text-center"
           >
             <span
               className={`mx-auto mb-4 flex items-center justify-center ${company.featured ? 'h-20 w-20 text-4xl' : 'h-16 w-16 text-3xl'} ${v.medal}`}
@@ -102,7 +102,7 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
         type="button"
         onClick={onTassel}
         aria-label={fillLabel(deco.pullCord, { venture: company.name })}
-        className={`absolute right-2 top-2 z-20 h-11 w-6 before:absolute before:inset-y-0 before:-inset-x-2.5 before:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)] ${v.tassel}`}
+        className={`absolute right-2 top-2 z-20 h-11 w-6 before:absolute before:inset-y-0 before:-inset-x-2.5 before:content-[''] ${v.tassel}`}
       />
     </div>
   )

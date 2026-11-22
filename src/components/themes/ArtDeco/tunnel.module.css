@@ -82,11 +82,6 @@
   transition: transform 0.25s ease-out, opacity 0.25s ease-out;
 }
 
-.leak:focus-visible {
-  outline: 2px solid var(--deco-gold-bright);
-  outline-offset: 2px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .whale {
     animation: none;

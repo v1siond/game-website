@@ -110,11 +110,6 @@
   color: var(--deco-gold-bright);
 }
 
-.link:focus-visible {
-  outline: 2px solid var(--deco-gold-bright);
-  outline-offset: 3px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .neon,
   .row[data-on] .neon {

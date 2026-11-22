@@ -78,12 +78,6 @@
   transform: translate3d(0, -2px, 0);
 }
 
-.link:focus-visible,
-.snap:focus-visible {
-  outline: 2px solid var(--deco-blood);
-  outline-offset: 2px;
-}
-
 /* The plate's half developed state, and its full development after a snap. */
 .veil {
   background: linear-gradient(180deg, rgb(58 42 20 / 0.85), rgb(20 12 4 / 0.9));

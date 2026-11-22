@@ -60,7 +60,7 @@ function DecoPosts() {
           <li key={link.href}>
             <Link
               href={link.href}
-              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--deco-gold-bright)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
             >
               <span className="text-lg underline decoration-[color:var(--deco-gold)] underline-offset-4">{link.title}</span>
               <time dateTime={link.date} className="shrink-0 text-sm uppercase tracking-wider text-[color:var(--deco-mist)]">
