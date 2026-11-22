@@ -390,11 +390,13 @@ interface SpriteProps {
   motion: DecoMotion
   /** Called when a one shot motion has played out. */
   onDone?: () => void
+  /** The walk's strides follow the scroll (--scene-progress from an ancestor) instead of the clock. */
+  scrub?: boolean
   className?: string
 }
 
 /** Him as the wrench and plasmid survivor of the undersea city, in a profession's kit, playing one motion. */
-export function SurvivorSprite({ profession, motion, onDone, className = '' }: SpriteProps) {
+export function SurvivorSprite({ profession, motion, onDone, scrub = false, className = '' }: SpriteProps) {
   const ids = useIds()
   const finish = (event: AnimationEvent<SVGGElement>) => {
     if (event.target !== event.currentTarget || !ONE_SHOT.has(motion)) return
@@ -404,7 +406,7 @@ export function SurvivorSprite({ profession, motion, onDone, className = '' }: S
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
-      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} onAnimationEnd={finish}>
+      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]} ${scrub ? s.scrub : ''}`} onAnimationEnd={finish}>
         <RevivalLight />
         <ellipse cx={62} cy={172.5} rx={26} ry={3.4} fill={C.abyss} opacity={0.5} />
         <g className={s.body}>

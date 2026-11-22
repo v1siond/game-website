@@ -14,8 +14,8 @@ import g from './guardian.module.css'
 // the drill spins, then he calms and walks on.
 //
 // Pattern: the shared scroll engine writes --scene-progress on the street, the pair's translate reads
-// it; the stomp and the skip are CSS loops; the provoked state is React state keyed per press so the
-// rear plays again. Reduced motion: they stand mid street, the legs still, a press only turns the ports.
+// it, and the stomp and the skip are scrubbed by it (no clock runs them); the provoked state is React
+// state keyed per press so the rear plays again. Reduced motion: they stand mid street, the legs still, a press only turns the ports.
 
 const PORTS = [
   [48, 40],

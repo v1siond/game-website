@@ -1,11 +1,13 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { cssVars } from '@/lib/cssVars'
 import { DECO_COLORS as C } from './palette'
 import look from './world.module.css'
 
 // The fixed backdrop of the city under the sea behind every section: the SVG patterns, the deco
 // pattern, the light rays through the dome, the drowned skyline, the caustic light and a few rising
-// bubbles. Ambient loops stop under reduced motion (world.module.css).
+// bubbles. The light and the bubbles move for under 5 s from the page opening and rest; under reduced
+// motion they rest from the start (world.module.css).
 //
 // The backdrop follows the depth the visitor is at, through the shared ZoneStageProvider on the page:
 // at the surface (the hero) the light rays come down from above; in the chambers the rays thin and the
@@ -136,16 +138,22 @@ export function WaterCaustics() {
   )
 }
 
-// Six bubbles, fixed so every render draws the same water: their place, size, rise time, start and
-// drift, and where each rests under reduced motion.
+// Six bubbles, fixed so every render draws the same water: their place, size, rise time and start in
+// seconds (a start before 0 puts the bubble part way up already), drift, and where each rests under
+// reduced motion. Each rises for RISE_S from the page opening and hangs where it got to.
 const BUBBLES = [
-  { x: '8%', size: '0.5rem', rise: '16s', delay: '0s', drift: '1.5rem', rest: 0.3 },
-  { x: '22%', size: '0.875rem', rise: '20s', delay: '-6s', drift: '2.5rem', rest: 0.62 },
-  { x: '41%', size: '0.375rem', rise: '13s', delay: '-3s', drift: '1rem', rest: 0.45 },
-  { x: '63%', size: '0.75rem', rise: '18s', delay: '-11s', drift: '2rem', rest: 0.78 },
-  { x: '79%', size: '0.5rem', rise: '15s', delay: '-8s', drift: '1.25rem', rest: 0.2 },
-  { x: '93%', size: '1rem', rise: '22s', delay: '-15s', drift: '2.75rem', rest: 0.55 },
+  { x: '8%', size: '0.5rem', rise: 16, delay: 0, drift: '1.5rem', rest: 0.3 },
+  { x: '22%', size: '0.875rem', rise: 20, delay: -6, drift: '2.5rem', rest: 0.62 },
+  { x: '41%', size: '0.375rem', rise: 13, delay: -3, drift: '1rem', rest: 0.45 },
+  { x: '63%', size: '0.75rem', rise: 18, delay: -11, drift: '2rem', rest: 0.78 },
+  { x: '79%', size: '0.5rem', rise: 15, delay: -8, drift: '1.25rem', rest: 0.2 },
+  { x: '93%', size: '1rem', rise: 22, delay: -15, drift: '2.75rem', rest: 0.55 },
 ]
+
+const RISE_S = 4.8
+
+/** The share of its rise a bubble plays, from where its start puts it to RISE_S after the page opens. */
+const loopsOf = (rise: number, delay: number) => (RISE_S - delay) / rise
 
 export function UnderwaterBubbles() {
   return (
@@ -154,7 +162,7 @@ export function UnderwaterBubbles() {
         <div
           key={x}
           className={`absolute rounded-full ${look.bubble}`}
-          style={{ '--x': x, '--size': size, '--rise': rise, '--delay': delay, '--drift': drift, '--rest': rest } as CSSProperties}
+          style={cssVars({ '--x': x, '--size': size, '--rise': `${rise}s`, '--delay': `${delay}s`, '--loops': loopsOf(rise, delay), '--drift': drift, '--rest': rest })}
         />
       ))}
     </div>

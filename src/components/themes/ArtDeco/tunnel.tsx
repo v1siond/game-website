@@ -13,9 +13,10 @@ import tunnel from './tunnel.module.css'
 // leak is a button: a press seals it with a brass patch and the jet stops.
 //
 // Pattern: the shared scroll engine writes --scene-progress on the tunnel and his walk reads it in its
-// translate; React renders only on the phase change (walking while the scene plays, the idle once done).
-// The whale and the jets are CSS loops. Reduced motion: the scene starts done, he stands at the far end,
-// no whale swim, the jets still; the patches still work.
+// translate and, scrubbed, his strides; React renders only on the phase change (walking while the scene
+// plays, the idle once done). The whale's glide and the jets' spits are CSS off data-phase, each ended
+// inside 5 s of the scene starting. Reduced motion: the scene starts done, he stands at the far end, no
+// whale swim, the jets still; the patches still work.
 
 const LEAKS = ['left-[22%]', 'left-[52%]', 'left-[80%]']
 const RIBS = [0, 25, 50, 75, 100]
@@ -76,7 +77,7 @@ export function GlassTunnel({ children }: { children: ReactNode }) {
   const seal = (index: number) => setSealed((now) => new Set(now).add(index))
 
   return (
-    <div ref={ref} className={`relative overflow-hidden ${tunnel.tube}`}>
+    <div ref={ref} data-phase={phase} className={`relative overflow-hidden ${tunnel.tube}`}>
       <Sea />
       <div className={`pointer-events-none absolute left-0 top-[12%] h-24 w-64 ${tunnel.whale}`}>
         <Whale />
@@ -102,7 +103,7 @@ export function GlassTunnel({ children }: { children: ReactNode }) {
 
       <div className={`relative h-36 ${tunnel.floor}`} aria-hidden="true">
         <div className={`absolute bottom-1 left-0 h-32 w-20 ${tunnel.walker}`}>
-          <SurvivorSprite profession="engineer" motion={MOTION_BY_PHASE[phase]} className="h-full w-full" />
+          <SurvivorSprite profession="engineer" motion={MOTION_BY_PHASE[phase]} scrub className="h-full w-full" />
         </div>
       </div>
     </div>

@@ -58,7 +58,8 @@
 }
 
 .card[data-playing] .reel {
-  animation: reel 1.4s linear infinite;
+  /* four turns, the length of the longest tape (TAPE_MS in diary.tsx) */
+  animation: reel 1.2s linear 4;
 }
 
 @keyframes reel {

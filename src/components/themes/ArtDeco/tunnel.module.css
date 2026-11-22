@@ -1,7 +1,8 @@
 /*
  * The glass tunnel (tunnel.tsx). His walk reads --scene-progress from the tunnel: from the left end to
- * the right end of the floor. The whale crosses behind the glass on a slow loop, the jets spit in
- * steps; a sealed joint shows its patch and no jet. Transform and opacity only.
+ * the right end of the floor. Once the scene starts (data-phase leaves idle) the whale glides in behind
+ * the glass and settles, and the jets spit in steps a few times and hold their spray; a sealed joint shows
+ * its patch and no jet. Transform and opacity only.
  */
 
 .tube {
@@ -23,19 +24,24 @@
 }
 
 .whale {
-  animation: whale-swim 34s linear infinite;
+  animation: whale-swim 4.8s cubic-bezier(0.2, 0.6, 0.3, 1) both;
   opacity: 0.85;
 }
 
 @keyframes whale-swim {
   from { transform: translate3d(110vw, 0, 0); }
-  to { transform: translate3d(-120%, 1.5rem, 0); }
+  to { transform: translate3d(60%, 0, 0); }
 }
 
 .jet {
   transform-origin: 50% 0;
   background: linear-gradient(to bottom, rgb(127 224 255 / 0.9), rgb(65 200 232 / 0));
-  animation: spit 0.9s steps(3) infinite;
+  animation: spit 0.9s steps(3) 5 forwards;
+}
+
+.tube[data-phase='idle'] .whale,
+.tube[data-phase='idle'] .jet {
+  animation-play-state: paused;
 }
 
 @keyframes spit {

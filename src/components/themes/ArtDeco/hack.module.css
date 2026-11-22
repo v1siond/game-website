@@ -41,7 +41,7 @@
 
 .spark {
   background: radial-gradient(circle, var(--deco-bolt-core), var(--deco-bolt) 45%, transparent 70%);
-  animation: spark 0.5s steps(2) infinite;
+  animation: spark 0.5s steps(2) 9;
 }
 
 @keyframes spark {
