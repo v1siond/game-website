@@ -6,8 +6,11 @@ import { CV_PATHS } from '@/i18n/config'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { mix } from '@/lib/color'
+import { cssVars } from '@/lib/cssVars'
 import { svgNumber } from './svgNumber'
 
+// An idle loop's start offset, read by the .hk-* rules as --stage-delay, so the loops of one kind run out of step.
+const stageDelay = (delay: string) => cssVars({ '--stage-delay': delay })
 
 // Palette the boss-stage ornaments need (mirrors the 10 Dark Fantasy fields they reference).
 export interface OrnamentPalette {
@@ -81,7 +84,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
     <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
       <rect x={-28} y={-150} width={56} height={170} rx={6} fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
       {[-122, -106, -90].map((ly, i) => <rect key={i} x={-20} y={ly} width={40} height={10} rx={2} fill={SHELL_D} stroke={RIM_S} strokeWidth="0.6" />)}
-      {[-62, -46, -30].map((ly, i) => <circle key={i} cx={-12} cy={ly} r={4} fill={i === 0 ? RIM_H : GLOW} className="hk-cursor" style={{ animationDelay: `${i * 0.4}s` }} />)}
+      {[-62, -46, -30].map((ly, i) => <circle key={i} cx={-12} cy={ly} r={4} fill={i === 0 ? RIM_H : GLOW} className="hk-cursor" style={stageDelay(`${i * 0.4}s`)} />)}
       {Array.from({ length: 5 }, (_, i) => <line key={i} x1={0} y1={-60 + i * 8} x2={20} y2={-60 + i * 8} stroke={SHELL_D} strokeWidth="2" />)}
     </g>
   )
@@ -145,7 +148,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   const codeCluster = (x: number, y: number, seed: number, k: string) => (
     <g key={k} aria-hidden="true">
       {[0, 1, 2].map((i) => (
-        <text key={i} x={x + (i - 1) * 24} y={y} className="hk-note" style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
+        <text key={i} x={x + (i - 1) * 24} y={y} className="hk-note" style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
       ))}
     </g>
   )
@@ -153,7 +156,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   return (
     <svg
       className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.82 }}
+      opacity="0.82"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
@@ -374,7 +377,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
           x={x + (i - 1) * 18}
           y={y}
           className="hk-note"
-          style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }}
+          style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)}
           fill={i % 2 === 0 ? GLOW : RIM_H}
           fontSize="30"
           opacity="0"
@@ -388,14 +391,14 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
   // idle: drum kit gives a small struck-note burst (no rings, those read as blue circles)
   const drumFx = (x: number, y: number, k: string) => (
     <g key={k} aria-hidden="true">
-      <text x={x} y={y - 34} className="hk-thump" style={{ animationDelay: '0.5s' }} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
+      <text x={x} y={y - 34} className="hk-thump" style={stageDelay('0.5s')} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
     </g>
   )
 
   return (
     <svg
       className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.82 }}
+      opacity="0.82"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
@@ -477,7 +480,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   // hanging heavy bag, chain + leather cylinder + brass cap/straps; swings on its hang point
   const heavyBag = (tx: number, ty: number, s: number, k: string, delay: number) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.92">
-      <g className="hk-swing" style={{ animationDelay: `${delay}s` }}>
+      <g className="hk-swing" style={stageDelay(`${delay}s`)}>
         <line x1="0" y1="-360" x2="0" y2="-250" stroke={HW} strokeWidth="5" opacity="0.6" />
         <path d="M-26,-250 L0,-205 L26,-250" fill="none" stroke={RIM} strokeWidth="4" />
         <path d="M-40,-205 Q-44,-212 -36,-216 L36,-216 Q44,-212 40,-205 L40,40 Q40,72 0,72 Q-40,72 -40,40 Z" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2.5" />
@@ -494,7 +497,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   // pair of boxing gloves hanging by their laces; sways
   const gloves = (tx: number, ty: number, s: number, k: string, delay: number) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
-      <g className="hk-sway" style={{ animationDelay: `${delay}s` }}>
+      <g className="hk-sway" style={stageDelay(`${delay}s`)}>
         <line x1="0" y1="-118" x2="-20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
         <line x1="0" y1="-118" x2="20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
         <circle cx="0" cy="-120" r="4" fill={RIM} />
@@ -545,7 +548,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <ellipse cx="0" cy="-110" rx="58" ry="14" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
       <ellipse cx="0" cy="-110" rx="58" ry="14" fill="none" stroke={RIM_H} strokeWidth="1" opacity="0.4" />
-      <g className="hk-sway" style={{ animationDelay: '0.3s' }}>
+      <g className="hk-sway" style={stageDelay('0.3s')}>
         <line x1="0" y1="-104" x2="0" y2="-78" stroke={HW} strokeWidth="3" opacity="0.6" />
         <path d="M-20,-78 Q-24,-40 0,-30 Q24,-40 20,-78 Q12,-86 0,-84 Q-12,-86 -20,-78 Z" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
         <line x1="-14" y1="-70" x2="14" y2="-70" stroke={RIM} strokeWidth="2" opacity="0.5" />
@@ -558,7 +561,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <line x1="0" y1="-200" x2="0" y2="-70" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
       <line x1="0" y1="-30" x2="0" y2="40" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
-      <g className="hk-sway" style={{ animationDelay: '1.1s' }}>
+      <g className="hk-sway" style={stageDelay('1.1s')}>
         <circle cx="0" cy="-50" r="22" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
         <path d="M-14,-58 Q-18,-44 -6,-36" fill="none" stroke={SHELL_D} strokeWidth="1.5" opacity="0.5" />
         <rect x="-6" y="-74" width="12" height="6" rx="2" fill={RIM} opacity="0.7" />
@@ -570,7 +573,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const jumpRope = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-150" r="5" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '0.6s' }}>
+      <g className="hk-sway" style={stageDelay('0.6s')}>
         {[0, 1, 2].map((i) => (
           <path key={i} d={`M${-14 + i * 4},-148 Q${-46 - i * 8},-70 ${-6 + i * 3},-12 Q${30 + i * 6},-70 ${10 - i * 3},-148`} fill="none" stroke={RIM} strokeWidth="3" opacity="0.5" />
         ))}
@@ -594,7 +597,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const mongkol = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-90" r="4" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '1.6s' }}>
+      <g className="hk-sway" style={stageDelay('1.6s')}>
         <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke="url(#fgBrass)" strokeWidth="7" />
         <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke={RIM_H} strokeWidth="2" opacity="0.4" />
         <path d="M-10,2 Q0,16 10,2" fill="none" stroke={RIM} strokeWidth="5" />
@@ -632,7 +635,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const handWraps = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-120" r="4" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '2s' }}>
+      <g className="hk-sway" style={stageDelay('2s')}>
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke="url(#fgBrass)" strokeWidth="9" />
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.3" />
         <path d="M-18,-80 Q-30,-30 -14,10" fill="none" stroke={RIM} strokeWidth="6" opacity="0.6" />
@@ -653,13 +656,13 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
 
   // idle: a small struck-impact burst near a bag (sparse, like the drum's)
   const impact = (x: number, y: number) => (
-    <text x={x} y={y} className="hk-thump" style={{ animationDelay: '0.7s' }} fill={RIM_H} fontSize="24" textAnchor="middle" opacity="0" aria-hidden="true">✦</text>
+    <text x={x} y={y} className="hk-thump" style={stageDelay('0.7s')} fill={RIM_H} fontSize="24" textAnchor="middle" opacity="0" aria-hidden="true">✦</text>
   )
 
   return (
     <svg
       className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.95 }}
+      opacity="0.95"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
