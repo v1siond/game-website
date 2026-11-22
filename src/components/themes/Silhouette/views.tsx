@@ -31,7 +31,7 @@ function Block({ title, wide = false, children }: { title: string; wide?: boolea
   return (
     <section className="relative px-4 py-10 sm:px-6" aria-labelledby={id}>
       <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
-        <SectionHeader id={id} title={title.toLowerCase()} />
+        <SectionHeader id={id} title={title} />
         {children}
       </div>
     </section>

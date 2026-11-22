@@ -33,7 +33,7 @@ export function CVLink() {
   const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${BUTTON} ${OUTLINED}`}>
-      {actions.cv.toLowerCase()}
+      {actions.cv}
     </Link>
   )
 }
@@ -42,7 +42,7 @@ export function PlayLink() {
   const { actions } = useLabels()
   return (
     <Link {...ENGINE_LINK} className={`${BUTTON} ${LIT}`}>
-      {actions.enter.toLowerCase()}
+      {actions.enter}
     </Link>
   )
 }
