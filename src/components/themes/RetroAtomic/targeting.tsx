@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -14,6 +14,7 @@ import { DwellerSprite, type DwellerMotion } from './dweller'
 import { AtomicChip, PHOSPHOR_BUTTON, PlusRow } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Projects through the targeting system. The pointer or focus on a project locks the targeting on it:
 // the section goes into its paused state (data-vats on the section: every other card drains to a dim
@@ -76,7 +77,7 @@ function ActionPoints({ points }: { points: number }) {
     <div className="flex items-center gap-3 bg-atomic-glass px-2 py-1 text-sm font-bold uppercase tracking-widest text-atomic-phosphor">
       <span>{hud.ap}</span>
       <span className={`relative block h-3 w-32 overflow-hidden border border-atomic-phosphor sm:w-44 ${atomic.apTrack}`} role="img" aria-label={label}>
-        <span className={`absolute inset-y-0 left-0 w-full origin-left bg-atomic-phosphor ${atomic.apFill}`} style={{ '--ap': points / AP_TOTAL } as CSSProperties} />
+        <span className={`absolute inset-y-0 left-0 w-full origin-left bg-atomic-phosphor ${atomic.apFill}`} style={cssVars({ '--ap': points / AP_TOTAL })} />
       </span>
       <span aria-hidden="true">{label}</span>
     </div>
@@ -117,7 +118,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
       className={`relative cursor-crosshair p-5 ${atomic.panel} ${atomic.target}`}
       data-target={targeted || undefined}
       data-shot={targeted ? phase ?? undefined : undefined}
-      style={{ '--i': index } as CSSProperties}
+      style={cssVars({ '--i': index })}
       onPointerEnter={() => onTarget(project.id)}
       onPointerLeave={() => onTarget(null)}
       onFocus={() => onTarget(project.id)}

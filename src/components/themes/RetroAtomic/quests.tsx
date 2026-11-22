@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -7,6 +6,7 @@ import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { AtomicChip, PlusRow } from './controls'
 import atomic from './atomic.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Experience as the terminal's quest log: each job an entry with its state box (the current one a
 // blinking diamond and "Active", an ended one a ticked box and "Completed"), the title, the company and
@@ -31,7 +31,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
   const { start, end } = jobYears(job, years.present)
 
   return (
-    <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={{ '--i': index } as CSSProperties}>
+    <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={cssVars({ '--i': index })}>
       <QuestState current={job.current} />
       <h3 className="mt-3 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{job.title}</h3>
       <p className="mt-1 text-base text-atomic-yellow">

@@ -1,6 +1,5 @@
 'use client'
 
-import type { CSSProperties } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -9,6 +8,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { newTabName } from '@/lib/cv/sectionText'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Tech Stack as the terminal's inventory screen: every category a pocket packed in masonry columns, its
 // name on the picked, inverted row with the item count, its tools as the rows the pick sweeps over on
@@ -25,7 +25,7 @@ export function Inventory({ categories }: { categories: CVData['techStack'] }) {
     <div className={`p-4 sm:p-6 ${atomic.panel}`}>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
         {categories.map((category, index) => (
-          <li key={category.id} data-pocket className={MASONRY_ITEM} style={{ '--i': index } as CSSProperties}>
+          <li key={category.id} data-pocket className={MASONRY_ITEM} style={cssVars({ '--i': index })}>
             <h3
               data-on
               className={`relative flex min-h-[44px] items-center justify-between gap-3 px-3 text-sm font-bold uppercase tracking-widest ${atomic.pickRow}`}

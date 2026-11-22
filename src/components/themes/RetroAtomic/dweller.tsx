@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
@@ -20,6 +19,7 @@ import {
   WARNING_RED,
 } from './palette'
 import s from './dweller.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Him as this world's own figure, a parody of the shelter dweller drawn as the mascot of that game's
 // posters and perk cards (Fallout's Vault Boy and the Vault Dweller): a big round head on a small body,
@@ -231,13 +231,13 @@ export const HOIST_GRIP = { x: HOIST_HAND.x, y: HOIST_HAND.y + HOIST_END.bodyDro
 
 // The joints and the hoist's end pose as the CSS variables dweller.module.css reads, so the drawing and the
 // footlocker's grip have one owner.
-const POSE_VARS = {
+const POSE_VARS = cssVars({
   '--shoulder-r': `${SHOULDER_RIGHT.x}px ${SHOULDER_RIGHT.y}px`,
   '--elbow-r': `${ELBOW_RIGHT.x}px ${ELBOW_RIGHT.y}px`,
   '--hoist-body': `${HOIST_END.bodyDrop}px`,
   '--hoist-arm': `${HOIST_END.arm}deg`,
   '--hoist-fore': `${HOIST_END.fore}deg`,
-} as CSSProperties
+})
 
 const THIGH = {
   right: 'M35.5 94 L49.5 94 L48 120 L38 120 Z',

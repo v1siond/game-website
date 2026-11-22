@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useTimedSteps } from '@/hooks/useTimedSteps'
@@ -10,6 +10,7 @@ import { DwellerSprite, HOIST_GRIP, VIEW, turn, type Point } from './dweller'
 import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, PHOSPHOR, POSTER_INK } from './palette'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Tech stack as looting a footlocker, the game's container screen. When the stage turns on he squats,
 // grabs the olive locker off the floor and hoists it onto his shoulder in the wide, strained carry stance
@@ -60,7 +61,7 @@ const REACH = {
   up: Math.max(...CARRIED.map((point) => HANDLE.y - point.y)),
 }
 
-const CARRY = {
+const CARRY = cssVars({
   '--view': `${VIEW.width} / ${VIEW.height}`,
   '--grip-x': `${(HOIST_GRIP.x / VIEW.width) * 100}%`,
   '--grip-y': `${(HOIST_GRIP.y / VIEW.height) * 100}%`,
@@ -73,7 +74,7 @@ const CARRY = {
   '--lid-hinge': `${HINGE.x}px ${HINGE.y}px`,
   '--lid-open': `${LID_OPEN_DEG}deg`,
   '--carry-tilt': `${CARRY_TILT_DEG}deg`,
-} as CSSProperties
+})
 
 /** How many pockets have landed: none until the pour starts, then one more every POCKET_MS. */
 function useLanded(on: boolean, total: number, instant: boolean) {
@@ -109,7 +110,7 @@ function CarryWeight({ weight, total }: { weight: number; total: number }) {
     <div className={`min-w-0 flex-1 p-3 sm:max-w-sm ${atomic.panel}`}>
       <p className="text-sm font-bold uppercase tracking-widest text-atomic-phosphor">{fillLabel(hud.carryWeight, { count: weight, total })}</p>
       <span className="mt-2 block h-3 w-full overflow-hidden border border-atomic-phosphor" aria-hidden="true">
-        <span className={`block h-full w-full origin-left bg-atomic-phosphor ${j.weightFill}`} style={{ '--weight': total ? weight / total : 0 } as CSSProperties} />
+        <span className={`block h-full w-full origin-left bg-atomic-phosphor ${j.weightFill}`} style={cssVars({ '--weight': total ? weight / total : 0 })} />
       </span>
     </div>
   )
@@ -120,7 +121,7 @@ export function Loot({ categories, on, children }: { categories: CVData['techSta
   const landed = useLanded(on, categories.length, reduced)
   const weight = categories.slice(0, landed).reduce((sum, category) => sum + category.items.length, 0)
   const total = categories.reduce((sum, category) => sum + category.items.length, 0)
-  const timing = { '--pour': `${POUR_MS}ms`, '--pocket': `${POCKET_MS}ms`, '--pockets': categories.length } as CSSProperties
+  const timing = cssVars({ '--pour': `${POUR_MS}ms`, '--pocket': `${POCKET_MS}ms`, '--pockets': categories.length })
 
   return (
     <div style={timing}>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
@@ -9,6 +9,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { RadioDancer } from './dance'
 import { PHOSPHOR, PHOSPHOR_DEEP } from './palette'
 import atomic from './atomic.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Bands as the terminal's radio: each band a station. Above the stations the receiver: him dancing with
 // the bakelite radio (dance.tsx), the tuning scale with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
@@ -36,11 +37,11 @@ function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: bool
   const { hud } = useLabels()
   const band = bands[tuned]
   const place = bands.length > 1 ? tuned / (bands.length - 1) : 0.5
-  const look = {
+  const look = cssVars({
     '--needle': place,
     '--amp': AMPLITUDES[tuned % AMPLITUDES.length],
     '--wave': SPEEDS[tuned % SPEEDS.length],
-  } as CSSProperties
+  })
 
   return (
     <div className={`mb-8 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 p-4 sm:p-6 md:grid-cols-[7rem_minmax(0,3fr)_minmax(0,2fr)] ${atomic.panel}`} style={look}>

@@ -300,6 +300,8 @@
 }
 
 .mound {
+  /* --spot is the mound's place along the yard, 0 to 1, set per mound by dig.tsx */
+  left: calc(var(--spot) * 100%);
   transform-origin: 50% 100%;
   transform: translateX(-50%) scaleY(0);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
