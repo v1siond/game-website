@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { Theme, themes, DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from './themes'
 import { PreviewProvider } from './PreviewContext'
 import { WORLD_PENDING_ATTR } from './worldPending'
@@ -43,10 +43,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // Render the default until mounted to avoid a hydration mismatch.
-  const value: ThemeContextType = {
-    theme: mounted ? theme : getThemeById(DEFAULT_THEME_ID),
-    setThemeById,
-  }
+  const value = useMemo<ThemeContextType>(
+    () => ({ theme: mounted ? theme : getThemeById(DEFAULT_THEME_ID), setThemeById }),
+    [mounted, theme, setThemeById],
+  )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode, type RefObject } from 'react'
+import { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo, ReactNode, type RefObject } from 'react'
 import { useTheme } from './ThemeContext'
 import { getThemeById } from './themes'
 import WorldPortal, { PORTAL_VARIANTS, type PortalVariant } from '@/components/worlds/WorldPortal'
@@ -107,9 +107,14 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   )
 
   const destTheme = destId ? getThemeById(destId) : theme
+  const isTransitioning = phase !== 'idle'
+  const value = useMemo<WorldTransitionContextType>(
+    () => ({ selectWorld, isTransitioning, isWorldsOpen, openWorlds, closeWorlds, worldsOpener }),
+    [selectWorld, isTransitioning, isWorldsOpen, openWorlds, closeWorlds],
+  )
 
   return (
-    <WorldTransitionContext.Provider value={{ selectWorld, isTransitioning: phase !== 'idle', isWorldsOpen, openWorlds, closeWorlds, worldsOpener }}>
+    <WorldTransitionContext.Provider value={value}>
       {children}
       {phase !== 'idle' && (
         <WorldPortal

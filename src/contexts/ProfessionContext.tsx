@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { type Profession, DEFAULT_PROFESSION, professionOnLoad } from '@/lib/cv/professions'
 import { readStored, writeStored } from '@/lib/storage'
 
@@ -28,12 +28,12 @@ export function ProfessionProvider({ children }: { children: ReactNode }) {
     if (onLoad) setActiveState(onLoad)
   }, [])
 
-  const setActive = (profession: Profession) => {
+  const setActive = useCallback((profession: Profession) => {
     writeStored('session', VISIT_PROFESSION_KEY, profession)
     setActiveState(profession)
-  }
+  }, [])
 
-  const value: ProfessionContextType = { active, setActive }
+  const value = useMemo<ProfessionContextType>(() => ({ active, setActive }), [active, setActive])
 
   return (
     <ProfessionContext.Provider value={value}>
