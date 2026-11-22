@@ -5,7 +5,9 @@ import { stepsFor, type Gait } from './gait'
 import type { Condition } from './ecg'
 
 // What he and the pursuer do in each room behind the page (./stage), as timed beats. A room's script runs
-// once when its part of the page scrolls into view, then the figures hold its last frame and only breathe.
+// once when its part of the page scrolls into view, then the figures hold its last frame. A script whose
+// beats run past SCRIPT_MS plays faster, every time in it scaled alike, so each room's act ends within 5 s
+// of its trigger with its beats in the same order and spacing (the pursuer's stride quickens with it).
 // It runs again only when what it shows changes: the item box on a new profession, the gym on a new
 // condition, the safe room on a save. Reduced motion, or a script already played, shows the last frame
 // at once, which is every beat folded over the start.
@@ -352,7 +354,26 @@ const SCRIPTS: Record<Zone, (context: ScriptContext) => Script> = {
   contact,
 }
 
-export const scriptFor = (zone: Zone, context: ScriptContext) => SCRIPTS[zone](context)
+const SCRIPT_MS = 5000
+
+// The times a beat carries: when it starts, and how long its moves and its joints take to get there.
+const TIMES = ['at', 'move', 'fmove', 'tempo', 'ftempo'] as const
+
+/** When a beat has fully played: its start plus the longest of its moves and joint eases. */
+const beatEnd = (beat: Beat) => beat.at + Math.max(beat.move ?? 0, beat.fmove ?? 0, beat.tempo ?? 0, beat.ftempo ?? 0)
+
+/** A beat with every time it carries scaled, rounded down so the scaled script never runs over. */
+const scaleBeat = (beat: Beat, scale: number): Beat =>
+  TIMES.reduce<Beat>((scaled, time) => (beat[time] === undefined ? scaled : { ...scaled, [time]: Math.floor((beat[time] ?? 0) * scale) }), beat)
+
+/** The script as it is when it ends by SCRIPT_MS, else played faster so it does. */
+function withinScript(script: Script): Script {
+  const end = Math.max(0, ...script.beats.map(beatEnd))
+  if (end <= SCRIPT_MS) return script
+  return { ...script, beats: script.beats.map((beat) => scaleBeat(beat, SCRIPT_MS / end)) }
+}
+
+export const scriptFor = (zone: Zone, context: ScriptContext) => withinScript(SCRIPTS[zone](context))
 
 /** What makes a room's script worth playing again: the same key means the room already looks right. */
 const KEYS: Record<Zone, (context: ScriptContext) => string> = {
