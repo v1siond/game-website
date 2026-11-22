@@ -21,6 +21,7 @@ import { shareOf } from './trail'
 import { useTrailWalker, type WalkLeg } from './walk'
 import { TrailWalker } from './walker'
 import map from './map.module.css'
+import { heldUntil } from '@/components/themes/shared/held'
 
 // The wardrobe's journal plate under the map he walks: ink on the page, 14.8 to 1, edged in bark.
 const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TRAIL.BARK }
@@ -322,7 +323,7 @@ export function ExpeditionHero({ name }: { name: string }) {
     <div
       ref={entrance.ref}
       data-worlds-hero=""
-      className="relative px-4 pb-6 pt-14 sm:px-6"
+      className={`relative px-4 pb-6 pt-14 sm:px-6 ${heldUntil(entrance.triggered || entrance.skip)}`}
       data-unrolled={reached.unrolled}
       data-inked={reached.inked}
       data-trailed={reached.trailed}

@@ -8,6 +8,10 @@
  * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites,
  * the dotted trail appears one dot at a time, a tile that is cleared flips its colour in one frame, and
  * the only smooth motions are the camera (the unroll, the zoom into a landmark) and his walk.
+ *
+ * The map's life plays once the map shows (the hero holds it until then, heldUntil) and has ended within
+ * 5 s: each two frame loop a set number of beats, ending on its first frame, the clouds the first 5 s of
+ * their drift at their own pace; his frames a set number of beats from the moment he walks or acts.
  */
 
 .root {
@@ -126,11 +130,12 @@
   }
 }
 
-/* The hills on the map breathe in two frames, out of step with each other (--i). */
+/* The hills on the map breathe in two frames, out of step with each other (--i), and rest unbreathed
+   (2.25 cycles end in the first frame of the third). */
 .hill {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: hill-breathe 1.6s steps(2, jump-none) infinite;
+  animation: hill-breathe 1.6s steps(2, jump-none) 2.25 forwards;
   animation-delay: calc(var(--i, 0) * -0.4s);
 }
 
@@ -147,7 +152,7 @@
 .ship {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: ship-rock 3.2s ease-in-out infinite;
+  animation: ship-rock 3.2s ease-in-out 1 forwards;
 }
 
 @keyframes ship-rock {
@@ -163,7 +168,7 @@
 .flame {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: flame-flick 0.5s steps(2, jump-none) infinite;
+  animation: flame-flick 0.5s steps(2, jump-none) 9.25 forwards;
   animation-delay: calc(var(--i, 0) * -0.25s);
 }
 
@@ -181,8 +186,10 @@
   transition: transform 400ms ease-out;
 }
 
+/* Each cloud starts 9 s further into its drift and plays on to 5 s after the map shows: the count is that
+   much of one drift counted from its start. */
 .cloudDrift {
-  animation: cloud-drift 26s ease-in-out infinite alternate;
+  animation: cloud-drift 26s ease-in-out calc((5 + var(--i, 0) * 9) / 26) alternate forwards;
   animation-delay: calc(var(--i, 0) * -9s);
 }
 
@@ -300,19 +307,19 @@
 }
 
 [data-walking='true'] .frame[data-f$='-walkA'] {
-  animation: frame-first 280ms steps(1, end) infinite;
+  animation: frame-first 280ms steps(1, end) 17 forwards;
 }
 
 [data-walking='true'] .frame[data-f$='-walkB'] {
-  animation: frame-second 280ms steps(1, end) infinite;
+  animation: frame-second 280ms steps(1, end) 17 forwards;
 }
 
 [data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actA'] {
-  animation: frame-first 440ms steps(1, end) infinite;
+  animation: frame-first 440ms steps(1, end) 5 forwards;
 }
 
 [data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actB'] {
-  animation: frame-second 440ms steps(1, end) infinite;
+  animation: frame-second 440ms steps(1, end) 5 forwards;
 }
 
 [data-acting='true'][data-walking='true'] .frame[data-f='torso-actA'],
@@ -347,11 +354,11 @@
 .breath {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: sprite-breath 1.8s steps(2, jump-none) infinite;
+  animation: sprite-breath 1.8s steps(2, jump-none) 2.25 forwards;
 }
 
 [data-walking='true'] .breath {
-  animation: sprite-bob 280ms steps(2, jump-none) infinite;
+  animation: sprite-bob 280ms steps(2, jump-none) 17.25 forwards;
 }
 
 @keyframes sprite-breath {
@@ -374,7 +381,7 @@
 
 .blink {
   opacity: 0;
-  animation: sprite-blink 4.2s steps(1, end) infinite;
+  animation: sprite-blink 4.2s steps(1, end) 1 forwards;
 }
 
 @keyframes sprite-blink {

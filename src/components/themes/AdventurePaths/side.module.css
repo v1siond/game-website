@@ -6,6 +6,11 @@
  * --to-x / --to-lift (x in % of the playfield, lift in px above the ground). Under reduced motion
  * (the block at the end) nothing plays and every part shows its resting state: he stands where his
  * last leg ends and every card is shown.
+ *
+ * Nothing loops: a section's playfield waits until the section shows (heldUntil on the region), a sprite's
+ * two frame cycle plays 19 beats (4.94 s at the default beat) from the moment it shows and holds frame A,
+ * and the living world behind the page plays the first 5 s of its slow drifts and patrols at their own
+ * pace once, as the page opens, and holds there.
  */
 
 /* ---------------------------------------------------------------------------------------------------
@@ -26,12 +31,12 @@
 
 /* A two frame cycle: frame A shows the first half of the beat, frame B the second. */
 .frameA {
-  animation: frame-a var(--beat, 260ms) steps(1, end) infinite;
+  animation: frame-a var(--beat, 260ms) steps(1, end) 19 forwards;
 }
 
 .frameB {
   opacity: 0;
-  animation: frame-b var(--beat, 260ms) steps(1, end) infinite;
+  animation: frame-b var(--beat, 260ms) steps(1, end) 19 forwards;
 }
 
 @keyframes frame-a {
@@ -52,10 +57,10 @@
   }
 }
 
-/* The skin coloured lid over his eye, shown for a moment every few seconds. */
+/* The skin coloured lid over his eye, shown for a moment once he stands. */
 .blink {
   opacity: 0;
-  animation: blink 4.2s steps(1, end) infinite;
+  animation: blink 4.2s steps(1, end) 1 forwards;
 }
 
 @keyframes blink {
@@ -484,7 +489,7 @@
 }
 
 .noteBlock[aria-current='true'] .noteFace {
-  animation: note-squash 720ms linear infinite;
+  animation: note-squash 720ms linear 6.5 forwards;
 }
 
 @keyframes note-squash {
@@ -499,7 +504,7 @@
 }
 
 .bounce {
-  animation: bounce 720ms infinite;
+  animation: bounce 720ms 6 forwards;
 }
 
 @keyframes bounce {
@@ -519,7 +524,7 @@
   left: 15px;
   bottom: 0;
   opacity: 0;
-  animation: note-rise 720ms ease-out infinite;
+  animation: note-rise 720ms ease-out 6 forwards;
 }
 
 @keyframes note-rise {
@@ -740,11 +745,11 @@
 }
 
 .farStrip {
-  animation: strip-slide 120s linear infinite;
+  animation: strip-slide 120s linear 0.04 forwards;
 }
 
 .nearStrip {
-  animation: strip-slide 52s linear infinite;
+  animation: strip-slide 52s linear 0.09 forwards;
 }
 
 @keyframes strip-slide {
@@ -779,21 +784,24 @@
   fill: var(--ap-hud);
 }
 
-/* Clouds with faces drift in from the right at three speeds, their delays spreading them out. */
+/* Clouds with faces drift in from the right at three speeds, their delays spreading them out; each plays
+   on to 5 s after the page opens (its count is that much of one drift, counted from its start). */
 .cloud {
   opacity: var(--clouds);
   transition: opacity 600ms ease;
-  animation: cloud-drift 70s linear infinite;
+  animation: cloud-drift 70s linear 0.07 forwards;
 }
 
 .cloud[data-i='1'] {
   animation-duration: 95s;
   animation-delay: -40s;
+  animation-iteration-count: 0.47;
 }
 
 .cloud[data-i='2'] {
   animation-duration: 120s;
   animation-delay: -90s;
+  animation-iteration-count: 0.79;
 }
 
 @keyframes cloud-drift {
@@ -817,7 +825,7 @@
 .sparkle {
   background: var(--ap-coin);
   clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  animation: sparkle 2.6s steps(3, jump-none) infinite;
+  animation: sparkle 2.6s steps(3, jump-none) 1 forwards;
 }
 
 .sparkle:nth-of-type(2n) {
@@ -866,13 +874,13 @@
   fill: var(--ap-pipe-light);
 }
 
-/* The plant rises out of its pipe, holds, and sinks back, hidden by the pipe in front of it. */
+/* The plant rises out of its pipe, holds, and sinks back, hidden by the pipe in front of it, once. */
 .plantPot {
   overflow: hidden;
 }
 
 .plant {
-  animation: plant-bob 4.6s ease-in-out infinite;
+  animation: plant-bob 4.6s ease-in-out 1 forwards;
 }
 
 @keyframes plant-bob {
@@ -887,13 +895,14 @@
   }
 }
 
-/* The mushroom walks left across the ground, the turtle right, each on a long loop. */
+/* The mushroom walks left across the ground, the turtle right, each for 4.8 s of its long walk at its own
+   pace, then stands where that leaves it. */
 .patrol[data-foe='walker'] {
-  animation: patrol-left 30s linear infinite;
+  animation: patrol-left 30s linear 0.16 forwards;
 }
 
 .patrol[data-foe='turtle'] {
-  animation: patrol-right 42s linear -18s infinite;
+  animation: patrol-right 42s linear -18s 0.547 forwards;
 }
 
 @keyframes patrol-left {
