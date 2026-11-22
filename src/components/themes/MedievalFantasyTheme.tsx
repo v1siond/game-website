@@ -8,6 +8,7 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -155,7 +156,9 @@ export default function MedievalFantasyTheme() {
         </ScrollScene>
 
         <main id="main-content">
-          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
+          <ProfessionRegion>
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
+          </ProfessionRegion>
         </main>
 
         {/* === FT Art Divider: Ice Throne === */}

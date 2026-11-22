@@ -4,6 +4,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
@@ -48,7 +49,9 @@ export default function SilhouetteTheme() {
         </div>
 
         <main id="main-content" className="relative z-20">
-          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+          <ProfessionRegion>
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+          </ProfessionRegion>
         </main>
 
         <Clearing profession={active} />

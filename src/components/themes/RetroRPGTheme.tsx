@@ -5,6 +5,7 @@ import { ProfessionSwitch } from "@/components/cv/ProfessionSwitch";
 import { useWorldView, useLabels } from "@/components/cv/CVDataProvider";
 import { RecruiterHero } from "@/components/cv/RecruiterHero";
 import { ProfessionSectionsView } from "@/components/cv/ProfessionSectionsView";
+import { ProfessionRegion } from "@/components/cv/ProfessionRegion";
 import { NameWords } from "@/components/cv/NameWords";
 import { CopyrightLine } from "./shared/CopyrightLine";
 import { MONO, PIXEL, RPG_VARS } from "./RetroRPG/palette";
@@ -139,10 +140,12 @@ export default function RetroRPGTheme() {
 
         {/* The picked profession's sections, and only those */}
         <main id="main-content" className="relative z-20">
-          <ProfessionSectionsView
-            views={SECTION_VIEWS}
-            sections={view.sections}
-          />
+          <ProfessionRegion>
+            <ProfessionSectionsView
+              views={SECTION_VIEWS}
+              sections={view.sections}
+            />
+          </ProfessionRegion>
         </main>
 
         <ZoneArea zone="ruins">

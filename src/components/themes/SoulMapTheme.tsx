@@ -4,6 +4,7 @@ import { Marcellus } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -59,7 +60,9 @@ export default function SoulMapTheme() {
         </div>
 
         <main id="main-content" className="relative z-20">
-          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+          <ProfessionRegion>
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+          </ProfessionRegion>
         </main>
 
         <div className="relative z-20">
