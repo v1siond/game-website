@@ -121,7 +121,7 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
           {years && <span className={`whitespace-nowrap text-sm font-bold text-[color:var(--noir-fog)] ${world.copy}`}>{years}</span>}
         </span>
         <span className={`mt-1 block font-bold ${BODY}`}>{project.role}</span>
-        <span className={`mt-2 block ${BODY}`}>{project.tagline}</span>
+        {project.tagline && <span className={`mt-2 block ${BODY}`}>{project.tagline}</span>}
         <span className="mt-4 flex justify-end" aria-hidden="true">
           <HitStar className="h-8 w-8 transition-transform duration-150 group-hover:rotate-45 group-hover:scale-125 motion-reduce:transition-none" />
         </span>
