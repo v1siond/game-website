@@ -395,30 +395,28 @@ export function SparRing({ profession }: { profession: Profession }) {
 const DECK_BOUT: Beat[] = [{ hero: 'act', partner: 'win', ms: 0 }]
 
 // He plays his flurry on the kit while his partner dances on the deck and the crowd along the rail
-// bobs; a pointer on a band's card makes them cheer, jumping higher and faster.
-export function DeckShow({ children }: { children: (cheer: (on: boolean) => void) => ReactNode }) {
+// bobs; a pointer on a band's card ([data-band] in children) or the focus in it makes them cheer, jumping
+// higher and faster, all in CSS (living.module.css), so a band hover renders nothing.
+export function DeckShow({ children }: { children: ReactNode }) {
   const { ref, on, reduced } = useScene('harbour')
   const { beat, take } = useBout(DECK_BOUT, on, reduced)
-  const [cheering, setCheering] = useState(false)
 
   return (
-    <div ref={ref}>
-      <div data-cheer={cheering || undefined}>
-        <Ring profession="drummer" stage="drummer" beat={beat} take={take} partnerAt="mid" className="mb-6 h-40 sm:h-52">
-          <svg
-            viewBox="0 0 640 60"
-            preserveAspectRatio="xMidYMax slice"
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 w-full sm:h-14"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <CrowdGroup x={20} base={60} count={5} gap={22} scale={0.9} i={0} />
-            <CrowdGroup x={250} base={60} count={4} gap={22} scale={0.9} i={1} />
-            <CrowdGroup x={460} base={60} count={6} gap={22} scale={0.9} i={2} />
-          </svg>
-        </Ring>
-      </div>
-      {children(setCheering)}
+    <div ref={ref} className={living.deck}>
+      <Ring profession="drummer" stage="drummer" beat={beat} take={take} partnerAt="mid" className="mb-6 h-40 sm:h-52">
+        <svg
+          viewBox="0 0 640 60"
+          preserveAspectRatio="xMidYMax slice"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 w-full sm:h-14"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <CrowdGroup x={20} base={60} count={5} gap={22} scale={0.9} i={0} />
+          <CrowdGroup x={250} base={60} count={4} gap={22} scale={0.9} i={1} />
+          <CrowdGroup x={460} base={60} count={6} gap={22} scale={0.9} i={2} />
+        </svg>
+      </Ring>
+      {children}
     </div>
   )
 }

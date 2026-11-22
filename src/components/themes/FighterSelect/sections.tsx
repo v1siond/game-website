@@ -148,21 +148,17 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
       <LightningLine />
       <ArcadePanel accent="p2" title={labels.sections.bands} id="bands-heading">
         <DeckShow>
-          {(cheer) => (
-            <>
-              <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
-              <BandList
-                bands={bands}
-                className={MASONRY_LIST}
-                itemClassName={MASONRY_ITEM}
-                renderBand={(slot) => (
-                  <div onPointerEnter={() => cheer(true)} onPointerLeave={() => cheer(false)} onFocus={() => cheer(true)} onBlur={() => cheer(false)}>
-                    <BandStage {...slot} />
-                  </div>
-                )}
-              />
-            </>
-          )}
+          <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
+          <BandList
+            bands={bands}
+            className={MASONRY_LIST}
+            itemClassName={MASONRY_ITEM}
+            renderBand={(slot) => (
+              <div data-band="">
+                <BandStage {...slot} />
+              </div>
+            )}
+          />
         </DeckShow>
         <p className="mt-6 text-sm italic text-[color:var(--fs-gold)]">{musician.line}</p>
       </ArcadePanel>
