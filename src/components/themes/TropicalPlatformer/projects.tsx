@@ -6,6 +6,8 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import type { Project } from '@/lib/cv/content'
+import { projectCard } from '@/lib/cv/cvView'
+import { SunPoints } from './boards'
 import { jungleButton } from './buttons'
 import { CartLine, RideButton, STATION } from './mineCart'
 import look from './jungle.module.css'
@@ -27,7 +29,8 @@ interface StationProps {
 // `here` flips.
 const ProjectStation = memo(function ProjectStation({ slot, index, here, onRide }: StationProps) {
   const labels = useLabels()
-  const { project, years, links, noLink } = slot
+  const { links, noLink } = slot
+  const project = projectCard(slot.project, labels)
 
   return (
     <article data-here={here || undefined} className={`rounded-3xl p-5 ${look.board} ${STATION}`}>
@@ -35,14 +38,16 @@ const ProjectStation = memo(function ProjectStation({ slot, index, here, onRide 
         <SlashBreaks text={project.name} />
       </h3>
       {project.role && <p className="mt-1 text-sm font-bold text-[color:var(--tp-plank-light)]">{project.role}</p>}
-      {years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{years}</p>}
+      {project.years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{project.years}</p>}
       {project.tagline && <p className="mt-3 text-base leading-relaxed text-[color:var(--tp-parchment)]">{project.tagline}</p>}
+      {project.description && <p className="mt-3 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{project.description}</p>}
       {project.impact && (
         <p className="mt-3 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
           <span className="font-bold text-[color:var(--tp-sun-gold)]">{labels.cards.impact}: </span>
           {project.impact}
         </p>
       )}
+      <SunPoints items={project.details} label={labels.cards.details} />
       {project.techStack.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
           {project.techStack.map((tech) => (
