@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { headingId } from '@/lib/cv/sectionText'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroCharacter, type SpritePose } from './character'
@@ -129,13 +130,13 @@ export function Clearing({ profession }: { profession: Profession }) {
     <section
       ref={ref}
       className="relative z-20 mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
-      aria-labelledby="silhouette-contact-heading"
+      aria-labelledby={headingId('silhouette', sections.contact)}
     >
       <ClearingScene profession={profession} trap={trap} />
       <RecruiterHero
         render={({ line, actions }) => (
           <div className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-left">
-            <h2 id="silhouette-contact-heading" className={`text-xl font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] ${TYPEWRITER}`}>
+            <h2 id={headingId('silhouette', sections.contact)} className={`text-xl font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] ${TYPEWRITER}`}>
               {sections.contact}
             </h2>
             <p className="max-w-xl text-sm text-[color:var(--sh-muted-text)]">{line}</p>
