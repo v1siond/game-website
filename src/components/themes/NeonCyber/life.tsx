@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Company, MartialArts } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
@@ -13,8 +13,8 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
-import { MercSprite, type MercMotion } from './merc'
-import { DataChip, HudPanel } from './hud'
+import { MercSprite, stillWhen, type MercMotion } from './merc'
+import { DataChip, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { NEON } from './palette'
 import life from './life.module.css'
@@ -40,12 +40,13 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 // ---------------------------------------------------------------- About
 
-export function ScanAbout() {
+/** The bio is the plan's; the tags read the rest of the summary (education, languages, a highlight). */
+export function ScanAbout({ bio }: { bio: string }) {
   const { professionalSummary } = useCVData()
   const { sections, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('japantown')
   const [arrived, setArrived] = useState(false)
-  const motion: MercMotion = reduced ? 'still' : arrived ? 'scan' : 'walk'
+  const motion = stillWhen(reduced, arrived ? 'scan' : 'walk')
   const tags = [
     { label: cyber.tagEducation, value: professionalSummary.education },
     { label: cyber.tagLanguages, value: professionalSummary.languages },
@@ -60,7 +61,7 @@ export function ScanAbout() {
             <MercSprite profession="engineer" motion={motion} className="h-auto w-full" />
           </div>
           <div className={`${life.scanBox} relative min-w-0 flex-1 overflow-hidden`}>
-            <p className="max-w-prose text-base leading-relaxed text-[color:var(--neon-ice)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--neon-ice)]">{bio}</p>
             <span className={`${life.sweep} pointer-events-none absolute inset-y-0 left-0 w-1 bg-[color:var(--neon-hud)]`} aria-hidden="true" />
           </div>
         </div>
@@ -90,10 +91,13 @@ const ECHOES = [
   { tint: life.echoCyan, lag: '0.24s', fade: 0.16 },
 ]
 
+// One figure of the dash. Before the stage turns on and once his own dash has ended he waits off the lane,
+// so he stands still there instead of running his leg loops where nobody sees them.
 function Runner({ motion, className = '', style }: { motion: MercMotion; className?: string; style?: CSSProperties }) {
+  const [ran, setRan] = useState(false)
   return (
-    <div className={`${life.runner} absolute inset-y-0 left-0 w-full ${className}`} style={style}>
-      <MercSprite profession="engineer" motion={motion} className="absolute bottom-0 left-0 h-full w-auto" />
+    <div className={`${life.runner} absolute inset-y-0 left-0 w-full ${className}`} style={style} onAnimationEnd={(event) => event.target === event.currentTarget && setRan(true)}>
+      <MercSprite profession="engineer" motion={ran ? 'still' : motion} className="absolute bottom-0 left-0 h-full w-auto" />
     </div>
   )
 }
@@ -102,13 +106,13 @@ export function SandevistanStack({ techStack }: { techStack: SectionsOf<'enginee
   const { sections, cards, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('megablock')
   const [take, setTake] = useState(0)
-  const motion: MercMotion = reduced ? 'still' : 'dash'
+  const motion: MercMotion = reduced || !lit ? 'still' : 'dash'
 
   const replay = reduced ? null : (
     <button
       type="button"
       onClick={() => setTake((n) => n + 1)}
-      className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hack)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hack)] hover:bg-[color-mix(in_srgb,var(--neon-hack)_12%,transparent)]`}
+      className={hudButton('hack')}
     >
       {cyber.replay}
     </button>
@@ -168,19 +172,23 @@ function BladesPass({ onPassed }: { onPassed: () => void }) {
 }
 
 // His own products (featured) are the two wide contracts of the first row, ruled in full gold with a
-// gold tag under the contract number; the other ventures follow three to a row.
+// gold tag under the contract number; the other ventures follow three to a row. Pointing at or focusing
+// a contract rings its pin on the map: the ring is written straight on the pins' data-hot, so a hover
+// re-renders none of the contracts.
 export function FixerContracts({ companies }: { companies: Company[] }) {
   const { sections, links, cyber, cards } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
   const preview = usePreview()
-  const [hot, setHot] = useState<number | null>(null)
+  const mapRef = useRef<SVGSVGElement>(null)
   const [passed, setPassed] = useState(false)
   const slashing = lit && !reduced && !preview && !passed
+  const ring = (hot: number | null) =>
+    mapRef.current?.querySelectorAll(`.${life.pin}`).forEach((pin, i) => pin.setAttribute('data-hot', on(i === hot)))
 
   return (
     <div ref={ref} className={`${life.mapStage} mb-10`} data-on={on(lit)}>
       <HudPanel title={sections.ventures}>
-        <svg viewBox="0 0 1000 160" className="mb-5 h-auto w-full border border-[color-mix(in_srgb,var(--neon-chrome-red)_45%,transparent)] bg-[color:var(--neon-ink)]" aria-hidden="true" focusable="false">
+        <svg ref={mapRef} viewBox="0 0 1000 160" className="mb-5 h-auto w-full border border-[color-mix(in_srgb,var(--neon-chrome-red)_45%,transparent)] bg-[color:var(--neon-ink)]" aria-hidden="true" focusable="false">
           <path d="M0 40 H1000 M0 100 H1000 M180 0 V160 M420 0 V160 M650 0 V160 M860 0 V160" stroke={NEON.steel} strokeWidth={1} />
           <path d="M0 140 Q300 90 520 120 T1000 70" stroke={NEON.chromeRed} strokeWidth={3} fill="none" strokeDasharray="10 6" />
           <path d="M60 20 h90 v50 h-90 Z M460 30 h120 v40 h-120 Z M720 110 h100 v40 h-100 Z" fill={NEON.panel} />
@@ -192,7 +200,7 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
             // the place sits on an outer group: the drop's CSS transform on the pin would replace an SVG
             // transform attribute on the same element and stack every pin at x 0
             <g key={company.id} transform={`translate(${pinX(i, companies.length)} 0)`}>
-              <g className={life.pin} data-hot={on(hot === i)} style={{ '--i': i } as CSSProperties}>
+              <g className={life.pin} data-hot="false" style={{ '--i': i } as CSSProperties}>
                 <circle className={life.pinRing} cx={0} cy={86} r={16} fill="none" stroke={NEON.gold} strokeWidth={3} />
                 <path d="M0 96 L-12 72 A14 14 0 1 1 12 72 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={2} />
                 {/* The map scales with the panel: its 16 unit digits reach 14 px only from lg, so below it the
@@ -208,7 +216,7 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
           {slashing && <BladesPass onPassed={() => setPassed(true)} />}
           <ul className="grid gap-5 md:grid-cols-6">
             {companies.map((company, i) => (
-              <li key={company.id} className={`${life.contract} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
+              <li key={company.id} className={`${life.contract} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': i } as CSSProperties} onPointerEnter={() => ring(i)} onPointerLeave={() => ring(null)} onFocus={() => ring(i)} onBlur={() => ring(null)}>
                 <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
                   <a
                     href={company.url}
@@ -292,10 +300,9 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
   const { cyber, sections } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('megablock')
   const [done, setDone] = useState(false)
-  const { achievements } = martialArts.primary
-  const last = achievements.length - 1
+  const last = martialArts.primary.achievements.length - 1
   const standing = done || reduced
-  const motion: MercMotion = reduced ? 'still' : standing ? 'kick' : 'sit'
+  const motion = stillWhen(reduced, standing ? 'kick' : 'sit')
 
   return (
     <div ref={ref} className={`${life.ripStage} mb-10`} data-on={on(lit)} data-done={on(standing)}>
@@ -321,20 +328,17 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
                 value: 'mt-1 text-sm text-[color:var(--neon-ice)]',
                 achievements: 'space-y-3',
               }}
-              renderAchievement={(achievement) => {
-                const i = achievements.indexOf(achievement)
-                return (
-                  <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={{ '--i': i } as CSSProperties}>
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
-                      <span className={`${life.installed} shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]`}>{cyber.installed}</span>
-                    </span>
-                    <span className="mt-2 block h-1.5 bg-[color:var(--neon-ink)]" aria-hidden="true">
-                      <span className={`${life.installBar} block h-full bg-[color:var(--neon-gold)]`} onAnimationEnd={i === last ? () => setDone(true) : undefined} />
-                    </span>
+              renderAchievement={(achievement, i) => (
+                <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={{ '--i': i } as CSSProperties}>
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
+                    <span className={`${life.installed} ${lit ? world.installedIn : ''} shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]`}>{cyber.installed}</span>
                   </span>
-                )
-              }}
+                  <span className="mt-2 block h-1.5 bg-[color:var(--neon-ink)]" aria-hidden="true">
+                    <span className={`${life.installBar} block h-full bg-[color:var(--neon-gold)]`} onAnimationEnd={i === last ? () => setDone(true) : undefined} />
+                  </span>
+                </span>
+              )}
             />
           </Scannable>
         </div>

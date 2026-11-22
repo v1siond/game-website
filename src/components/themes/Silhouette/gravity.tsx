@@ -59,7 +59,6 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
     landing.current = window.setTimeout(() => setPose('act'), LAND_MS)
   }
 
-  const { achievements } = martialArts.primary
   const fall = flipped ? shade.fallUp : shade.fallDown
 
   return (
@@ -73,7 +72,7 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
               type="button"
               aria-pressed={flipped}
               onClick={flip}
-              className={`${world.button} mt-4 inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)] ${TYPEWRITER}`}
+              className={`${world.button} mt-4 inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)] ${TYPEWRITER}`}
             >
               {words.flipGravity}
             </button>
@@ -88,11 +87,11 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
               achievements: 'space-y-2',
               achievement: 'text-sm text-[color:var(--sh-muted-text)]',
             }}
-            renderAchievement={(achievement) => (
+            renderAchievement={(achievement, index) => (
               <span
                 key={flips}
                 className={`flex items-start gap-1.5 border-l-2 border-[color:var(--sh-rim)] bg-[color:var(--sh-night)] p-2 ${triggered ? fall : 'opacity-0'}`}
-                style={{ '--i': achievements.indexOf(achievement) } as CSSProperties}
+                style={{ '--i': index } as CSSProperties}
               >
                 <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
                   -

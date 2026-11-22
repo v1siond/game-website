@@ -19,15 +19,20 @@ import world from './world.module.css'
 //
 // Animated: one bob per category, him and the crate he pushes (moved by --scene-progress), his parts.
 
-const BRACE = 'M0 0 L100 100 M100 0 L0 100'
+// A crate's cross brace, corner to corner, stretched over its box; `className` adds to its placing.
+function CrateBrace({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${className}`} aria-hidden="true" focusable="false">
+      <path d="M0 0 L100 100 M100 0 L0 100" stroke="var(--sh-edge)" strokeWidth={6} vectorEffect="non-scaling-stroke" fill="none" opacity={0.6} />
+    </svg>
+  )
+}
 
 function Crate({ category, index }: { category: CVData['techStack'][number]; index: number }) {
   return (
     <div className={shade.bob} style={{ '--i': index } as CSSProperties}>
       <div className={`relative border-4 border-[color:var(--sh-black)] p-4 ${world.crate}`}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-          <path d={BRACE} stroke="var(--sh-edge)" strokeWidth={6} vectorEffect="non-scaling-stroke" fill="none" opacity={0.6} />
-        </svg>
+        <CrateBrace className="pointer-events-none" />
         <div className="relative bg-[color:var(--sh-panel)] p-3">
           <h3 className="mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-[color:var(--sh-heading)]">
             <span className="grayscale" aria-hidden="true">
@@ -60,9 +65,7 @@ function Waterline() {
       <div className={`absolute bottom-3 left-0 right-28 flex items-end ${shade.pushAlong}`}>
         <HeroCharacter profession="engineer" pose={phase === 'done' ? 'idle' : 'push'} className="block h-16 w-10" />
         <div className={`relative -ml-1 h-12 w-14 border-4 border-[color:var(--sh-black)] ${world.crate}`}>
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" focusable="false">
-            <path d={BRACE} stroke="var(--sh-edge)" strokeWidth={6} vectorEffect="non-scaling-stroke" fill="none" opacity={0.6} />
-          </svg>
+          <CrateBrace />
         </div>
       </div>
     </div>

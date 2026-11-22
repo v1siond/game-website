@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { HeroCharacter } from './character'
 import { SHADE } from './palette'
 import world from './world.module.css'
@@ -15,8 +14,6 @@ import shade from './shade.module.css'
 // plate edge lit. At the cable's head he beats an oil drum, and the current steps on his strokes.
 //
 // Animated: one current per band, his parts.
-
-const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
 
 // The four bolts holding a plate down, one per corner.
 const BOLTS = ['left-1.5 top-1.5', 'right-1.5 top-1.5', 'bottom-1.5 left-1.5', 'bottom-1.5 right-1.5']
@@ -37,7 +34,7 @@ function Plate({ index, link, children }: { index: number; link: BandSlot['linkP
   )
   if (!link) return plate
   return (
-    <a {...link} className={`group block h-full ${LINK_FOCUS}`}>
+    <a {...link} className="group block h-full">
       {plate}
     </a>
   )
@@ -56,8 +53,6 @@ function OilDrum() {
 }
 
 export function ShockStage({ bands }: { bands: Band[] }) {
-  const { links } = useLabels()
-
   return (
     <div className="relative">
       <div className="mb-2 flex items-end gap-0.5 lg:mb-6" aria-hidden="true">
@@ -71,17 +66,17 @@ export function ShockStage({ bands }: { bands: Band[] }) {
       <BandList
         bands={bands}
         className="relative grid gap-6 pl-8 sm:grid-cols-2 lg:grid-cols-4 lg:pl-0"
-        renderBand={({ band, years, linkProps }) => (
-          <Plate index={bands.indexOf(band)} link={linkProps}>
+        renderBand={({ band, years, linkProps, release }, index) => (
+          <Plate index={index} link={linkProps}>
             <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)] group-hover:underline">{band.name}</h3>
             <p className="mt-1 text-sm tracking-wider text-[color:var(--sh-muted-text)]">
               {band.role}
               {years && <span aria-hidden="true"> | </span>}
               {years}
             </p>
-            {band.release && (
+            {release && (
               <p className="mt-2 text-sm text-[color:var(--sh-text)]">
-                {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+                {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
               </p>
             )}
           </Plate>

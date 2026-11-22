@@ -242,8 +242,8 @@ export function CityBackdrop({ zones }: { zones: ValueStore<District> }) {
       <div className={`absolute inset-x-0 top-0 h-[200%] ${world.rain} ${world.rainSlow}`} />
       <div className={`absolute inset-x-0 top-0 h-[200%] ${world.rain}`} />
       {/* scanlines and the optics vignette: static */}
-      <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(0,0,0,0.25)_2px_3px)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent_45%,rgba(7,6,12,0.85)_100%)]" />
+      <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,color-mix(in_srgb,black_25%,transparent)_2px_3px)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent_45%,color-mix(in_srgb,var(--neon-ink)_85%,transparent)_100%)]" />
     </div>
   )
 }

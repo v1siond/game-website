@@ -41,7 +41,7 @@ function Lever({ option, pulling, onPull }: { option: ProfessionOption; pulling:
       type="button"
       {...option.optionProps}
       onClick={onPull}
-      className="group flex min-h-[44px] items-center gap-3 px-2 py-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]"
+      className="group flex min-h-[44px] items-center gap-3 px-2 py-1 text-left"
     >
       <svg viewBox="0 0 48 64" className="h-14 w-10 shrink-0" aria-hidden="true" focusable="false">
         <g className={`${shade.leverHandle} ${thrown ? shade.leverPulled : ''}`}>
@@ -113,8 +113,9 @@ export function LeverSwitch() {
     }
     setPulling(option.id)
     setPose('push')
-    later(() => setTurn('out'), PULL_MS)
-    later(change, PULL_MS + TURN_OUT_MS)
+    // A pull starts the list afresh, so it holds one pull's timers and the turn in after it, never every
+    // pull's since the page opened.
+    timers.current = [window.setTimeout(() => setTurn('out'), PULL_MS), window.setTimeout(change, PULL_MS + TURN_OUT_MS)]
   }
 
   return (

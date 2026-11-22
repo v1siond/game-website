@@ -23,7 +23,6 @@ import shade from './shade.module.css'
 //
 // Animated: one sign per entry (once), the one being touched, him on the cable (once) and his parts.
 
-const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
 const TITLE = 'text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)]'
 const META = 'text-sm tracking-wider text-[color:var(--sh-muted-text)]'
 
@@ -59,7 +58,7 @@ function Sign({ index, lit, href, children }: { index: number; lit: boolean; hre
 
   if (!href) return <div className={shade.sign}>{board}</div>
   return (
-    <a {...href} className={`group block ${shade.sign} ${LINK_FOCUS}`}>
+    <a {...href} className={`group block ${shade.sign}`}>
       {board}
     </a>
   )

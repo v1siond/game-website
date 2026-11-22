@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NEON } from './palette'
@@ -27,6 +28,9 @@ export const MERC_ACTION: Record<Profession, MercMotion> = {
   drummer: 'drum',
   fighter: 'kick',
 }
+
+/** Him held still under reduced motion, else playing `motion`. */
+export const stillWhen = (reduced: boolean, motion: MercMotion): MercMotion => (reduced ? 'still' : motion)
 
 const MOTION_CLASS: Record<MercMotion, string> = {
   still: '',
@@ -265,8 +269,9 @@ interface MercProps {
   className?: string
 }
 
-/** Him as the night city merc, in a profession's kit, playing one motion; he glitches when hovered. */
-export function MercSprite({ profession, motion, className = '' }: MercProps) {
+/** Him as the night city merc, in a profession's kit, playing one motion; he glitches when hovered.
+ *  Memoised on its three primitive props, so a parent render that keeps them redraws none of his svg. */
+export const MercSprite = memo(function MercSprite({ profession, motion, className = '' }: MercProps) {
   return (
     <svg viewBox="0 0 100 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
@@ -293,4 +298,4 @@ export function MercSprite({ profession, motion, className = '' }: MercProps) {
       </g>
     </svg>
   )
-}
+})

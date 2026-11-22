@@ -9,7 +9,7 @@ import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { BREACH_START, BUFFER_SIZE, MATRIX_SIZE, breachPuzzle, bufferBytes, byteText, canPick, matched, outcome, pick, type BreachOutcome } from './breach'
-import { DataChip, HudPanel } from './hud'
+import { DataChip, HUD_LINK, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { MercSprite } from './merc'
 import world from './world.module.css'
@@ -195,7 +195,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
               <button
                 type="button"
                 onClick={() => setState(BREACH_START)}
-                className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hud)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]`}
+                className={hudButton('hud')}
               >
                 {cyber.retry}
               </button>
@@ -204,7 +204,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
               <button
                 type="button"
                 onClick={() => setSkipped(true)}
-                className={`${world.cut} min-h-[44px] border border-[color:var(--neon-ice)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-ice)] hover:bg-[color-mix(in_srgb,var(--neon-ice)_12%,transparent)]`}
+                className={hudButton('ice')}
               >
                 {cyber.openNow}
               </button>
@@ -241,9 +241,8 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
   )
 }
 
-function GigCard({ project, years, links }: ProjectSlot) {
-  const labels = useLabels()
-  const { cyber, sections } = labels
+function GigCard({ project, years, links, noLink }: ProjectSlot) {
+  const { cyber, sections, cards } = useLabels()
   const [breaching, setBreaching] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
 
@@ -261,7 +260,7 @@ function GigCard({ project, years, links }: ProjectSlot) {
           <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{project.tagline}</p>
           {project.impact && <p className="mt-2 text-sm text-[color:var(--neon-hack)]">{project.impact}</p>}
           {project.techStack.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-1" aria-label={labels.cards.technologiesUsed}>
+            <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.technologiesUsed}>
               {project.techStack.slice(0, 5).map((tech) => (
                 <DataChip key={tech}>{tech}</DataChip>
               ))}
@@ -281,13 +280,13 @@ function GigCard({ project, years, links }: ProjectSlot) {
               <a
                 key={kind}
                 {...linkProps}
-                className={`${world.cut} inline-flex min-h-[44px] items-center border border-[color:var(--neon-use)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-use)] hover:bg-[color-mix(in_srgb,var(--neon-use)_14%,transparent)]`}
+                className={HUD_LINK}
               >
                 {label}
               </a>
             ))}
           </div>
-          {links.length === 0 && <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{labels.links.noPublicLink}</p>}
+          {noLink && <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{noLink}</p>}
         </article>
       </Scannable>
       {breaching && <BreachDialog project={project} trigger={trigger} onClose={() => setBreaching(false)} />}

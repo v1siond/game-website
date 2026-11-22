@@ -1,8 +1,7 @@
 import { paletteVars } from '../shared/paletteVars'
 
 // Neon Cyber's palette, every colour of the world once: the night city's void and dusk, the neon tubes
-// (magenta, cyan, hot pink, yellow, green, orange, violet), the steel and walls of its alleys, and the
-// costume of the hero. The SVG art and inline styles read NEON; NEON_VARS puts the same values on the
+// (magenta, cyan, hot pink, yellow), the steel and walls of its alleys, and the costume of the hero. The SVG art and inline styles read NEON; NEON_VARS puts the same values on the
 // world's root as --neon-* variables, which the Tailwind arbitrary values (bg-[color:var(--neon-void)])
 // read, and the theme registry reads NEON, so no colour is written twice.
 
@@ -20,14 +19,7 @@ export const NEON = {
   magenta: '#ff00ff',
   cyan: '#00ffff',
   hotPink: '#ff0066',
-  pinkText: '#ff3385',
   yellow: '#ffff00',
-  green: '#00ff66',
-  led: '#00ff00',
-  orange: '#ff6600',
-  violet: '#9966cc',
-  violetText: '#b388e6',
-  lilac: '#c4a3e6',
 
   // The optics HUD: the loud yellow that carries data, red line work for the chrome only (red words on
   // the dark ground fail contrast), the scanner's colour key (gold for work, green for what can be

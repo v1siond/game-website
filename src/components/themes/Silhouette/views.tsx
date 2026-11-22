@@ -1,9 +1,9 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import type { Labels } from '@/lib/cv/labels'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
@@ -24,45 +24,55 @@ import world from './world.module.css'
 // flooded hold, his services stand as plain slabs under a fade, the spider loses a leg in the trap
 // line, his projects lie on a sawmill floor under a
 // running saw and his ventures are lit signs over the city; the Musician's bands are plates on an electrified floor stepping in time; the Martial
-// Artist's record sits in the gravity room.
+// Artist's record sits in the gravity room. The shared section plan picks which a profession shows and in
+// which order.
 
-function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
+// A section titled from the labels by its key.
+function Block({ titleKey, wide = false, children }: { titleKey: keyof Labels['sections']; wide?: boolean; children: ReactNode }) {
+  const { sections } = useLabels()
+  const title = sections[titleKey]
   const id = headingId('silhouette', title)
   return (
     <section className="relative px-4 py-10 sm:px-6" aria-labelledby={id}>
       <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
-        <SectionHeader id={id} title={title.toLowerCase()} />
+        <SectionHeader id={id} title={title} />
         {children}
       </div>
     </section>
   )
 }
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const { sections: titles } = useLabels()
-
-  return (
-    <>
-      <Block title={titles.about}>
-        <ChaseAbout bio={professionalSummary.bio} />
+// One frame per section of the shared plan, which picks the ones a profession shows and their order. The
+// trap line closes the services, so it sits in their frame; the projects keep the Featured Work title.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <Block titleKey="about">
+        <ChaseAbout bio={slot.bio} />
       </Block>
-
-      {sections.jobs.length > 0 && (
-        <Block title={titles.workExperience} wide>
-          <HangingJobs jobs={sections.jobs} />
-        </Block>
-      )}
-
-      <Block title={titles.techStack} wide>
-        <FloatingCrates categories={sections.techStack} />
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <Block titleKey="workExperience" wide>
+        <HangingJobs jobs={slot.jobs} />
       </Block>
-
-      {sections.services.length > 0 && (
-        <Block title={titles.services} wide>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <Block titleKey="techStack" wide>
+        <FloatingCrates categories={slot.categories} />
+      </Block>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <>
+        <Block titleKey="services" wide>
           <FadeInScene>
             <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
+              {slot.services.map((service) => (
                 <li key={service.id} className={`${MASONRY_ITEM} border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]">{service.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-muted-text)]">{service.line}</p>
@@ -71,48 +81,41 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
             </ul>
           </FadeInScene>
         </Block>
-      )}
-
-      <TrapLine />
-
-      <Block title={titles.featuredWork} wide>
-        <MillProjects projects={sections.projects} />
+        <TrapLine />
+      </>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <Block titleKey="featuredWork" wide>
+        <MillProjects projects={slot.projects} />
       </Block>
-
-      {sections.companies.length > 0 && (
-        <Block title={titles.ventures} wide>
-          <VentureSigns companies={sections.companies} />
-        </Block>
-      )}
-    </>
-  )
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <Block titleKey="ventures" wide>
+        <VentureSigns companies={slot.companies} />
+      </Block>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const { years } = useLabels()
+    return (
+      <Block titleKey="bands" wide>
+        <p className="mb-6 text-center text-sm text-[color:var(--sh-text)]">{drumsSince(slot.musician, years)}</p>
+        <ShockStage bands={slot.bands} />
+        <p className="mt-6 text-center text-sm italic text-[color:var(--sh-muted-text)]">{slot.musician.line}</p>
+      </Block>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    return (
+      <Block titleKey="muayThai" wide>
+        <GravityRecord martialArts={slot.martialArts} />
+      </Block>
+    )
+  },
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const { sections: titles, years } = useLabels()
-
-  return (
-    <Block title={titles.bands} wide>
-      <p className="mb-6 text-center text-sm text-[color:var(--sh-text)]">{drumsSince(musician, years)}</p>
-      <ShockStage bands={bands} />
-      <p className="mt-6 text-center text-sm italic text-[color:var(--sh-muted-text)]">{musician.line}</p>
-    </Block>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { sections: titles } = useLabels()
-
-  return (
-    <Block title={titles.muayThai} wide>
-      <GravityRecord martialArts={sections.martialArts} />
-    </Block>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)

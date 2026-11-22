@@ -6,7 +6,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { NameWords } from '@/components/cv/NameWords'
-import { CVLink, HeroAction } from './actions'
+import { ContactActions } from './actions'
 import { MercSprite } from './merc'
 import { panelHeadingId } from './hud'
 import world from './world.module.css'
@@ -48,7 +48,7 @@ export function HoloCall({ profession }: { profession: Profession }) {
                 ))}
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-[color:var(--neon-data)] bg-[color:var(--neon-ink)]">
                   <MercSprite profession={profession} motion={triggered ? 'scan' : 'idle'} className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
-                  <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.14)_2px_3px)]" />
+                  <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,color-mix(in_srgb,var(--neon-data)_14%,transparent)_2px_3px)]" />
                   <div className="absolute inset-0 flex flex-col">
                     {PORTRAIT_LINES.map((i) => (
                       <span key={i} className={`${world.resolve} block flex-1 bg-[color:var(--neon-glass)]`} style={{ '--i': i } as CSSProperties} />
@@ -62,11 +62,8 @@ export function HoloCall({ profession }: { profession: Profession }) {
                   <NameWords name={name} />
                 </p>
                 <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{line}</p>
-                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-labelledby={panelHeadingId(sections.contact)}>
-                  {actions.map((action) => (
-                    <HeroAction key={action.id} action={action} className={world.answer} />
-                  ))}
-                  <CVLink />
+                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-label={cyber.incomingCall}>
+                  <ContactActions actions={actions} actionClassName={world.answer} />
                 </nav>
               </div>
             </div>

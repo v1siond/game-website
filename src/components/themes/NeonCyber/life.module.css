@@ -295,10 +295,7 @@
 .ripStage[data-on='false'] .installed {
   opacity: 0;
 }
-.ripStage[data-on='true'] .installed {
-  animation: installed-in 0.2s steps(2) calc(1.4s + var(--i) * 0.9s) both;
-}
-
+/* once the stage is on, world.installedIn fades the word in on the world's one fade keyframe */
 @keyframes install {
   from {
     transform: scaleX(0);
@@ -315,25 +312,15 @@
     transform: scaleX(1);
   }
 }
-@keyframes installed-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 /* the chair's clamp arms close on him while he sits, and open when he stands */
 .clamp {
   transform-box: fill-box;
   transform-origin: right center;
+  transition: transform 0.4s ease;
 }
 .ripStage[data-done='false'] .clamp {
   transform: rotate(-18deg);
-}
-.clamp {
-  transition: transform 0.4s ease;
 }
 
 /* he stands out of the chair, a step to the right, for the kick */

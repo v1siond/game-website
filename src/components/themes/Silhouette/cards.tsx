@@ -11,7 +11,6 @@ import world from './world.module.css'
 // game frames its few words, the section header, and the job and project cards the rope (./ropes) and
 // the sawmill floor (./mill) hold.
 
-const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]'
 const CARD_TITLE = 'text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]'
 const CARD_META = 'text-sm tracking-wider text-[color:var(--sh-dim-text)]'
 const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--sh-muted-text)]'
@@ -117,7 +116,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
             <a
               key={kind}
               {...linkProps}
-              className={`inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] px-3 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] transition-colors hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)] ${LINK_FOCUS}`}
+              className={`inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] px-3 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] transition-colors hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)]`}
             >
               {label}
             </a>

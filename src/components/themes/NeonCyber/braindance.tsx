@@ -10,8 +10,8 @@ import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { DataChip, HudPanel } from './hud'
-import { MercSprite } from './merc'
+import { DataChip, HudPanel, hudButton } from './hud'
+import { MercSprite, stillWhen } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
 
@@ -128,8 +128,11 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
     const step = (now: number) => {
       const progress = Math.min(1, (now - began) / PLAY_TIME)
       moveHead(progress)
-      if (progress < 1) frame.current = window.requestAnimationFrame(step)
-      else setRiding(false)
+      if (progress === 1) {
+        setRiding(false)
+        return
+      }
+      frame.current = window.requestAnimationFrame(step)
     }
     frame.current = window.requestAnimationFrame(step)
   }, [moveHead])
@@ -189,7 +192,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
         <button
           type="button"
           onClick={play}
-          className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hud)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]`}
+          className={hudButton('hud')}
         >
           {cyber.replay}
         </button>
@@ -235,7 +238,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                   <span className="block h-full w-full rotate-45 bg-[color:var(--neon-hud)]" />
                   {/* him riding the playhead through the years: walking while it plays, at rest when it stops */}
                   <span className="absolute bottom-full left-1/2 block w-10 -translate-x-1/2">
-                    <MercSprite profession="engineer" motion={reducedMotion ? 'still' : riding ? 'walk' : 'idle'} className="block h-auto w-full" />
+                    <MercSprite profession="engineer" motion={stillWhen(reducedMotion, riding ? 'walk' : 'idle')} className="block h-auto w-full" />
                   </span>
                 </span>
               </div>
