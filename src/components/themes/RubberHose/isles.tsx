@@ -125,12 +125,20 @@ export function Isles({ zones }: { zones: ValueStore<Isle> }) {
   )
 }
 
+/** What a section draws on its isle: the section itself, or a function of whether it has come into view. */
+type IsleChildren = ReactNode | ((on: boolean) => ReactNode)
+
+function drawnOnIsle(children: IsleChildren, on: boolean): ReactNode {
+  if (typeof children === 'function') return children(on)
+  return children
+}
+
 /** A section's place on an isle: hands the isle up while in view, and says when it first came into view. */
-export function IsleStage({ isle, className = '', children }: { isle: Isle; className?: string; children: (on: boolean) => ReactNode }) {
+export function IsleStage({ isle, className = '', children }: { isle: Isle; className?: string; children: IsleChildren }) {
   const { ref, on } = useZoneStage<Isle>(isle)
   return (
     <div ref={ref} className={className}>
-      {children(on)}
+      {drawnOnIsle(children, on)}
     </div>
   )
 }

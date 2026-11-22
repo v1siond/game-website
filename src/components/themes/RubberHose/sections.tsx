@@ -18,7 +18,7 @@ import { IsleStage } from './isles'
 import { BagFoe, Bandstand, FlowerKnockout, MapRun, ShopCounter, StageCurtains } from './stages'
 import world from './world.module.css'
 import styles from './scenes.module.css'
-import { drumsSince } from '@/lib/cv/sectionText'
+import { drumsSince, headingId } from '@/lib/cv/sectionText'
 
 // The picked profession's sections, each on its isle (./isles, the backdrop follows) and each with its own
 // act of his (./stages). About: he knocks out the flower boss and the text unfolds. Work Experience: the
@@ -57,6 +57,18 @@ const KO_BURST = Array.from({ length: KO_RAYS * 2 }, (_, i) => {
   return `${(100 + Math.cos(angle) * 98 * reach).toFixed(1)},${(30 + Math.sin(angle) * 29 * reach).toFixed(1)}`
 }).join(' ')
 
+// The heading each section is named by (aria-labelledby).
+const HEADING = {
+  about: headingId('hose', 'About'),
+  workExperience: headingId('hose', 'Work Experience'),
+  techStack: headingId('hose', 'Tech Stack'),
+  services: headingId('hose', 'Services'),
+  featuredWork: headingId('hose', 'Featured Work'),
+  ventures: headingId('hose', 'Ventures'),
+  bands: headingId('hose', 'Bands'),
+  muayThai: headingId('hose', 'Muay Thai'),
+} as const
+
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const titles = useLabels().sections
@@ -66,8 +78,8 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
     <>
       <IsleStage isle="meadow">
         {(on) => (
-          <section aria-labelledby="hose-about" className="mb-8">
-            <CurlBanner id="hose-about">{titles.about}</CurlBanner>
+          <section aria-labelledby={HEADING.about} className="mb-8">
+            <CurlBanner id={HEADING.about}>{titles.about}</CurlBanner>
             <FlowerKnockout on={on} reduced={reduced} profession="engineer">
               <p className={`mx-auto max-w-prose p-5 leading-relaxed ${world.titleCard} ${LEAD}`}>{professionalSummary.bio}</p>
             </FlowerKnockout>
@@ -79,29 +91,27 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.jobs.length > 0 && (
         <IsleStage isle="meadow">
-        {() => (
-        <ScrollScene reveal={false} start={RUN_START} end={RUN_END}>
-          <section aria-labelledby="hose-work-experience" className="mb-8">
-            <CurlBanner id="hose-work-experience">{titles.workExperience}</CurlBanner>
-            <div className="sticky top-3 z-30 mb-2">
-              <RunBar profession="engineer" stops={sections.jobs.length} />
-            </div>
-            <Reveal>
-              {({ played }) => (
-                <ul className={`pt-4 ${MASONRY_LIST}`}>
-                  {sections.jobs.map((entry, index) => (
-                    <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
-                      <div className={styles.breathe}>
-                        <ExperienceCard entry={entry} />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Reveal>
-          </section>
-        </ScrollScene>
-        )}
+          <ScrollScene reveal={false} start={RUN_START} end={RUN_END}>
+            <section aria-labelledby={HEADING.workExperience} className="mb-8">
+              <CurlBanner id={HEADING.workExperience}>{titles.workExperience}</CurlBanner>
+              <div className="sticky top-3 z-30 mb-2">
+                <RunBar profession="engineer" stops={sections.jobs.length} />
+              </div>
+              <Reveal>
+                {({ played }) => (
+                  <ul className={`pt-4 ${MASONRY_LIST}`}>
+                    {sections.jobs.map((entry, index) => (
+                      <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
+                        <div className={styles.breathe}>
+                          <ExperienceCard entry={entry} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Reveal>
+            </section>
+          </ScrollScene>
         </IsleStage>
       )}
 
@@ -109,8 +119,8 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <IsleStage isle="carnival">
         {(on) => (
-          <section aria-labelledby="hose-tech-stack" className="mx-auto mb-8 max-w-3xl">
-            <CurlBanner id="hose-tech-stack">{titles.techStack}</CurlBanner>
+          <section aria-labelledby={HEADING.techStack} className="mx-auto mb-8 max-w-3xl">
+            <CurlBanner id={HEADING.techStack}>{titles.techStack}</CurlBanner>
             <ShopCounter on={on} reduced={reduced} profession="engineer">
               <TechBubbleCloud categories={sections.techStack} />
             </ShopCounter>
@@ -120,43 +130,39 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.services.length > 0 && (
         <IsleStage isle="carnival">
-          {() => (
-            <section aria-labelledby="hose-services" className="mb-8">
-              <CurlBanner id="hose-services">{titles.services}</CurlBanner>
-              <FadeInScene>
-                <FingerGunPop>
-                  <ul className={MASONRY_LIST}>
-                    {sections.services.map((service) => (
-                      <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
-                        <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
-                        <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </FingerGunPop>
-              </FadeInScene>
-            </section>
-          )}
+          <section aria-labelledby={HEADING.services} className="mb-8">
+            <CurlBanner id={HEADING.services}>{titles.services}</CurlBanner>
+            <FadeInScene>
+              <FingerGunPop>
+                <ul className={MASONRY_LIST}>
+                  {sections.services.map((service) => (
+                    <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
+                      <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
+                      <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
+                    </li>
+                  ))}
+                </ul>
+              </FingerGunPop>
+            </FadeInScene>
+          </section>
         </IsleStage>
       )}
 
       <IsleStage isle="carnival">
-        {() => (
-          <section aria-labelledby="hose-featured-work" className="mb-8">
-            <CurlBanner id="hose-featured-work">{titles.featuredWork}</CurlBanner>
-            <ParrySlap>
-              <ParryBoard projects={sections.projects} />
-            </ParrySlap>
-          </section>
-        )}
+        <section aria-labelledby={HEADING.featuredWork} className="mb-8">
+          <CurlBanner id={HEADING.featuredWork}>{titles.featuredWork}</CurlBanner>
+          <ParrySlap>
+            <ParryBoard projects={sections.projects} />
+          </ParrySlap>
+        </section>
       </IsleStage>
 
       <ArtBreak kind="bouncingBalls" />
 
       <IsleStage isle="carnival">
         {(on) => (
-          <section aria-labelledby="hose-ventures">
-            <CurlBanner id="hose-ventures">{titles.ventures}</CurlBanner>
+          <section aria-labelledby={HEADING.ventures}>
+            <CurlBanner id={HEADING.ventures}>{titles.ventures}</CurlBanner>
             <StageCurtains on={on} profession="engineer">
               <ul className="grid gap-4 md:grid-cols-6">
                 {sections.companies.map((company) => (
@@ -181,15 +187,13 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
     <>
       <ArtBreak kind="singAlong" />
       <IsleStage isle="casino">
-        {() => (
-          <section aria-labelledby="hose-bands" className="mb-8">
-            <CurlBanner id="hose-bands">{labels.sections.bands}</CurlBanner>
-            <Bandstand profession="drummer" />
-            <p className={`mb-6 p-3 ${world.titleCard} ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
-            <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandRecord {...slot} />} />
-            <p className={`mt-6 p-3 italic ${world.titleCard} ${LEAD} ${world.red}`}>{musician.line}</p>
-          </section>
-        )}
+        <section aria-labelledby={HEADING.bands} className="mb-8">
+          <CurlBanner id={HEADING.bands}>{labels.sections.bands}</CurlBanner>
+          <Bandstand profession="drummer" />
+          <p className={`mb-6 p-3 ${world.titleCard} ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
+          <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandRecord {...slot} />} />
+          <p className={`mt-6 p-3 italic ${world.titleCard} ${LEAD} ${world.red}`}>{musician.line}</p>
+        </section>
       </IsleStage>
     </>
   )
@@ -203,46 +207,44 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
     <>
       <ArtBreak kind="bouncingBalls" />
       <IsleStage isle="casino">
-      {() => (
-      <section aria-labelledby="hose-muay-thai" className="mb-8">
-        <CurlBanner id="hose-muay-thai">{titles.muayThai}</CurlBanner>
-        <Reveal className={`relative mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
-          {({ played }) => (
-            <>
-            <RingBell />
-            <BagFoe on={played} profession="fighter" />
-            <div className="relative mb-6 flex min-h-24 items-center justify-center px-6">
-              <svg viewBox="0 0 200 60" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${world.inked} ${played ? styles.koBurst : styles.koBurstWait}`} aria-hidden="true" focusable="false">
-                <polygon points={KO_BURST} fill={HOSE.highlight} />
-              </svg>
-              <h3 className={`relative text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
-                {martialArts.primary.title}
-              </h3>
-            </div>
-            <MuayThaiRecord
-              martialArts={martialArts}
-              classNames={{
-                facts: 'grid sm:grid-cols-2 gap-4 mb-6',
-                fact: `p-3 ${world.fact}`,
-                term: `text-sm tracking-widest uppercase ${world.red}`,
-                value: `text-sm mt-1 ${world.ink}`,
-                achievements: 'space-y-4',
-                achievement: `text-sm ${world.ink}`,
-              }}
-              renderAchievement={(achievement) => (
-                <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
-                  <span className={`inline-block ${world.red} ${staggerAt(martialArts.primary.achievements.indexOf(achievement))} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
-                    ★
-                  </span>
-                  <span>{achievement}</span>
-                </p>
-              )}
-            />
-            </>
-          )}
-        </Reveal>
-      </section>
-      )}
+        <section aria-labelledby={HEADING.muayThai} className="mb-8">
+          <CurlBanner id={HEADING.muayThai}>{titles.muayThai}</CurlBanner>
+          <Reveal className={`relative mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
+            {({ played }) => (
+              <>
+                <RingBell />
+                <BagFoe on={played} profession="fighter" />
+                <div className="relative mb-6 flex min-h-24 items-center justify-center px-6">
+                  <svg viewBox="0 0 200 60" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${world.inked} ${played ? styles.koBurst : styles.koBurstWait}`} aria-hidden="true" focusable="false">
+                    <polygon points={KO_BURST} fill={HOSE.highlight} />
+                  </svg>
+                  <h3 className={`relative text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
+                    {martialArts.primary.title}
+                  </h3>
+                </div>
+                <MuayThaiRecord
+                  martialArts={martialArts}
+                  classNames={{
+                    facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+                    fact: `p-3 ${world.fact}`,
+                    term: `text-sm tracking-widest uppercase ${world.red}`,
+                    value: `text-sm mt-1 ${world.ink}`,
+                    achievements: 'space-y-4',
+                    achievement: `text-sm ${world.ink}`,
+                  }}
+                  renderAchievement={(achievement) => (
+                    <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
+                      <span className={`inline-block ${world.red} ${staggerAt(martialArts.primary.achievements.indexOf(achievement))} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
+                        ★
+                      </span>
+                      <span>{achievement}</span>
+                    </p>
+                  )}
+                />
+              </>
+            )}
+          </Reveal>
+        </section>
       </IsleStage>
     </>
   )
