@@ -19,7 +19,7 @@ const HARBOUR: Point = [500, 538]
 const CROSSROADS: Point = [500, 408]
 
 /** The stretch from the harbour to the crossroads, walked once on arrival. */
-export const ARRIVAL = buildTrail([HARBOUR, [462, 478], CROSSROADS])
+const ARRIVAL = buildTrail([HARBOUR, [462, 478], CROSSROADS])
 
 /** Each profession's trail, from the crossroads out to its landmark's tile. */
 export const BRANCHES: Record<Profession, Trail> = {
@@ -138,7 +138,7 @@ export const HubMapArt = memo(function HubMapArt() {
         <path d={ISLAND} transform="translate(500 330) scale(1.1) translate(-500 -330)" strokeDasharray="6 8" />
       </g>
 
-      <g className={map.inked} style={cssVars({ '--i': 0 })}>
+      <g>
         <path d={ISLAND} fill={TRAIL.SAND} stroke={TRAIL.INK} strokeWidth={3} />
         <path d={ISLAND} fill="url(#ap-meadow)" transform="translate(500 320) scale(0.94) translate(-500 -320)" />
         <path d={ISLAND} fill="url(#ap-fall)" transform="translate(500 320) scale(0.94) translate(-500 -320)" className={map.fall} />
@@ -153,7 +153,7 @@ export const HubMapArt = memo(function HubMapArt() {
         <path d={PLATEAU} fill="url(#ap-fall)" stroke={TRAIL.INK} strokeWidth={2.4} className={map.fall} />
       </g>
 
-      <g className={map.inked} style={cssVars({ '--i': 1 })}>
+      <g>
         <Trees x={380} y={170} />
         <Trees x={660} y={170} s={0.9} />
         <Trees x={320} y={470} s={1.1} />
@@ -167,7 +167,7 @@ export const HubMapArt = memo(function HubMapArt() {
         </g>
       </g>
 
-      <g className={map.inked} style={cssVars({ '--i': 2 })}>
+      <g>
         <Hill x={420} y={300} w={64} h={46} i={0} />
         <Hill x={612} y={250} w={58} h={40} i={1} />
         <Hill x={250} y={420} w={70} h={50} i={2} />
@@ -175,7 +175,7 @@ export const HubMapArt = memo(function HubMapArt() {
       </g>
 
       {/* the harbour: a jetty into the sea and the ship that brought him, rocking at anchor */}
-      <g className={map.inked} style={cssVars({ '--i': 3 })}>
+      <g>
         <rect x={488} y={540} width={24} height={44} fill="url(#ap-wood)" stroke={TRAIL.INK} strokeWidth={1.6} />
         <g className={map.ship}>
           <path d="M556 566 H612 L600 584 H566 Z" fill="url(#ap-wood)" stroke={TRAIL.INK} strokeWidth={1.8} />
@@ -192,24 +192,24 @@ export const HubMapArt = memo(function HubMapArt() {
         ))}
         <TrailDots dots={ARRIVAL_DOTS} />
         {BRANCH_DOTS.map(({ profession, dots }) => (
-          <TrailDots key={profession} dots={dots} leg={1} />
+          <TrailDots key={profession} dots={dots} />
         ))}
       </g>
 
-      {PROFESSION_ORDER.map((profession, index) => {
+      {PROFESSION_ORDER.map((profession) => {
         const [x, y] = landmarkPoint(profession)
         return (
-          <g key={profession} className={map.inked} style={cssVars({ '--i': 4 + index })}>
-            <g transform={`translate(${x} ${y - LANDMARKS[profession].lift})`}>{LANDMARKS[profession].art}</g>
+          <g key={profession} transform={`translate(${x} ${y - LANDMARKS[profession].lift})`}>
+            {LANDMARKS[profession].art}
           </g>
         )
       })}
 
-      <LevelTile x={HARBOUR[0]} y={HARBOUR[1]} kind="exit" className={map.tileLit} />
-      <LevelTile x={CROSSROADS[0]} y={CROSSROADS[1]} r={9} kind="stop" className={map.tileLit} />
+      <LevelTile x={HARBOUR[0]} y={HARBOUR[1]} kind="exit" />
+      <LevelTile x={CROSSROADS[0]} y={CROSSROADS[1]} r={9} kind="stop" />
       {PROFESSION_ORDER.map((profession) => {
         const [x, y] = landmarkPoint(profession)
-        return <LevelTile key={profession} x={x} y={y} r={15} kind="exit" className={map.tileLit} />
+        return <LevelTile key={profession} x={x} y={y} r={15} kind="exit" />
       })}
 
       <Cloud x={230} y={110} s={1} i={0} depth="18px" />

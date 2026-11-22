@@ -4,13 +4,16 @@ import { courier, joints, setPose, type Pose } from '../courier'
 import { clamp01, reached, type Era } from './era'
 
 // Muay Thai: the jungle ring under a waterfall by a temple. He throws a round kick into the bag for each
-// fact of the record, the bag swings, and a torch per fact lights round the ring.
+// fact of the record, the bag swings, and a torch per fact lights round the ring. The bag hangs at his hip
+// height, its near side (x 1030) where the instep of a full kick lands (about 1040, 685).
+
+const BAG_PIVOT = [1060, 470] as const
 
 const kickOf = (f: number, count: number): number => (f >= count ? 0 : Math.sin(clamp01((f - Math.floor(f)) * 1.4) * Math.PI))
 
 const kickPose = (f: number, count: number): Partial<Pose> => {
   const kick = kickOf(f, count)
-  return { x: 900, y: 900, scale: 1.25, lean: -kick * 34, hipF: 10 + kick * 105, kneeF: -40 + kick * 36, hipB: -8 - kick * 10, kneeB: -10, shF: 70 - kick * 30, elF: 120, shB: 40 + kick * 60, elB: 110 - kick * 60, head: kick * 10, scarf: kick * 40 }
+  return { x: 960, y: 900, scale: 1.25, lean: -kick * 34, hipF: 10 + kick * 105, kneeF: -40 + kick * 36, hipB: -8 - kick * 10, kneeB: -10, shF: 70 - kick * 30, elF: 120, shB: 40 + kick * 60, elB: 110 - kick * 60, head: kick * 10, scarf: kick * 40 }
 }
 
 export const jungle: Era = {
@@ -37,7 +40,7 @@ export const jungle: Era = {
         ${torches}
         ${[400, 1200].map((x) => `<rect x="${x - 10}" y="700" width="20" height="170" fill="${JUNGLE.post}"/><rect x="${x - 14}" y="694" width="28" height="12" fill="${JUNGLE.ropeRed}"/>`).join('')}
         ${[730, 770, 810].map((y, i) => `<path d="M400,${y} L1200,${y}" stroke="${ropes[i]}" stroke-width="5"/>`).join('')}`),
-      figure: svg(`<path d="M960,340 L1180,340" stroke="${JUNGLE.beam}" stroke-width="12"/><g data-fx="bag"><path d="M1080,340 L1080,420" stroke="${JUNGLE.chain}" stroke-width="4"/><rect x="1050" y="420" width="60" height="220" rx="28" fill="${JUNGLE.bag}" stroke="${JUNGLE.bagEdge}" stroke-width="4"/><rect x="1050" y="470" width="60" height="16" fill="${JUNGLE.bagEdge}"/></g>${courier(kickPose(0, count))}`),
+      figure: svg(`<path d="M980,470 L1200,470" stroke="${JUNGLE.beam}" stroke-width="12"/><g data-fx="bag"><path d="M1060,470 L1060,540" stroke="${JUNGLE.chain}" stroke-width="4"/><rect x="1030" y="540" width="60" height="220" rx="28" fill="${JUNGLE.bag}" stroke="${JUNGLE.bagEdge}" stroke-width="4"/><rect x="1030" y="590" width="60" height="16" fill="${JUNGLE.bagEdge}"/></g>${courier(kickPose(0, count))}`),
       fg: svg(`<g fill="${JUNGLE.leaf}">${frond(-80, 1010, 460, -50, JUNGLE.leaf)}${frond(-60, 1010, 380, -80, JUNGLE.leaf)}<path d="M1800,1000 L1800,560 Q1600,620 1560,760 Q1520,880 1480,1000 Z"/>${frond(1700, 1010, 420, -130, JUNGLE.leaf)}</g>
         <g data-fx="flies" fill="${JUNGLE.fly}">${Array.from({ length: 18 }, (_, i) => `<circle cx="${(i * 181) % 1600}" cy="${400 + ((i * 113) % 500)}" r="3" opacity="0.7"/>`).join('')}</g>`),
     }
@@ -51,7 +54,7 @@ export const jungle: Era = {
       tf(flies, `translate(${r1(Math.sin(p * 7) * 40)} ${r1(-p * 120)})`)
       flames.forEach((flame, i) => fade(flame, 0.1 + reached(f, i) * 0.9))
       const hit = Math.sin(clamp01((f - Math.floor(f) - 0.3) * 1.6) * Math.PI)
-      tf(bag, `rotate(${r1(-hit * 16)} 1080 340)`)
+      tf(bag, `rotate(${r1(-hit * 16)} ${BAG_PIVOT[0]} ${BAG_PIVOT[1]})`)
       setPose(j, kickPose(f, count))
     }
   },

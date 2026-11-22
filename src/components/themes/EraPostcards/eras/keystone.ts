@@ -7,11 +7,15 @@ import { clamp01, reached, type Era } from './era'
 // shard per venture leaves its orbit and docks in the pedestal while the guardian's eyes go dark. Cars
 // cross, rain falls. His own products, first in the list, carry pink shards, the rest cyan.
 
-const socketsAt = (count: number): number[] => spread(count, 620, 980)
+const socketsAt = (count: number): number[] => spread(count, 990, 1310)
+
+// His hover disc, left of the pedestal: he faces right, so he faces the sockets the shards dock in. At 850
+// he is clear of the text column on a desktop and inside the picture's middle a phone shows.
+const DISC_X = 850
 
 const reachPose = (p: number, f: number): Partial<Pose> => {
   const reach = Math.sin(clamp01(f - Math.floor(f)) * Math.PI)
-  return { x: 1110, y: 842, scale: 1.15, shF: 30 + reach * 120, elF: 10, shB: -10, head: -10 - reach * 10, lean: -6, scarf: Math.sin(p * 20) * 10 }
+  return { x: DISC_X, y: 842, scale: 1.15, shF: 30 + reach * 120, elF: 10, shB: -10, head: -10 - reach * 10, lean: -6, scarf: Math.sin(p * 20) * 10 }
 }
 
 // Where shard i circles before it is reached: an ellipse round the guardian, turning with the scene.
@@ -49,9 +53,9 @@ export const keystone: Era = {
         ${skyline(72, { base: 760, hMin: 120, hMax: 300, fill: KEYSTONE.cityFar, lit: KEYSTONE.cityFarLit, density: 0.18, spires: 0.3 })}`),
       mid: svg(`<g data-fx="cars" transform="translate(-400 0)">${cars}</g>${skyline(73, { base: 860, hMin: 160, hMax: 420, wMin: 60, wMax: 140, fill: KEYSTONE.cityNear, lit: KEYSTONE.cityNearLit, density: 0.22, spires: 0.25 })}
         <g fill="none" stroke-width="5"><rect x="120" y="520" width="80" height="26" rx="6" stroke="${KEYSTONE.trailCyan}"/><rect x="1380" y="470" width="110" height="30" rx="6" stroke="${KEYSTONE.signLime}"/></g>`),
-      near: svg(`${defs(linear('vn-ped', [[0, KEYSTONE.pedestalTop], [1, KEYSTONE.pedestalBottom]]))}<path d="M520,1000 L580,880 L1020,880 L1080,1000 Z" fill="url(#vn-ped)"/><path d="M580,880 L1020,880" stroke="${KEYSTONE.trailCyan}" stroke-width="4"/>
+      near: svg(`${defs(linear('vn-ped', [[0, KEYSTONE.pedestalTop], [1, KEYSTONE.pedestalBottom]]))}<path d="M890,1000 L950,880 L1350,880 L1410,1000 Z" fill="url(#vn-ped)"/><path d="M950,880 L1350,880" stroke="${KEYSTONE.trailCyan}" stroke-width="4"/>
         ${sockets.map((x) => `<ellipse cx="${r1(x)}" cy="896" rx="26" ry="7" fill="${KEYSTONE.socket}" stroke="${KEYSTONE.trailPink}" stroke-width="2"/>`).join('')}`),
-      figure: svg(`<g data-fx="hover"><ellipse cx="1110" cy="842" rx="80" ry="14" fill="${KEYSTONE.disc}" stroke="${KEYSTONE.signLime}" stroke-width="3"/>${glow('vn-hov', 1110, 858, 80, KEYSTONE.signLime, 0.5)}${courier(reachPose(0, 0))}</g>${shards}`),
+      figure: svg(`<g data-fx="hover"><ellipse cx="${DISC_X}" cy="842" rx="80" ry="14" fill="${KEYSTONE.disc}" stroke="${KEYSTONE.signLime}" stroke-width="3"/>${glow('vn-hov', DISC_X, 858, 80, KEYSTONE.signLime, 0.5)}${courier(reachPose(0, 0))}</g>${shards}`),
       fg: svg(`<g data-fx="rain" stroke="${KEYSTONE.rain}" stroke-width="1.5" opacity="0.35">${Array.from({ length: 60 }, (_, i) => `<path d="M${((i * 97) % 1800) - 100},${((i * 53) % 1600) - 1200} l-10,50"/>`).join('')}</g>
         <path d="M-200,1000 L-200,950 L1800,950 L1800,1000 Z" fill="${KEYSTONE.rail}"/><path d="M-200,950 L1800,950" stroke="${KEYSTONE.trailPink}" stroke-width="3"/>
         ${Array.from({ length: 20 }, (_, i) => `<rect x="${-200 + i * 100}" y="905" width="6" height="45" fill="${KEYSTONE.rail}"/>`).join('')}<rect x="-200" y="905" width="2000" height="5" fill="${KEYSTONE.rail}"/>`),

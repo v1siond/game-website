@@ -8,7 +8,6 @@ import { yearOf } from '@/lib/cv/cvView'
 import { worldCV } from '@/lib/cv/content'
 import { BlogProvider } from '@/components/blog/BlogProvider'
 import { WORLD_PENDING_SCRIPT } from '@/themes/worldPending'
-import { INTRO_SCRIPT } from '@/themes/introFlag'
 import { readWorldPreloads, worldPreloadScript } from '@/lib/worlds/preload'
 import { WorldRenderer } from './WorldRenderer'
 
@@ -22,8 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // The worlds are written in English only (see the site layout), so the site loads the English CV once
 // and every world reads it from the provider, and the latest posts beside it (drafts only on the dev
 // server). The server renders the default world in full, so its CV text is in the HTML crawlers read;
-// the inline scripts hide it only for a visitor who picked another one, and mark the entrance only for a
-// visitor whose browser will play it, and start fetching a returning visitor's stored world before
+// the inline scripts hide it only for a visitor who picked another one, and start fetching a returning visitor's stored world before
 // hydration (src/lib/worlds/preload.ts, its chunk files read from this build). The page is built once
 // per deploy, so the year it renders with is the build's; the client moves to its own clock after
 // hydration.
@@ -40,7 +38,6 @@ export default async function Home() {
         <ProfilePageJsonLd cv={cv} path={'/'} />
         <script dangerouslySetInnerHTML={{ __html: worldPreloadScript(preloads) }} />
         <script dangerouslySetInnerHTML={{ __html: WORLD_PENDING_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
         <WorldRenderer />
       </BlogProvider>
     </CVDataProvider>
