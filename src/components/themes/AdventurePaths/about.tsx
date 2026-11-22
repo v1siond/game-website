@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
 import { Actor, useCourse } from './actor'
@@ -38,8 +38,7 @@ const BUMP_MS = 600
 /** Whether the block shows hit: not yet, hit on his way up, or hit again by a replay (later in the jump). */
 type HitState = 'false' | 'true' | 'again'
 
-export function AboutLevel({ profession }: { profession: Profession }) {
-  const { professionalSummary } = useCVData()
+export function AboutLevel({ bio, profession }: { bio: string; profession: Profession }) {
   const { sections, trail } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('plains')
   const course = useCourse(COURSE, BUMP_MS)
@@ -66,7 +65,7 @@ export function AboutLevel({ profession }: { profession: Profession }) {
           {on && <Actor motion={course.motion} profession={profession} take={course.take} onAnimationEnd={course.onOwnAnimationEnd} />}
         </Playfield>
         <div key={course.take} className={`${side.unfold} rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6`}>
-          <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{professionalSummary.bio}</p>
+          <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{bio}</p>
         </div>
       </div>
     </Region>
