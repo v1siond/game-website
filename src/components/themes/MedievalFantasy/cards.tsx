@@ -73,7 +73,7 @@ export function ProjectCard({ slot: { project, links } }: { slot: ProjectSlot })
       </p>
       <p style={CARD_BODY}>{card.tagline}</p>
       {card.description && <p className="mb-1 text-sm text-[color:var(--realm-text-mid)]">{card.description}</p>}
-      {card.impact && <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontWeight: 500 }}><ImpactLabel />{card.impact}</p>}
+      {card.impact && <p className="text-[1rem] font-medium text-[color:var(--realm-frost-ice-mid)]"><ImpactLabel />{card.impact}</p>}
       <MarkedLines items={card.details} label={labels.cards.details} look={MARKED_LIST} />
       <TagList items={card.techStack} label={labels.cards.technologiesUsed} look={CHIP_ROW} />
       {links.length > 0 && (
