@@ -458,7 +458,7 @@
   transform: translate3d(0, -2px, 0);
 }
 
-.switch[aria-pressed='true'] .switchCap {
+.switch[aria-expanded='true'] .switchCap {
   transform: scale(1.08, 0.45);
 }
 

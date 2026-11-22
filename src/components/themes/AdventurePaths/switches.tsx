@@ -135,9 +135,8 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         </div>
         <button
           type="button"
-          aria-pressed={pressed}
           aria-expanded={pressed}
-          aria-controls={pressed ? boxId : undefined}
+          aria-controls={boxId}
           aria-label={fillLabel(trail.pressSwitch, { name: project.name })}
           onClick={() => setPressed((now) => !now)}
           className={`shrink-0 rounded-sm p-1 ${map.switch}`}
