@@ -1,4 +1,5 @@
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskMotion, maskScene, maskSpot, maskSteps, MASK_GUARD, MASK_STEP_MS, pipAt, postAt, postX, restSpot, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { restSpot } from '@/lib/motion/course'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskMotion, maskScene, maskSpot, maskSteps, MASK_GUARD, MASK_STEP_MS, pipAt, postAt, postX, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -7,7 +8,7 @@ const FIVE_S = 5000
 
 const SCENE: Scene = {
   start: { x: 0, lift: 0 },
-  beats: [
+  legs: [
     { name: 'walk', pose: 'run', ms: 600, to: { x: 30, lift: 0 } },
     { name: 'pull', pose: 'pull', ms: 500, to: { x: 30, lift: 0 } },
     { name: 'jump', pose: 'hop', ms: 400, to: { x: 40, lift: 20 } },
@@ -37,7 +38,7 @@ describe('a scene as beats', () => {
   })
 
   it('rests on the start spot when a scene has no beats', () => {
-    expect(restSpot({ start: { x: 12, lift: 0 }, beats: [], rest: 'idle' })).toEqual({ x: 12, lift: 0 })
+    expect(restSpot({ start: { x: 12, lift: 0 }, legs: [], rest: 'idle' })).toEqual({ x: 12, lift: 0 })
   })
 })
 
@@ -72,19 +73,19 @@ describe('the hero', () => {
 
 describe('About: the count box', () => {
   it('plays the walk, the plunger pull, the three pips and the panel opening in 2.4 s', () => {
-    expect(COUNT_BOX.beats.map((beat) => beat.name)).toEqual(['walk', 'pull', 'count', 'open'])
+    expect(COUNT_BOX.legs.map((beat) => beat.name)).toEqual(['walk', 'pull', 'count', 'open'])
     expect(sceneMs(COUNT_BOX)).toBe(2400)
   })
 
   it('blinks the three pips one after another inside the count beat', () => {
     expect(PIPS).toBe(3)
-    const count = COUNT_BOX.beats.find((beat) => beat.name === 'count')
+    const count = COUNT_BOX.legs.find((beat) => beat.name === 'count')
     expect(pipAt(0)).toBe(beatStart(COUNT_BOX, 'count'))
     expect(pipAt(PIPS - 1)).toBeLessThan(beatStart(COUNT_BOX, 'count') + (count?.ms ?? 0))
   })
 
   it('leaves him at the plunger on the box, never on top of it', () => {
-    expect(new Set(COUNT_BOX.beats.map((beat) => beat.to.lift))).toEqual(new Set([0]))
+    expect(new Set(COUNT_BOX.legs.map((beat) => beat.to.lift))).toEqual(new Set([0]))
   })
 })
 
@@ -128,7 +129,7 @@ describe('Tech Stack: the spin through the boxes', () => {
 
   it.each([1, 4, 8, 12, 30])('spins him across the row until the last of %i boxes has broken, within 4.5 s', (count) => {
     const scene = techScene(count)
-    expect(scene.beats.map((beat) => beat.pose)).toEqual(['spin'])
+    expect(scene.legs.map((beat) => beat.pose)).toEqual(['spin'])
     expect(sceneMs(scene)).toBeGreaterThanOrEqual(breakAt(count - 1, count))
     expect(sceneMs(scene)).toBeLessThanOrEqual(4500)
   })
@@ -136,12 +137,12 @@ describe('Tech Stack: the spin through the boxes', () => {
 
 describe('Services: the iron box', () => {
   it('runs him under the box, jumps him head first into it and lands him, in 1.2 s', () => {
-    expect(IRON_BOX.beats.map((beat) => beat.pose)).toEqual(['run', 'hit', 'idle'])
+    expect(IRON_BOX.legs.map((beat) => beat.pose)).toEqual(['run', 'hit', 'idle'])
     expect(sceneMs(IRON_BOX)).toBe(1200)
   })
 
   it('jumps straight up under the box and comes back to the ground', () => {
-    const [run, hit, land] = IRON_BOX.beats
+    const [run, hit, land] = IRON_BOX.legs
     expect(hit.to.x).toBe(run.to.x)
     expect(hit.to.lift).toBeGreaterThan(0)
     expect(land.to).toEqual(run.to)
@@ -174,7 +175,7 @@ describe('Projects: pointing at a sphere', () => {
 
 describe('Ventures: collecting the gems', () => {
   it('runs him into the row when the section shows, within 1 s', () => {
-    expect(GEMS_IN.beats.map((beat) => beat.pose)).toEqual(['run'])
+    expect(GEMS_IN.legs.map((beat) => beat.pose)).toEqual(['run'])
     expect(sceneMs(GEMS_IN)).toBeLessThan(1000)
   })
 
@@ -204,7 +205,7 @@ describe('Bands: the drum roll on each box', () => {
 
   it('travels to a box, then rolls on it, box after box, left to right', () => {
     const scene = bandScene(3)
-    expect(scene.beats.map((beat) => beat.pose)).toEqual(['run', 'drum', 'run', 'drum', 'run', 'drum'])
+    expect(scene.legs.map((beat) => beat.pose)).toEqual(['run', 'drum', 'run', 'drum', 'run', 'drum'])
     expect(boxX(0, 3)).toBeLessThan(boxX(1, 3))
     expect(boxX(1, 3)).toBeLessThan(boxX(2, 3))
     expect(boxX(0, 1)).toBe(50)
@@ -248,11 +249,11 @@ describe('Muay Thai: the carved mask', () => {
 
   it('plays one beat of 1 s per step, his guard braced on each and the victory knee on the last', () => {
     const scene = maskScene(3)
-    expect(scene.beats.map((beat) => beat.name)).toEqual(['step-1', 'step-2', 'step-3'])
-    expect(scene.beats.map((beat) => beat.pose)).toEqual(['guard', 'guard', 'knee'])
-    expect(scene.beats.every((beat) => beat.ms === MASK_STEP_MS && beat.to.x === MASK_GUARD.x)).toBe(true)
-    expect(maskScene(1).beats.map((beat) => beat.pose)).toEqual(['knee'])
-    expect(maskScene(0).beats).toEqual([])
+    expect(scene.legs.map((beat) => beat.name)).toEqual(['step-1', 'step-2', 'step-3'])
+    expect(scene.legs.map((beat) => beat.pose)).toEqual(['guard', 'guard', 'knee'])
+    expect(scene.legs.every((beat) => beat.ms === MASK_STEP_MS && beat.to.x === MASK_GUARD.x)).toBe(true)
+    expect(maskScene(1).legs.map((beat) => beat.pose)).toEqual(['knee'])
+    expect(maskScene(0).legs).toEqual([])
   })
 
   it('shows the step playing while it moves, then holds that step his pose without moving', () => {
@@ -266,7 +267,7 @@ describe('Muay Thai: the carved mask', () => {
 })
 
 describe('Contact: the save monitor', () => {
-  const names = (scene: Scene) => scene.beats.map((beat) => beat.name)
+  const names = (scene: Scene) => scene.legs.map((beat) => beat.name)
 
   it('walks him to the monitor and presses it before either ending', () => {
     expect(names(saveScene(true)).slice(0, 2)).toEqual(['walk', 'press'])
@@ -276,14 +277,14 @@ describe('Contact: the save monitor', () => {
   it('ends a full run on the gem and his victory dance, under 2 s', () => {
     const full = saveScene(true)
     expect(names(full)).toEqual(['walk', 'press', 'gem'])
-    expect(full.beats.at(-1)?.pose).toBe('dance')
-    expect(full.beats.at(-1)?.ms).toBeLessThan(2000)
+    expect(full.legs.at(-1)?.pose).toBe('dance')
+    expect(full.legs.at(-1)?.ms).toBeLessThan(2000)
   })
 
   it('ends a run that is not full on one blink, with no dance', () => {
     const short = saveScene(false)
     expect(names(short)).toEqual(['walk', 'press', 'blink'])
-    expect(short.beats.map((beat) => beat.pose)).not.toContain('dance')
+    expect(short.legs.map((beat) => beat.pose)).not.toContain('dance')
   })
 
   it('plays out in 3 s or less either way', () => {

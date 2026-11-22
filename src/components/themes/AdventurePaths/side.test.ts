@@ -1,5 +1,6 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
-import { motionOf, playedPast, hopToward, restSpot, type Course } from './course'
+import { restSpot } from '@/lib/motion/course'
+import { motionOf, hopToward, type Course } from './course'
 import { FOE, FOE_FRAME_NAMES, HERO, HERO_OUTFITS, HERO_POSES, foeColours, foeRows, heroParts } from './side'
 
 const pixelKeys = (rows: readonly string[]) => rows.flatMap((row) => [...row]).filter((key) => key !== '.')
@@ -44,13 +45,6 @@ describe('a level course', () => {
     expect(restSpot(COURSE)).toEqual({ x: 50, lift: 60 })
     expect(motionOf(COURSE, 'bump').from).toEqual({ x: 50, lift: 60 })
     expect(motionOf(COURSE, 'stand')).toMatchObject({ path: 'still', frame: 'stand', from: { x: 50, lift: 60 }, to: { x: 50, lift: 60 } })
-  })
-
-  it('counts a leg as played once a later leg runs or he has arrived', () => {
-    expect(playedPast(COURSE, 'run', false, 'run')).toBe(false)
-    expect(playedPast(COURSE, 'jump', false, 'run')).toBe(true)
-    expect(playedPast(COURSE, 'jump', false, 'jump')).toBe(false)
-    expect(playedPast(COURSE, 'stand', true, 'jump')).toBe(true)
   })
 
   it('hops one platform at a time toward the target, either way, and stays once there', () => {

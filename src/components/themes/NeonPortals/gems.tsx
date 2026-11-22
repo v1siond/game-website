@@ -14,7 +14,8 @@ import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { BODY, CARD_LINE, CARD_TITLE, PANEL, Tags } from './cards'
-import { COLLECT, GEMS_IN, collectMotion, restSpot } from './choreography'
+import { restSpot } from '@/lib/motion/course'
+import { COLLECT, GEMS_IN, collectMotion } from './choreography'
 import { findId } from './finds'
 import { GEMS, PORTAL, type Era } from './palette'
 import { FigureRow, Region, Rig, useScene } from './stage'
@@ -134,7 +135,7 @@ export function GemLevel({ companies }: { companies: Companies }) {
   const [spot, setSpot] = useState({ from: restSpot(GEMS_IN).x, to: restSpot(GEMS_IN).x })
   const [flight, setFlight] = useState<Flight | null>(null)
   const [collected, setCollected] = useState(NONE)
-  const entered = scene.step >= GEMS_IN.beats.length
+  const entered = scene.step >= GEMS_IN.legs.length
   const motion = entered ? collectMotion(spot.from, spot.to, collect.move === 'run') : scene.motion
 
   const startCollect = (id: string) => (gem: Element) => {

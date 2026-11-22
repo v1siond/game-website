@@ -1,3 +1,5 @@
+import { legFrom, restSpot, type LegsFrom, type Spot } from '@/lib/motion/course'
+
 // Every set piece of the world as data: where he starts, the beats he plays one after another, and the
 // pose he holds once they are over. A beat ends on the animationend of his own rig (stage.tsx), which
 // usePoseSequence turns into the next beat, so the timings here are the only clock. No React here, so
@@ -23,23 +25,16 @@ export const POSES = [
 
 export type Pose = (typeof POSES)[number]
 
-/** A place on a stage: x in % of its width, lift in % of its height over the ground. */
-export interface Spot {
-  x: number
-  lift: number
-}
-
 export interface Beat {
   name: string
   pose: Pose
   ms: number
-  /** Where he is when the beat ends; the beat moves him there from where the last one ended. */
+  /** Where he is when the beat ends (lift in % of the stage's height); the beat moves him there from where the last one ended. */
   to: Spot
 }
 
-export interface Scene {
-  start: Spot
-  beats: readonly Beat[]
+/** A scene: its beats are the legs of the shared course (src/lib/motion/course.ts), one after another. */
+export interface Scene extends LegsFrom<Beat> {
   /** The pose he holds once the beats are over. */
   rest: Pose
 }
@@ -52,23 +47,20 @@ export interface Motion {
   ms: number
 }
 
-export const sceneMs = (scene: Scene): number => scene.beats.reduce((total, beat) => total + beat.ms, 0)
+export const sceneMs = (scene: Scene): number => scene.legs.reduce((total, beat) => total + beat.ms, 0)
 
 /** When a beat starts, counted from the start of the scene. */
 export function beatStart(scene: Scene, name: string): number {
-  const index = scene.beats.findIndex((beat) => beat.name === name)
-  return scene.beats.slice(0, Math.max(0, index)).reduce((total, beat) => total + beat.ms, 0)
+  const index = scene.legs.findIndex((beat) => beat.name === name)
+  return scene.legs.slice(0, Math.max(0, index)).reduce((total, beat) => total + beat.ms, 0)
 }
-
-export const restSpot = (scene: Scene): Spot => scene.beats.at(-1)?.to ?? scene.start
 
 /** The motion of step `index`: the beat playing, or the held rest once every beat has played. */
 export function motionAt(scene: Scene, index: number): Motion {
-  const beat = scene.beats[index]
+  const beat = scene.legs[index]
   const rest = restSpot(scene)
   if (!beat) return { pose: scene.rest, from: rest, to: rest, ms: 0 }
-  const from = index === 0 ? scene.start : scene.beats[index - 1].to
-  return { pose: beat.pose, from, to: beat.to, ms: beat.ms }
+  return { pose: beat.pose, from: legFrom(scene, index), to: beat.to, ms: beat.ms }
 }
 
 // The hero: the platform rises, the three pads light in turn, he beams onto the picked pad and the clock
@@ -100,7 +92,7 @@ export const AT_PLUNGER: Spot = { x: 38, lift: 0 }
 
 export const COUNT_BOX: Scene = {
   start: { x: 8, lift: 0 },
-  beats: [
+  legs: [
     { name: 'walk', pose: 'run', ms: 600, to: AT_PLUNGER },
     { name: 'pull', pose: 'pull', ms: 500, to: AT_PLUNGER },
     { name: 'count', pose: 'idle', ms: 900, to: AT_PLUNGER },
@@ -146,7 +138,7 @@ export const BOX_BREAK = { leadMs: BREAK_LEAD_MS, ms: BREAK_MS } as const
 /** The spin: across the row, lasting until the last box has broken. */
 export const techScene = (count: number): Scene => ({
   start: { x: 6, lift: 0 },
-  beats: [{ name: 'spin', pose: 'spin', ms: breakAt(Math.max(0, count - 1), count) + BREAK_MS, to: { x: 94, lift: 0 } }],
+  legs: [{ name: 'spin', pose: 'spin', ms: breakAt(Math.max(0, count - 1), count) + BREAK_MS, to: { x: 94, lift: 0 } }],
   rest: 'idle',
 })
 
@@ -157,7 +149,7 @@ const UNDER_BOX: Spot = { x: 50, lift: 0 }
 
 export const IRON_BOX: Scene = {
   start: { x: 6, lift: 0 },
-  beats: [
+  legs: [
     { name: 'run', pose: 'run', ms: 400, to: UNDER_BOX },
     { name: 'hit', pose: 'hit', ms: 500, to: { x: UNDER_BOX.x, lift: 55 } },
     { name: 'land', pose: 'idle', ms: 300, to: UNDER_BOX },
@@ -182,7 +174,7 @@ export const aimAt = (share: number): number => (0.5 - Math.min(1, Math.max(0, s
 // runs him to its gem, and once he is there the gem flies up into the tally.
 export const GEMS_IN: Scene = {
   start: { x: -6, lift: 0 },
-  beats: [{ name: 'enter', pose: 'run', ms: 800, to: { x: 10, lift: 0 } }],
+  legs: [{ name: 'enter', pose: 'run', ms: 800, to: { x: 10, lift: 0 } }],
   rest: 'idle',
 }
 
@@ -226,7 +218,7 @@ export function bandScene(count: number): Scene {
       { name: `roll-${index}`, pose: 'drum', ms: HITS * beatMs, to: at },
     ]
   }).flat()
-  return { start: { x: 0, lift: 0 }, beats, rest: 'idle' }
+  return { start: { x: 0, lift: 0 }, legs: beats, rest: 'idle' }
 }
 
 /** When lid `index` of `count` springs open: the fifth beat of its roll, counted from the scene's start. */
@@ -265,7 +257,7 @@ const AT_GUARD: Spot = { x: MASK_GUARD.x, lift: 0 }
 /** The mask's steps as beats: his guard braced on each, the victory knee on the last. */
 export const maskScene = (steps: number): Scene => ({
   start: AT_GUARD,
-  beats: Array.from({ length: steps }, (_, index) => ({
+  legs: Array.from({ length: steps }, (_, index) => ({
     name: `step-${index + 1}`,
     pose: index === steps - 1 ? 'knee' : 'guard',
     ms: MASK_STEP_MS,
@@ -277,7 +269,7 @@ export const maskScene = (steps: number): Scene => ({
 /** His rig at a mask step: the step's beat while the mask moves, then that beat's pose held still. */
 export const maskMotion = (scene: Scene, step: number, moving: boolean): Motion => {
   if (moving) return motionAt(scene, step - 1)
-  const pose = scene.beats[step - 1]?.pose ?? 'guard'
+  const pose = scene.legs[step - 1]?.pose ?? 'guard'
   return { pose, from: AT_GUARD, to: AT_GUARD, ms: 0 }
 }
 
@@ -300,6 +292,6 @@ export const SAVE_FROM: Spot = { x: 14, lift: 0 }
 /** The save: the same walk and press, then the ending the tally earns. */
 export const saveScene = (full: boolean): Scene => ({
   start: SAVE_FROM,
-  beats: [...SAVE_START, SAVE_END[full ? 'full' : 'short']],
+  legs: [...SAVE_START, SAVE_END[full ? 'full' : 'short']],
   rest: 'idle',
 })

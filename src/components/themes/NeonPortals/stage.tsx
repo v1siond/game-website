@@ -2,9 +2,10 @@
 
 import { useCallback, useMemo, useState, type AnimationEvent, type ReactNode, type Ref } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
+import { useLegSequence } from '@/hooks/useLegSequence'
 import { cssVars } from '@/lib/cssVars'
 import { headingId } from '@/lib/cv/sectionText'
+import { travelVars } from '@/lib/motion/course'
 import { motionAt, type Motion, type Scene } from './choreography'
 import { Character } from './character'
 import { ART_PLATE, FACE } from './cards'
@@ -16,8 +17,9 @@ import stage from './stage.module.css'
 // the cards. The section is the zone stage (useZoneStage), so one observer both hands its era to the
 // backdrop and starts its scene.
 //
-// A scene is the beats of choreography.ts played by usePoseSequence: his rig carries him from where one
-// beat ended to where the next ends (stage.module.css, the beat's --ms), and the rig's own animationend
+// A scene is the beats of choreography.ts played by the shared useLegSequence (the legs engine Adventure
+// Paths runs too, src/lib/motion/course.ts): his rig carries him from where one beat ended to where the
+// next ends (stage.module.css, travelVars), and the rig's own animationend
 // steps the sequence, so the beats are the only clock. Before the section shows, the rig is held on its
 // first frame (data-run false); under reduced motion or in a preview it rests on the last frame.
 
@@ -68,9 +70,6 @@ export type RigSize = 'strip' | 'row'
 
 const BODY_SIZE: Record<RigSize, string> = { strip: stage.inStrip, row: stage.inRow }
 
-const motionVars = (motion: Motion) =>
-  cssVars({ '--from-x': motion.from.x, '--from-lift': motion.from.lift, '--to-x': motion.to.x, '--to-lift': motion.to.lift, '--ms': motion.ms })
-
 interface RigProps {
   motion: Motion
   /** The beat's key: a new beat restarts the rig's animation. */
@@ -87,7 +86,7 @@ interface RigProps {
 export function Rig({ motion, step, run, size, onAnimationEnd, track = stage.rig, children }: RigProps) {
   const { active } = useProfession()
   return (
-    <div key={step} className={track} data-run={run} data-moving={motion.ms > 0} style={motionVars(motion)} onAnimationEnd={onAnimationEnd}>
+    <div key={step} className={track} data-run={run} data-moving={motion.ms > 0} style={cssVars(travelVars(motion))} onAnimationEnd={onAnimationEnd}>
       <div className={`${stage.body} ${BODY_SIZE[size]}`}>
         <Character profession={active} pose={motion.pose} />
       </div>
@@ -115,11 +114,10 @@ const REST = 'rest'
 
 /** A scene's beats played by the shared pose sequence, each ended by the rig's own animationend. */
 export function useScene(scene: Scene, { still, onDone }: ScenePlayOptions): ScenePlay {
-  const names = useMemo(() => scene.beats.map((beat) => beat.name), [scene])
-  const sequence = usePoseSequence<string>({ entrance: names, rest: REST })
+  const names = useMemo(() => scene.legs.map((beat) => beat.name), [scene])
+  const sequence = useLegSequence<string>(names, REST)
   const last = names.length - 1
-  const playing = names.indexOf(sequence.pose)
-  const step = still || playing < 0 ? names.length : playing
+  const step = still ? names.length : sequence.step
 
   const onRigEnd = (event: AnimationEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
