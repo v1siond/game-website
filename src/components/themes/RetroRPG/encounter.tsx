@@ -60,16 +60,13 @@ function useEncounterPhase() {
   const skip = reduced || preview
 
   useEffect(() => {
-    if (skip) {
-      setPhase('ready')
-      return
-    }
-    if (!triggered) return
-    const timers = PHASE_AT.map(([next, at]) => window.setTimeout(() => setPhase((now) => (now === 'ready' ? now : next)), at))
+    if (skip || !triggered) return
+    const timers = PHASE_AT.map(([next, at]) => window.setTimeout(() => setPhase(next), at))
     return () => timers.forEach(window.clearTimeout)
   }, [triggered, skip])
 
-  return { ref, phase, skip }
+  // Reduced motion and a preview show the end, read straight from skip rather than stored a commit later.
+  return { ref, phase: skip ? 'ready' : phase, skip }
 }
 
 /** Counts profession switches after the first render, so the flash and the turn play only on a switch. */

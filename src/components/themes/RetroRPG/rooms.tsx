@@ -44,17 +44,15 @@ function useRoom(zone: Zone, beat: Beat) {
   const { ref, on, reduced } = useZoneStage(zone)
   const preview = usePreview()
   const [take, setTake] = useState(0)
-  const [room, setRoom] = useState<RoomPhase>('idle')
+  const [played, setRoom] = useState<RoomPhase>('idle')
   const [shown, setShown] = useState(false)
   const skip = reduced || preview
+  // Reduced motion and a preview open on done, read straight from skip rather than stored a commit later.
+  const room = skip ? 'done' : played
   if (room === 'done' && !shown) setShown(true)
 
   useEffect(() => {
-    if (skip) {
-      setRoom('done')
-      return
-    }
-    if (!on) return
+    if (skip || !on) return
     setRoom('walk')
     const timers = [window.setTimeout(() => setRoom('act'), beat.act), window.setTimeout(() => setRoom('done'), beat.done)]
     return () => timers.forEach(window.clearTimeout)
