@@ -184,6 +184,14 @@
 .mapStage[data-on='true'] .contract {
   animation: contract-in 0.5s ease-out calc(0.7s + var(--i) * 0.35s) both;
 }
+/* A contract a keyboard user tabs to before it drops in shows at once (a pointer click never matches). Its
+ * entrance is emptied, not removed: a removed animation would start again when the focus leaves. */
+.mapStage .contract:has(:focus-visible) {
+  opacity: 1;
+  transform: none;
+  animation-duration: 0s;
+  animation-fill-mode: none;
+}
 .pin[data-hot='true'] .pinRing {
   animation: pin-ping 0.8s ease-out infinite;
 }
