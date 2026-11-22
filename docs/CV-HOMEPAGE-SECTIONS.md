@@ -39,9 +39,16 @@ formats the same way (year spans, job years, project links, the Muay Thai facts,
 - Bands, the services and the Muay Thai record are always shown whole. The services are one flat list, no
   group headings: each service a title and a description (`line`) from `content/cv/services.json`, and no
   world holds a count or a word of it. The worlds print the title and the description only.
-- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills:
-  each service its title and description, then a line of use cases (labels `cvPage.useCases`, the
-  service's `useCases`) when it has any, then the contact line and an Email me link.
+- `/cv` is the print CV, in English, Spanish or Italian, with a selection of its own and no five year cut
+  (`src/app/(cv)/cv/CVContent.tsx`). In order: the header (name, headline, email, LinkedIn, website,
+  availability; no tagline), the bio, the summary highlights (`cvPage.coreCompetencies`), the current
+  positions (`roles.json`), the featured projects only (name, tagline, description, impact, tech; no role,
+  years, details or links), the ventures with his own products first (name, tagline, description,
+  address; no services), Technical Skills, the Services, every job (title, years, company, highlights; no
+  description, skills or location), then education and languages. The Services section gives each service
+  its title and description, then a line of use cases (labels `cvPage.useCases`, the service's `useCases`)
+  when it has any, then the contact line and an Email me link. The website, the current positions and the
+  use cases are on `/cv` only.
 
 ## How a section moves
 

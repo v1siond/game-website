@@ -1,9 +1,10 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { ventureCard } from '@/lib/cv/cvView'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'
@@ -29,11 +30,12 @@ const META = 'text-sm tracking-wider text-[color:var(--sh-muted-text)]'
 const ROOFTOPS =
   'M0 60 V34 H40 V22 H58 V34 H96 V14 H104 V6 H110 V14 H122 V30 H170 V18 H210 V40 H250 V26 H262 V10 H270 V26 H300 V36 H350 V20 H392 V44 H430 V28 H470 V16 H486 V28 H520 V38 H560 V24 H600 V60 Z'
 
+// A sign's link is named by its visible text (the plate, name, tagline, description and services), so a
+// screen reader reaches every field of the card, then hears that it opens a new tab.
 interface SignLink {
   href: string
   target: '_blank'
   rel: string
-  'aria-label': string
 }
 
 function Sign({ index, lit, href, children }: { index: number; lit: boolean; href?: SignLink; children: ReactNode }) {
@@ -88,8 +90,9 @@ function Rooftops({ light, children }: { light: SkyLight; children: ReactNode })
   )
 }
 
-export function VentureSigns({ companies }: { companies: CVData['companies'] }) {
-  const { links, cards } = useLabels()
+export function VentureSigns({ companies: entries }: { companies: CVData['companies'] }) {
+  const { links, cards, sections } = useLabels()
+  const companies = useMemo(() => entries.map(ventureCard), [entries])
   const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
 
   return (
@@ -108,7 +111,6 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
                         href: company.url,
                         target: '_blank',
                         rel: 'noopener noreferrer',
-                        'aria-label': newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name),
                       }
                     : undefined
                 }
@@ -126,6 +128,16 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
                 </h3>
                 <p className={`mt-1 ${META}`}>{company.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-text)]">{company.description}</p>
+                {company.services.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
+                    {company.services.map((service) => (
+                      <li key={service} className={`border border-[color:var(--sh-rim)] px-1.5 py-0.5 uppercase ${META}`}>
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {company.url && <span className="sr-only"> {newTabHint(links)}</span>}
               </Sign>
             </li>
           ))}

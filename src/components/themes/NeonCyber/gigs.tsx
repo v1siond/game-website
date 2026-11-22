@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { projectCard, type ProjectCard as ProjectCardView } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -51,25 +52,54 @@ const STATUS_TONE: Record<BreachOutcome, string> = {
 }
 
 interface BreachDialogProps {
-  project: Project
+  project: ProjectCardView
+  /** What the code matrix is drawn from: the project's slug, or its id when it has none. */
+  seed: string
+  open: boolean
   trigger: RefObject<HTMLButtonElement | null>
   onClose: () => void
 }
 
-function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
-  const { cyber, actions, cards } = useLabels()
-  const reducedMotion = useReducedMotion()
+const breachHeadingId = (project: ProjectCardView): string => `nc-breach-${project.id}`
+
+/** The project's file: its description, the commit backed details and its result, with `children` over it. */
+function BreachFile({ project, children }: { project: ProjectCardView; children?: ReactNode }) {
+  const { cards } = useLabels()
+  return (
+    <section className="relative mt-6 border-t border-[color-mix(in_srgb,var(--neon-chrome-red)_60%,transparent)] pt-4" aria-label={cards.details}>
+      {project.description && <p className="text-sm text-[color:var(--neon-ice)]">{project.description}</p>}
+      {project.details.length > 0 && (
+        <ul className="mt-3 space-y-1">
+          {project.details.map((detail) => (
+            <li key={detail} className="flex gap-2 text-sm text-[color:var(--neon-ice)]">
+              <span className="text-[color:var(--neon-hack)]" aria-hidden="true">
+                {'>'}
+              </span>
+              {detail}
+            </li>
+          ))}
+        </ul>
+      )}
+      {project.impact && (
+        <p className="mt-3 text-sm text-[color:var(--neon-hud)]">
+          <span className="sr-only">{cards.impact}: </span>
+          {project.impact}
+        </p>
+      )}
+      {children}
+    </section>
+  )
+}
+
+/**
+ * The dialog is always in the page, closed until Breach is pressed, so the server HTML carries every
+ * project's file. The board mounts on each open, so every breach starts from a fresh buffer.
+ */
+function BreachDialog({ project, seed, open, trigger, onClose }: BreachDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const puzzle = useMemo(() => breachPuzzle(project.slug || project.id), [project])
-  const [state, setState] = useState(BREACH_START)
-  const [skipped, setSkipped] = useState(false)
-  const result = outcome(puzzle, state)
-  const unlocked = skipped || reducedMotion || result === 'open'
-  const buffer = bufferBytes(puzzle, state)
-  const done = matched(puzzle, state)
-  const shown: BreachOutcome = unlocked ? 'open' : result
 
   useEffect(() => {
+    if (!open) return
     const dialog = dialogRef.current
     const opener = trigger.current
     dialog?.showModal()
@@ -77,21 +107,39 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
       dialog?.close()
       opener?.focus()
     }
-  }, [trigger])
-
-  const headingId = `nc-breach-${project.id}`
-  const scramble = puzzle.matrix.flat().map(byteText).join(' ')
+  }, [open, trigger])
 
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby={headingId}
+      aria-labelledby={breachHeadingId(project)}
       onCancel={(event) => {
         event.preventDefault()
         onClose()
       }}
       className={`${world.dialog} ${world.panel} m-auto w-[min(56rem,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] overflow-y-auto bg-[color:var(--neon-glass)] p-4 text-[color:var(--neon-ice)] sm:p-6`}
     >
+      {open ? <BreachBoard project={project} seed={seed} onClose={onClose} /> : <BreachFile project={project} />}
+    </dialog>
+  )
+}
+
+function BreachBoard({ project, seed, onClose }: { project: ProjectCardView; seed: string; onClose: () => void }) {
+  const { cyber, actions } = useLabels()
+  const reducedMotion = useReducedMotion()
+  const puzzle = useMemo(() => breachPuzzle(seed), [seed])
+  const [state, setState] = useState(BREACH_START)
+  const [skipped, setSkipped] = useState(false)
+  const result = outcome(puzzle, state)
+  const unlocked = skipped || reducedMotion || result === 'open'
+  const buffer = bufferBytes(puzzle, state)
+  const done = matched(puzzle, state)
+  const shown: BreachOutcome = unlocked ? 'open' : result
+  const headingId = breachHeadingId(project)
+  const scramble = puzzle.matrix.flat().map(byteText).join(' ')
+
+  return (
+    <>
       <header className="mb-4 flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm uppercase tracking-[0.3em] text-[color:var(--neon-chrome-red)]">{cyber.breach}</p>
@@ -214,21 +262,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
       </div>
 
       {/* the file: real text, under the scramble until it opens */}
-      <section className="relative mt-6 border-t border-[color-mix(in_srgb,var(--neon-chrome-red)_60%,transparent)] pt-4" aria-label={cards.details}>
-        <p className="text-sm text-[color:var(--neon-ice)]">{project.description}</p>
-        {project.details.length > 0 && (
-          <ul className="mt-3 space-y-1">
-            {project.details.map((detail) => (
-              <li key={detail} className="flex gap-2 text-sm text-[color:var(--neon-ice)]">
-                <span className="text-[color:var(--neon-hack)]" aria-hidden="true">
-                  {'>'}
-                </span>
-                {detail}
-              </li>
-            ))}
-          </ul>
-        )}
-        {project.impact && <p className="mt-3 text-sm text-[color:var(--neon-hud)]">{project.impact}</p>}
+      <BreachFile project={project}>
         <div
           className={`${world.scramble} pointer-events-none absolute inset-0 top-4 overflow-hidden break-all bg-[color:var(--neon-glass)] text-sm leading-6 text-[color:var(--neon-hud-dim)]`}
           data-open={unlocked}
@@ -236,13 +270,15 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
         >
           {scramble.repeat(12)}
         </div>
-      </section>
-    </dialog>
+      </BreachFile>
+    </>
   )
 }
 
-function GigCard({ project, years, links, noLink }: ProjectSlot) {
-  const { cyber, sections, cards } = useLabels()
+function GigCard({ project: entry, links, noLink }: ProjectSlot) {
+  const labels = useLabels()
+  const { cyber, sections, cards } = labels
+  const project = useMemo(() => projectCard(entry, labels), [entry, labels])
   const [breaching, setBreaching] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
 
@@ -254,11 +290,16 @@ function GigCard({ project, years, links, noLink }: ProjectSlot) {
             <h3 className="min-w-0 text-base text-[color:var(--neon-ice)]">
               <SlashBreaks text={project.name} />
             </h3>
-            {years && <span className="shrink-0 text-sm text-[color:var(--neon-ash)]">{years}</span>}
+            {project.years && <span className="shrink-0 text-sm text-[color:var(--neon-ash)]">{project.years}</span>}
           </header>
           <p className="text-sm text-[color:var(--neon-hud)]">{project.role}</p>
           <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{project.tagline}</p>
-          {project.impact && <p className="mt-2 text-sm text-[color:var(--neon-hack)]">{project.impact}</p>}
+          {project.impact && (
+            <p className="mt-2 text-sm text-[color:var(--neon-hack)]">
+              <span className="sr-only">{cards.impact}: </span>
+              {project.impact}
+            </p>
+          )}
           {project.techStack.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.technologiesUsed}>
               {project.techStack.map((tech) => (
@@ -289,7 +330,7 @@ function GigCard({ project, years, links, noLink }: ProjectSlot) {
           {noLink && <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{noLink}</p>}
         </article>
       </Scannable>
-      {breaching && <BreachDialog project={project} trigger={trigger} onClose={() => setBreaching(false)} />}
+      <BreachDialog project={project} seed={entry.slug || entry.id} open={breaching} trigger={trigger} onClose={() => setBreaching(false)} />
     </>
   )
 }

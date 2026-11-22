@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock, jobCard, projectCard } from '@/lib/cv/cvView'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
@@ -41,41 +41,47 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
   )
 }
 
-// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
-// own year west of UTC.
+// A list in the card's body type, each line behind the dash every Silhouette card marks its points with.
+function DashList({ items, label }: { items: string[]; label: string }) {
+  if (items.length === 0) return null
+  return (
+    <ul className="mt-2 space-y-1" aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className={`flex items-start gap-1.5 ${CARD_BODY}`}>
+          <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
+            -
+          </span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// Every field of the job's card, the years in the label ("2019 to 2022").
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { years } = useLabels()
-  const span = jobSpanCompact(entry, years)
+  const { years, cards } = useLabels()
+  const job = jobCard(entry, years)
 
   return (
     <article className={`border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
       <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className={CARD_TITLE}>{entry.title}</h3>
+          <h3 className={CARD_TITLE}>{job.title}</h3>
           <p className={`mt-0.5 ${CARD_META}`}>
-            <SlashBreaks text={entry.company} />
+            <SlashBreaks text={job.company} />
           </p>
+          {job.location && <p className={`mt-0.5 ${CARD_META}`}>{job.location}</p>}
         </div>
         <span className={`whitespace-nowrap uppercase ${CARD_META}`}>
-          {span}
+          {job.years}
         </span>
       </div>
-      {entry.description && <p className={`mt-2 ${CARD_BODY}`}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
-        <ul className="mt-2 space-y-1">
-          {entry.highlights.map((highlight) => (
-            <li key={highlight} className={`flex items-start gap-1.5 ${CARD_BODY}`}>
-              <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
-                -
-              </span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
-      {entry.skills.length > 0 && (
+      {job.description && <p className={`mt-2 ${CARD_BODY}`}>{job.description}</p>}
+      <DashList items={job.highlights} label={cards.keyAchievements} />
+      {job.skills.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {entry.skills.map((skill) => (
+          {job.skills.map((skill) => (
             <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]">
               {skill}
             </span>
@@ -86,20 +92,27 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   )
 }
 
-export function ProjectCard({ project, years, links }: ProjectSlot) {
+// Every field of the project's card, and the links with their names from the slot.
+export function ProjectCard({ project: entry, links }: ProjectSlot) {
+  const labels = useLabels()
+  const { cards } = labels
+  const project = projectCard(entry, labels)
   return (
     <Card>
       <div className="flex items-start justify-between gap-2">
         <h3 className={`min-w-0 ${CARD_TITLE}`}>
           <SlashBreaks text={project.name} />
         </h3>
-        {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
+        {project.years && <span className={`whitespace-nowrap ${CARD_META}`}>{project.years}</span>}
       </div>
       <p className="mt-0.5 text-sm text-[color:var(--sh-text)]">{project.role}</p>
       {project.tagline && <p className={`mt-0.5 ${CARD_META}`}>{project.tagline}</p>}
+      {project.description && <p className={`mt-1.5 ${CARD_BODY}`}>{project.description}</p>}
+      <DashList items={project.details} label={cards.details} />
       {project.impact && (
         <p className={`mt-1.5 italic ${CARD_BODY}`}>
           <span aria-hidden="true">{'-> '}</span>
+          <span className="sr-only">{cards.impact}: </span>
           {project.impact}
         </p>
       )}
@@ -124,5 +137,31 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </div>
       )}
     </Card>
+  )
+}
+
+// His education, languages and summary highlights under the chase, on the slab the job cards use.
+export function AboutFacts() {
+  const { about, cards } = useLabels()
+  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const facts = [
+    { label: about.education, value: education },
+    { label: about.languages, value: languages },
+  ].filter((fact) => fact.value)
+
+  return (
+    <div className={`mx-auto mt-6 max-w-prose border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
+      {facts.length > 0 && (
+        <dl className="space-y-2">
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt className={`uppercase ${CARD_META}`}>{fact.label}</dt>
+              <dd className={CARD_BODY}>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <DashList items={highlights} label={cards.keyAchievements} />
+    </div>
   )
 }

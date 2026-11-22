@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import type { Job } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
-import { fillLabel } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -267,12 +266,11 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
           {edit.clips
             .slice()
             .reverse()
-            .map(({ job, heat }) => {
-              const { start, end } = jobYears(job, years.present)
-              const period = fillLabel(years.range, { start, end })
+            .map(({ job: entry, heat }) => {
+              const job = jobCard(entry, years)
               return (
                 <li key={job.id} className={MASONRY_ITEM}>
-                  <Scannable kind="job" title={sections.workExperience} fact={period}>
+                  <Scannable kind="job" title={sections.workExperience} fact={job.years}>
                     <article
                       className={`${world.lens} border border-[color-mix(in_srgb,var(--neon-ice)_15%,transparent)] bg-[color:var(--neon-glass)] p-4`}
                       data-lit={head.lit.includes(job.id)}
@@ -283,7 +281,8 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                         <p className="text-sm text-[color:var(--neon-hud)]">
                           <SlashBreaks text={job.company} />
                         </p>
-                        <p className="text-sm text-[color:var(--neon-ash)]">{period}</p>
+                        <p className="text-sm text-[color:var(--neon-ash)]">{job.years}</p>
+                        {job.location && <p className="text-sm text-[color:var(--neon-ash)]">{job.location}</p>}
                       </header>
                       {job.description && <p className="mb-2 text-sm text-[color:var(--neon-ice)]">{job.description}</p>}
                       {job.highlights.length > 0 && (

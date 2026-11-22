@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react'
 import type { Company } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import horror from './horror.module.css'
@@ -20,15 +20,16 @@ import look from './world.module.css'
 //
 // Animated: the tags' drop (once), a ware's lift on hover or focus.
 
+// A ware's link is named by its visible text (the tag, name, tagline, description and services), so a screen
+// reader reaches every field of the card, then hears that it opens a new tab.
 function Ware({ company }: { company: Company }) {
-  const { links, cards } = useLabels()
+  const { links, cards, sections } = useLabels()
 
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
       className={`relative block p-4 ${look.file} ${horror.ware}`}
     >
       <span className="absolute -top-2 left-1/2 h-4 w-1 -translate-x-1/2 bg-[color:var(--sh-brass)]" aria-hidden="true" />
@@ -43,7 +44,7 @@ function Ware({ company }: { company: Company }) {
       <p className="mb-2 text-sm text-[color:var(--sh-brass-text)]">{company.tagline}</p>
       <p className="text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{company.description}</p>
       {company.services.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
           {company.services.map((service) => (
             <li key={service} className="border border-[color:var(--sh-wood)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]">
               {service}
@@ -51,6 +52,7 @@ function Ware({ company }: { company: Company }) {
           ))}
         </ul>
       )}
+      <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )
 }

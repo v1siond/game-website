@@ -25,7 +25,7 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { drumsSince, headingId, newTabName } from '@/lib/cv/sectionText'
+import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
 import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
@@ -1030,7 +1030,8 @@ const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } 
   )
 })
 
-// Company card
+// Company card. The link is named by its visible text (the plate, name, tagline, description and services),
+// so a screen reader reaches every field of the card, then hears that it opens a new tab.
 // His own products (featured) take the first row two to a row, a wider card with a gold plaque over
 // the name; the other ventures follow three to a row.
 const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVData['companies'][number] }) {
@@ -1047,7 +1048,6 @@ const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVD
         border: `1px solid ${DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}, ${company.tagline}`)}
     >
       {company.featured && (
         <span className="mb-3 inline-block border border-[color:var(--df-spirit-gold)] px-2 py-0.5 text-sm uppercase tracking-widest text-[color:var(--df-spirit-gold)]">
@@ -1065,6 +1065,7 @@ const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVD
       </div>
       <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
       {company.services.length > 0 && <TagList label={sections.services} tags={company.services} className="mt-3" />}
+      <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )
 })

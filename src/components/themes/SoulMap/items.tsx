@@ -8,12 +8,13 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
+import { projectCard, type ProjectCard } from '@/lib/cv/cvView'
 import { Knight } from './knight'
 import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
+import { CARD_BODY, CARD_META, CARD_TITLE, EmberList, TAG } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -22,7 +23,7 @@ import souls from './souls.module.css'
 // rises out of it, and his phantom gathers inside, up off one knee in the smith's gear; the project's
 // card rises with him out of the light, he stands by it a moment, then fades home and the sign dims.
 // Pick up is the game's own verb for what he brought: the item box at the bottom of the screen names the
-// project and what it gave (its impact, or its tagline), the souls counter climbs, and the card keeps a
+// project and what it gave (its impact, nothing more when it has none), the souls counter climbs, and the card keeps a
 // "picked up" mark. Under reduced motion the sign lies lit and the card is there, no phantom.
 
 const PICK_UP_SOULS = 400
@@ -71,14 +72,14 @@ function SummonedPhantom({ summoned, home, script }: { summoned: boolean; home: 
   )
 }
 
-function PickUp({ project, picked, onPick }: { project: Project; picked: boolean; onPick: () => void }) {
+function PickUp({ project, picked, onPick }: { project: ProjectCard; picked: boolean; onPick: () => void }) {
   const run = useRunActions()
   const { souls: words } = useLabels()
 
   const pickUp = () => {
     if (picked) return
     onPick()
-    run.found(project.name, project.impact || project.tagline)
+    run.found(project.name, project.impact)
     run.earn(PICK_UP_SOULS)
   }
 
@@ -95,7 +96,10 @@ function PickUp({ project, picked, onPick }: { project: Project; picked: boolean
   )
 }
 
-function ItemCard({ project, years, links }: ProjectSlot) {
+function ItemCard({ project: entry, links }: ProjectSlot) {
+  const labels = useLabels()
+  const { cards } = labels
+  const project = projectCard(entry, labels)
   const [home, setHome] = useState(false)
   const { ref, triggered, script } = useTriggeredScript(summon(() => setHome(true)), { threshold: 0.25 })
   const [picked, setPicked] = useState(false)
@@ -109,13 +113,20 @@ function ItemCard({ project, years, links }: ProjectSlot) {
           <h3 className={`min-w-0 ${CARD_TITLE}`}>
             <SlashBreaks text={project.name} />
           </h3>
-          {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
+          {project.years && <span className={`whitespace-nowrap ${CARD_META}`}>{project.years}</span>}
         </div>
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{project.role}</p>
         <p className={`mt-1 ${CARD_META}`}>{project.tagline}</p>
-        {project.impact && <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>{project.impact}</p>}
+        {project.description && <p className={`mt-3 ${CARD_BODY}`}>{project.description}</p>}
+        <EmberList items={project.details} label={cards.details} />
+        {project.impact && (
+          <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>
+            <span className="sr-only">{cards.impact}: </span>
+            {project.impact}
+          </p>
+        )}
         {project.techStack.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5">
+          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
             {project.techStack.map((tech) => (
               <li key={tech} className={TAG}>
                 {tech}

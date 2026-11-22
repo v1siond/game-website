@@ -2,7 +2,7 @@
 
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -10,7 +10,7 @@ import { useScrollScene } from '@/hooks/useScrollScene'
 import type { Job } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
-import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
+import { CARD_BODY, CARD_META, CARD_TITLE, EmberList, TAG } from './menu'
 import { CARVED, SOUL } from './palette'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
@@ -90,12 +90,12 @@ function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; 
   )
 }
 
-function JobStop({ job, order }: { job: Job; order: number }) {
-  const { years } = useLabels()
+function JobStop({ job: entry, order }: { job: Job; order: number }) {
+  const { years, cards } = useLabels()
+  const job = jobCard(entry, years)
   const [gone, setGone] = useState(false)
   const lastMoments = [LAST_MOVES[order % LAST_MOVES.length], ...fall(() => setGone(true))]
   const { ref, triggered, script } = useTriggeredScript(lastMoments, { threshold: 0.2, end: 'down' })
-  const span = jobSpanCompact(job, years)
 
   return (
     <article ref={ref} className={`${souls.stop} ${triggered ? souls.stopOn : ''}`}>
@@ -111,22 +111,14 @@ function JobStop({ job, order }: { job: Job; order: number }) {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className={CARD_TITLE}>{job.title}</h3>
           <span className={`whitespace-nowrap ${CARD_META}`}>
-            {span}
+            {job.years}
           </span>
         </div>
+        {job.location && <p className={`mt-1 ${CARD_META}`}>{job.location}</p>}
         {job.description && <p className={`mt-3 ${CARD_BODY}`}>{job.description}</p>}
-        {job.highlights.length > 0 && (
-          <ul className="mt-3 space-y-1.5">
-            {job.highlights.map((highlight) => (
-              <li key={highlight} className={`flex gap-2 ${CARD_BODY}`}>
-                <span className="mt-2 h-1 w-1 shrink-0 rotate-45 bg-[color:var(--soul-ember)]" aria-hidden="true" />
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        )}
+        <EmberList items={job.highlights} label={cards.keyAchievements} />
         {job.skills.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5">
+          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={cards.skillsUsed}>
             {job.skills.map((skill) => (
               <li key={skill} className={TAG}>
                 {skill}
