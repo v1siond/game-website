@@ -772,9 +772,11 @@
   opacity: 0;
 }
 
-/* ---------------------------------------------------------------- reduced motion */
+/* ---------------------------------------------------------------- reduced motion and print
+   Both show every scene's end frame: under reduced motion at once, on paper whether or not its section
+   was ever scrolled to, so no hidden reveal prints blank. */
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce), print {
   .root *,
   .root *::before,
   .root *::after {

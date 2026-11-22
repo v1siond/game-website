@@ -130,7 +130,8 @@
   100% { transform: none; opacity: 1; }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Reduced motion and print: the portraits at full light, still. */
+@media (prefers-reduced-motion: reduce), print {
   .foe, .ray, .stone, .dust, .petrified, .stomped { animation: none !important; }
   .stage .stomped { opacity: 1; transform: none; }
 }
