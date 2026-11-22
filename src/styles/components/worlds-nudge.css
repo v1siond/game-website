@@ -5,8 +5,8 @@
    properties the React components set from the current world's palette (launcherColors in
    src/lib/worlds/nudge.ts): --wl-text the label colour, --wl-body running text, --wl-fill the world's
    background, --wl-edge the black or white outer hairline. Both text pairs read at 7 to 1 or more; the rings
-   keep 3 to 1 from any page behind. The defaults (Retro Atomic's, the default world) only cover a paint before the
-   component sets its own.
+   keep 3 to 1 from any page behind. The defaults (Retro Atomic's colours) only cover a paint before the component
+   sets its own.
    =================================================================== */
 
 .c-worlds-launcher,
