@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { CV_PATHS } from '@/i18n/config'
 import { useTheme } from '@/themes/ThemeContext'
@@ -776,8 +776,9 @@ export default function GlobalProfessionStage() {
   const { theme } = useTheme()
   const { active } = useProfession()
   const pathname = usePathname()
+  // One palette object per theme, so the memo stage skips the renders that change nothing it draws.
+  const p = useMemo(() => paletteFromColors(theme.colors), [theme.colors])
   if (WORLDS_WITH_OWN_STAGE.has(theme.id) || CV_PAGE_PATHS.has(pathname ?? '')) return null
-  const p = paletteFromColors(theme.colors)
   return <ProfessionStage profession={active} p={p} />
 }
 

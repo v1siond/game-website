@@ -581,7 +581,7 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
 })
 
 // Waystation node for profession selection (generic rest point, not HK bench)
-const WaystationNode = memo(function WaystationNode({
+function WaystationNode({
   option,
   isReceivingEnergy,
 }: {
@@ -723,7 +723,7 @@ const WaystationNode = memo(function WaystationNode({
       </div>
     </button>
   )
-})
+}
 
 const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; color: string }> = {
   drummer: { icon: <WaveIcon />, color: DARK_FANTASY.lavender },
