@@ -102,6 +102,13 @@
   }
 }
 
+/* On paper a typed line prints whole, whether or not its section was ever scrolled to. */
+@media print {
+  .typeCover {
+    display: none;
+  }
+}
+
 /* His name on the file card (hall.tsx), readable from the first frame: the typewriter's carriage steps the
    line home a letter at a time, transform only. */
 @media (prefers-reduced-motion: no-preference) {
