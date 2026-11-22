@@ -325,4 +325,17 @@
 @media (prefers-reduced-motion: reduce) {
   .sprite, .sprite * { animation: none !important; }
   .knob, .dialNeedle, .tune .foreRight { transition: none; }
+
+  /* The hoist's held end pose (its keyframes at 100%), so the footlocker, already on his shoulder under
+   * reduced motion (journey.module.css), hangs from his hand. */
+  .hoist .body { transform: translateY(var(--hoist-body)); }
+  .hoist .thighRight { transform: rotate(22deg); }
+  .hoist .shinRight { transform: rotate(-36deg); }
+  .hoist .thighLeft { transform: rotate(-22deg); }
+  .hoist .shinLeft { transform: rotate(36deg); }
+  .hoist .armRight { transform: rotate(var(--hoist-arm)); }
+  .hoist .foreRight { transform: rotate(var(--hoist-fore)); }
+  .hoist .armLeft { transform: rotate(-60deg); }
+  .hoist .foreLeft { transform: rotate(-25deg); }
+  .hoist .head { transform: rotate(8deg); }
 }
