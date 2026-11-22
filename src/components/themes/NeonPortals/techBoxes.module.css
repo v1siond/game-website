@@ -1,0 +1,226 @@
+/*
+ * The X braced boxes (techBoxes.tsx), drawn on the shared TechList's items: each item is a crate, its cream
+ * inner panel holding the category, and its braced lid two plank halves (the item's ::before and ::after)
+ * across the top. When the spin starts (data-broken) each lid breaks into its two planks that fly apart,
+ * and two berries (the heading's ::before and ::after) fly out, box i at --lead + i * --step ms. A replay
+ * swaps between two identical sets of keyframes (data-round), so the break plays again. The open boxes
+ * stay open (BD29). Transforms and opacity only.
+ *
+ * Animated: the planks (one class), the berries (one class).
+ * Reduced motion and the preview (data-still): every box open, no planks and no berries.
+ */
+
+.boxes > ul > li {
+  position: relative;
+  padding: 2.75rem 1rem 1rem;
+  border: 4px solid var(--np-wood);
+  border-radius: 6px;
+  background: var(--np-cream);
+  color: var(--np-ink);
+  box-shadow: 0 5px 0 var(--np-wood-dark);
+}
+
+/* The lid: two plank halves, each braced with its own X. */
+.boxes > ul > li::before,
+.boxes > ul > li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 2rem;
+  border-bottom: 3px solid var(--np-ink);
+  background:
+    linear-gradient(to top right, transparent calc(50% - 3px), var(--np-wood-dark) calc(50% - 3px), var(--np-wood-dark) calc(50% + 3px), transparent calc(50% + 3px)),
+    linear-gradient(to bottom right, transparent calc(50% - 3px), var(--np-wood-dark) calc(50% - 3px), var(--np-wood-dark) calc(50% + 3px), transparent calc(50% + 3px)),
+    repeating-linear-gradient(to bottom, var(--np-wood-lit) 0 8px, var(--np-wood) 8px 10px);
+  pointer-events: none;
+}
+
+.boxes > ul > li::before {
+  left: 0;
+  border-right: 2px solid var(--np-ink);
+}
+
+.boxes > ul > li::after {
+  right: 0;
+}
+
+/* The berries, hidden until they fly out of the breaking box. */
+.boxes > ul > li > h3::before,
+.boxes > ul > li > h3::after {
+  content: '';
+  position: absolute;
+  top: 0.6rem;
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--np-ink);
+  border-radius: 50%;
+  background: var(--np-berry);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boxes > ul > li > h3::after {
+  background: var(--np-lime);
+}
+
+.boxes[data-broken='true'] > ul > li::before,
+.boxes[data-broken='true'] > ul > li::after,
+.boxes[data-broken='true'] > ul > li > h3::before,
+.boxes[data-broken='true'] > ul > li > h3::after {
+  animation-duration: calc(var(--break) * 1ms);
+  animation-timing-function: ease-in;
+  animation-delay: calc((var(--lead) + var(--i, 0) * var(--step)) * 1ms);
+  animation-fill-mode: both;
+}
+
+.boxes[data-broken='true'][data-round='0'] > ul > li::before {
+  animation-name: plank-left-a;
+}
+
+.boxes[data-broken='true'][data-round='1'] > ul > li::before {
+  animation-name: plank-left-b;
+}
+
+.boxes[data-broken='true'][data-round='0'] > ul > li::after {
+  animation-name: plank-right-a;
+}
+
+.boxes[data-broken='true'][data-round='1'] > ul > li::after {
+  animation-name: plank-right-b;
+}
+
+.boxes[data-broken='true'][data-round='0'] > ul > li > h3::before {
+  animation-name: berry-left-a;
+}
+
+.boxes[data-broken='true'][data-round='1'] > ul > li > h3::before {
+  animation-name: berry-left-b;
+}
+
+.boxes[data-broken='true'][data-round='0'] > ul > li > h3::after {
+  animation-name: berry-right-a;
+}
+
+.boxes[data-broken='true'][data-round='1'] > ul > li > h3::after {
+  animation-name: berry-right-b;
+}
+
+@keyframes plank-left-a {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-48px, -64px) rotate(-38deg);
+  }
+}
+
+@keyframes plank-left-b {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-48px, -64px) rotate(-38deg);
+  }
+}
+
+@keyframes plank-right-a {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(48px, -64px) rotate(38deg);
+  }
+}
+
+@keyframes plank-right-b {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(48px, -64px) rotate(38deg);
+  }
+}
+
+@keyframes berry-left-a {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-90px, -80px) scale(0.7);
+  }
+}
+
+@keyframes berry-left-b {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-90px, -80px) scale(0.7);
+  }
+}
+
+@keyframes berry-right-a {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(84px, -96px) scale(0.7);
+  }
+}
+
+@keyframes berry-right-b {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(84px, -96px) scale(0.7);
+  }
+}
+
+.boxes[data-still] > ul > li::before,
+.boxes[data-still] > ul > li::after,
+.boxes[data-still] > ul > li > h3::before,
+.boxes[data-still] > ul > li > h3::after {
+  animation: none !important;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boxes > ul > li::before,
+  .boxes > ul > li::after,
+  .boxes > ul > li > h3::before,
+  .boxes > ul > li > h3::after {
+    animation: none !important;
+    opacity: 0;
+  }
+}

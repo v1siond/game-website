@@ -1,0 +1,208 @@
+/*
+ * The night behind the page (backdrop.tsx): the sky, the stars, the sea and one layer per era, crossfaded
+ * by the root's data-zone. An era's own element plays a few times the first time its era comes in, then
+ * holds still: once the page leaves an era, the backdrop marks it data-played and its element never plays
+ * again, so scrolling back shows it at rest (BD29). The stars and the swell play once on arrival. Transforms and opacity only; nothing loops (BD29).
+ *
+ * Animated: the stars (one class), the swell, the crossfade, the beacon, the flames, the motes, the
+ * banners, the ring, the weed, the lamps, the lava.
+ * Reduced motion: the eras swap at once and every element holds still.
+ */
+
+.world {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 100%, var(--np-glow), transparent 70%),
+    linear-gradient(to bottom, var(--np-void), var(--np-chamber) 60%, var(--np-sea));
+}
+
+.world svg * {
+  transform-box: fill-box;
+}
+
+.star {
+  transform-origin: center;
+  animation: twinkle 1.6s ease-in-out calc(var(--i, 0) * 0.2s) 2;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.sea {
+  overflow: visible;
+}
+
+.swell {
+  animation: swell 2.4s ease-in-out 2;
+}
+
+@keyframes swell {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-24px);
+  }
+}
+
+.era {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease-in-out;
+}
+
+.world[data-zone='hub'] [data-era='hub'],
+.world[data-zone='medieval'] [data-era='medieval'],
+.world[data-zone='tomb'] [data-era='tomb'],
+.world[data-zone='wall'] [data-era='wall'],
+.world[data-zone='future'] [data-era='future'],
+.world[data-zone='underwater'] [data-era='underwater'],
+.world[data-zone='arabian'] [data-era='arabian'],
+.world[data-zone='prehistoric'] [data-era='prehistoric'] {
+  opacity: 1;
+}
+
+.world[data-zone='hub'] [data-era='hub']:not([data-played]) .beacon {
+  animation: pulse 1.4s ease-in-out 3;
+}
+
+.world[data-zone='medieval'] [data-era='medieval']:not([data-played]) .flame {
+  transform-origin: 50% 100%;
+  animation: flicker 0.45s ease-in-out 8;
+}
+
+/* A mote rests where its drift ends, so the tomb shows the same after its one play. */
+.mote {
+  opacity: 0.6;
+  transform: translate(30px, -70px);
+}
+
+.world[data-zone='tomb'] [data-era='tomb']:not([data-played]) .mote {
+  animation: drift 3.2s ease-out calc(var(--i, 0) * 0.25s) 1 both;
+}
+
+.world[data-zone='wall'] [data-era='wall']:not([data-played]) .banner {
+  transform-origin: 0 50%;
+  animation: flap 0.6s ease-in-out 6;
+}
+
+.world[data-zone='future'] [data-era='future']:not([data-played]) .ring {
+  transform-origin: center;
+  animation: turn 1.8s ease-in-out 2;
+}
+
+.world[data-zone='underwater'] [data-era='underwater']:not([data-played]) .weed {
+  transform-origin: 50% 100%;
+  animation: sway 2.2s ease-in-out calc(var(--i, 0) * 0.15s) 2;
+}
+
+.world[data-zone='arabian'] [data-era='arabian']:not([data-played]) .lamp {
+  animation: pulse 0.9s ease-in-out 4;
+}
+
+.world[data-zone='prehistoric'] [data-era='prehistoric']:not([data-played]) .lava {
+  animation: pulse 1.6s ease-in-out 3;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(0.85, 1.2);
+  }
+  70% {
+    transform: scale(1.1, 0.9);
+  }
+}
+
+@keyframes drift {
+  from {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.6;
+    transform: translate(30px, -70px);
+  }
+}
+
+@keyframes flap {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-8deg) scaleX(0.9);
+  }
+}
+
+@keyframes turn {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(6deg);
+  }
+  70% {
+    transform: rotate(-5deg);
+  }
+}
+
+.world[data-still] *,
+.world[data-still] .era {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .era {
+    transition: none;
+  }
+
+  .star,
+  .swell,
+  .world .beacon,
+  .world .flame,
+  .world .mote,
+  .world .banner,
+  .world .ring,
+  .world .weed,
+  .world .lamp,
+  .world .lava {
+    animation: none !important;
+  }
+}

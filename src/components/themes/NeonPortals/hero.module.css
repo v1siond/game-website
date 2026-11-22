@@ -1,0 +1,217 @@
+/*
+ * The hub hero (hero.tsx). Every time comes from HERO_TIMING through the variables the hero sets (--beam-at,
+ * --hop-ms and the rest, in ms). The entrance plays once: the platform rises, the pads light in turn, he
+ * beams onto his pad, the ring behind his name glows. A pick moves him and the sphere to the new pad and
+ * swaps the sphere's room. Transforms and opacity only; nothing loops (BD29).
+ *
+ * Animated: the platform, the pads (one class), the beam, the ring, the sphere's arcs, him.
+ * Reduced motion and the preview (data-still): the finished hub, no entrance and no move.
+ */
+
+.scene {
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 62%, var(--np-glow), transparent 70%),
+    linear-gradient(to bottom, var(--np-void), var(--np-chamber) 70%, var(--np-sea));
+}
+
+.name {
+  text-shadow:
+    3px 3px 0 var(--np-title-edge),
+    -1px -1px 0 var(--np-title-edge),
+    2px -1px 0 var(--np-title-edge),
+    -1px 2px 0 var(--np-title-edge),
+    0 6px 0 var(--np-ink);
+}
+
+.platform {
+  animation: rise calc(var(--platform-ms) * 1ms) ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.padLit {
+  animation: pad-light calc(var(--pad-ms) * 1ms) ease-out calc((var(--pads-at) + var(--i, 0) * var(--pad-step)) * 1ms) both;
+}
+
+@keyframes pad-light {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.padRing {
+  opacity: 0;
+  transition: opacity calc(var(--hop-ms) * 1ms) ease-out;
+}
+
+.pad[data-picked='true'] .padRing {
+  opacity: 1;
+}
+
+/* Him, the beam and the sphere follow the picked pad. */
+.follow {
+  transform: translate(calc(var(--pad-x) * 1px), calc(var(--pad-y) * 1px));
+  transition: transform calc(var(--hop-ms) * 1ms) ease-in-out;
+}
+
+.sphere {
+  transform: translateY(-140px);
+}
+
+.room {
+  animation: swap calc(var(--swap-ms) * 1ms) ease-out both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes swap {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.arcs {
+  animation: arcs calc(var(--swap-ms) * 1ms) steps(1, end) both;
+}
+
+@keyframes arcs {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  60% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.beam {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: beam calc(var(--beam-ms) * 1ms) ease-out calc(var(--beam-at) * 1ms) both;
+}
+
+@keyframes beam {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  40% {
+    opacity: 0.7;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+}
+
+.figure {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.figure[data-move='beam'] {
+  animation: beam-in calc(var(--beam-ms) * 1ms) ease-out calc(var(--beam-at) * 1ms) both;
+}
+
+.figure[data-move='hop'] {
+  animation: hold calc(var(--hop-ms) * 1ms) linear;
+}
+
+.figure[data-move='scratch'] {
+  animation: hold calc(var(--scratch-ms) * 1ms) linear;
+}
+
+@keyframes beam-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scaleY(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: scaleY(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A move's own clock: nothing changes, its end steps the pose sequence. */
+@keyframes hold {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ringGlow {
+  animation: glow calc(var(--ring-ms) * 1ms) ease-out calc(var(--ring-at) * 1ms) both;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+.hero[data-still] *,
+.hero[data-still] *::before,
+.hero[data-still] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platform,
+  .padLit,
+  .room,
+  .arcs,
+  .beam,
+  .figure,
+  .ringGlow {
+    animation: none !important;
+  }
+
+  .padRing,
+  .follow {
+    transition: none;
+  }
+}

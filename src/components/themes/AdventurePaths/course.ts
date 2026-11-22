@@ -1,15 +1,11 @@
+import { legFrom, restSpot, travelVars, type Spot } from '@/lib/motion/course'
 import type { HeroFrame } from './side'
 
 // A level scene's choreography as data: where he starts, the legs he runs or jumps one after another,
 // and the spot he rests on. Each leg is a straight line or a jump arc from where the last one ended;
-// the track's CSS (side.module.css) animates it from --from-* to --to-*. No React here, so the rules
-// are tested alone.
-
-/** A spot on the playfield: x in % of its width, lift in px above the ground. */
-export interface Spot {
-  x: number
-  lift: number
-}
+// the track's CSS (side.module.css) animates it from --from-* to --to-*. The course rules every legged world
+// shares (the spot, where a leg starts, the rest spot, the travel variables) are src/lib/motion/course.ts;
+// a spot's lift here is in px. No React here, so the rules are tested alone.
 
 export interface Leg<P extends string = string> {
   pose: P
@@ -43,23 +39,13 @@ export interface Motion {
   peak?: number
 }
 
-/** Where he stands once the legs are run. */
-export const restSpot = (course: Course): Spot => course.legs.at(-1)?.to ?? course.start
-
 export function motionOf(course: Course, pose: string): Motion {
   const index = course.legs.findIndex((leg) => leg.pose === pose)
   const rest = restSpot(course)
-  if (index >= 0) return { ...course.legs[index], from: index === 0 ? course.start : course.legs[index - 1].to }
+  if (index >= 0) return { ...course.legs[index], from: legFrom(course, index) }
   const move = course.moves?.find((leg) => leg.pose === pose)
   if (move) return { ...move, from: rest }
   return { pose, frame: course.rest.frame, path: 'still', from: rest, to: rest, ms: 0 }
-}
-
-/** Whether the legs have played past a pose: its leg is over, or he is at rest. */
-export function playedPast(course: Course, now: string, arrived: boolean, pose: string): boolean {
-  if (arrived) return true
-  const legs = course.legs.map((leg) => leg.pose)
-  return legs.indexOf(now) > legs.indexOf(pose)
 }
 
 /** One hop toward a target along a row of spots, the way he crosses platforms one at a time. */
@@ -73,15 +59,7 @@ export function hopToward(hop: Hop, target: number): Hop {
   return { from: hop.at, at: hop.at + Math.sign(target - hop.at) }
 }
 
-/** The CSS variables the track reads for a motion (see side.module.css). */
+/** The CSS variables the track reads for a motion (see side.module.css): the shared travel, the ease and the arc's peak. */
 export function motionVars(motion: Motion): Record<string, string | number> {
-  return {
-    '--from-x': motion.from.x,
-    '--from-lift': motion.from.lift,
-    '--to-x': motion.to.x,
-    '--to-lift': motion.to.lift,
-    '--ms': motion.ms,
-    '--ease': motion.ease ?? 'linear',
-    '--peak': motion.peak ?? 40,
-  }
+  return { ...travelVars(motion), '--ease': motion.ease ?? 'linear', '--peak': motion.peak ?? 40 }
 }

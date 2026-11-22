@@ -1,11 +1,11 @@
 'use client'
 
 import { useMemo, type AnimationEventHandler, type ReactNode } from 'react'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
+import { useLegSequence } from '@/hooks/useLegSequence'
 import type { Profession } from '@/lib/cv/professions'
 import { pixelRuns } from '@/lib/pixelRuns'
 import { cssVars } from '@/lib/cssVars'
-import { motionOf, motionVars, playedPast, type Course, type Motion } from './course'
+import { motionOf, motionVars, type Course, type Motion } from './course'
 import { FOE, HERO, HERO_EYE, HERO_OUTFITS, foeColours, foeRows, heroParts, type FoeFrame, type HeroFrame, type SpritePart } from './side'
 import { PixelRuns } from '../shared/PixelRuns'
 import side from './side.module.css'
@@ -109,8 +109,6 @@ export function Actor({ motion, profession, take = 0, onAnimationEnd, hopClassNa
 /** A scene's course played by the shared pose sequence: the motion to show, and which legs are over. */
 export function useCourse<P extends string>(course: Course<P>, moveMs?: number) {
   const entrance = useMemo(() => course.legs.map((leg) => leg.pose), [course])
-  const sequence = usePoseSequence<P>({ entrance, rest: course.rest.pose, still: course.rest.pose, moveMs })
-  const motion = motionOf(course, sequence.pose)
-  const past = (pose: P) => playedPast(course, sequence.pose, sequence.arrived, pose)
-  return { ...sequence, motion, past }
+  const sequence = useLegSequence<P>(entrance, course.rest.pose, { still: course.rest.pose, moveMs })
+  return { ...sequence, motion: motionOf(course, sequence.pose) }
 }
