@@ -1,11 +1,11 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
+import type { Labels } from '@/lib/cv/labels'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import type { SectionsOf } from '@/lib/cv/cvView'
 import { AreaTitle, CARD_BODY, CARD_TITLE, MenuPanel, TechSlots } from './menu'
 import { FogGate } from './gate'
 import { LiftDescent } from './descent'
@@ -23,7 +23,8 @@ import { IllusoryWall, RollIn } from './plunge'
 // The Tech Stack and the Services are the game's menu screen (./menu): the stack's stands behind an
 // illusory wall he breaks with a plunging attack, the services are knocked into place by his roll (./plunge).
 
-function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
+function Block({ titleKey, wide = false, children }: { titleKey: keyof Labels['sections']; wide?: boolean; children: ReactNode }) {
+  const title = useLabels().sections[titleKey]
   const id = headingId('soul', title)
   return (
     <section className="relative px-4 py-12 sm:px-6" aria-labelledby={id}>
@@ -35,89 +36,86 @@ function Block({ title, wide = false, children }: { title: string; wide?: boolea
   )
 }
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const { sections: titles } = useLabels()
-
-  return (
-    <>
-      <Block title={titles.about}>
+// One frame per section of the shared plan, which picks the ones a profession shows and their order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <Block titleKey="about">
         <FogGate>
           <MenuPanel>
-            <p className="max-w-prose text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--soul-text)]">{slot.bio}</p>
           </MenuPanel>
         </FogGate>
       </Block>
-
-      {sections.jobs.length > 0 && (
-        <Block title={titles.workExperience} wide>
-          <LiftDescent jobs={sections.jobs} />
-        </Block>
-      )}
-
-      <Block title={titles.techStack} wide>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <Block titleKey="workExperience" wide>
+        <LiftDescent jobs={slot.jobs} />
+      </Block>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <Block titleKey="techStack" wide>
         <IllusoryWall>
           <MenuPanel>
-            <TechSlots categories={sections.techStack} />
+            <TechSlots categories={slot.categories} />
           </MenuPanel>
         </IllusoryWall>
       </Block>
-
-      {sections.services.length > 0 && (
-        <Block title={titles.services} wide>
-          <RollIn>
-            <MenuPanel>
-              <ul className={MASONRY_LIST}>
-                {sections.services.map((service) => (
-                  <li key={service.id} className={MASONRY_ITEM}>
-                    <h3 className={CARD_TITLE}>{service.title}</h3>
-                    <p className={`mt-2 ${CARD_BODY}`}>{service.line}</p>
-                  </li>
-                ))}
-              </ul>
-            </MenuPanel>
-          </RollIn>
-        </Block>
-      )}
-
-      <Block title={titles.featuredWork} wide>
-        <ItemProjects projects={sections.projects} />
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <Block titleKey="services" wide>
+        <RollIn>
+          <MenuPanel>
+            <ul className={MASONRY_LIST}>
+              {slot.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <h3 className={CARD_TITLE}>{service.title}</h3>
+                  <p className={`mt-2 ${CARD_BODY}`}>{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </MenuPanel>
+        </RollIn>
       </Block>
-
-      {sections.companies.length > 0 && (
-        <Block title={titles.ventures} wide>
-          <FloorMessages companies={sections.companies} />
-        </Block>
-      )}
-    </>
-  )
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <Block titleKey="featuredWork" wide>
+        <ItemProjects projects={slot.projects} />
+      </Block>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <Block titleKey="ventures" wide>
+        <FloorMessages companies={slot.companies} />
+      </Block>
+    )
+  },
+  bands: function BandsFrame({ slot: { musician, bands } }) {
+    const { years } = useLabels()
+    return (
+      <Block titleKey="bands" wide>
+        <p className="text-center text-base text-[color:var(--soul-glow)]">{drumsSince(musician, years)}</p>
+        <SunStages bands={bands} />
+        <p className="mt-6 text-center text-sm italic text-[color:var(--soul-text-soft)]">{musician.line}</p>
+      </Block>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    return (
+      <Block titleKey="muayThai" wide>
+        <FogArena martialArts={slot.martialArts} />
+      </Block>
+    )
+  },
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const { sections: titles, years } = useLabels()
-
-  return (
-    <Block title={titles.bands} wide>
-      <p className="text-center text-base text-[color:var(--soul-glow)]">{drumsSince(musician, years)}</p>
-      <SunStages bands={bands} />
-      <p className="mt-6 text-center text-sm italic text-[color:var(--soul-text-soft)]">{musician.line}</p>
-    </Block>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { sections: titles } = useLabels()
-
-  return (
-    <Block title={titles.muayThai} wide>
-      <FogArena martialArts={sections.martialArts} />
-    </Block>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)
