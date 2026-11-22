@@ -41,7 +41,7 @@ function Drummer() {
 
 function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
   const { links } = useLabels()
-  const { band, years, linkProps, nameFor } = slot
+  const { band, years, linkProps, nameFor, release } = slot
 
   return (
     <article className={`relative overflow-hidden ${cel.paper} ${cel.boss}`} style={{ ['--i' as string]: index }}>
@@ -53,9 +53,9 @@ function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
           {band.role}
           {years && ` · ${years}`}
         </p>
-        {band.release && (
+        {release && (
           <p className="mt-3 inline-block bg-[var(--cel-ink)] px-2 py-1 text-sm font-bold text-[var(--cel-sun)]">
-            {links.released}: {band.release}
+            {release.label}: {release.title}
           </p>
         )}
         {linkProps && (
