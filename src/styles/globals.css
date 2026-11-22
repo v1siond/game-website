@@ -155,11 +155,13 @@ textarea:focus-visible {
     display: none !important;
   }
 
-  /* Ensure readable text */
+  /* Readable text; the colours a page sets on its own blocks (the /cv links, its rules) print as set */
   body {
     color: #000 !important;
     background: #fff !important;
     font-size: 12pt !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   a {
@@ -172,6 +174,15 @@ textarea:focus-visible {
     font-size: 0.8em;
     word-wrap: break-word;
   }
+
+  /* The CV (CVContent.tsx, #cv-content) already writes each link as its URL, so it is not printed twice */
+  #cv-content a::after {
+    content: none;
+  }
+}
+
+@page {
+  margin: 0.5in;
 }
 
 /* =================================================================== */
