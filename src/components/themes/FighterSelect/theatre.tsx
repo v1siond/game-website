@@ -407,7 +407,7 @@ export function TourStage({ scene, profession, labels, settled = false }: { scen
                     <ScrubFighter profession={profession} who="partner" mirror poses={posesOf(scene.beats, 'partner')} />
                   </g>
                 )}
-                <g data-fx="hero" data-worlds-figure="" transform={place(HERO_X)}>
+                <g data-fx="hero" transform={place(HERO_X)}>
                   <ScrubFighter profession={profession} poses={posesOf(scene.beats, 'hero')} />
                 </g>
               </g>
