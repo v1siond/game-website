@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
-import { CVLink, HeroAction, PlayLink } from './actions'
+import { ContactSigns } from './actions'
 import { Actor, useCourse } from './actor'
 import { cssVars } from './art'
 import { Castle, Firework } from './blocks'
@@ -102,11 +102,7 @@ export function GoalPole({ profession }: { profession: Profession }) {
             <div className="rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6">
               <p className="mb-6 text-base text-white">{line}</p>
               <div className="flex flex-wrap gap-3">
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PlayLink />
+                <ContactSigns actions={actions} />
               </div>
             </div>
           )}

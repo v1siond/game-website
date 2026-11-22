@@ -11,7 +11,7 @@ import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import { NameWords } from '@/components/cv/NameWords'
-import { CVLink, HeroAction, PlayLink } from './actions'
+import { ContactSigns } from './actions'
 import { cssVars } from './art'
 import { ARRIVAL, BRANCHES, HUB, HubCompass, HubMapArt, landmarkPoint } from './hubMap'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -225,11 +225,7 @@ function NamePlaque() {
               <p className="mt-1 text-sm italic text-[color:var(--ap-ink-soft)]">{tagline}</p>
               <p className="mt-1 text-sm">{line}</p>
               <nav className="mt-4 flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PlayLink />
+                <ContactSigns actions={actions} />
               </nav>
             </div>
           </div>
