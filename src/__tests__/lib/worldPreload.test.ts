@@ -4,7 +4,8 @@ import { readWorldPreloads, worldPreloadScript, worldPreloads, type LoadableMani
 import { WORLD_IDS } from '@/lib/worlds/registry'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY } from '@/themes/themes'
 
-// The manifest a `next build` wrote at 91be23e9 (the jspdf entries, keyed on node_modules paths, left out).
+// The manifest a `next build` wrote at 91be23e9 (the jspdf entries, keyed on node_modules paths, left out),
+// with Adventure Paths' chunk from the build that made Era Postcards the default and Adventure Paths a chunk.
 const BUILT: LoadableManifest = manifest
 const HELPERS = join(process.cwd(), 'src', '__tests__', 'helpers')
 

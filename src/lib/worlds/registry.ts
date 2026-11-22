@@ -44,6 +44,7 @@ const CATEGORY_BY_ID: Record<string, WorldCategory> = {
   'cell-shaded': 'Action',
   'silhouette': 'Artistic',
   'art-deco': 'Artistic',
+  'era-postcards': 'Artistic',
   'tropical-platformer': 'Artistic',
 }
 

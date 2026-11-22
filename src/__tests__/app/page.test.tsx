@@ -3,6 +3,7 @@ import { WorldRenderer } from '@/app/(site)/WorldRenderer'
 import { render } from '../helpers/test-utils'
 
 // Mock the heavy themed layouts: we only care that the right *world* renders.
+jest.mock('@/components/themes/EraPostcardsTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-era-postcards" /> }))
 jest.mock('@/components/themes/DarkFantasyTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-dark-fantasy" /> }))
 jest.mock('@/components/themes/SurvivalHorrorTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-survival-horror" /> }))
 jest.mock('@/components/themes/NeonPortalsTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-neon-portals" /> }))
@@ -27,9 +28,9 @@ describe('Home page (boot into a world)', () => {
     jest.clearAllMocks()
   })
 
-  it('boots into the default world (adventure-paths) when nothing is stored', () => {
+  it('boots into the default world (era-postcards) when nothing is stored', () => {
     render(<WorldRenderer />)
-    expect(screen.getByTestId('theme-adventure-paths')).toBeInTheDocument()
+    expect(screen.getByTestId('theme-era-postcards')).toBeInTheDocument()
   })
 
   it('boots into the stored world from localStorage', async () => {

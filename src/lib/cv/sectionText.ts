@@ -41,7 +41,6 @@ export const newTabName = (links: Labels['links'], name: string): string => fill
  *  note is the one part of the name the card does not show. */
 export const newTabHint = (links: Labels['links']): string => newTabName(links, '').trim()
 
-/** "1 year", "4 years". */
 /** "1 year", "12 years": a count of years in the visitor's language. */
 export const yearCount = (count: number, labels: Labels['years']): string =>
   fillLabel(count === 1 ? labels.yearOne : labels.yearMany, { count })

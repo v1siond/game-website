@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, worldCV, type CVContentFiles } from '@/lib/cv/content'
 import { viewFor, yearOf, type SectionsOf } from '@/lib/cv/cvView'
-import { sectionPlan } from '@/lib/cv/sectionPlan'
+import { everySection, sectionPlan } from '@/lib/cv/sectionPlan'
 
 // Which sections a profession shows and in which order, decided once for every world: the engineer's six
 // in a fixed order, each left out when it has nothing to show; one section for the drummer and the fighter.
@@ -60,5 +60,20 @@ describe('sectionPlan', () => {
   it('gives the fighter the Muay Thai record', () => {
     const fighter = sectionsOf('fighter') as SectionsOf<'fighter'>
     expect(sectionPlan(fighter, bio)).toEqual([{ id: 'muayThai', titleKey: 'muayThai', martialArts: fighter.martialArts }])
+  })
+})
+
+describe('everySection', () => {
+  it('lays every profession on one page: the engineer six, then the bands, then the Muay Thai record', () => {
+    const plan = everySection(cv, NOW)
+    expect(plan.map((slot) => slot.id)).toEqual(['about', 'work', 'tech', 'services', 'projects', 'ventures', 'bands', 'muayThai'])
+    expect(plan.slice(0, 6)).toEqual(sectionPlan(engineer, bio))
+    expect(plan[6]).toEqual(sectionPlan(sectionsOf('drummer'), bio)[0])
+    expect(plan[7]).toEqual(sectionPlan(sectionsOf('fighter'), bio)[0])
+  })
+
+  it('cuts the work to the world view of the year it is given, as one profession would', () => {
+    const work = everySection(cv, NOW).find((slot) => slot.id === 'work')
+    expect(work).toEqual({ id: 'work', titleKey: 'workExperience', jobs: engineer.jobs })
   })
 })

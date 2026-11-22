@@ -39,23 +39,25 @@ export interface ScrollStageOptions {
   draw: (position: number, lag: number, metrics: StageMetrics) => void
   /** The settle's time constant in ms, SETTLE_TAU_MS when left out; 0 draws at the scroll. */
   tauMs?: number
+  /** What the stages are built from: a new value (new content, stages bound again) measures and draws at once. */
+  content?: unknown
 }
 
 const PHONE_QUERY = '(max-width: 767.98px)'
 
 const readMetrics = (): StageMetrics => ({ viewport: window.innerHeight, phone: window.matchMedia(PHONE_QUERY).matches })
 
-export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, tauMs = SETTLE_TAU_MS }: ScrollStageOptions): (element: T | null) => void {
+export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, tauMs = SETTLE_TAU_MS, content }: ScrollStageOptions): (element: T | null) => void {
   const [element, setElement] = useState<T | null>(null)
   const latest = useLatest({ measure, draw, tauMs })
 
-  // The first frame: measure and draw at the scroll before the browser paints.
+  // The first frame, and the first after new content: measure and draw at the scroll before the browser paints.
   useLayoutEffect(() => {
     if (!enabled || !element) return
     const metrics = readMetrics()
     latest.current.measure(window.scrollY, metrics)
     latest.current.draw(window.scrollY, 0, metrics)
-  }, [enabled, element, latest])
+  }, [enabled, element, latest, content])
 
   useEffect(() => {
     if (!enabled || !element) return

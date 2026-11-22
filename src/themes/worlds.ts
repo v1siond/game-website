@@ -4,16 +4,17 @@ import { WORLD_IDS } from '@/lib/worlds/registry'
 
 // Every world's full themed layout, read only by WorldRenderer; ids and categories are in
 // src/lib/worlds/registry.ts, which pages that only list the worlds import instead.
-// The default world (Adventure Paths, DEFAULT_THEME_ID) is imported statically: the server renders it
+// The default world (Era Postcards, DEFAULT_THEME_ID) is imported statically: the server renders it
 // into the home page HTML and it ships in the first load. Every other world is its own chunk, fetched
 // only when a visitor enters it (a returning visitor's stored world, or a pick in the worlds modal).
 // Each import() is written out with a literal path so the bundler splits each world on its own.
-import AdventurePathsTheme from '@/components/themes/AdventurePathsTheme'
+import EraPostcardsTheme from '@/components/themes/EraPostcardsTheme'
 
 const DarkFantasyTheme = dynamic(() => import('@/components/themes/DarkFantasyTheme'))
 const SurvivalHorrorTheme = dynamic(() => import('@/components/themes/SurvivalHorrorTheme'))
 const NeonPortalsTheme = dynamic(() => import('@/components/themes/NeonPortalsTheme'))
 const SoulMapTheme = dynamic(() => import('@/components/themes/SoulMapTheme'))
+const AdventurePathsTheme = dynamic(() => import('@/components/themes/AdventurePathsTheme'))
 const RubberHoseTheme = dynamic(() => import('@/components/themes/RubberHoseTheme'))
 const RetroRPGTheme = dynamic(() => import('@/components/themes/RetroRPGTheme'))
 const BoldNoirTheme = dynamic(() => import('@/components/themes/BoldNoirTheme'))
@@ -33,6 +34,7 @@ const MedievalFantasyTheme = dynamic(() =>
 
 // id -> full themed layout
 const COMPONENT_BY_ID: Record<string, ComponentType> = {
+  'era-postcards': EraPostcardsTheme,
   'dark-fantasy': DarkFantasyTheme,
   'survival-horror': SurvivalHorrorTheme,
   'neon-portals': NeonPortalsTheme,

@@ -1,0 +1,649 @@
+/* Era Postcards: the text over the stages. Every colour is a palette variable: --ep-* for the page,
+   --era-accent and --era-card set per section from its era's look. The text is plain HTML in normal flow;
+   it is never scaled, faded or blurred, so it is opaque from its first frame. */
+
+.root {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--ep-ink);
+  color: var(--ep-chalk);
+  font: 400 1.0625rem/1.55 var(--ep-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.root :focus-visible {
+  outline: 3px solid var(--era-accent, var(--ep-portal));
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip {
+  position: fixed;
+  left: 16px;
+  top: -80px;
+  z-index: 40;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--ep-chalk);
+  color: var(--ep-ink);
+  font-weight: 700;
+}
+
+.skip:focus {
+  top: 16px;
+}
+
+.display {
+  font-family: var(--ep-face), 'Arial Narrow', sans-serif;
+  font-weight: 900;
+  line-height: 0.9;
+  margin: 0;
+}
+
+/* ---- The ledger (top left) and the gate rail (right) ---- */
+.ledger {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px clamp(16px, 6vw, 96px);
+  padding-right: 200px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ep-scrim) 70%, transparent), transparent);
+  pointer-events: none;
+}
+
+.brand {
+  pointer-events: auto;
+  color: var(--ep-chalk);
+  font: 900 1.6rem/1 var(--ep-face), sans-serif;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  border: 2px solid var(--ep-portal);
+  border-radius: 50% / 40%;
+}
+
+.ledgerText {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ep-mist);
+}
+
+.ledgerCount {
+  color: var(--ep-chalk);
+  font-weight: 700;
+  margin-left: 10px;
+}
+
+.rail {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+}
+
+.rail ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.rail a {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--ep-mist);
+  background: color-mix(in srgb, var(--ep-scrim) 60%, transparent);
+}
+
+.rail a[aria-current] {
+  background: var(--ep-portal);
+  border-color: var(--ep-portal);
+}
+
+.rail span {
+  position: absolute;
+  right: 34px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--ep-night);
+  color: var(--ep-chalk);
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rail a:hover span,
+.rail a:focus-visible span {
+  opacity: 1;
+}
+
+/* ---- The text layer ---- */
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- The hero ---- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  padding: 96px clamp(16px, 6vw, 96px) 9vh;
+}
+
+.heroCopy {
+  max-width: 720px;
+  text-shadow: 0 2px 18px color-mix(in srgb, var(--ep-scrim) 90%, transparent);
+}
+
+.name {
+  font-size: clamp(4rem, 11vw, 10.5rem);
+  letter-spacing: -0.01em;
+}
+
+.headline {
+  font: 700 clamp(1.3rem, 2.4vw, 1.9rem)/1.15 var(--ep-face), sans-serif;
+  color: var(--ep-portal);
+  margin: 14px 0 10px;
+}
+
+.tagline {
+  max-width: 60ch;
+  margin: 0 0 8px;
+}
+
+.line {
+  color: var(--ep-mist);
+  max-width: 60ch;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 22px 0 0;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--era-accent);
+  background: color-mix(in srgb, var(--ep-scrim) 55%, transparent);
+  color: var(--ep-chalk);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.pill:hover {
+  background: color-mix(in srgb, var(--era-accent) 22%, var(--ep-scrim));
+}
+
+.pillSolid {
+  background: var(--era-accent);
+  color: var(--ep-ink);
+}
+
+.pillSolid:hover {
+  background: var(--ep-chalk);
+}
+
+.pads {
+  margin-top: 28px;
+}
+
+.padsTitle {
+  margin: 0 0 10px;
+  color: var(--ep-mist);
+  font-size: 0.95rem;
+}
+
+.pads ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pad {
+  display: grid;
+  min-width: 150px;
+  padding: 10px 18px 12px;
+  color: var(--ep-chalk);
+  text-decoration: none;
+  text-shadow: none;
+  border-radius: 50% / 36%;
+  border: 3px solid var(--pad);
+  background: color-mix(in srgb, var(--ep-scrim) 70%, transparent);
+}
+
+.pad strong {
+  font: 900 1.35rem/1 var(--ep-face), sans-serif;
+}
+
+.pad span {
+  font-size: 0.9rem;
+  color: var(--ep-mist);
+}
+
+.pad:hover {
+  background: color-mix(in srgb, var(--pad) 25%, var(--ep-scrim));
+}
+
+.padEngineer {
+  --pad: var(--ep-pad-engineer);
+}
+
+.padDrummer {
+  --pad: var(--ep-pad-drummer);
+}
+
+.padFighter {
+  --pad: var(--ep-pad-fighter);
+}
+
+.wardrobe {
+  position: absolute;
+  right: clamp(16px, 8vw, 160px);
+  bottom: 14vh;
+}
+
+/* ---- A section: a tall head that holds the picture alone, then brings the title up, then the cards ---- */
+.era {
+  position: relative;
+  padding: 0 clamp(16px, 6vw, 96px) 70svh;
+}
+
+.head {
+  min-height: 125svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 12svh;
+  max-width: 900px;
+  text-shadow: 0 2px 22px color-mix(in srgb, var(--ep-scrim) 95%, transparent);
+}
+
+.plate {
+  margin: 0 0 10px;
+  font-weight: 600;
+  color: var(--era-accent);
+  font-size: 1.05rem;
+}
+
+.title {
+  font-size: clamp(3.6rem, 10vw, 9.5rem);
+  color: var(--ep-chalk);
+  text-shadow:
+    0 0 1px var(--era-accent),
+    0 4px 0 color-mix(in srgb, var(--era-accent) 55%, black),
+    0 8px 40px color-mix(in srgb, var(--ep-scrim) 90%, transparent);
+}
+
+.body {
+  width: min(600px, 44vw);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.techList > ul {
+  columns: 1;
+}
+
+.grid {
+  display: grid;
+  gap: 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A card is a postcard from the era: the era's night colour, a postmark stamp for its dates. The tech
+   stack's categories are the shared list's own items, so they take the card look from their place. */
+.card,
+.techList > ul > li {
+  position: relative;
+  margin: 0;
+  padding: 24px 26px;
+  list-style: none;
+  background: color-mix(in srgb, var(--era-card) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-accent) 40%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 60px -30px rgb(0 0 0 / 0.9),
+    inset 0 0 0 6px color-mix(in srgb, var(--era-card) 70%, black);
+}
+
+.techList > ul > li {
+  margin-bottom: 22px;
+  break-inside: avoid;
+}
+
+.cardTitle {
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  color: var(--ep-chalk);
+  padding-right: 120px;
+}
+
+.cardTitleWide {
+  padding-right: 0;
+}
+
+.card p {
+  margin: 10px 0 0;
+}
+
+.subhead {
+  margin: 18px 0 6px;
+  font-size: 1rem;
+  color: var(--era-accent);
+}
+
+.meta {
+  color: var(--ep-mist);
+}
+
+.meta strong {
+  color: var(--ep-chalk);
+}
+
+.role {
+  font-style: italic;
+  color: var(--ep-mist);
+}
+
+.impact strong {
+  color: var(--era-accent);
+}
+
+.card .stamp {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  max-width: 130px;
+  margin: 0;
+  padding: 6px 10px;
+  text-align: center;
+  border: 2px dashed var(--era-accent);
+  border-radius: 6px;
+  color: var(--era-accent);
+  font: 700 0.95rem/1.15 var(--ep-face), sans-serif;
+  letter-spacing: 0.02em;
+  transform: rotate(4deg);
+}
+
+.bullets {
+  margin: 8px 0 0;
+  padding-left: 1.1em;
+}
+
+.bullets li {
+  margin: 4px 0;
+}
+
+.bullets li::marker {
+  color: var(--era-accent);
+}
+
+.chips {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--era-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-accent) 45%, transparent);
+  font-size: 0.92rem;
+}
+
+.links a {
+  color: var(--ep-chalk);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.glyph {
+  font-size: 0.8em;
+  margin-right: 0.3em;
+}
+
+.lead {
+  border-width: 2px;
+}
+
+.card .bio {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.facts {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.fact {
+  display: grid;
+  gap: 2px;
+}
+
+.term {
+  color: var(--era-accent);
+  font-weight: 700;
+}
+
+.value {
+  margin: 0;
+}
+
+.stones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.stone {
+  padding: 16px 20px 16px 52px;
+}
+
+.stoneMark {
+  position: absolute;
+  left: 18px;
+  top: 20px;
+  width: 18px;
+  height: 24px;
+  border-radius: 9px 9px 3px 3px;
+  background: var(--era-accent);
+}
+
+.featured {
+  border: 2px solid var(--era-accent);
+}
+
+.beacon {
+  min-height: 150svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30svh clamp(16px, 6vw, 96px) 20svh;
+}
+
+.beaconCopy {
+  max-width: 760px;
+  text-align: center;
+  text-shadow: 0 2px 22px color-mix(in srgb, var(--ep-scrim) 95%, transparent);
+}
+
+.beaconCopy .actions {
+  justify-content: center;
+}
+
+.beaconLine {
+  margin: 18px auto 0;
+  font-size: 1.15rem;
+}
+
+.sign {
+  margin: 40px 0 0;
+  font: 900 1.8rem/1 var(--ep-face), sans-serif;
+  color: var(--era-accent);
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 40px;
+  text-align: center;
+  color: var(--ep-mist);
+  font-size: 0.9rem;
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .techList > ul {
+    columns: 2;
+    column-gap: 22px;
+  }
+
+  .grid .cardTitle {
+    padding-right: 0;
+    font-size: 1.9rem;
+  }
+}
+
+/* Phone: full width cards, the rail folds away (the ledger and the sections stay). */
+@media (max-width: 767.98px) {
+  .root {
+    font-size: 1rem;
+  }
+
+  .rail {
+    display: none;
+  }
+
+  .ledger {
+    padding: 10px 16px;
+    padding-right: 96px;
+  }
+
+  .ledgerText {
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    padding: 88px 16px 7svh;
+  }
+
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .wardrobe {
+    position: static;
+    margin-top: 24px;
+  }
+
+  .era {
+    padding: 0 16px 60svh;
+  }
+
+  .head {
+    min-height: 115svh;
+    padding-bottom: 10svh;
+  }
+
+  .body {
+    width: 100%;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  .stone {
+    padding-left: 52px;
+  }
+
+  .cardTitle {
+    padding-right: 0;
+  }
+
+  .card .stamp {
+    position: static;
+    display: inline-block;
+    margin: 0 0 12px;
+    transform: none;
+    max-width: none;
+  }
+}
+
+/* Reduced motion: each stage sits still at the top of its section, so the heads need one screen only. */
+.still .era {
+  isolation: isolate;
+  padding-bottom: 20svh;
+}
+
+.still .hero {
+  isolation: isolate;
+}
+
+.still .head {
+  min-height: 100svh;
+}
+
+/* The ledger follows the scroll engine, which does not run here. */
+.still .ledgerText {
+  display: none;
+}
+
+.still .beacon {
+  isolation: isolate;
+  min-height: 100svh;
+  padding-top: 10svh;
+}

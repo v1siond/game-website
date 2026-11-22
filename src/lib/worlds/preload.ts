@@ -26,6 +26,7 @@ const WORLD_IMPORTS: Record<string, readonly string[]> = {
   'survival-horror': ['@/components/themes/SurvivalHorrorTheme'],
   'neon-portals': ['@/components/themes/NeonPortalsTheme'],
   'soul-map': ['@/components/themes/SoulMapTheme'],
+  'adventure-paths': ['@/components/themes/AdventurePathsTheme'],
   'rubber-hose': ['@/components/themes/RubberHoseTheme'],
   'retro-rpg': ['@/components/themes/RetroRPGTheme'],
   'bold-noir': ['@/components/themes/BoldNoirTheme'],

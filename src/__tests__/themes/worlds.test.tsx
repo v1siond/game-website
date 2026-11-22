@@ -1,9 +1,10 @@
 import { themes } from '@/themes/themes'
 
-// Every world component and the shared stage are mocked so the suite checks the registry wiring, not 17 heavy layouts, and a
+// Every world component and the shared stage are mocked so the suite checks the registry wiring, not 18 heavy layouts, and a
 // world mid edit cannot break it. Each call is written out at the top level with a literal path and an
 // inline factory, because babel-jest hoists only those above the imports; a call inside a helper runs
 // after the imports and the real worlds load.
+jest.mock('@/components/themes/EraPostcardsTheme', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/themes/DarkFantasyTheme', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/themes/SurvivalHorrorTheme', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/themes/NeonPortalsTheme', () => ({ __esModule: true, default: () => null }))
