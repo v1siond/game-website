@@ -1,10 +1,18 @@
 import Link from 'next/link'
+import type { Labels } from '@/lib/cv/labels'
+import { BLOG_PATH } from '@/lib/blog/links'
 
 // The plain frame of /blog and its posts, the look of /cv: a white toolbar pinned to the top with the
 // way back, and the same links again where a page ends. The toolbar's right padding keeps its links
 // clear of the fixed Worlds button in the top right corner, as on /cv.
 
 export type BackLink = { href: string; label: string }
+
+/** The way back from a post or a missing one: every post, then the site. */
+export const blogBackLinks = (blog: Labels['blog']): BackLink[] => [
+  { href: BLOG_PATH, label: blog.allPosts },
+  { href: '/', label: blog.backHome },
+]
 
 const TOOLBAR_LINK =
   'flex min-h-11 items-center gap-2 rounded px-1 py-1 text-sm text-gray-700 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-800'

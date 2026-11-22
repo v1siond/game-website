@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import { jobYears, newTabName } from '@/lib/cv/sectionText'
+import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
@@ -63,14 +63,14 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
 // too narrow for the title to run beside the stamp, so there the title starts below it.
 export function RankCard({ entry, index }: { entry: Job; index: number }) {
   const { cards, years } = useLabels()
-  const { start, end } = jobYears(entry, years.present)
+  const span = jobSpanCompact(entry, years)
 
   return (
     <div className={world.rank} style={orderVars(index)}>
       <article className={`p-6 pt-14 sm:pt-9 ${world.slab} ${world.lift}`}>
         <p className={`absolute -top-1 right-4 ${world.stamp}`}>
           <span className={`block bg-[color:var(--noir-red-plate)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${world.stampRest}`}>
-            {start} - {end}
+            {span}
           </span>
         </p>
         <h3 className="text-3xl leading-none tracking-wide">{entry.title}</h3>

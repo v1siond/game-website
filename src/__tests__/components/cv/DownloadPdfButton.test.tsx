@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { renderWithCV as render } from '../../helpers/test-utils'
+import { renderWithCV as render, testCV } from '../../helpers/test-utils'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 
 // Mock html2pdf.js
@@ -16,6 +16,8 @@ jest.mock('html2pdf.js', () => ({
     save: mockSave,
   })),
 }))
+
+const { cvPage } = testCV().labels
 
 // The mocked save resolves at once, so the generating state is gone before a test can look at it; a test
 // about that state keeps save pending.
@@ -38,14 +40,14 @@ describe('DownloadPdfButton', () => {
   })
 
   describe('initial render', () => {
-    it('renders button with provided label', () => {
-      render(<DownloadPdfButton label="Download PDF" />)
+    it('renders the download label of the page language', () => {
+      render(<DownloadPdfButton contentId="cv-content" />)
 
-      expect(screen.getByRole('button')).toHaveTextContent('Download PDF')
+      expect(screen.getByRole('button')).toHaveTextContent(cvPage.downloadPdf)
     })
 
     it('renders download icon', () => {
-      render(<DownloadPdfButton label="Download CV" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       // Check for SVG icon (download icon path)
       const button = screen.getByRole('button')
@@ -54,9 +56,9 @@ describe('DownloadPdfButton', () => {
     })
 
     it('button is enabled by default', () => {
-      render(<DownloadPdfButton label="Download" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
-      expect(screen.getByRole('button')).not.toBeDisabled()
+      expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'false')
     })
   })
 
@@ -64,34 +66,34 @@ describe('DownloadPdfButton', () => {
     it('shows generating state when clicked', async () => {
       const user = userEvent.setup()
       holdSaveOpen()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       const button = screen.getByRole('button')
       await user.click(button)
 
-      // Should show "Generating..." text
       await waitFor(() => {
-        expect(screen.getByText(/Generating/i)).toBeInTheDocument()
+        expect(button).toHaveTextContent(cvPage.generating)
       })
     })
 
-    it('disables button while generating', async () => {
+    it('marks the button disabled while generating, keeping focus on it', async () => {
       const user = userEvent.setup()
       holdSaveOpen()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       const button = screen.getByRole('button')
       await user.click(button)
 
       await waitFor(() => {
-        expect(button).toBeDisabled()
+        expect(button).toHaveAttribute('aria-disabled', 'true')
       })
+      expect(button).toHaveFocus()
     })
 
     it('shows spinner animation while generating', async () => {
       const user = userEvent.setup()
       holdSaveOpen()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       const button = screen.getByRole('button')
       await user.click(button)
@@ -107,7 +109,7 @@ describe('DownloadPdfButton', () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const html2pdf = require('html2pdf.js').default
 
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.click(screen.getByRole('button'))
 
@@ -121,18 +123,17 @@ describe('DownloadPdfButton', () => {
 
     it('re-enables button after generation completes', async () => {
       const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       const button = screen.getByRole('button')
       await user.click(button)
 
       // Wait for generation to complete
       await waitFor(() => {
-        expect(button).not.toBeDisabled()
+        expect(button).toHaveAttribute('aria-disabled', 'false')
       })
 
-      // Should show original label again
-      expect(screen.getByText('Download PDF')).toBeInTheDocument()
+      expect(button).toHaveTextContent(cvPage.downloadPdf)
     })
   })
 
@@ -148,7 +149,7 @@ describe('DownloadPdfButton', () => {
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.click(screen.getByRole('button'))
 
@@ -166,7 +167,7 @@ describe('DownloadPdfButton', () => {
       // Make save throw an error
       mockSave.mockRejectedValueOnce(new Error('PDF generation failed'))
 
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.click(screen.getByRole('button'))
 
@@ -176,7 +177,7 @@ describe('DownloadPdfButton', () => {
 
       // Button should be re-enabled after error
       await waitFor(() => {
-        expect(screen.getByRole('button')).not.toBeDisabled()
+        expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'false')
       })
 
       consoleSpy.mockRestore()
@@ -187,14 +188,14 @@ describe('DownloadPdfButton', () => {
     it('button is keyboard accessible', async () => {
       const user = userEvent.setup()
       holdSaveOpen()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       // Tab to button and press Enter
       await user.tab()
       await user.keyboard('{Enter}')
 
       await waitFor(() => {
-        expect(screen.getByText(/Generating/i)).toBeInTheDocument()
+        expect(screen.getByRole('button')).toHaveTextContent(cvPage.generating)
       })
     })
   })

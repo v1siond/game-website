@@ -5,7 +5,7 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, newTabName } from '@/lib/cv/sectionText'
+import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { MONO, PIXEL } from './palette'
@@ -61,7 +61,7 @@ const lineDelay = (index: number) => ({ '--show-delay': `${LINE_START_MS + index
 // Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { cards, years } = useLabels()
-  const { start, end } = jobYears(entry, years.present)
+  const span = jobSpanCompact(entry, years)
   const { ref, play } = usePlay(LINE_START_MS + entry.highlights.length * LINE_GAP_MS + 600)
 
   return (
@@ -78,7 +78,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
             <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={entry.company} /></p>
           </div>
           <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
-            {start} - {end}
+            {span}
           </span>
         </div>
         {entry.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{entry.description}</p>}

@@ -1,34 +1,58 @@
-'use client'
-
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
-import { useCVData } from '@/components/cv/CVDataProvider'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { venturesFor } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Locale } from '@/i18n/config'
+import type { CVData } from '@/lib/cv/content'
+import { CVSection } from './CVSection'
+
+// The element the PDF button turns into the PDF.
+const CV_CONTENT_ID = 'cv-content'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
-/** The CV of the page's language; the language switch goes to the same CV in another one. */
-export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
-  const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } =
-    useCVData()
+// The page's print rules (colours kept, links plain, the page margin) as a plain style element, since
+// styled-jsx runs only in a client component and this one renders on the server.
+const PRINT_STYLES = `
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .print\\:hidden {
+      display: none !important;
+    }
+    .print\\:px-0 {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .print\\:py-0 {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    a {
+      text-decoration: none !important;
+    }
+  }
+  @page {
+    margin: 0.5in;
+  }
+`
+
+/** The CV of the page's language, rendered on the server; the language switch goes to the same CV in
+ *  another one, and the toolbar's two controls are the page's only client parts. */
+export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale }>) {
+  const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } = cv
   const { cvPage } = labels
   const ventures = venturesFor(companies)
 
-  // A running job has no end date, so it ends in the label for now.
-  const yearRange = (job: (typeof workExperience)[number]): string => {
-    const { start, end } = jobYears(job, labels.years.present)
-    return `${start} - ${end}`
-  }
-
-  // Find company URL by slug matching role slug
+  // A current role links the venture of the same slug.
   const getCompanyUrl = (roleSlug: string): string | undefined => {
     const company = companies.find((c) => c.slug === roleSlug)
     return company?.url
@@ -55,24 +79,21 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           </Link>
           <div className="flex flex-wrap items-center gap-4">
             <LanguageSwitcher locale={locale} />
-            <DownloadPdfButton label={cvPage.downloadPdf} />
+            <DownloadPdfButton contentId={CV_CONTENT_ID} />
           </div>
         </div>
       </nav>
 
       {/* CV Content - this is what gets converted to PDF */}
       <main
-        id="cv-content"
+        id={CV_CONTENT_ID}
         className="max-w-[850px] mx-auto px-4 py-8 sm:px-8 bg-white text-black font-sans [--focus-ring:#2563eb] scroll-mt-32 sm:scroll-mt-20 [&_header]:scroll-mt-32 [&_section]:scroll-mt-32 sm:[&_header]:scroll-mt-20 sm:[&_section]:scroll-mt-20 print:px-0 print:py-0"
       >
-        {/* Header / Contact */}
         <header className="border-b-2 border-black pb-4 mb-6">
           <h1 className="text-[clamp(1.75rem,8vw,1.875rem)] font-bold mb-1">
             <NameWords name={fullName} />
           </h1>
-          {professionalSummary && (
-            <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
-          )}
+          <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]">
             <span>{contact.email}</span>
             <span aria-hidden="true">|</span>
@@ -87,36 +108,22 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           <p className="text-sm text-gray-600">{contact.availability}</p>
         </header>
 
-        {/* Professional Summary */}
-        {professionalSummary && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.professionalSummary}
-            </h2>
-            <p className="text-sm leading-relaxed">{professionalSummary.bio}</p>
-          </section>
-        )}
+        <CVSection title={cvPage.professionalSummary}>
+          <p className="text-sm leading-relaxed">{professionalSummary.bio}</p>
+        </CVSection>
 
-        {/* Core Competencies */}
-        {professionalSummary && professionalSummary.highlights.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.coreCompetencies}
-            </h2>
+        {professionalSummary.highlights.length > 0 && (
+          <CVSection title={cvPage.coreCompetencies}>
             <ul className="text-sm list-disc list-inside columns-1 sm:columns-2 gap-8">
               {professionalSummary.highlights.map((h, i) => (
                 <li key={i}>{h}</li>
               ))}
             </ul>
-          </section>
+          </CVSection>
         )}
 
-        {/* Current Positions */}
         {currentRoles.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.currentPositions}
-            </h2>
+          <CVSection title={cvPage.currentPositions}>
             {currentRoles.map((role) => {
               const companyUrl = getCompanyUrl(role.slug)
               return (
@@ -133,15 +140,11 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 </div>
               )
             })}
-          </section>
+          </CVSection>
         )}
 
-        {/* Key projects */}
         {featuredProjects.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.keyProjects}
-            </h2>
+          <CVSection title={cvPage.keyProjects}>
             {featuredProjects.map((project) => (
               <div key={project.id} className="mb-4">
                 <h3 className="text-base font-semibold">
@@ -161,13 +164,12 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 )}
               </div>
             ))}
-          </section>
+          </CVSection>
         )}
 
         {/* Ventures: his own products first, each marked, then the companies he works through */}
         {ventures.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">{labels.sections.ventures}</h2>
+          <CVSection title={labels.sections.ventures}>
             {ventures.map((venture) => (
               <div key={venture.id} className="mb-4">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -190,15 +192,11 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 </a>
               </div>
             ))}
-          </section>
+          </CVSection>
         )}
 
-        {/* Technical Skills */}
         {techStack.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.technicalSkills}
-            </h2>
+          <CVSection title={cvPage.technicalSkills}>
             <ul className={`text-sm ${MASONRY_LIST}`}>
               {techStack.map((category) => (
                 <li key={category.id} className={MASONRY_ITEM}>
@@ -207,15 +205,12 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 </li>
               ))}
             </ul>
-          </section>
+          </CVSection>
         )}
 
         {/* Services: one masonry list, each service its title, description and use cases, then the next step for a buyer */}
         {services.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {labels.sections.services}
-            </h2>
+          <CVSection title={labels.sections.services}>
             <ul className={`text-sm ${MASONRY_LIST}`}>
               {services.map((service) => (
                 <li key={service.id} className={MASONRY_ITEM}>
@@ -238,27 +233,21 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 {labels.actions.emailMe}
               </a>
             </p>
-          </section>
+          </CVSection>
         )}
 
-        {/* Professional Experience */}
         {workExperience.length > 0 && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.professionalExperience}
-            </h2>
+          <CVSection title={cvPage.professionalExperience}>
             {workExperience.map((exp) => (
               <div key={exp.id} className="mb-4">
                 <div className="flex flex-wrap justify-between items-baseline gap-x-4">
                   <h3 className="text-base font-semibold">{exp.title}</h3>
-                  <span className="text-sm text-gray-600">
-                    {yearRange(exp)}
-                  </span>
+                  <span className="text-sm text-gray-600">{jobSpanCompact(exp, labels.years)}</span>
                 </div>
                 <p className="text-sm italic text-gray-700">
                   <SlashBreaks text={exp.company} />
                 </p>
-                {exp.highlights && exp.highlights.length > 0 && (
+                {exp.highlights.length > 0 && (
                   <ul className="text-sm list-disc list-inside mt-1 space-y-1">
                     {exp.highlights.map((highlight, i) => (
                       <li key={i}>{highlight}</li>
@@ -267,46 +256,15 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 )}
               </div>
             ))}
-          </section>
+          </CVSection>
         )}
 
-        {/* Education and the languages he speaks */}
-        {professionalSummary && (
-          <section className="mb-6">
-            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {cvPage.education}
-            </h2>
-            <p className="text-sm">{professionalSummary.education}</p>
-            <p className="text-sm">{professionalSummary.languages}</p>
-          </section>
-        )}
+        <CVSection title={cvPage.education}>
+          <p className="text-sm">{professionalSummary.education}</p>
+          <p className="text-sm">{professionalSummary.languages}</p>
+        </CVSection>
 
-        {/* Print styles */}
-        <style jsx global>{`
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .print\\:hidden {
-              display: none !important;
-            }
-            .print\\:px-0 {
-              padding-left: 0;
-              padding-right: 0;
-            }
-            .print\\:py-0 {
-              padding-top: 0;
-              padding-bottom: 0;
-            }
-            a {
-              text-decoration: none !important;
-            }
-          }
-          @page {
-            margin: 0.5in;
-          }
-        `}</style>
+        <style>{PRINT_STYLES}</style>
       </main>
     </>
   )

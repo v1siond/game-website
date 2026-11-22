@@ -10,8 +10,11 @@ export const MARK_GRID = 16
 /** The tile behind the face, also the manifest's theme colour. */
 export const MARK_BACKGROUND = '#0a0a0a'
 
+/** The light outline around the face, also the text colour of the link preview drawn beside it. */
+export const MARK_OUTLINE = '#f2efe6'
+
 const MARK_COLOURS: Record<string, string> = {
-  O: '#f2efe6',
+  O: MARK_OUTLINE,
   H: HERO_IDENTITY.hair,
   S: HERO_IDENTITY.skin,
   s: HERO_IDENTITY.skinShade,

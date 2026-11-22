@@ -1,15 +1,17 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
+import { useYearNow } from '@/hooks/useYearNow'
 import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
+import { INTRO_ATTR } from '@/themes/introFlag'
 import { TRAIL_VARS } from './AdventurePaths/palette'
 import { MapDefs } from './AdventurePaths/art'
 import { ExpeditionHero } from './AdventurePaths/hero'
@@ -32,13 +34,26 @@ import map from './AdventurePaths/map.module.css'
 // The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): the
 // browser only parts start in effects (the hub map's entrance timeline, his walk, the pointer tilt), and
 // under reduced motion the server drawn map shows its resting frame through CSS until the client sets it.
+// The entrance hides its pieces only under INTRO_ATTR on <html> (introFlag.ts), so the server HTML is the
+// finished map for a visitor with no JavaScript.
+
+// A client side navigation to the home page never runs the page's inline script, so the world marks the
+// entrance itself before its first paint (a layout effect), and the entrance plays as on a full load.
+function useIntroMark() {
+  useLayoutEffect(() => {
+    if (prefersReducedMotion()) return
+    document.documentElement.setAttribute(INTRO_ATTR, '')
+  }, [])
+}
 
 export default function AdventurePathsTheme() {
+  useIntroMark()
   const { active } = useProfession()
   const view = useWorldView()
   const { fullName } = useCVData()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
+  const year = useYearNow()
   const pointerRef = usePointerVars(!reducedMotion)
   const [zone, setZone] = useState<Zone>('plains')
   const onZone = useCallback((next: Zone) => setZone(next), [])
@@ -76,7 +91,7 @@ export default function AdventurePathsTheme() {
         <RecruiterHero
           render={({ name }) => (
             <p className="inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-sm text-white">
-              © {new Date().getFullYear()} <NameWords name={name} />
+              © {year} <NameWords name={name} />
             </p>
           )}
         />

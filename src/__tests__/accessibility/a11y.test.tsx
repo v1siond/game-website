@@ -30,20 +30,20 @@ describe('Accessibility Tests', () => {
     })
 
     it('has accessible button role', () => {
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       expect(screen.getByRole('button')).toBeInTheDocument()
     })
 
     it('has descriptive button text', () => {
-      render(<DownloadPdfButton label="Download CV as PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
-      expect(screen.getByRole('button')).toHaveTextContent('Download CV as PDF')
+      expect(screen.getByRole('button')).toHaveTextContent(cvPage.downloadPdf)
     })
 
     it('is keyboard focusable', async () => {
       const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.tab()
 
@@ -52,36 +52,38 @@ describe('Accessibility Tests', () => {
 
     it('can be activated with keyboard', async () => {
       const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       const button = screen.getByRole('button')
       button.focus()
 
       await user.keyboard('{Enter}')
 
-      // Button should be disabled during generation
-      expect(button).toBeDisabled()
+      // Marked disabled during generation, focus kept on it
+      expect(button).toHaveAttribute('aria-disabled', 'true')
+      expect(button).toHaveFocus()
     })
 
     it('provides visual feedback during loading', async () => {
       const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.click(screen.getByRole('button'))
 
-      // Should show loading state
-      expect(screen.getByText(/Generating/i)).toBeInTheDocument()
+      // The busy text is in the button and in the polite live region a screen reader announces
+      expect(screen.getByRole('button')).toHaveTextContent(cvPage.generating)
+      expect(document.querySelector('[aria-live="polite"]')).toHaveTextContent(cvPage.generating)
     })
 
     it('disabled state is properly communicated', async () => {
       const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
+      render(<DownloadPdfButton contentId="cv-content" />)
 
       await user.click(screen.getByRole('button'))
 
       const button = screen.getByRole('button')
-      expect(button).toBeDisabled()
-      expect(button).toHaveAttribute('disabled')
+      expect(button).toHaveAttribute('aria-disabled', 'true')
+      expect(button).not.toHaveAttribute('disabled')
     })
   })
 
@@ -129,7 +131,7 @@ describe('Accessibility Tests', () => {
     it('buttons have button role', () => {
       render(
         <div>
-          <DownloadPdfButton label="Download" />
+          <DownloadPdfButton contentId="cv-content" />
         </div>
       )
 

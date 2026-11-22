@@ -24,7 +24,10 @@
 
 /* ---------------------------------------------------------------------------------------------------
  * The hub map: unrolled on arrival, inked, the trail dotted in, then he walks to his landmark.
- * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx).
+ * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx). A phase hides
+ * its pieces only under html[data-intro], set before the first paint when the entrance will play
+ * (src/themes/introFlag.ts), so with no JavaScript or under reduced motion the server HTML is the
+ * finished map. The marker is the exception: it stays hidden until the client places him.
  * ------------------------------------------------------------------------------------------------- */
 
 /* The map held in two hands: it leans a few degrees toward the pointer. */
@@ -39,7 +42,7 @@
   transition: transform 1100ms var(--glide);
 }
 
-[data-unrolled='false'] .cover {
+:global(html[data-intro]) [data-unrolled='false'] .cover {
   transform: none;
   transition: none;
 }
@@ -51,7 +54,7 @@
     transform 380ms var(--pop) calc(var(--i, 0) * 90ms);
 }
 
-[data-inked='false'] .inked {
+:global(html[data-intro]) [data-inked='false'] .inked {
   opacity: 0;
   transform: translate3d(0, 10px, 0);
   transition: none;
@@ -63,7 +66,7 @@
   transition: opacity 260ms ease-out calc((var(--leg, 0) + var(--at, 0)) * var(--trail-ms, 560ms));
 }
 
-[data-trailed='false'] .dot {
+:global(html[data-intro]) [data-trailed='false'] .dot {
   opacity: 0;
   transition: none;
 }
@@ -78,7 +81,7 @@
   transition: opacity 260ms ease-out;
 }
 
-[data-trailed='false'] .tileLit {
+:global(html[data-intro]) [data-trailed='false'] .tileLit {
   opacity: 0;
   transition: none;
 }
@@ -91,7 +94,7 @@
     opacity 200ms ease-out;
 }
 
-[data-inked='false'] .plaque {
+:global(html[data-intro]) [data-inked='false'] .plaque {
   opacity: 0;
   transform: translate3d(0, -40px, 0) rotate(-6deg);
   transition: none;
@@ -534,23 +537,5 @@
   .landmark,
   .ring {
     transition: none;
-  }
-
-  /* The server draws the hub map before its phases are set; under reduced motion it shows the map
-   * unrolled, inked and dotted from the first paint instead of waiting for the client to set them.
-   * The marker stays hidden until the client places him at his landmark. */
-  [data-unrolled='false'] .cover {
-    transform: translate3d(101%, 0, 0);
-  }
-
-  [data-inked='false'] .inked,
-  [data-inked='false'] .plaque {
-    opacity: 1;
-    transform: none;
-  }
-
-  [data-trailed='false'] .dot,
-  [data-trailed='false'] .tileLit {
-    opacity: 1;
   }
 }

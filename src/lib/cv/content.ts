@@ -203,6 +203,32 @@ export type CVData = Omit<CVContent, 'workExperience' | 'currentRoles' | 'compan
   labels: Labels
 }
 
+/**
+ * The CV a world reads: CVData without what only /cv prints (the key projects list, the current roles,
+ * the services' use cases, his website), so the home page's payload carries none of it and tsc stops a
+ * world that reads one.
+ */
+export type WorldCV = Omit<CVData, 'featuredProjects' | 'currentRoles' | 'services' | 'contact'> & {
+  contact: Omit<Contact, 'website'>
+  services: Array<Omit<Service, 'useCases'>>
+}
+
+/** The world's part of a loaded CV, field by field, for the page to hand to the client. */
+export const worldCV = (cv: CVData): WorldCV => ({
+  fullName: cv.fullName,
+  professionalSummary: cv.professionalSummary,
+  contact: { email: cv.contact.email, linkedin: cv.contact.linkedin, availability: cv.contact.availability, line: cv.contact.line },
+  workExperience: cv.workExperience,
+  projects: cv.projects,
+  musician: cv.musician,
+  bands: cv.bands,
+  martialArts: cv.martialArts,
+  techStack: cv.techStack,
+  companies: cv.companies,
+  services: cv.services.map(({ id, title, line }) => ({ id, title, line })),
+  labels: cv.labels,
+})
+
 // A key missing from the locale block keeps its English value, so a half translated file still renders.
 const sectionFor = <Section extends object>(file: LocalisedFile<Section>, locale: Locale): Section => {
   const translated: Partial<Section> = file[locale] ?? {}

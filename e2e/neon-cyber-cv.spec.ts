@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test, expect, type Locator, type Page } from '@playwright/test'
 import { cvDataFrom, type CVContentFiles, CV_CONTENT_FILES } from '../src/lib/cv/content'
-import { viewFor } from '../src/lib/cv/cvView'
+import { viewFor, yearOf } from '../src/lib/cv/cvView'
 
 // The Neon Cyber world against the content files: what the page shows is what content/cv holds, read
 // through the same view a world reads, so an edit at /admin never needs this file changed.
@@ -16,7 +16,7 @@ const contentFiles = Object.fromEntries(
   ]),
 ) as CVContentFiles
 const cv = cvDataFrom(contentFiles, 'en')
-const viewOf = (profession: string) => viewFor(cv, profession, 'world')
+const viewOf = (profession: string) => viewFor(cv, profession, 'world', yearOf(new Date()))
 
 const hero = viewOf('engineer').hero
 

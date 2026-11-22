@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllCVData } from '@/lib/cv-data'
 import type { Labels } from '@/lib/cv/labels'
-import { listPosts } from '@/lib/blog/posts'
+import { blogOptions, listPosts } from '@/lib/blog/posts'
 import { postPath } from '@/lib/blog/links'
 import { shownDate, type Post } from '@/lib/blog/post'
 import { blogMetadata } from '@/lib/seo'
@@ -42,7 +42,7 @@ function PostList({ posts, blog }: Readonly<{ posts: Post[]; blog: Labels['blog'
 
 // Every post the build shows, newest first (drafts only on the dev server), from content/blog.
 export default async function BlogIndex() {
-  const [cv, posts] = await Promise.all([getAllCVData('en'), listPosts({ env: process.env.NODE_ENV })])
+  const [cv, posts] = await Promise.all([getAllCVData('en'), listPosts(blogOptions())])
   const { blog, sections, navigation } = cv.labels
 
   return (
