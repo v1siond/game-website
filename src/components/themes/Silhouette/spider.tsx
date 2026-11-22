@@ -39,23 +39,31 @@ function blade(a: Point, b: Point, wa: number, wb: number): string {
 
 const at = (x: number, y: number): Point => ({ x, y })
 
-const FORELEG: Leg = { hip: at(116, 104), knee: at(152, 28), tip: at(222, GROUND) }
-
-// Near legs behind the foreleg, front to back.
-const NEAR_LEGS: readonly Leg[] = [
-  { hip: at(106, 100), knee: at(124, 20), tip: at(176, GROUND) },
-  { hip: at(90, 96), knee: at(62, 16), tip: at(40, GROUND) },
-  { hip: at(80, 100), knee: at(34, 36), tip: at(6, GROUND) },
-]
-
-const FAR_LEGS: readonly Leg[] = [
-  { hip: at(110, 98), knee: at(140, 36), tip: at(200, GROUND) },
-  { hip: at(86, 96), knee: at(50, 28), tip: at(22, GROUND) },
-]
-
 const THIGH = 4.2
 const KNEE = 2.4
 const TIP = 0.4
+
+// A leg with its two blades' paths, worked out once at load: the legs never change shape, only turn.
+interface ShapedLeg extends Leg {
+  thigh: string
+  shin: string
+}
+
+const shaped = (leg: Leg): ShapedLeg => ({ ...leg, thigh: blade(leg.hip, leg.knee, THIGH, KNEE), shin: blade(leg.knee, leg.tip, KNEE, TIP) })
+
+const FORELEG = shaped({ hip: at(116, 104), knee: at(152, 28), tip: at(222, GROUND) })
+
+// Near legs behind the foreleg, front to back.
+const NEAR_LEGS: readonly ShapedLeg[] = [
+  { hip: at(106, 100), knee: at(124, 20), tip: at(176, GROUND) },
+  { hip: at(90, 96), knee: at(62, 16), tip: at(40, GROUND) },
+  { hip: at(80, 100), knee: at(34, 36), tip: at(6, GROUND) },
+].map(shaped)
+
+const FAR_LEGS: readonly ShapedLeg[] = [
+  { hip: at(110, 98), knee: at(140, 36), tip: at(200, GROUND) },
+  { hip: at(86, 96), knee: at(50, 28), tip: at(22, GROUND) },
+].map(shaped)
 
 // The lump: a big abdomen behind, the smaller head and thorax in front, a ragged underside.
 const BODY =
@@ -69,24 +77,24 @@ const DUST = [at(-6, -2), at(0, -5), at(6, -1), at(-3, -9), at(4, -11)]
 
 const joint = (point: Point) => `${point.x}px ${point.y}px`
 
-function LegShape({ leg, fill }: { leg: Leg; fill: string }) {
+function LegShape({ leg, fill }: { leg: ShapedLeg; fill: string }) {
   return (
     <>
-      <path d={blade(leg.hip, leg.knee, THIGH, KNEE)} fill={fill} />
+      <path d={leg.thigh} fill={fill} />
       <circle cx={leg.knee.x} cy={leg.knee.y} r={KNEE} fill={fill} />
-      <path d={blade(leg.knee, leg.tip, KNEE, TIP)} fill={fill} />
+      <path d={leg.shin} fill={fill} />
     </>
   )
 }
 
 // A moving leg: the thigh turns round the hip and carries the shin, which turns round the knee.
-function MovingLeg({ leg, className, kneeClassName = '', index }: { leg: Leg; className: string; kneeClassName?: string; index: number }) {
+function MovingLeg({ leg, className, kneeClassName = '', index }: { leg: ShapedLeg; className: string; kneeClassName?: string; index: number }) {
   return (
     <g className={`${spider.hip} ${className}`} style={{ '--hip': joint(leg.hip), '--i': index } as CSSProperties}>
-      <path d={blade(leg.hip, leg.knee, THIGH, KNEE)} fill={SHADE.black} />
+      <path d={leg.thigh} fill={SHADE.black} />
       <circle cx={leg.knee.x} cy={leg.knee.y} r={KNEE} fill={SHADE.black} />
       <g className={`${spider.knee} ${kneeClassName}`} style={{ '--knee': joint(leg.knee) } as CSSProperties}>
-        <path d={blade(leg.knee, leg.tip, KNEE, TIP)} fill={SHADE.black} />
+        <path d={leg.shin} fill={SHADE.black} />
       </g>
     </g>
   )
@@ -150,10 +158,10 @@ export const TORN_SHIN = blade(at(0, 0), at(62, -26), 3.2, TIP)
 
 // Only its two forelegs, reaching down over a cliff edge from the body above it: viewBox 120 by 80, the
 // hips above the top edge, the knees bent out to each side, the needle tips at the bottom.
-const REACH: readonly Leg[] = [
+const REACH: readonly ShapedLeg[] = [
   { hip: at(58, -12), knee: at(26, 22), tip: at(46, 78) },
   { hip: at(66, -12), knee: at(98, 26), tip: at(80, 76) },
-]
+].map(shaped)
 
 export function ReachingLegs({ className = '' }: { className?: string }) {
   return (
