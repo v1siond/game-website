@@ -663,6 +663,30 @@ collections:
                   - { <<: *text, label: "Tally masks", name: tallyMasks }
                   - { <<: *text, label: "Tally line", name: tallyLine, hint: 'Keep {name} {count} {total}' }
                   - { <<: *text, label: "Dance again", name: danceAgain }
+              - label: Era postcards world (era-postcards)
+                name: eras
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Hub place", name: placeHero }
+                  - { <<: *text, label: "About place", name: placeAbout }
+                  - { <<: *text, label: "Work place", name: placeWork }
+                  - { <<: *text, label: "Tech place", name: placeTech }
+                  - { <<: *text, label: "Services place", name: placeServices }
+                  - { <<: *text, label: "Projects place", name: placeProjects }
+                  - { <<: *text, label: "Ventures place", name: placeVentures }
+                  - { <<: *text, label: "Bands place", name: placeBands }
+                  - { <<: *text, label: "Muay Thai place", name: placeMuayThai }
+                  - { <<: *text, label: "Contact place", name: placeContact }
+                  - { <<: *text, label: "Gate plate", name: gate, hint: 'Keep {number} {total} {place}' }
+                  - { <<: *text, label: "About count", name: countAbout, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Work count", name: countWork, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Tech count", name: countTech, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Services count", name: countServices, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Projects count", name: countProjects, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Ventures count", name: countVentures, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Bands count", name: countBands, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Muay Thai count", name: countMuayThai, hint: 'Keep {count} {total}' }
               - label: Bonfire world (soul-map)
                 name: souls
                 widget: object
