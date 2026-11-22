@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
@@ -41,11 +41,14 @@ const slotFor = (project: Project, labels: Labels): ProjectSlot => ({
 
 export function ProjectList({ projects, renderProject, className, itemClassName }: ProjectListProps) {
   const labels = useLabels()
+  // One slot object per project for as long as the projects and labels stay, so a memo card fed a slot
+  // skips the parent's unrelated renders.
+  const slots = useMemo(() => projects.map((project) => slotFor(project, labels)), [projects, labels])
   return (
     <ul className={className}>
-      {projects.map((project) => (
-        <li key={project.id} className={itemClassName}>
-          {renderProject(slotFor(project, labels))}
+      {slots.map((slot) => (
+        <li key={slot.project.id} className={itemClassName}>
+          {renderProject(slot)}
         </li>
       ))}
     </ul>

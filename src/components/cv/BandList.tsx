@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
@@ -30,11 +30,14 @@ const slotFor = (band: Band, labels: Labels): BandSlot => ({
 
 export function BandList({ bands, renderBand, className, itemClassName }: BandListProps) {
   const labels = useLabels()
+  // One slot object per band for as long as the bands and labels stay, so a memo card fed a slot skips
+  // the parent's unrelated renders.
+  const slots = useMemo(() => bands.map((band) => slotFor(band, labels)), [bands, labels])
   return (
     <ul className={className}>
-      {bands.map((band) => (
-        <li key={band.id} className={itemClassName}>
-          {renderBand(slotFor(band, labels))}
+      {slots.map((slot) => (
+        <li key={slot.band.id} className={itemClassName}>
+          {renderBand(slot)}
         </li>
       ))}
     </ul>
