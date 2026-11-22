@@ -6,6 +6,8 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
 import { useScrollScene } from '@/hooks/useScrollScene'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroCharacter, type SpritePose } from './character'
 import { GiantSpider } from './spider'
@@ -25,7 +27,8 @@ import shade from './shade.module.css'
 // The spider, lame since the trap line, lurks at the left edge and flinches back when the jaws snap.
 // Reduced motion skips the run and the snap.
 //
-// Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean, the spider.
+// Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean, the spider. Their
+// loops wait until the scene shows and play once; a sprung trap plays its own beats.
 
 type Trap = 'ready' | 'run' | 'snap' | 'respawn'
 
@@ -59,9 +62,10 @@ const FENCE_POSTS = [120, 200, 280, 360, 440]
 function ClearingScene({ profession, trap }: { profession: Profession; trap: Trap }) {
   const light = PROFESSION_SKY[profession]
   const shut = trap === 'snap' ? shade.jawShut : ''
+  const { ref, triggered } = useSectionTrigger()
 
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden border-2 border-[color:var(--sh-black)]" aria-hidden="true">
+    <div ref={ref} className={`relative aspect-[16/10] w-full overflow-hidden border-2 border-[color:var(--sh-black)] ${heldUntil(triggered)}`} aria-hidden="true">
       <Sky light={light} />
       <Layer depth="far">
         <path d="M0 176 V150 H130 V130 H230 V146 H300 V120 H380 V140 H470 V126 H600 V176 Z" fill={light.far} />

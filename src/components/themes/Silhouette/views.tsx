@@ -7,6 +7,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { AboutSlab, SectionHeader } from './cards'
 import { ChaseAbout } from './chase'
 import { HangingJobs } from './ropes'
@@ -27,13 +29,15 @@ import world from './world.module.css'
 // Artist's record sits in the gravity room. The shared section plan picks which a profession shows and in
 // which order.
 
-// A section titled from the labels by its key.
+// A section titled from the labels by its key. Its set piece's loops wait on their first frame until the
+// section shows, then play once (heldUntil).
 function Block({ titleKey, wide = false, children }: { titleKey: keyof Labels['sections']; wide?: boolean; children: ReactNode }) {
   const { sections } = useLabels()
+  const { ref, triggered } = useSectionTrigger()
   const title = sections[titleKey]
   const id = headingId('silhouette', title)
   return (
-    <section className="relative px-4 py-10 sm:px-6" aria-labelledby={id}>
+    <section ref={ref} className={`relative px-4 py-10 sm:px-6 ${heldUntil(triggered)}`} aria-labelledby={id}>
       <div className={`mx-auto ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
         <SectionHeader id={id} title={title} />
         {children}

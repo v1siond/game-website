@@ -41,7 +41,7 @@ const POSE: Record<WakePhase, SpritePose> = {
   iris: 'lie',
   rise: 'rise',
   title: 'rise',
-  done: 'idle',
+  done: 'stand',
 }
 
 const SHOWN: Record<WakePhase, boolean> = { dark: false, iris: false, rise: false, title: true, done: true }

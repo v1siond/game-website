@@ -3,7 +3,10 @@
  * place, the wake iris, the lever and the rotating room, the spider chase, the trap line, the rope down
  * the chasm, the floating crates and the waterline, the sawmill, the rooftop signs and their cable, the
  * electrified floor, the gravity switch and the trap at the city's edge. Transform and opacity only;
- * every loop stops under reduced motion, and every reveal shows its last frame. The pointer arrives as
+ * every loop plays a set number of times inside 5 s of its section showing (the section holds it until
+ * then) and rests on the frame it started from, a long turn or drift plays only its first 5 s at its own
+ * speed (a fractional count) and holds there, every loop stops under reduced motion, and every reveal
+ * shows its last frame. The pointer arrives as
  * --mx and --my (-1 to 1, usePointerVars on the world root), a reveal's order as --i, set on the element.
  */
 
@@ -53,17 +56,17 @@
 
 .spin {
   transform-origin: center;
-  animation: spin 18s linear infinite;
+  animation: spin 18s linear 0.27 forwards;
 }
 
 .spinBack {
   transform-origin: center;
-  animation: spin 9s linear infinite reverse;
+  animation: spin 9s linear 0.54 reverse forwards;
 }
 
 .piston {
   transform-origin: center bottom;
-  animation: piston 2.4s ease-in-out infinite;
+  animation: piston 2.4s ease-in-out 2 forwards;
 }
 
 .lampSwing,
@@ -73,37 +76,38 @@
 }
 
 .lampSwing {
-  animation: swing-small 4.2s ease-in-out infinite;
+  animation: swing-small 4.2s ease-in-out 1 forwards;
 }
 
 .ropeSway {
-  animation: swing-small 6s ease-in-out infinite;
+  animation: swing-small 4.8s ease-in-out 1 forwards;
 }
 
 .bagSwing {
-  animation: bag-swing 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  animation: bag-swing 1.8s cubic-bezier(0.3, 0, 0.2, 1) 2 forwards;
 }
 
 .lampFlicker {
-  animation: flicker 5s steps(1, end) infinite;
+  animation: flicker 5s steps(1, end) 1 forwards;
 }
 
 .screenGlow {
-  animation: screen-glow 2.6s ease-in-out infinite;
+  animation: screen-glow 2.6s ease-in-out 1 forwards;
 }
 
 .cymbal {
   transform-origin: center;
-  animation: cymbal 0.5s ease-out infinite;
+  animation: cymbal 0.5s ease-out 9 forwards;
 }
 
+/* The birds fly in from the left at their own speed and stop where they are drawn, a fifth of the way. */
 .birds {
-  animation: birds 22s linear infinite;
+  animation: birds 22s linear 0.2 forwards;
 }
 
 .sway {
   transform-origin: center bottom;
-  animation: swing-small 3.4s ease-in-out infinite;
+  animation: swing-small 3.4s ease-in-out 1 forwards;
 }
 
 @keyframes spin {
@@ -132,7 +136,7 @@
   }
 }
 
-/* The bag takes his kick at the kick's peak (52% of the same 1.8s) and swings away. */
+/* The bag takes his kick at the kick's peak (52% of the same 1.8s, twice) and swings away. */
 @keyframes bag-swing {
   0%,
   50%,
@@ -364,7 +368,7 @@
 /* ---- the floating crates (crates.tsx): each bobs on its ripple, out of step with the next ---- */
 
 .bob {
-  animation: bob 3.6s ease-in-out calc(var(--i, 0) * -0.9s) infinite;
+  animation: bob 3.6s ease-in-out calc(var(--i, 0) * -0.9s) 1 forwards;
 }
 
 @keyframes bob {
@@ -383,7 +387,7 @@
   transform: translateX(calc(var(--scene-progress, 0) * 100%));
 }
 
-/* ---- the sawmill (mill.tsx): the carriage runs the rail once, the blade spins ---- */
+/* ---- the sawmill (mill.tsx): the carriage runs the rail once, the blade spins four turns ---- */
 
 .carriage {
   transform: translate3d(0, 0, 0);
@@ -397,7 +401,7 @@
 .blade {
   transform-box: fill-box;
   transform-origin: center;
-  animation: spin 1.1s linear infinite;
+  animation: spin 1.1s linear 4 forwards;
 }
 
 /* The lantern: a warm pool of light that follows the pointer over the dark of the section. */
@@ -417,11 +421,12 @@
   transition: transform 4.5s linear 0.4s;
 }
 
-/* ---- the electrified floor (stage.tsx): the current lights one plate per beat of a four count ---- */
+/* ---- the electrified floor (stage.tsx): the current lights one plate per beat of a four count, --i the
+   plate's beat (0 to 3), for seven beats, and rests between beats with every plate dim ---- */
 
 .current {
   opacity: 0.15;
-  animation: current 2s steps(1, end) calc(var(--i, 0) * 0.5s) infinite;
+  animation: current 2s steps(1, end) calc(var(--i, 0) * 0.5s) 1.75 forwards;
 }
 
 @keyframes current {

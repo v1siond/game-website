@@ -2,8 +2,11 @@
  * His sprite's poses (character.tsx). Every part turns round its own joint, given in the sprite's
  * viewBox units (transform-box: view-box): the shoulders at y 24.5, the hips at y 39.5, the neck at
  * y 20.5 and the feet at y 63. He faces right, so a negative turn swings a limb forward. Transforms only.
+ * Each pose's loop plays a set number of times from the moment the pose starts, inside 5 s, and rests on
+ * a frame of the pose; the lit eyes blink once after the sprite shows.
  *
- * - idle: the chest rises and falls, the two lit eyes blink.
+ * - idle: the chest rises and falls once, the two lit eyes blink.
+ * - stand: idle at rest, once a scene has played out: standing, the chest still.
  * - run: a heavy run, legs and arms in opposition, a forward lean and a bob that lands on each step.
  * - push: leaning into the load, arms out straight, short slow steps (a crate, a lever, a door).
  * - fall: the knees go, he pitches forward onto the ground; lie holds him there; rise gets him up in
@@ -63,11 +66,15 @@
 /* ---- idle ---- */
 
 .idle .body {
-  animation: breathe 3.6s ease-in-out infinite;
+  animation: breathe 3.6s ease-in-out 1 forwards;
+}
+
+.stand .body {
+  transform: scaleY(1);
 }
 
 .sprite .eye {
-  animation: blink 5.2s steps(1, end) infinite;
+  animation: blink 4.8s steps(1, end) 1 forwards;
 }
 
 @keyframes breathe {
@@ -94,7 +101,7 @@
 /* ---- run ---- */
 
 .run .whole {
-  animation: run-bob 0.62s linear infinite;
+  animation: run-bob 0.62s linear 2;
 }
 
 .run .body {
@@ -103,12 +110,12 @@
 
 .run .legFront,
 .run .armBack {
-  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) 2;
 }
 
 .run .legBack,
 .run .armFront {
-  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) infinite reverse;
+  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) 2 reverse;
 }
 
 @keyframes run-swing {
@@ -141,15 +148,15 @@
 
 .push .armFront,
 .push .armBack {
-  animation: push-shove 1.4s ease-in-out infinite;
+  animation: push-shove 1.4s ease-in-out 3 forwards;
 }
 
 .push .legBack {
-  animation: push-step-back 1.4s ease-in-out infinite;
+  animation: push-step-back 1.4s ease-in-out 3 forwards;
 }
 
 .push .legFront {
-  animation: push-step-front 1.4s ease-in-out infinite;
+  animation: push-step-front 1.4s ease-in-out 3 forwards;
 }
 
 @keyframes push-shove {
@@ -293,11 +300,11 @@
 }
 
 .act.engineer .armFront {
-  animation: type-a 0.34s ease-in-out infinite alternate;
+  animation: type-a 0.34s ease-in-out 14 alternate forwards;
 }
 
 .act.engineer .armBack {
-  animation: type-b 0.34s ease-in-out infinite alternate;
+  animation: type-b 0.34s ease-in-out 14 alternate forwards;
 }
 
 @keyframes type-a {
@@ -321,16 +328,16 @@
 /* ---- act: the Musician drums ---- */
 
 .act.drummer .armFront {
-  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) 9 forwards;
 }
 
 .act.drummer .armBack {
-  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) 9 forwards;
   animation-delay: -0.25s;
 }
 
 .act.drummer .head {
-  animation: drum-nod 0.5s ease-in-out infinite;
+  animation: drum-nod 0.5s ease-in-out 9 forwards;
 }
 
 @keyframes drum-hit {
@@ -360,15 +367,15 @@
 }
 
 .act.fighter .armBack {
-  animation: kick-guard 1.8s ease-in-out infinite;
+  animation: kick-guard 1.8s ease-in-out 2 forwards;
 }
 
 .act.fighter .legFront {
-  animation: kick 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  animation: kick 1.8s cubic-bezier(0.3, 0, 0.2, 1) 2 forwards;
 }
 
 .act.fighter .body {
-  animation: kick-lean 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  animation: kick-lean 1.8s cubic-bezier(0.3, 0, 0.2, 1) 2 forwards;
 }
 
 @keyframes kick {
@@ -429,7 +436,7 @@
 
 .hang .whole {
   transform-origin: 20px 2px;
-  animation: hang-sway 2.4s ease-in-out infinite;
+  animation: hang-sway 2.4s ease-in-out 2 forwards;
 }
 
 @keyframes hang-sway {

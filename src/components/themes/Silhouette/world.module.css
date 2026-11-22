@@ -2,7 +2,9 @@
  * Silhouette's page look, outside the scroll scenes: the near black ground, the fixed atmosphere of fog
  * layers, film grain and vignette, and the offset block button. Every colour reads the palette's CSS
  * variables (--sh-*, set on the root from palette.ts). The fog drifts are ambient keyframes on transform
- * and opacity only, stopped under reduced motion.
+ * and opacity only, stopped under reduced motion. Each plays the first 5 s of its long drift once, as the page
+ * opens, at the speed it always had, and holds where that leaves it: a fractional iteration count, so the
+ * fog barely shifts and never loops.
  */
 
 .world {
@@ -26,7 +28,7 @@
     color-mix(in srgb, var(--sh-edge) 12%, transparent) 75%,
     transparent 100%
   );
-  animation: fog-drift-slow 90s ease-in-out infinite alternate;
+  animation: fog-drift-slow 90s ease-in-out 0.055 forwards;
 }
 
 .fogFast {
@@ -38,7 +40,7 @@
     color-mix(in srgb, var(--sh-raised) 7%, transparent) 65%,
     transparent 90%
   );
-  animation: fog-drift-fast 60s ease-in-out infinite alternate;
+  animation: fog-drift-fast 60s ease-in-out 0.08 forwards;
 }
 
 .fogRise {
@@ -48,7 +50,7 @@
     color-mix(in srgb, var(--sh-fog) 6%, transparent) 30%,
     transparent 60%
   );
-  animation: fog-rise 40s ease-in-out infinite;
+  animation: fog-rise 40s ease-in-out 0.12 forwards;
 }
 
 /* The heavy vignette, the letterbox at top and bottom and the side shade, one layer. */

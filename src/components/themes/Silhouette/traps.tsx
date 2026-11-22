@@ -15,7 +15,8 @@ import shade from './shade.module.css'
 // facing the dark. When the strip comes into view the spider stalks out of the brush after him, rears,
 // and drives its foreleg down into the nearest trap; the jaws bite, it tears itself free and drags back
 // into the dark without the leg, which stays standing in the shut jaws. From here on it is lame.
-// Reduced motion shows the end: the shut trap holding the leg, the lame spider at the dark edge.
+// Reduced motion shows the end, the frame the strip holds once it has played out: the shut trap holding
+// the leg, the lame spider at rest at the dark edge.
 //
 // Animated: the spider's legs and body, its walk (one moved group), the biting trap's two jaws, the torn
 // leg's fade, his idle, one beat timer.
@@ -38,7 +39,7 @@ const STAGE: Record<Beat, Stage> = {
   rear: { ms: 420, x: 122, pose: 'stab', lame: false, shut: false },
   bite: { ms: 500, x: 122, pose: 'stab', lame: false, shut: true },
   tear: { ms: 1300, x: 0, pose: 'flinch', lame: true, shut: true },
-  lost: { ms: 0, x: 0, pose: 'lurk', lame: true, shut: true },
+  lost: { ms: 0, x: 0, pose: 'rest', lame: true, shut: true },
 }
 
 const ENTRANCE: readonly Beat[] = ['wait', 'approach', 'rear', 'bite', 'tear']

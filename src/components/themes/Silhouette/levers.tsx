@@ -6,6 +6,8 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import type { SpritePose } from './character'
 import { gearPath } from './depth'
 import { Place } from './places'
@@ -18,7 +20,8 @@ import shade from './shade.module.css'
 // with the cog ring turning with it. The arrow keys change the profession straight away
 // (ProfessionSwitch), so a change that did not come from a pull still turns the new place in.
 //
-// Animated: the place's props and his parts (./places), the turning room, the cog ring, the handles.
+// Animated: the place's props and his parts (./places), the turning room, the cog ring, the handles. The
+// place's loops wait until the switch shows, then play once; a new profession's place plays its own.
 
 const PULL_MS = 320
 const TURN_OUT_MS = 420
@@ -83,6 +86,7 @@ export function LeverSwitch() {
   const [turns, setTurns] = useState(0)
   const shown = useRef(active)
   const timers = useRef<number[]>([])
+  const { ref, triggered } = useSectionTrigger()
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
@@ -119,7 +123,7 @@ export function LeverSwitch() {
   }
 
   return (
-    <section className="relative z-20 mx-auto max-w-5xl px-4 sm:px-6" aria-label={navigation.professionSelection}>
+    <section ref={ref} className={`relative z-20 mx-auto max-w-5xl px-4 sm:px-6 ${heldUntil(triggered)}`} aria-label={navigation.professionSelection}>
       <div className="grid items-center gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Hatch profession={active} pose={pose} turn={turn} turns={turns} />
         <div className="flex flex-col items-center gap-4 md:items-start">

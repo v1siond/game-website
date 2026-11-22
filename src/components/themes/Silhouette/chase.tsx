@@ -17,7 +17,8 @@ import world from './world.module.css'
 // comes into view the spider's legs feel their way out of that dark, its foreleg rears and stabs the
 // ground where he stood, he leaps clear and runs, it stabs again at his heels, he leaps again, and it
 // draws back into the brush while he stands at the far end, out of reach. The visitor can run it again.
-// Reduced motion shows the last beat: him safe at the end, the spider lurking at the dark edge.
+// Reduced motion shows the last beat: him safe at the end, the spider at rest at the dark edge, the frame
+// the chase holds once it has played out.
 //
 // Animated: the spider's legs and body (spider.module.css), its walk and his run (two moved groups), his
 // parts, one beat timer.
@@ -40,7 +41,7 @@ const STAGE: Record<Beat, Stage> = {
   chase: { ms: 800, spider: { x: 130, pose: 'stalk' }, hero: { x: 400, pose: 'run' } },
   strikeAgain: { ms: 650, spider: { x: 200, pose: 'stab' }, hero: { x: 490, pose: 'jump' } },
   retreat: { ms: 1200, spider: { x: -60, pose: 'stalk' }, hero: { x: 540, pose: 'run' } },
-  outrun: { ms: 0, spider: { x: -60, pose: 'lurk' }, hero: { x: 540, pose: 'idle' } },
+  outrun: { ms: 0, spider: { x: -60, pose: 'rest' }, hero: { x: 540, pose: 'stand' } },
 }
 
 const ENTRANCE: readonly Beat[] = ['dark', 'emerge', 'strike', 'chase', 'strikeAgain', 'retreat']
