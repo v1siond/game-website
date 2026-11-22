@@ -825,11 +825,7 @@ function WaystationSelector({ active }: { active: Profession }) {
       <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
       <div className="max-w-6xl mx-auto px-4 md:px-6">
         <div
-          className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
-          style={{
-            background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
-            borderRadius: '4px',
-          }}
+          className={`relative h-40 md:h-56 overflow-hidden rounded bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--df-void-purple)_18.8%,transparent))] ${world.selector}`}
         >
           {/* Connection paths */}
           <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
@@ -1081,15 +1077,6 @@ export default function DarkFantasyTheme() {
             linear-gradient(180deg, transparent 60%, ${DARK_FANTASY.void}90 100%)
           `,
         }}
-      />
-
-      {/* Bottom obscure overlay - content fades into darkness */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-48 pointer-events-none z-[7]"
-        style={{
-          background: `linear-gradient(180deg, transparent 0%, ${DARK_FANTASY.void}40 30%, ${DARK_FANTASY.void}90 70%, ${DARK_FANTASY.void} 100%)`,
-        }}
-        aria-hidden="true"
       />
 
       {/* Fixed Navigation Bar */}
