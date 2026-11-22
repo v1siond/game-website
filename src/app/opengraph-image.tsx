@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 import { getAllCVData } from '@/lib/cv-data'
-import { PREVIEW_IMAGE, SITE_URL, shortRole } from '@/lib/seo'
+import { PREVIEW_IMAGE, SITE_ORIGIN, shortRole } from '@/lib/seo'
 import { MARK_BACKGROUND, siteMarkSvg } from '@/lib/siteMark'
 
 // The link preview of every page (Open Graph and Twitter): the mark, his name, his role from the
@@ -36,7 +36,7 @@ export default async function OpenGraphImage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, flex: 1 }}>
           <div style={{ fontSize: 76, lineHeight: 1.05 }}>{cv.fullName}</div>
           <div style={{ fontSize: 34, lineHeight: 1.3, color: '#b9b4a8' }}>{shortRole(cv.professionalSummary.headline)}</div>
-          <div style={{ fontSize: 28, color: '#e8a462' }}>{new URL(SITE_URL).host}</div>
+          <div style={{ fontSize: 28, color: '#e8a462' }}>{SITE_ORIGIN.host}</div>
         </div>
       </div>
     ),

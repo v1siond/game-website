@@ -15,6 +15,9 @@ export type BlogOptions = {
   dir?: string
 }
 
+/** The options of a page or route served by this build: drafts follow the build's own environment. */
+export const blogOptions = (): BlogOptions => ({ env: process.env.NODE_ENV })
+
 const showsDrafts = (env: BlogOptions['env']): boolean => env === 'development'
 
 // A folder git no longer holds (every post deleted) is no posts, any other read error stops the build.

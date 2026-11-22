@@ -10,6 +10,12 @@ import { BLOG_PATH, postPath } from './blog/links'
 /** The one address the site is served on; canonicals, the sitemap and the JSON-LD are built from it. */
 export const SITE_URL = 'https://alexanderpulido.dev'
 
+/** SITE_URL parsed once: the metadataBase every page's relative metadata URLs resolve against. */
+export const SITE_ORIGIN = new URL(SITE_URL)
+
+// Every page the site serves is open to crawlers, with large image previews.
+const INDEXED_ROBOTS: Metadata['robots'] = { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } }
+
 /** The pages crawlers are pointed at, by path: the home page and the CV in every language. */
 export type IndexedPath = '/' | CVPath
 export const INDEXED_PATHS: readonly IndexedPath[] = ['/', ...locales.map((locale) => CV_PATHS[locale])]
@@ -86,7 +92,7 @@ export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
   const images = [{ ...PREVIEW_IMAGE, alt: siteTitle(cv) }]
 
   return {
-    metadataBase: new URL(SITE_URL),
+    metadataBase: SITE_ORIGIN,
     title,
     description,
     applicationName: cv.fullName,
@@ -95,7 +101,7 @@ export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
     creator: cv.fullName,
     publisher: cv.fullName,
     alternates: alternatesFor(path),
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+    robots: INDEXED_ROBOTS,
     openGraph: {
       type: 'profile',
       url: path,
@@ -152,14 +158,14 @@ type BlogHead = {
 }
 
 const blogHead = (cv: SeoFacts, { path, title, description, image, openGraph, keywords }: BlogHead): Metadata => ({
-  metadataBase: new URL(SITE_URL),
+  metadataBase: SITE_ORIGIN,
   title,
   description,
   keywords,
   authors: [{ name: cv.fullName, url: SITE_URL }],
   creator: cv.fullName,
   alternates: { canonical: path },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  robots: INDEXED_ROBOTS,
   openGraph: { url: path, siteName: cv.fullName, title, description, images: [image], ...openGraph },
   twitter: { card: 'summary_large_image', title, description, images: [image] },
 })

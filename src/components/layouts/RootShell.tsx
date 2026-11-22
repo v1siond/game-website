@@ -3,7 +3,8 @@ import localFont from "next/font/local";
 import { Bebas_Neue } from "next/font/google";
 import "../../styles/globals.css";
 import ClientProviders from "../providers/ClientProviders";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_ORIGIN } from "@/lib/seo";
+import { MARK_BACKGROUND } from "@/lib/siteMark";
 import { getLabels } from "@/lib/cv-data";
 import type { Locale } from "@/i18n/config";
 
@@ -50,7 +51,7 @@ const bebasNeue = Bebas_Neue({
 // Every page's relative metadata URLs (the root opengraph-image file, canonicals) resolve against the
 // site's address, the 404 page's included, which sets no page metadata of its own.
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: SITE_ORIGIN,
 };
 
 export const viewport: Viewport = {
@@ -59,7 +60,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
-  themeColor: '#0a0a0a',
+  themeColor: MARK_BACKGROUND,
 };
 
 interface RootShellProps {

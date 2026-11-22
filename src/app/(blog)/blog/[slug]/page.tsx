@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getAllCVData } from '@/lib/cv-data'
-import { getPost, listPosts } from '@/lib/blog/posts'
+import { blogOptions, getPost, listPosts } from '@/lib/blog/posts'
 import { renderMarkdown } from '@/lib/blog/markdown'
 import { BLOG_PATH } from '@/lib/blog/links'
 import { shownDate, type Post } from '@/lib/blog/post'
@@ -14,15 +14,13 @@ type Props = Readonly<{ params: Promise<{ slug: string }> }>
 // notFound() renders the blog's own 404 inside the blog layout.
 export const dynamicParams = true
 
-const options = () => ({ env: process.env.NODE_ENV })
-
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  return (await listPosts(options())).map((post) => ({ slug: post.slug }))
+  return (await listPosts(blogOptions())).map((post) => ({ slug: post.slug }))
 }
 
 // The post at the address, or the 404 page.
 const postAt = async (params: Props['params']): Promise<Post> => {
-  const post = await getPost((await params).slug, options())
+  const post = await getPost((await params).slug, blogOptions())
   if (!post) notFound()
   return post
 }

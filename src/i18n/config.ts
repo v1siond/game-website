@@ -3,6 +3,9 @@ export type Locale = (typeof locales)[number]
 
 export const defaultLocale = 'en' satisfies Locale
 
+/** The cookie that keeps a visitor's language pick: the switcher writes it, the middleware reads it. */
+export const LOCALE_COOKIE = 'locale'
+
 export function isLocale(value: string | null | undefined): value is Locale {
   return !!value && (locales as readonly string[]).includes(value)
 }

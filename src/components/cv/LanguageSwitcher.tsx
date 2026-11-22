@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useId, useTransition, useEffect, useState, type ReactNode } from 'react'
-import { cvPath, isLocale, locales, type Locale } from '@/i18n/config'
+import { LOCALE_COOKIE, cvPath, defaultLocale, isLocale, locales, type Locale } from '@/i18n/config'
 import { useLabels } from './CVDataProvider'
 
 // The one language switcher. It owns the locale cookie and what a pick does; a world that wants its own
@@ -24,13 +24,24 @@ interface LanguageSwitcherProps {
 }
 
 const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
+const COOKIE_PREFIX = `${LOCALE_COOKIE}=`
 
 function storedLocale(): Locale | null {
   const fromCookie = document.cookie
     .split('; ')
-    .find((row) => row.startsWith('locale='))
-    ?.split('=')[1]
+    .find((row) => row.startsWith(COOKIE_PREFIX))
+    ?.slice(COOKIE_PREFIX.length)
   return isLocale(fromCookie) ? fromCookie : null
+}
+
+type Placement = 'cvPage' | 'elsewhere'
+type Router = ReturnType<typeof useRouter>
+
+// What a pick does after the cookie is written: a CV page opens the CV at the picked language's address,
+// any other page re-renders in place with the new cookie.
+const AFTER_PICK: Record<Placement, (router: Router, picked: Locale) => void> = {
+  cvPage: (router, picked) => router.push(cvPath(picked)),
+  elsewhere: (router) => router.refresh(),
 }
 
 function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
@@ -66,7 +77,7 @@ const renderSelect = (state: LocaleSwitchState) => <SelectSwitcher {...state} />
 export function LanguageSwitcher({ render = renderSelect, locale }: LanguageSwitcherProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [currentLocale, setCurrentLocale] = useState<Locale>(locale ?? 'en')
+  const [currentLocale, setCurrentLocale] = useState<Locale>(locale ?? defaultLocale)
 
   useEffect(() => {
     if (locale) return
@@ -75,12 +86,10 @@ export function LanguageSwitcher({ render = renderSelect, locale }: LanguageSwit
   }, [locale])
 
   const changeLocale = (newLocale: Locale) => {
-    document.cookie = `locale=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`
+    document.cookie = `${COOKIE_PREFIX}${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`
     setCurrentLocale(newLocale)
-    startTransition(() => {
-      if (locale) router.push(cvPath(newLocale))
-      else router.refresh()
-    })
+    const placement: Placement = locale ? 'cvPage' : 'elsewhere'
+    startTransition(() => AFTER_PICK[placement](router, newLocale))
   }
 
   return <>{render({ currentLocale, isPending, changeLocale })}</>
