@@ -248,7 +248,7 @@ textarea:focus-visible {
 /* ---- Variant: VORTEX (iris swirl) ---------------------------------- */
 .wp-root[data-variant="vortex"] .wp-fx,
 .wp-root[data-variant="vortex"] .wp-ring {
-  left: 50%; top: 50%; inset: auto;
+  inset: 50% auto auto 50%;
   border-radius: 50%;
 }
 .wp-root[data-variant="vortex"] .wp-fx {
@@ -270,7 +270,7 @@ textarea:focus-visible {
 
 /* ---- Variant: WORMHOLE (tunnel dive) ------------------------------- */
 .wp-root[data-variant="wormhole"] .wp-fx {
-  left: 50%; top: 50%; inset: auto;
+  inset: 50% auto auto 50%;
   width: 200vmax; height: 200vmax; margin: -100vmax 0 0 -100vmax;
   border-radius: 50%;
   background: repeating-radial-gradient(circle at 50% 50%, var(--wp-accent) 0 0.4vmax, transparent 0.4vmax 4.5vmax);
@@ -287,7 +287,7 @@ textarea:focus-visible {
 
 /* ---- Variant: HYPERSPACE (warp streaks) ---------------------------- */
 .wp-root[data-variant="hyperspace"] .wp-fx {
-  left: 50%; top: 50%; inset: auto;
+  inset: 50% auto auto 50%;
   width: 300vmax; height: 300vmax; margin: -150vmax 0 0 -150vmax;
   background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0 0.6deg, var(--wp-accent) 0.6deg 1.2deg, transparent 1.2deg 3deg, var(--wp-secondary) 3deg 3.5deg, transparent 3.5deg 5deg);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 5vmax, #000 16vmax);
