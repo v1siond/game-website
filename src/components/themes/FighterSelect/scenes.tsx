@@ -2,6 +2,7 @@
 
 import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import { cssVars } from '@/lib/cssVars'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -9,6 +10,7 @@ import { marksUpTo, reached, type Beat } from './bout'
 import { useBout } from './boutPlayer'
 import { Ring } from './duo'
 import { Fighter } from './fighter'
+import { WIN_MS } from './moves'
 import { CallText, ImpactBurst } from './badges'
 import { useComboLand } from './combo'
 import { FS } from './palette'
@@ -28,6 +30,17 @@ import living from './living.module.css'
 // - ParryRow (Ventures): his partner throws a punch per venture and he parries each with the blue
 //   flash, lighting its card, then answers with the uppercut.
 // - SparRing (Muay Thai): his roundhouse and jab put the partner down, K.O., then Perfect.
+// A bout with a beat per item keeps its pace while it fits and steps faster for a long list, so with the
+// win pose closing it every bout ends inside 5 s of its trigger (itemBout).
+
+const beatsMs = (beats: readonly Beat[]) => beats.reduce((sum, beat) => sum + beat.ms, 0)
+
+// The lead in, then `item` once per item, then the close: each item's beat keeps its ms while the bout
+// fits, and is cut to its share when the items would run it, with the win pose after, past 5 s.
+function itemBout(lead: readonly Beat[], item: Beat, count: number, close: readonly Beat[]): Beat[] {
+  const ms = stepWithin({ step: item.ms, count, fixed: beatsMs(lead) + beatsMs(close), budget: STORY_MS - WIN_MS })
+  return [...lead, ...Array.from({ length: count }, (): Beat => ({ ...item, ms })), ...close]
+}
 
 // ---- About: the bonus stage car ----
 
@@ -154,15 +167,8 @@ export function CarSmash({ profession, children }: { profession: Profession; chi
 
 // ---- Tech Stack: a ki blast lights each card ----
 
-const blastBout = (count: number): Beat[] => [
-  { hero: 'stance', ms: 300 },
-  ...Array.from({ length: count }, (): Beat => ({
-    hero: 'hadouken',
-    ms: 1000,
-    mark: 'light',
-  })),
-  { hero: 'win', ms: 0 },
-]
+const blastBout = (count: number): Beat[] =>
+  itemBout([{ hero: 'stance', ms: 300 }], { hero: 'hadouken', ms: 1000, mark: 'light' }, count, [{ hero: 'win', ms: 0 }])
 
 // A row of cards the bout lights in turn: renderItem draws one card, lit or not, and render wraps the
 // drawn cards in the section's own list.
@@ -214,16 +220,16 @@ export function BlastRow<T>({ profession, items, renderItem, render }: { profess
 
 // ---- Projects: the super art ----
 
-const superBout = (count: number): Beat[] => [
-  { hero: 'stance', ms: 200 },
-  { hero: 'hadouken', ms: 1100, mark: 'flash' },
-  ...Array.from({ length: count }, (): Beat => ({
-    hero: 'tatsumaki',
-    ms: 360,
-    mark: 'hit',
-  })),
-  { hero: 'win', ms: 0 },
-]
+const superBout = (count: number): Beat[] =>
+  itemBout(
+    [
+      { hero: 'stance', ms: 200 },
+      { hero: 'hadouken', ms: 1100, mark: 'flash' },
+    ],
+    { hero: 'tatsumaki', ms: 360, mark: 'hit' },
+    count,
+    [{ hero: 'win', ms: 0 }],
+  )
 
 export function SuperArt({ profession, count }: { profession: Profession; count: number }) {
   const { arcade } = useLabels()
@@ -282,17 +288,11 @@ export function SuperArt({ profession, count }: { profession: Profession; count:
 
 // ---- Ventures: the parry ----
 
-const parryBout = (count: number): Beat[] => [
-  { hero: 'stance', partner: 'walk', ms: 600 },
-  ...Array.from({ length: count }, (): Beat => ({
-    hero: 'parry',
-    partner: 'punch',
-    ms: 700,
-    mark: 'light',
-  })),
-  { hero: 'shoryuken', partner: 'hurt', ms: 760, mark: 'hit' },
-  { hero: 'win', partner: 'stance', ms: 0 },
-]
+const parryBout = (count: number): Beat[] =>
+  itemBout([{ hero: 'stance', partner: 'walk', ms: 600 }], { hero: 'parry', partner: 'punch', ms: 700, mark: 'light' }, count, [
+    { hero: 'shoryuken', partner: 'hurt', ms: 760, mark: 'hit' },
+    { hero: 'win', partner: 'stance', ms: 0 },
+  ])
 
 export function ParryRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()

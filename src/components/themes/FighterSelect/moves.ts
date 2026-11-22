@@ -52,6 +52,9 @@ const ACT_MOTION: Record<Profession, Motion> = {
   fighter: { mode: 'forward', cycleMs: 1300, key: 2, runs: 2 },
 }
 
+/** How long his win pose plays at the end of a bout, every run of it. */
+export const WIN_MS = MOTION.win.cycleMs * MOTION.win.runs
+
 export const motionFor = (pose: FighterPose, profession: Profession): Motion => (pose === 'act' ? ACT_MOTION[profession] : MOTION[pose])
 
 export const SPECIALS = ['hadouken', 'shoryuken', 'tatsumaki'] as const

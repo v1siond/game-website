@@ -94,6 +94,12 @@
     animation: slam 340ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both;
   }
 
+  /* The preview's first play waits for its cue to arm. */
+  .cue[data-scene-phase='idle'] .previewIn,
+  .cue[data-scene-phase='idle'] .callIn {
+    animation-play-state: paused;
+  }
+
   .pickFlash {
     animation: flash 420ms ease-out both;
   }
