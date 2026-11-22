@@ -1,66 +1,22 @@
+import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type ArmPivots, type RigPose } from '@/lib/motion/rigPose'
+import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
 import s from './merc.module.css'
 
-// The merc posed by the scroll: every joint of his figure (merc.tsx) as a number, written as a transform
-// on its group, each group turning round its own joint (the origins in merc.module.css). A scene blends
-// two poses (the walk between props and its action at one) with `mix`, so every frame is a function of
-// the scroll. The angles are the ones his CSS motions end on (walk, dash, scan, hack, drum, kick, sit,
-// blades), so he looks the same as in the rig.
+// The merc posed by the scroll, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's numbers, plus his
+// own kit on top, the mantis blades, the optic reticle, the jack cable and deck and the quickhack's glyphs.
+// The angles are the ones his CSS motions in the rig end on, so he looks the same in the quickhack menu.
 
-export interface MercPose {
-  /** The body's rise in viewBox units (negative is up), its lean in degrees. */
-  rise: number
-  lean: number
-  armRight: number
-  foreRight: number
-  armLeft: number
-  foreLeft: number
-  thighRight: number
-  shinRight: number
-  thighLeft: number
-  shinLeft: number
-  /** How far each knee comes toward the viewer on the front view stride, 0 to 1. */
-  kneeRight: number
-  kneeLeft: number
-  /** 0 to 1: the mantis blades out, the reticle locked, the cable and deck out, the glyphs' climb. */
-  blades: number
-  reticle: number
-  jack: number
-  glyphs: number
-}
+/** The rig's pose and, 0 to 1: the mantis blades out, the reticle locked, the cable and deck out, the glyphs' climb. */
+export type MercPose = RigPose & { blades: number; reticle: number; jack: number; glyphs: number }
 
-export const STAND: MercPose = {
-  rise: 0,
-  lean: 0,
-  armRight: 0,
-  foreRight: 0,
-  armLeft: 0,
-  foreLeft: 0,
-  thighRight: 0,
-  shinRight: 0,
-  thighLeft: 0,
-  shinLeft: 0,
-  kneeRight: 0,
-  kneeLeft: 0,
-  blades: 0,
-  reticle: 0,
-  jack: 0,
-  glyphs: 0,
-}
+export const STAND: MercPose = { ...RIG_STAND, blades: 0, reticle: 0, jack: 0, glyphs: 0 }
 
-const KEYS = Object.keys(STAND) as Array<keyof MercPose>
-
-/** The pose `t` of the way from `a` to `b`. */
-export const mix = (a: MercPose, b: MercPose, t: number): MercPose =>
-  Object.fromEntries(KEYS.map((key) => [key, a[key] + (b[key] - a[key]) * t])) as unknown as MercPose
+export const mix = (a: MercPose, b: MercPose, t: number): MercPose => rigMix(a, b, t)
 
 const pose = (partial: Partial<MercPose>): MercPose => ({ ...STAND, ...partial })
 
-/** The street stride at `phase` (one step per unit): a knee comes up and the other side's arm swings. */
-export function walk(phase: number): MercPose {
-  const right = Math.max(0, Math.sin(phase * Math.PI))
-  const left = Math.max(0, -Math.sin(phase * Math.PI))
-  return pose({ rise: -2 * Math.abs(Math.sin(phase * Math.PI)), kneeRight: right, kneeLeft: left, shinRight: -7 * right, shinLeft: 7 * left, armLeft: 8 * right, armRight: -8 * left })
-}
+/** The street stride at `phase`. */
+export const walk = (phase: number): MercPose => pose(rigWalk(phase))
 
 /** The time slow dash: leaning in, arms back, the thighs scissoring with `phase`. */
 export function dash(phase: number): MercPose {
@@ -97,8 +53,10 @@ export const SIT: MercPose = pose({ rise: 18, thighRight: -72, thighLeft: -72, s
 /** The blades folded out `t` of the way and the arms crossing into the slash. */
 export const slash = (t: number): MercPose => pose({ blades: t, armRight: 30 * t, armLeft: -30 * t, lean: 4 * t })
 
-// The group of each joint, found once per stage by its class in merc.module.css.
-const JOINTS = {
+/** His right arm's joints and hand in his viewBox (the origins in merc.module.css), for where his hand is. */
+export const RIGHT_ARM: ArmPivots = { shoulder: [32, 48], elbow: [30.5, 66], hand: [30.5, 88] }
+
+const LIMB_CLASSES = {
   body: s.body,
   armRight: s.armRight,
   foreRight: s.foreRight,
@@ -108,42 +66,31 @@ const JOINTS = {
   shinRight: s.shinRight,
   thighLeft: s.thighLeft,
   shinLeft: s.shinLeft,
-  bladeRight: s.bladeRight,
-  bladeLeft: s.bladeLeft,
-  reticle: s.reticle,
-  jack: s.jack,
-  glyphs: s.glyphs,
-} as const
-
-export type MercJoints = { [Name in keyof typeof JOINTS]: SVGElement | null }
-
-/** His joints inside `root`, the group that holds one MercFigure. */
-export const mercJoints = (root: Element): MercJoints =>
-  Object.fromEntries(Object.entries(JOINTS).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className}`)])) as MercJoints
-
-const write = (el: SVGElement | null, transform: string, opacity?: number): void => {
-  if (!el) return
-  el.style.transform = transform
-  if (opacity !== undefined) el.style.opacity = opacity.toFixed(3)
 }
 
-const turn = (deg: number): string => `rotate(${deg.toFixed(1)}deg)`
+const KIT_CLASSES = { bladeRight: s.bladeRight, bladeLeft: s.bladeLeft, reticle: s.reticle, jack: s.jack, glyphs: s.glyphs }
 
-/** Writes `p` on his joints: transforms and opacity only. */
+export type MercJoints = RigJoints & Record<keyof typeof KIT_CLASSES, SVGElement | null>
+
+/** His groups inside `root`, the group that holds one MercFigure. */
+export const mercJoints = (root: Element): MercJoints => ({
+  ...rigJoints(root, LIMB_CLASSES),
+  ...(Object.fromEntries(Object.entries(KIT_CLASSES).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className}`)])) as Record<keyof typeof KIT_CLASSES, SVGElement | null>),
+})
+
+const show = (el: SVGElement | null, transform: string, opacity: number): void => {
+  if (!el) return
+  el.style.transform = transform
+  el.style.opacity = opacity.toFixed(3)
+}
+
+/** Writes `p` on his groups: the rig's limbs, then his kit. Transforms and opacity only. */
 export function setMercPose(j: MercJoints, p: MercPose): void {
-  write(j.body, `translateY(${p.rise.toFixed(2)}px) rotate(${p.lean.toFixed(1)}deg)`)
-  write(j.armRight, turn(p.armRight))
-  write(j.foreRight, turn(p.foreRight))
-  write(j.armLeft, turn(p.armLeft))
-  write(j.foreLeft, turn(p.foreLeft))
-  write(j.thighRight, `${turn(p.thighRight)} scaleY(${(1 - 0.18 * p.kneeRight).toFixed(3)})`)
-  write(j.thighLeft, `${turn(p.thighLeft)} scaleY(${(1 - 0.18 * p.kneeLeft).toFixed(3)})`)
-  write(j.shinRight, `${turn(p.shinRight)} scaleY(${(1 - 0.08 * p.kneeRight).toFixed(3)})`)
-  write(j.shinLeft, `${turn(p.shinLeft)} scaleY(${(1 - 0.08 * p.kneeLeft).toFixed(3)})`)
+  setRigPose(j, p)
   const blade = `scale(${(0.2 + 0.8 * p.blades).toFixed(3)})`
-  write(j.bladeRight, blade, p.blades)
-  write(j.bladeLeft, blade, p.blades)
-  write(j.reticle, 'none', p.reticle)
-  write(j.jack, 'none', p.jack)
-  write(j.glyphs, `translateY(${(6 - 16 * p.glyphs).toFixed(2)}px)`)
+  show(j.bladeRight, blade, p.blades)
+  show(j.bladeLeft, blade, p.blades)
+  show(j.reticle, 'none', p.reticle)
+  show(j.jack, 'none', p.jack)
+  if (j.glyphs) j.glyphs.style.transform = `translateY(${(6 - 16 * p.glyphs).toFixed(2)}px)`
 }

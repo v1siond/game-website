@@ -8,7 +8,8 @@ import { ramp } from '@/lib/scroll/stage'
 import { clamp01, fadeTo, fx, lerp, r1, reached, spread, transformTo } from '../shared/stageNodes'
 import type { District } from './city'
 import { NEON } from './palette'
-import { SIT, STAND, dash, drum, hack, hop, kick, mix, scan, slash, walk, type MercPose } from './pose'
+import { handAt } from '@/lib/motion/rigPose'
+import { RIGHT_ARM, SIT, STAND, dash, drum, hack, hop, kick, mix, scan, slash, walk, type MercPose } from './pose'
 
 // Each part of the page as a scene of the night city: its district, his kit, the props it holds (one per
 // card the section counts) and, per frame, what the props and he do at the scene's progress p (0 when its
@@ -166,9 +167,12 @@ const about: SceneDef = {
     return (p, f) => {
       tags.forEach((tag, i) => fadeTo(tag, 0.25 + 0.75 * reached(f, i)))
       const { x, at, act } = travel(xs, f, -110)
-      beam?.setAttribute('d', `M${r1(x)} ${GROUND - 190} L${r1(xs[at] - 40)} ${TAG_Y + 10}`)
+      const pose = mix(walk(f * 3 + p * 2), scan(1), act)
+      // the beam leaves from his hand at the temple, where the reticle locks
+      const [hx, hy] = handAt(RIGHT_ARM, pose.armRight, pose.foreRight)
+      beam?.setAttribute('d', `M${r1(x + (hx - 50) * K)} ${r1(GROUND + (hy - 144) * K)} L${r1(xs[at] - 40)} ${TAG_Y + 10}`)
       fadeTo(beam, act * 0.9)
-      return merc(x, mix(walk(f * 3 + p * 2), scan(1), act))
+      return merc(x, pose)
     }
   }),
 }
