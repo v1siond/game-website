@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, memo } from 'react'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -31,20 +32,8 @@ interface SpiritState {
   mood: 'idle' | 'curious' | 'excited' | 'sleepy'
 }
 
-// The companion, the trail and the parallax hide at 768px and below (too distracting on a phone).
-// Starts visible so the first client render matches the server one, then follows the window width.
-function useWiderThanMobile(): boolean {
-  const [isWide, setIsWide] = useState(true)
-
-  useEffect(() => {
-    const checkWidth = () => setIsWide(window.innerWidth > 768)
-    checkWidth()
-    window.addEventListener('resize', checkWidth)
-    return () => window.removeEventListener('resize', checkWidth)
-  }, [])
-
-  return isWide
-}
+// The trail and the parallax hide at 768px and below (too distracting on a phone).
+const WIDER_THAN_MOBILE = '(min-width: 769px)'
 
 export const SpiritCompanion = memo(function SpiritCompanion() {
   const [state, setState] = useState<SpiritState>({
@@ -56,7 +45,7 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
     rotation: 0,
     mood: 'idle',
   })
-  const isVisible = useWiderThanMobile()
+  const isVisible = useMediaQuery(WIDER_THAN_MOBILE)
   const rafRef = useRef<number | null>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
   const scrollRef = useRef(0)
@@ -291,7 +280,7 @@ interface Particle {
 
 export const CursorTrail = memo(function CursorTrail() {
   const [particles, setParticles] = useState<Particle[]>([])
-  const isVisible = useWiderThanMobile()
+  const isVisible = useMediaQuery(WIDER_THAN_MOBILE)
   const mouseRef = useRef({ x: 0, y: 0 })
   const lastEmitRef = useRef(0)
   const particleIdRef = useRef(0)
@@ -366,7 +355,7 @@ export const CursorTrail = memo(function CursorTrail() {
 
 export const ParallaxLayers = memo(function ParallaxLayers() {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const isVisible = useWiderThanMobile()
+  const isVisible = useMediaQuery(WIDER_THAN_MOBILE)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
