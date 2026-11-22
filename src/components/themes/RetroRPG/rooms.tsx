@@ -3,7 +3,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { usePreview } from '@/themes/PreviewContext'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MONO, PIXEL, RPG } from './palette'
 import { DUMMY, FLOWER, KEEPER, KEEPER_PAW, MONSTER, PORTRAIT_OPEN, PORTRAIT_SHUT, SENTRY, type PixelSprite } from './npcs'
@@ -30,7 +29,7 @@ import { heldUntil } from '@/components/themes/shared/held'
 //
 // Pattern: one phase table per room (walk, act, done in ms) on the shared zone stage (useZoneStage hands
 // the room's zone to the overworld backdrop and says when it is first seen); the phase is data-room, read by
-// rooms.module.css, every move a steps() keyframe. Reduced motion and a World Select preview open on done.
+// rooms.module.css, every move a steps() keyframe. Reduced motion opens on done.
 // Each room is one SVG on a 320 by 80 grid (him on his own 20 by 30 grid inside it), drawn crisp.
 
 type RoomPhase = 'idle' | 'walk' | 'act' | 'done'
@@ -41,13 +40,11 @@ interface Beat {
 }
 
 function useRoom(zone: Zone, beat: Beat) {
-  const { ref, on, reduced } = useZoneStage(zone)
-  const preview = usePreview()
+  const { ref, on, reduced: skip } = useZoneStage(zone)
   const [take, setTake] = useState(0)
   const [played, setRoom] = useState<RoomPhase>('idle')
   const [shown, setShown] = useState(false)
-  const skip = reduced || preview
-  // Reduced motion and a preview open on done, read straight from skip rather than stored a commit later.
+  // Reduced motion opens on done, read straight from skip rather than stored a commit later.
   const room = skip ? 'done' : played
   if (room === 'done' && !shown) setShown(true)
 

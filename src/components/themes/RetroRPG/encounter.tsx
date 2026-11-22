@@ -4,7 +4,6 @@ import { useEffect, useState, type FocusEvent, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { usePreview } from '@/themes/PreviewContext'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { RoomWalker, StageWalker } from './walker'
 import { Bang } from './rooms'
@@ -29,8 +28,8 @@ const OUTFIT_LOOK: WardrobeLook = { plate: RPG.void, text: RPG.text, ring: RPG.b
 //   ready  4300ms  everything rests on its last frame (data-play="done")
 //
 // Pattern: setTimeout phases (a fixed choreography, no per frame values), each phase a data-phase value
-// the CSS reads; every move is a steps() keyframe on transform or opacity. Reduced motion and a World
-// Select preview start on ready; a keyboard focus inside jumps to ready.
+// the CSS reads; every move is a steps() keyframe on transform or opacity. Reduced motion starts on
+// ready; a keyboard focus inside jumps to ready.
 //
 // A profession switch replays two things on top: the screen flashes white once and his sprite turns
 // through four hard frames into the new outfit.
@@ -56,10 +55,8 @@ const PLAY_OF: Record<Phase, Play> = {
 
 function useEncounterPhase() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1 })
-  const reduced = useReducedMotion()
-  const preview = usePreview()
   const [phase, setPhase] = useState<Phase>('wait')
-  const skip = reduced || preview
+  const skip = useReducedMotion()
 
   useEffect(() => {
     if (skip || !triggered) return
@@ -75,7 +72,7 @@ function useEncounterPhase() {
     setRevealed(true)
   }
 
-  // Reduced motion, a preview and a keyboard focus show the end, read straight from state rather than
+  // Reduced motion and a keyboard focus show the end, read straight from state rather than
   // stored a commit later.
   return { ref, phase: skip || revealed ? 'ready' : phase, skip, reveal }
 }
