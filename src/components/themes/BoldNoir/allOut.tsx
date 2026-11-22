@@ -6,7 +6,8 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
-import { Bullet, Chips } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BULLETS, Chips } from './cards'
 import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -162,13 +163,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
             {project.impact}
           </p>
         )}
-        {project.details.length > 0 && (
-          <ul className="mt-4 space-y-1.5" aria-label={labels.cards.details}>
-            {project.details.map((detail) => (
-              <Bullet key={detail}>{detail}</Bullet>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={project.details} label={labels.cards.details} look={{ ...BULLETS, list: 'mt-4 space-y-1.5' }} />
         {project.techStack.length > 0 && <Chips items={project.techStack} label={labels.sections.techStack} className="mt-4" />}
         <div className="mt-6 flex flex-wrap gap-3">
           {links.map((link) => (

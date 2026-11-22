@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { useId } from 'react'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
@@ -12,6 +12,7 @@ import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -60,16 +61,15 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
   )
 }
 
-/** A row behind the red star the title cards mark a highlight or a detail with. */
-export function StarLine({ children }: { children: ReactNode }) {
-  return (
-    <li className={`flex items-start gap-2 ${BODY}`}>
-      <span className={world.red} aria-hidden="true">
-        ★
-      </span>
-      {children}
-    </li>
-  )
+/** Rows behind the red star the title cards mark a highlight or a detail with. */
+export const STAR_LINES: MarkedLinesLook = {
+  list: 'mt-2 space-y-1',
+  line: `flex items-start gap-2 ${BODY}`,
+  marker: (
+    <span className={world.red} aria-hidden="true">
+      ★
+    </span>
+  ),
 }
 
 // A job on a title card, the years ("2019 to 2022") on an ink tab above it.
@@ -88,13 +88,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </p>
       {job.location && <p className={`italic ${BODY}`}>{job.location}</p>}
       {job.description && <p className={`mb-2 mt-2 ${BODY}`}>{job.description}</p>}
-      {job.highlights.length > 0 && (
-        <ul className="mt-2 space-y-1" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
-            <StarLine key={highlight}>{highlight}</StarLine>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={STAR_LINES} />
       <Chips items={job.skills} label={cards.skillsUsed} />
     </article>
   )
@@ -119,13 +113,7 @@ export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
       <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
       <p className={`mb-2 ${BODY}`}>{project.tagline}</p>
       {project.description && <p className={`mb-2 ${BODY}`}>{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="mb-2 space-y-1" aria-label={labels.cards.details}>
-          {project.details.map((detail) => (
-            <StarLine key={detail}>{detail}</StarLine>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={labels.cards.details} look={{ ...STAR_LINES, list: 'mb-2 space-y-1' }} />
       {project.impact && (
         <p className={`mb-2 rounded px-2 py-1 italic ${BODY} ${world.impact}`}>
           <span aria-hidden="true">→ </span>

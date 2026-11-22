@@ -7,7 +7,8 @@ import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import type { Project } from '@/lib/cv/content'
 import { projectCard } from '@/lib/cv/cvView'
-import { SunPoints } from './boards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { SUN_POINTS } from './boards'
 import { jungleButton } from './buttons'
 import { CartLine, RideButton, STATION } from './mineCart'
 import look from './jungle.module.css'
@@ -47,7 +48,7 @@ const ProjectStation = memo(function ProjectStation({ slot, index, here, onRide 
           {project.impact}
         </p>
       )}
-      <SunPoints items={project.details} label={labels.cards.details} />
+      <MarkedLines items={project.details} label={labels.cards.details} look={SUN_POINTS} />
       {project.techStack.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
           {project.techStack.map((tech) => (

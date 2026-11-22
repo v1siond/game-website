@@ -10,6 +10,7 @@ import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // The cards each section lists, each a crooked slab whose words sit level so they read. Every card sits
 // in two layers: the outer one plays the entrance once when its stage fires (rank flip, result slide),
@@ -43,15 +44,12 @@ export function Chips({ items, label, className = 'mt-3' }: { items: string[]; l
   )
 }
 
-/** A list row behind a red diamond, a highlight or a detail of a card; `tone` sets its type and colour
- *  (the dim paper of a slab by default, the ink of the speech box on the About statement). */
-export function Bullet({ children, tone = BODY }: { children: ReactNode; tone?: string }) {
-  return (
-    <li className={`flex items-start gap-2 ${tone}`}>
-      <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
-      {children}
-    </li>
-  )
+/** Rows behind a red diamond, the highlights or details of a card, in the dim paper of a slab (the About
+ *  statement sets the ink of its speech box over it). */
+export const BULLETS: MarkedLinesLook = {
+  list: 'mt-3 space-y-1.5',
+  line: `flex items-start gap-2 ${BODY}`,
+  marker: <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />,
 }
 
 export function TechStackBoard({ categories }: { categories: CVData['techStack'] }) {
@@ -92,13 +90,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
         </p>
         {job.location && <p className={`mt-1 text-sm font-bold text-[color:var(--noir-fog)] ${world.copy}`}>{job.location}</p>}
         {job.description && <p className={`mt-3 ${BODY}`}>{job.description}</p>}
-        {job.highlights.length > 0 && (
-          <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
-            {job.highlights.map((highlight) => (
-              <Bullet key={highlight}>{highlight}</Bullet>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={job.highlights} label={cards.keyAchievements} look={BULLETS} />
         {job.skills.length > 0 && <Chips items={job.skills} label={cards.skillsUsed} />}
       </article>
     </div>

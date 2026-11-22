@@ -11,6 +11,7 @@ import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // The fight cards every list entry sits on: a flat dark box ruled in its accent, ringed in black, with
 // the cut corner of a move list panel; highlights are marked with a hit spark. A running job is ruled
@@ -44,18 +45,10 @@ function Tags({ items, label }: { items: string[]; label: string }) {
 }
 
 /** Lines marked with a hit spark: a job's highlights, a project's details, the About highlights. */
-export function SparkLines({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mb-4 space-y-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-3 text-sm text-white">
-          <HitSpark />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  )
+export const SPARK_LINES: MarkedLinesLook = {
+  list: 'mb-4 space-y-2',
+  line: 'flex items-start gap-3 text-sm text-white',
+  marker: <HitSpark />,
 }
 
 // The job's years stand on the round's life bars above the card (./rounds), not on the card.
@@ -76,7 +69,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 
       {job.description && <p className={`mb-4 ${BODY}`}>{job.description}</p>}
 
-      <SparkLines items={job.highlights} label={cards.keyAchievements} />
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPARK_LINES} />
 
       <Tags items={job.skills} label={cards.skillsUsed} />
     </FightCard>
@@ -108,7 +101,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
         </p>
       )}
 
-      <SparkLines items={project.details} label={labels.cards.details} />
+      <MarkedLines items={project.details} label={labels.cards.details} look={SPARK_LINES} />
 
       <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
 

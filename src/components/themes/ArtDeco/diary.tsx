@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
@@ -27,6 +28,17 @@ import diary from './diary.module.css'
 // that is the content, not motion.
 
 const LINE_MS = 2200
+
+// A job's highlights, each behind a diamond in the line's own colour, lit one by one as the diary plays.
+const DIARY_LINES: MarkedLinesLook = {
+  list: 'relative mt-4 space-y-2',
+  line: `flex items-start gap-2 text-sm ${diary.line}`,
+  marker: (
+    <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
+      <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
+    </svg>
+  ),
+}
 
 interface Playing {
   id: string
@@ -104,18 +116,12 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
 
       {card.description && <p className="relative mt-4 text-sm leading-relaxed text-[color:var(--deco-mist)]">{card.description}</p>}
 
-      {card.highlights.length > 0 && (
-        <ul className="relative mt-4 space-y-2" aria-label={cards.keyAchievements}>
-          {card.highlights.map((highlight, line) => (
-            <li key={highlight} data-lit={(isPlaying && line <= playing) || undefined} className={`flex items-start gap-2 text-sm ${diary.line}`}>
-              <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
-                <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
-              </svg>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines
+        items={card.highlights}
+        label={cards.keyAchievements}
+        look={DIARY_LINES}
+        lineProps={(line) => ({ 'data-lit': (isPlaying && line <= playing) || undefined })}
+      />
 
       <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3">
         {card.skills.length > 0 && (

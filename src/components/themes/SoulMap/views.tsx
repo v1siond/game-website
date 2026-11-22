@@ -7,7 +7,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import type { Labels } from '@/lib/cv/labels'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { AreaTitle, CARD_BODY, CARD_META, CARD_TITLE, EmberList, MenuPanel, TechSlots } from './menu'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { AreaTitle, CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, MenuPanel, TechSlots } from './menu'
 import { FogGate } from './gate'
 import { LiftDescent } from './descent'
 import { ItemProjects } from './items'
@@ -58,7 +59,7 @@ function AboutFacts() {
           ))}
         </dl>
       )}
-      <EmberList items={highlights} label={cards.keyAchievements} className="mt-4" />
+      <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...EMBER_LIST, list: 'space-y-1.5 mt-4' }} />
     </>
   )
 }

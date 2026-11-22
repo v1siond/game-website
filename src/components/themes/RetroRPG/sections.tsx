@@ -10,6 +10,7 @@ import {
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
 import { VentureList } from "@/components/cv/VentureList";
+import { MarkedLines } from "@/components/cv/MarkedLines";
 import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
 import { MASONRY_ITEM, MASONRY_LIST } from "@/lib/cv/masonry";
 import { drumsSince } from "@/lib/cv/sectionText";
@@ -20,7 +21,7 @@ import {
   ExperienceCard,
   ItemBag,
   ProjectCard,
-  SaidLine,
+  SAID_LINES,
 } from "./cards";
 import { BulletBox } from "./bulletBox";
 import { MonsterTurnBox } from "./monsterTurn";
@@ -127,16 +128,11 @@ const FRAMES: SectionFrames = {
         <EncounterRoom>
           <OpenBox>
             <p className={`max-w-prose ${BODY}`}>{slot.bio}</p>
-            {highlights.length > 0 && (
-              <ul
-                className="mt-4 max-w-prose space-y-2"
-                aria-label={cards.keyAchievements}
-              >
-                {highlights.map((highlight) => (
-                  <SaidLine key={highlight}>{highlight}</SaidLine>
-                ))}
-              </ul>
-            )}
+            <MarkedLines
+              items={highlights}
+              label={cards.keyAchievements}
+              look={{ ...SAID_LINES, list: "mt-4 max-w-prose space-y-2" }}
+            />
             <dl className="mt-4 max-w-prose space-y-1">
               <StatLine label={about.education} value={education} />
               <StatLine label={about.languages} value={languages} />

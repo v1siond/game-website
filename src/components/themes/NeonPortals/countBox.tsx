@@ -10,7 +10,8 @@ import { usePreview } from '@/themes/PreviewContext'
 import { staggerAt } from '../shared/stagger'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
-import { BODY, PANEL, Points } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BODY, PANEL, POINTS } from './cards'
 import { AT_PLUNGER, COUNT_BOX, PIPS, pipAt } from './choreography'
 import { findId } from './finds'
 import { PORTAL, type Era } from './palette'
@@ -113,7 +114,7 @@ export function CountBoxLevel() {
           <span className="font-bold">{aboutLabels.languages}: </span>
           {about.languages}
         </p>
-        <Points items={about.highlights} label={cvPage.coreCompetencies} />
+        <MarkedLines items={about.highlights} label={cvPage.coreCompetencies} look={POINTS} />
       </div>
     </Region>
   )

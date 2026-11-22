@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useRef, type MouseEvent } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
@@ -11,6 +11,7 @@ import { jobCard, projectCard } from '@/lib/cv/cvView'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MONO, PIXEL } from './palette'
 import { Command } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
@@ -47,13 +48,11 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
-export function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
-  return (
-    <li className={`flex items-start gap-2 ${BODY} ${className}`} style={style}>
-      <Mark />
-      <span>{children}</span>
-    </li>
-  )
+/** Lines the box speaks, each behind the asterisk: a job's highlights, a project's details, the About highlights. */
+export const SAID_LINES: MarkedLinesLook = {
+  list: 'space-y-2',
+  line: `flex items-start gap-2 ${BODY}`,
+  marker: <Mark />,
 }
 
 // Each achievement line shows a beat after the one before it, the way the box speaks line by line.
@@ -86,15 +85,12 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           </span>
         </div>
         {job.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{job.description}</p>}
-        {job.highlights.length > 0 && (
-          <ul className="space-y-2" aria-label={cards.keyAchievements}>
-            {job.highlights.map((highlight, index) => (
-              <SaidLine key={highlight} className={world.after} style={lineDelay(index)}>
-                {highlight}
-              </SaidLine>
-            ))}
-          </ul>
-        )}
+        <MarkedLines
+          items={job.highlights}
+          label={cards.keyAchievements}
+          look={SAID_LINES}
+          lineProps={(index) => ({ className: world.after, style: lineDelay(index) })}
+        />
         <div className={SHOW_AFTER.last}>
           <Tags items={job.skills} label={cards.skillsUsed} />
         </div>
@@ -157,13 +153,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
         <p className={`mb-2 ${META}`}>{project.role}</p>
         <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
         {project.description && <p className={`mb-3 ${BODY}`}>{project.description}</p>}
-        {project.details.length > 0 && (
-          <ul className="mb-3 space-y-2" aria-label={labels.cards.details}>
-            {project.details.map((detail) => (
-              <SaidLine key={detail}>{detail}</SaidLine>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={project.details} label={labels.cards.details} look={{ ...SAID_LINES, list: 'mb-3 space-y-2' }} />
         {project.impact && (
           <p ref={impact} className={`flex items-start gap-2 text-sm text-[color:var(--rpg-green)] ${MONO}`}>
             <Mark />

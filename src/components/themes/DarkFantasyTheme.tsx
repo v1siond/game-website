@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
@@ -35,6 +36,17 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+
+// The lines of a card or the About frame, each behind the spirit gold asterisk.
+const SPIRIT_LINES: MarkedLinesLook = {
+  list: 'space-y-1',
+  line: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
+  marker: (
+    <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">
+      *
+    </span>
+  ),
+}
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
@@ -996,16 +1008,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } 
       </p>
       <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>{project.tagline}</p>
       {project.description && <p className="text-sm mt-2 text-[color:var(--df-silver-text)]">{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="space-y-1 mt-2" aria-label={cards.details}>
-          {project.details.map((detail) => (
-            <li key={detail} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
-              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-              {detail}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={cards.details} look={{ ...SPIRIT_LINES, list: 'space-y-1 mt-2' }} />
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
@@ -1143,16 +1146,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
         </span>
       </div>
       {job.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{job.description}</p>}
-      {job.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
-            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
-              <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPIRIT_LINES} />
       {job.skills.length > 0 && <TagList label={cards.skillsUsed} tags={job.skills} className="mt-3" />}
       {!isLast && (
         <div
@@ -1573,16 +1567,7 @@ const FRAMES: SectionFrames = {
       <>
         <FramedSection title={sections[slot.titleKey]}>
           <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
-          {highlights.length > 0 && (
-            <ul className="max-w-prose mx-auto mt-4 space-y-1" aria-label={cards.keyAchievements}>
-              {highlights.map((highlight) => (
-                <li key={highlight} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
-                  <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-                  {highlight}
-                </li>
-              ))}
-            </ul>
-          )}
+          <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SPIRIT_LINES, list: 'max-w-prose mx-auto mt-4 space-y-1' }} />
           {education && <p className="max-w-prose mx-auto mt-4 text-sm text-[color:var(--df-silver-text)]">{education}</p>}
           {languages && <p className="max-w-prose mx-auto mt-1 text-sm text-[color:var(--df-silver-text)]">{languages}</p>}
         </FramedSection>

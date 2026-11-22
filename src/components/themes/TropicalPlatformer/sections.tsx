@@ -9,7 +9,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import type { SectionSlot } from '@/lib/cv/sectionPlan'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { BLOG_PATH, postLinks } from '@/lib/blog/links'
-import { ServiceBoard, SunPoints, TechBoard, VentureBoard } from './boards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { SUN_POINTS, ServiceBoard, TechBoard, VentureBoard } from './boards'
 import { WOOD_BUTTON } from './buttons'
 import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
@@ -55,7 +56,7 @@ const FRAMES: SectionFrames = {
           <Board>
             <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
             <div className="mx-auto max-w-prose">
-              <SunPoints items={highlights} label={cards.keyAchievements} />
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={SUN_POINTS} />
               {education && (
                 <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
                   <span className="font-bold text-[color:var(--tp-sun-gold)]">{about.education}: </span>

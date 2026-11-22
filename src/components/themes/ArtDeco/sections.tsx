@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
@@ -61,6 +62,17 @@ function Level({ slot, fade = false, children }: LevelProps) {
   return <FadeInScene>{chamber}</FadeInScene>
 }
 
+// The About highlights on the brass panel, each behind a gold diamond.
+const GOLD_DIAMONDS: MarkedLinesLook = {
+  list: 'mx-auto mt-5 max-w-prose space-y-2',
+  line: 'flex items-start gap-2 text-sm text-[color:var(--deco-cream)]',
+  marker: (
+    <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0 text-[color:var(--deco-gold)]" aria-hidden="true" focusable="false">
+      <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
+    </svg>
+  ),
+}
+
 // One line of the About plate's facts, the label in the gold capitals; an empty fact leaves no line.
 function AboutFact({ label, value }: { label: string; value: string }) {
   if (!value) return null
@@ -82,18 +94,7 @@ const FRAMES: SectionFrames = {
         <PoweredRoom>
           <BrassPanel>
             <p className="mx-auto max-w-prose text-base leading-relaxed text-[color:var(--deco-cream)]">{slot.bio}</p>
-            {highlights.length > 0 && (
-              <ul className="mx-auto mt-5 max-w-prose space-y-2" aria-label={cards.keyAchievements}>
-                {highlights.map((highlight) => (
-                  <li key={highlight} className="flex items-start gap-2 text-sm text-[color:var(--deco-cream)]">
-                    <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0 text-[color:var(--deco-gold)]" aria-hidden="true" focusable="false">
-                      <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
-                    </svg>
-                    {highlight}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <MarkedLines items={highlights} label={cards.keyAchievements} look={GOLD_DIAMONDS} />
             <dl className="mx-auto mt-5 max-w-prose space-y-1 text-sm">
               <AboutFact label={about.education} value={education} />
               <AboutFact label={about.languages} value={languages} />

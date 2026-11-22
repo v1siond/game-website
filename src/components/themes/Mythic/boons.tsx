@@ -12,7 +12,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { BOONS_PER_WAVE, rarityOf, waveOf, type Rarity } from './fates'
 import { SlabButton } from './buttons'
-import { BloodPoints } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BLOOD_POINTS } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -85,7 +86,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
         </p>
         {project.tagline && <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">{project.tagline}</p>}
         {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
-        <BloodPoints title={cards.details} items={project.details} />
+        <MarkedLines items={project.details} label={cards.details} look={BLOOD_POINTS} />
         {project.impact && (
           <p className="mt-3 border-l-4 border-[var(--rarity)] pl-3 text-base">
             <span className="sr-only">{cards.impact}: </span>

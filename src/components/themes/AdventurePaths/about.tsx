@@ -1,6 +1,7 @@
 'use client'
 
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { aboutBlock } from '@/lib/cv/cvView'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -18,6 +19,13 @@ import side from './side.module.css'
 // and hit it again, and the window unfolds again. Under reduced motion he stands under the used block
 // and the window is open. The window holds the whole About block: the bio, his highlights as coin rows,
 // then his education and languages.
+
+// The About highlights as coin rows in the white message window.
+const COIN_ROWS: MarkedLinesLook = {
+  list: 'mt-4 max-w-prose space-y-1.5',
+  line: 'flex items-start gap-2 text-sm text-white',
+  marker: <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-white bg-[color:var(--ap-coin)]" aria-hidden="true" />,
+}
 
 type AboutPose = 'run' | 'jump' | 'land' | 'stand' | 'bump'
 
@@ -78,16 +86,7 @@ export function AboutLevel({ bio, profession }: { bio: string; profession: Profe
         </Playfield>
         <div key={course.take} className={`${side.unfold} rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6`}>
           <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{bio}</p>
-          {highlights.length > 0 && (
-            <ul className="mt-4 max-w-prose space-y-1.5" aria-label={cards.keyAchievements}>
-              {highlights.map((highlight) => (
-                <li key={highlight} className="flex items-start gap-2 text-sm text-white">
-                  <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-white bg-[color:var(--ap-coin)]" aria-hidden="true" />
-                  <span>{highlight}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <MarkedLines items={highlights} label={cards.keyAchievements} look={COIN_ROWS} />
           {facts.length > 0 && (
             <dl className="mt-4 max-w-prose space-y-1 text-sm text-white">
               {facts.map(({ term, value }) => (

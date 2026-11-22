@@ -12,7 +12,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
-import { SunPoints } from './boards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { SUN_POINTS } from './boards'
 import { StatusLine } from './buttons'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
@@ -135,7 +136,7 @@ const Platform = memo(function Platform({ entry, coins, index, armed, occupied, 
 
       {job.description && <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{job.description}</p>}
 
-      <SunPoints items={job.highlights} label={cards.keyAchievements} />
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SUN_POINTS} />
 
       {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>

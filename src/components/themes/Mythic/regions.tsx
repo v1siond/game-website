@@ -5,7 +5,8 @@ import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { BloodPoints, Stage } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BLOOD_POINTS, Stage } from './stage'
 import { Trials } from './trials'
 import { ChainHaul } from './chains'
 import { ChestHeave } from './chest'
@@ -34,7 +35,7 @@ const FRAMES: SectionFrames = {
         <ChainHaul>
           <p className="max-w-prose text-lg leading-relaxed">{slot.bio}</p>
           <div className="max-w-prose">
-            <BloodPoints title={cards.keyAchievements} items={highlights} />
+            <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
             {education && (
               <p className="mt-4 text-base">
                 <span className={`text-sm text-[var(--myth-gold)] ${u.display}`}>{about.education}: </span>

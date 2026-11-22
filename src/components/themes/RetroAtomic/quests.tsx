@@ -3,7 +3,8 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { AtomicChip, PlusRow } from './controls'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { AtomicChip, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
 
@@ -41,13 +42,7 @@ function QuestCard({ job: entry, index }: { job: Job; index: number }) {
 
       {job.description && <p className="mt-3 text-sm leading-relaxed text-atomic-ash">{job.description}</p>}
 
-      {job.highlights.length > 0 && (
-        <ul className="mt-4 space-y-1 border-t border-atomic-phosphor/30 pt-3" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
-            <PlusRow key={highlight}>{highlight}</PlusRow>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={PLUS_ROWS} />
 
       {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>

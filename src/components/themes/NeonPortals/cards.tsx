@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // The world's type and card faces. Names and counts are the game's fat cartoon capitals (Luckiest Guy,
 // --np-face); the reading text is a round sans (Nunito, --np-body). A card is one of the game's objects
@@ -49,18 +50,10 @@ export function Tags({ items, label, className = '' }: ListProps) {
 }
 
 /** A card's points, each behind a small berry: a job's highlights, a project's details. */
-export function Points({ items, label, className = '' }: ListProps) {
-  if (items.length === 0) return null
-  return (
-    <ul className={`mt-3 space-y-1.5 ${className}`} aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-2 text-sm leading-relaxed">
-          <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-[color:var(--np-ink)] bg-[color:var(--np-berry)]" aria-hidden="true" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  )
+export const POINTS: MarkedLinesLook = {
+  list: 'mt-3 space-y-1.5',
+  line: 'flex items-start gap-2 text-sm leading-relaxed',
+  marker: <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-[color:var(--np-ink)] bg-[color:var(--np-berry)]" aria-hidden="true" />,
 }
 
 /** A line of facts with a heading of its own, for the fields a card shows under its title. */

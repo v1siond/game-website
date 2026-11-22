@@ -9,7 +9,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { ArcadePanel } from './frames'
-import { MoveCard, ProjectCard, ServiceCard, SparkLines, VentureCard } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { MoveCard, ProjectCard, SPARK_LINES, ServiceCard, VentureCard } from './cards'
 import { ClashSeparator, LightningLine, RoundWins } from './separators'
 import { ComboZone, HitCard } from './combo'
 import { BandStage, LockIn, ResultRecord, RoundEntry } from './rounds'
@@ -53,7 +54,7 @@ const FRAMES: SectionFrames = {
           <CarSmash profession="engineer">
             <p className={`mt-6 max-w-prose ${LEAD}`}>{slot.bio}</p>
             <div className="mt-6 max-w-prose">
-              <SparkLines items={highlights} label={cards.keyAchievements} />
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={SPARK_LINES} />
               {education && (
                 <p className="text-sm text-white">
                   <span className={`uppercase text-[color:var(--fs-gold)] ${look.display}`}>{about.education}: </span>

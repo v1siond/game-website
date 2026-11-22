@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
 import { jobCard } from '@/lib/cv/cvView'
@@ -30,6 +31,13 @@ import bump from './jobBump.module.css'
 // reduced motion he stands on the ledge at once and no card bumps.
 
 const LEDGE_HEIGHT = 44
+
+// A job's highlights as coin rows on its paper card.
+const COIN_ROWS: MarkedLinesLook = {
+  list: 'mt-3 space-y-1.5',
+  line: 'flex items-start gap-2 text-sm',
+  marker: <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />,
+}
 const ENTRY: Spot = { x: 0, lift: 0 }
 const RUN_IN: Motion = { pose: 'run', frame: 'run', path: 'line', from: { x: -20, lift: 0 }, to: ENTRY, ms: 520 }
 const HOP_MS = 280
@@ -97,16 +105,7 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
         <span className="rounded-sm bg-[color:var(--ap-hud)] px-2 py-1 text-sm text-white">{card.years}</span>
       </div>
       {card.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{card.description}</p>}
-      {card.highlights.length > 0 && (
-        <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
-          {card.highlights.map((highlight) => (
-            <li key={highlight} className="flex items-start gap-2 text-sm">
-              <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />
-              <span>{highlight}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={card.highlights} label={cards.keyAchievements} look={COIN_ROWS} />
       {card.skills.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.skillsUsed}>
           {card.skills.map((skill) => (

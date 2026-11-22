@@ -11,7 +11,8 @@ import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ArtBreak, CurlBanner, PieEyes } from './art'
 import { HOSE } from './palette'
-import { BandRecord, CompanyPoster, ExperienceCard, StarLine, TechBubbleCloud } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud } from './cards'
 import { Reveal, RunBar } from './scenes'
 import { staggerAt } from '../shared/stagger'
 import { ParryBoard } from './parry'
@@ -100,13 +101,7 @@ const FRAMES: SectionFrames = {
               <FlowerKnockout on={on} reduced={reduced} profession="engineer">
                 <div className={`mx-auto max-w-prose p-5 ${world.titleCard}`}>
                   <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
-                  {highlights.length > 0 && (
-                    <ul className="mt-4 space-y-1" aria-label={cards.keyAchievements}>
-                      {highlights.map((highlight) => (
-                        <StarLine key={highlight}>{highlight}</StarLine>
-                      ))}
-                    </ul>
-                  )}
+                  <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
                   <dl className="mt-4 space-y-1">
                     <BillLine label={about.education} value={education} />
                     <BillLine label={about.languages} value={languages} />

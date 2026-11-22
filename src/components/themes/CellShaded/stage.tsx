@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { headingId } from '@/lib/cv/sectionText'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { Zone } from './wasteland'
 import cel from './cel.module.css'
 
@@ -14,22 +15,12 @@ import cel from './cel.module.css'
 export const celHeadingId = (title: string) => headingId('cel', title)
 
 /** Lines marked with the orange diamond the bounty notices give a job's highlights, under their inked
- *  heading: a job's highlights, a project's details, the About highlights. Nothing when there are none. */
-export function OrangePoints({ title, items }: { title: string; items: string[] }) {
-  if (items.length === 0) return null
-  return (
-    <>
-      <h4 className={`mt-4 text-base ${cel.display} [-webkit-text-stroke:0]`}>{title}</h4>
-      <ul className="mt-2 space-y-1.5">
-        {items.map((line) => (
-          <li key={line} className="flex gap-2 text-base">
-            <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--cel-orange)]" aria-hidden="true" />
-            <span>{line}</span>
-          </li>
-        ))}
-      </ul>
-    </>
-  )
+ *  heading: a job's highlights, a project's details, the About highlights. */
+export const ORANGE_POINTS: MarkedLinesLook = {
+  heading: `mt-4 text-base ${cel.display} [-webkit-text-stroke:0]`,
+  list: 'mt-2 space-y-1.5',
+  line: 'flex gap-2 text-base',
+  marker: <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--cel-orange)]" aria-hidden="true" />,
 }
 
 export function SectionTitle({ title }: { title: string }) {

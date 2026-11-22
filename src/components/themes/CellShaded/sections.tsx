@@ -7,7 +7,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
-import { OrangePoints, Stage } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { ORANGE_POINTS, Stage } from './stage'
 import type { Zone } from './wasteland'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
@@ -57,7 +58,7 @@ const FRAMES: SectionFrames = {
           <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
             <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
             <div className="max-w-prose">
-              <OrangePoints title={cards.keyAchievements} items={highlights} />
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
               {education && (
                 <p className="mt-4 text-base">
                   <span className="font-bold uppercase tracking-wider">{about.education}: </span>

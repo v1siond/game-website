@@ -13,7 +13,8 @@ import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
-import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MarkedList, ProjectCard, VentureCard } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MARKED_LIST, ProjectCard, VentureCard } from './cards'
 import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
 
 // Each profession's sections, framed per zone between ornaments and art dividers.
@@ -60,7 +61,7 @@ interface FrameProps {
 // open with theirs); the zone turns from chaos to frost after the services.
 const FRAMES: SectionFrames<FrameProps> = {
   about: function AboutFrame({ slot, layout, isLargeScreen }) {
-    const { sections } = useLabels()
+    const { sections, cards } = useLabels()
     const { professionalSummary } = useCVData()
     const { education, languages, highlights } = aboutBlock(professionalSummary)
     return (
@@ -76,7 +77,7 @@ const FRAMES: SectionFrames<FrameProps> = {
               }}>{slot.bio}</p>
               {education && <p className="text-base text-[color:var(--realm-text-mid)]">{education}</p>}
               {languages && <p className="text-base text-[color:var(--realm-text-mid)]">{languages}</p>}
-              <MarkedList items={highlights} />
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={MARKED_LIST} />
             </RealmFrame>
           </section>
         </ScrollScene>

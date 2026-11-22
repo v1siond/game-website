@@ -12,7 +12,8 @@ import { cssVars } from '@/lib/cssVars'
 import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
-import { MarkList, PinnedTags, STAMP } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { MARK_LIST, PinnedTags, STAMP } from './cards'
 import { SH } from './palette'
 import horror from './horror.module.css'
 import look from './world.module.css'
@@ -115,7 +116,7 @@ function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
         <SlashBreaks text={project.name} />
       </h3>
       {project.description && <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>}
-      <MarkList items={project.details} label={cards.details} className="mt-2 space-y-1" />
+      <MarkedLines items={project.details} label={cards.details} look={{ ...MARK_LIST, list: 'mt-2 space-y-1' }} />
       {project.impact && (
         <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">
           <span className="sr-only">{cards.impact}: </span>

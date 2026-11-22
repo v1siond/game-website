@@ -12,7 +12,8 @@ import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
 import { DwellerSprite, type DwellerMotion } from './dweller'
-import { AtomicChip, PHOSPHOR_BUTTON, PlusRow } from './controls'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { AtomicChip, PHOSPHOR_BUTTON, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 import { cssVars } from '@/lib/cssVars'
@@ -239,13 +240,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
           </p>
         )}
 
-        {project.details.length > 0 && (
-          <ul className="mt-5 space-y-1" aria-label={cards.details}>
-            {project.details.map((detail) => (
-              <PlusRow key={detail}>{detail}</PlusRow>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={project.details} label={cards.details} look={{ ...PLUS_ROWS, list: 'mt-5 space-y-1' }} />
 
         {project.techStack.length > 0 && (
           <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>

@@ -4,6 +4,7 @@ import type { Job } from '@/lib/cv/content'
 import { aboutBlock, jobCard, projectCard } from '@/lib/cv/cvView'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -42,20 +43,14 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
 }
 
 // A list in the card's body type, each line behind the dash every Silhouette card marks its points with.
-function DashList({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-2 space-y-1" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={`flex items-start gap-1.5 ${CARD_BODY}`}>
-          <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
-            -
-          </span>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+const DASH_LIST: MarkedLinesLook = {
+  list: 'mt-2 space-y-1',
+  line: `flex items-start gap-1.5 ${CARD_BODY}`,
+  marker: (
+    <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
+      -
+    </span>
+  ),
 }
 
 // Every field of the job's card, the years in the label ("2019 to 2022").
@@ -78,7 +73,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </span>
       </div>
       {job.description && <p className={`mt-2 ${CARD_BODY}`}>{job.description}</p>}
-      <DashList items={job.highlights} label={cards.keyAchievements} />
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={DASH_LIST} />
       {job.skills.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {job.skills.map((skill) => (
@@ -108,7 +103,7 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
       <p className="mt-0.5 text-sm text-[color:var(--sh-text)]">{project.role}</p>
       {project.tagline && <p className={`mt-0.5 ${CARD_META}`}>{project.tagline}</p>}
       {project.description && <p className={`mt-1.5 ${CARD_BODY}`}>{project.description}</p>}
-      <DashList items={project.details} label={cards.details} />
+      <MarkedLines items={project.details} label={cards.details} look={DASH_LIST} />
       {project.impact && (
         <p className={`mt-1.5 italic ${CARD_BODY}`}>
           <span aria-hidden="true">{'-> '}</span>
@@ -161,7 +156,7 @@ export function AboutFacts() {
           ))}
         </dl>
       )}
-      <DashList items={highlights} label={cards.keyAchievements} />
+      <MarkedLines items={highlights} label={cards.keyAchievements} look={DASH_LIST} />
     </div>
   )
 }

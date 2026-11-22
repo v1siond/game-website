@@ -11,7 +11,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { compareStat, rarityOf, statsOf, type Rarity, type Stat, type StatKey, type Trend } from './loot'
 import { InkButton } from './buttons'
-import { OrangePoints } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { ORANGE_POINTS } from './stage'
 import cel from './cel.module.css'
 
 // The projects as loot on the dusk field: each one drops in with a column of its rarity's light
@@ -112,7 +113,7 @@ function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardP
           </p>
           {project.tagline && <p className="mt-2 text-base font-bold">{project.tagline}</p>}
           {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
-          <OrangePoints title={cards.details} items={project.details} />
+          <MarkedLines items={project.details} label={cards.details} look={ORANGE_POINTS} />
 
           <dl className="mt-4 border-[3px] border-[var(--cel-ink)] bg-[var(--cel-white)] px-3 py-1">
             {statsFor(slot.project, labels).map((stat, statIndex) => (

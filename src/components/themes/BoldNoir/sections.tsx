@@ -13,7 +13,8 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Project } from '@/lib/cv/content'
 import { HitStar } from './backdrop'
-import { BandPanel, Bullet, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BULLETS, BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
 import { AllOutAttack } from './allOut'
 import { SlappedStatement, StampedCase } from './evidence'
 import { NOIR } from './palette'
@@ -80,15 +81,11 @@ function About({ bio }: { bio: string }) {
       <SlappedStatement>
         <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
           <p className={`max-w-prose text-base leading-relaxed ${world.copy}`}>{bio}</p>
-          {highlights.length > 0 && (
-            <ul className="mt-4 max-w-prose space-y-1.5" aria-label={cards.keyAchievements}>
-              {highlights.map((highlight) => (
-                <Bullet key={highlight} tone={`text-sm ${world.copy}`}>
-                  {highlight}
-                </Bullet>
-              ))}
-            </ul>
-          )}
+          <MarkedLines
+            items={highlights}
+            label={cards.keyAchievements}
+            look={{ ...BULLETS, list: 'mt-4 max-w-prose space-y-1.5', line: `flex items-start gap-2 text-sm ${world.copy}` }}
+          />
           <div className="mt-4 max-w-prose space-y-1">
             <StatementFact label={about.education} value={education} />
             <StatementFact label={about.languages} value={languages} />

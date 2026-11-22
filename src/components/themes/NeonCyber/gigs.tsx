@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { projectCard, type ProjectCard as ProjectCardView } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -22,6 +23,17 @@ import world from './world.module.css'
 // full buffer without it can be tried again, and Open now skips the hack. The file's text is in the
 // dialog from the start, under a scramble of bytes that lifts when it opens, so a screen reader reads it
 // whatever the matrix shows; under reduced motion the file opens at once.
+
+// A gig's details, each behind the hack prompt.
+const PROMPT_LINES: MarkedLinesLook = {
+  list: 'mt-3 space-y-1',
+  line: 'flex gap-2 text-sm text-[color:var(--neon-ice)]',
+  marker: (
+    <span className="text-[color:var(--neon-hack)]" aria-hidden="true">
+      {'>'}
+    </span>
+  ),
+}
 
 const ROWS = Array.from({ length: MATRIX_SIZE }, (_, i) => i)
 
@@ -68,18 +80,7 @@ function BreachFile({ project, children }: { project: ProjectCardView; children?
   return (
     <section className="relative mt-6 border-t border-[color-mix(in_srgb,var(--neon-chrome-red)_60%,transparent)] pt-4" aria-label={cards.details}>
       {project.description && <p className="text-sm text-[color:var(--neon-ice)]">{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="mt-3 space-y-1">
-          {project.details.map((detail) => (
-            <li key={detail} className="flex gap-2 text-sm text-[color:var(--neon-ice)]">
-              <span className="text-[color:var(--neon-hack)]" aria-hidden="true">
-                {'>'}
-              </span>
-              {detail}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={cards.details} look={PROMPT_LINES} />
       {project.impact && (
         <p className="mt-3 text-sm text-[color:var(--neon-hud)]">
           <span className="sr-only">{cards.impact}: </span>

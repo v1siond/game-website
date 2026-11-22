@@ -19,7 +19,8 @@ import { Loot } from './footlocker'
 import { Dig } from './dig'
 import { Spar } from './spar'
 import { BeamedLog, BootedTube } from './repairs'
-import { PlusRow } from './controls'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { PLUS_ROWS } from './controls'
 import type { Zone } from './journey'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
@@ -84,13 +85,11 @@ const FRAMES: SectionFrames = {
         <Fetch>
           <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
             <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
-            {highlights.length > 0 && (
-              <ul className="mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3" aria-label={cards.keyAchievements}>
-                {highlights.map((highlight) => (
-                  <PlusRow key={highlight}>{highlight}</PlusRow>
-                ))}
-              </ul>
-            )}
+            <MarkedLines
+              items={highlights}
+              label={cards.keyAchievements}
+              look={{ ...PLUS_ROWS, list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3' }}
+            />
             <dl className="mt-4 max-w-prose space-y-1 text-sm">
               <TerminalFact label={about.education} value={education} />
               <TerminalFact label={about.languages} value={languages} />

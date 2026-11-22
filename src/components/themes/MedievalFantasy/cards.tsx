@@ -7,6 +7,7 @@ import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { shownUrl } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { REALM } from './palette'
 import { InnerCard } from './panels'
 import { RealmButton } from './actions'
@@ -26,17 +27,14 @@ export const CARD_CHIP: CSSProperties = {
 }
 
 // The marked lines under a card (a job's highlights, a project's details, the About highlights).
-export function MarkedList({ items }: { items: string[] }) {
-  if (items.length === 0) return null
-  return (
-    <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
-      {items.map((item) => (
-        <li key={item} style={{ color: REALM.textMid, fontSize: '0.875rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
-          <span style={{ position: 'absolute', left: 0, color: REALM.goldDark }} aria-hidden="true">›</span>{item}
-        </li>
-      ))}
-    </ul>
-  )
+export const MARKED_LIST: MarkedLinesLook = {
+  list: 'mt-1.5',
+  line: 'relative mb-0.5 pl-3 text-[0.875rem] text-[color:var(--realm-text-mid)]',
+  marker: (
+    <span className="absolute left-0 text-[color:var(--realm-gold-dark)]" aria-hidden="true">
+      ›
+    </span>
+  ),
 }
 
 // The tags under a card, every one: a job's skills, a project's technologies, a venture's services.
@@ -52,7 +50,7 @@ function ChipRow({ chips }: { chips: string[] }) {
 }
 
 export function JobCard({ job }: { job: Job }) {
-  const { years } = useLabels()
+  const { years, cards } = useLabels()
   const card = jobCard(job, years)
   return (
     <InnerCard highlight={job.endDate === null} zone="roc">
@@ -65,7 +63,7 @@ export function JobCard({ job }: { job: Job }) {
         <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{card.years}</span>
       </div>
       {card.description && <p style={{ color: REALM.textMid, fontSize: '0.875rem' }}>{card.description}</p>}
-      <MarkedList items={card.highlights} />
+      <MarkedLines items={card.highlights} label={cards.keyAchievements} look={MARKED_LIST} />
       <ChipRow chips={card.skills} />
     </InnerCard>
   )
@@ -86,7 +84,7 @@ export function ProjectCard({ slot: { project, links } }: { slot: ProjectSlot })
       <p style={CARD_BODY}>{card.tagline}</p>
       {card.description && <p className="mb-1 text-sm text-[color:var(--realm-text-mid)]">{card.description}</p>}
       {card.impact && <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontWeight: 500 }}>{card.impact}</p>}
-      <MarkedList items={card.details} />
+      <MarkedLines items={card.details} label={labels.cards.details} look={MARKED_LIST} />
       <ChipRow chips={card.techStack} />
       {links.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>

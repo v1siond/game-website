@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { headingId } from '@/lib/cv/sectionText'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import u from './underworld.module.css'
 
 // A section's stage in the descent: the gilded title plate and the section's own scene. useZoneStage
@@ -28,22 +29,12 @@ export const useHouse = () => useContext(HouseContext)
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
 /** Lines marked with the blood red diamond the trials give a job's highlights: a job's highlights, a
- *  project's details, the About highlights, under their gold heading. Nothing when there are none. */
-export function BloodPoints({ title, items }: { title: string; items: string[] }) {
-  if (items.length === 0) return null
-  return (
-    <>
-      <h4 className={`mt-4 text-sm text-[var(--myth-gold)] ${u.display}`}>{title}</h4>
-      <ul className="mt-2 space-y-1.5">
-        {items.map((line) => (
-          <li key={line} className="flex gap-2 text-base">
-            <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />
-            <span>{line}</span>
-          </li>
-        ))}
-      </ul>
-    </>
-  )
+ *  project's details, the About highlights, under their gold heading. */
+export const BLOOD_POINTS: MarkedLinesLook = {
+  heading: `mt-4 text-sm text-[var(--myth-gold)] ${u.display}`,
+  list: 'mt-2 space-y-1.5',
+  line: 'flex gap-2 text-base',
+  marker: <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />,
 }
 
 export function Laurel({ flip = false }: { flip?: boolean }) {

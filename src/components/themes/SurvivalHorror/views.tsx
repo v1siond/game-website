@@ -7,7 +7,8 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { Labels } from '@/lib/cv/labels'
 import { PaperPanel } from './panels'
-import { MarkList, ServiceNotes, TechCloud } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { MARK_LIST, ServiceNotes, TechCloud } from './cards'
 import { MapFiles } from './files'
 import { AttacheCase } from './case'
 import { TraderWares } from './trader'
@@ -60,7 +61,7 @@ function AboutFacts() {
           ))}
         </dl>
       )}
-      <MarkList items={highlights} label={cards.keyAchievements} className="mt-4 space-y-1" />
+      <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...MARK_LIST, list: 'mt-4 space-y-1' }} />
     </>
   )
 }

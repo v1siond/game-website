@@ -9,7 +9,8 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
-import { OrangePoints } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { ORANGE_POINTS } from './stage'
 import cel from './cel.module.css'
 
 // Work Experience as the town's bounty board: each job a notice pinned to the planks, slapped on when it
@@ -47,7 +48,7 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
           {card.location && ` · ${card.location}`}
         </p>
         <p className="mt-3 text-base leading-relaxed">{card.description}</p>
-        <OrangePoints title={cards.keyAchievements} items={card.highlights} />
+        <MarkedLines items={card.highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
         {card.skills.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
             {card.skills.map((skill) => (

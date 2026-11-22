@@ -14,7 +14,8 @@ import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, CARD_META, CARD_TITLE, EmberList, TAG } from './menu'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAG } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -118,7 +119,7 @@ function ItemCard({ project: entry, links }: ProjectSlot) {
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{project.role}</p>
         <p className={`mt-1 ${CARD_META}`}>{project.tagline}</p>
         {project.description && <p className={`mt-3 ${CARD_BODY}`}>{project.description}</p>}
-        <EmberList items={project.details} label={cards.details} />
+        <MarkedLines items={project.details} label={cards.details} look={EMBER_LIST} />
         {project.impact && (
           <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>
             <span className="sr-only">{cards.impact}: </span>
