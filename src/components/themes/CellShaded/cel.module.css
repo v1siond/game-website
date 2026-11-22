@@ -47,15 +47,6 @@
   transform: skewX(8deg);
 }
 
-.hint {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: var(--cel-ink);
-  color: var(--cel-paper);
-  font-size: 0.875rem;
-  font-weight: 700;
-}
-
 /* A printed surface: paper, a thick ink border and a hard ink drop. */
 .paper {
   background: var(--cel-paper);
@@ -701,9 +692,9 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* ---------------------------------------------------------------- a section's stage (zones.tsx) */
+/* ---------------------------------------------------------------- a section's stage (stage.tsx) */
 
-/* The title slab slides in when the section first comes into view (data-on, useSectionTrigger). */
+/* The title slab slides in when the section first comes into view (data-on, useZoneStage). */
 .stage .titleSlab {
   opacity: 0;
 }
@@ -889,18 +880,6 @@
 
 .skillLit[data-on] {
   opacity: 1;
-}
-
-.spineLit {
-  background: var(--cel-sun);
-  transform: scaleY(0);
-  transform-origin: 50% 0;
-  transition: transform 220ms ease-out;
-  transition-delay: calc(var(--t) * 45ms);
-}
-
-.spineLit[data-on] {
-  transform: scaleY(1);
 }
 
 @keyframes celUnlock {

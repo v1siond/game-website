@@ -161,13 +161,11 @@ export function LootDrops({ projects }: { projects: Project[] }) {
   const equippedStats = useMemo(() => statsFor(equipped, labels), [equipped, labels])
 
   return (
-    <>
-      <ProjectList
-        projects={projects}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderProject={(slot, index) => <LootCard slot={slot} index={index} equippedId={equipped.id} equippedStats={equippedStats} onEquip={setEquippedId} />}
-      />
-    </>
+    <ProjectList
+      projects={projects}
+      className={MASONRY_LIST}
+      itemClassName={MASONRY_ITEM}
+      renderProject={(slot, index) => <LootCard slot={slot} index={index} equippedId={equipped.id} equippedStats={equippedStats} onEquip={setEquippedId} />}
+    />
   )
 }
