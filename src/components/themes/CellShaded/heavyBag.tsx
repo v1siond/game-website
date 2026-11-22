@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { fillLabel } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
@@ -21,6 +22,11 @@ import cel from './cel.module.css'
 const STRIKES: readonly SpriteMotion[] = ['kick', 'knee', 'elbow']
 const FIRST_HIT_MS = 500
 const HIT_GAP_MS = 750
+// The last strike's own move (about 460 ms), which must end by 5 s too.
+const LAST_STRIKE_MS = 500
+
+/** The gap between strikes: HIT_GAP_MS, shorter when there are enough achievements that the last would land after 5 s. */
+const hitGapFor = (hits: number) => stepWithin({ step: HIT_GAP_MS, count: hits - 1, fixed: FIRST_HIT_MS + LAST_STRIKE_MS, budget: STORY_MS })
 
 function Bag({ swing }: { swing: number }) {
   return (
@@ -49,7 +55,8 @@ export function HeavyBag({ martialArts, on }: { martialArts: MartialArts; on: bo
 
   useEffect(() => {
     if (!on || reduced) return
-    const timers = achievements.map((_, index) => window.setTimeout(() => setStrikes((count) => count + 1), FIRST_HIT_MS + index * HIT_GAP_MS))
+    const gap = hitGapFor(achievements.length)
+    const timers = achievements.map((_, index) => window.setTimeout(() => setStrikes((count) => count + 1), FIRST_HIT_MS + index * gap))
     return () => timers.forEach((timer) => window.clearTimeout(timer))
   }, [on, reduced, achievements])
 
