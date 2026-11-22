@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { HOSE } from './palette'
@@ -146,7 +147,7 @@ export const HERO_BOX = { top: -20, height: 170, reachTop: -36 } as const
 /** His drawn height in motion over his box's height: how much taller than his box a stage leaves room for. */
 export const HERO_REACH = (HERO_BOX.top + HERO_BOX.height - HERO_BOX.reachTop) / HERO_BOX.height
 
-export function HeroCharacter({ profession, pose = 'idle', className = '' }: { profession: Profession; pose?: HeroPose; className?: string }) {
+export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '' }: { profession: Profession; pose?: HeroPose; className?: string }) {
   const kit = KIT[profession]
   const gun = pose === 'shoot'
 
@@ -174,4 +175,4 @@ export function HeroCharacter({ profession, pose = 'idle', className = '' }: { p
       </g>
     </svg>
   )
-}
+})

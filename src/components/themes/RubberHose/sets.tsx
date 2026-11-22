@@ -1,6 +1,6 @@
 'use client'
 
-import type { ComponentProps, ReactNode } from 'react'
+import { memo, type ComponentProps, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
 import { HeroCharacter, type HeroPose } from './cup'
@@ -441,7 +441,7 @@ const SETS: Record<Profession, () => ReactNode> = {
 }
 
 // The picked profession's set in its inked frame. Decorative: the sections below carry the content.
-export function ProfessionSet({ profession }: { profession: Profession }) {
+export const ProfessionSet = memo(function ProfessionSet({ profession }: { profession: Profession }) {
   const Set = SETS[profession]
 
   return (
@@ -449,4 +449,4 @@ export function ProfessionSet({ profession }: { profession: Profession }) {
       <Set />
     </div>
   )
-}
+})

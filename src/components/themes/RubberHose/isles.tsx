@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
 import { PieEyes } from './art'
 import { HOSE } from './palette'
@@ -107,7 +107,7 @@ function Casino() {
 const DRAWN: Record<Isle, () => ReactNode> = { meadow: Meadow, carnival: Carnival, casino: Casino }
 
 /** The fixed painted backdrop, showing the isle the page is on. */
-export function Isles({ zones }: { zones: ValueStore<Isle> }) {
+export const Isles = memo(function Isles({ zones }: { zones: ValueStore<Isle> }) {
   const current = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
@@ -123,7 +123,7 @@ export function Isles({ zones }: { zones: ValueStore<Isle> }) {
       })}
     </div>
   )
-}
+})
 
 /** What a section draws on its isle: the section itself, or a function of whether it has come into view. */
 type IsleChildren = ReactNode | ((on: boolean) => ReactNode)
