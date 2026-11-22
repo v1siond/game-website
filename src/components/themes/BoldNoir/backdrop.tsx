@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { memo, type CSSProperties, type ReactNode } from 'react'
 import { NameWords } from '@/components/cv/NameWords'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -10,16 +10,18 @@ import world from './world.module.css'
 
 const RAYS = 18
 
+const rayPoint = (angle: number) => `${100 + Math.cos(angle) * 140},${100 + Math.sin(angle) * 140}`
+
+// The burst's rays as polygon points, worked out once: each ray a half step wide round the 200 by 200 box's centre.
+const RAY_POINTS = Array.from({ length: RAYS }, (_, i) => `100,100 ${rayPoint((i / RAYS) * Math.PI * 2)} ${rayPoint(((i + 0.5) / RAYS) * Math.PI * 2)}`)
+
 /** A star burst of alternating ink and red rays, drawn in a 200 by 200 box round its centre. */
 export function StarBurst({ className, light = NOIR.red, dark = NOIR.ink }: { className: string; light?: string; dark?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className} aria-hidden="true" focusable="false">
-      {Array.from({ length: RAYS }, (_, i) => {
-        const from = (i / RAYS) * Math.PI * 2
-        const to = ((i + 0.5) / RAYS) * Math.PI * 2
-        const point = (angle: number) => `${100 + Math.cos(angle) * 140},${100 + Math.sin(angle) * 140}`
-        return <polygon key={i} points={`100,100 ${point(from)} ${point(to)}`} fill={i % 2 ? dark : light} />
-      })}
+      {RAY_POINTS.map((points, i) => (
+        <polygon key={i} points={points} fill={i % 2 ? dark : light} />
+      ))}
     </svg>
   )
 }
@@ -178,7 +180,8 @@ function JaggedSkyline({ className }: { className: string }) {
   )
 }
 
-export function NoirBackdrop() {
+// The night behind the page takes no props, so it draws once and skips every root render after.
+export const NoirBackdrop = memo(function NoirBackdrop() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
       <div className={`absolute -right-[30vmax] -top-[30vmax] h-[90vmax] w-[90vmax] opacity-25 ${world.follow}`}>
@@ -193,4 +196,4 @@ export function NoirBackdrop() {
       <JaggedSkyline className="absolute inset-x-0 bottom-0 h-32 w-full opacity-90" />
     </div>
   )
-}
+})
