@@ -73,9 +73,9 @@ function DoorLeafArt({ suit }: { suit: Suit }) {
 }
 
 function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
-  const { horror: words, links } = useLabels()
+  const { horror: words } = useLabels()
   const [unlocked, setUnlocked] = useState(false)
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
   const suitName = words[suit]
   const behindId = `survival-horror-band-${band.id}`
   const unlock = () => {
@@ -99,9 +99,9 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
 
       <div className={`relative mt-4 h-40 overflow-hidden border-4 border-[color:var(--sh-sepia)] bg-[color:var(--sh-void)] ${horror.doorFrame}`}>
         <div id={behindId} className="absolute inset-0 flex flex-col justify-center gap-3 p-4" inert={!unlocked}>
-          {band.release && (
+          {release && (
             <p className="text-sm text-[color:var(--sh-cream)]">
-              {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+              {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
             </p>
           )}
           {linkProps && (

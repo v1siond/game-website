@@ -117,8 +117,8 @@ function ToolList({ project }: { project: Project }) {
 }
 
 function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
-  const { horror: words, links: linkLabels } = useLabels()
-  const { project, links } = slot
+  const { horror: words } = useLabels()
+  const { project, links, noLink } = slot
 
   return (
     <div className="flex h-full flex-col p-4">
@@ -134,7 +134,7 @@ function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
             {label}
           </a>
         ))}
-        {links.length === 0 && <span className="text-sm italic text-[color:var(--sh-cream)]">{linkLabels.noPublicLink}</span>}
+        {noLink && <span className="text-sm italic text-[color:var(--sh-cream)]">{noLink}</span>}
         <button ref={turnRef} type="button" onClick={onTurn} className={TURN_PLATE}>
           {words.putBack}
         </button>
