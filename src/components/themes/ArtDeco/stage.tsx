@@ -7,12 +7,20 @@ import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { MartialArts } from '@/lib/cv/content'
 import { SurvivorSprite, type DecoMotion } from './sprite'
+import { STORY_MS } from '@/lib/motion/stepWithin'
 import stage from './stage.module.css'
+
+// The strikes that fit in STORY_MS: each is the sprite's 1.8 s strike.
+const STRIKE_MS = 1800
+
+/** How many lines each strike lights, so the last line lights within STORY_MS for any count. */
+const linesPerStrike = (lines: number) => Math.ceil(lines / Math.max(1, Math.floor(STORY_MS / STRIKE_MS)))
 
 // The Muay Thai record on the city's theatre stage. When the stage comes into view the maroon curtains
 // part, the spotlight drops on him in his gold shorts, and the programme beside the stage lights its
-// achievements one by one, each on a knee then round kick he throws under the light. The facts sit on
-// the programme's head. Pointing at him (or a tap) makes him throw it again.
+// achievements on the knee then round kick he throws under the light, one line a strike, or a share of the
+// lines a strike when there are more lines than STORY_MS fits strikes (1.8 s each), so the programme is lit
+// by 5 s for any count. The facts sit on the programme's head. Pointing at him (or a tap) makes him throw it again.
 //
 // Pattern: the shared usePoseSequence plays the strike on every new line; the next line lights when the
 // strike ends (the sprite's animationend), so nothing here is timed but the curtain, which is CSS off
@@ -33,7 +41,7 @@ export function TheatreStage({ martialArts }: { martialArts: MartialArts }) {
 
   const struck = () => {
     advance()
-    setLit((n) => Math.min(n + 1, achievements.length))
+    setLit((n) => Math.min(n + linesPerStrike(achievements.length), achievements.length))
   }
 
   return (

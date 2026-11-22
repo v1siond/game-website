@@ -71,6 +71,11 @@
   transform: scaleY(1);
 }
 
+/* His idle waits until the panel is seen. */
+.works:not([data-on]) * {
+  animation-play-state: paused;
+}
+
 /* The roll up: the slats gather into the top, then the rolled shutter fades. */
 .works[data-open] .shutter {
   transform: scaleY(0);

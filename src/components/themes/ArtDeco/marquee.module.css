@@ -79,7 +79,8 @@
 }
 
 .row[data-on] .neon {
-  animation: buzz 1.1s steps(1, end) calc(0.2s + var(--i) * 180ms) both;
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation: buzz 1.1s steps(1, end) calc(0.2s + min(calc(var(--i) * 180ms), 3.7s)) both;
 }
 
 @keyframes buzz {

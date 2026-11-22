@@ -29,9 +29,10 @@
 .board[data-on] .print {
   opacity: 1;
   transform: rotate(var(--tilt));
+  /* the stagger is capped, so the last item lands by 5 s for any count */
   transition:
-    opacity 0.5s ease-out calc(var(--i) * 110ms),
-    transform 0.9s var(--ease-swing) calc(var(--i) * 110ms);
+    opacity 0.5s ease-out min(calc(var(--i) * 110ms), 4.1s),
+    transform 0.9s var(--ease-swing) min(calc(var(--i) * 110ms), 4.1s);
 }
 
 .paper {
@@ -87,7 +88,8 @@
 
 .board[data-on] .veil {
   opacity: 0.55;
-  transition: opacity 1.4s ease-out calc(0.4s + var(--i) * 110ms);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  transition: opacity 1.4s ease-out calc(0.4s + min(calc(var(--i) * 110ms), 3.2s));
 }
 
 .print[data-developed] .veil {

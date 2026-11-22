@@ -98,7 +98,8 @@
 
 .hero[data-on] .letter {
   animation: letter-on 0.5s steps(1, end) forwards;
-  animation-delay: calc(0.9s + var(--i) * 60ms);
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation-delay: calc(0.9s + min(calc(var(--i) * 60ms), 3.6s));
 }
 
 @keyframes letter-on {

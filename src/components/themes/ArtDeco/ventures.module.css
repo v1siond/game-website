@@ -117,7 +117,8 @@
 
 .cloth[data-open] {
   transform: translateY(0);
-  transition-delay: calc(var(--wave, 0) * 0.35s);
+  /* the stagger is capped, so after his walk and yank (2.5 s) the last banner has fallen by 5 s for any count */
+  transition-delay: min(calc(var(--wave, 0) * 0.35s), 1.4s);
 }
 
 .roll {
