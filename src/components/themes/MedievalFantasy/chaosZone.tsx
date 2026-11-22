@@ -6,6 +6,7 @@ import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
 import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
+import { SPAWN_AT_MS, spawnS } from './spawn'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
 
@@ -14,7 +15,9 @@ import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
 // only opacity and transform animate.
 interface RockPart {
   keyframes: string
-  timing: string
+  /** The flight's length and delay as drawn, in seconds; spawnS fits them. */
+  seconds: number
+  delay: number
   brightness: number
   startHidden: boolean
   outlineFill: string
@@ -22,9 +25,12 @@ interface RockPart {
   detail?: ReactNode
 }
 
+// A rock's flight as the shorthand's length, timing and delay, fitted to the spawn.
+const partTiming = (part: RockPart) => `${spawnS(part.seconds)}s ease-out ${spawnS(part.delay)}s`
+
 const ROCK_PARTS: RockPart[] = [
   {
-    keyframes: chaos.assembleHead, timing: '1.8s ease-out', brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleHead, seconds: 1.8, delay: 0, brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
     outline: (fill) => <ellipse cx="80" cy="25" rx="22" ry="18" fill={fill} />,
     detail: (
       <>
@@ -35,17 +41,17 @@ const ROCK_PARTS: RockPart[] = [
     ),
   },
   {
-    keyframes: chaos.assembleLeftShoulder, timing: '1.5s ease-out 0.2s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftShoulder, seconds: 1.5, delay: 0.2, brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill={fill} />,
     detail: <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill={REALM.stone28} />,
   },
   {
-    keyframes: chaos.assembleRightShoulder, timing: '1.6s ease-out 0.15s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightShoulder, seconds: 1.6, delay: 0.15, brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill={fill} />,
     detail: <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill={REALM.stone28} />,
   },
   {
-    keyframes: chaos.assembleTorso, timing: '1.4s ease-out 0.3s', brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
+    keyframes: chaos.assembleTorso, seconds: 1.4, delay: 0.3, brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
     outline: (fill) => <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill={fill} />,
     detail: (
       <>
@@ -55,19 +61,19 @@ const ROCK_PARTS: RockPart[] = [
     ),
   },
   {
-    keyframes: chaos.assembleLeftArm, timing: '1.7s ease-out 0.4s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftArm, seconds: 1.7, delay: 0.4, brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="15,72 8,100 18,115 30,108 28,78" fill={fill} />,
   },
   {
-    keyframes: chaos.assembleRightArm, timing: '1.65s ease-out 0.35s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightArm, seconds: 1.65, delay: 0.35, brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="145,72 152,100 142,115 130,108 132,78" fill={fill} />,
   },
   {
-    keyframes: chaos.assembleLeftLeg, timing: '1.3s ease-out 0.5s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftLeg, seconds: 1.3, delay: 0.5, brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="50,120 42,160 55,185 68,175 62,125" fill={fill} />,
   },
   {
-    keyframes: chaos.assembleRightLeg, timing: '1.35s ease-out 0.45s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightLeg, seconds: 1.35, delay: 0.45, brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="110,120 118,160 105,185 92,175 98,125" fill={fill} />,
   },
 ]
@@ -279,20 +285,13 @@ function GolemSpawn() {
     if (reduced) return
     const timeouts: NodeJS.Timeout[] = []
 
-    // Phase 1: Meteor falls (starts after 2s, lasts 1.5s)
-    timeouts.push(setTimeout(() => setGolemPhase('meteor'), 2000))
-
-    // Phase 2: Explosion on impact (after meteor lands)
-    timeouts.push(setTimeout(() => setGolemPhase('explosion'), 3500))
-
-    // Phase 3: Rocks start assembling (after explosion)
-    timeouts.push(setTimeout(() => setGolemPhase('assembling'), 4200))
-
-    // Phase 4: Final detailed golem appears (assembly stays visible)
-    timeouts.push(setTimeout(() => setGolemPhase('final'), 6500))
-
-    // Phase 5: Hide assembly after final is fully visible (0.5s overlap)
-    timeouts.push(setTimeout(() => setHideAssembly(true), 7000))
+    // The meteor falls, explodes on impact, the rocks assemble, the final golem fades in over them and the
+    // assembly hides once he is fully visible, each at its fitted moment (spawn.ts).
+    timeouts.push(setTimeout(() => setGolemPhase('meteor'), SPAWN_AT_MS.meteor))
+    timeouts.push(setTimeout(() => setGolemPhase('explosion'), SPAWN_AT_MS.explosion))
+    timeouts.push(setTimeout(() => setGolemPhase('assembling'), SPAWN_AT_MS.assembling))
+    timeouts.push(setTimeout(() => setGolemPhase('final'), SPAWN_AT_MS.final))
+    timeouts.push(setTimeout(() => setHideAssembly(true), SPAWN_AT_MS.hidden))
 
     return () => timeouts.forEach(t => clearTimeout(t))
   }, [reduced])
@@ -321,7 +320,7 @@ function GolemSpawn() {
             position: 'absolute',
             left: '-50px',
             top: '-200px',
-            animation: `${chaos.golemMeteorFall} 1.5s ease-in forwards`,
+            animation: `${chaos.golemMeteorFall} ${spawnS(1.5)}s ease-in forwards`,
           }}
         >
           {/* Meteor core - scales up during animation */}
@@ -332,7 +331,7 @@ function GolemSpawn() {
             background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
             boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
             transformOrigin: '0 0',
-            animation: `${chaos.meteorGrow} 1.5s ease-in forwards`,
+            animation: `${chaos.meteorGrow} ${spawnS(1.5)}s ease-in forwards`,
           }} />
           {/* Meteor trail - diagonal, grows with meteor */}
           <div style={{
@@ -344,7 +343,7 @@ function GolemSpawn() {
             background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
             filter: 'blur(5px)',
             transformOrigin: 'bottom center',
-            animation: `${chaos.meteorTrailGrow} 1.5s ease-in forwards`,
+            animation: `${chaos.meteorTrailGrow} ${spawnS(1.5)}s ease-in forwards`,
           }} />
         </div>
       )}
@@ -362,7 +361,7 @@ function GolemSpawn() {
               width: '250px',
               height: '250px',
               background: `radial-gradient(circle, ${REALM.chaosFelBright}90 0%, ${REALM.chaosFelMid}60 30%, ${REALM.chaosFelDark}30 60%, transparent 80%)`,
-              animation: `${chaos.explosionFlash} 0.6s ease-out forwards`,
+              animation: `${chaos.explosionFlash} ${spawnS(0.6)}s ease-out forwards`,
             }} />
           )}
 
@@ -380,8 +379,8 @@ function GolemSpawn() {
             }}
           >
             <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
-            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out forwards` }} />
-            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out 0.1s forwards` }} />
+            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out forwards` }} />
+            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out ${spawnS(0.1)}s forwards` }} />
             <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosFelDark} opacity="0.4" />
           </svg>
 
@@ -411,7 +410,7 @@ function GolemSpawn() {
             width: '150px',
             height: '200px',
             background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}30 30%, transparent 70%)`,
-            animation: `${chaos.emergeGlow} 2.5s ease-out forwards`,
+            animation: `${chaos.emergeGlow} ${spawnS(2.5)}s ease-out forwards`,
             pointerEvents: 'none',
           }} />
 
@@ -426,14 +425,14 @@ function GolemSpawn() {
               top: '0px',
               overflow: 'visible',
               opacity: (phase === 'assembling' || phase === 'final') ? 1 : 0,
-              transition: 'opacity 0.5s ease',
+              transition: `opacity ${spawnS(0.5)}s ease`,
             }}
           >
             {ROCK_PARTS.map((part) => (
-              <g key={part.keyframes} style={{ animation: `${part.keyframes} ${part.timing} forwards`, opacity: part.startHidden ? 0 : undefined }}>
+              <g key={part.keyframes} style={{ animation: `${part.keyframes} ${partTiming(part)} forwards`, opacity: part.startHidden ? 0 : undefined }}>
                 {part.outline(part.outlineFill)}
                 {part.detail}
-                <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${part.timing} both` } as CSSProperties}>
+                <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${partTiming(part)} both` } as CSSProperties}>
                   {part.outline(REALM.ash100)}
                 </g>
               </g>
@@ -444,7 +443,7 @@ function GolemSpawn() {
 
       {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
       {phase === 'final' && (
-        <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
+        <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} ${spawnS(1)}s ease-out forwards` }}>
           <InfernalGolemSVG id="final" />
         </div>
       )}
