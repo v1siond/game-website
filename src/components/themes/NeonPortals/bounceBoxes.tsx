@@ -9,7 +9,6 @@ import { cssVars } from '@/lib/cssVars'
 import type { Band, Musician } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { ART_PLATE, BODY, CARD_LINE, CARD_TITLE, FACE, PANEL } from './cards'
@@ -26,7 +25,7 @@ import css from './bounceBoxes.module.css'
 // find. The cards sit under the strip, readable before, during and after.
 //
 // Animated: him, the lids (one class, each at its own --lid), the cards' jump (one class, same times).
-// Reduced motion and the preview: every lid open and the cards at rest, him resting after the last box.
+// Reduced motion: every lid open and the cards at rest, him resting after the last box.
 
 function BandBox() {
   return (
@@ -95,9 +94,7 @@ export function BounceBoxLevel({ bands, musician }: { bands: Band[]; musician: M
   const { sections, actions, years } = useLabels()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('arabian')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('arabian')
   const replay = useReplay(on, still)
   const count = bands.length
   const hit = useMemo(() => cssVars({ '--hit': `${bandTiming(count).beatMs}ms` }), [count])

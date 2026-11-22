@@ -8,7 +8,6 @@ import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
 import type { MartialArts } from '@/lib/cv/content'
-import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { ART_PLATE, BODY, FACE, PANEL } from './cards'
@@ -25,7 +24,7 @@ import css from './masks.module.css'
 // mask covers his face in its glow and he ends on the victory knee. Each step the mask takes is a find.
 //
 // Animated: him (the guard's brace each step, the knee at the last), the mask's step, the glow.
-// Reduced motion and the preview: the mask on his face with its glow, him on the knee, every mark lit.
+// Reduced motion: the mask on his face with its glow, him on the knee, every mark lit.
 
 const RECORD_LOOK = {
   facts: 'grid gap-3 sm:grid-cols-2',
@@ -69,9 +68,7 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
   const { sections, actions } = useLabels()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('prehistoric')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('prehistoric')
   const steps = maskSteps(martialArts.primary.achievements.length)
   const scene = useMemo(() => maskScene(steps), [steps])
   // Each step is a one shot move of the shared sequence, taken only at rest; the takes count the steps.

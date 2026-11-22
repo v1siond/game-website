@@ -5,7 +5,6 @@ import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
-import { usePreview } from '@/themes/PreviewContext'
 import { staggerAt } from '../shared/stagger'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
@@ -24,7 +23,7 @@ import css from './countBox.module.css'
 // before, during and after. "Again" plays it again. Opening the box is the run's first find.
 //
 // Animated: him, the pips (one class), the panel.
-// Reduced motion and the preview: him at the plunger, the pips lit and the panel open.
+// Reduced motion: him at the plunger, the pips lit and the panel open.
 
 // The box stands from his pulling spot: --at is AT_PLUNGER's x and the box's left edge is 10 px right of it, so
 // the plunger's handle (7 px into the box) is where his front hand reaches in the pull, at the strip's fixed h-56.
@@ -93,9 +92,7 @@ export function CountBoxLevel() {
   const about = useAboutBlock()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('hub')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('hub')
   const replay = useReplay(on, still)
 
   const opened = () => {

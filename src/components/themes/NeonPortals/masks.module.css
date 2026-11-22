@@ -6,7 +6,7 @@
  * Transforms and opacity only.
  *
  * Animated: the mask's step, the glow, the marks (one class).
- * Reduced motion and the preview (data-still): the mask on his face, the glow open, no transition.
+ * Reduced motion (data-still): the mask on his face, the glow open, no transition.
  */
 
 .track {

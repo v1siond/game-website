@@ -7,7 +7,6 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
-import { usePreview } from '@/themes/PreviewContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { FindProvider } from './shared/finds'
 import { Backdrop } from './NeonPortals/backdrop'
@@ -46,17 +45,16 @@ export default function NeonPortalsTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const preview = usePreview()
   const { zones, stage } = useZoneStore<Era>('hub', reduced)
   const totals = useFindTotals()
 
   return (
-    <FindProvider totals={totals} full={reduced || preview}>
+    <FindProvider totals={totals} full={reduced}>
       <div
         style={PORTAL_VARS}
         className={`relative min-h-screen overflow-x-clip bg-[color:var(--np-void)] text-[color:var(--np-white)] [--focus-ring:var(--np-gold)] [--focus-halo:var(--np-void)] ${BODY} ${portalFace.variable} ${portalBody.variable}`}
       >
-        <Backdrop zones={zones} still={reduced || preview} />
+        <Backdrop zones={zones} still={reduced} />
         <a
           href="#portals-main"
           className="sr-only z-50 rounded-full bg-[color:var(--np-gold)] px-4 py-2 font-bold text-[color:var(--np-ink)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4"

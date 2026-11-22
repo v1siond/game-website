@@ -10,7 +10,6 @@ import { cssVars } from '@/lib/cssVars'
 import type { Job } from '@/lib/cv/content'
 import { jobCard, type JobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { usePreview } from '@/themes/PreviewContext'
 import { SceneButton } from './actions'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { TagList } from '@/components/cv/TagList'
@@ -29,7 +28,7 @@ import css from './checkpoints.module.css'
 // scroll takes over again. On a phone the strip is lower and each card carries its own small post.
 //
 // Animated: him, the lanterns of the posts and of the cards (one class, staggered by --t).
-// Reduced motion and the preview: the path run, him at its end, every post's and card's lantern lit.
+// Reduced motion: the path run, him at its end, every post's and card's lantern lit.
 
 type RunMove = 'stand' | 'run'
 
@@ -102,7 +101,6 @@ function JobPlate({ card }: { card: JobCard }) {
 export function CheckpointLevel({ jobs }: { jobs: Job[] }) {
   const { sections, actions, years } = useLabels()
   const { ref, on, reduced } = useZoneStage<Era>('medieval')
-  const preview = usePreview()
   const scroll = useScrollScene<HTMLDivElement>({ start: 0.95, end: 0.3 })
   const run = usePoseSequence<RunMove>({ entrance: NO_ENTRANCE, rest: 'stand', moveMs: RUN_MS })
   const running = run.move === 'run'
@@ -122,7 +120,7 @@ export function CheckpointLevel({ jobs }: { jobs: Job[] }) {
           ))}
           <Rig motion={motion} step={0} run size="strip" track={css.runner} />
         </Strip>
-        {!(reduced || preview) && <SceneButton label={actions.run} onPress={() => run.play('run')} disabled={running} className="-mt-2 mb-6" />}
+        {!reduced && <SceneButton label={actions.run} onPress={() => run.play('run')} disabled={running} className="-mt-2 mb-6" />}
         <ol className={MASONRY_LIST}>
           {plates.map((card, index) => (
             <li key={card.id} className={MASONRY_ITEM} style={cssVars({ '--t': postAt(index, count) })}>

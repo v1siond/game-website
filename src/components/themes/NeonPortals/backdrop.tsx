@@ -18,7 +18,7 @@ import css from './backdrop.module.css'
 // and the one element of each of those two eras, played only the first time its era comes in: the hub's beacon, the
 // torch flames, the sand motes in the light shaft, the banners, the neon ring, the weed, the lamps, the
 // lava's glow. At most 5 at once, none looping (BD29).
-// Reduced motion and the preview: the eras swap with no fade and nothing moves.
+// Reduced motion: the eras swap with no fade and nothing moves.
 
 const ERAS = Object.keys(ERA) as Era[]
 

@@ -5,7 +5,7 @@
  * identical keyframes (data-round). The frames stay solid (BD29). Transforms and opacity only.
  *
  * Animated: the box's bump and rays, the card frames (one class).
- * Reduced motion and the preview (data-still): every frame solid, the box at rest.
+ * Reduced motion (data-still): every frame solid, the box at rest.
  */
 
 .box svg * {

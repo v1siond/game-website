@@ -5,7 +5,7 @@
  * Both end where they began and nothing loops (BD29). Transforms and opacity only.
  *
  * Animated: the screen's blink, the flash.
- * Reduced motion and the preview (data-still): no blink and no flash, the hologram already the gem.
+ * Reduced motion (data-still): no blink and no flash, the hologram already the gem.
  */
 
 .monitor {
