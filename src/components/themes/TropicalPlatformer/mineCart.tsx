@@ -7,10 +7,10 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import { cssVars } from '@/lib/cssVars'
+import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import { CaveCeiling } from './scenery'
-import look from './jungle.module.css'
 import cart from './mineCart.module.css'
 
 // A mine cart line over a list: a rail strip with one station per stop, broken between stations as the
@@ -66,7 +66,7 @@ export function RideButton({ name, here, onRide }: { name: string; here: boolean
       onClick={ride}
       aria-pressed={here}
       aria-label={fillLabel(jungle.rideTo, { stop: name })}
-      className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
+      className={jungleButton({ tone: here ? 'gold' : 'wood', size: 'small', extra: 'mt-4 inline-flex items-center' })}
     >
       {here ? jungle.cartHere : jungle.ride}
     </button>
@@ -136,9 +136,7 @@ export function CartLine({ stops, profession, children }: CartLineProps) {
 
       {children({ stop, rideTo })}
 
-      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-        {status}
-      </p>
+      <StatusLine>{status}</StatusLine>
     </div>
   )
 }

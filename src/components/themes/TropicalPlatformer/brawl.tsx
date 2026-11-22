@@ -7,6 +7,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
+import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
@@ -25,6 +26,7 @@ import ring from './brawl.module.css'
 type Phase = 'ready' | 'walk' | 'hit'
 
 const PHASE_MS: Record<Exclude<Phase, 'ready'>, number> = { walk: 1000, hit: 700 }
+const FIGHT_BUTTON = jungleButton({ tone: 'gold', size: 'wide' })
 const NEXT: Record<Exclude<Phase, 'ready'>, Phase> = { walk: 'hit', hit: 'ready' }
 
 function Burst({ solid }: { solid: boolean }) {
@@ -144,12 +146,10 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
       />
       <div className="flex w-full flex-col items-center gap-4 md:w-80">
         <Clearing phase={phase} round={won} />
-        <button type="button" onClick={fight} className={`min-h-[44px] rounded-xl px-6 text-base ${look.button} ${look.buttonGold} ${look.focus}`}>
+        <button type="button" onClick={fight} className={FIGHT_BUTTON}>
           {all ? jungle.fightAgain : jungle.fight}
         </button>
-        <p role="status" className={`min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-          {status}
-        </p>
+        <StatusLine spaced={false}>{status}</StatusLine>
       </div>
     </div>
   )

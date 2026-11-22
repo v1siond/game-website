@@ -9,6 +9,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Band, Musician } from '@/lib/cv/content'
 import { cssVars } from '@/lib/cssVars'
+import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
@@ -83,7 +84,7 @@ const HangingBand = memo(function HangingBand({ slot, index, here, entered, swin
           onClick={() => onSwing(index)}
           aria-pressed={here}
           aria-label={fillLabel(jungle.swingTo, { band: band.name })}
-          className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
+          className={jungleButton({ tone: here ? 'gold' : 'wood', size: 'small', extra: 'mt-4 inline-flex items-center' })}
         >
           {here ? jungle.swingHere : jungle.swing}
         </button>
@@ -113,9 +114,7 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         itemClassName={`${MASONRY_ITEM} pt-6`}
         renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} entered={triggered} swings={index === at ? swings : 0} onSwing={swingTo} />}
       />
-      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-        {status}
-      </p>
+      <StatusLine>{status}</StatusLine>
     </div>
   )
 }

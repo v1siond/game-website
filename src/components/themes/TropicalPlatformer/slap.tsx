@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroCharacter } from './character'
-import look from './jungle.module.css'
+import { jungleButton } from './buttons'
 import quake from './slap.module.css'
 
 // The tech stack shaken loose by the ground slap, the source's hand slap that pounds the floor and
@@ -16,6 +16,7 @@ import quake from './slap.module.css'
 // Pattern: a slap count remounts the boards (the jolt replays) and a timer ends the slapping pose.
 
 const SLAP_MS = 1800
+const SLAP_BUTTON = jungleButton({ tone: 'wood', size: 'large' })
 
 /** The class of a tech board the slap jolts. */
 export const JOLTED = quake.item
@@ -51,7 +52,7 @@ export function GroundSlap({ children }: { children: ReactNode }) {
         {children}
       </div>
       <div className="mt-6 flex justify-center">
-        <button type="button" onClick={slap} className={`min-h-[44px] rounded-xl px-5 text-base ${look.button} ${look.buttonWood} ${look.focus}`}>
+        <button type="button" onClick={slap} className={SLAP_BUTTON}>
           {jungle.slapAgain}
         </button>
       </div>

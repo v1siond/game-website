@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
-import look from './jungle.module.css'
+import { jungleButton } from './buttons'
 import charge from './rhino.module.css'
 
 // The ventures rammed open by the source's rhino buddy, who charges through whatever stands in the way.
@@ -15,6 +15,8 @@ import charge from './rhino.module.css'
 //
 // Pattern: a charge count remounts the runner and the cards, so the CSS plays again; no timers. The
 // root (its observer and data-charging) and the Charge button stay mounted, so focus stays on the button.
+
+const CHARGE_BUTTON = jungleButton({ tone: 'wood', size: 'large' })
 
 // The rhino side on, facing right: grey hide, a big ivory horn, a small one behind it, four trotting legs.
 export function Rhino() {
@@ -59,7 +61,7 @@ export function RhinoCharge({ children }: { children: ReactNode }) {
         <div>{children}</div>
       </Fragment>
       <div className="mt-6 flex justify-center">
-        <button type="button" onClick={() => setCharges((count) => count + 1)} className={`min-h-[44px] rounded-xl px-5 text-base ${look.button} ${look.buttonWood} ${look.focus}`}>
+        <button type="button" onClick={() => setCharges((count) => count + 1)} className={CHARGE_BUTTON}>
           {jungle.charge}
         </button>
       </div>

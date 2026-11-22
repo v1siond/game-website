@@ -7,7 +7,7 @@ import { headingId } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { cssVars } from '@/lib/cssVars'
-import { JungleAction, JungleCVLink } from './buttons'
+import { JungleAction, JungleCVLink, jungleButton } from './buttons'
 import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
@@ -23,6 +23,8 @@ import night from './nightfall.module.css'
 // rocks it; Jump again replays the finish. Pattern: CSS off one trigger (data-on), the roll 0 to 0.9 s,
 // the window at 0.6 s, the target from 0.9 s, the sign from 1 s; a replay count remounts the scene's
 // actors.
+
+const JUMP_BUTTON = jungleButton({ tone: 'wood', size: 'small', extra: 'absolute left-3 top-3' })
 
 // The four fireflies: where each drifts from and its delay.
 const FIREFLIES = [
@@ -94,7 +96,7 @@ export function TreehouseContact() {
           <button
             type="button"
             onClick={() => setFinishes((count) => count + 1)}
-            className={`absolute left-3 top-3 min-h-[44px] rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}
+            className={JUMP_BUTTON}
           >
             {jungle.jumpAgain}
           </button>

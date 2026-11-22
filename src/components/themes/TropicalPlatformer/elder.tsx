@@ -4,10 +4,10 @@ import { useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { BarrelArt } from './barrel'
+import { jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { usePlayedOut } from './playedOut'
 import { COLORS as C } from './palette'
-import look from './jungle.module.css'
 import yard from './elder.module.css'
 import motion from './motion.module.css'
 
@@ -51,6 +51,7 @@ export function OldTimer() {
 }
 
 const LINES = ['elderSays1', 'elderSays2', 'elderSays3'] as const
+const ASK_BUTTON = jungleButton({ tone: 'wood', size: 'small' })
 
 /** About: he is fired into the old timer's yard, the board opens, the old timer grumbles. */
 export function ElderYard({ children }: { children: ReactNode }) {
@@ -87,7 +88,7 @@ export function ElderYard({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={() => setLine((current) => (current + 1) % LINES.length)}
-          className={`min-h-[44px] rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}
+          className={ASK_BUTTON}
         >
           {jungle.elderAsk}
         </button>

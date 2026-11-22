@@ -6,12 +6,15 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import type { Project } from '@/lib/cv/content'
+import { jungleButton } from './buttons'
 import { CartLine, RideButton, STATION } from './mineCart'
 import look from './jungle.module.css'
 
 // The projects as a mine cart ride through the cave: one station per project on the rails over the
 // list, him in the cart. Each project is a board with a ride button; the cart rolls to it, hopping the
 // broken rail between, and the board lifts as the stop (mineCart.tsx).
+
+const LINK_BUTTON = jungleButton({ tone: 'wood', size: 'small', extra: 'inline-flex items-center' })
 
 interface StationProps {
   slot: ProjectSlot
@@ -51,7 +54,7 @@ const ProjectStation = memo(function ProjectStation({ slot, index, here, onRide 
       )}
       <div className="mt-4 flex flex-wrap gap-3">
         {links.map(({ kind, label, linkProps }) => (
-          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}>
+          <a key={kind} {...linkProps} className={LINK_BUTTON}>
             {label}
           </a>
         ))}

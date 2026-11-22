@@ -11,6 +11,7 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
+import { StatusLine } from './buttons'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
 import { letterCards, nameLetters } from './letters'
@@ -275,9 +276,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
           </div>
         )}
       </div>
-      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-        {status}
-      </p>
+      <StatusLine>{status}</StatusLine>
     </div>
   )
 }
