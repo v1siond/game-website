@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -84,17 +84,10 @@ export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { navigation, professions, blog } = useLabels()
-  const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
-  const pointer = usePointerVars(mounted && !reducedMotion)
+  const pointer = usePointerVars(!reducedMotion)
   const [zone, setZone] = useState<DecoZone>('surface')
   const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (next: DecoZone) => setZone(next) }), [reducedMotion])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <ZoneStageProvider value={stage}>

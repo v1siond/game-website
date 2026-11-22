@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -41,18 +41,11 @@ export default function NeonCyberTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [district, setDistrict] = useState<District>('watson')
   const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (zone: District) => setDistrict(zone) }), [reducedMotion])
-  const rootRef = usePointerVars(mounted && !reducedMotion)
+  const rootRef = usePointerVars(!reducedMotion)
   useTimeSlow(rootRef, scanning)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>

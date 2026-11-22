@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -39,17 +39,10 @@ export default function CellShadedTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
   const [zone, setZone] = useState<Zone>('noon')
-  const pointerRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const pointerRef = usePointerVars(!reduced)
 
   const onZone = useCallback((next: Zone) => setZone(next), [])
-
-  if (!mounted) return null
 
   return (
     <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>

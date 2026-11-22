@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -37,14 +36,7 @@ export default function BoldNoirTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const rootRef = usePointerVars(!reducedMotion)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>

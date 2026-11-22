@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
@@ -52,17 +52,10 @@ export default function RubberHoseTheme() {
   const view = useWorldView()
   const { navigation, professions, sections } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
+  const rootRef = usePointerVars(!reducedMotion)
   const [isle, setIsle] = useState<Isle>('meadow')
   const onZone = useCallback((zone: Isle) => setIsle(zone), [])
   const zoneStage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${world.focusRing}`} style={HOSE_VARS}>

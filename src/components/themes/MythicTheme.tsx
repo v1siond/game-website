@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -35,14 +35,9 @@ export default function MythicTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
   const [zone, setZone] = useState<Zone>('hall')
   const [rebirths, setRebirths] = useState(0)
-  const pointerRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const pointerRef = usePointerVars(!reduced)
 
   const onZone = useCallback((next: Zone) => setZone(next), [])
 
@@ -50,8 +45,6 @@ export default function MythicTheme() {
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
     setRebirths((count) => count + 1)
   }, [reduced])
-
-  if (!mounted) return null
 
   return (
     <div ref={pointerRef} style={MYTH_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${u.root}`}>

@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Lilita_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -40,15 +39,8 @@ export default function TropicalPlatformerTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { navigation, professions } = useLabels()
-  const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
-  const pointer = usePointerVars(mounted && !reducedMotion)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const pointer = usePointerVars(!reducedMotion)
 
   return (
     <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${jungleFace.variable}`}>

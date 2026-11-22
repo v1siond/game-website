@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -38,15 +38,10 @@ export default function SurvivalHorrorTheme() {
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const preview = usePreview()
-  const [mounted, setMounted] = useState(false)
   const [zone, setZone] = useState<Zone>('hall')
   const [herbs, takeHerbs] = useState(0)
   const [saves, setSaves] = useState(0)
-  const rootRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const rootRef = usePointerVars(!reduced)
 
   const onZone = useCallback((next: Zone) => setZone(next), [])
   const save = useCallback(() => setSaves((count) => count + 1), [])

@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { useWorldView } from '@/components/cv/CVDataProvider'
@@ -31,12 +30,7 @@ export default function SilhouetteTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const rootRef = usePointerVars(!reducedMotion)
 
   return (
     <CutProvider>
