@@ -5,7 +5,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
-import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
+import { cycles, PLAY_S, slice, swings } from '@/components/themes/shared/loops'
 import { SPAWN_AT_MS, spawnS } from './spawn'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
@@ -1260,13 +1260,13 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
 
             {/* Worn, rain-soaked bloody banner - brownish red tones */}
             {[
-              { id: 1, x: 0, w: 18, delay: '0s', fill: REALM.blood19, yOff: 0 },
-              { id: 2, x: 18, w: 18, delay: '0.12s', fill: REALM.blood15b, yOff: 2 },
-              { id: 3, x: 36, w: 18, delay: '0.24s', fill: REALM.blood11a, yOff: 4 },
-              { id: 4, x: 54, w: 18, delay: '0.36s', fill: REALM.blood8, yOff: 6 },
-              { id: 5, x: 72, w: 15, delay: '0.48s', fill: REALM.blood6, yOff: 8 },
+              { id: 1, x: 0, w: 18, delay: 0, fill: REALM.blood19, yOff: 0 },
+              { id: 2, x: 18, w: 18, delay: 0.12, fill: REALM.blood15b, yOff: 2 },
+              { id: 3, x: 36, w: 18, delay: 0.24, fill: REALM.blood11a, yOff: 4 },
+              { id: 4, x: 54, w: 18, delay: 0.36, fill: REALM.blood8, yOff: 6 },
+              { id: 5, x: 72, w: 15, delay: 0.48, fill: REALM.blood6, yOff: 8 },
             ].map((col) => (
-              <g key={col.id} style={{ animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'), animationDelay: col.delay }}>
+              <g key={col.id} style={{ animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', col.delay), animationDelay: `${col.delay}s` }}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
@@ -1304,7 +1304,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 </g>
               </g>
             ))}
-            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'), animationDelay: '0.55s' }} />
+            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', 0.55), animationDelay: '0.55s' }} />
           </g>
 
           {/* Pole shadow */}
@@ -1322,7 +1322,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 fill={REALM.stone4b}
                 opacity={0.25 - i * 0.04}
                 style={{
-                  animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'),
+                  animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', i * 0.12),
                   animationDelay: `${i * 0.12}s`,
                   transformOrigin: `${i * 15}px ${i * 2}px`,
                 }}

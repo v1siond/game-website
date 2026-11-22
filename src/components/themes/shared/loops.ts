@@ -1,6 +1,6 @@
 // How a world's living loops play since BD29: each starts when its zone or section shows, has ended within
 // PLAY_S of that, and holds its last frame. A cycle (a flame, a sway, a pulse) plays as many whole cycles as
-// fit, so it rests on the frame it started from; one longer than the time left plays once over that time,
+// fit, so it rests on the frame it started from (an alternate one in there and back pairs, swings); one longer than the time left plays once over that time,
 // which also caps a delay that grows with an item's place in a row, unless less than half its cycle is left,
 // when it rests on its start frame. A stream of particles (rain, snow,
 // motes) plays the first PLAY_S of its fall at its own pace, from where it starts, and holds there, a still
@@ -27,6 +27,13 @@ export function cycles(name: string, seconds: number, timing: string, delay = 0)
   if (room < seconds * MIN_PACE) return `${name} ${secs(seconds)} ${timing} 0 forwards`
   const cycle = Math.min(seconds, room)
   return `${name} ${secs(cycle)} ${timing} ${cyclesIn(cycle, room)} forwards`
+}
+
+/** An `alternate` loop as whole there and back pairs that end within PLAY_S of the start, `delay` (s) waited
+ *  first, so it rests where it started: an odd count would hold its far keyframe. */
+export function swings(name: string, seconds: number, timing: string, delay = 0): string {
+  const room = PLAY_S - Math.max(delay, 0)
+  return `${name} ${secs(seconds)} ${timing} alternate ${2 * cyclesIn(2 * seconds, room)} forwards`
 }
 
 /** The first PLAY_S of a looping fall at its own pace, from `delay` (s, negative when already under way). */

@@ -1,4 +1,5 @@
-import { cycles } from './loops'
+import { STORY_MS } from '@/lib/motion/stepWithin'
+import { cycles, swings } from './loops'
 
 // The shorthand's length in seconds and its iteration count, read back from what a style is given.
 function parts(shorthand: string): { seconds: number; count: number } {
@@ -6,6 +7,11 @@ function parts(shorthand: string): { seconds: number; count: number } {
   const seconds = parseFloat(words.find((word) => /^[\d.]+s$/.test(word)) ?? '0')
   const count = Number(words[words.length - 2])
   return { seconds, count }
+}
+
+const endS = (shorthand: string, delay: number) => {
+  const { seconds, count } = parts(shorthand)
+  return delay + seconds * count
 }
 
 describe('cycles', () => {
@@ -20,5 +26,14 @@ describe('cycles', () => {
 
   it('still fits a cycle into the time left when half of it or more is there', () => {
     expect(parts(cycles('breath', 3.6, 'ease-in-out', 2.5))).toEqual({ seconds: 2.5, count: 1 })
+  })
+})
+
+describe('swings', () => {
+  it('plays an alternate loop in there and back pairs, so it ends on its start pose by 5 s', () => {
+    const shorthand = swings('banner', 1.4, 'ease-in-out', 0.48)
+    expect(shorthand).toContain('alternate')
+    expect(parts(shorthand).count % 2).toBe(0)
+    expect(endS(shorthand, 0.48)).toBeLessThanOrEqual(STORY_MS / 1000)
   })
 })
