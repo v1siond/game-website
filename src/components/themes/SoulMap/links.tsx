@@ -1,8 +1,6 @@
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
 import ashen from './ashen.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, cut like the game's menu entries: carved capitals on dark stone between two thin
 // gold rules, the lit highlight sweeping in behind the word on hover and focus. Email is the lit one (gold
@@ -12,37 +10,21 @@ export const BUTTON = `${ashen.button} inline-flex min-h-[44px] items-center jus
 
 export const BUTTON_LIT = `${BUTTON} ${ashen.buttonLit} text-[color:var(--soul-glow)]`
 
-const ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
   email: BUTTON_LIT,
   linkedin: BUTTON,
+  cv: BUTTON,
+  engine: BUTTON,
 }
 
-export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+/** The hero's actions (none under the last fire, whose messages are its own), then the CV and the engine. */
+export function ContactButtons({ actions = [] }: { actions?: readonly HeroActionSlot[] }) {
+  const { cv, engine } = useSiteLinks('engine')
   return (
     <>
-      {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={ACTION_LOOK[action.id]}>
-          {action.label}
-        </a>
+      {[...actions, cv, engine].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={CONTACT_LOOK[slot.id]} />
       ))}
     </>
-  )
-}
-
-export function CVLink() {
-  const { actions } = useLabels()
-  return (
-    <Link href="/cv" className={BUTTON}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function EngineLink() {
-  const { actions } = useLabels()
-  return (
-    <Link {...ENGINE_LINK} aria-label={actions.viewEngine} className={BUTTON}>
-      {actions.engine}
-    </Link>
   )
 }

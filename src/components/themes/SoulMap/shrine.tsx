@@ -10,7 +10,7 @@ import { Bonfire, type FireState } from './bonfire'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
 import { useRunActions } from './run'
-import { CVLink, EngineLink, HeroActions } from './links'
+import { ContactButtons } from './links'
 import { CARVED, SOUL } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import souls from './souls.module.css'
@@ -239,9 +239,7 @@ export function ShrineHero() {
             <p className="mt-3 text-base leading-relaxed text-[color:var(--soul-text-soft)]">{tagline}</p>
             <p className="mt-2 text-sm text-[color:var(--soul-text-soft)]">{line}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <HeroActions actions={actions} />
-              <CVLink />
-              <EngineLink />
+              <ContactButtons actions={actions} />
             </div>
           </div>
         )}
