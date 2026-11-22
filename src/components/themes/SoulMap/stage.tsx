@@ -44,7 +44,7 @@ function WarDrum() {
   )
 }
 
-function Stage({ slot: { band, years, linkProps, nameFor } }: { slot: BandSlot }) {
+function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: BandSlot }) {
   const run = useRun()
   const reduced = useReducedMotion()
   const { souls: words, links } = useLabels()
@@ -82,9 +82,9 @@ function Stage({ slot: { band, years, linkProps, nameFor } }: { slot: BandSlot }
           {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
         </div>
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{band.role}</p>
-        {band.release && (
+        {release && (
           <p className={`mt-1 ${CARD_META}`}>
-            {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+            {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
           </p>
         )}
         <div className="mt-4 flex flex-wrap gap-2">

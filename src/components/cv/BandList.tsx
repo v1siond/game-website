@@ -15,6 +15,9 @@ export interface BandSlot {
   linkProps: { href: string; target: '_blank'; rel: string; 'aria-label': string } | null
   /** "Website of {band} (opens in a new tab)" for a link that reads "Website". */
   nameFor: (visibleText: string) => string
+  /** The release line's parts, labels.links.released and the title; null for a band with no release.
+   *  The world adds its own punctuation and quotes. */
+  release: { label: string; title: string } | null
 }
 
 interface BandListProps {
@@ -32,6 +35,7 @@ const slotFor = (band: Band, labels: Labels): BandSlot => ({
     ? { href: band.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': newTabName(labels.links, band.name) }
     : null,
   nameFor: (visibleText) => newTabName(labels.links, fillLabel(labels.links.linkOf, { link: visibleText, project: band.name })),
+  release: band.release ? { label: labels.links.released, title: band.release } : null,
 })
 
 export function BandList({ bands, renderBand, className, itemClassName }: BandListProps) {
