@@ -246,11 +246,13 @@
 
 /* A keyboard visitor who tabs into a room before its event ends sees the focused block at once, and it
    stays put when the event ends (a pointer click never matches :focus-visible). After the shop rule, so
-   it wins in every room. */
+   it wins in every room. Its entrance is emptied, not removed: a removed animation would start again
+   when the focus leaves. */
 [data-shown] .gated:has(:focus-visible) {
   opacity: 1;
   transform: none;
-  animation: none;
+  animation-duration: 0s;
+  animation-fill-mode: none;
 }
 
 /* the item box's line lands at its top edge, under the room, and opens down from there */
