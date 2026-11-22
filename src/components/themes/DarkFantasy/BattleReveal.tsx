@@ -754,11 +754,13 @@ const SlashEffect = memo(function SlashEffect() {
 // Impact burst effect - sparks radiating from hit point
 const ImpactBurst = memo(function ImpactBurst() {
   const sparkCount = 8
-  const sparks = Array.from({ length: sparkCount }, (_, i) => ({
-    angle: (360 / sparkCount) * i,
-    length: 20 + Math.random() * 15,
-    delay: Math.random() * 50,
-  }))
+  const [sparks] = useState(() =>
+    Array.from({ length: sparkCount }, (_, i) => ({
+      angle: (360 / sparkCount) * i,
+      length: 20 + Math.random() * 15,
+      delay: Math.random() * 50,
+    })),
+  )
 
   return (
     <svg
@@ -815,38 +817,44 @@ const DeathParticles = memo(function DeathParticles() {
   const orangeColors = [DARK_FANTASY.flameOrange, DARK_FANTASY.flameAmber, DARK_FANTASY.flameYellow, DARK_FANTASY.flameDeep, DARK_FANTASY.infected, DARK_FANTASY.flameRed]
 
   // Core explosion particles - burst outward
-  const burstParticles = Array.from({ length: 20 }, (_, i) => {
-    const angle = (i / 20) * Math.PI * 2
-    const distance = 40 + Math.random() * 60
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance,
-      delay: Math.random() * 50,
-      duration: 300 + Math.random() * 200,
-      size: 6 + Math.random() * 8,
-      color: orangeColors[i % orangeColors.length],
-    }
-  })
+  const [burstParticles] = useState(() =>
+    Array.from({ length: 20 }, (_, i) => {
+      const angle = (i / 20) * Math.PI * 2
+      const distance = 40 + Math.random() * 60
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance,
+        delay: Math.random() * 50,
+        duration: 300 + Math.random() * 200,
+        size: 6 + Math.random() * 8,
+        color: orangeColors[i % orangeColors.length],
+      }
+    }),
+  )
 
   // Rising soul particles
-  const soulParticles = Array.from({ length: 15 }, () => ({
-    x: Math.random() * 100 - 50,
-    delay: 100 + Math.random() * 150,
-    duration: 400 + Math.random() * 200,
-    size: 4 + Math.random() * 6,
-  }))
+  const [soulParticles] = useState(() =>
+    Array.from({ length: 15 }, () => ({
+      x: Math.random() * 100 - 50,
+      delay: 100 + Math.random() * 150,
+      duration: 400 + Math.random() * 200,
+      size: 4 + Math.random() * 6,
+    })),
+  )
 
   // Spark/debris particles
-  const sparkParticles = Array.from({ length: 12 }, () => {
-    const angle = Math.random() * Math.PI * 2
-    const distance = 30 + Math.random() * 40
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance - 20,
-      delay: Math.random() * 80,
-      size: 2 + Math.random() * 3,
-    }
-  })
+  const [sparkParticles] = useState(() =>
+    Array.from({ length: 12 }, () => {
+      const angle = Math.random() * Math.PI * 2
+      const distance = 30 + Math.random() * 40
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance - 20,
+        delay: Math.random() * 80,
+        size: 2 + Math.random() * 3,
+      }
+    }),
+  )
 
   return (
     <div className="relative w-40 h-40" style={{ transform: 'translate(-50%, -50%)' }}>
@@ -924,31 +932,35 @@ const BloodSplatter = memo(function BloodSplatter() {
   const bloodColors = [DARK_FANTASY.infected, DARK_FANTASY.flameRed, DARK_FANTASY.bloodDark, DARK_FANTASY.flameOrange]
 
   // Main blood drops
-  const drops = Array.from({ length: 16 }, (_, i) => {
-    const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 0.25
-    const distance = 30 + Math.random() * 50
-    const gravity = 20 + Math.random() * 30
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance + gravity,
-      delay: Math.random() * 50,
-      duration: 200 + Math.random() * 150,
-      size: 4 + Math.random() * 8,
-      color: bloodColors[i % bloodColors.length],
-    }
-  })
+  const [drops] = useState(() =>
+    Array.from({ length: 16 }, (_, i) => {
+      const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 0.25
+      const distance = 30 + Math.random() * 50
+      const gravity = 20 + Math.random() * 30
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance + gravity,
+        delay: Math.random() * 50,
+        duration: 200 + Math.random() * 150,
+        size: 4 + Math.random() * 8,
+        color: bloodColors[i % bloodColors.length],
+      }
+    }),
+  )
 
   // Smaller spray particles
-  const spray = Array.from({ length: 12 }, () => {
-    const angle = (Math.random() - 0.5) * Math.PI
-    const distance = 20 + Math.random() * 30
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance + 15,
-      delay: Math.random() * 30,
-      size: 2 + Math.random() * 3,
-    }
-  })
+  const [spray] = useState(() =>
+    Array.from({ length: 12 }, () => {
+      const angle = (Math.random() - 0.5) * Math.PI
+      const distance = 20 + Math.random() * 30
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance + 15,
+        delay: Math.random() * 30,
+        size: 2 + Math.random() * 3,
+      }
+    }),
+  )
 
   return (
     <div className="relative w-32 h-32" style={{ transform: 'translate(-50%, -50%)' }}>
@@ -996,23 +1008,27 @@ const BloodPool = memo(function BloodPool() {
   const poolColors = [DARK_FANTASY.poolOrange, DARK_FANTASY.poolGreen, DARK_FANTASY.poolAmber, DARK_FANTASY.poolGreenLight, DARK_FANTASY.poolRed, DARK_FANTASY.poolGreenMid]
 
   // Main pool blobs - spread LEFT from right edge
-  const pools = Array.from({ length: 8 }, (_, i) => ({
-    x: -10 - Math.random() * 70,  // All negative = extends LEFT from right edge
-    y: Math.random() * 20,
-    width: 20 + Math.random() * 40,
-    height: 8 + Math.random() * 12,
-    delay: i * 50,
-    color: poolColors[i % poolColors.length],
-  }))
+  const [pools] = useState(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      x: -10 - Math.random() * 70, // All negative = extends LEFT from right edge
+      y: Math.random() * 20,
+      width: 20 + Math.random() * 40,
+      height: 8 + Math.random() * 12,
+      delay: i * 50,
+      color: poolColors[i % poolColors.length],
+    })),
+  )
 
   // Small drips/splats - also extend left
-  const drips = Array.from({ length: 12 }, (_, i) => ({
-    x: -5 - Math.random() * 90,
-    y: Math.random() * 15 - 5,
-    size: 4 + Math.random() * 8,
-    delay: 100 + i * 30,
-    color: poolColors[i % poolColors.length],
-  }))
+  const [drips] = useState(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      x: -5 - Math.random() * 90,
+      y: Math.random() * 15 - 5,
+      size: 4 + Math.random() * 8,
+      delay: 100 + i * 30,
+      color: poolColors[i % poolColors.length],
+    })),
+  )
 
   return (
     <div className="relative w-40 h-12">

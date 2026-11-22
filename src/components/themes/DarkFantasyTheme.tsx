@@ -262,7 +262,22 @@ const GothicChandelier = memo(function GothicChandelier() {
 })
 
 // Stone/crystal formations
+// The spikes and moss are placed once per mount, so a re-render never moves a stone.
+const STONE_SPIKES = 20
+const MOSS_X = [100, 350, 650, 850]
+const placeStones = () => ({
+  spikes: Array.from({ length: STONE_SPIKES }, (_, i) => ({
+    x: i * 50 + 25 + (Math.random() - 0.5) * 20,
+    height: 25 + Math.random() * 35,
+    width: 8 + Math.random() * 8,
+    lean: (Math.random() - 0.5) * 10,
+    isCrystal: i % 4 === 0,
+  })),
+  moss: MOSS_X.map((x) => ({ x, rx: 30 + Math.random() * 20 })),
+})
+
 const StoneFormations = memo(function StoneFormations() {
+  const [{ spikes, moss }] = useState(placeStones)
   return (
     <svg
       className="fixed bottom-0 left-0 w-full h-32 opacity-60 pointer-events-none z-[6]"
@@ -278,12 +293,7 @@ const StoneFormations = memo(function StoneFormations() {
       />
 
       {/* Crystal/stone spikes - irregular, weathered */}
-      {Array.from({ length: 20 }, (_, i) => {
-        const x = i * 50 + 25 + (Math.random() - 0.5) * 20
-        const height = 25 + Math.random() * 35
-        const width = 8 + Math.random() * 8
-        const lean = (Math.random() - 0.5) * 10
-        const isCrystal = i % 4 === 0
+      {spikes.map(({ x, height, width, lean, isCrystal }, i) => {
         return (
           <g key={i}>
             <path
@@ -308,12 +318,12 @@ const StoneFormations = memo(function StoneFormations() {
       })}
 
       {/* Moss/organic growth patches */}
-      {[100, 350, 650, 850].map((x, i) => (
+      {moss.map(({ x, rx }, i) => (
         <ellipse
           key={i}
           cx={x}
           cy={90}
-          rx={30 + Math.random() * 20}
+          rx={rx}
           ry={8}
           fill={DARK_FANTASY.mossGreen}
           opacity="0.3"
@@ -462,11 +472,12 @@ const VoidDepths = memo(function VoidDepths() {
   )
 })
 
-// Combined atmosphere layer - NO chandelier here (it's in header now)
-const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
+// Combined atmosphere layer - NO chandelier here (it's in header now). The stones are placed at random, so they
+// wait for the mount.
+const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere({ mounted }: { mounted: boolean }) {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3] contain-strict" aria-hidden="true" role="presentation">
-      <StoneFormations />
+      {mounted && <StoneFormations />}
 
       {/* Central ethereal glow - no blur filter for performance */}
       <div
@@ -1685,6 +1696,8 @@ export default function DarkFantasyTheme() {
   const { navigation, actions: actionLabels, sections } = useLabels()
   const siteLinks = useSiteLinks('engine')
   const active = view.profession
+  // The world draws on its first commit; only the layers placed by Math.random or by the pointer wait for the
+  // mount, so a server render and the hydrating client never disagree on them.
   const [mounted, setMounted] = useState(false)
 
   // The final battle starts as the contact section comes into view, a little before it is centred.
@@ -1693,22 +1706,6 @@ export default function DarkFantasyTheme() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Show loading skeleton
-  if (!mounted) {
-    return (
-      <div
-        style={DARK_FANTASY_VARS}
-        className="min-h-screen flex items-center justify-center bg-[color:var(--df-void)]"
-        role="status"
-        aria-label={navigation.loadingTheme}
-      >
-        <div className="animate-pulse text-center" style={{ color: DARK_FANTASY.bone }}>
-          {navigation.loading}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div
@@ -1731,14 +1728,14 @@ export default function DarkFantasyTheme() {
         }}
       />
       <VoidDepths />
-      <EtherealRain />
-      <DarkFantasyAtmosphere />
-      <SpiritParticles />
+      {mounted && <EtherealRain />}
+      <DarkFantasyAtmosphere mounted={mounted} />
+      {mounted && <SpiritParticles />}
       <ProfessionStage profession={active} p={DARK_FANTASY} />
 
       {/* Interactive Elements - desktop only */}
-      <ParallaxLayers />
-      <CursorTrail />
+      {mounted && <ParallaxLayers />}
+      {mounted && <CursorTrail />}
 
       {/* Vignette overlay - optimized: no box-shadow */}
       <div
