@@ -727,6 +727,7 @@ collections:
                   - { <<: *text, label: "Back to site", name: backToSite }
                   - { <<: *text, label: "Download PDF", name: downloadPdf }
                   - { <<: *text, label: "Generating", name: generating }
+                  - { <<: *text, label: "Line shown when the PDF export fails", name: pdfFailed }
                   - { <<: *text, label: "Language", name: language }
                   - { <<: *text, label: "Professional summary", name: professionalSummary }
                   - { <<: *text, label: "Core competencies", name: coreCompetencies }
