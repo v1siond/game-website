@@ -143,7 +143,7 @@ export function Clearing({ profession }: { profession: Profession }) {
                 type="button"
                 onClick={spring}
                 disabled={trap !== 'ready'}
-                className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted-text)] hover:text-[color:var(--sh-text)] disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]`}
+                className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted-text)] hover:text-[color:var(--sh-text)] disabled:opacity-60`}
               >
                 {words.springTrap}
               </button>

@@ -72,7 +72,7 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
               type="button"
               aria-pressed={flipped}
               onClick={flip}
-              className={`${world.button} mt-4 inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)] ${TYPEWRITER}`}
+              className={`${world.button} mt-4 inline-flex min-h-[44px] items-center border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)] ${TYPEWRITER}`}
             >
               {words.flipGravity}
             </button>

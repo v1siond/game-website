@@ -41,7 +41,7 @@ function Lever({ option, pulling, onPull }: { option: ProfessionOption; pulling:
       type="button"
       {...option.optionProps}
       onClick={onPull}
-      className="group flex min-h-[44px] items-center gap-3 px-2 py-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]"
+      className="group flex min-h-[44px] items-center gap-3 px-2 py-1 text-left"
     >
       <svg viewBox="0 0 48 64" className="h-14 w-10 shrink-0" aria-hidden="true" focusable="false">
         <g className={`${shade.leverHandle} ${thrown ? shade.leverPulled : ''}`}>

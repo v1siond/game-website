@@ -7,7 +7,7 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 // Silhouette's buttons, on the offset block (world.module.css): email is lit fog white, LinkedIn, the CV
 // and the engine are outlined in it.
 
-const BUTTON = `${world.button} inline-flex min-h-[44px] items-center justify-center px-4 py-1.5 text-sm uppercase tracking-[0.2em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]`
+const BUTTON = `${world.button} inline-flex min-h-[44px] items-center justify-center px-4 py-1.5 text-sm uppercase tracking-[0.2em]`
 
 const LIT = 'bg-[color:var(--sh-text)] text-[color:var(--sh-black)]'
 const OUTLINED = 'border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)]'

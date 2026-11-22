@@ -16,8 +16,6 @@ import shade from './shade.module.css'
 //
 // Animated: one current per band, his parts.
 
-const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
-
 // The four bolts holding a plate down, one per corner.
 const BOLTS = ['left-1.5 top-1.5', 'right-1.5 top-1.5', 'bottom-1.5 left-1.5', 'bottom-1.5 right-1.5']
 
@@ -37,7 +35,7 @@ function Plate({ index, link, children }: { index: number; link: BandSlot['linkP
   )
   if (!link) return plate
   return (
-    <a {...link} className={`group block h-full ${LINK_FOCUS}`}>
+    <a {...link} className="group block h-full">
       {plate}
     </a>
   )
