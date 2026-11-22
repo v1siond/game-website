@@ -20,8 +20,8 @@ import world from './world.module.css'
 const EQ_BARS = [0, 1, 2, 3, 4]
 
 function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: number; tuned: boolean; onTune: () => void }) {
-  const { links, actions, sections } = useLabels()
-  const { band, years, linkProps } = slot
+  const { actions, sections } = useLabels()
+  const { band, years, linkProps, release } = slot
 
   return (
     <Scannable kind="use" title={sections.bands} fact={years || band.role}>
@@ -47,9 +47,9 @@ function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: numbe
         </header>
         <p className="mt-1 text-sm text-[color:var(--neon-hud)]">{band.role}</p>
         {years && <p className="text-sm text-[color:var(--neon-ash)]">{years}</p>}
-        {band.release && (
+        {release && (
           <p className="mt-2 text-sm text-[color:var(--neon-ice)]">
-            {links.released} <cite>{band.release}</cite>
+            {release.label} <cite>{release.title}</cite>
           </p>
         )}
         {linkProps && (

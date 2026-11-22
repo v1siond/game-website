@@ -241,9 +241,8 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
   )
 }
 
-function GigCard({ project, years, links }: ProjectSlot) {
-  const labels = useLabels()
-  const { cyber, sections } = labels
+function GigCard({ project, years, links, noLink }: ProjectSlot) {
+  const { cyber, sections, cards } = useLabels()
   const [breaching, setBreaching] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
 
@@ -261,7 +260,7 @@ function GigCard({ project, years, links }: ProjectSlot) {
           <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{project.tagline}</p>
           {project.impact && <p className="mt-2 text-sm text-[color:var(--neon-hack)]">{project.impact}</p>}
           {project.techStack.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-1" aria-label={labels.cards.technologiesUsed}>
+            <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.technologiesUsed}>
               {project.techStack.slice(0, 5).map((tech) => (
                 <DataChip key={tech}>{tech}</DataChip>
               ))}
@@ -287,7 +286,7 @@ function GigCard({ project, years, links }: ProjectSlot) {
               </a>
             ))}
           </div>
-          {links.length === 0 && <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{labels.links.noPublicLink}</p>}
+          {noLink && <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{noLink}</p>}
         </article>
       </Scannable>
       {breaching && <BreachDialog project={project} trigger={trigger} onClose={() => setBreaching(false)} />}
