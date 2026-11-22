@@ -68,7 +68,7 @@ const fall = (sink: () => void): PoseStep[] => [
   { pose: 'down', ms: 2600, effect: sink },
 ]
 
-// The ghost leaves the page once it has sunk (.ghostGone ends), so its pose loop stops with it.
+// The ghost leaves the page once it has sunk (.ghostGone ends), so nothing of it stays on the page.
 function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
   const [sunk, setSunk] = useState(false)

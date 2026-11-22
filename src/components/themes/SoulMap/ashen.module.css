@@ -17,7 +17,8 @@
   background: radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.65) 100%);
 }
 
-/* Ash drifting down through the whole page: eight flakes, each on its own slow fall and sway. */
+/* Ash drifting down through the whole page: eight flakes, each on its own slow fall and sway, that settle
+   where they rest. */
 .flake {
   position: absolute;
   top: -2vh;
@@ -37,34 +38,38 @@
 .flake:nth-child(7) { left: 84%; width: 2px; height: 2px; }
 .flake:nth-child(8) { left: 93%; }
 
-/* Without motion the flakes rest scattered down the screen instead of falling. */
-.flake:nth-child(odd) { transform: translateY(38vh); }
-.flake:nth-child(even) { transform: translateY(71vh); }
+/* Where each flake rests, scattered down the screen: the whole look without motion, and where the fall
+   settles with it. */
+.flake:nth-child(odd) { --rest: 38vh; }
+.flake:nth-child(even) { --rest: 71vh; }
+
+.flake {
+  translate: 0 var(--rest);
+}
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Three motions per flake, so the drift never snaps at a waypoint: the fall is steady (the translate
-     property, linear), the sway eases side to side on a shorter period of its own (transform, eased and
-     alternating), and the flake fades in at the top and out near the bottom. The fall and the fade share
-     one length; the sway's never divides into it, so no flake retraces its path. */
+  /* Three motions per flake, so the drift never snaps at a waypoint: the fall (the translate property)
+     drifts the last 24 vh down to its rest at the old pace, slowing as it lands; the sway eases side to
+     side and back (transform, eased, alternating); the flake fades in as it starts. Each flake starts on
+     its own beat and every one has landed by 4.9 s. */
   .flake {
     animation:
-      ash-fall 19s linear infinite,
-      ash-sway 6.3s ease-in-out infinite alternate,
-      ash-fade 19s linear infinite;
+      ash-fall 4.2s cubic-bezier(0.3, 0.5, 0.5, 1) backwards,
+      ash-sway 2.1s ease-in-out 2 alternate forwards,
+      ash-fade 0.8s ease-out backwards;
   }
 
-  .flake:nth-child(2) { animation-duration: 23s, 7.4s, 23s; animation-delay: -6s, -2.1s, -6s; }
-  .flake:nth-child(3) { animation-duration: 17s, 5.2s, 17s; animation-delay: -11s, -4.4s, -11s; }
-  .flake:nth-child(4) { animation-duration: 26s, 8.9s, 26s; animation-delay: -3s, -1.2s, -3s; }
-  .flake:nth-child(5) { animation-duration: 21s, 6.1s, 21s; animation-delay: -15s, -3.3s, -15s; }
-  .flake:nth-child(6) { animation-duration: 18s, 7.7s, 18s; animation-delay: -8s, -5.6s, -8s; }
-  .flake:nth-child(7) { animation-duration: 24s, 5.8s, 24s; animation-delay: -18s, -0.7s, -18s; }
-  .flake:nth-child(8) { animation-duration: 20s, 6.8s, 20s; animation-delay: -12s, -2.9s, -12s; }
+  .flake:nth-child(2) { animation-delay: 0.3s; }
+  .flake:nth-child(3) { animation-delay: 0.6s; }
+  .flake:nth-child(4) { animation-delay: 0.1s; }
+  .flake:nth-child(5) { animation-delay: 0.5s; }
+  .flake:nth-child(6) { animation-delay: 0.2s; }
+  .flake:nth-child(7) { animation-delay: 0.7s; }
+  .flake:nth-child(8) { animation-delay: 0.4s; }
 }
 
 @keyframes ash-fall {
-  from { translate: 0 0; }
-  to { translate: 0 106vh; }
+  from { translate: 0 calc(var(--rest) - 24vh); }
 }
 
 @keyframes ash-sway {
@@ -73,10 +78,13 @@
 }
 
 @keyframes ash-fade {
-  0% { opacity: 0; }
-  8% { opacity: 0.35; }
-  86% { opacity: 0.35; }
-  100% { opacity: 0; }
+  from { opacity: 0; }
+}
+
+/* A scene that plays from the moment it is in view: until its section trigger marks it data-on, every
+   part of it stands on its first frame (classSelect.tsx, arena.tsx, lastFire.tsx). */
+.cue:not([data-on]) * {
+  animation-play-state: paused !important;
 }
 
 /* The menu panel: dark stone, a thin worn gold frame and a darker inner edge. */

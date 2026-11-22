@@ -18,7 +18,7 @@ import souls from './souls.module.css'
 
 // The bands play in the light: each card is a dark stage under a broken roof, and as the visitor
 // reaches it a shaft of sun falls through the gap onto the stage, he walks into it with his mallets
-// (two strides) and plays a war drum in the light, then rests his mallets. Encore is the visitor's: it
+// (two strides) and plays two bars on a war drum in the light, then rests his mallets, 5 s in all. Encore is the visitor's: it
 // cuts in on whatever he is doing, he plays again and then
 // throws both arms up into the sun, the game's own gesture of praise, the banner names the band and the
 // first encore of each band gives souls. Under reduced motion the light is on and he stands at the drum.
@@ -26,7 +26,7 @@ import souls from './souls.module.css'
 const ENCORE_SOULS = 200
 const WALK_IN: PoseStep[] = [
   { pose: 'walk', ms: 2400 },
-  { pose: 'act', ms: 4200 },
+  { pose: 'act', ms: 2600 },
 ]
 const ENCORE: PoseStep[] = [
   { pose: 'act', ms: 2600 },

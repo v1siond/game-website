@@ -10,7 +10,7 @@ import souls from './souls.module.css'
 // About is behind a fog gate, the white wall the game puts at the way into a new area. When the visitor
 // reaches it he walks out of the fog under the stone arch (two heavy strides, 2.4 s), the wall thins
 // behind him and the fog lying over the panel clears, so the words are what he walked in to. Once
-// through he stands at the panel's edge, breathing. Under reduced motion he already stands through the
+// through he stands still at the panel's edge. Under reduced motion he already stands through the
 // gate and the fog is gone.
 
 const STRIDES: PoseStep[] = [{ pose: 'walk', ms: 2400 }]

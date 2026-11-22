@@ -19,7 +19,7 @@ import souls from './souls.module.css'
 
 // The ventures are the game's messages left on the floor: each one a stone slab with its name written
 // in glowing orange script, the way players leave words for each other. The script is written into the
-// stone as the visitor reaches the slab, and its light breathes on the stone after. Pointing at a slab (or focusing
+// stone as the visitor reaches the slab, and its light breathes once on the stone after and stays. Pointing at a slab (or focusing
 // into it) lifts the script off the stone and brightens it, the moment the game shows a message; the
 // words under it are the venture's own. Appraise is the game's rating of a message: it marks the slab
 // appraised and gives the souls a good rating brings.
