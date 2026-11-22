@@ -693,12 +693,6 @@
 
 /* ---------------------------------------------------------------- a section's stage (stage.tsx) */
 
-/* Nothing in a section plays before the section is seen: its loops (the drummer, the respawn rings) wait,
-   paused on their first frame, and play once it is on. */
-.stage:not([data-on]) * {
-  animation-play-state: paused;
-}
-
 /* The title slab slides in when the section first comes into view (data-on, useZoneStage). */
 .stage .titleSlab {
   opacity: 0;

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { heldUntil } from '@/components/themes/shared/held'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { CREAM, POSTER_BLUE, POSTER_INK, SHELTER_YELLOW } from './palette'
 import atomic from './atomic.module.css'
@@ -69,7 +70,7 @@ function CutOutWords({ text }: { text: string }) {
 
 function PerkCard({ achievement, index, shown }: { achievement: string; index: number; shown: boolean }) {
   return (
-    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard}`} data-shown={shown || undefined}>
+    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard} ${heldUntil(shown)}`} data-shown={shown || undefined}>
       <div className="relative h-44 overflow-hidden border-b-4 border-atomic-poster-ink">
         <Sunburst />
         <div className={`absolute inset-x-0 bottom-0 mx-auto h-40 w-28 ${atomic.perkHop}`}>

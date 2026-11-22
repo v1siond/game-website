@@ -81,13 +81,6 @@
   from { opacity: 0; }
 }
 
-/* A scene that plays from the moment it is in view: until its section trigger marks it data-on, every
-   part of it stands on its first frame (classSelect.tsx, arena.tsx, lastFire.tsx, stage.tsx, gate.tsx,
-   descent.tsx). */
-.cue:not([data-on]) * {
-  animation-play-state: paused !important;
-}
-
 /* The menu panel: dark stone, a thin worn gold frame and a darker inner edge. */
 .panel {
   background: linear-gradient(180deg, rgb(28 25 21 / 0.94), rgb(20 18 16 / 0.96));

@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { SurvivorSprite, type DecoMotion } from './sprite'
 import { DECO_COLORS as C } from './palette'
@@ -129,7 +130,7 @@ export function HackedShutter({ children }: { children: (opened: boolean) => Rea
 
 
   return (
-    <div data-on={triggered || undefined} data-open={done || undefined} className={hack.works}>
+    <div data-open={done || undefined} className={`${hack.works} ${heldUntil(triggered)}`}>
       <div ref={ref} className={`relative mx-auto mb-6 flex max-w-2xl flex-col items-center gap-2 p-3 sm:flex-row sm:items-end sm:gap-4 sm:p-5 ${hack.panel}`}>
         <div className="h-28 w-[4.7rem] flex-shrink-0 sm:h-32 sm:w-20" aria-hidden="true">
           <SurvivorSprite profession="engineer" motion={pose} onDone={advance} className="h-full w-full" />

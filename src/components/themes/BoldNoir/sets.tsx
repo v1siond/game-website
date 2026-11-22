@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { InView } from '@/components/themes/shared/held'
 import type { Profession } from '@/lib/cv/professions'
 import { HitStar, StarBurst } from './backdrop'
 import { DETECTIVE_HOST, Detective } from './detective'
@@ -13,7 +13,8 @@ import world from './world.module.css'
 // ink, a near layer of solid black shapes and paper highlights, no gradient. The far and near layers
 // lean against the pointer (--mx, --my) in opposite directions for depth. A pick slams the new set in
 // (keyed by profession in the theme). The set plays once, from the moment its frame is in view (the shared
-// section trigger marks it data-on), and every loop in it rests within 5 s (world.module.css).
+// InView holds the frame's slam and every part of it until then), and every loop in it rests within 5 s
+// (world.module.css).
 // - System Engineer: the night office, the city through the window, a standing desk with two
 //   monitors, the code lines typing in and the cursor blinking (4 animated).
 // - Musician: the club stage, a spotlight sweeping, his kit, the crash cymbal shaking on the hit
@@ -139,11 +140,10 @@ const SET: Record<Profession, () => ReactNode> = {
 
 export function ProfessionSet({ profession }: { profession: Profession }) {
   const Scene = SET[profession]
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn} ${DETECTIVE_HOST.lean}`} aria-hidden="true">
+    <InView threshold={0.3} className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn} ${DETECTIVE_HOST.lean}`} aria-hidden="true">
       <Scene />
-    </div>
+    </InView>
   )
 }

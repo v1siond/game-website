@@ -46,19 +46,6 @@
     animation: ride 4.8s linear forwards;
   }
 
-  /* A stage that is not in view holds its crowd still. */
-  .zone:not([data-on]) .bob,
-  .zone:not([data-on]) .sway,
-  .zone:not([data-on]) .rock,
-  .zone:not([data-on]) .ride {
-    animation-play-state: paused;
-  }
-
-  /* The deck crowd waits for its show to come into view. */
-  .deck:not([data-on]) .bob {
-    animation-play-state: paused;
-  }
-
   /* The deck crowd cheering when a band takes the focus: eight jumps, higher and faster, ending down. */
   .deck:has([data-band]:focus-within) .bob {
     animation: cheer 360ms steps(2, jump-none) 8 alternate;

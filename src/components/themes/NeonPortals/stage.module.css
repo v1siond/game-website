@@ -50,11 +50,6 @@
   animation: travel calc(var(--ms) * 1ms) linear both;
 }
 
-.rig[data-run='false'],
-.rig[data-run='false'] * {
-  animation-play-state: paused !important;
-}
-
 @keyframes travel {
   from {
     transform: translate(calc(var(--from-x) * 1%), calc(var(--from-lift) * -1%));

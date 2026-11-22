@@ -2,6 +2,7 @@
 
 import { memo, type ReactNode } from 'react'
 import { useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { PieEyes } from './art'
 import { HOSE } from './palette'
 import stage from './stage.module.css'
@@ -116,7 +117,7 @@ export const Isles = memo(function Isles({ zones }: { zones: ValueStore<Isle> })
       {ISLES.map((isle) => {
         const Drawn = DRAWN[isle]
         return (
-          <svg key={isle} viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${stage.isle} ${stage.cue}`} data-on={isle === current || undefined} focusable="false">
+          <svg key={isle} viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${stage.isle} ${heldUntil(isle === current)}`} data-on={isle === current || undefined} focusable="false">
             <Drawn />
             <FacedCloud x={20} y={30} scale={0.9} className={stage.drift} />
             <FacedCloud x={220} y={96} scale={0.6} className={stage.driftSlow} />
@@ -137,13 +138,13 @@ function drawnOnIsle(children: IsleChildren, on: boolean): ReactNode {
 
 /**
  * A section's place on an isle: hands the isle up while in view, and says when it first came into view.
- * Cued (the default), everything in it waits on its first frame until then (stage.module.css .cue), so its
+ * Cued (the default), everything in it waits on its first frame until then (heldUntil), so its
  * loops play from the moment it is reached; the first screen is not cued, it plays as the page loads.
  */
 export function IsleStage({ isle, cued = true, className = '', children }: { isle: Isle; cued?: boolean; className?: string; children: IsleChildren }) {
   const { ref, on } = useZoneStage<Isle>(isle)
   return (
-    <div ref={ref} data-on={on || undefined} className={`${cued ? stage.cue : ''} ${className}`}>
+    <div ref={ref} className={`${heldUntil(on || !cued)} ${className}`}>
       {drawnOnIsle(children, on)}
     </div>
   )

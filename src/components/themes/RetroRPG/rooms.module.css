@@ -419,10 +419,6 @@
   transition: opacity 600ms steps(4, end);
 }
 
-.zone[data-active='false'] * {
-  animation-play-state: paused !important;
-}
-
 @keyframes fall {
   from { transform: translate(0, -20px); }
   to { transform: translate(var(--drift, 12px), 200px); }

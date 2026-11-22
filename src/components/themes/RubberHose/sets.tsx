@@ -2,8 +2,8 @@
 
 import { memo, type ComponentProps, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { PieEyes } from './art'
-import { Cue } from './cue'
+import { InView } from '@/components/themes/shared/held'
+import { CUE_THRESHOLD, PieEyes } from './art'
 import { HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import styles from './sets.module.css'
@@ -448,9 +448,9 @@ export const ProfessionSet = memo(function ProfessionSet({ profession }: { profe
 
   return (
     <div className={`relative mb-10 h-44 overflow-hidden sm:h-64 lg:h-72 ${styles.frame}`} aria-hidden="true">
-      <Cue>
+      <InView threshold={CUE_THRESHOLD}>
         <Scene />
-      </Cue>
+      </InView>
     </div>
   )
 })

@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { heldUntil } from '@/components/themes/shared/held'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Band } from '@/lib/cv/content'
 import { Knight } from './knight'
@@ -19,7 +20,7 @@ import souls from './souls.module.css'
 // The bands play in the light: each card is a dark stage under a broken roof, and as the visitor
 // reaches it a shaft of sun falls through the gap onto the stage, he walks into it with his mallets
 // (two strides) and plays a bar on a war drum in the light, then rests his mallets and catches his breath
-// (a 1 s idle, so the scene ends 5 s in). The stage waits on its first frame until reached (ashen .cue).
+// (a 1 s idle, so the scene ends 5 s in). The stage waits on its first frame until reached (heldUntil).
 // Encore is the visitor's: it cuts in on whatever he is doing, he plays again and then throws both arms
 // up into the sun, the game's own gesture of praise, the banner names the band and the first encore of
 // each band gives souls. Under reduced motion the light is on and he stands at the drum.
@@ -62,7 +63,7 @@ function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: B
   }
 
   return (
-    <article ref={ref} data-on={triggered || undefined} className={`${ashen.panel} ${ashen.cue} overflow-hidden`}>
+    <article ref={ref} className={`${ashen.panel} overflow-hidden ${heldUntil(triggered)}`}>
       <div className="relative h-36 overflow-hidden bg-gradient-to-b from-[color:var(--soul-abyss)] to-[color:var(--soul-rock)]">
         <span className={`absolute -top-4 left-[38%] h-44 w-24 ${souls.sunShaft} ${lit ? souls.sunShaftOn : ''}`} aria-hidden="true" />
         <WarDrum />

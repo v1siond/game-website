@@ -8,6 +8,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { atomicId } from './anchors'
 import { QuestLog } from './quests'
 import { Holotapes, Inventory } from './inventory'
@@ -58,7 +59,7 @@ function Stage({ title, zone, className = '', children }: StageProps) {
   const { ref, on } = useZoneStage(zone)
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage} ${className}`}>
+    <section ref={ref} data-on={on || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage} ${heldUntil(on)} ${className}`}>
       <SectionTitle title={title} />
       {typeof children === 'function' ? children(on) : children}
     </section>

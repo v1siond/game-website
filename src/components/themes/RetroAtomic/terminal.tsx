@@ -4,6 +4,7 @@ import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
@@ -36,7 +37,7 @@ function WalkOut({ walking }: { walking: boolean }) {
   const { pose, onOwnAnimationEnd } = usePoseSequence<DwellerMotion>({ entrance: WALK_OUT, rest: 'idle', still: 'still' })
 
   return (
-    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor}`} onAnimationEnd={onOwnAnimationEnd}>
+    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor} ${heldUntil(walking)}`} onAnimationEnd={onOwnAnimationEnd}>
       <div className="ml-auto mr-[4%] h-40 w-28">
         <DwellerSprite profession={active} motion={pose} className="h-full w-full" />
       </div>

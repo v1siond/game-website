@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { InView } from '@/components/themes/shared/held'
 import type { Profession } from '@/lib/cv/professions'
 import { Bonfire } from './bonfire'
 import { Knight } from './knight'
@@ -14,7 +14,6 @@ import { ContactLink } from '@/components/cv/SiteLinks'
 import { BUTTON_LIT, ContactButtons } from './links'
 import { AreaTitle } from './menu'
 import { CARVED } from './palette'
-import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
 // Contact is the last fire at the end of the road, still unlit, with his email and LinkedIn written on
@@ -34,8 +33,6 @@ export function LastFire({ profession }: { profession: Profession }) {
   const script = usePoseScript('idle')
   const id = headingId('soul', sections.contact)
   const messages = useRef<HTMLUListElement>(null)
-  // The fire's last ember pulses once as the scene comes into view, not on the page's first draw.
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   const kindle = () => {
     if (lit) return
@@ -51,7 +48,8 @@ export function LastFire({ profession }: { profession: Profession }) {
     <section className="relative px-4 pb-16 pt-12 sm:px-6" aria-labelledby={id}>
       <div className="mx-auto max-w-4xl">
         <AreaTitle id={id} title={sections.contact} />
-        <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto mt-8 h-64 max-w-xl sm:h-72 ${ashen.cue}`}>
+        {/* The fire's last ember pulses once as the scene comes into view, not on the page's first draw. */}
+        <InView threshold={0.3} className="relative mx-auto mt-8 h-64 max-w-xl sm:h-72">
           <div className={`absolute inset-x-0 bottom-0 h-24 rounded-[50%] ${souls.lastGround}`} aria-hidden="true" />
           <div className="absolute bottom-6 left-1/2 h-44 w-40 -ml-20">
             <Bonfire state={lit ? 'lit' : 'out'} className="h-full w-full" />
@@ -59,7 +57,7 @@ export function LastFire({ profession }: { profession: Profession }) {
           <div className={`absolute bottom-7 left-[18%] aspect-[60/96] h-40 sm:left-[22%] ${lit ? souls.atFire : ''}`}>
             <Knight key={script.key} gear={profession} pose={script.pose} className="h-full w-full" />
           </div>
-        </div>
+        </InView>
 
         <div className="mt-6 flex flex-col items-center gap-3 text-center">
           {!lit && (

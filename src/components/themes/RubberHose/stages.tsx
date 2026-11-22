@@ -2,8 +2,8 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { PieEyes } from './art'
-import { Cue } from './cue'
+import { InView } from '@/components/themes/shared/held'
+import { CUE_THRESHOLD, PieEyes } from './art'
 import { HERO_REACH, HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -198,13 +198,13 @@ export function MapRun({ profession }: { profession: Profession }) {
         <circle cx={60} cy={30} r={10} fill={HOSE.paperSepia} stroke={HOSE.ink} strokeWidth={1.6} />
         <circle cx={340} cy={30} r={10} fill={HOSE.paperSepia} stroke={HOSE.ink} strokeWidth={1.6} />
       </svg>
-      <Cue>
+      <InView threshold={CUE_THRESHOLD}>
         <div className={`absolute inset-x-4 bottom-2 top-0 ${stage.mapLane}`}>
           <div className={`absolute bottom-0 left-0 h-16 w-10 ${stage.mapRunner}`}>
             <HeroCharacter profession={profession} pose="run" scrub className="h-full w-full" />
           </div>
         </div>
-      </Cue>
+      </InView>
     </div>
   )
 }

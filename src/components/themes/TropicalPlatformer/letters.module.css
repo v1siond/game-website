@@ -4,7 +4,7 @@
  * the balloon floats up. Transform and opacity only.
  */
 
-.coin[data-on] {
+.coin {
   animation: coin-spin 1.8s ease-in-out 2;
 }
 
@@ -82,7 +82,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coin[data-on],
+  .coin,
   .landed,
   .balloon {
     animation: none;

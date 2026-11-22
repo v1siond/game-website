@@ -6,6 +6,7 @@ import { useLegSequence } from '@/hooks/useLegSequence'
 import { cssVars } from '@/lib/cssVars'
 import { headingId } from '@/lib/cv/sectionText'
 import { travelVars } from '@/lib/motion/course'
+import { heldUntil } from '@/components/themes/shared/held'
 import { motionAt, type Motion, type Scene } from './choreography'
 import { Character } from './character'
 import { ART_PLATE, FACE } from './cards'
@@ -21,7 +22,7 @@ import stage from './stage.module.css'
 // Paths runs too, src/lib/motion/course.ts): his rig carries him from where one beat ended to where the
 // next ends (stage.module.css, travelVars), and the rig's own animationend
 // steps the sequence, so the beats are the only clock. Before the section shows, the rig is held on its
-// first frame (data-run false); under reduced motion or in a preview it rests on the last frame.
+// first frame (heldUntil, until `run`); under reduced motion or in a preview it rests on the last frame.
 
 interface RegionProps {
   title: string
@@ -86,7 +87,7 @@ interface RigProps {
 export function Rig({ motion, step, run, size, onAnimationEnd, track = stage.rig, children }: RigProps) {
   const { active } = useProfession()
   return (
-    <div key={step} className={track} data-run={run} data-moving={motion.ms > 0} style={cssVars(travelVars(motion))} onAnimationEnd={onAnimationEnd}>
+    <div key={step} className={`${track} ${heldUntil(run)}`} data-moving={motion.ms > 0} style={cssVars(travelVars(motion))} onAnimationEnd={onAnimationEnd}>
       <div className={`${stage.body} ${BODY_SIZE[size]}`}>
         <Character profession={active} pose={motion.pose} />
       </div>

@@ -2,6 +2,8 @@
 
 import { memo, type CSSProperties, type ReactNode } from 'react'
 import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
+import { PLAY_S } from '@/components/themes/shared/loops'
 import { RPG } from './palette'
 import rooms from './rooms.module.css'
 
@@ -12,8 +14,8 @@ import rooms from './rooms.module.css'
 // the heat zone with lava flicker and rising embers, the ancestor's pastel town with drifting clouds.
 //
 // Rooms in the game are flat: a back wall band over a floor, a black void round them. So is each zone:
-// one SVG, the wall band, the floor and its small life. Only the zone on show animates (data-active, read
-// by rooms.module.css); a veil keeps the page's boxes the brightest thing on screen.
+// one SVG, the wall band, the floor and its small life. Only the zone on show animates (the others are held
+// on their frame, heldUntil); a veil keeps the page's boxes the brightest thing on screen.
 
 export type Zone = 'ruins' | 'snow' | 'water' | 'heat' | 'town'
 
@@ -22,8 +24,9 @@ const ZONES: readonly Zone[] = ['ruins', 'snow', 'water', 'heat', 'town']
 /** Something that falls or rises through the zone: its x, how far into its fall it starts and how long it takes. */
 type Mote = readonly [x: number, at: number, ms: number]
 
-// How long a mote moves once its zone is on show; it then holds where it is, or has fallen out.
-const MOTE_PLAY_MS = 5000
+// How long a mote moves once its zone is on show (the shared loop budget); it then holds where it is, or
+// has fallen out.
+const MOTE_PLAY_MS = PLAY_S * 1000
 
 // A mote starts `at` into its fall and plays on for MOTE_PLAY_MS at most, once: --fall-n is that much of one
 // fall counted from its start, never more than the whole fall.
@@ -172,8 +175,7 @@ export const Overworld = memo(function Overworld({ zones }: { zones: ValueStore<
             key={id}
             viewBox="0 0 320 180"
             preserveAspectRatio="xMidYMid slice"
-            className={`absolute inset-0 h-full w-full ${rooms.zone} ${active ? 'opacity-100' : 'opacity-0'}`}
-            data-active={active}
+            className={`absolute inset-0 h-full w-full ${rooms.zone} ${active ? 'opacity-100' : 'opacity-0'} ${heldUntil(active)}`}
             shapeRendering="crispEdges"
             focusable="false"
           >
