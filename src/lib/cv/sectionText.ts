@@ -1,4 +1,4 @@
-import type { Band, Job, MartialArts, Musician, Project, ProjectLinks } from '@/lib/cv/content'
+import type { Job, MartialArts, Musician, Project, ProjectLinks } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 
 // The phrases every world prints around the CV facts: link labels, year spans, the Muay Thai record
@@ -57,8 +57,6 @@ export function yearSpan({ startYear, endYear, current, years = null }: Span, la
   if (years !== null) return yearCount(years, labels)
   return ''
 }
-
-export const bandSpan = (band: Band, labels: Labels['years']): string => yearSpan(band, labels)
 
 /** The line over the bands: "Drumming since 2005". */
 export const drumsSince = ({ since }: Pick<Musician, 'since'>, labels: Labels['years']): string =>

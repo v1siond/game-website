@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
-import { bandSpan, newTabName } from '@/lib/cv/sectionText'
+import { newTabName, yearSpan } from '@/lib/cv/sectionText'
 
 // The bands (R5) as a list without a look, in the order viewFor gives (current first). A band with a
 // site carries `linkProps` for the world's anchor; one without carries null and is drawn as text. A link
@@ -30,7 +30,7 @@ interface BandListProps {
 
 const slotFor = (band: Band, labels: Labels): BandSlot => ({
   band,
-  years: bandSpan(band, labels.years),
+  years: yearSpan(band, labels.years),
   linkProps: band.url
     ? { href: band.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': newTabName(labels.links, band.name) }
     : null,
