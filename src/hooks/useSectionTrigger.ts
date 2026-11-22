@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLatest } from '@/hooks/useLatest'
-import { usePreview } from '@/themes/PreviewContext'
 
 // Whether a section is on screen, from an IntersectionObserver on the element `ref` is set on. With
 // `triggerOnce` (the default) `triggered` turns true the first time the section shows and stays true, and
 // the element is no longer watched. With `triggerOnce: false` it follows the section in and out, and
-// `inView` says the same; outside a preview a one shot caller gets `inView` false, since nothing watches it
+// `inView` says the same; a one shot caller gets `inView` false, since nothing watches it
 // once it has shown. `onEnter` runs each time the section comes into view (once for a one shot section), in
 // the observer's callback, so a caller acts on the entry without an effect relaying `triggered`.
 
@@ -51,10 +50,6 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
   const [shown, setShown] = useState(false)
   const elementRef = useRef<HTMLElement | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
-
-  // In a World Select preview, sections are clipped/frozen so the observer never
-  // fires, force everything "triggered" so the hero renders instead of staying blank.
-  const isPreview = usePreview()
 
   // The latest onEnter, so a new one each render never rebuilds the observer.
   const enterRef = useLatest(onEnter)
@@ -104,7 +99,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
 
   return {
     ref: setRef,
-    triggered: isPreview || shown,
-    inView: isPreview || (!triggerOnce && shown),
+    triggered: shown,
+    inView: !triggerOnce && shown,
   }
 }

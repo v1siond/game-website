@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { Theme, themes, DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from './themes'
-import { PreviewProvider } from './PreviewContext'
 import { WORLD_PENDING_ATTR } from './worldPending'
 import { readStored, writeStored } from '@/lib/storage'
 import { captureWorld } from '@/lib/worlds/capture'
@@ -49,24 +48,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-}
-
-/**
- * Forces a specific world's theme into a subtree and marks it as a preview, so the
- * Worlds section cards can render real themed layouts at the right theme without the
- * (now-removed) switcher or blank scroll-gated sections. See PreviewContext.
- */
-export function WorldPreviewProvider({ theme, children }: { theme: Theme; children: ReactNode }) {
-  const value: ThemeContextType = {
-    theme,
-    setThemeById: () => {},
-  }
-
-  return (
-    <ThemeContext.Provider value={value}>
-      <PreviewProvider value={true}>{children}</PreviewProvider>
-    </ThemeContext.Provider>
-  )
 }
 
 export function useTheme(): ThemeContextType {

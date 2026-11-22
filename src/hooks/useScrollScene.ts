@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import {
   type FrameTask,
@@ -23,7 +22,7 @@ import {
  * frame, which first measures every armed section and then writes each progress (0 to 1) to the
  * `--scene-progress` CSS variable on its element, so the frame forces layout once. React re-renders
  * only on phase changes (idle, playing, done), never per frame. Once done the scene stays done
- * (`hasAnimated`), and every listener is released. Reduced motion and World Select previews start done.
+ * (`hasAnimated`), and every listener is released. Reduced motion starts done.
  */
 
 export const SCENE_PROGRESS_VAR = '--scene-progress'
@@ -81,7 +80,6 @@ export function useScrollScene<T extends HTMLElement = HTMLDivElement>({
   const [element, setElement] = useState<T | null>(null)
   const [phase, setPhase] = useState<ScenePhase>(SCENE_IDLE.phase)
   const hasAnimated = useRef(false)
-  const isPreview = usePreview()
 
   useEffect(() => {
     if (!element) return
@@ -96,7 +94,7 @@ export function useScrollScene<T extends HTMLElement = HTMLDivElement>({
       writeProgress(element, SCENE_DONE)
       return
     }
-    if (isPreview || prefersReducedMotion()) {
+    if (prefersReducedMotion()) {
       finish()
       return
     }
@@ -131,7 +129,7 @@ export function useScrollScene<T extends HTMLElement = HTMLDivElement>({
       disarmScene(scene)
       observer.disconnect()
     }
-  }, [element, isPreview, start, end, rootMargin])
+  }, [element, start, end, rootMargin])
 
   return { ref: setElement, phase }
 }
