@@ -1,6 +1,7 @@
 'use client'
 
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
 import { Actor, useCourse } from './actor'
@@ -15,7 +16,8 @@ import side from './side.module.css'
 // jumps and hits it from below, the block bumps, a coin spins out, the block turns to a used block, and
 // his summary unfolds under it in the game's black message window. Pressing the block makes him jump
 // and hit it again, and the window unfolds again. Under reduced motion he stands under the used block
-// and the window is open.
+// and the window is open. The window holds the whole About block: the bio, his highlights as coin rows,
+// then his education and languages.
 
 type AboutPose = 'run' | 'jump' | 'land' | 'stand' | 'bump'
 
@@ -44,7 +46,12 @@ function hitOf(replays: number, struck: boolean): HitState {
 }
 
 export function AboutLevel({ bio, profession }: { bio: string; profession: Profession }) {
-  const { sections, trail } = useLabels()
+  const { sections, trail, cards, about } = useLabels()
+  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const facts = [
+    { term: about.education, value: education },
+    { term: about.languages, value: languages },
+  ].filter((fact) => fact.value)
   const { ref, on, reduced } = useZoneStage<Zone>('plains')
   const course = useCourse(COURSE, BUMP_MS)
   const hit = hitOf(course.take, on && course.past('jump'))
@@ -71,6 +78,26 @@ export function AboutLevel({ bio, profession }: { bio: string; profession: Profe
         </Playfield>
         <div key={course.take} className={`${side.unfold} rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6`}>
           <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{bio}</p>
+          {highlights.length > 0 && (
+            <ul className="mt-4 max-w-prose space-y-1.5" aria-label={cards.keyAchievements}>
+              {highlights.map((highlight) => (
+                <li key={highlight} className="flex items-start gap-2 text-sm text-white">
+                  <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-white bg-[color:var(--ap-coin)]" aria-hidden="true" />
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {facts.length > 0 && (
+            <dl className="mt-4 max-w-prose space-y-1 text-sm text-white">
+              {facts.map(({ term, value }) => (
+                <div key={term}>
+                  <dt className="inline font-bold text-[color:var(--ap-coin)]">{term}: </dt>
+                  <dd className="inline">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </div>
     </Region>

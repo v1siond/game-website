@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { fillLabel } from '@/lib/cv/labels'
+import { projectCard, type ProjectCard } from '@/lib/cv/cvView'
 import type { Project } from '@/lib/cv/content'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -27,7 +28,8 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 // are its secret exits.
 //
 // Above the palaces is the stretch he crosses (research images 04, 12, 20): he runs in, jumps onto the
-// big switch and stomps it flat, which fills every palace's blocks at once, then hops onto the pipe at
+// big switch and stomps it flat, which presses every palace at once (its blocks fill and its message box
+// opens, so every project's story is on screen once the section has played), then hops onto the pipe at
 // the end and sinks down it, out of sight, toward the underground room of the next section. The big
 // switch is also a button that fills or empties every palace's blocks.
 
@@ -103,7 +105,7 @@ function TechBlocks({ items, colour, pressed, label }: { items: string[]; colour
  * markup, hidden until the switch is pressed, so the server HTML carries every description; leaving
  * `display: none` restarts `.messageBox`'s open animation on each press.
  */
-function MessageBox({ project, id, hidden }: { project: Project; id: string; hidden: boolean }) {
+function MessageBox({ project, id, hidden }: { project: ProjectCard; id: string; hidden: boolean }) {
   const { cards } = useLabels()
   return (
     <div id={id} hidden={hidden} className={`mt-4 rounded-sm border-4 border-double border-[color:var(--ap-ink)] bg-[color:var(--ap-ink)] p-4 text-[color:var(--ap-page)] ${map.messageBox}`}>
@@ -122,12 +124,16 @@ function MessageBox({ project, id, hidden }: { project: Project; id: string; hid
   )
 }
 
+// The big switch, stomped as the section plays (or at once under reduced motion), opens every palace; a
+// palace's own switch then flips its palace against that, so each switch is a plain toggle.
 function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: SwitchColour; filled: boolean }) {
-  const { project, years, links } = slot
-  const { cards, trail } = useLabels()
-  const [pressed, setPressed] = useState(false)
+  const labels = useLabels()
+  const { cards, trail } = labels
+  const project = projectCard(slot.project, labels)
+  const [flipped, setFlipped] = useState(false)
+  const open = flipped !== filled
   const boxId = `trail-project-${project.id}`
-  const [main, ...secret] = links
+  const [main, ...secret] = slot.links
 
   return (
     <article className={PAPER_CARD}>
@@ -135,23 +141,28 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         <div className="min-w-0">
           <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}><SlashBreaks text={project.name} /></h3>
           <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{project.role}</p>
-          {years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{years}</p>}
+          {project.years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{project.years}</p>}
         </div>
         <button
           type="button"
-          aria-expanded={pressed}
+          aria-expanded={open}
           aria-controls={boxId}
           aria-label={fillLabel(trail.pressSwitch, { name: project.name })}
-          onClick={() => setPressed((now) => !now)}
+          onClick={() => setFlipped((now) => !now)}
           className={`shrink-0 rounded-sm p-1 ${map.switch}`}
         >
           <SwitchBlock colour={colour} />
         </button>
       </div>
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
-      {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
-      <TechBlocks items={project.techStack} colour={colour} pressed={pressed || filled} label={cards.technologiesUsed} />
-      <MessageBox project={project} id={boxId} hidden={!pressed} />
+      {project.impact && (
+        <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">
+          <span className="sr-only">{cards.impact}: </span>
+          {project.impact}
+        </p>
+      )}
+      <TechBlocks items={project.techStack} colour={colour} pressed={open} label={cards.technologiesUsed} />
+      <MessageBox project={project} id={boxId} hidden={!open} />
       {main && (
         <div className="mt-4 flex flex-wrap gap-2">
           <a {...main.linkProps} className={`${LINK} bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]`}>
