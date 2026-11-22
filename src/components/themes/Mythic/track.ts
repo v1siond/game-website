@@ -46,9 +46,9 @@ export function useSceneMove(move: Move, threshold: number) {
 export function useTurnQueue(items: readonly { id: string }[], gapMs: number, onTurn: () => void) {
   const { reduced } = useZoneStageContext()
   const [entered, setEntered] = useState<ReadonlySet<string>>(new Set())
-  const [done, setDone] = useState<readonly string[]>([])
+  const [done, setDone] = useState<ReadonlySet<string>>(new Set())
   const lastTurn = useRef(0)
-  const next = items.find((item) => entered.has(item.id) && !done.includes(item.id))
+  const next = items.find((item) => entered.has(item.id) && !done.has(item.id))
 
   // The latest onTurn, held in a ref a layout effect writes, so a new one each render never resets the clock.
   const turnRef = useRef(onTurn)
@@ -65,12 +65,12 @@ export function useTurnQueue(items: readonly { id: string }[], gapMs: number, on
     const wait = Math.max(0, lastTurn.current + gapMs - Date.now())
     const timer = window.setTimeout(() => {
       lastTurn.current = Date.now()
-      setDone((current) => [...current, next.id])
+      setDone((current) => new Set(current).add(next.id))
       turnRef.current()
     }, wait)
     return () => window.clearTimeout(timer)
   }, [next, reduced, gapMs])
 
-  const isDone = (id: string) => reduced || done.includes(id)
-  return { enter, isDone, take: done.length, count: reduced ? items.length : done.length }
+  const isDone = (id: string) => reduced || done.has(id)
+  return { enter, isDone, take: done.size, count: reduced ? items.length : done.size }
 }

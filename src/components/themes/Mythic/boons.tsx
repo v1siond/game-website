@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -146,7 +146,8 @@ export function Boons({ projects }: { projects: Project[] }) {
     setChosenIds((current) => (current.includes(id) ? current.filter((each) => each !== id) : [...current, id]))
   }, [])
 
-  const chosen = chosenIds.flatMap((id) => projects.filter((project) => project.id === id))
+  const byId = useMemo(() => new Map(projects.map((project) => [project.id, project])), [projects])
+  const chosen = chosenIds.flatMap((id) => byId.get(id) ?? [])
 
   return (
     <>
@@ -155,8 +156,8 @@ export function Boons({ projects }: { projects: Project[] }) {
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => (
-          <BoonCard slot={slot} index={projects.indexOf(slot.project)} chosen={chosenIds.includes(slot.project.id)} onChoose={toggle} />
+        renderProject={(slot, index) => (
+          <BoonCard slot={slot} index={index} chosen={chosenIds.includes(slot.project.id)} onChoose={toggle} />
         )}
       />
     </>

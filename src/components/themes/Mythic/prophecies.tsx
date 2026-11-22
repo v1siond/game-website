@@ -117,7 +117,6 @@ function Arena() {
 
 export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
   const { myth } = useLabels()
-  const { achievements } = martialArts.primary
 
   return (
     <div className="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
@@ -135,10 +134,10 @@ export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
               achievements: `space-y-3 p-5 ${u.panel}`,
               achievement: 'flex items-start justify-between gap-4 border-b border-[var(--myth-gold-deep)] pb-3 last:border-b-0 last:pb-0',
             }}
-            renderAchievement={(achievement) => (
+            renderAchievement={(achievement, index) => (
               <>
                 <span className="text-base">{achievement}</span>
-                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={{ ['--i' as string]: achievements.indexOf(achievement) }}>
+                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={{ ['--i' as string]: index }}>
                   {myth.fulfilled}
                 </span>
               </>
