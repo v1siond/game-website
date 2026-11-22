@@ -1,7 +1,9 @@
 import dynamic from 'next/dynamic'
 import type { ComponentType } from 'react'
-import { themes } from './themes'
+import { WORLD_IDS } from '@/lib/worlds/registry'
 
+// Every world's full themed layout, read only by WorldRenderer; ids and categories are in
+// src/lib/worlds/registry.ts, which pages that only list the worlds import instead.
 // The default world (Adventure Paths, DEFAULT_THEME_ID) is imported statically: the server renders it
 // into the home page HTML and it ships in the first load. Every other world is its own chunk, fetched
 // only when a visitor enters it (a returning visitor's stored world, or a pick in the worlds modal).
@@ -23,31 +25,11 @@ const CellShadedTheme = dynamic(() => import('@/components/themes/CellShadedThem
 const SilhouetteTheme = dynamic(() => import('@/components/themes/SilhouetteTheme'))
 const MythicTheme = dynamic(() => import('@/components/themes/MythicTheme'))
 const TropicalPlatformerTheme = dynamic(() => import('@/components/themes/TropicalPlatformerTheme'))
-const MedievalFantasyTheme = dynamic(() => import('@/components/themes/MedievalFantasyTheme'))
-
-export type WorldCategory = 'Fantasy' | 'Retro' | 'Neon' | 'Action' | 'Artistic'
-
-// Each chip's icon is drawn in src/components/worlds/categoryIcons.tsx.
-export interface WorldCategoryMeta {
-  name: WorldCategory
-}
-
-// Display order of the filter chips on the World Select screen.
-export const WORLD_CATEGORIES: WorldCategoryMeta[] = [
-  { name: 'Fantasy' },
-  { name: 'Retro' },
-  { name: 'Neon' },
-  { name: 'Action' },
-  { name: 'Artistic' },
-]
-
-export interface World {
-  /** Matches the Theme id in themes.ts, drives `?t=<id>` and ThemeContext. */
-  id: string
-  /** The full themed layout rendered when you enter the world. */
-  component: ComponentType
-  category: WorldCategory
-}
+// Medieval Fantasy is the one world under the shared profession stage (ClientProviders), so its chunk
+// arrives with the stage's and the stage never shows a beat after the world.
+const MedievalFantasyTheme = dynamic(() =>
+  Promise.all([import('@/components/themes/MedievalFantasyTheme'), import('@/components/themes/shared/professionStage')]).then(([world]) => world),
+)
 
 // id -> full themed layout
 const COMPONENT_BY_ID: Record<string, ComponentType> = {
@@ -70,40 +52,9 @@ const COMPONENT_BY_ID: Record<string, ComponentType> = {
   'medieval-fantasy': MedievalFantasyTheme,
 }
 
-// id -> category bucket (mirrors the groupings the ThemeSwitcher used)
-const CATEGORY_BY_ID: Record<string, WorldCategory> = {
-  'dark-fantasy': 'Fantasy',
-  'medieval-fantasy': 'Fantasy',
-  'mythic': 'Fantasy',
-  'soul-map': 'Fantasy',
-  'adventure-paths': 'Fantasy',
-  'retro-rpg': 'Retro',
-  'retro-atomic': 'Retro',
-  'rubber-hose': 'Retro',
-  'neon-cyber': 'Neon',
-  'neon-portals': 'Neon',
-  'bold-noir': 'Neon',
-  'fighter-select': 'Action',
-  'survival-horror': 'Action',
-  'cell-shaded': 'Action',
-  'silhouette': 'Artistic',
-  'art-deco': 'Artistic',
-  'tropical-platformer': 'Artistic',
-}
-
-// Built from `themes` so the registry order and membership always track themes.ts.
-// If a theme is added without a component/category here, the build fails loudly below.
-export const WORLDS: World[] = themes.map((theme) => {
-  const component = COMPONENT_BY_ID[theme.id]
-  const category = CATEGORY_BY_ID[theme.id]
-  if (!component) {
-    throw new Error(`worlds.ts: no component registered for theme "${theme.id}"`)
-  }
-  if (!category) {
-    throw new Error(`worlds.ts: no category registered for theme "${theme.id}"`)
-  }
-  return { id: theme.id, component, category }
-})
+// A theme added without a component fails the build here rather than rendering the default in its place.
+const missing = WORLD_IDS.filter((id) => !COMPONENT_BY_ID[id])
+if (missing.length > 0) throw new Error(`worlds.ts: no component registered for ${missing.join(', ')}`)
 
 export function getWorldComponent(id: string): ComponentType | undefined {
   return COMPONENT_BY_ID[id]

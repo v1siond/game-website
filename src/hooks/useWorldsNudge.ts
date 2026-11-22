@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
-import { WORLDS } from '@/themes/worlds'
+import { WORLD_IDS } from '@/lib/worlds/registry'
 import {
   HINT_OFFERED_KEY,
   HINT_MIN_MS,
@@ -28,8 +28,6 @@ const SEEN_AFTER_MS = 1500
 
 // The longest the waiting card holds a measure for running animations to end, so a long reveal cannot stall it.
 const SETTLE_CAP_MS = 1000
-
-const WORLD_IDS = WORLDS.map((world) => world.id)
 
 // What the hint must not cover when it opens: any text, and any control a visitor could reach.
 const CONTROLS = 'a[href], button, input, select, textarea, summary, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])'

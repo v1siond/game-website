@@ -1,13 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { WORLDS, WORLD_CATEGORIES, type World } from '@/themes/worlds'
+import { WORLDS, WORLD_CATEGORIES, type World } from '@/lib/worlds/registry'
 import type { PickerEntry } from '@/lib/worlds/nudge'
 import WorldCard from './WorldCard'
 import { CATEGORY_ICONS, type WorldFilter as Filter } from './categoryIcons'
 import { useWorldsLabels } from './WorldsLabels'
 
 const WORLD_BY_ID = new Map<string, World>(WORLDS.map((world) => [world.id, world]))
+
+// The registry is fixed for the page's life, so each chip's count is counted once, not per render.
+const CATEGORIES_WITH_COUNTS = WORLD_CATEGORIES.map((cat) => ({
+  ...cat,
+  count: WORLDS.filter((w) => w.category === cat.name).length,
+})).filter((c) => c.count > 0)
 
 function FilterChip({
   active,
@@ -45,10 +51,6 @@ export default function WorldsGrid({ order }: { order: PickerEntry[] }) {
   const [filter, setFilter] = useState<Filter>('All')
 
   const entries = order.filter((entry) => filter === 'All' || WORLD_BY_ID.get(entry.id)?.category === filter)
-  const categoriesWithCounts = WORLD_CATEGORIES.map((cat) => ({
-    ...cat,
-    count: WORLDS.filter((w) => w.category === cat.name).length,
-  })).filter((c) => c.count > 0)
 
   return (
     <div>
@@ -59,7 +61,7 @@ export default function WorldsGrid({ order }: { order: PickerEntry[] }) {
         className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
       >
         <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} label="All" count={WORLDS.length} />
-        {categoriesWithCounts.map((cat) => (
+        {CATEGORIES_WITH_COUNTS.map((cat) => (
           <FilterChip
             key={cat.name}
             active={filter === cat.name}

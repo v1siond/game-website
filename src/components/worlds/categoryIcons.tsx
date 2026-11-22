@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { WorldCategory } from '@/themes/worlds'
+import type { WorldCategory } from '@/lib/worlds/registry'
 
 // The World Select filter chips' icons, line drawings in currentColor so the chip's own colour (the
 // hosting world's accent or muted text) tints them, the same style as the shared profession icons.

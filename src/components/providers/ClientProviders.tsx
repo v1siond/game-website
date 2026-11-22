@@ -1,13 +1,24 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { ThemeProvider } from '../../themes/ThemeContext'
+import dynamic from 'next/dynamic'
+import { ThemeProvider, useTheme } from '../../themes/ThemeContext'
 import { WorldTransitionProvider } from '../../themes/WorldTransitionContext'
 import { ProfessionProvider } from '../../contexts/ProfessionContext'
 import WorldsLauncher from '../worlds/WorldsLauncher'
 import WorldsModal from '../worlds/WorldsModal'
 import { WorldsLabelsProvider, type WorldsText } from '../worlds/WorldsLabels'
-import GlobalProfessionStage from '../themes/shared/professionStage'
+import { SHARED_STAGE_WORLD_ID } from '@/lib/worlds/registry'
+
+// Its own chunk, so /cv, /blog and every world that draws its own stage never download it.
+const GlobalProfessionStage = dynamic(() => import('@/components/themes/shared/professionStage'))
+
+/** The profession boss-stage ornaments, recoloured per world, in the one world that uses the shared set. */
+function SharedProfessionStage() {
+  const { theme } = useTheme()
+  if (theme.id !== SHARED_STAGE_WORLD_ID) return null
+  return <GlobalProfessionStage />
+}
 
 export default function ClientProviders({ children, worldsLabels }: { children: ReactNode; worldsLabels: WorldsText }) {
   return (
@@ -15,8 +26,7 @@ export default function ClientProviders({ children, worldsLabels }: { children: 
       <ProfessionProvider>
         <WorldTransitionProvider>
           <WorldsLabelsProvider labels={worldsLabels}>
-            {/* profession boss-stage ornaments, recoloured per world (dark-fantasy renders its own) */}
-            <GlobalProfessionStage />
+            <SharedProfessionStage />
             {children}
             {/* worlds picker lives outside the page content flow, available in every world */}
             <WorldsLauncher />

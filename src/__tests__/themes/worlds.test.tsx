@@ -1,6 +1,6 @@
 import { themes } from '@/themes/themes'
 
-// Every world component is mocked so the suite checks the registry wiring, not 17 heavy layouts, and a
+// Every world component and the shared stage are mocked so the suite checks the registry wiring, not 17 heavy layouts, and a
 // world mid edit cannot break it. Each call is written out at the top level with a literal path and an
 // inline factory, because babel-jest hoists only those above the imports; a call inside a helper runs
 // after the imports and the real worlds load.
@@ -21,25 +21,19 @@ jest.mock('@/components/themes/SilhouetteTheme', () => ({ __esModule: true, defa
 jest.mock('@/components/themes/MythicTheme', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/themes/TropicalPlatformerTheme', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/themes/MedievalFantasyTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/shared/professionStage', () => ({ __esModule: true, default: () => null }))
 
-import {
-  WORLDS,
-  WORLD_CATEGORIES,
-  getWorldComponent,
-} from '@/themes/worlds'
+import { WORLDS, WORLD_CATEGORIES, WORLD_IDS } from '@/lib/worlds/registry'
+import { getWorldComponent } from '@/themes/worlds'
 
 describe('worlds registry', () => {
   it('has exactly one world per theme, in the same order', () => {
-    expect(WORLDS.map((w) => w.id)).toEqual(themes.map((t) => t.id))
+    expect(WORLD_IDS).toEqual(themes.map((t) => t.id))
   })
 
-  it('gives every world a component and a known category', () => {
+  it('gives every world a known category', () => {
     const known = new Set(WORLD_CATEGORIES.map((c) => c.name))
     for (const world of WORLDS) {
-      // The default world is a plain function component; the others are next/dynamic's loadable
-      // wrappers, which React exposes as element type objects ($$typeof).
-      const element = world.component as unknown as { $$typeof?: symbol }
-      expect(typeof world.component === 'function' || typeof element.$$typeof === 'symbol').toBe(true)
       expect(known.has(world.category)).toBe(true)
     }
   })
@@ -59,10 +53,11 @@ describe('worlds registry', () => {
   })
 
   describe('getWorldComponent', () => {
-    it('returns the component for a valid world id', () => {
-      expect(getWorldComponent('mythic')).toBe(
-        WORLDS.find((w) => w.id === 'mythic')!.component
-      )
+    it.each(WORLD_IDS)('resolves %s to a component', (id) => {
+      // The default world is a plain function component; the others are next/dynamic's loadable
+      // wrappers, which React exposes as element type objects ($$typeof).
+      const component = getWorldComponent(id) as unknown as { $$typeof?: symbol } | undefined
+      expect(typeof component === 'function' || typeof component?.$$typeof === 'symbol').toBe(true)
     })
 
     it('returns undefined for an unknown id', () => {
