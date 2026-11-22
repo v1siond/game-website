@@ -4,6 +4,10 @@
 export const MASONRY_LIST = 'columns-1 gap-6 md:columns-2 xl:columns-3'
 export const MASONRY_ITEM = 'mb-6 break-inside-avoid'
 
+// The same masonry for a list read in a theatre world's screen column (the scene on its right from lg): the
+// column is about half the page, so it stops at two columns where the page wide list goes to three.
+export const MASONRY_COLUMN_LIST = 'columns-1 gap-6 md:columns-2'
+
 // The tool tiles inside one masonry card: two up while the card's column is wide enough for its longest
 // name, one up when it is not. The count follows the card's width, not the viewport's, because a card
 // in a three column row can be narrower than the same card alone on a phone.
