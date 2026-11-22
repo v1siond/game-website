@@ -4,7 +4,7 @@ import { Alfa_Slab_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { fillLabel } from '@/lib/cv/labels'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { FS_VARS } from './FighterSelect/palette'
@@ -65,14 +65,9 @@ export default function FighterSelectTheme() {
               <SelectScreen active={active} title={labels.professions[active]} />
             </ArcadePanel>
 
-            <div
-              role="region"
-              aria-label={fillLabel(labels.navigation.professionDetails, {
-                profession: labels.professions[active],
-              })}
-            >
+            <ProfessionRegion>
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-            </div>
+            </ProfessionRegion>
           </main>
 
           <ChallengerScene profession={active} />
