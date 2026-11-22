@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
+import { cssVars } from '@/lib/cssVars'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import { CaveCeiling } from './scenery'
@@ -30,7 +31,7 @@ function Cart() {
       <path d="M6 4 H74" stroke={C.hoop} strokeWidth="3" />
       <path d="M10 14 H70 M12 22 H68" stroke={C.hoop} strokeWidth="1.5" opacity="0.6" />
       {[22, 58].map((cx) => (
-        <g key={cx} className={cart.wheel} style={{ '--cx': `${cx}px` } as CSSProperties}>
+        <g key={cx} className={cart.wheel} style={cssVars({ '--cx': `${cx}px` })}>
           <circle cx={cx} cy="32" r="7" fill={C.barkDark} stroke={C.hoopLight} strokeWidth="2" />
           <path d={`M${cx - 6} 32 H${cx + 6} M${cx} 26 V38`} stroke={C.hoopLight} strokeWidth="1.5" />
         </g>
@@ -122,11 +123,11 @@ export function CartLine({ stops, profession, children }: CartLineProps) {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={cart.line}>
-      <div className={`relative mb-10 h-32 overflow-hidden rounded-3xl sm:h-36 ${cart.tunnel}`} style={{ '--n': stops.length } as CSSProperties} aria-hidden="true">
+      <div className={`relative mb-10 h-32 overflow-hidden rounded-3xl sm:h-36 ${cart.tunnel}`} style={cssVars({ '--n': stops.length })} aria-hidden="true">
         <CaveCeiling />
         <Rails stations={stops.length} />
-        <div className={`absolute bottom-2 left-0 ${cart.track}`} style={{ '--stop': stop } as CSSProperties} data-riding={riding || undefined}>
-          <div key={ride.count} className={`relative mx-auto w-full max-w-[6rem] ${cart.hop}`} style={{ '--hops': Math.max(ride.hops, 1) } as CSSProperties}>
+        <div className={`absolute bottom-2 left-0 ${cart.track}`} style={cssVars({ '--stop': stop })} data-riding={riding || undefined}>
+          <div key={ride.count} className={`relative mx-auto w-full max-w-[6rem] ${cart.hop}`} style={cssVars({ '--hops': Math.max(ride.hops, 1) })}>
             <HeroCharacter profession={profession} pose={riding ? 'run' : 'idle'} className="absolute bottom-[45%] left-[12%] w-[76%]" />
             <Cart />
           </div>

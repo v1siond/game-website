@@ -1,9 +1,10 @@
 'use client'
 
-import { memo, useId, type AnimationEventHandler, type CSSProperties, type ReactNode } from 'react'
+import { memo, useId, type AnimationEventHandler, type ReactNode } from 'react'
 import { mix } from '@/lib/color'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
+import { cssVars } from '@/lib/cssVars'
 import { COLORS } from './palette'
 import { usePlayedOut } from './playedOut'
 import sprite from './character.module.css'
@@ -312,7 +313,7 @@ export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'i
       data-pose={pose}
       data-profession={profession}
       onAnimationEnd={onAnimationEnd}
-      style={{ '--pose-delay': delay } as CSSProperties}
+      style={cssVars({ '--pose-delay': delay })}
       aria-hidden="true"
       focusable="false"
     >

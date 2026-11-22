@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, type AnimationEvent, type CSSProperties, type ReactNode } from 'react'
+import { useState, type AnimationEvent, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
+import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
@@ -54,7 +55,7 @@ const STAVES = [-70, -40, -12, 14, 42, 72]
 function InsigniaBand({ active }: { active: Profession }) {
   return (
     <div className="absolute left-[14%] top-[37%] h-[22%] w-[72%] overflow-hidden rounded-md border-2 border-[color:var(--tp-bark-dark)] bg-[color:var(--tp-bark-dark)]" aria-hidden="true">
-      <div className={`flex h-full w-[300%] ${partner.band}`} style={{ '--slot': PROFESSION_ORDER.indexOf(active) } as CSSProperties}>
+      <div className={`flex h-full w-[300%] ${partner.band}`} style={cssVars({ '--slot': PROFESSION_ORDER.indexOf(active) })}>
         {PROFESSION_ORDER.map((id) => (
           <svg key={id} viewBox="0 0 40 40" className="h-full w-1/3 py-1" focusable="false">
             {INSIGNIA[id](C.sunGold)}
@@ -96,7 +97,7 @@ function BarrelStage() {
             <InsigniaBand active={active} />
           </div>
           {STAVES.map((angle) => (
-            <span key={angle} className={`absolute left-1/2 top-1/3 block h-14 w-4 rounded-md ${partner.stave}`} style={{ '--a': `${angle}deg` } as CSSProperties} />
+            <span key={angle} className={`absolute left-1/2 top-1/3 block h-14 w-4 rounded-md ${partner.stave}`} style={cssVars({ '--a': `${angle}deg` })} />
           ))}
         </div>
       </div>

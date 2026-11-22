@@ -1,12 +1,12 @@
 'use client'
 
-import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData, Service } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { cssVars } from '@/lib/cssVars'
 import { Board } from './levelSign'
 import look from './jungle.module.css'
 
@@ -31,7 +31,7 @@ export function TechBoard({ categories, itemClassName = '' }: BoardListProps & {
   return (
     <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category, index) => (
-        <li key={category.id} className={`${MASONRY_ITEM} ${itemClassName}`} style={{ '--i': index } as CSSProperties}>
+        <li key={category.id} className={`${MASONRY_ITEM} ${itemClassName}`} style={cssVars({ '--i': index })}>
           <Board>
             <h3 className={`mb-3 flex items-center gap-2 text-base uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>
               <span aria-hidden="true">{category.icon}</span>
@@ -57,7 +57,7 @@ export function VentureBoard({ companies, itemClassName = '' }: BoardListProps &
   return (
     <ul className="grid gap-5 md:grid-cols-6">
       {companies.map((company, index) => (
-        <li key={company.id} className={`${company.featured ? 'md:col-span-3' : 'md:col-span-2'} ${itemClassName}`} style={{ '--i': index } as CSSProperties}>
+        <li key={company.id} className={`${company.featured ? 'md:col-span-3' : 'md:col-span-2'} ${itemClassName}`} style={cssVars({ '--i': index })}>
           <a
             href={company.url}
             target="_blank"

@@ -1,6 +1,7 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { SectionCameo } from '../shared/SectionCameo'
 import { HeroCharacter, type HeroPose } from './character'
 import { BarrelArt, MuzzleBurst } from './barrel'
@@ -48,7 +49,7 @@ const THROWN = (
         <span
           key={stave.turn}
           className={`absolute left-6 top-5 h-5 w-2 rounded-sm bg-[color:var(--tp-plank)] ${d.stave}`}
-          style={{ '--dx': stave.dx, '--dy': stave.dy, '--turn': stave.turn } as CSSProperties}
+          style={cssVars({ '--dx': stave.dx, '--dy': stave.dy, '--turn': stave.turn })}
         />
       ))}
     </span>

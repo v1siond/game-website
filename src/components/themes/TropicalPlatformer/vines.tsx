@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useCallback, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -8,6 +8,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Band, Musician } from '@/lib/cv/content'
+import { cssVars } from '@/lib/cssVars'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
@@ -49,7 +50,7 @@ const HangingBand = memo(function HangingBand({ slot, index, here, swings, onSwi
   const { band, years, linkProps, release } = slot
 
   return (
-    <div className={`relative pt-10 ${grove.hang}`} style={{ '--i': index } as CSSProperties}>
+    <div className={`relative pt-10 ${grove.hang}`} style={cssVars({ '--i': index })}>
       <article data-here={here || undefined} className={`relative rounded-3xl p-5 ${look.board} ${grove.card}`}>
         <Vines />
         {here && (

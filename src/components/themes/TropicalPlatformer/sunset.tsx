@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState, type CSSProperties } from 'react'
+import { memo, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -11,6 +11,7 @@ import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
 import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { cssVars } from '@/lib/cssVars'
 import { ToneScope } from './scenery'
 import look from './jungle.module.css'
 import scenery from './scenery.module.css'
@@ -50,11 +51,11 @@ const GROUND_BAND = `M-30 262 Q100 250 200 258 Q${LANDING_X - 38} ${GROUND_Y - 0
 
 // The tree house cannon's box in the scene's units, its height the barrel's drawing at that width.
 const CANNON = { x: 100, y: 78, width: 48 }
-const CANNON_AT = {
+const CANNON_AT = cssVars({
   '--cannon-left': `${(CANNON.x / SCENE.width) * 100}%`,
   '--cannon-top': `${(CANNON.y / SCENE.height) * 100}%`,
   '--cannon-width': `${(CANNON.width / SCENE.width) * 100}%`,
-} as CSSProperties
+})
 
 // His flight starts with his box's top left corner at the barrel's mouth (the rim's top at its middle,
 // before the cannon's tilt) and tops out with his box's top on ARC_TOP_Y, both in the scene's units.
@@ -66,7 +67,7 @@ const MOUTH = {
 }
 const ARC_TOP_Y = 18.4
 const LANDED_TOP = GROUND_Y - LANDING_BOX.height
-const LANDING = {
+const LANDING = cssVars({
   '--ground': GROUND_Y / SCENE.height,
   '--landing-left': `${(LANDING_BOX.x / SCENE.width) * 100}%`,
   '--landing-width': `${(LANDING_BOX.width / SCENE.width) * 100}%`,
@@ -74,7 +75,7 @@ const LANDING = {
   '--from-x': `${((MOUTH.x - LANDING_BOX.x) / LANDING_BOX.width) * 100}%`,
   '--from-y': `${((MOUTH.y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
   '--peak-y': `${((ARC_TOP_Y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
-} as CSSProperties
+})
 
 // The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
 // cloud, and birds.
@@ -222,7 +223,7 @@ function PlankName({ name }: { name: string }) {
         <NameWords
           name={name}
           letter={(letter, i) => (
-            <span className={sunset.letter} style={{ '--i': i } as CSSProperties}>
+            <span className={sunset.letter} style={cssVars({ '--i': i })}>
               {letter}
             </span>
           )}

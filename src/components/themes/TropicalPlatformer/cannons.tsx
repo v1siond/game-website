@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
@@ -9,6 +9,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
+import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
@@ -81,14 +82,14 @@ const Platform = memo(function Platform({ entry, coins, index, armed, occupied, 
   const barrelRef = useCallback((element: HTMLElement | null) => onBarrel(index, element), [onBarrel, index])
   const { start, end } = jobYears(entry, years.present)
   const cannon = (
-    <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={{ '--aim': `${aim ?? 0}deg` } as CSSProperties}>
+    <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={cssVars({ '--aim': `${aim ?? 0}deg` })}>
       {occupied && <HeroCharacter profession="engineer" pose="idle" className={`absolute bottom-[58%] left-[10%] w-[80%] ${run.peek}`} />}
       <BarrelArt mark="burst" className="relative block h-auto w-full" />
     </span>
   )
 
   return (
-    <article key={landed} data-landed={landed > 0 || undefined} className={`relative rounded-3xl p-5 pt-6 ${look.board} ${run.platform}`} style={{ '--i': index } as CSSProperties}>
+    <article key={landed} data-landed={landed > 0 || undefined} className={`relative rounded-3xl p-5 pt-6 ${look.board} ${run.platform}`} style={cssVars({ '--i': index })}>
       <span className={`absolute inset-x-0 top-0 h-3 rounded-t-3xl ${run.grass}`} aria-hidden="true" />
       {coins.length > 0 && (
         <div className="absolute -top-5 left-4 flex gap-2">
@@ -262,7 +263,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
         {flight && (
           <div
             className={`pointer-events-none absolute left-0 top-0 z-20 h-16 w-12 ${run.flyX}`}
-            style={{ '--dx': `${flight.dx}px`, '--dy': `${flight.dy}px`, '--peak': `${flight.peak}px` } as CSSProperties}
+            style={cssVars({ '--dx': `${flight.dx}px`, '--dy': `${flight.dy}px`, '--peak': `${flight.peak}px` })}
             aria-hidden="true"
           >
             <div className={`h-full w-full ${run.flyY}`}>

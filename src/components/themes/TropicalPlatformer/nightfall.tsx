@@ -1,11 +1,12 @@
 'use client'
 
-import { memo, useState, type CSSProperties } from 'react'
+import { memo, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { cssVars } from '@/lib/cssVars'
 import { JungleAction, JungleCVLink } from './buttons'
 import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
@@ -79,7 +80,7 @@ export function TreehouseContact() {
             <span
               key={fly.left}
               className={`absolute block h-2 w-2 rounded-full ${night.firefly}`}
-              style={{ '--left': fly.left, '--top': fly.top, '--delay': fly.delay } as CSSProperties}
+              style={cssVars({ '--left': fly.left, '--top': fly.top, '--delay': fly.delay })}
               aria-hidden="true"
             />
           ))}

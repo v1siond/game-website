@@ -14,9 +14,16 @@ import cross from './crossing.module.css'
 // Pattern: CSS off one trigger (data-on): a full width layer carries him across (2.2 s) over an inner
 // layer for the arcs and the swing angle; the vines sway on their own tops.
 
-function Vine({ left, late }: { left: string; late?: boolean }) {
+// Each vine hangs centred on its point of the gap (18% and 68%), half its width to the left of it; the
+// second one catches him, so it takes the late swing.
+const VINE_AT = {
+  first: 'left-[calc(18%-0.625rem)]',
+  second: `left-[calc(68%-0.625rem)] ${cross.vineLate}`,
+} as const
+
+function Vine({ at }: { at: keyof typeof VINE_AT }) {
   return (
-    <svg viewBox="0 0 20 100" preserveAspectRatio="none" className={`absolute top-0 h-[70%] w-5 ${cross.vine} ${late ? cross.vineLate : ''}`} style={{ left }} aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 20 100" preserveAspectRatio="none" className={`absolute top-0 h-[70%] w-5 ${cross.vine} ${VINE_AT[at]}`} aria-hidden="true" focusable="false">
       <path d="M10 0 Q4 25 10 50 T10 100" fill="none" stroke={C.moss} strokeWidth="4" />
       <path d="M10 22 q8 -5 10 2 q-6 2 -10 -2 Z M10 58 q-8 -5 -10 2 q6 2 10 -2 Z" fill={C.fern} />
     </svg>
@@ -29,8 +36,8 @@ export function VineCrossing() {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto h-48 max-w-4xl ${cross.gap}`} aria-hidden="true">
-      <Vine left="calc(18% - 0.625rem)" />
-      <Vine left="calc(68% - 0.625rem)" late />
+      <Vine at="first" />
+      <Vine at="second" />
       <div className={`pointer-events-none absolute inset-0 ${cross.carry}`}>
         <div className={`absolute left-[calc(18%-0.8rem)] top-[calc(70%-0.7rem)] w-16 ${cross.arc}`}>
           <HeroCharacter profession={active} pose="swing" className="block h-auto w-full" />
