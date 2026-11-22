@@ -1,12 +1,13 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import type { Labels } from '@/lib/cv/labels'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { AreaTitle, CARD_BODY, CARD_TITLE, MenuPanel, TechSlots } from './menu'
+import { AreaTitle, CARD_BODY, CARD_META, CARD_TITLE, EmberList, MenuPanel, TechSlots } from './menu'
 import { FogGate } from './gate'
 import { LiftDescent } from './descent'
 import { ItemProjects } from './items'
@@ -36,6 +37,32 @@ function Block({ titleKey, wide = false, children }: { titleKey: keyof Labels['s
   )
 }
 
+// His education, languages and summary highlights under the bio, on the same menu panel.
+function AboutFacts() {
+  const { about, cards } = useLabels()
+  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const facts = [
+    { label: about.education, value: education },
+    { label: about.languages, value: languages },
+  ].filter((fact) => fact.value)
+
+  return (
+    <>
+      {facts.length > 0 && (
+        <dl className="mt-4 space-y-2">
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt className={`uppercase ${CARD_META}`}>{fact.label}</dt>
+              <dd className={CARD_BODY}>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <EmberList items={highlights} label={cards.keyAchievements} className="mt-4" />
+    </>
+  )
+}
+
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
@@ -44,6 +71,7 @@ const FRAMES: SectionFrames = {
         <FogGate>
           <MenuPanel>
             <p className="max-w-prose text-base leading-relaxed text-[color:var(--soul-text)]">{slot.bio}</p>
+            <AboutFacts />
           </MenuPanel>
         </FogGate>
       </Block>

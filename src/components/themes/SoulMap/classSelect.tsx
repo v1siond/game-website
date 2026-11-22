@@ -38,7 +38,7 @@ const STATUS_FOR: { [Id in Profession]: (sections: Extract<ProfessionSections, {
     { label: titles.bands, value: String(sections.bands.length) },
     { label: professionFields.drummer, value: drumsSince(sections.musician, years) },
   ],
-  fighter: (sections, labels) => muayThaiFacts(sections.martialArts, labels).slice(0, 4),
+  fighter: (sections, labels) => muayThaiFacts(sections.martialArts, labels),
 }
 
 const statusFor = (sections: ProfessionSections, labels: Labels): StatusRow[] =>
