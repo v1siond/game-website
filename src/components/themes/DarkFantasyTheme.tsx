@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo, useId, memo, type ReactNode } from 'react'
+import { useEffect, useState, useRef, useMemo, memo, type ComponentType } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
@@ -16,30 +16,27 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import type { SectionFrames } from '@/components/cv/SectionPlanView'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
-import { ProfessionStage } from '@/components/themes/shared/professionStage'
+import { Theatre } from '@/components/themes/shared/theatre/Stage'
+import { useTheatre } from '@/components/themes/shared/theatre/useTheatre'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
-import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
-import { BugPullReveal } from './DarkFantasy/BugCreature'
-import { BattleReveal } from './DarkFantasy/BattleReveal'
+import { SpiritWisp } from './DarkFantasy/relics'
+import { DarkStage, HALL_MOTION, scenesOf, type DarkScene } from './DarkFantasy/scenes'
 import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
-import { heldUntil } from '@/components/themes/shared/held'
-import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
+import { slice } from '@/components/themes/shared/loops'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 
 // The lines of a card or the About frame, each behind the spirit gold asterisk.
@@ -64,121 +61,6 @@ const SPIRIT_FACTS: AboutFactsLook = {
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
-
-// Abstract spirit wisp - optimized: no SVG filter. Each wisp owns its gradient id, so the nav's wisp, hidden
-// below sm, never holds the gradient another wisp's url(#id) resolves to.
-const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
-  const gradId = `${useId()}wisp`
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" role="presentation">
-      <defs>
-        <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={color} stopOpacity="0.9" />
-          <stop offset="30%" stopColor={color} stopOpacity="0.6" />
-          <stop offset="60%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      {/* Outer ethereal haze - multiple circles instead of filter */}
-      <circle cx="20" cy="20" r="18" fill={`url(#${gradId})`} />
-      <circle cx="20" cy="20" r="12" fill={color} opacity="0.15" />
-      {/* Inner core */}
-      <ellipse cx="20" cy="20" rx="6" ry="8" fill={color} opacity="0.8" />
-      {/* Trailing wisps */}
-      <path
-        d="M16,26 Q12,32 10,36 M20,28 Q20,34 18,38 M24,26 Q28,32 30,36"
-        fill="none"
-        stroke={color}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.4"
-      />
-    </svg>
-  )
-})
-
-// Mechanical gear
-const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: number }) {
-  const teeth = 12
-  // Each gear owns its brass gradient id (useId), the same reason as the wisp's.
-  const brassId = `${useId()}brass`
-  return (
-    <svg width={size} height={size} viewBox="0 0 50 50" aria-hidden="true" role="presentation">
-      <defs>
-        <linearGradient id={brassId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={DARK_FANTASY.brass} />
-          <stop offset="100%" stopColor={DARK_FANTASY.copper} />
-        </linearGradient>
-      </defs>
-      {/* Gear teeth */}
-      {Array.from({ length: teeth }, (_, i) => {
-        const angle = (i * 360) / teeth
-        const rad = (angle * Math.PI) / 180
-        const innerR = 16
-        const outerR = 22
-        const toothWidth = 0.15
-        const x1 = 25 + Math.cos(rad - toothWidth) * innerR
-        const y1 = 25 + Math.sin(rad - toothWidth) * innerR
-        const x2 = 25 + Math.cos(rad - toothWidth * 0.5) * outerR
-        const y2 = 25 + Math.sin(rad - toothWidth * 0.5) * outerR
-        const x3 = 25 + Math.cos(rad + toothWidth * 0.5) * outerR
-        const y3 = 25 + Math.sin(rad + toothWidth * 0.5) * outerR
-        const x4 = 25 + Math.cos(rad + toothWidth) * innerR
-        const y4 = 25 + Math.sin(rad + toothWidth) * innerR
-        return (
-          <path
-            key={i}
-            d={`M${x1},${y1} L${x2},${y2} L${x3},${y3} L${x4},${y4}`}
-            fill={`url(#${brassId})`}
-          />
-        )
-      })}
-      {/* Inner ring */}
-      <circle cx="25" cy="25" r="16" fill="none" stroke={`url(#${brassId})`} strokeWidth="3" />
-      {/* Center hole */}
-      <circle cx="25" cy="25" r="6" fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.brass} strokeWidth="1" />
-      {/* Decorative spokes */}
-      <path d="M25,10 L25,19 M25,31 L25,40 M10,25 L19,25 M31,25 L40,25" stroke={DARK_FANTASY.copper} strokeWidth="2" opacity="0.5" />
-    </svg>
-  )
-})
-
-// Floating lantern (generic dark fantasy element)
-const FloatingLantern = memo(function FloatingLantern({ size = 30 }: { size?: number }) {
-  return (
-    <svg width={size} height={size * 1.4} viewBox="0 0 30 42" aria-hidden="true" role="presentation">
-      {/* Lantern frame - gothic style */}
-      <path
-        d="M10,12 L10,32 Q10,38 15,38 Q20,38 20,32 L20,12"
-        fill="none"
-        stroke={DARK_FANTASY.copper}
-        strokeWidth="1.5"
-      />
-      {/* Top cap */}
-      <path d="M8,12 L22,12 L20,8 Q15,6 10,8 Z" fill={DARK_FANTASY.brass} />
-      {/* Hook */}
-      <path d="M15,8 L15,2 Q15,0 17,0 Q19,0 19,2" fill="none" stroke={DARK_FANTASY.copper} strokeWidth="1" />
-      {/* Glass panels */}
-      <rect x="11" y="14" width="8" height="16" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
-      {/* Inner flame glow */}
-      <ellipse cx="15" cy="22" rx="3" ry="5" fill={DARK_FANTASY.spiritGold} opacity="0.8" />
-      <ellipse cx="15" cy="22" rx="5" ry="8" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
-    </svg>
-  )
-})
-
-// An art section between the frames: it reveals on scroll, and its spirits and lanterns float once it
-// shows (heldUntil), never at mount below the first screen.
-function ArtScene({ children }: { children: ReactNode }) {
-  const { ref, triggered } = useSectionTrigger()
-  return (
-    <ScrollScene>
-      <div ref={ref} className={heldUntil(triggered)}>
-        {children}
-      </div>
-    </ScrollScene>
-  )
-}
 
 // Ethereal rain effect - optimized with fewer elements
 const EtherealRain = memo(function EtherealRain() {
@@ -262,282 +144,16 @@ const SpiritParticles = memo(function SpiritParticles() {
   )
 })
 
-// Gothic chandelier with mechanical elements - compact version that doesn't overlap content
-const GothicChandelier = memo(function GothicChandelier() {
-  return (
-    <svg
-      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[500px] h-16 opacity-50"
-      viewBox="0 0 500 60"
-      aria-hidden="true"
-      role="presentation"
-    >
-      {/* Central chain with gear link */}
-      <path d="M250,0 L250,10" stroke={DARK_FANTASY.brass} strokeWidth="2" />
-      <circle cx="250" cy="14" r="4" fill="none" stroke={DARK_FANTASY.copper} strokeWidth="1" />
-      <circle cx="250" cy="14" r="2" fill={DARK_FANTASY.brass} />
-
-      {/* Simple ornate arms */}
-      <path
-        d="M250,18 Q200,22 150,20 Q100,24 50,22"
-        fill="none"
-        stroke={DARK_FANTASY.brass}
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <path
-        d="M250,18 Q300,22 350,20 Q400,24 450,22"
-        fill="none"
-        stroke={DARK_FANTASY.brass}
-        strokeWidth="1"
-        opacity="0.6"
-      />
-
-      {/* Subtle glow points along the arms */}
-      {[100, 175, 250, 325, 400].map((x, i) => (
-        <g key={i}>
-          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="3" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
-          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="6" fill={DARK_FANTASY.spiritGold} opacity="0.1" />
-        </g>
-      ))}
-
-      {/* Central larger glow */}
-      <ellipse cx="250" cy="30" rx="20" ry="12" fill={DARK_FANTASY.spiritGold} opacity="0.15" />
-    </svg>
-  )
-})
-
-// Stone/crystal formations
-// The spikes and moss are placed once per mount, so a re-render never moves a stone.
-const STONE_SPIKES = 20
-const MOSS_X = [100, 350, 650, 850]
-const placeStones = () => ({
-  spikes: Array.from({ length: STONE_SPIKES }, (_, i) => ({
-    x: i * 50 + 25 + (Math.random() - 0.5) * 20,
-    height: 25 + Math.random() * 35,
-    width: 8 + Math.random() * 8,
-    lean: (Math.random() - 0.5) * 10,
-    isCrystal: i % 4 === 0,
-  })),
-  moss: MOSS_X.map((x) => ({ x, rx: 30 + Math.random() * 20 })),
-})
-
-const StoneFormations = memo(function StoneFormations() {
-  const [{ spikes, moss }] = useState(placeStones)
-  return (
-    <svg
-      className="fixed bottom-0 left-0 w-full h-32 opacity-60 pointer-events-none z-[6]"
-      viewBox="0 0 1000 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      role="presentation"
-    >
-      {/* Base weathered stone */}
-      <path
-        d="M0,85 Q200,82 400,88 Q600,80 800,86 Q900,83 1000,85 L1000,100 L0,100 Z"
-        fill={DARK_FANTASY.stoneDark}
-      />
-
-      {/* Crystal/stone spikes - irregular, weathered */}
-      {spikes.map(({ x, height, width, lean, isCrystal }, i) => {
-        return (
-          <g key={i}>
-            <path
-              d={`M${x},85
-                 L${x + lean - width * 0.3},${85 - height * 0.7}
-                 L${x + lean},${85 - height}
-                 L${x + lean + width * 0.3},${85 - height * 0.7}
-                 L${x},85`}
-              fill={isCrystal ? DARK_FANTASY.ethereal : DARK_FANTASY.stoneGrey}
-              opacity={isCrystal ? 0.4 : 0.8}
-            />
-            {isCrystal && (
-              <path
-                d={`M${x + lean},${85 - height} L${x + lean},${85 - height + 10}`}
-                stroke={DARK_FANTASY.ethereal}
-                strokeWidth="2"
-                opacity="0.6"
-              />
-            )}
-          </g>
-        )
-      })}
-
-      {/* Moss/organic growth patches */}
-      {moss.map(({ x, rx }, i) => (
-        <ellipse
-          key={i}
-          cx={x}
-          cy={90}
-          rx={rx}
-          ry={8}
-          fill={DARK_FANTASY.mossGreen}
-          opacity="0.3"
-        />
-      ))}
-    </svg>
-  )
-})
-
-// Boss-arena depth, a gothic STAGE: a distant back wall with small,
-// receded lancet windows, a FLOOR in front (cornice + perspective lines + soft stage
-// light) so there's a clear floor/wall read, framed by interior columns and hanging
-// soul-lamps, distant towers beyond, fog and drifting soul motes. Profession floor props
-// layer on top. Static SVG + CSS motes only (no scroll work).
-const VoidDepths = memo(function VoidDepths() {
-  const motes = useMemo(
-    () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        left: (i * 47 + 5) % 100,
-        top: (i * 23 + 7) % 70,
-        size: 2 + (i % 3),
-        dur: 9 + ((i * 5) % 11),
-        // a start 0.5 s further on per mote, at most 3 s, so each still drifts for 2 s before 5 s
-        delay: (i % 7) * 0.5,
-        gold: i % 5 === 0,
-      })),
-    []
-  )
-
-  // small, distant pointed-arch (lancet) window set into the back wall
-  const lancet = (x: number, baseY: number, w: number, h: number, k: string, op: number) => {
-    const hw = w / 2,
-      l = x - hw,
-      r = x + hw,
-      apexY = baseY - h,
-      springY = baseY - h + Math.min(w * 0.8, h * 0.5)
-    const d = `M${l},${baseY} L${l},${springY} Q${l},${apexY} ${x},${apexY} Q${r},${apexY} ${r},${springY} L${r},${baseY} Z`
-    return (
-      <g key={k}>
-        <path d={d} fill={DARK_FANTASY.ethereal} opacity={op * 0.45} />
-        <path d={d} fill="none" stroke={DARK_FANTASY.stoneGrey} strokeWidth="2.5" opacity={op * 1.8} />
-        <line x1={x} y1={baseY} x2={x} y2={apexY} stroke={DARK_FANTASY.stoneGrey} strokeWidth="1.5" opacity={op * 1.4} />
-      </g>
-    )
-  }
-
-  const tower = (x: number, baseY: number, w: number, topY: number, k: string, op: number) => {
-    const hw = w / 2,
-      roofH = w * 1.9
-    return (
-      <g key={k} fill={DARK_FANTASY.voidDeep} opacity={op}>
-        <rect x={x - hw} y={topY} width={w} height={baseY - topY} />
-        <polygon points={`${x - hw},${topY} ${x},${topY - roofH} ${x + hw},${topY}`} />
-      </g>
-    )
-  }
-
-  const lamp = (x: number, y: number, k: string) => (
-    <g key={k}>
-      <line x1={x} y1={y - 80} x2={x} y2={y + 70} stroke={DARK_FANTASY.stoneGrey} strokeWidth="3" opacity="0.4" />
-      <path d={`M${x - 14},${y} Q${x},${y - 20} ${x + 14},${y} Q${x},${y + 7} ${x - 14},${y} Z`} fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.stoneGrey} strokeWidth="2" opacity="0.6" />
-      <circle cx={x} cy={y} r="24" fill={DARK_FANTASY.ethereal} opacity="0.07" />
-      <circle cx={x} cy={y} r="7" fill={DARK_FANTASY.etherealDark} opacity="0.5" />
-    </g>
-  )
-
-  const column = (x: number, k: string) => (
-    <g key={k}>
-      <rect x={x - 52} y={0} width="104" height="1080" fill={DARK_FANTASY.void} opacity="0.82" />
-      <rect x={x - 66} y={112} width="132" height="36" rx="6" fill={DARK_FANTASY.void} opacity="0.85" />
-      <rect x={x - 66} y={540} width="132" height="26" rx="4" fill={DARK_FANTASY.void} opacity="0.85" />
-      {[250, 400].map((y, j) => (
-        <path key={j} d={`M${x - 52},${y} Q${x},${y + 18} ${x + 52},${y}`} fill="none" stroke={DARK_FANTASY.stoneDark} strokeWidth="3" opacity="0.8" />
-      ))}
-    </g>
-  )
-
-  const HORIZON = 560
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true" role="presentation">
-      {/* upper nave light, soft floor "stage" light, and a dark vignette */}
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 60% 40% at 50% 22%, ${DARK_FANTASY.ethereal}0e, transparent 60%)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 55% 32% at 50% 84%, ${DARK_FANTASY.ethereal}0c, transparent 62%)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, ${DARK_FANTASY.void} 100%)` }} />
-
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-        {/* distant towers beyond the wall (faint, high) */}
-        {tower(360, 200, 34, -50, 't1', 0.28)}
-        {tower(960, 165, 54, -120, 't2', 0.32)}
-        {tower(1560, 200, 34, -50, 't3', 0.28)}
-
-        {/* BACK WALL */}
-        <rect x="0" y="0" width="1920" height={HORIZON} fill={DARK_FANTASY.void} opacity="0.55" />
-        {Array.from({ length: 13 }, (_, i) => (
-          <rect key={`pil${i}`} x={70 + i * 145} y={0} width="14" height={HORIZON} fill={DARK_FANTASY.voidDeep} opacity="0.4" />
-        ))}
-        {/* small, distant lancet windows, high on the wall */}
-        {Array.from({ length: 12 }, (_, i) => lancet(150 + i * 145, 430, 96, 250, `w${i}`, 0.1))}
-
-        {/* CORNICE, wall/floor boundary (contrast) */}
-        <rect x="0" y={HORIZON - 5} width="1920" height="9" fill={DARK_FANTASY.stoneGrey} opacity="0.2" />
-        <rect x="0" y={HORIZON + 4} width="1920" height="22" fill={DARK_FANTASY.void} opacity="0.4" />
-
-                {/* FLOOR, flat 2D side-view plane + foreground balustrade ledge (no perspective) */}
-        <rect x="0" y={HORIZON} width="1920" height={1080 - HORIZON} fill={DARK_FANTASY.voidDeep} opacity="0.3" />
-        <rect x="0" y="1004" width="1920" height="14" fill={DARK_FANTASY.void} opacity="0.92" />
-        <rect x="0" y="1056" width="1920" height="24" fill={DARK_FANTASY.void} opacity="0.96" />
-        {Array.from({ length: 28 }, (_, i) => {
-          const bx = 34 + i * 69
-          return (
-            <g key={`bal${i}`} fill={DARK_FANTASY.void} opacity="0.9">
-              <rect x={bx - 7} y="1018" width="14" height="40" rx="3" />
-              <ellipse cx={bx} cy="1018" rx="13" ry="7" />
-              <ellipse cx={bx} cy="1056" rx="13" ry="7" />
-            </g>
-          )
-        })}
-
-        {/* interior side columns */}
-        {column(48, 'cL')}
-        {column(1872, 'cR')}
-
-        {/* hanging soul-lamps along the wall */}
-        {lamp(300, 250, 'l1')}
-        {lamp(620, 210, 'l2')}
-        {lamp(1300, 210, 'l3')}
-        {lamp(1620, 250, 'l4')}
-      </svg>
-
-      {motes.map((m, i) => (
-        <span
-          key={i}
-          className={world.mote}
-          style={{
-            left: `${m.left}%`,
-            top: `${m.top}%`,
-            width: m.size,
-            height: m.size,
-            background: `radial-gradient(circle, ${m.gold ? DARK_FANTASY.spiritGold : DARK_FANTASY.etherealDark}, transparent 70%)`,
-            animation: slice(world.drift, m.dur, 'ease-in-out', m.delay),
-            animationDelay: `${m.delay}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-})
-
-// Combined atmosphere layer - NO chandelier here (it's in header now). The stones are placed at random, so they
-// wait for the mount.
-const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere({ mounted }: { mounted: boolean }) {
+// The spirit light hanging over every scene, under the chandelier.
+const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3] contain-strict" aria-hidden="true" role="presentation">
-      {mounted && <StoneFormations />}
-
       {/* Central ethereal glow - no blur filter for performance */}
       <div
         className="absolute top-[15%] left-1/2 w-[800px] h-[500px]"
         style={{
           background: `radial-gradient(ellipse at center top, ${DARK_FANTASY.spiritGold}10 0%, ${DARK_FANTASY.spiritGold}05 20%, ${DARK_FANTASY.ethereal}04 50%, transparent 80%)`,
           transform: 'translateX(-50%) translateZ(0)',
-        }}
-      />
-      {/* Bottom mist */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-48"
-        style={{
-          background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}50, ${DARK_FANTASY.void}80)`,
         }}
       />
     </div>
@@ -891,6 +507,9 @@ const DialogueFlourish = memo(function DialogueFlourish({
   )
 })
 
+// How far inside its box the section frame draws its border.
+const FRAME_INSET_REM = 1
+
 // The section frame, after the game's dialogue boxes: an opaque panel (.df-panel, so the stage behind never
 // shows through), a vine flourish on its top and bottom edges and the title centred over a short rule.
 const VoidFrame = memo(function VoidFrame({
@@ -958,7 +577,7 @@ const VoidFrame = memo(function VoidFrame({
 // Services: a title and its line each, read in the same frame as the tech stack.
 function ServiceList({ services }: { services: Service[] }) {
   return (
-    <ul className={MASONRY_LIST}>
+    <ul className={MASONRY_COLUMN_LIST}>
       {services.map((service) => (
         <li key={service.id} className={MASONRY_ITEM}>
           <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]">
@@ -975,7 +594,7 @@ function ServiceList({ services }: { services: Service[] }) {
 const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
   return (
-    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+    <ul className={MASONRY_COLUMN_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
         <li key={category.id} className={MASONRY_ITEM}>
           <h3
@@ -1073,7 +692,7 @@ const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVD
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] ${company.featured ? 'md:col-span-3' : 'md:col-span-2'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]`}
+      className={`block h-full p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]`}
       style={{
         background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
         border: `1px solid ${DARK_FANTASY.stoneDark}`,
@@ -1181,280 +800,6 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
   )
 })
 
-// Art Section 1 - Spirit wisps with mechanical gears (spirit light and brass)
-// The art section's spirits start one after another, this far apart, and each plays one whole float in the
-// time left of the 5 s, so all four rest on the float's first frame, as drawn.
-const SPIRIT_STAGGER_S = 0.3
-
-const ArtSectionSpirits = memo(function ArtSectionSpirits() {
-  return (
-    <div className="relative z-20 py-16 px-6 overflow-hidden" aria-hidden="true" role="presentation">
-      <div className="max-w-6xl mx-auto relative h-48 flex items-center justify-center">
-        {/* Connecting mechanical vines */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet">
-          {/* Organic-mechanical tendrils */}
-          <path
-            d="M400,100 Q320,85 240,95 Q160,105 80,90"
-            fill="none"
-            stroke={DARK_FANTASY.forestGreen}
-            strokeWidth="2"
-            opacity="0.3"
-          />
-          <path
-            d="M400,100 Q480,85 560,95 Q640,105 720,90"
-            fill="none"
-            stroke={DARK_FANTASY.forestGreen}
-            strokeWidth="2"
-            opacity="0.3"
-          />
-          {/* Brass conduits */}
-          <path
-            d="M400,100 Q350,110 280,105 Q200,100 120,115"
-            fill="none"
-            stroke={DARK_FANTASY.brass}
-            strokeWidth="1.5"
-            opacity="0.25"
-            strokeDasharray="8 4"
-          />
-          <path
-            d="M400,100 Q450,110 520,105 Q600,100 680,115"
-            fill="none"
-            stroke={DARK_FANTASY.brass}
-            strokeWidth="1.5"
-            opacity="0.25"
-            strokeDasharray="8 4"
-          />
-          {/* Spirit orbs along paths */}
-          {[120, 200, 280, 520, 600, 680].map((x, i) => (
-            <g key={i}>
-              <circle
-                cx={x}
-                cy={95 + Math.sin(i * 1.2) * 10}
-                r={4 + (i % 2) * 2}
-                fill={i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal}
-                opacity={0.4}
-              />
-              <circle
-                cx={x}
-                cy={95 + Math.sin(i * 1.2) * 10}
-                r={8 + (i % 2) * 3}
-                fill={i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal}
-                opacity={0.1}
-              />
-            </g>
-          ))}
-        </svg>
-
-        {/* Central composition */}
-        <div className="relative z-10 flex items-center gap-8">
-          <div className="opacity-60">
-            <MechanicalGear size={40} />
-          </div>
-          <SpiritWisp size={60} color={DARK_FANTASY.spiritGold} />
-          <div className="opacity-60">
-            <MechanicalGear size={40} />
-          </div>
-        </div>
-
-        {/* Floating particles - no box-shadow */}
-        {[
-          { x: '20%', y: '30%', color: DARK_FANTASY.spiritGold },
-          { x: '80%', y: '40%', color: DARK_FANTASY.ethereal },
-          { x: '15%', y: '70%', color: DARK_FANTASY.forestGreen },
-          { x: '85%', y: '60%', color: DARK_FANTASY.spiritGold },
-        ].map((p, i) => (
-          <div
-            key={i}
-            className="absolute w-4 h-4 rounded-full"
-            style={{
-              left: p.x,
-              top: p.y,
-              background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: cycles(world.spiritFloat, PLAY_S - i * SPIRIT_STAGGER_S, 'ease-in-out', i * SPIRIT_STAGGER_S),
-              animationDelay: `${i * SPIRIT_STAGGER_S}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Divider */}
-      <div className="max-w-2xl mx-auto flex items-center gap-4 mt-4">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.brass}, transparent)` }} />
-        <svg width="20" height="20" viewBox="0 0 20 20">
-          <path d="M10,2 L18,10 L10,18 L2,10 Z" fill="none" stroke={DARK_FANTASY.spiritGold} strokeWidth="1" opacity="0.6" />
-          <circle cx="10" cy="10" r="2" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
-        </svg>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.brass}, transparent)` }} />
-      </div>
-    </div>
-  )
-})
-
-// Art Section 2 - Floating lanterns (generic dark fantasy)
-const ArtSectionLanterns = memo(function ArtSectionLanterns() {
-  const lanterns = useMemo(() =>
-    Array.from({ length: 7 }, (_, i) => ({
-      id: i,
-      x: 10 + i * 13,
-      y: 30 + Math.sin(i * 0.8) * 15,
-      size: 25 + (i % 3) * 5,
-      delay: i * 0.4,
-    })),
-    []
-  )
-
-  return (
-    <div className="relative z-20 py-16 px-6 overflow-hidden" aria-hidden="true" role="presentation">
-      <div className="max-w-4xl mx-auto relative h-32 flex items-center justify-center">
-        {/* Lanterns floating */}
-        {lanterns.map((l) => (
-          <div
-            key={l.id}
-            className="absolute transform hover:scale-110 transition-transform duration-300"
-            style={{
-              left: `${l.x}%`,
-              top: `${l.y}%`,
-              animation: cycles(world.lanternFloat, 4, 'ease-in-out', l.delay),
-              animationDelay: `${l.delay}s`,
-            }}
-          >
-            <FloatingLantern size={l.size} />
-          </div>
-        ))}
-
-        {/* Light rays from lanterns */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(ellipse at 50% 50%, ${DARK_FANTASY.spiritGold}15 0%, transparent 60%)`,
-          }}
-        />
-      </div>
-
-    </div>
-  )
-})
-
-// Art Section 3 - Crystal/stone formation with ethereal energy
-const ArtSectionCrystals = memo(function ArtSectionCrystals() {
-  return (
-    <div className="relative z-20 py-16 px-6 overflow-hidden" aria-hidden="true" role="presentation">
-      <div className="max-w-6xl mx-auto relative h-40">
-        <svg className="w-full h-full" viewBox="0 0 1000 160" preserveAspectRatio="xMidYMid meet">
-          {/* Central crystal cluster */}
-          <g transform="translate(500, 80)">
-            {/* Main crystal */}
-            <path
-              d="M0,-50 L12,-20 L8,40 L-8,40 L-12,-20 Z"
-              fill={DARK_FANTASY.ethereal}
-              opacity="0.6"
-            />
-            <path
-              d="M0,-50 L12,-20 L0,0 L-12,-20 Z"
-              fill={DARK_FANTASY.ethereal}
-              opacity="0.8"
-            />
-            {/* Side crystals */}
-            <path
-              d="M-30,-30 L-22,-10 L-26,25 L-34,25 L-38,-10 Z"
-              fill={DARK_FANTASY.spiritGold}
-              opacity="0.5"
-              transform="rotate(-15)"
-            />
-            <path
-              d="M30,-30 L38,-10 L34,25 L26,25 L22,-10 Z"
-              fill={DARK_FANTASY.spiritGold}
-              opacity="0.5"
-              transform="rotate(15)"
-            />
-            {/* Small accent crystals */}
-            <path d="M-50,-10 L-45,5 L-55,5 Z" fill={DARK_FANTASY.forestGreen} opacity="0.4" transform="rotate(-25)" />
-            <path d="M50,-10 L55,5 L45,5 Z" fill={DARK_FANTASY.forestGreen} opacity="0.4" transform="rotate(25)" />
-          </g>
-
-          {/* Energy tendrils spreading from crystals */}
-          <path
-            d="M500,30 Q400,25 300,40 Q200,55 100,45"
-            fill="none"
-            stroke={DARK_FANTASY.ethereal}
-            strokeWidth="2"
-            opacity="0.2"
-          />
-          <path
-            d="M500,30 Q600,25 700,40 Q800,55 900,45"
-            fill="none"
-            stroke={DARK_FANTASY.ethereal}
-            strokeWidth="2"
-            opacity="0.2"
-          />
-          <path
-            d="M500,50 Q420,60 340,55 Q260,50 180,65"
-            fill="none"
-            stroke={DARK_FANTASY.spiritGold}
-            strokeWidth="1.5"
-            opacity="0.15"
-          />
-          <path
-            d="M500,50 Q580,60 660,55 Q740,50 820,65"
-            fill="none"
-            stroke={DARK_FANTASY.spiritGold}
-            strokeWidth="1.5"
-            opacity="0.15"
-          />
-
-          {/* Energy nodes */}
-          {[150, 280, 380, 620, 720, 850].map((x, i) => (
-            <g key={i}>
-              <circle
-                cx={x}
-                cy={45 + Math.sin(i * 1.5) * 12}
-                r={5}
-                fill={i % 2 === 0 ? DARK_FANTASY.ethereal : DARK_FANTASY.spiritGold}
-                opacity={0.3}
-              />
-              <circle
-                cx={x}
-                cy={45 + Math.sin(i * 1.5) * 12}
-                r={10}
-                fill={i % 2 === 0 ? DARK_FANTASY.ethereal : DARK_FANTASY.spiritGold}
-                opacity={0.1}
-              />
-            </g>
-          ))}
-        </svg>
-
-        {/* Glow behind crystals - no blur filter */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-40"
-          style={{
-            background: `radial-gradient(ellipse, ${DARK_FANTASY.ethereal}15 0%, ${DARK_FANTASY.ethereal}08 30%, ${DARK_FANTASY.spiritGold}05 60%, transparent 80%)`,
-          }}
-        />
-      </div>
-
-      {/* Bottom divider */}
-      <div className="max-w-3xl mx-auto flex items-center gap-6 mt-4">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.ethereal}40, transparent)` }} />
-        <div className="flex gap-3">
-          {[DARK_FANTASY.ethereal, DARK_FANTASY.spiritGold, DARK_FANTASY.ethereal].map((color, i) => (
-            <div
-              key={i}
-              className="w-2 h-2"
-              style={{
-                background: color,
-                opacity: 0.4 + i * 0.15,
-                boxShadow: `0 0 8px ${color}`,
-                clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-              }}
-            />
-          ))}
-        </div>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.ethereal}40, transparent)` }} />
-      </div>
-    </div>
-  )
-})
-
 // The profession selector: the waystations on their wire and, for 500ms after each pick, the energy running
 // along it from the station he left to the one he picked. The selector keeps the station the energy leaves
 // from, so a pick and the energy's end re-render it alone, not the whole world.
@@ -1476,51 +821,45 @@ function WaystationSelector({ active }: { active: Profession }) {
   }, [active])
 
   return (
-    <ScrollScene>
-      <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
-        <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <div
-            className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
-            style={{
-              background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
-              borderRadius: '4px',
-            }}
-          >
-            {/* Connection paths */}
-            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                  <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
-                  <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-              <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-              {/* Gear decorations at intersections */}
-              <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-              <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-            </svg>
+    <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
+      <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
+        <div
+          className={`relative h-40 md:h-56 overflow-hidden rounded bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--df-void-purple)_18.8%,transparent))] ${world.selector}`}
+        >
+          {/* Connection paths */}
+          <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
+                <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+            <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+            {/* Gear decorations at intersections */}
+            <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+            <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+          </svg>
 
-            {/* Energy flow animation between nodes */}
-            <EnergyFlowAnimation
-              fromProfession={from}
-              toProfession={active}
-              isAnimating={flowing}
-            />
+          {/* Energy flow animation between nodes */}
+          <EnergyFlowAnimation
+            fromProfession={from}
+            toProfession={active}
+            isAnimating={flowing}
+          />
 
-            <ProfessionSwitch
-              className="absolute inset-0"
-              label={navigation.professionSelection}
-              renderOption={(option) => (
-                <WaystationNode option={option} isReceivingEnergy={flowing && option.selected} />
-              )}
-            />
-          </div>
+          <ProfessionSwitch
+            className="absolute inset-0"
+            label={navigation.professionSelection}
+            renderOption={(option) => (
+              <WaystationNode option={option} isReceivingEnergy={flowing && option.selected} />
+            )}
+          />
         </div>
-      </section>
-    </ScrollScene>
+      </div>
+    </section>
   )
 }
 
@@ -1528,8 +867,9 @@ function WaystationSelector({ active }: { active: Profession }) {
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
-// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones.
-const DF_OUTLINED = 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
+// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones, on the void so the hall
+// lit behind them never takes their words under AAA.
+const DF_OUTLINED = 'bg-[color:var(--df-void)] border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
   email: `${DF_BUTTON} bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]`,
   linkedin: `${DF_BUTTON} ${DF_OUTLINED}`,
@@ -1539,8 +879,8 @@ const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
 const NAV_LINK =
   'px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)]'
 const NAV_LOOK: Record<SiteLinkId, string> = {
-  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]`,
-  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]`,
+  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color:var(--df-void)]`,
+  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,var(--df-void))]`,
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
@@ -1553,168 +893,82 @@ function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   )
 }
 
-function FramedSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <ScrollScene>
-      <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-        <div className="max-w-4xl mx-auto">
-          <VoidFrame title={title}>{children}</VoidFrame>
-        </div>
-      </section>
-    </ScrollScene>
-  )
-}
-
-// Knight Slash Reveal: the knight cuts in and the frame slides from the right.
-function SlashRevealSection({ title, children }: { title: string; children: React.ReactNode }) {
-  const trigger = useSectionTrigger()
-
-  return (
-    <div ref={trigger.ref}>
-      <KnightSlashReveal triggered={trigger.triggered}>
-        <section className="relative z-20 px-[var(--panel-inset)] py-[var(--panel-top)]">
-          <div className="mx-auto max-w-[var(--slash-panel)] lg:max-w-[calc(2*var(--panel-half))]">
-            <VoidFrame title={title}>{children}</VoidFrame>
-          </div>
-        </section>
-      </KnightSlashReveal>
-    </div>
-  )
-}
-
-// Each section in its frame, the art divider that follows it inside the same frame. The shared plan picks which
-// sections a profession shows and in which order.
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { sections, cards } = useLabels()
+// What each section shows inside its frame, every field from the shared lists and the card view models. The
+// cards a scene counts (one relic each) sit inside [data-stage-items].
+const CARDS: SectionFrames = {
+  about: function AboutCards({ slot }) {
+    const { cards } = useLabels()
     const { highlights } = useAboutBlock()
     return (
       <>
-        <FramedSection title={sections[slot.titleKey]}>
-          <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
+        <p className="max-w-prose mx-auto leading-relaxed text-[color:var(--df-bone)]">{slot.bio}</p>
+        <div data-stage-items="">
           <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SPIRIT_LINES, list: 'max-w-prose mx-auto mt-4 space-y-1' }} />
-          <AboutFacts look={SPIRIT_FACTS} />
-        </FramedSection>
-
-        {/* Art Section 1 - Spirits and Gears */}
-        <ArtScene>
-          <ArtSectionSpirits />
-        </ArtScene>
+        </div>
+        <AboutFacts look={SPIRIT_FACTS} />
       </>
     )
   },
-  // Work Experience - Knight Slash Reveal (content slides from right)
-  work: function WorkFrame({ slot }) {
-    const { sections } = useLabels()
-    const { jobs } = slot
+  work: function WorkCards({ slot: { jobs } }) {
     return (
-      <>
-        <SlashRevealSection title={sections[slot.titleKey]}>
-          <div>
-            {jobs.map((entry, index) => (
-              <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
-            ))}
-          </div>
-        </SlashRevealSection>
-
-        {/* Art Section 2 - Lanterns */}
-        <ArtScene>
-          <ArtSectionLanterns />
-        </ArtScene>
-      </>
+      <ul data-stage-items="">
+        {jobs.map((entry, index) => (
+          <li key={entry.id}>
+            <ExperienceCard entry={entry} isLast={index === jobs.length - 1} />
+          </li>
+        ))}
+      </ul>
     )
   },
-  tech: function TechFrame({ slot }) {
-    const { sections } = useLabels()
+  tech: function TechCards({ slot }) {
     return (
-      <FramedSection title={sections[slot.titleKey]}>
+      <div data-stage-items="">
         <TechCloud categories={slot.categories} />
-      </FramedSection>
+      </div>
     )
   },
-  services: function ServicesFrame({ slot }) {
-    const { sections } = useLabels()
+  services: function ServiceCards({ slot }) {
     return (
-      <FramedSection title={sections[slot.titleKey]}>
+      <div data-stage-items="">
         <ServiceList services={slot.services} />
-      </FramedSection>
+      </div>
     )
   },
-  // Projects - Bug Pull Reveal
-  projects: function ProjectsFrame({ slot }) {
-    const { sections } = useLabels()
-    const projectsTrigger = useSectionTrigger()
+  projects: function ProjectCards({ slot }) {
+    return (
+      <div data-stage-items="">
+        <ProjectList projects={slot.projects} className="grid md:grid-cols-2 gap-3 md:gap-4" renderProject={(projectSlot) => <ProjectCard slot={projectSlot} />} />
+      </div>
+    )
+  },
+  ventures: function VentureCards({ slot }) {
+    return (
+      <ul data-stage-items="" className="grid md:grid-cols-2 gap-3 md:gap-4">
+        {slot.companies.map((company) => (
+          <li key={company.id}>
+            <CompanyCard company={company} />
+          </li>
+        ))}
+      </ul>
+    )
+  },
+  bands: function BandCards({ slot: { musician, bands } }) {
+    const { years } = useLabels()
     return (
       <>
-        <div ref={projectsTrigger.ref}>
-          <BugPullReveal triggered={projectsTrigger.triggered}>
-            <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
-              <div className="max-w-4xl mx-auto">
-                <VoidFrame title={sections[slot.titleKey]}>
-                  <ProjectList
-                    projects={slot.projects}
-                    className="grid md:grid-cols-2 gap-3 md:gap-4"
-                    renderProject={(projectSlot) => <ProjectCard slot={projectSlot} />}
-                  />
-                </VoidFrame>
-              </div>
-            </section>
-          </BugPullReveal>
-        </div>
-
-        {/* Art Section 3 - Crystals */}
-        <ArtScene>
-          <ArtSectionCrystals />
-        </ArtScene>
-      </>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    const { sections } = useLabels()
-    return (
-      <FramedSection title={sections[slot.titleKey]}>
-        <div className="grid md:grid-cols-6 gap-3 md:gap-4">
-          {slot.companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
-          ))}
-        </div>
-      </FramedSection>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    const { sections, years } = useLabels()
-    const { musician, bands } = slot
-    return (
-      <>
-        <ArtScene>
-          <ArtSectionSpirits />
-        </ArtScene>
-
-        <SlashRevealSection title={sections[slot.titleKey]}>
-          <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
-            {drumsSince(musician, years)}
-          </p>
+        <p className="text-sm mb-4 text-center text-[color:var(--df-bone)]">{drumsSince(musician, years)}</p>
+        <div data-stage-items="">
           <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(bandSlot) => <BandCard {...bandSlot} />} />
-          <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
-        </SlashRevealSection>
-
-        <ArtScene>
-          <ArtSectionLanterns />
-        </ArtScene>
+        </div>
+        <p className="text-sm mt-4 italic text-center text-[color:var(--df-lavender)]">{musician.line}</p>
       </>
     )
   },
-  muayThai: function MuayThaiFrame({ slot }) {
-    const { sections } = useLabels()
-    const { martialArts } = slot
+  muayThai: function MuayThaiCards({ slot: { martialArts } }) {
     return (
       <>
-        <ArtScene>
-          <ArtSectionSpirits />
-        </ArtScene>
-
-        <SlashRevealSection title={sections[slot.titleKey]}>
-          <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
+        <h3 className="text-lg font-medium mb-4 text-[color:var(--df-bone)]">{martialArts.primary.title}</h3>
+        <div data-stage-items="">
           <MuayThaiRecord
             martialArts={martialArts}
             classNames={{
@@ -1732,32 +986,62 @@ const FRAMES: SectionFrames = {
               </>
             )}
           />
-        </SlashRevealSection>
-
-        <ArtScene>
-          <ArtSectionCrystals />
-        </ArtScene>
+        </div>
       </>
     )
   },
 }
 
-const SECTION_VIEWS = sectionViews(FRAMES)
+// The column a frame reads in: beside the scene from lg, the knight and his relics on its right; below lg the
+// whole width, the scene showing in the screens of picture alone above and below it.
+const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(42rem,46vw)]'
+const SIDE = 'px-4 md:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
 
+/** One section: a screen of its scene alone, then its frame over the held scene, then the scene again
+ *  before it sinks. Under reduced motion its own scene sits still behind the first screen. */
+function SceneSection({ scene, profession, still }: { scene: DarkScene & { slot: SectionSlot }; profession: Profession; still: boolean }) {
+  const { sections } = useLabels()
+  const Cards = CARDS[scene.slot.id] as ComponentType<{ slot: SectionSlot }>
+  return (
+    <div data-scene={scene.id} className={`relative z-20 pb-[70svh] ${SIDE}`}>
+      {still && <DarkStage scene={scene} profession={profession} settled />}
+      <div className="min-h-[100svh]" />
+      <div className={COLUMN}>
+        <VoidFrame title={sections[scene.slot.titleKey]}>
+          <Cards slot={scene.slot} />
+        </VoidFrame>
+      </div>
+    </div>
+  )
+}
+
+// Dark Fantasy: his CV as a knight's descent through a gothic cavern arena. The hero shows the arena and the
+// profession's boss stage; then every section is a full screen scene that rises from the dark, holds while
+// its frame scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine). In
+// each scene the knight frees one relic per card as that card scrolls up; in projects he fights the bug and
+// at the contact he ends it. Under reduced motion every section carries its own scene, still.
 export default function DarkFantasyTheme() {
   const view = useWorldView()
-  const { navigation, actions: actionLabels, sections } = useLabels()
+  const labels = useLabels()
+  const { navigation, actions: actionLabels, sections } = labels
+  const { professionalSummary } = useCVData()
+  const { highlights } = useAboutBlock()
   const siteLinks = useSiteLinks('engine')
   const active = view.profession
-  // The world draws on its first commit; only the layers placed by Math.random or by the pointer wait for the
-  // mount, so a server render and the hydrating client never disagree on them.
+  // The rain and the spirits are placed by Math.random and the cursor trail and parallax follow the pointer,
+  // so they wait for the mount: a server render and the hydrating client never disagree on them.
   const [mounted, setMounted] = useState(false)
   // The cursor trail and the parallax follow the pointer, motion a reduced motion visitor asked not to get.
-  const reducedMotion = useReducedMotion()
-  const pointerMotion = mounted && !reducedMotion
+  const reduced = useReducedMotion()
+  const pointerMotion = mounted && !reduced
 
-  // The final battle starts as the contact section comes into view, a little before it is centred.
-  const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights),
+    [view.sections, professionalSummary.bio, labels, highlights],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, HALL_MOTION, reduced)
+  const gates = scenes.filter((scene): scene is DarkScene & { slot: SectionSlot } => scene.slot !== null)
+  const contact = scenes[scenes.length - 1]
 
   useEffect(() => {
     setMounted(true)
@@ -1766,27 +1050,20 @@ export default function DarkFantasyTheme() {
   return (
     <div
       style={DARK_FANTASY_VARS}
-      className="min-h-screen relative overflow-hidden [--focus-ring:var(--df-spirit-gold)] [--focus-halo:var(--df-void)] bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
+      className={`${world.root} min-h-screen relative overflow-x-clip [--focus-ring:var(--df-spirit-gold)] [--focus-halo:var(--df-void)] bg-[color:var(--df-void)] font-['Comic_Sans_MS','Comic_Sans',cursive]`}
     >
       <SkipLink />
 
-      {/* Atmospheric background layers */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at 50% 10%, ${DARK_FANTASY.ethereal}15 0%, transparent 50%),
-            radial-gradient(ellipse at 20% 60%, ${DARK_FANTASY.voidPurple}40 0%, transparent 40%),
-            radial-gradient(ellipse at 80% 40%, ${DARK_FANTASY.spiritGold}08 0%, transparent 35%),
-            linear-gradient(180deg, ${DARK_FANTASY.void} 0%, ${DARK_FANTASY.voidDeep} 40%, ${DARK_FANTASY.voidPurple} 100%)
-          `,
-        }}
-      />
-      <VoidDepths />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef}>
+          {scenes.map((scene) => (
+            <DarkStage key={scene.id} scene={scene} profession={active} />
+          ))}
+        </Theatre>
+      )}
       {mounted && <EtherealRain />}
-      <DarkFantasyAtmosphere mounted={mounted} />
+      <DarkFantasyAtmosphere />
       {mounted && <SpiritParticles />}
-      <ProfessionStage profession={active} p={DARK_FANTASY} />
 
       {/* Interactive Elements - desktop only */}
       {pointerMotion && <ParallaxLayers />}
@@ -1802,11 +1079,6 @@ export default function DarkFantasyTheme() {
           `,
         }}
       />
-
-      {/* Chandelier - absolute at top, doesn't scroll */}
-      <div className="absolute top-0 left-0 right-0 z-[2] pointer-events-none" aria-hidden="true">
-        <GothicChandelier />
-      </div>
 
       {/* Fixed Navigation Bar */}
       <nav
@@ -1848,28 +1120,29 @@ export default function DarkFantasyTheme() {
         </div>
       </nav>
 
+      {/* The text layer: every word of the page, drawn by the theatre at the settled scroll so it rests with the art */}
+      <div ref={textRef}>
       {/* Hero Section - below fixed nav, the recruiter first screen */}
       {/* one step over the next section below lg, so the plate hanging into its top padding takes the clicks */}
       <header data-worlds-hero="" className="relative z-20 max-lg:z-[21] pt-20 md:pt-24 pb-6 px-4 md:px-6">
+        {reduced && <DarkStage scene={scenes[0]} profession={active} settled />}
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="max-w-4xl mx-auto text-center">
-              <h1
-                className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3"
-                style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
-              >
-                <NameWords name={name} />
-              </h1>
-              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silverText }}>
-                {headline}
-              </p>
-              <p
-                className="text-sm tracking-wider italic"
-                style={{ color: DARK_FANTASY.spiritGold, textShadow: `0 0 10px ${DARK_FANTASY.spiritGold}40` }}
-              >
-                {tagline}
-              </p>
-              <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
+              {/* The lines sit on a void plate, its edge feathered into the hall, so the lamps lit behind them never
+                  take the words under AAA. */}
+              <div className="mx-auto w-fit max-w-full rounded-lg bg-[color-mix(in_srgb,var(--df-void)_90%,transparent)] px-4 py-3 shadow-[0_0_48px_24px_color-mix(in_srgb,var(--df-void)_90%,transparent)] md:px-8">
+                <h1 className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3 text-[color:var(--df-bone)] [text-shadow:0_0_20px_color-mix(in_srgb,var(--df-ethereal)_19%,transparent)]">
+                  <NameWords name={name} />
+                </h1>
+                <p className="text-sm md:text-lg tracking-wider mb-2 text-[color:var(--df-silver-text)]">
+                  {headline}
+                </p>
+                <p className="text-sm tracking-wider italic text-[color:var(--df-spirit-gold)] [text-shadow:0_0_10px_color-mix(in_srgb,var(--df-spirit-gold)_25%,transparent)]">
+                  {tagline}
+                </p>
+                <p className="text-sm mt-2 text-[color:var(--df-bone)]">{line}</p>
+              </div>
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
                 {/* out of the page flow so the hero keeps its places. From lg a zero size item at the end of the
@@ -1885,50 +1158,36 @@ export default function DarkFantasyTheme() {
           )}
         />
       </header>
-
-      {/* Main content */}
       <main id="main-content" tabIndex={-1} className="outline-none">
+        <WaystationSelector active={active} />
 
-      <WaystationSelector active={active} />
+        <ProfessionRegion>
+          {gates.map((scene) => (
+            <SceneSection key={scene.id} scene={scene} profession={active} still={reduced} />
+          ))}
+        </ProfessionRegion>
 
-      <ProfessionRegion>
-        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-      </ProfessionRegion>
-
+        {/* Contact: the knight ends the bug on the scene behind it */}
+        <div data-scene="contact" className={`relative z-20 pt-[60svh] pb-[40svh] ${SIDE}`}>
+          {reduced && <DarkStage scene={contact} profession={active} settled />}
+          <section className="df-panel relative mx-auto max-w-2xl bg-[color:var(--df-panel)] px-6 py-10" aria-label={sections.contact}>
+            <RecruiterHero
+              render={({ line, actions }) => (
+                <div className="text-center">
+                  <div className="mb-8">
+                    <h2 className="text-xl tracking-[0.15em] mb-3 text-[color:var(--df-brass-text)]">{actionLabels.emailMe}</h2>
+                    <p className="text-sm text-[color:var(--df-silver-text)]">{line}</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <HeroActions actions={actions} />
+                    <ContactLink slot={siteLinks.cv} className={`${DF_BUTTON} ${DF_OUTLINED}`} />
+                  </div>
+                </div>
+              )}
+            />
+          </section>
+        </div>
       </main>
-
-      {/* Contact CTA - Battle Reveal (knight kills bug, content drops from top) */}
-      <div ref={contactTrigger.ref}>
-        <BattleReveal triggered={contactTrigger.triggered}>
-        <section className="relative z-20 py-16 px-6" aria-label={sections.contact}>
-          <RecruiterHero
-            render={({ line, actions }) => (
-              <div className="max-w-2xl mx-auto text-center">
-                <div className="mb-8">
-                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText }}>
-                    {actionLabels.emailMe}
-                  </h2>
-                  <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{line}</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <HeroActions actions={actions} />
-                  <ContactLink slot={siteLinks.cv} className={`${DF_BUTTON} ${DF_OUTLINED}`} />
-                </div>
-              </div>
-            )}
-          />
-        </section>
-        </BattleReveal>
-      </div>
-
-      {/* Bottom obscure overlay - content fades into darkness */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-48 pointer-events-none z-[7]"
-        style={{
-          background: `linear-gradient(180deg, transparent 0%, ${DARK_FANTASY.void}40 30%, ${DARK_FANTASY.void}90 70%, ${DARK_FANTASY.void} 100%)`,
-        }}
-        aria-hidden="true"
-      />
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center">
@@ -1940,6 +1199,7 @@ export default function DarkFantasyTheme() {
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>
       </footer>
+      </div>
     </div>
   )
 }

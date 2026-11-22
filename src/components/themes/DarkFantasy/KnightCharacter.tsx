@@ -1,11 +1,7 @@
 'use client'
 
-import { memo, ReactNode, useState, useEffect, useRef, type CSSProperties } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
-import knight from './knight.module.css'
+import { memo } from 'react'
 import { DARK_FANTASY } from './palette'
-import { cycles } from '@/components/themes/shared/loops'
 
 /**
  * ALEXANDER AS A MASKED CAVERN KNIGHT
@@ -21,73 +17,62 @@ import { cycles } from '@/components/themes/shared/loops'
  *
  * ALEXANDER ADAPTATION:
  * - Beard extends from bottom of mask
+ *
+ * Drawn as an SVG element, so a scene places him inside its own picture. His nail ([data-nail]) turns on
+ * the pommel and its soul light ([data-nail-glow]) brightens: the scene writes both from the scroll
+ * (slashAngle), so his slashes play forwards and back with it.
  */
 
-// The knight's drawing in viewBox units: its width and height, his size on screen being these times his
-// scale, and the line his soles and his ground shadow sit on, KNIGHT_SOLE_Y below the drawing's top.
-const KNIGHT_VIEW_WIDTH = 60
-const KNIGHT_VIEW_HEIGHT = 80
-const KNIGHT_SOLE_Y = 79
+// The knight's drawing in viewBox units: its width and height, his size being these times his scale, and
+// the line his soles and his ground shadow sit on, KNIGHT_SOLE_Y below the drawing's top.
+export const KNIGHT_VIEW_WIDTH = 60
+export const KNIGHT_VIEW_HEIGHT = 80
+export const KNIGHT_SOLE_Y = 79
 // The small ground shadow drawn over his legs sits this far above the sole line the contact shadows sit on.
 const KNIGHT_INNER_SHADOW_RISE = 3
 
-// He breathes from his fight's complete phase on, the latest of which is the battle reveal's at 2.5 s
-// (BattleReveal.tsx), so his float and cloak play whole breaths that end within 5 s of any fight's start.
-const BREATH_AT_S = 2.5
+// The nail at rest, held to the side; it turns on the pommel.
+const NAIL_REST_DEG = 25
 
-interface KnightCharacterProps {
-  scale?: number
-  attacking?: boolean
-  attackPhase?: number
-  facingDirection?: 'left' | 'right'
-  breathing?: boolean
+/** The nail's transform at `angle` degrees, turned on the pommel. */
+export const nailTurn = (angle: number): string => `rotate(${angle.toFixed(1)} 52 55)`
+
+// A slash: the nail swings up and over to NAIL_STRIKE_DEG by RAISE_END, holds to STRIKE_END and comes back
+// to rest by the slash's end.
+const NAIL_STRIKE_DEG = -60
+const RAISE_END = 0.3
+const STRIKE_END = 0.5
+
+/** The nail's angle at `phase` of a slash, 0 to 1: rest, the swing up, the hold, back to rest. */
+export function slashAngle(phase: number): number {
+  if (phase <= 0 || phase >= 1) return NAIL_REST_DEG
+  if (phase < RAISE_END) return NAIL_REST_DEG + (NAIL_STRIKE_DEG - NAIL_REST_DEG) * (phase / RAISE_END)
+  if (phase < STRIKE_END) return NAIL_STRIKE_DEG
+  return NAIL_STRIKE_DEG + (NAIL_REST_DEG - NAIL_STRIKE_DEG) * ((phase - STRIKE_END) / (1 - STRIKE_END))
 }
 
-export const KnightCharacter = memo(function KnightCharacter({
-  scale = 1,
-  attacking = false,
-  attackPhase = 0,
-  facingDirection = 'right',
-  breathing = false,
-}: KnightCharacterProps) {
-  const isLeft = facingDirection === 'left'
+/** How bright the blade's soul light is at `phase` of a slash: lit from the swing to the hold's end. */
+export const slashGlow = (phase: number): number => (phase > 0.2 && phase < 0.6 ? 0.5 : 0)
 
-  const getNailRotation = () => {
-    if (!attacking) return 25
-    if (attackPhase < 0.3) return 25 - (attackPhase / 0.3) * 85
-    if (attackPhase < 0.5) return -60
-    return -60 + ((attackPhase - 0.5) / 0.5) * 85
-  }
-
-  const nailRotation = getNailRotation()
-
+/** The knight, feet at his drawing's sole line; `x` and `y` place his box's top left in the parent SVG. */
+export const KnightCharacter = memo(function KnightCharacter({ scale = 1, x = 0, y = 0 }: { scale?: number; x?: number; y?: number }) {
   return (
-    <span style={{ display: 'block', animation: breathing && !attacking ? cycles(knight.knightIdleFloat, 3.6, 'ease-in-out', BREATH_AT_S) : undefined }}>
-    {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
     <svg
+      x={x}
+      y={y}
       width={KNIGHT_VIEW_WIDTH * scale}
       height={KNIGHT_VIEW_HEIGHT * scale}
       viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} ${KNIGHT_VIEW_HEIGHT}`}
-      className="block"
-      style={{
-        overflow: 'visible',
-        transform: isLeft ? 'scaleX(-1)' : 'none',
-        filter: `drop-shadow(0 4px 3px rgba(0,0,0,0.45)) drop-shadow(0 0 5px ${DARK_FANTASY.soulBlue}22)`,
-      }}
+      overflow="visible"
+      className="[filter:drop-shadow(0_4px_3px_rgba(0,0,0,0.45))_drop-shadow(0_0_5px_color-mix(in_srgb,var(--df-soul-blue)_13%,transparent))]"
     >
       {/* Ground contact shadow, two soft stacked ellipses (replaces the old glow-only shadow) */}
       <ellipse cx="30" cy={KNIGHT_SOLE_Y} rx="21" ry="4.5" fill={DARK_FANTASY.black} opacity="0.22" />
       <ellipse cx="30" cy={KNIGHT_SOLE_Y} rx="14" ry="3" fill={DARK_FANTASY.black} opacity="0.4" />
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
-      {/* Based on reference image proportions */}
 
-      {/* CLOAK/BODY - small, below head - breathing animation applied here only */}
-      <g
-        style={{
-          transformOrigin: '30px 60px',
-          animation: breathing ? cycles(knight.knightCloakBreathing, 3, 'ease-in-out', BREATH_AT_S) : undefined,
-        }}
-      >
+      {/* CLOAK/BODY - small, below head */}
+      <g>
         <path
           d="M18,48
              C14,52 12,60 14,70
@@ -214,13 +199,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       />
 
       {/* NAIL - held to the side */}
-      <g
-        style={{
-          transformOrigin: '52px 55px',
-          transform: `rotate(${nailRotation}deg)`,
-          transition: attacking ? 'transform 0.06s ease-out' : 'transform 0.15s ease-out',
-        }}
-      >
+      <g data-nail="" transform={nailTurn(NAIL_REST_DEG)}>
         {/* Handle */}
         <rect x="49" y="53" width="6" height="10" rx="1" fill={DARK_FANTASY.cloakDark} stroke={DARK_FANTASY.black} strokeWidth="0.5" />
         {/* Blade */}
@@ -232,201 +211,12 @@ export const KnightCharacter = memo(function KnightCharacter({
         />
         {/* Highlight */}
         <line x1="52" y1="50" x2="52" y2="18" stroke={DARK_FANTASY.white} strokeWidth="0.5" opacity="0.5" />
-        {attacking && attackPhase > 0.2 && attackPhase < 0.6 && (
-          <path
-            d="M52,53 L48,35 L52,15 L56,35 L52,53"
-            fill={DARK_FANTASY.soulBlue}
-            opacity="0.5"
-          />
-        )}
+        {/* The soul light on the blade at the height of a slash; the scene writes its opacity */}
+        <path data-nail-glow="" d="M52,53 L48,35 L52,15 L56,35 L52,53" fill={DARK_FANTASY.soulBlue} opacity="0" />
       </g>
 
       {/* Ground shadow */}
       <ellipse cx="30" cy={KNIGHT_SOLE_Y - KNIGHT_INNER_SHADOW_RISE} rx="14" ry="2" fill={DARK_FANTASY.black} opacity="0.3" />
     </svg>
-    </span>
-  )
-})
-
-// ============================================
-// KNIGHT SLASH REVEAL ANIMATION
-// ============================================
-// Uses IntersectionObserver for reliable triggering
-
-interface KnightSlashRevealProps {
-  children: ReactNode
-  triggered: boolean
-}
-
-type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
-
-// The slash stage, set on the reveal and read by the panel inside it (DarkFantasyTheme) and the knight: the
-// panel's widest, its inset from the stage's top and sides, the knight's size, and how far left of his entry
-// place he rests. --panel-half is half the panel: at most half of SLASH_PANEL_REM, and on a narrower screen as
-// much as leaves room right of it for the knight and his rest step. From lg he is pinned to the screen, his
-// entry place the farther right of the panel's edge plus that rest and 8% in from the screen's right edge,
-// never past the screen's right edge. Below lg the panel fills the column, so no place beside it is left: he
-// rests standing on the panel's top edge at its right corner, above the panel and its text, at the size the
-// combat layer gives him there: his soles on the line the panel's frame draws, FRAME_INSET_REM inside the
-// panel's top, his box sunk below that line by --sole-drop, the part of his drawing under his soles.
-const SLASH_PANEL_REM = 56
-const SLASH_KNIGHT_SCALE = 1.8
-const REST_SHIFT_PX = 90
-const PHONE_KNIGHT_SCALE = SLASH_KNIGHT_SCALE * COMBAT_PHONE_SCALE
-/** How far inside its box the panel's frame (VoidFrame) draws its border, read by the frame and the knight. */
-export const FRAME_INSET_REM = 1
-const SLASH_STAGE = {
-  '--slash-panel': `${SLASH_PANEL_REM}rem`,
-  '--panel-top': '2rem',
-  '--frame-inset': `${FRAME_INSET_REM}rem`,
-  '--sole-drop': `${(KNIGHT_VIEW_HEIGHT - KNIGHT_SOLE_Y) * PHONE_KNIGHT_SCALE}px`,
-  '--panel-inset': '1.5rem',
-  '--rest': `${REST_SHIFT_PX}px`,
-  '--knight-w': `${KNIGHT_VIEW_WIDTH * SLASH_KNIGHT_SCALE}px`,
-  '--panel-half': `min(${SLASH_PANEL_REM / 2}rem, 50vw - var(--knight-w) - var(--rest))`,
-  minHeight: '200px',
-} as CSSProperties
-
-const PHASE_TIMING = {
-  'knight-enter': 500,      // 0.5s delay before animation starts
-  'knight-raise': 700,
-  'slash': 850,
-  'content-reveal': 950,
-  'complete': 1300,
-}
-
-// His pose in each phase: he steps in from the right, raises, slashes and backs off to rest beside the panel.
-const KNIGHT_POSES: Record<AnimationPhase, CSSProperties> = {
-  'idle': { transform: 'translateX(120px)', opacity: 0 },
-  'knight-enter': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') },
-  'knight-raise': { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') },
-  'slash': { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') },
-  'content-reveal': { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') },
-  // He rests closer to the content, to its left
-  'complete': { transform: `translateX(-${REST_SHIFT_PX}px)`, opacity: 0.7, transition: moveAndFade('300ms ease-out') },
-}
-
-// The panel waits off to the right until his slash, then slides in.
-const CONTENT_HIDDEN: CSSProperties = { transform: 'translateX(100%)', opacity: 0 }
-const CONTENT_POSES: Record<AnimationPhase, CSSProperties> = {
-  'idle': CONTENT_HIDDEN,
-  'knight-enter': CONTENT_HIDDEN,
-  'knight-raise': CONTENT_HIDDEN,
-  'slash': CONTENT_HIDDEN,
-  'content-reveal': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') },
-  'complete': { transform: 'translateX(0)', opacity: 1 },
-}
-
-export const KnightSlashReveal = memo(function KnightSlashReveal({
-  children,
-  triggered,
-}: KnightSlashRevealProps) {
-  const [phase, setPhase] = useState<AnimationPhase>('idle')
-  const [attackPhase, setAttackPhase] = useState(0)
-  const [showSlash, setShowSlash] = useState(false)
-  const hasAnimated = useRef(false)
-  // continuous in-view so the fixed knight fades out once we scroll past the section
-  const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
-
-  useEffect(() => {
-    // The trigger fires once, so the reveal plays once and the phase starts idle
-    if (!triggered || hasAnimated.current) return
-
-    // Mark as animated so we don't replay
-    hasAnimated.current = true
-
-    const timers: NodeJS.Timeout[] = []
-    // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
-    let attackFrame = 0
-
-    // 0.5s delay before animation starts
-    timers.push(setTimeout(() => setPhase('knight-enter'), PHASE_TIMING['knight-enter']))
-    timers.push(setTimeout(() => setPhase('knight-raise'), PHASE_TIMING['knight-raise']))
-
-    timers.push(setTimeout(() => {
-      setPhase('slash')
-      setShowSlash(true)
-      const start = performance.now()
-      const animateAttack = (now: number) => {
-        const progress = Math.min((now - start) / 100, 1)
-        setAttackPhase(progress)
-        if (progress < 1) attackFrame = requestAnimationFrame(animateAttack)
-      }
-      attackFrame = requestAnimationFrame(animateAttack)
-    }, PHASE_TIMING['slash']))
-
-    timers.push(setTimeout(() => {
-      setShowSlash(false)
-      setPhase('content-reveal')
-      setAttackPhase(0)
-    }, PHASE_TIMING['content-reveal']))
-
-    timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
-
-    return () => {
-      timers.forEach(t => clearTimeout(t))
-      cancelAnimationFrame(attackFrame)
-    }
-  }, [triggered])
-
-  const showKnight = phase !== 'idle'
-  const isAttacking = phase === 'knight-raise' || phase === 'slash'
-
-  return (
-    <div ref={stageRef} className="relative w-full max-lg:overflow-x-clip" style={SLASH_STAGE}>
-      {showSlash && (
-        <div
-          className="absolute inset-0 z-10 pointer-events-none"
-          style={{
-            background: `linear-gradient(90deg, transparent 20%, ${DARK_FANTASY.soulBlue}40 50%, transparent 80%)`,
-            animation: `${knight.slashFlash} 100ms ease-out`
-          }}
-        />
-      )}
-
-      {/* COMBAT_Z.content: the transform from getContentStyle() makes this a stacking context;
-          without an explicit z-index it sinks below the fixed z-[1..8] background and the fighters */}
-      {/* Inert while the panel waits off screen, so a Tab never lands on a control nobody can see */}
-      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]} inert={CONTENT_POSES[phase] === CONTENT_HIDDEN}>
-        {children}
-      </div>
-
-      {/* Below lg: the knight stands on the panel frame's top line at its right corner (SLASH_STAGE) */}
-      {showKnight && (
-        <div
-          data-worlds-figure=""
-          className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top)_-_var(--frame-inset)_-_var(--sole-drop))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
-          style={KNIGHT_POSES[phase]}
-          aria-hidden="true"
-        >
-          <KnightCharacter
-            scale={PHONE_KNIGHT_SCALE}
-            attacking={isAttacking}
-            attackPhase={attackPhase}
-            facingDirection="left"
-            breathing={phase === 'complete'}
-          />
-        </div>
-      )}
-
-      {/* From lg: the knight pinned to the viewport (bottom-right ~15-18%); only the content above scrolls */}
-      {showKnight && (
-        <FixedCombatLayer inView={inView}>
-          <div
-            data-worlds-figure=""
-            className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none max-lg:hidden"
-            style={KNIGHT_POSES[phase]}
-          >
-            <KnightCharacter
-              scale={SLASH_KNIGHT_SCALE}
-              attacking={isAttacking}
-              attackPhase={attackPhase}
-              facingDirection="left"
-              breathing={phase === 'complete'}
-            />
-          </div>
-        </FixedCombatLayer>
-      )}
-    </div>
   )
 })
