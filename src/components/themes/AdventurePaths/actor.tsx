@@ -7,6 +7,7 @@ import { pixelRuns } from '@/lib/pixelRuns'
 import { cssVars } from '@/lib/cssVars'
 import { motionOf, motionVars, playedPast, type Course, type Motion } from './course'
 import { FOE, HERO, HERO_EYE, HERO_OUTFITS, foeColours, foeRows, heroParts, type FoeFrame, type HeroFrame, type SpritePart } from './side'
+import { PixelRuns } from '../shared/PixelRuns'
 import side from './side.module.css'
 
 // The side view cast drawn from the pixel rows in side.ts: him, the walking mushroom, the turtle and the
@@ -18,11 +19,9 @@ import side from './side.module.css'
 function Pixels({ parts, colours }: { parts: readonly SpritePart[]; colours: Record<string, string> }) {
   return (
     <>
-      {parts.flatMap(({ rows, top }, part) =>
-        pixelRuns(rows, top).map((run) => (
-          <rect key={`${part}-${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
-        )),
-      )}
+      {parts.map(({ rows, top }, part) => (
+        <PixelRuns key={part} runs={pixelRuns(rows, top)} colours={colours} />
+      ))}
     </>
   )
 }

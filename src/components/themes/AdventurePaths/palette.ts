@@ -94,6 +94,10 @@ export const TRAIL = {
   HUD: '#000000',
 } as const
 
+// The inks both of his pixel figures share, the map walker (sprite.ts) and the side view hero (side.ts):
+// the outline, the white gloves and the brown shoes. Drawn into SVG only, so they stay out of TRAIL_VARS.
+export const SPRITE_INK = { OUTLINE: '#160e08', GLOVE: '#fbf8ee', SHOE: '#6b3a1c' } as const
+
 /** The palette as CSS variables, set once on the world's root. */
 export const TRAIL_VARS = paletteVars('ap', TRAIL)
 

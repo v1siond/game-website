@@ -24,9 +24,8 @@ export function Cue({ children, className = '' }: { children: ReactNode; classNa
   )
 }
 
-// The --i variable a staggered piece reads for its delay, as literal classes for the build.
-const STAGGER = ['[--i:0]', '[--i:1]', '[--i:2]', '[--i:3]', '[--i:4]', '[--i:5]', '[--i:6]', '[--i:7]']
-export const staggerAt = (index: number) => STAGGER[Math.min(index, STAGGER.length - 1)]
+// Re-exported for the rounds, which take their HUD pieces from this module.
+export { staggerAt } from '../shared/stagger'
 
 export type Side = 'p1' | 'p2'
 

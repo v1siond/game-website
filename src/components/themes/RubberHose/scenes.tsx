@@ -94,9 +94,8 @@ export function Reveal({ children, className = '' }: { children: (look: RevealLo
   )
 }
 
-// The --i variable a staggered item reads for its delay, as literal classes for the build.
-export const STAGGER = ['[--i:0]', '[--i:1]', '[--i:2]', '[--i:3]', '[--i:4]', '[--i:5]', '[--i:6]', '[--i:7]']
-export const staggerAt = (index: number) => STAGGER[Math.min(index, STAGGER.length - 1)]
+// Re-exported for the sections and the root, which take their scene pieces from this module.
+export { staggerAt } from '../shared/stagger'
 
 // A stop's place along the bar, 0 to 1, as the --at variable its flag reads.
 const stopAt = (index: number, stops: number): CSSProperties => ({ '--at': stops > 1 ? index / (stops - 1) : 1 }) as CSSProperties

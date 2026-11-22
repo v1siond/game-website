@@ -7,7 +7,7 @@ import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { fillLabel } from '@/lib/cv/labels'
+import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
 import { Command, FOCUS } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
@@ -15,7 +15,7 @@ import { usePlay } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
+import { MASONRY_TILES } from '@/lib/cv/masonry'
 import { ITEM, SentryPortrait, TALKS } from './rooms'
 
 // Retro RPG's entries, each a box of the encounter screen:
@@ -253,26 +253,18 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
 // The tech stack as the item menu: one pocket per category, each item a line the heart can sit on.
 export function ItemBag({ categories }: { categories: CVData['techStack'] }) {
-  const { cards } = useLabels()
-
   return (
-    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
-      {categories.map((category) => (
-        <li key={category.id} className={MASONRY_ITEM}>
-          <h3 className={`mb-3 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name}
-          </h3>
-          <ul className={`${MASONRY_TILES} gap-x-4 gap-y-1`} aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
-            {category.items.map((tech) => (
-              <li key={tech} className={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick} ${ITEM}`}>
-                <Soul className={`h-3 w-3.5 shrink-0 ${world.cursor}`} />
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
-    </ul>
+    <TechList
+      categories={categories}
+      headingClassName={`mb-3 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}
+      itemsClassName={`${MASONRY_TILES} gap-x-4 gap-y-1`}
+      itemClassName={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick} ${ITEM}`}
+      renderItem={(tech) => (
+        <>
+          <Soul className={`h-3 w-3.5 shrink-0 ${world.cursor}`} />
+          {tech}
+        </>
+      )}
+    />
   )
 }

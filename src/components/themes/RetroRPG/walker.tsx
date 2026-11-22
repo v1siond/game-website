@@ -5,6 +5,7 @@ import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, pixelRuns, walkPose
 import sprite from './sprite.module.css'
 import rooms from './rooms.module.css'
 import type { PixelSprite } from './npcs'
+import { PixelRuns } from '../shared/PixelRuns'
 
 // Him as the room walker (the pixel data in sprite.ts), drawn as one rect per run of a colour on the
 // 20 by 30 grid with crisp edges. Each component draws only the frames its place needs; sprite.module.css
@@ -17,22 +18,17 @@ function Pixels({ pose, colours }: { pose: Pose; colours: Record<string, string>
     ...pixelRuns(pose.torso, PART_TOP.torso),
     ...pixelRuns(pose.legs, PART_TOP.legs),
   ]
-  return (
-    <>
-      {runs.map((run) => (
-        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
-      ))}
-    </>
-  )
+  return <PixelRuns runs={runs} colours={colours} />
 }
+
+const SOUL_RUNS = pixelRuns(HEART.rows, HEART.y, HEART.x)
+const SOUL_COLOURS = { h: RPG.soul }
 
 /** The red heart over his chest, his soul, shown in the battle moments. */
 function ChestSoul({ className }: { className: string }) {
   return (
     <g className={className}>
-      {pixelRuns(HEART.rows, HEART.y, HEART.x).map((run) => (
-        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={RPG.soul} />
-      ))}
+      <PixelRuns runs={SOUL_RUNS} colours={SOUL_COLOURS} />
     </g>
   )
 }
@@ -146,9 +142,7 @@ export function Sparkles({ className = '' }: { className?: string }) {
 export function PixelArt({ sprite: { rows, colours }, x = 0, y = 0, className }: { sprite: PixelSprite; x?: number; y?: number; className?: string }) {
   return (
     <g className={className}>
-      {pixelRuns(rows, y, x).map((run) => (
-        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
-      ))}
+      <PixelRuns runs={pixelRuns(rows, y, x)} colours={colours} />
     </g>
   )
 }

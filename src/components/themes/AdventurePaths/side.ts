@@ -1,6 +1,6 @@
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
-import { TRAIL } from './palette'
+import { SPRITE_INK, TRAIL } from './palette'
 
 // The side view cast of the levels, drawn as pixel rows (one letter a pixel, '.' clear) like the top view
 // map walker in sprite.ts. Him: a parody of the plumber hero in the 16 bit side view, 16 by 26, facing
@@ -219,10 +219,8 @@ export function heroParts(pose: HeroPose, headgear: HeroHeadgear): SpritePart[] 
 /** Where his eye is, for the blink. */
 export const HERO_EYE = { x: 9, y: HEAD_TOP + 5, height: 2 } as const
 
-const OUTLINE = '#160e08'
-
 const COSTUME = {
-  K: OUTLINE,
+  K: SPRITE_INK.OUTLINE,
   C: '#d8281c',
   c: '#8e1a10',
   T: '#d8281c',
@@ -234,8 +232,8 @@ const COSTUME = {
   B: HERO_IDENTITY.beard,
   E: HERO_IDENTITY.eyes,
   P: '#2a58c8',
-  G: '#fbf8ee',
-  F: '#6b3a1c',
+  G: SPRITE_INK.GLOVE,
+  F: SPRITE_INK.SHOE,
 }
 
 export interface HeroOutfit {
@@ -325,7 +323,7 @@ export const FOE_FRAME_NAMES = Object.keys(FOE_FRAMES) as FoeFrame[]
 
 export const foeRows = (frame: FoeFrame): readonly string[] => FOE_FRAMES[frame]
 
-const FOE_BASE = { K: OUTLINE, W: '#ffffff', E: OUTLINE, D: '#3a0c0c' }
+const FOE_BASE = { K: SPRITE_INK.OUTLINE, W: '#ffffff', E: SPRITE_INK.OUTLINE, D: '#3a0c0c' }
 
 /** Each foe's colours: the brown mushroom, the green turtle with its yellow skin, the red spotted plant. */
 export const FOE_COLOURS: Record<'walker' | 'turtle' | 'plant', Record<string, string>> = {
