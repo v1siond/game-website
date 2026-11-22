@@ -1,4 +1,5 @@
 import type { Profession } from '@/lib/cv/professions'
+import { turnAbout } from '@/lib/motion/turnAbout'
 
 // His joints and every move he makes, as plain data, so the sprite, its test and the pose renders all
 // read one source. He is drawn in three quarter profile facing right (the sheet in
@@ -338,11 +339,6 @@ export const firstPose = (move: Move, profession: Profession): Pose => resolveKe
 
 // The near fist's centre on the drawing at rest: sprite.tsx draws the near FIST around it, and a scene puts a hold in it.
 export const NEAR_FIST: readonly [number, number] = [98, 129]
-
-const turnAbout = ([x, y]: readonly [number, number], angle: number, [cx, cy]: readonly [number, number]): [number, number] => {
-  const rad = (angle * Math.PI) / 180
-  return [cx + (x - cx) * Math.cos(rad) - (y - cy) * Math.sin(rad), cy + (x - cx) * Math.sin(rad) + (y - cy) * Math.cos(rad)]
-}
 
 /** Where the near fist sits in the 160 by 210 box in a pose: the forearm, the arm and the chest turned, then the body moved. */
 export function nearFistAt(pose: Pose): readonly [number, number] {
