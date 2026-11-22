@@ -1,6 +1,7 @@
 'use client'
 
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { COLORS as C } from './palette'
 import coins from './letters.module.css'
 
@@ -20,11 +21,14 @@ export function LetterCoin({ letter }: { letter: string }) {
   )
 }
 
-/** A letter waiting on its card, spinning once it scrolls in (data-on); once found it flies up and fades. */
+/**
+ * A letter waiting on its card, spinning once it scrolls in (held on its first frame until then); once found
+ * it flies up and fades, at once even when picked before the trigger.
+ */
 export function HiddenCoin({ letter, found }: { letter: string; found: boolean }) {
   const { ref, triggered } = useSectionTrigger()
   return (
-    <span ref={ref} data-on={triggered || undefined} className={`block h-11 w-11 ${found ? coins.flown : coins.coin}`} aria-hidden="true">
+    <span ref={ref} className={`block h-11 w-11 ${found ? coins.flown : coins.coin} ${heldUntil(triggered || found)}`} aria-hidden="true">
       <LetterCoin letter={letter} />
     </span>
   )
