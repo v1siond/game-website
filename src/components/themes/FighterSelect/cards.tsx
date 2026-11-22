@@ -7,7 +7,7 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -152,7 +152,8 @@ export function BandCard({ band, years, linkProps, release }: BandSlot) {
 }
 
 // A venture as a fight card; one of his own products (featured) is a wider gold card with a gold
-// player tag over the name, the way the select screen marks the pick.
+// player tag over the name, the way the select screen marks the pick. The link is named by the words the
+// card shows (the description and services included) plus the new tab note a screen reader alone hears.
 export function VentureCard({ company: entry }: { company: CVData['companies'][number] }) {
   const { links, cards, sections } = useLabels()
   const company = ventureCard(entry)
@@ -162,7 +163,6 @@ export function VentureCard({ company: entry }: { company: CVData['companies'][n
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
       className={`block h-full motion-safe:transition-transform motion-safe:hover:scale-[1.02] ${FOCUS}`}
     >
       <FightCard accent={company.featured ? 'gold' : 'cyan'}>
@@ -188,6 +188,7 @@ export function VentureCard({ company: entry }: { company: CVData['companies'][n
             <Tags items={company.services} label={sections.services} />
           </div>
         )}
+        <span className="sr-only"> {newTabHint(links)}</span>
       </FightCard>
     </a>
   )

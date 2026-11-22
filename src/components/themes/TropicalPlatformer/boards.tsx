@@ -1,7 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData, Service } from '@/lib/cv/content'
 import { ventureCard } from '@/lib/cv/cvView'
@@ -18,7 +18,8 @@ import look from './jungle.module.css'
 // the venture's site (also placed by --i, for the rhino's charge in rhino.tsx). The services read as a
 // masonry of plain boards, a title and its line, under the shared fade. His own products (featured)
 // are the two wide planks of the first row, a bark tag in sun gold over the name; the other ventures
-// follow three to a row.
+// follow three to a row. A plank's link is named by the words it shows (the description and services
+// included) plus the new tab note a screen reader alone hears.
 
 /** Lines read on a dark board, each after a sun gold dot: a job's highlights, a project's details, the
  *  About highlights. Nothing when there are none. */
@@ -81,7 +82,6 @@ export function VentureBoard({ companies, itemClassName = '' }: BoardListProps &
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`block h-full rounded-2xl p-5 text-[color:var(--tp-bark-dark)] ${look.plank} ${look.plankText} ${look.button} ${look.focus}`}
           >
             {company.featured && (
@@ -110,6 +110,7 @@ export function VentureBoard({ companies, itemClassName = '' }: BoardListProps &
                 ))}
               </ul>
             )}
+            <span className="sr-only"> {newTabHint(links)}</span>
           </a>
         </li>
       ))}

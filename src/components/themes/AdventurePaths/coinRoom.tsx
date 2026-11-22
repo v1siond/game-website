@@ -1,7 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { ventureCard, type SectionsOf } from '@/lib/cv/cvView'
@@ -20,7 +20,8 @@ import side from './side.module.css'
 // coins, each one gone with a flick as he takes it, and the ventures' cards pop up one after another as
 // he runs. Under reduced motion he stands at the far side and every card shows. His own products
 // (featured) pop up first, two wide cards to a row with a coin gold top and the black HUD plate over the
-// name; the other ventures follow three to a row.
+// name; the other ventures follow three to a row. A card's link is named by the words it shows (the
+// description and services included) plus the new tab note a screen reader alone hears.
 
 type RoomPose = 'drop' | 'run' | 'stand'
 
@@ -76,7 +77,6 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
               href={company.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
               className="block h-full transition-transform hover:-translate-y-1 motion-reduce:transition-none"
             >
               <article
@@ -102,6 +102,7 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
                     ))}
                   </ul>
                 )}
+                <span className="sr-only"> {newTabHint(links)}</span>
               </article>
             </a>
           </li>
