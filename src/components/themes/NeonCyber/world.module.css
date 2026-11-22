@@ -1,6 +1,7 @@
 /* Neon Cyber's own motion and chrome: the optics HUD of a netrunner city. Every animation moves transform or
  * opacity only. The base style of each element is its final frame and the keyframes start from the first
  * frame (fill: both), so under reduced motion, where every animation is dropped, the page rests whole.
+ * Nothing loops (BD29): each motion plays a bounded number of runs inside 5 s and rests on a still frame.
  * The root carries the palette as --neon-* and the pointer as --mx and --my (-1 to 1). */
 
 .root {
@@ -99,11 +100,13 @@
     color-mix(in srgb, var(--neon-data) 22%, transparent) 22px 23px,
     transparent 23px 61px
   );
-  animation: rainFall 0.7s linear infinite;
+  animation: rainFall 0.7s linear 6;
 }
 
+/* The far sheet falls slower, three times, so it rests inside 5 s as well. */
 .rainSlow {
   animation-duration: 1.3s;
+  animation-iteration-count: 3;
   opacity: 0.5;
 }
 
@@ -116,23 +119,22 @@
   }
 }
 
+/* One flying car crosses the skyline and is gone. */
 .car {
-  animation: carCross 48s linear infinite;
-  animation-delay: 4s;
+  animation: carCross 4.5s linear 0.3s both;
 }
 
 @keyframes carCross {
-  0% {
+  from {
     transform: translateX(-200px);
   }
-  14%,
-  100% {
+  to {
     transform: translateX(calc(100vw + 200px));
   }
 }
 
 .flicker {
-  animation: flicker 6s steps(1) infinite;
+  animation: flicker 4.8s steps(1);
 }
 
 @keyframes flicker {
@@ -513,9 +515,9 @@
   }
 }
 
-/* ---- His rigs: the den, the club, the overpass gym, each with its own loop ---- */
+/* ---- His rigs: the den, the club, the overpass gym, each with its own motion, played once ---- */
 .codeScroll {
-  animation: codeScroll 3.2s steps(8) infinite;
+  animation: codeScroll 3.2s steps(8) forwards;
 }
 
 @keyframes codeScroll {
@@ -525,7 +527,7 @@
 }
 
 .blink {
-  animation: blink 1s steps(1) infinite;
+  animation: blink 1s steps(1) 4;
 }
 
 @keyframes blink {
@@ -537,18 +539,23 @@
 .beam {
   transform-box: view-box;
   transform-origin: var(--origin);
-  animation: beam 4s ease-in-out infinite alternate;
+  animation: beam 4.8s ease-in-out;
 }
 
 .beamBack {
   animation-delay: -2s;
 }
 
+/* One sweep out to each side and back to straight down. */
 @keyframes beam {
-  from {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
     transform: rotate(-14deg);
   }
-  to {
+  75% {
     transform: rotate(14deg);
   }
 }
@@ -556,7 +563,7 @@
 .cymbal {
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  animation: cymbal 0.5s ease-out infinite;
+  animation: cymbal 0.5s ease-out 8;
 }
 
 @keyframes cymbal {
@@ -572,7 +579,7 @@
 .bag {
   transform-box: fill-box;
   transform-origin: 50% 0;
-  animation: bag 2.4s ease-in-out infinite;
+  animation: bag 2.4s ease-in-out 2;
 }
 
 @keyframes bag {
@@ -590,7 +597,7 @@
 }
 
 .traffic {
-  animation: traffic 3.6s linear infinite;
+  animation: traffic 3.6s linear both;
 }
 
 @keyframes traffic {
@@ -718,7 +725,7 @@
 }
 
 .tuned .eq > span {
-  animation: eq 0.48s ease-in-out infinite alternate;
+  animation: eq 0.48s ease-in-out 10 alternate;
   animation-delay: calc(var(--i) * -0.13s);
 }
 

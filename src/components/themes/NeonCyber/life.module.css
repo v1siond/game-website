@@ -193,7 +193,7 @@
   animation-fill-mode: none;
 }
 .pin[data-hot='true'] .pinRing {
-  animation: pin-ping 0.8s ease-out infinite;
+  animation: pin-ping 0.8s ease-out 4;
 }
 .pinRing {
   opacity: 0;
@@ -385,13 +385,13 @@
   animation: foe-in 0.4s steps(3) both;
 }
 .ripStage[data-done='true'] .foeBody {
-  animation: foe-hit 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: foe-hit 1.8s cubic-bezier(0.4, 0, 0.2, 1) 2;
 }
 .ripStage[data-done='true'] .impact {
-  animation: impact 1.8s steps(1) infinite;
+  animation: impact 1.8s steps(1) 2;
 }
 .ripStage[data-done='true'] .foeOptics {
-  animation: foe-optics 1.8s steps(1) infinite;
+  animation: foe-optics 1.8s steps(1) 2;
 }
 
 @keyframes foe-in {
@@ -457,7 +457,7 @@
   transform: translateX(calc(50cqw - 6rem));
 }
 .driveStage[data-on='true'] .car {
-  animation: drive 5.4s both;
+  animation: drive 4.8s both;
 }
 
 @keyframes drive {
@@ -476,13 +476,13 @@
   transform-origin: 50% 100%;
 }
 .driveStage[data-on='true'] .rider {
-  animation: hop-in 5.4s both;
+  animation: hop-in 4.8s both;
 }
 .driver {
   opacity: 0;
 }
 .driveStage[data-on='true'] .driver {
-  animation: driver-in 5.4s steps(1) both;
+  animation: driver-in 4.8s steps(1) both;
 }
 
 @keyframes hop-in {
@@ -518,7 +518,7 @@
   transform: scaleX(0);
 }
 .driveStage[data-on='true'] .streak {
-  animation: streak 5.4s both;
+  animation: streak 4.8s both;
 }
 
 @keyframes streak {
@@ -537,7 +537,7 @@
   opacity: 0.4;
 }
 .driveStage[data-on='true'] .headlight {
-  animation: flash 5.4s steps(1) both;
+  animation: flash 4.8s steps(1) both;
 }
 
 @keyframes flash {
