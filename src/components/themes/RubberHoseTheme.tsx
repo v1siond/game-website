@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
@@ -9,7 +8,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { HOSE, HOSE_VARS } from './RubberHose/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -53,9 +52,7 @@ export default function RubberHoseTheme() {
   const { navigation, professions, sections } = useLabels()
   const reducedMotion = useReducedMotion()
   const rootRef = usePointerVars(!reducedMotion)
-  const [isle, setIsle] = useState<Isle>('meadow')
-  const onZone = useCallback((zone: Isle) => setIsle(zone), [])
-  const zoneStage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
+  const { zones, stage } = useZoneStore<Isle>('meadow', reducedMotion)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${world.focusRing}`} style={HOSE_VARS}>
@@ -63,8 +60,8 @@ export default function RubberHoseTheme() {
         {navigation.skipToContent}
       </a>
 
-      <ZoneStageProvider value={zoneStage}>
-      <Isles current={isle} />
+      <ZoneStageProvider value={stage}>
+      <Isles zones={zones} />
       <FilmFrame />
       <FilmGrain />
       <RisingNotes />

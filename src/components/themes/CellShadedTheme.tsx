@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback, useState } from 'react'
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -8,7 +7,7 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { paletteVars } from './shared/paletteVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { CEL } from './CellShaded/palette'
@@ -39,16 +38,15 @@ export default function CellShadedTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const [zone, setZone] = useState<Zone>('noon')
   const pointerRef = usePointerVars(!reduced)
-
-  const onZone = useCallback((next: Zone) => setZone(next), [])
+  const { zones, stage } = useZoneStore<Zone>('noon', reduced)
+  useZoneAttribute(zones, pointerRef)
 
   return (
-    <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
+    <div ref={pointerRef} style={ROOT_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
       <HatchDefs />
       <Wasteland />
-      <ZoneStageProvider value={{ reduced, onZone }}>
+      <ZoneStageProvider value={stage}>
         <FreezeIntro profession={active} reduced={reduced} />
         <QuickChange profession={active} />
 

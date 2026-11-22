@@ -1,12 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
 import { Alfa_Slab_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { fillLabel } from '@/lib/cv/labels'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { FS_VARS } from './FighterSelect/palette'
 import { ArcadePanel } from './FighterSelect/frames'
@@ -48,13 +47,12 @@ export default function FighterSelectTheme() {
   const view = useWorldView()
   const labels = useLabels()
   const reduced = useReducedMotion()
-  const [zone, setZone] = useState<Zone>('castle')
-  const stage = useMemo(() => ({ reduced, onZone: (next: Zone) => setZone(next) }), [reduced])
+  const { zones, stage } = useZoneStore<Zone>('castle', reduced)
 
   return (
     <ZoneStageProvider value={stage}>
       <div className={`relative min-h-screen overflow-x-clip ${look.root} ${fsFace.variable}`} style={FS_VARS}>
-        <TourBackdrop zone={zone} />
+        <TourBackdrop zones={zones} />
         <div className={`pointer-events-none fixed inset-0 z-0 ${look.scanlines}`} aria-hidden="true" />
 
         <div className="relative z-10">

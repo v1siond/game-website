@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { useZoneStage } from '@/hooks/useZoneStage'
+import { createValueStore, useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
 import { Survivor } from './survivor'
 import { STALKER_BOX, Stalker } from './stalker'
 import { RoomArt } from './rooms'
@@ -25,19 +25,45 @@ import stage from './stage.module.css'
 // Everything is placed from his feet at the left of the screen in his body widths; nothing here takes the
 // pointer, and the whole stage is hidden from assistive technology (the page carries every fact).
 
-interface StageState {
+interface StageTally {
   herbs: number
-  takeHerbs(count: number): void
   saves: number
+}
+
+interface StageState {
+  tally: ValueStore<StageTally>
+  takeHerbs(count: number): void
   save(): void
 }
 
-const StageContext = createContext<StageState>({ herbs: 0, takeHerbs: () => undefined, saves: 0, save: () => undefined })
+/**
+ * The herbs used in the gym and the saves at the typewriter, kept in a store per mount of the world so a
+ * herb or a save re-renders only the stage and the two panels that read them, not the whole page.
+ */
+export function createStageState(): StageState {
+  const tally = createValueStore<StageTally>({ herbs: 0, saves: 0 })
+
+  return {
+    tally,
+    takeHerbs: (herbs) => {
+      if (herbs === tally.read().herbs) return
+      tally.write({ ...tally.read(), herbs })
+    },
+    save: () => tally.write({ ...tally.read(), saves: tally.read().saves + 1 }),
+  }
+}
+
+const StageContext = createContext<StageState | null>(null)
 
 export const StageProvider = StageContext.Provider
 
-/** The herbs used in the gym and the saves at the typewriter, which the stage plays. */
-export const useStageState = () => useContext(StageContext)
+/** The herbs and the saves the stage plays, with the two ways to change them. */
+export function useStageState() {
+  const state = useContext(StageContext)
+  if (state === null) throw new Error('useStageState must be used within a StageProvider (SurvivalHorrorTheme renders it)')
+  const { herbs, saves } = useStoreValue(state.tally)
+  return { herbs, saves, takeHerbs: state.takeHerbs, save: state.save }
+}
 
 const CONDITION_AFTER: Record<number, Condition> = { 0: 'danger', 1: 'caution', 2: 'fine' }
 
@@ -70,14 +96,16 @@ const foeVars = (frame: Frame) =>
   }) as CSSProperties
 
 interface StageProps {
-  zone: Zone
+  zones: ValueStore<Zone>
   profession: Profession
   reduced: boolean
   // The World Select preview: the hall's last frame, nothing played.
   still: boolean
 }
 
-export function Stage({ zone, profession, reduced, still }: StageProps) {
+export function Stage({ zones, profession, reduced, still }: StageProps) {
+  const inView = useStoreValue(zones)
+  const zone = still ? 'hall' : inView
   const { herbs, saves } = useStageState()
   const condition = conditionAfter(herbs)
   const played = useRef(new Set<string>())

@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -13,7 +12,7 @@ import { BLOG_PATH, postLinks } from '@/lib/blog/links'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { DECO_COLORS as C, DECO_VARS } from './ArtDeco/palette'
 import {
   AbyssVeil,
@@ -86,12 +85,12 @@ export default function ArtDecoTheme() {
   const { navigation, professions, blog } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointer = usePointerVars(!reducedMotion)
-  const [zone, setZone] = useState<DecoZone>('surface')
-  const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (next: DecoZone) => setZone(next) }), [reducedMotion])
+  const { zones, stage } = useZoneStore<DecoZone>('surface', reducedMotion)
+  useZoneAttribute(zones, pointer)
 
   return (
     <ZoneStageProvider value={stage}>
-      <div ref={pointer} style={DECO_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${look.root} ${decoFace.variable}`}>
+      <div ref={pointer} style={DECO_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${look.root} ${decoFace.variable}`}>
         <DecoSVGDefs />
 
         <DecoPatternBackground />

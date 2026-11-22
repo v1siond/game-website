@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
 import { useProfession } from "@/contexts/ProfessionContext";
 import { ProfessionSwitch } from "@/components/cv/ProfessionSwitch";
 import { useWorldView, useLabels } from "@/components/cv/CVDataProvider";
@@ -14,7 +13,7 @@ import { CommandOption } from "./RetroRPG/selector";
 import { Encounter } from "./RetroRPG/encounter";
 import { SavePoint } from "./RetroRPG/savePoint";
 import { SECTION_VIEWS } from "./RetroRPG/sections";
-import { ZoneStageProvider } from "@/hooks/useZoneStage";
+import { ZoneStageProvider, useZoneStore } from "@/hooks/useZoneStage";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { Overworld, type Zone } from "./RetroRPG/overworld";
 import { ZoneArea } from "./RetroRPG/rooms";
@@ -55,9 +54,7 @@ export default function RetroRPGTheme() {
   const { active } = useProfession();
   const view = useWorldView();
   const reduced = useReducedMotion();
-  const [zone, setZone] = useState<Zone>("ruins");
-  const onZone = useCallback((next: Zone) => setZone(next), []);
-  const stage = useMemo(() => ({ reduced, onZone }), [reduced, onZone]);
+  const { zones, stage } = useZoneStore<Zone>("ruins", reduced);
 
   return (
     <ZoneStageProvider value={stage}>
@@ -65,7 +62,7 @@ export default function RetroRPGTheme() {
         className={`relative min-h-screen overflow-x-clip ${world.world}`}
         style={RPG_VARS}
       >
-        <Overworld zone={zone} />
+        <Overworld zones={zones} />
 
         <a
           href="#main-content"

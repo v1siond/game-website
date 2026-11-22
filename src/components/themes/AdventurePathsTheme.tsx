@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import { useLayoutEffect } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
@@ -9,7 +9,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
 import { useYearNow } from '@/hooks/useYearNow'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { INTRO_ATTR } from '@/themes/introFlag'
 import { TRAIL_VARS } from './AdventurePaths/palette'
@@ -55,9 +55,7 @@ export default function AdventurePathsTheme() {
   const reducedMotion = useReducedMotion()
   const year = useYearNow()
   const pointerRef = usePointerVars(!reducedMotion)
-  const [zone, setZone] = useState<Zone>('plains')
-  const onZone = useCallback((next: Zone) => setZone(next), [])
-  const stage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
+  const { zones, stage } = useZoneStore<Zone>('plains', reducedMotion)
 
   return (
     <div
@@ -65,7 +63,7 @@ export default function AdventurePathsTheme() {
       className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--ap-ink)] [--focus-halo:var(--ap-parchment)] bg-[color:var(--ap-sky-high)] font-['Segoe_UI',system-ui,sans-serif] text-[color:var(--ap-parchment)] ${map.root}`}
       style={TRAIL_VARS}
     >
-      <LivingWorld zone={zone} />
+      <LivingWorld zones={zones} />
       <MapDefs />
       <a
         href="#trail-main"

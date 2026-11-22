@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -9,7 +9,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { CityBackdrop, type District } from './NeonCyber/city'
 import { DistrictStage, DriveOff } from './NeonCyber/life'
 import { BootHero } from './NeonCyber/boot'
@@ -42,15 +42,14 @@ export default function NeonCyberTheme() {
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
   const [scanning, setScanning] = useState(false)
-  const [district, setDistrict] = useState<District>('watson')
-  const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (zone: District) => setDistrict(zone) }), [reducedMotion])
+  const { zones, stage } = useZoneStore<District>('watson', reducedMotion)
   const rootRef = usePointerVars(!reducedMotion)
   useTimeSlow(rootRef, scanning)
 
   return (
     <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>
       <ZoneStageProvider value={stage}>
-      <CityBackdrop district={district} />
+      <CityBackdrop zones={zones} />
       <ScanVeil />
 
       <DistrictStage district="watson">

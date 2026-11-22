@@ -1,3 +1,4 @@
+import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { FoeSprite } from './actor'
 import side from './side.module.css'
 
@@ -90,7 +91,8 @@ export function Pipe({ className = 'h-11 w-10' }: { className?: string }) {
 const SPARKLES = ['left-[14%] top-[22%]', 'left-[62%] top-[34%]']
 const CLOUDS = ['top-[10%]', 'top-[24%]', 'top-[38%]']
 
-export function LivingWorld({ zone }: { zone: Zone }) {
+export function LivingWorld({ zones }: { zones: ValueStore<Zone> }) {
+  const zone = useStoreValue(zones)
   return (
     <div className={`pointer-events-none fixed inset-0 z-0 overflow-hidden ${side.world}`} data-zone={zone} aria-hidden="true">
       {ZONES.map((name) => (

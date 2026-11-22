@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useZoneStage } from '@/hooks/useZoneStage'
+import { useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
 import { PieEyes } from './art'
 import { HOSE } from './palette'
 import stage from './stage.module.css'
@@ -107,7 +107,8 @@ function Casino() {
 const DRAWN: Record<Isle, () => ReactNode> = { meadow: Meadow, carnival: Carnival, casino: Casino }
 
 /** The fixed painted backdrop, showing the isle the page is on. */
-export function Isles({ current }: { current: Isle }) {
+export function Isles({ zones }: { zones: ValueStore<Isle> }) {
+  const current = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
       {ISLES.map((isle) => {
