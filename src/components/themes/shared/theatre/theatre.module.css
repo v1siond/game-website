@@ -1,0 +1,60 @@
+/* The scene pictures of a theatre world. In the theatre every stage is fixed behind the text; the engine
+   (useTheatre) sets each stage's opacity, visibility and veil and each layer's transform. Before the
+   engine's first frame (and with no JavaScript) only the first stage, the hero's, shows at its first frame.
+   A world colours the theatre with --theatre-ground (behind every stage) and --theatre-veil (the dark a
+   stage fades into). */
+
+.theatre {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--theatre-ground);
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 50% 40%;
+  will-change: opacity, transform;
+}
+
+.stage:first-child {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Reduced motion: the stage sits still at the top of its own section, one screen tall, under the text. */
+.settled {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: 56% 78%;
+  will-change: transform;
+}
+
+.layer > :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--theatre-veil);
+  opacity: 0;
+}
