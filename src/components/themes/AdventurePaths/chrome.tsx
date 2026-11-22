@@ -3,6 +3,7 @@
 import type { Ref } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { initialsOf } from '@/lib/cv/nameWords'
 import { Stage } from '../shared/theatre/Stage'
 import { ContactSigns } from './actions'
 import { JOURNAL_SERIF } from './palette'
@@ -12,13 +13,6 @@ import page from './page.module.css'
 // The pieces round the levels: the HUD bar at the top of the screen (the level the page is in and how many
 // of its things he has done, both written by the theatre's lead callback) and the goal at the end, the
 // contact, under the flagpole run.
-
-/** His initials, the HUD's mark: the first letter of each word of his name. */
-const initialsOf = (name: string): string =>
-  name
-    .split(/\s+/)
-    .map((word) => word.charAt(0))
-    .join('')
 
 export function Hud({ placeRef, countRef, anchor }: { placeRef: Ref<HTMLSpanElement>; countRef: Ref<HTMLSpanElement>; anchor: string }) {
   const { trail } = useLabels()
