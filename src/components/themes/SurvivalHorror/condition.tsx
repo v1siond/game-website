@@ -1,9 +1,9 @@
 'use client'
 
-import type { CSSProperties } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { ConditionMonitor } from './ecg'
 import { conditionAfter, useStageState } from './stage'
 import { CORNER_MARKS } from './panels'
@@ -36,13 +36,19 @@ function HerbPot({ herb }: { herb: Herb }) {
 
 function HerbSlot({ herb, label, used, waiting, onUse }: { herb: Herb; label: string; used: boolean; waiting: boolean; onUse: () => void }) {
   const { horror: words } = useLabels()
+  const spent = used || waiting
+  const use = () => {
+    if (spent) return
+    onUse()
+  }
+
   return (
     <button
       type="button"
-      onClick={onUse}
-      disabled={used || waiting}
+      onClick={use}
+      aria-disabled={spent}
       title={waiting ? words.herbHint : undefined}
-      className={`relative flex min-h-[44px] items-center gap-3 border-2 p-2 pr-4 text-sm ${look.slot} ${look.focus} ${used ? 'border-[color:var(--sh-wood)] opacity-60' : 'border-[color:var(--sh-brass)] enabled:hover:border-[color:var(--sh-flame)]'} disabled:cursor-default`}
+      className={`relative flex min-h-[44px] items-center gap-3 border-2 p-2 pr-4 text-sm ${look.slot} ${used ? 'border-[color:var(--sh-wood)] opacity-60' : 'border-[color:var(--sh-brass)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)]'} aria-disabled:cursor-default`}
     >
       {CORNER_MARKS.map((place) => (
         <span key={place} className={`absolute h-2.5 w-2.5 border-[color:var(--sh-brass)] ${place}`} aria-hidden="true" />
@@ -83,11 +89,8 @@ export function HerbRecovery({ martialArts }: { martialArts: MartialArts }) {
           achievements: 'grid gap-3 md:grid-cols-2',
           achievement: 'text-sm text-[color:var(--sh-cream)]',
         }}
-        renderAchievement={(achievement) => (
-          <p
-            className={`relative flex items-start gap-2 p-3 ${look.file} ${horror.stamp} ${fine ? horror.stamped : ''}`}
-            style={{ '--i': martialArts.primary.achievements.indexOf(achievement) } as CSSProperties}
-          >
+        renderAchievement={(achievement, index) => (
+          <p className={`relative flex items-start gap-2 p-3 ${look.file} ${horror.stamp} ${fine ? horror.stamped : ''}`} style={cssVars({ '--i': index })}>
             <span className="mt-1.5 h-2 w-2 shrink-0 rotate-45 bg-[color:var(--sh-herb-green)]" aria-hidden="true" />
             <span>{achievement}</span>
           </p>

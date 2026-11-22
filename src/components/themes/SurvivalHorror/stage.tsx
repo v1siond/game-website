@@ -25,14 +25,17 @@ import stage from './stage.module.css'
 // Everything is placed from his feet at the left of the screen in his body widths; nothing here takes the
 // pointer, and the whole stage is hidden from assistive technology (the page carries every fact).
 
+// The herbs used: none, the green one, then the red one mixed into it.
+export type Herbs = 0 | 1 | 2
+
 interface StageTally {
-  herbs: number
+  herbs: Herbs
   saves: number
 }
 
 interface StageState {
   tally: ValueStore<StageTally>
-  takeHerbs(count: number): void
+  takeHerbs(count: Herbs): void
   save(): void
 }
 
@@ -65,9 +68,10 @@ export function useStageState() {
   return { herbs, saves, takeHerbs: state.takeHerbs, save: state.save }
 }
 
-const CONDITION_AFTER: Record<number, Condition> = { 0: 'danger', 1: 'caution', 2: 'fine' }
+// His condition after each count of herbs, indexed by the count.
+const CONDITION = ['danger', 'caution', 'fine'] as const satisfies readonly Condition[]
 
-export const conditionAfter = (herbs: number) => CONDITION_AFTER[herbs]
+export const conditionAfter = (herbs: Herbs): Condition => CONDITION[herbs]
 
 /** A part of the page as a window onto its room: a gap of bare stage, then the part. */
 export function RoomWindow({ zone, children, className = '' }: { zone: Zone; children: ReactNode; className?: string }) {

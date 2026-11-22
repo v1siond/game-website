@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { Breath, Drop, Joint, Limb } from './rig'
 import { SH } from './palette'
-import { sweepOf, turnFor, type Gait, type Leg, type LegTurn, type Point } from './gait'
+import { feetFor, gaitFor, type Gait, type Legs } from './gait'
 
 // The pursuer of the 1999 sequel (Nemesis, named here in code only), drawn from the series' renders: about
 // one and a half times his height, the shoulders very wide and the head small on them, a black coat to below
@@ -27,7 +27,7 @@ const FLOOR_Y = 158
 export const STALKER_LEGS = {
   back: { hip: [BACK_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
   front: { hip: [FRONT_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
-} as const satisfies Record<string, Leg>
+} as const satisfies Legs
 
 // His box on the stage, in the hero's box: half again as wide and 1.3 times as tall (stage.tsx sizes it).
 export const STALKER_BOX = { width: 1.52, height: 1.3 } as const
@@ -48,18 +48,9 @@ const STAND: PoseRow = { lean: 2, head: 4, backArm: [4, -6], frontArm: [-4, -8],
 
 const pose = (row: Partial<PoseRow>): PoseRow => ({ ...STAND, ...row })
 
-const tenth = (value: number) => Math.round(value * 10) / 10
-
 // A stepping pose from where his soles are (x, and y 158 on the floor or less when lifted) and how far he
-// is lowered; the hip and knee turns come from the leg math (./gait), so a planted sole is on the floor
-// exactly and a knee always bends forward.
-function feet(drop: number, back: Point, front: Point) {
-  const turn = (leg: Leg, sole: Point): LegTurn => {
-    const [hip, knee] = turnFor(leg, [sole[0], sole[1] - drop])
-    return [tenth(hip), tenth(knee)]
-  }
-  return { drop, backLeg: turn(STALKER_LEGS.back, back), frontLeg: turn(STALKER_LEGS.front, front) }
-}
+// is lowered (./gait).
+const feet = feetFor(STALKER_LEGS)
 
 export const STALKER_POSES = {
   stand: STAND,
@@ -79,10 +70,7 @@ export const STALKER_POSES = {
 
 export type StalkerPose = keyof typeof STALKER_POSES
 
-const strideOf = (from: PoseRow, to: PoseRow) =>
-  ((sweepOf(STALKER_LEGS.back, from.backLeg, to.backLeg) + sweepOf(STALKER_LEGS.front, from.frontLeg, to.frontLeg)) / 2) * IN_HERO_WIDTHS
-
-const gait = (cycle: Gait<StalkerPose>['cycle']): Gait<StalkerPose> => ({ cycle, stride: strideOf(STALKER_POSES[cycle[0]], STALKER_POSES[cycle[2]]) })
+const gait = gaitFor<StalkerPose>(STALKER_LEGS, STALKER_POSES, (length) => length * IN_HERO_WIDTHS)
 
 // His gaits for the stage (scripts.ts), each with how far one step carries him in the hero's body widths.
 export const STALKER_GAITS = {
@@ -138,7 +126,7 @@ function Leg({ x, fill, angles }: { x: number; fill: string; angles: readonly [n
 const STRAPS = [52, 62, 72, 82]
 
 export function Stalker({ pose: poseName, className = '' }: { pose: StalkerPose; className?: string }) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
   const row = STALKER_POSES[poseName]
   const coat = `url(#${id}-coat)`
 

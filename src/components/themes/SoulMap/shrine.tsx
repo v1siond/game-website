@@ -7,10 +7,10 @@ import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { NameWords } from '@/components/cv/NameWords'
 import { Bonfire, type FireState } from './bonfire'
-import { Knight } from './knight'
+import { Knight, type KnightPose } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
-import { CVLink, EngineLink, HeroActions } from './links'
+import { useRunActions } from './run'
+import { ContactButtons } from './links'
 import { CARVED, SOUL } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import souls from './souls.module.css'
@@ -42,6 +42,8 @@ const TIMELINE: Array<[Phase, number]> = [
 ]
 
 const FIRE: Record<Phase, FireState> = { ash: 'out', ember: 'ember', lit: 'lit', rise: 'lit', ready: 'lit' }
+// His pose while the fire is lit: seated by it, then rising with it; once ready his script poses him.
+const LIGHTING_POSE: Record<Exclude<Phase, 'ready'>, KnightPose> = { ash: 'seated', ember: 'seated', lit: 'seated', rise: 'rise' }
 
 const ROLL_COST = 20
 const REST_SOULS = 50
@@ -168,14 +170,14 @@ function Ruins() {
 }
 
 export function ShrineHero() {
-  const run = useRun()
+  const run = useRunActions()
   const { souls: words } = useLabels()
   const phase = useLighting(() => run.announce('kindled', words.kindled))
   const script = usePoseScript('idle')
   const ready = phase === 'ready'
   // Before the lighting is done he is already sitting by the dead fire (no sitting down on the first
   // draw), then rises with it.
-  const pose = ready ? script.pose : phase === 'rise' ? 'rise' : 'seated'
+  const pose = phase === 'ready' ? script.pose : LIGHTING_POSE[phase]
 
   const rest = () => {
     if (!ready) return
@@ -239,9 +241,7 @@ export function ShrineHero() {
             <p className="mt-3 text-base leading-relaxed text-[color:var(--soul-text-soft)]">{tagline}</p>
             <p className="mt-2 text-sm text-[color:var(--soul-text-soft)]">{line}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <HeroActions actions={actions} />
-              <CVLink />
-              <EngineLink />
+              <ContactButtons actions={actions} />
             </div>
           </div>
         )}

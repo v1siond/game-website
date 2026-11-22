@@ -1,9 +1,8 @@
 /*
- * Survival Horror's page look: a panelled house at night. The page darkens toward its edges like a fixed
- * camera room, a damask wallpaper sits faint behind everything, fog lies low, one warm lamp glow hangs
- * over the top of the page and flickers, and a fine film grain moves over it all. Every colour reads the
- * --sh-* variables set from palette.ts. The loops animate transform and opacity only and stop under
- * reduced motion; the scenes and their motion live in horror.module.css.
+ * Survival Horror's page look: a panelled house at night. The stage darkens toward its edges like a fixed
+ * camera room and a fine film grain moves over it all. Every colour reads the --sh-* variables set from
+ * palette.ts. The grain animates transform only and stops under reduced motion; the scenes and their
+ * motion live in horror.module.css.
  */
 
 .root {
@@ -25,57 +24,7 @@
   letter-spacing: 0.08em;
 }
 
-/* ---- the room: fixed layers behind the content ---- */
-
-.wallpaper {
-  background-image: radial-gradient(circle at 50% 50%, var(--sh-wood) 0 1.5px, transparent 2px),
-    radial-gradient(ellipse 9px 14px at 50% 50%, transparent 8px, var(--sh-wood) 9px, transparent 10px);
-  background-size: 60px 60px;
-  opacity: 0.08;
-}
-
-.lamp {
-  background: radial-gradient(ellipse 60% 40% at 50% 0%, color-mix(in srgb, var(--sh-flame) 16%, transparent), transparent 70%);
-  animation: lamp-flicker 7s steps(1, end) infinite;
-}
-
-/* The lamp dips twice in quick succession, then holds, the way a failing bulb does. */
-@keyframes lamp-flicker {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  62% {
-    opacity: 0.55;
-  }
-  64% {
-    opacity: 1;
-  }
-  67% {
-    opacity: 0.4;
-  }
-  70% {
-    opacity: 1;
-  }
-}
-
-.fogLow {
-  background: linear-gradient(0deg, color-mix(in srgb, var(--sh-ash) 30%, transparent), transparent);
-}
-
-.fogDrift {
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sh-fog) 12%, transparent), transparent);
-  animation: fog-drift 40s linear infinite;
-}
-
-@keyframes fog-drift {
-  from {
-    transform: translate3d(-60%, 0, 0);
-  }
-  to {
-    transform: translate3d(60%, 0, 0);
-  }
-}
+/* ---- the camera: fixed layers over the stage ---- */
 
 .vignette {
   background: radial-gradient(ellipse at 50% 35%, transparent 25%, color-mix(in srgb, var(--sh-void) 85%, transparent) 100%);
@@ -126,15 +75,7 @@
   box-shadow: inset 0 0 24px color-mix(in srgb, var(--sh-void) 70%, transparent);
 }
 
-/* One focus ring for every control in the world: the lamp flame. */
-.focus:focus-visible {
-  outline: 2px solid var(--sh-flame);
-  outline-offset: 2px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .lamp,
-  .fogDrift,
   .grain {
     animation: none;
   }

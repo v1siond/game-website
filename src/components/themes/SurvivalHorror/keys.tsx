@@ -63,7 +63,7 @@ function DoorLeafArt({ suit }: { suit: Suit }) {
       <rect width={100} height={140} fill={SH.wood} />
       <rect x={10} y={10} width={80} height={52} fill="none" stroke={SH.sepia} strokeWidth={3} />
       <rect x={10} y={74} width={80} height={56} fill="none" stroke={SH.sepia} strokeWidth={3} />
-      <g transform="translate(38 24) scale(1)" fill={SH.brass}>
+      <g transform="translate(38 24)" fill={SH.brass}>
         {SUIT_ART[suit]}
       </g>
       <circle cx={86} cy={70} r={4} fill={SH.brass} />
@@ -73,11 +73,15 @@ function DoorLeafArt({ suit }: { suit: Suit }) {
 }
 
 function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
-  const { horror: words, links } = useLabels()
+  const { horror: words } = useLabels()
   const [unlocked, setUnlocked] = useState(false)
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
   const suitName = words[suit]
   const behindId = `survival-horror-band-${band.id}`
+  const unlock = () => {
+    if (unlocked) return
+    setUnlocked(true)
+  }
 
   return (
     <article className={`p-4 ${look.file}`}>
@@ -95,9 +99,9 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
 
       <div className={`relative mt-4 h-40 overflow-hidden border-4 border-[color:var(--sh-sepia)] bg-[color:var(--sh-void)] ${horror.doorFrame}`}>
         <div id={behindId} className="absolute inset-0 flex flex-col justify-center gap-3 p-4" inert={!unlocked}>
-          {band.release && (
+          {release && (
             <p className="text-sm text-[color:var(--sh-cream)]">
-              {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+              {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
             </p>
           )}
           {linkProps && (
@@ -114,11 +118,11 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => setUnlocked(true)}
-          disabled={unlocked}
+          onClick={unlock}
+          aria-disabled={unlocked}
           aria-controls={behindId}
           aria-label={unlocked ? undefined : fillLabel(words.useKeyOn, { suit: suitName, band: band.name })}
-          className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-ivory)] enabled:hover:border-[color:var(--sh-flame)] disabled:cursor-default`}
+          className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-ivory)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)] aria-disabled:cursor-default`}
         >
           <Key suit={suit} turned={unlocked} />
           {unlocked ? words.unlocked : fillLabel(words.useKey, { suit: suitName })}
@@ -130,12 +134,11 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
 
 export function SuitDoors({ musician, bands }: { musician: Musician; bands: BandSlot['band'][] }) {
   const { years } = useLabels()
-  const suitOf = new Map(bands.map((band, index) => [band.id, SUITS[index % SUITS.length]]))
 
   return (
     <>
       <p className="mb-6 text-base leading-relaxed text-[color:var(--sh-cream)]">{drumsSince(musician, years)}</p>
-      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <SuitDoor slot={slot} suit={suitOf.get(slot.band.id) ?? 'spade'} />} />
+      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot, index) => <SuitDoor slot={slot} suit={SUITS[index % SUITS.length]} />} />
       <p className="mt-2 text-sm italic text-[color:var(--sh-cream)]">{musician.line}</p>
     </>
   )

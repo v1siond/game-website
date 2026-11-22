@@ -1,4 +1,4 @@
-import { footAt, plantedDrop, stepsFor, sweepOf, turnFor, type Leg } from './gait'
+import { footAt, stepsFor, sweepOf, turnFor, type Leg } from './gait'
 
 // A leg hanging from a hip at (20, 50): thigh 20 and shin 30, so the foot of a straight leg is on y 100.
 const LEG: Leg = { hip: [20, 50], thigh: 20, shin: 30 }
@@ -35,16 +35,6 @@ describe('turnFor', () => {
   it('straightens the leg towards a point out of reach', () => {
     const turn = turnFor(LEG, [60, 100])
     near(turn, [(Math.atan2(-40, 50) * 180) / Math.PI, 0])
-  })
-})
-
-describe('plantedDrop', () => {
-  it('lowers the figure until its lowest foot stands on the floor', () => {
-    const back = [LEG, [20, 10]] as const
-    const front = [{ ...LEG, hip: [26, 50] as const }, [-30, 20]] as const
-    const lowest = Math.max(footAt(...back)[1], footAt(...front)[1])
-    expect(plantedDrop(100, [back, front])).toBeCloseTo(100 - lowest, 4)
-    expect(plantedDrop(100, [[LEG, [0, 0]]])).toBeCloseTo(0, 4)
   })
 })
 

@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { useWorldView } from '@/components/cv/CVDataProvider'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -35,7 +35,6 @@ import look from './SurvivalHorror/world.module.css'
 export default function SurvivalHorrorTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const preview = usePreview()
   const rootRef = usePointerVars(!reduced)
@@ -61,9 +60,9 @@ export default function SurvivalHorrorTheme() {
               </RoomWindow>
 
               <main className="px-4 sm:px-6">
-                <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+                <ProfessionRegion className="mx-auto max-w-6xl">
                   <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-                </div>
+                </ProfessionRegion>
               </main>
 
               <RoomWindow zone="contact">

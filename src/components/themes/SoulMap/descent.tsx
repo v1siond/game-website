@@ -4,13 +4,12 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrollScene } from '@/hooks/useScrollScene'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
 import { Knight } from './knight'
-import { usePoseScript, type PoseStep } from './poses'
+import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
 import { CARVED, SOUL } from './palette'
 import ashen from './ashen.module.css'
@@ -67,16 +66,10 @@ const fall = (sink: () => void): PoseStep[] => [
   { pose: 'down', ms: 2600, effect: sink },
 ]
 
-function Bloodstain({ replay, order }: { replay: boolean; order: number }) {
+// The ghost leaves the page once it has sunk (.ghostGone ends), so its pose loop stops with it.
+function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
-  const script = usePoseScript('idle')
-  const { play } = script
-  const [gone, setGone] = useState(false)
-
-  useEffect(() => {
-    if (!replay || reduced) return
-    play([LAST_MOVES[order % LAST_MOVES.length], ...fall(() => setGone(true))], 'down')
-  }, [replay, reduced, order, play])
+  const [sunk, setSunk] = useState(false)
 
   return (
     <div className="relative mx-auto h-24 w-40" aria-hidden="true">
@@ -85,8 +78,11 @@ function Bloodstain({ replay, order }: { replay: boolean; order: number }) {
         <ellipse cx={70} cy={8} rx={18} ry={3} fill={SOUL.bloodBright} opacity={0.6} />
         <ellipse cx={112} cy={11} rx={6} ry={2} fill={SOUL.blood} />
       </svg>
-      {replay && !reduced && (
-        <div className={`absolute bottom-1 left-[3.6rem] h-20 w-[3.125rem] ${souls.ghost} ${gone ? souls.ghostGone : ''}`}>
+      {replay && !reduced && !sunk && (
+        <div
+          className={`absolute bottom-1 left-[3.6rem] h-20 w-[3.125rem] ${souls.ghost} ${gone ? souls.ghostGone : ''}`}
+          onAnimationEnd={(event) => gone && event.target === event.currentTarget && setSunk(true)}
+        >
           <Knight key={script.key} gear="engineer" pose={script.pose} spirit="blood" className="h-full w-full" />
         </div>
       )}
@@ -96,12 +92,14 @@ function Bloodstain({ replay, order }: { replay: boolean; order: number }) {
 
 function JobStop({ job, order }: { job: Job; order: number }) {
   const { years } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
+  const [gone, setGone] = useState(false)
+  const lastMoments = [LAST_MOVES[order % LAST_MOVES.length], ...fall(() => setGone(true))]
+  const { ref, triggered, script } = useTriggeredScript(lastMoments, { threshold: 0.2, end: 'down' })
   const span = jobSpanCompact(job, years)
 
   return (
     <article ref={ref} className={`${souls.stop} ${triggered ? souls.stopOn : ''}`}>
-      <Bloodstain replay={triggered} order={order} />
+      <Bloodstain replay={triggered} gone={gone} script={script} />
       <div className={`${souls.areaName} mb-3 flex items-center gap-3`}>
         <span className="h-px flex-1 bg-[color:var(--soul-glow-deep)]" aria-hidden="true" />
         <p className={`${CARVED} min-w-0 text-center text-base uppercase tracking-[0.28em] text-[color:var(--soul-text)]`}>

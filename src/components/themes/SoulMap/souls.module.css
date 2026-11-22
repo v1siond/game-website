@@ -1,6 +1,6 @@
 /*
- * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, descent.tsx,
- * items.tsx, messages.tsx, summons.tsx, arena.tsx, lastFire.tsx, views.tsx). Heavy and slow the way the
+ * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, gate.tsx, descent.tsx,
+ * items.tsx, messages.tsx, stage.tsx, arena.tsx, lastFire.tsx, menu.tsx). Heavy and slow the way the
  * hard knight action game moves: things settle with ease out, a flare is fast and its fade is long, the
  * loops run on periods that never divide into each other, and each section enters its own way (a menu
  * fades open, an area's name surfaces, a glint flares, a message is written, a phantom materialises, the
@@ -295,7 +295,7 @@
 
 /* ============================================================= shrine ================================== */
 
-/* A drawn thing that is a button (the fire, him): no button chrome, a gold ring on keyboard focus. */
+/* A drawn thing that is a button (the fire, him): no button chrome; keyboard focus draws the global ring. */
 .target {
   background: none;
   border: 0;
@@ -310,11 +310,6 @@
 /* A scene target is a control drawn as art, so a thin banner gold edge marks it as one (3 to 1 and more on the ruins). */
 .target:enabled {
   outline: 1px solid var(--soul-glow);
-  outline-offset: 4px;
-}
-
-.target:focus-visible {
-  outline: 2px solid var(--soul-glow);
   outline-offset: 4px;
 }
 

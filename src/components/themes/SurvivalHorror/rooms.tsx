@@ -34,6 +34,13 @@ const POSTS = Array.from({ length: 23 }, (_, index) => 70 + index * 20)
 const STEPS = Array.from({ length: 9 }, (_, index) => index)
 const BOOKS = Array.from({ length: 14 }, (_, index) => index)
 
+// The spines along a shelf: every fourth leather, the rest olive on every third, else rust.
+function spineOf(book: number): string {
+  if (book % 4 === 0) return SH.leather
+  if (book % 3 === 0) return SH.olive
+  return SH.rust
+}
+
 function Wall({ tone = SH.paper, children }: { tone?: string; children?: ReactNode }) {
   return (
     <>
@@ -177,7 +184,7 @@ const ABOUT = (
         <g key={y}>
           <rect x={346} y={y} width={138} height={4} fill={SH.sepia} />
           {BOOKS.map((book) => (
-            <rect key={book} x={350 + book * 9.4} y={y - 22 + (book % 3) * 2} width={7} height={22 - (book % 3) * 2} fill={book % 4 === 0 ? SH.leather : book % 3 === 0 ? SH.olive : SH.rust} />
+            <rect key={book} x={350 + book * 9.4} y={y - 22 + (book % 3) * 2} width={7} height={22 - (book % 3) * 2} fill={spineOf(book)} />
           ))}
         </g>
       ))}

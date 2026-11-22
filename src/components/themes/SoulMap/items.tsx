@@ -1,17 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { Knight } from './knight'
-import { usePoseScript } from './poses'
-import { useRun } from './run'
+import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
+import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
@@ -32,6 +31,12 @@ const RISE_MS = 1400
 const STAND_MS = 1800
 const FADE_MS = 900
 
+const summon = (sendHome: () => void): PoseStep[] => [
+  { pose: 'respawn', ms: RISE_MS },
+  { pose: 'idle', ms: STAND_MS },
+  { pose: 'idle', ms: FADE_MS, effect: sendHome },
+]
+
 function SummonSign({ lit }: { lit: boolean }) {
   return (
     <svg viewBox="0 0 120 24" className={`absolute inset-x-0 bottom-0 mx-auto h-6 w-32 ${souls.sigil} ${lit ? souls.sigilLit : ''}`} aria-hidden="true" focusable="false">
@@ -42,28 +47,22 @@ function SummonSign({ lit }: { lit: boolean }) {
   )
 }
 
-function SummonedPhantom({ summoned }: { summoned: boolean }) {
+// Once he has faded home (.phantomHome on the figure ends) the column and the figure leave the page, so
+// his idle loop stops with them.
+function SummonedPhantom({ summoned, home, script }: { summoned: boolean; home: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
-  const script = usePoseScript('idle')
-  const { play } = script
-  const [home, setHome] = useState(false)
-
-  useEffect(() => {
-    if (!summoned || reduced) return
-    play([
-      { pose: 'respawn', ms: RISE_MS },
-      { pose: 'idle', ms: STAND_MS },
-      { pose: 'idle', ms: FADE_MS, effect: () => setHome(true) },
-    ])
-  }, [summoned, reduced, play])
+  const [faded, setFaded] = useState(false)
 
   return (
     <div className="relative h-28" aria-hidden="true">
       <SummonSign lit={summoned} />
-      {summoned && !reduced && (
+      {summoned && !reduced && !faded && (
         <>
           <span className={`absolute bottom-2 left-1/2 h-24 w-14 -translate-x-1/2 ${souls.summonColumn} ${home ? souls.phantomHome : ''}`} />
-          <div className={`absolute bottom-2 left-1/2 h-24 w-[3.75rem] -translate-x-1/2 ${souls.phantomGather} ${home ? souls.phantomHome : ''}`}>
+          <div
+            className={`absolute bottom-2 left-1/2 h-24 w-[3.75rem] -translate-x-1/2 ${souls.phantomGather} ${home ? souls.phantomHome : ''}`}
+            onAnimationEnd={(event) => home && event.target === event.currentTarget && setFaded(true)}
+          >
             <Knight key={script.key} gear="engineer" pose={script.pose} spirit="summon" className="h-full w-full" />
           </div>
         </>
@@ -73,7 +72,7 @@ function SummonedPhantom({ summoned }: { summoned: boolean }) {
 }
 
 function PickUp({ project, picked, onPick }: { project: Project; picked: boolean; onPick: () => void }) {
-  const run = useRun()
+  const run = useRunActions()
   const { souls: words } = useLabels()
 
   const pickUp = () => {
@@ -87,7 +86,7 @@ function PickUp({ project, picked, onPick }: { project: Project; picked: boolean
     <button
       type="button"
       onClick={pickUp}
-      disabled={picked}
+      aria-disabled={picked}
       aria-label={picked ? `${project.name}: ${words.pickedUp}` : fillLabel(words.pickUpOf, { project: project.name })}
       className={picked ? BUTTON : BUTTON_LIT}
     >
@@ -97,12 +96,14 @@ function PickUp({ project, picked, onPick }: { project: Project; picked: boolean
 }
 
 function ItemCard({ project, years, links }: ProjectSlot) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
+  const [home, setHome] = useState(false)
+  const { ref, triggered, script } = useTriggeredScript(summon(() => setHome(true)), { threshold: 0.25 })
   const [picked, setPicked] = useState(false)
+  const reached = triggered ? souls.itemOn : ''
 
   return (
-    <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''} ${picked ? souls.itemPicked : ''}`}>
-      <SummonedPhantom summoned={triggered} />
+    <article ref={ref} className={`${souls.item} ${reached} ${picked ? souls.itemPicked : ''}`}>
+      <SummonedPhantom summoned={triggered} home={home} script={script} />
       <div className={`${souls.itemCard} ${ashen.panel} -mt-2 p-5`}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className={`min-w-0 ${CARD_TITLE}`}>
@@ -136,9 +137,5 @@ function ItemCard({ project, years, links }: ProjectSlot) {
 }
 
 export function ItemProjects({ projects }: { projects: Project[] }) {
-  return (
-    <>
-      <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ItemCard {...slot} />} />
-    </>
-  )
+  return <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ItemCard {...slot} />} />
 }

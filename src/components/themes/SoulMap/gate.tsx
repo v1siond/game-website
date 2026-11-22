@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { Knight } from './knight'
-import { usePoseScript } from './poses'
+import { useTriggeredScript, type PoseStep } from './poses'
 import { SOUL } from './palette'
 import souls from './souls.module.css'
 
@@ -14,7 +13,7 @@ import souls from './souls.module.css'
 // through he stands at the panel's edge, breathing. Under reduced motion he already stands through the
 // gate and the fog is gone.
 
-const STRIDES_MS = 2400
+const STRIDES: PoseStep[] = [{ pose: 'walk', ms: 2400 }]
 
 function Arch() {
   return (
@@ -28,15 +27,8 @@ function Arch() {
 
 export function FogGate({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.35 })
-  const script = usePoseScript('idle')
-  const { play } = script
+  const { ref, triggered, script } = useTriggeredScript(STRIDES, { threshold: 0.35 })
   const through = triggered || reduced
-
-  useEffect(() => {
-    if (!triggered || reduced) return
-    play([{ pose: 'walk', ms: STRIDES_MS }])
-  }, [triggered, reduced, play])
 
   return (
     <div ref={ref}>

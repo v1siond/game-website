@@ -3,7 +3,8 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { Breath, Drop, Joint, Limb } from './rig'
 import { SH } from './palette'
-import { footAt, sweepOf, turnFor, type Gait, type Leg, type LegTurn, type Point } from './gait'
+import { turnAbout } from '@/lib/motion/turnAbout'
+import { feetFor, footAt, gaitFor, type Gait, type Legs } from './gait'
 import rig from './rig.module.css'
 
 // Him as this world's character, a parody of the 2005 survival horror hero (Leon in the village game, named
@@ -47,7 +48,7 @@ const KEY_Y = 63
 export const HERO_LEGS = {
   back: { hip: [BACK_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
   front: { hip: [FRONT_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
-} as const satisfies Record<string, Leg>
+} as const satisfies Legs
 
 interface Angles {
   lean: number
@@ -83,18 +84,9 @@ const STAND: PoseRow = {
 
 const pose = (row: Partial<PoseRow>, from: PoseRow = STAND): PoseRow => ({ ...from, ...row })
 
-const tenth = (value: number) => Math.round(value * 10) / 10
-
-// A stepping pose from where his soles are: each sole's point (x, and y 110 on the floor or less when
-// lifted) and how far he is lowered; the hip and knee turns come from the leg math (./gait), so a planted
-// sole is on the floor exactly and a knee always bends forward.
-function feet(drop: number, back: Point, front: Point) {
-  const turn = (leg: Leg, sole: Point): LegTurn => {
-    const [hip, knee] = turnFor(leg, [sole[0], sole[1] - drop])
-    return [tenth(hip), tenth(knee)]
-  }
-  return { drop, backLeg: turn(HERO_LEGS.back, back), frontLeg: turn(HERO_LEGS.front, front) }
-}
+// A stepping pose from where his soles are (x, and y 110 on the floor or less when lifted) and how far he is
+// lowered (./gait).
+const feet = feetFor(HERO_LEGS)
 
 // The gaits are four keys a cycle: a contact (one sole landing ahead of its hip, the other behind), the
 // passing key (the planted sole under its hip, the other lifted past it), then the same on the other leg.
@@ -135,10 +127,6 @@ const LIMP_PASS_B = pose(feet(1, [22, 110], [29, 101]), LIMP)
 const SIT = pose({ lean: 4, head: 6, frontArm: [-50, -50], backArm: [-45, -55], backLeg: [-84, 84], frontLeg: [-86, 86], drop: 22, hold: 'bare' })
 
 const DEG = Math.PI / 180
-const turnAbout = ([x, y]: Point, degrees: number, [cx, cy]: Point): Point => [
-  cx + (x - cx) * Math.cos(degrees * DEG) - (y - cy) * Math.sin(degrees * DEG),
-  cy + (x - cx) * Math.sin(degrees * DEG) + (y - cy) * Math.cos(degrees * DEG),
-]
 
 /** The elbow turn that lands the fist on KEY_Y, for the arm at `shoulderX` turned by `shoulder`, in a seated pose. */
 function strikeElbow(shoulderX: number, shoulder: number, { lean, drop }: { lean: number; drop: number }): number {
@@ -207,9 +195,7 @@ export const HERO_POSES = {
 
 export type HeroPose = keyof typeof HERO_POSES
 
-const strideOf = (from: PoseRow, to: PoseRow) => (sweepOf(HERO_LEGS.back, from.backLeg, to.backLeg) + sweepOf(HERO_LEGS.front, from.frontLeg, to.frontLeg)) / 2 / VIEW_WIDTH
-
-const gait = (cycle: Gait<HeroPose>['cycle']): Gait<HeroPose> => ({ cycle, stride: strideOf(HERO_POSES[cycle[0]], HERO_POSES[cycle[2]]) })
+const gait = gaitFor<HeroPose>(HERO_LEGS, HERO_POSES, (length) => length / VIEW_WIDTH)
 
 // His gaits for the stage (scripts.ts), each with how far one step carries him in his body widths. Backing
 // away plays the aimed step in reverse, so the planted sole sweeps forward as he goes back.
@@ -311,45 +297,52 @@ const PROFESSION_ITEM: Record<Profession, (x: number) => ReactNode> = {
   fighter: (x) => <rect x={x - 2.4} y={58} width={4.8} height={8} rx={2} fill={SH.cream} />,
 }
 
-// What the front hand holds, drawn in the forearm's frame so it turns with the hand.
+interface HoldArt {
+  x: number
+  laser: boolean
+  profession: Profession
+}
+
+// What the front hand can hold, drawn in the forearm's frame at the hand's x so it turns with the hand.
+const HOLDS: Record<Exclude<Hold, 'kit'> | Kit['hand'], (art: HoldArt) => ReactNode> = {
+  gun: ({ x, laser }) => (
+    <>
+      <rect x={x - 3.4} y={57} width={3} height={4.4} rx={0.6} fill={SH.gunmetal} />
+      <rect x={x - 1.4} y={57.6} width={2.8} height={9.6} rx={0.5} fill={SH.gunmetal} />
+      <rect x={x - 0.6} y={58} width={0.8} height={8.8} fill={SH.steel} />
+      {laser && (
+        <>
+          <line x1={x} y1={67.4} x2={x} y2={600} stroke={SH.laser} strokeWidth={0.5} opacity={0.75} />
+          <circle cx={x} cy={600} r={1.6} fill={SH.laser} />
+        </>
+      )}
+    </>
+  ),
+  stick: ({ x }) => <line x1={x} y1={56} x2={x + 1} y2={72} stroke={SH.brass} strokeWidth={1.1} strokeLinecap="round" />,
+  wrap: () => null,
+  paper: ({ x }) => (
+    <>
+      <rect x={x - 1} y={50} width={11} height={14} fill={SH.ivory} transform={`rotate(-12 ${x} 57)`} />
+      <path d={`M${x + 1} 53 H${x + 8} M${x + 1} 56 H${x + 7} M${x + 1} 59 H${x + 8}`} stroke={SH.ash} strokeWidth={0.5} transform={`rotate(-12 ${x} 57)`} />
+    </>
+  ),
+  key: ({ x }) => (
+    <>
+      <rect x={x - 0.5} y={57.6} width={1} height={6} fill={SH.brass} />
+      <rect x={x - 0.5} y={62} width={2.4} height={1} fill={SH.brass} />
+    </>
+  ),
+  item: ({ x, profession }) => PROFESSION_ITEM[profession](x),
+  bare: () => null,
+}
+
+// The front hand: what the pose has it hold (the profession's own for 'kit'), then the fist round it.
 function FrontHold({ hold, kit, profession, x, laser }: { hold: Hold; kit: Kit; profession: Profession; x: number; laser: boolean }) {
   const shown = hold === 'kit' ? kit.hand : hold
-  const wrapped = kit.hand === 'wrap'
-  const HOLDS: Record<Exclude<Hold, 'kit'> | Kit['hand'], ReactNode> = {
-    gun: (
-      <>
-        <rect x={x - 3.4} y={57} width={3} height={4.4} rx={0.6} fill={SH.gunmetal} />
-        <rect x={x - 1.4} y={57.6} width={2.8} height={9.6} rx={0.5} fill={SH.gunmetal} />
-        <rect x={x - 0.6} y={58} width={0.8} height={8.8} fill={SH.steel} />
-        {laser && (
-          <>
-            <line x1={x} y1={67.4} x2={x} y2={600} stroke={SH.laser} strokeWidth={0.5} opacity={0.75} />
-            <circle cx={x} cy={600} r={1.6} fill={SH.laser} />
-          </>
-        )}
-      </>
-    ),
-    stick: <line x1={x} y1={56} x2={x + 1} y2={72} stroke={SH.brass} strokeWidth={1.1} strokeLinecap="round" />,
-    wrap: null,
-    paper: (
-      <>
-        <rect x={x - 1} y={50} width={11} height={14} fill={SH.ivory} transform={`rotate(-12 ${x} 57)`} />
-        <path d={`M${x + 1} 53 H${x + 8} M${x + 1} 56 H${x + 7} M${x + 1} 59 H${x + 8}`} stroke={SH.ash} strokeWidth={0.5} transform={`rotate(-12 ${x} 57)`} />
-      </>
-    ),
-    key: (
-      <>
-        <rect x={x - 0.5} y={57.6} width={1} height={6} fill={SH.brass} />
-        <rect x={x - 0.5} y={62} width={2.4} height={1} fill={SH.brass} />
-      </>
-    ),
-    item: PROFESSION_ITEM[profession](x),
-    bare: null,
-  }
   return (
     <>
-      {HOLDS[shown]}
-      <Fist x={x} wrapped={wrapped} />
+      {HOLDS[shown]({ x, laser, profession })}
+      <Fist x={x} wrapped={kit.hand === 'wrap'} />
     </>
   )
 }
@@ -404,7 +397,7 @@ interface SurvivorProps {
 }
 
 export function Survivor({ profession, pose: poseName, laser = false, className = '' }: SurvivorProps) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
   const kit = KIT[profession]
   const row = HERO_POSES[poseName]
   const leather = `url(#${id}-leather)`

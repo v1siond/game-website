@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { SOUL } from './palette'
@@ -228,7 +228,8 @@ function Flask({ x, className }: { x: number; className: string }) {
 }
 
 function Gauntlet({ x, paint, wrapped }: { x: number; paint: Paint; wrapped: boolean }) {
-  return <circle cx={x} cy={HAND_Y} r={wrapped ? 2.6 : 2.3} fill={wrapped ? paint.ink.wraps : paint.ink.steelDark} />
+  const fill = wrapped ? paint.ink.wraps : paint.ink.steelDark
+  return <circle cx={x} cy={HAND_Y} r={wrapped ? 2.6 : 2.3} fill={fill} />
 }
 
 // The heater shield strapped to the near forearm: steel face, a darker rim, the boss and a centre ridge.
@@ -397,38 +398,28 @@ const GEAR: Record<KnightGear, Gear> = {
   },
 }
 
-// Where he stands inside a scene's own svg: his feet's left edge at x, the ground at y, and his height,
-// all in the scene's units, so he lines up with the art at every width.
-export interface KnightPlace {
-  x: number
-  y: number
-  height: number
-}
-
 interface KnightProps {
   gear: KnightGear
   pose?: KnightPose
-  place?: KnightPlace
   spirit?: KnightSpirit
   // Faces left instead of right (an opponent).
   facingLeft?: boolean
   className?: string
 }
 
-const placement = (place: KnightPlace | undefined) =>
-  place && { x: place.x, y: place.y - place.height, height: place.height, width: (place.height * 60) / 96 }
-
-export function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false, className = '' }: KnightProps) {
-  const id = useId().replace(/:/g, '')
+// Memoised: his props are plain values, so a scene that re-renders around him (the arena on every stamina
+// tick) leaves the sprite alone until his pose or gear changes.
+export const Knight = memo(function Knight({ gear, pose = 'idle', spirit, facingLeft = false, className = '' }: KnightProps) {
+  const id = useId()
   const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
   const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
   const look = GEAR[gear]
+  const spiritClass = spirit ? SPIRIT_CLASS[spirit] : ''
 
   return (
     <svg
-      {...placement(place)}
       viewBox="0 0 60 96"
-      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spirit ? SPIRIT_CLASS[spirit] : ''} ${facingLeft ? knight.facingLeft : ''} ${className}`}
+      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spiritClass} ${facingLeft ? knight.facingLeft : ''} ${className}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -472,4 +463,4 @@ export function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false,
       </g>
     </svg>
   )
-}
+})

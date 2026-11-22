@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
-import { CARD_BUTTON, CVLink, HeroAction } from './actions'
+import { CARD_BUTTON, ContactPlates } from './actions'
 import { PANEL_HEADING, sectionHeadingId } from './panels'
 import { useStageState } from './stage'
 import horror from './horror.module.css'
@@ -20,9 +19,9 @@ const RIBBONS = 3
 
 function SaveDesk({ line }: { line: string }) {
   const { horror: words } = useLabels()
-  const { save } = useStageState()
-  const [ribbons, setRibbons] = useState(RIBBONS)
-  const saved = ribbons < RIBBONS
+  const { save, saves } = useStageState()
+  const ribbons = Math.max(RIBBONS - saves, 0)
+  const saved = saves > 0
 
   return (
     <div className="mt-4 grid gap-4 md:grid-cols-[2fr_1fr]">
@@ -34,11 +33,11 @@ function SaveDesk({ line }: { line: string }) {
         <button
           type="button"
           onClick={() => {
-            setRibbons((left) => Math.max(left - 1, 0))
+            if (ribbons === 0) return
             save()
           }}
-          disabled={ribbons === 0}
-          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] enabled:hover:border-[color:var(--sh-flame)] disabled:opacity-60`}
+          aria-disabled={ribbons === 0}
+          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)] aria-disabled:opacity-60`}
         >
           {words.save}
         </button>
@@ -69,10 +68,7 @@ export function SafeRoom() {
             <>
               <SaveDesk line={line} />
               <nav className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap" aria-label={sections.contact}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
+                <ContactPlates actions={actions} sites={['cv']} />
               </nav>
             </>
           )}

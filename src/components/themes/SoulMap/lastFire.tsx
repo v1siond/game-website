@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
@@ -8,8 +8,9 @@ import type { Profession } from '@/lib/cv/professions'
 import { Bonfire } from './bonfire'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
-import { useRun } from './run'
-import { BUTTON_LIT, CVLink, EngineLink } from './links'
+import { useRunActions } from './run'
+import { ContactLink } from '@/components/cv/SiteLinks'
+import { BUTTON_LIT, ContactButtons } from './links'
 import { AreaTitle } from './menu'
 import { CARVED } from './palette'
 import souls from './souls.module.css'
@@ -17,7 +18,7 @@ import souls from './souls.module.css'
 // Contact is the last fire at the end of the road, still unlit, with his email and LinkedIn written on
 // the floor beside it as the game's orange messages. Kindle lights it: the flame climbs the sword, the
 // gold banner shows, and he sits down by it in the gear of the profession on show. The messages are the
-// links themselves.
+// links themselves. Kindle leaves with the fire lit, so it hands keyboard focus on to the first message.
 
 const KINDLE_SOULS = 500
 // Two heavy strides to the fire (knight.module.css), the length of the slide that carries him there
@@ -25,14 +26,16 @@ const KINDLE_SOULS = 500
 const WALK_MS = 2400
 
 export function LastFire({ profession }: { profession: Profession }) {
-  const run = useRun()
+  const run = useRunActions()
   const { sections, souls: words } = useLabels()
   const [lit, setLit] = useState(false)
   const script = usePoseScript('idle')
   const id = headingId('soul', sections.contact)
+  const messages = useRef<HTMLUListElement>(null)
 
   const kindle = () => {
     if (lit) return
+    messages.current?.querySelector<HTMLElement>('a')?.focus()
     setLit(true)
     run.announce('kindled', words.kindled)
     run.earn(KINDLE_SOULS)
@@ -55,35 +58,33 @@ export function LastFire({ profession }: { profession: Profession }) {
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-3 text-center">
-          {lit ? null : (
-            <>
-              <button type="button" onClick={kindle} className={BUTTON_LIT}>
-                {words.kindle}
-              </button>
-            </>
+          {!lit && (
+            <button type="button" onClick={kindle} className={BUTTON_LIT}>
+              {words.kindle}
+            </button>
           )}
         </div>
 
         <RecruiterHero
           render={({ line, actions }) => (
             <div className="mt-8 text-center">
-              <ul className="mx-auto grid max-w-2xl gap-4 sm:grid-cols-2">
+              <ul ref={messages} className="mx-auto grid max-w-2xl gap-4 sm:grid-cols-2">
                 {actions.map((action) => (
                   <li key={action.id} className={`${souls.slab} p-4`}>
-                    <a
-                      {...action.linkProps}
-                      className={`${souls.inscription} ${CARVED} block min-h-[44px] text-lg [overflow-wrap:anywhere] text-[color:var(--soul-message)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--soul-glow)]`}
-                    >
-                      <span className="block text-sm uppercase tracking-[0.24em] text-[color:var(--soul-text-soft)]">{action.label}</span>
-                      {action.value}
-                    </a>
+                    <ContactLink slot={action} className={`${souls.inscription} ${CARVED} block min-h-[44px] text-lg [overflow-wrap:anywhere] text-[color:var(--soul-message)]`}>
+                      {(label) => (
+                        <>
+                          <span className="block text-sm uppercase tracking-[0.24em] text-[color:var(--soul-text-soft)]">{label}</span>
+                          {action.value}
+                        </>
+                      )}
+                    </ContactLink>
                   </li>
                 ))}
               </ul>
               <p className="mt-6 text-sm text-[color:var(--soul-text-soft)]">{line}</p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <CVLink />
-                <EngineLink />
+                <ContactButtons />
               </div>
             </div>
           )}
