@@ -108,8 +108,8 @@ interface CardProps {
 // A memo card: the parent re-renders on every target and shot change, and only the cards whose props
 // changed (the old and the new target) draw again.
 const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProps) {
-  const { hud, cards, links: linkLabels, actions } = useLabels()
-  const { project, years, links } = slot
+  const { hud, cards, actions } = useLabels()
+  const { project, years, links, noLink } = slot
   const buttonRef = useRef<HTMLButtonElement>(null)
   const fire = () => buttonRef.current && onFire(slot, buttonRef.current)
 
@@ -166,7 +166,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
             {label}
           </a>
         ))}
-        {links.length === 0 && <span className="text-sm text-atomic-ash">{linkLabels.noPublicLink}</span>}
+        {noLink && <span className="text-sm text-atomic-ash">{noLink}</span>}
       </div>
     </article>
   )

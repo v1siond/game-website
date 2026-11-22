@@ -68,8 +68,7 @@ function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: bool
 }
 
 function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTune: () => void }) {
-  const { links } = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
 
   const body = (
     <>
@@ -78,9 +77,9 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
       <h3 className="text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{band.name}</h3>
       <p className="mt-1 text-base text-atomic-yellow">{band.role}</p>
       {years && <p className="mt-1 text-sm text-atomic-phosphor-dim-text">{years}</p>}
-      {band.release && (
+      {release && (
         <p className="mt-3 text-sm text-atomic-ash">
-          {links.released} <cite>{band.release}</cite>
+          {release.label} <cite>{release.title}</cite>
         </p>
       )}
     </>
