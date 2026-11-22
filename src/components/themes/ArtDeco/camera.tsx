@@ -180,7 +180,7 @@ export function ResearchBoard({ projects, arrived }: { projects: Project[]; arri
         projects={projects}
         className={`px-3 pt-3 sm:px-0 ${MASONRY_LIST}`}
         itemClassName={`${MASONRY_ITEM} pt-2`}
-        renderProject={(slot) => <Photograph slot={slot} index={projects.indexOf(slot.project)} />}
+        renderProject={(slot, index) => <Photograph slot={slot} index={index} />}
       />
     </div>
   )

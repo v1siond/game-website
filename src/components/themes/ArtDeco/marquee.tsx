@@ -69,7 +69,7 @@ export function MarqueeRow({ bands, musician }: { bands: Band[]; musician: Music
         bands={bands}
         className="columns-1 gap-6 md:columns-2"
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <Board slot={slot} index={bands.indexOf(slot.band)} />}
+        renderBand={(slot, index) => <Board slot={slot} index={index} />}
       />
       <p className="mt-6 text-center text-base italic text-[color:var(--deco-gold)]">{musician.line}</p>
     </div>
