@@ -137,7 +137,7 @@ function Arena({ take, fighter, cleared, total }: { take: number; fighter: PoseS
   useTrack(medallionRef, MEDALLION_TRACK, FIGHT_MS, take)
 
   return (
-    <div className={`overflow-hidden ${u.panel}`}>
+    <div data-on={take > 0 || undefined} className={`overflow-hidden ${u.arena} ${u.panel}`}>
       <svg viewBox={`0 0 ${SCENE.width} ${SCENE.height}`} preserveAspectRatio="xMidYMax slice" className="block aspect-[16/8] w-full lg:aspect-[16/11]" aria-hidden="true">
         <Storm />
         <g ref={foeRef} opacity={reduced || take > 0 ? 0 : 1} className={u.sceneProp}>

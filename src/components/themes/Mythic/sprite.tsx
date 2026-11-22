@@ -518,7 +518,7 @@ interface SpriteProps {
   motion: SpriteMotion
   className?: string
   place?: Place
-  /** A one shot move has played out (never called for a loop, or under reduced motion). */
+  /** A one shot move has played out (never called for a cycle, or under reduced motion). */
   onDone?: () => void
   sheathed?: boolean
   /** Bumped to play the motion again from its start (the same move twice in a row) on the same figure. */
@@ -535,7 +535,7 @@ function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion:
     if (!svg || reduced || motion === 'still' || typeof svg.animate !== 'function') return
     const { ms, loop } = MOVES[motion]
     const keys = resolveKeys(motion, profession)
-    const timing: KeyframeAnimationOptions = { duration: ms, iterations: loop ? Infinity : 1 }
+    const timing: KeyframeAnimationOptions = { duration: ms, iterations: loop || 1 }
     const frames = (style: (pose: Pose) => Keyframe) => keys.map(({ at, pose }) => ({ offset: at, easing: 'ease-in-out', ...style(pose) }))
 
     const joints = [...svg.querySelectorAll<SVGGElement>('[data-joint]')].map((element) => {
