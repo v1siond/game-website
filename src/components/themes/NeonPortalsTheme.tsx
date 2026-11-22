@@ -10,6 +10,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { usePreview } from '@/themes/PreviewContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { FindProvider } from './shared/finds'
+import { Backdrop } from './NeonPortals/backdrop'
 import { BODY } from './NeonPortals/cards'
 import { HubHero } from './NeonPortals/hero'
 import { PORTAL_VARS, type Era } from './NeonPortals/palette'
@@ -45,7 +46,7 @@ export default function NeonPortalsTheme() {
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const preview = usePreview()
-  const { stage } = useZoneStore<Era>('hub', reduced)
+  const { zones, stage } = useZoneStore<Era>('hub', reduced)
   const totals = useFindTotals()
 
   return (
@@ -54,6 +55,7 @@ export default function NeonPortalsTheme() {
         style={PORTAL_VARS}
         className={`relative min-h-screen overflow-x-clip bg-[color:var(--np-void)] text-[color:var(--np-white)] [--focus-ring:var(--np-gold)] [--focus-halo:var(--np-void)] ${BODY} ${portalFace.variable} ${portalBody.variable}`}
       >
+        <Backdrop zones={zones} still={reduced || preview} />
         <a
           href="#portals-main"
           className="sr-only z-50 rounded-full bg-[color:var(--np-gold)] px-4 py-2 font-bold text-[color:var(--np-ink)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
