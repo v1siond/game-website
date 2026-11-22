@@ -144,13 +144,13 @@
         "endDate": "",
         "current": true,
         "employment": "Independiente",
-        "description": "Ingeniero y arquitecto central para clientes empresariales y startups: reescrituras de sistemas, lanzamientos con plazos de cumplimiento y productos nuevos desde cero.",
+        "description": "Soy el ingeniero y arquitecto central para clientes empresariales y startups. Reescribo sistemas, saco lanzamientos con plazos de cumplimiento y construyo productos nuevos.",
         "highlights": [
           "InsurAdmin: lo construí desde cero para gestionar los feeds de aseguradoras y los equipos de agencia.",
-          "Agency Rocket: construí los parsers de Annuity, IUL y Whole Life y el cobro con Stripe de la suite (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co PM y líder de desarrollo de una app de citas donde los amigos en pareja invitan a solteros a eventos. Construí la verificación de edad con Veriff, APIs de ranking con mazos de tarjetas, notificaciones SMS y el checkout de Stripe sobre Phoenix y Ash.",
+          "Agency Rocket: construí los parsers de Annuity, IUL y Whole Life y el cobro con Stripe de la suite. La suite incluye My New Retirement, Wealth United y Debt Action Plan.",
+          "Datepal: co PM y líder de desarrollo de una app de citas sobre Phoenix y Ash.",
           "PMX Affiliate Marketplace: construí y lancé todo el stack y su integración nativa con Shopify.",
-          "SecureBancard: salvé el lanzamiento construyendo yo solo el 80% del soporte Dual BIN, a tiempo para el plazo de cumplimiento.",
+          "SecureBancard: salvé el lanzamiento construyendo yo solo la mayor parte del soporte Dual BIN, a tiempo para el plazo de cumplimiento.",
           "Truth Social: ingeniero backend en las primeras etapas. Escalé el backend en Rails con desarrolladores del núcleo de Mastodon."
         ],
         "skills": [],
@@ -165,7 +165,7 @@
         "endDate": "2023-12-01",
         "current": false,
         "employment": "Tiempo completo",
-        "description": "Pearson Channels: coarquitecto de Channels, construido casi desde cero con el equipo principal.",
+        "description": "Fui coarquitecto de Pearson Channels con el equipo principal, casi desde cero.",
         "highlights": [
           "Planifiqué y ejecuté la migración de los datos SQL heredados a los almacenes NoSQL de Pearson.",
           "Construí preparaciones de exámenes, lecciones en video y widgets compartidos."
@@ -187,7 +187,7 @@
         "employment": "Tiempo completo",
         "description": "Líder de ingeniería del producto B2B de Clutch Prep hasta su adquisición por Pearson.",
         "highlights": [
-          "Lideró el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia"
+          "Lideré el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia."
         ],
         "skills": [
           "AWS Lambda"
@@ -205,8 +205,8 @@
         "employment": "Tiempo completo",
         "description": "Cursos en línea para desarrolladores de software. Construí la plataforma y enseñé en ella, sobre todo frontend.",
         "highlights": [
-          "Una de mis series más populares: personajes en pixel art con sombras en CSS puro, cuando CSS aún era muy limitado.",
-          "Lecciones sobre pasar de CSS a Sass y Stylus, ITCSS, JavaScript y auditorías WCAG AAA.",
+          "Una de mis series más populares: personajes en pixel art con sombras en CSS puro.",
+          "Lecciones sobre Sass, Stylus, ITCSS, JavaScript y auditorías WCAG AAA.",
           "Maquetación al píxel a partir de diseños, antes de que existiera Figma."
         ],
         "skills": [],
@@ -224,7 +224,7 @@
         "description": "",
         "highlights": [],
         "skills": [],
-        "title": "Desarrollador Fullstack",
+        "title": "Desarrollador Full Stack",
         "company": "SolutionRus",
         "location": "Florida",
         "startDate": "2016-11-01"
@@ -281,13 +281,13 @@
         "endDate": "",
         "current": true,
         "employment": "Indipendente",
-        "description": "Ingegnere e architetto centrale per clienti enterprise e startup: riscritture di sistemi, lanci con scadenze di conformità e nuovi prodotti da zero.",
+        "description": "Sono l'ingegnere e architetto centrale per clienti enterprise e startup. Riscrivo sistemi, porto a termine lanci con scadenze di conformità e costruisco nuovi prodotti.",
         "highlights": [
           "InsurAdmin: l'ho costruito da zero per gestire i feed delle compagnie e i team di agenzia.",
           "Agency Rocket: ho costruito i parser Annuity, IUL e Whole Life e la fatturazione Stripe della suite (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri in cui gli amici in coppia invitano i single agli eventi. Ho costruito la verifica dell'età con Veriff, API di ranking con pile di carte, notifiche SMS e il checkout Stripe su Phoenix e Ash.",
+          "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri su Phoenix e Ash.",
           "PMX Affiliate Marketplace: ho costruito e lanciato l'intero stack e la sua integrazione nativa con Shopify.",
-          "SecureBancard: ho salvato il lancio costruendo da solo l'80% del supporto Dual BIN, in tempo per la scadenza di conformità.",
+          "SecureBancard: ho salvato il lancio costruendo da solo la maggior parte del supporto Dual BIN, in tempo per la scadenza di conformità.",
           "Truth Social: ingegnere backend nelle prime fasi. Ho scalato il backend Rails con gli sviluppatori core di Mastodon."
         ],
         "skills": [],
@@ -302,7 +302,7 @@
         "endDate": "2023-12-01",
         "current": false,
         "employment": "Tempo pieno",
-        "description": "Pearson Channels: co-architetto di Channels, costruito quasi da zero con il team principale.",
+        "description": "Sono stato co-architetto di Pearson Channels con il team principale, quasi da zero.",
         "highlights": [
           "Ho pianificato ed eseguito la migrazione dei dati SQL legacy negli archivi NoSQL di Pearson.",
           "Ho costruito preparazioni agli esami, video lezioni e widget condivisi."
@@ -324,7 +324,7 @@
         "employment": "Tempo pieno",
         "description": "Responsabile tecnico del prodotto B2B di Clutch Prep fino all'acquisizione da parte di Pearson.",
         "highlights": [
-          "Ha guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia"
+          "Ho guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia."
         ],
         "skills": [
           "AWS Lambda"
@@ -342,8 +342,8 @@
         "employment": "Tempo pieno",
         "description": "Corsi online per sviluppatori software. Ho costruito la piattaforma e ci ho insegnato, soprattutto frontend.",
         "highlights": [
-          "Una delle mie serie più seguite: personaggi in pixel art con ombre in puro CSS, quando il CSS era ancora molto limitato.",
-          "Lezioni sul passaggio da CSS a Sass e Stylus, ITCSS, JavaScript e audit WCAG AAA.",
+          "Una delle mie serie più seguite: personaggi in pixel art con ombre in puro CSS.",
+          "Lezioni su Sass, Stylus, ITCSS, JavaScript e audit WCAG AAA.",
           "Implementazioni al pixel a partire dai design, prima che esistesse Figma."
         ],
         "skills": [],
@@ -361,7 +361,7 @@
         "description": "",
         "highlights": [],
         "skills": [],
-        "title": "Sviluppatore Fullstack",
+        "title": "Sviluppatore Full Stack",
         "company": "SolutionRus",
         "location": "Florida",
         "startDate": "2016-11-01"

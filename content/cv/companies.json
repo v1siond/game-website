@@ -96,7 +96,7 @@
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Aprendizaje de idiomas con un tutor de IA",
-        "description": "Sillabo toma un curso de idiomas real, hecho por personas, y lo convierte en un curso con IA. Italiano para hispanohablantes.",
+        "description": "Sillabo convierte un curso escrito por personas en un curso con IA. Italiano para hispanohablantes.",
         "url": "https://sillabo.up.railway.app",
         "services": [
           "Tutor de IA",
@@ -110,11 +110,11 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Software a medida para empresas",
+        "tagline": "Software para seguros y fintech",
         "description": "Software a medida y consultoría para empresas de seguros y financieras.",
         "url": "https://dbadbadba.com/",
         "services": [
-          "Desarrollo de software a medida",
+          "Software a medida",
           "Arquitectura de sistemas",
           "Consultoría técnica",
           "Infraestructura en la nube"
@@ -124,7 +124,7 @@
       {
         "id": "pmx",
         "name": "PMX",
-        "tagline": "Marketplace de afiliados para e-commerce",
+        "tagline": "Marketplace de afiliados para marcas de Shopify",
         "description": "Plataforma de afiliados donde las marcas de Shopify encuentran afiliados y les pagan sus comisiones.",
         "url": "https://getpmx.com",
         "services": [
@@ -138,8 +138,8 @@
       {
         "id": "grctechme",
         "name": "GRCTechMe",
-        "tagline": "Tecnología de auditoría y cumplimiento",
-        "description": "Plataforma de auditoría digital para abogados y agencias, publicada en Google Cloud Marketplace.",
+        "tagline": "Software de auditoría y cumplimiento",
+        "description": "Plataforma de auditoría digital para abogados y agencias.",
         "url": "https://grctechme.com/",
         "services": [
           "Auditorías digitales",
@@ -172,7 +172,7 @@
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Apprendimento delle lingue con un tutor IA",
-        "description": "Sillabo prende un vero corso di lingua, fatto da persone, e lo trasforma in un corso con IA. Italiano per ispanofoni.",
+        "description": "Sillabo trasforma un corso scritto da persone in un corso con IA. Italiano per ispanofoni.",
         "url": "https://sillabo.up.railway.app",
         "services": [
           "Tutor IA",
@@ -186,11 +186,11 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Software su misura per le aziende",
+        "tagline": "Software per assicurazioni e fintech",
         "description": "Software su misura e consulenza per compagnie assicurative e finanziarie.",
         "url": "https://dbadbadba.com/",
         "services": [
-          "Sviluppo software su misura",
+          "Software su misura",
           "Architettura di sistemi",
           "Consulenza tecnica",
           "Infrastruttura cloud"
@@ -200,7 +200,7 @@
       {
         "id": "pmx",
         "name": "PMX",
-        "tagline": "Marketplace di affiliazione per e-commerce",
+        "tagline": "Marketplace di affiliazione per brand Shopify",
         "description": "Piattaforma di affiliazione dove i brand Shopify trovano affiliati e pagano le loro commissioni.",
         "url": "https://getpmx.com",
         "services": [
@@ -214,8 +214,8 @@
       {
         "id": "grctechme",
         "name": "GRCTechMe",
-        "tagline": "Tecnologia per audit e conformità",
-        "description": "Piattaforma di audit digitale per avvocati e agenzie, pubblicata sul Google Cloud Marketplace.",
+        "tagline": "Software di audit e conformità",
+        "description": "Piattaforma di audit digitale per avvocati e agenzie.",
         "url": "https://grctechme.com/",
         "services": [
           "Audit digitali",

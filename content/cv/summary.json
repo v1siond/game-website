@@ -21,16 +21,17 @@
   },
   "es": {
     "professionalSummary": {
-      "headline": "Ingeniero Senior Staff Full-Stack y de Sistemas de IA con más de 10 años de experiencia",
-      "tagline": "Creó PMX, InsurAdmin y GRCTechMe. Salvó el lanzamiento de SecureBancard. Lideró el producto B2B de Clutch Prep hasta su adquisición por Pearson. Productos de seguros, pagos, educación e IA, desde backends en Elixir hasta apps en React.",
-      "bio": "Diseño y construyo plataformas fintech y de seguros e integraciones de IA. Los equipos me llaman cuando un lanzamiento está en riesgo o un sistema tiene que empezar de cero, y lo llevo a producción. Trabajo en backends funcionales concurrentes como Elixir con la misma soltura que en stacks empresariales.",
+      "headline": "Ingeniero Senior Staff Full Stack y de Sistemas de IA con más de 10 años de experiencia",
+      "tagline": "Construí PMX, InsurAdmin y GRCTechMe. Salvé el lanzamiento de SecureBancard. Lideré el producto B2B de Clutch Prep hasta su adquisición por Pearson.",
+      "bio": "Construyo plataformas fintech y de seguros y sus funciones de IA. Los equipos me llaman cuando un lanzamiento está en riesgo o un sistema tiene que empezar de cero, y lo llevo a producción. Trabajo con la misma soltura en Elixir que en Rails o Node.",
       "education": "Ingeniero en Sistemas, UNEFA, 2008 a 2014",
       "languages": "Español e inglés nativos, italiano básico",
       "highlights": [
         "Fui coarquitecto de Pearson Channels casi desde cero y migré los datos relacionales a los almacenes NoSQL de Pearson sin tiempo de inactividad.",
         "Construí PMX Affiliate Marketplace y su integración nativa con Shopify.",
-        "Lancé GRCTechMe en Google Cloud Marketplace superando su revisión de cumplimiento. Construyo funciones LLM seguras sobre Gemini y Claude, portales empresariales de IA y pipelines de texto a voz con edge-tts.",
-        "Construí InsurAdmin desde cero para los feeds de aseguradoras y los equipos de agencia. Construí el núcleo de Agency Rocket: sus parsers de pólizas y su cobro con Stripe.",
+        "Llevé GRCTechMe a través de la revisión de cumplimiento de Google Cloud Marketplace.",
+        "Construyo funciones LLM seguras sobre Gemini y Claude, portales empresariales de IA y pipelines de texto a voz con edge-tts.",
+        "Construí InsurAdmin desde cero para los feeds de aseguradoras y los equipos de agencia, y el núcleo de Agency Rocket: sus parsers de pólizas y el cobro con Stripe.",
         "Nebulith: mi propio motor de juegos y editor de mapas, a punto de salir.",
         "Construyo redes neuronales desde cero para conectar sistemas backend con agentes de IA.",
         "Desarrollador backend en las primeras etapas de Truth Social. Ajusté el backend en Rails con desarrolladores del núcleo de Mastodon."
@@ -39,16 +40,17 @@
   },
   "it": {
     "professionalSummary": {
-      "headline": "Ingegnere Senior Staff Full-Stack e di Sistemi di IA con oltre 10 anni di esperienza",
-      "tagline": "Ha creato PMX, InsurAdmin e GRCTechMe. Ha salvato il lancio di SecureBancard. Ha guidato il prodotto B2B di Clutch Prep fino alla sua acquisizione da parte di Pearson. Prodotti per assicurazioni, pagamenti, formazione e IA, dai backend in Elixir alle app React.",
-      "bio": "Progetto e sviluppo piattaforme fintech e assicurative e integrazioni di IA. I team mi chiamano quando un lancio è a rischio o un sistema deve partire da zero, e lo porto in produzione. Lavoro con backend funzionali concorrenti come Elixir con la stessa facilità che con gli stack enterprise.",
+      "headline": "Ingegnere Senior Staff Full Stack e di Sistemi di IA con oltre 10 anni di esperienza",
+      "tagline": "Ho costruito PMX, InsurAdmin e GRCTechMe. Ho salvato il lancio di SecureBancard. Ho guidato il prodotto B2B di Clutch Prep fino all'acquisizione da parte di Pearson.",
+      "bio": "Costruisco piattaforme fintech e assicurative e le loro funzioni di IA. I team mi chiamano quando un lancio è a rischio o un sistema deve partire da zero, e lo porto in produzione. Lavoro con la stessa facilità in Elixir e in Rails o Node.",
       "education": "Ingeniero en Sistemas, UNEFA, dal 2008 al 2014",
       "languages": "Spagnolo e inglese madrelingua, italiano base",
       "highlights": [
         "Sono stato co-architetto di Pearson Channels quasi da zero e ho spostato i dati relazionali negli archivi NoSQL di Pearson senza tempi di inattività.",
         "Ho costruito PMX Affiliate Marketplace e la sua integrazione nativa con Shopify.",
-        "Ho lanciato GRCTechMe sul Google Cloud Marketplace superando la revisione di conformità. Costruisco funzioni LLM sicure su Gemini e Claude, portali enterprise di IA e pipeline di sintesi vocale con edge-tts.",
-        "Ho costruito InsurAdmin da zero per i feed delle compagnie e i team di agenzia. Ho costruito il cuore di Agency Rocket: i parser delle polizze e la fatturazione Stripe.",
+        "Ho portato GRCTechMe oltre la revisione di conformità del Google Cloud Marketplace.",
+        "Costruisco funzioni LLM sicure su Gemini e Claude, portali enterprise di IA e pipeline di sintesi vocale con edge-tts.",
+        "Ho costruito InsurAdmin da zero per i feed delle compagnie e i team di agenzia, e il cuore di Agency Rocket: i parser delle polizze e la fatturazione Stripe.",
         "Nebulith: il mio motore di gioco ed editor di mappe, in uscita a breve.",
         "Costruisco reti neurali da zero per collegare i sistemi backend agli agenti di IA.",
         "Sviluppatore backend nelle prime fasi di Truth Social. Ho ottimizzato il backend Rails con gli sviluppatori core di Mastodon."
