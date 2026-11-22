@@ -73,14 +73,40 @@ function Mesa() {
   )
 }
 
+// Him in his box: he runs in and leaps with the entrance, and once he has landed, pointing at him or
+// clicking him plays his action, the same as each section shows. The pointer state lives here, so it
+// redraws him alone, not the whole intro card.
+function Runner({ profession, shown }: { profession: Profession; shown: ReadonlySet<Phase> }) {
+  const [acting, setActing] = useState(false)
+
+  return (
+    <div
+      className={`relative h-full w-full ${cel.runner}`}
+      onPointerEnter={() => setActing(true)}
+      onPointerLeave={() => setActing(false)}
+      onClick={() => setActing((now) => !now)}
+    >
+      {DUST.map((index) => (
+        <span
+          key={index}
+          className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
+          style={{ ['--i' as string]: index }}
+          aria-hidden="true"
+        />
+      ))}
+      <div className={`h-full w-full ${cel.leap}`}>
+        <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
+      </div>
+    </div>
+  )
+}
+
 export function FreezeIntro({ profession, reduced }: { profession: Profession; reduced: boolean }) {
   const { hud, navigation } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.05, rootMargin: '0px' })
   const [reached, setReached] = useState<ReadonlySet<Phase>>(() => new Set())
   const done = reduced || reached.has('done')
   const shown = done ? ALL_PHASES : reached
-
-  const [acting, setActing] = useState(false)
   const skip = useCallback(() => setReached(ALL_PHASES), [])
 
   useEffect(() => {
@@ -111,29 +137,11 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
       )}
 
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
-        {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
         {/* his box: he runs in inside it, and the mesa hangs from its bottom edge, so his bottom is the ridge top */}
         <div className="relative flex flex-col items-center gap-4">
           <div data-worlds-figure="" className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
             <Mesa />
-            <div
-              className={`relative h-full w-full ${cel.runner}`}
-              onPointerEnter={() => setActing(true)}
-              onPointerLeave={() => setActing(false)}
-              onClick={() => setActing((now) => !now)}
-            >
-              {DUST.map((index) => (
-                <span
-                  key={index}
-                  className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
-                  style={{ ['--i' as string]: index }}
-                  aria-hidden="true"
-                />
-              ))}
-              <div className={`h-full w-full ${cel.leap}`}>
-                <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
-              </div>
-            </div>
+            <Runner profession={profession} shown={shown} />
           </div>
           <Wardrobe look={OUTFIT_LOOK} ready={done} className="c-wardrobe--fan-down-below-md absolute inset-x-0 bottom-[calc(100%_+_1rem)] z-10 md:bottom-auto md:top-[calc(100%_+_1rem)]" />
         </div>
