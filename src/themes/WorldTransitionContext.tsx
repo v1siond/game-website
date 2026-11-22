@@ -9,6 +9,8 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 const COVER_MS = 720
 const REVEAL_MS = 620
 
+type Phase = 'idle' | 'cover' | 'reveal'
+
 interface WorldTransitionContextType {
   /** Animate a portal, then load the world, scroll to top, and persist the choice. */
   selectWorld: (id: string) => void
@@ -26,7 +28,13 @@ const WorldTransitionContext = createContext<WorldTransitionContextType | undefi
 
 export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const { theme, setThemeById } = useTheme()
-  const [phase, setPhase] = useState<'idle' | 'cover' | 'reveal'>('idle')
+  const [phase, setPhase] = useState<Phase>('idle')
+  // The phase as of now, for selectWorld to read inside the same event that set it.
+  const phaseRef = useRef<Phase>('idle')
+  const enterPhase = useCallback((next: Phase) => {
+    phaseRef.current = next
+    setPhase(next)
+  }, [])
   const [variant, setVariant] = useState<PortalVariant>('vortex')
   const [destId, setDestId] = useState<string | null>(null)
   const [isWorldsOpen, setIsWorldsOpen] = useState(false)
@@ -51,6 +59,7 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       setIsWorldsOpen(false) // picking a world closes the picker modal
       if (id === theme.id) return // already in this world
+      if (phaseRef.current !== 'idle') return // one portal at a time: a pick during the cover is dropped
 
       // Reduced-motion (or non-DOM env): swap instantly, no portal.
       if (prefersReducedMotion()) {
@@ -76,23 +85,25 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
       lastVariant.current = next
       setVariant(next)
       setDestId(id)
-      setPhase('cover')
+      enterPhase('cover')
 
       // At the cover peak the screen is fully obscured, swap the world + jump to top.
       const t1 = window.setTimeout(() => {
         setThemeById(id)
         window.scrollTo(0, 0)
-        setPhase('reveal')
+        enterPhase('reveal')
 
         const t2 = window.setTimeout(() => {
-          setPhase('idle')
+          enterPhase('idle')
           setDestId(null)
+          // Emptied in place: the unmount cleanup holds this same array.
+          timers.current.length = 0
         }, REVEAL_MS)
         timers.current.push(t2)
       }, COVER_MS)
       timers.current.push(t1)
     },
-    [theme.id, setThemeById]
+    [theme.id, setThemeById, enterPhase]
   )
 
   const destTheme = destId ? getThemeById(destId) : theme
