@@ -6,6 +6,7 @@ import type { VentureSlot } from '@/components/cv/VentureList'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { shownUrl } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { TagList, type TagListLook } from '@/components/cv/TagList'
@@ -72,7 +73,7 @@ export function ProjectCard({ slot: { project, links } }: { slot: ProjectSlot })
       </p>
       <p style={CARD_BODY}>{card.tagline}</p>
       {card.description && <p className="mb-1 text-sm text-[color:var(--realm-text-mid)]">{card.description}</p>}
-      {card.impact && <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontWeight: 500 }}>{card.impact}</p>}
+      {card.impact && <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontWeight: 500 }}><ImpactLabel />{card.impact}</p>}
       <MarkedLines items={card.details} label={labels.cards.details} look={MARKED_LIST} />
       <TagList items={card.techStack} label={labels.cards.technologiesUsed} look={CHIP_ROW} />
       {links.length > 0 && (

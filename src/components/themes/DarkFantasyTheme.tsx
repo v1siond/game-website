@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
@@ -29,7 +30,7 @@ import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacte
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
-import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
+import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -48,6 +49,15 @@ const SPIRIT_LINES: MarkedLinesLook = {
       *
     </span>
   ),
+}
+
+// His education and languages under the highlights, each label in the spirit gold.
+const SPIRIT_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'max-w-prose mx-auto text-sm text-[color:var(--df-silver-text)]',
+  term: 'inline text-[color:var(--df-spirit-gold)]',
+  value: 'inline',
+  termEnd: ': ',
 }
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
@@ -1557,14 +1567,13 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
     const { sections, cards } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { highlights } = useAboutBlock()
     return (
       <>
         <FramedSection title={sections[slot.titleKey]}>
           <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
           <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SPIRIT_LINES, list: 'max-w-prose mx-auto mt-4 space-y-1' }} />
-          {education && <p className="max-w-prose mx-auto mt-4 text-sm text-[color:var(--df-silver-text)]">{education}</p>}
-          {languages && <p className="max-w-prose mx-auto mt-1 text-sm text-[color:var(--df-silver-text)]">{languages}</p>}
+          <AboutFacts look={SPIRIT_FACTS} />
         </FramedSection>
 
         {/* Art Section 1 - Spirits and Gears */}

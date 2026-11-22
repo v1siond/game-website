@@ -7,8 +7,8 @@ import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { REALM } from './palette'
@@ -57,13 +57,21 @@ interface FrameProps {
   isLargeScreen: boolean
 }
 
+// His education and languages under the bio, each label set in the semibold.
+const REALM_FACTS: AboutFactsLook = {
+  list: '',
+  fact: 'text-base text-[color:var(--realm-text-mid)]',
+  term: 'inline font-semibold',
+  value: 'inline',
+  termEnd: ': ',
+}
+
 // One frame per section in the plan's order, each with the art divider that follows it (bands and Muay Thai
 // open with theirs); the zone turns from chaos to frost after the services.
 const FRAMES: SectionFrames<FrameProps> = {
   about: function AboutFrame({ slot, layout, isLargeScreen }) {
     const { sections, cards } = useLabels()
-    const { professionalSummary } = useCVData()
-    const { education, languages, highlights } = aboutBlock(professionalSummary)
+    const { highlights } = useAboutBlock()
     return (
       <>
         <ScrollScene>
@@ -75,8 +83,7 @@ const FRAMES: SectionFrames<FrameProps> = {
                 fontSize: isLargeScreen ? '1.125rem' : '1rem',
                 padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
               }}>{slot.bio}</p>
-              {education && <p className="text-base text-[color:var(--realm-text-mid)]">{education}</p>}
-              {languages && <p className="text-base text-[color:var(--realm-text-mid)]">{languages}</p>}
+              <AboutFacts look={REALM_FACTS} />
               <MarkedLines items={highlights} label={cards.keyAchievements} look={MARKED_LIST} />
             </RealmFrame>
           </section>
