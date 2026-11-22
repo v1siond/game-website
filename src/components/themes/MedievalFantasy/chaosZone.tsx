@@ -71,7 +71,7 @@ const ROCK_PARTS: RockPart[] = [
 ]
 
 // The stones sit near 22% luminance (c). A white layer at alpha a lifts c to c + a(1 - c), which equals the
-// c * brightness the parts used to start at when a = c(brightness - 1) / (1 - c).
+// c * brightness a part lands at when a = c(brightness - 1) / (1 - c).
 const STONE_LUMINANCE = 0.22
 
 function flashOverlayAlpha(brightness: number): number {
@@ -94,7 +94,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
   ], [])
   const [activeZone, setActiveZone] = useState(0)
   const lastZoneRef = useRef(-1)
-  // Occasional falling meteor (every 8-15 seconds, like old golem spawn cadence)
+  // Occasional falling meteor (every 8-15 seconds)
   const [fallingMeteor, setFallingMeteor] = useState<{
     id: number
     startX: number
@@ -150,7 +150,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
 
     const scheduleNext = () => {
       if (!isActive) return
-      // Every 8-15 seconds (like old golem cadence)
       const delay = 8000 + Math.random() * 7000
       timeouts.push(setTimeout(() => {
         spawnMeteor()
@@ -236,7 +235,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       id: i,
       x: Math.random() * 130 - 15,
       delay: Math.random() * -4,
-      duration: 2.5 + Math.random() * 1.5, // 2.5-4s (was 0.6-0.9s) - much fewer repaints
+      duration: 2.5 + Math.random() * 1.5, // 2.5-4s, long cycles repaint less
       length: 25 + Math.random() * 30,
     })),
     []

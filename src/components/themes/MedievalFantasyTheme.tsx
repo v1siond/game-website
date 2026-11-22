@@ -43,10 +43,8 @@ export default function MedievalFantasyTheme() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Calculate available space - EXACT match to Dark Fantasy spacing
-  // Dark Fantasy uses: py-6 md:py-8 (1.5rem/2rem padding) for sections, py-16 (4rem) for art dividers
-  // Section gap in DF = bottom padding + top padding of next = 3rem (small) / 4rem (md+)
-  // Art divider total padding = 8rem (4rem top + 4rem bottom), but we use margin so just 4rem each side
+  // A window 800 px tall or more spaces the sections and art dividers 4rem apart and draws the dividers
+  // larger; a shorter window keeps them 3rem apart with smaller dividers.
   const isLargeScreen = viewportHeight >= 800
   const layout: SectionLayout = {
     sectionSpacing: isLargeScreen ? '4rem' : '3rem',
@@ -60,7 +58,7 @@ export default function MedievalFantasyTheme() {
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 
-      {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
+      {/* ============ MAIN CONTENT ============ */}
       <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
 
         {/* ============ REIGN OF CHAOS ZONE ============ */}
@@ -145,7 +143,7 @@ export default function MedievalFantasyTheme() {
           <FTArtDivider variant="throne" scale={layout.artDividerScale} />
         </ArtDivider>
 
-        {/* Contact - no card, floating text like Dark Fantasy. The last section never reaches the default end
+        {/* Contact - no card, floating text. The last section never reaches the default end
             line (half the viewport) before the page runs out, so its reveal ends higher, at full opacity. */}
         <ScrollScene end={0.8}>
           <section aria-label={sections.contact} style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
