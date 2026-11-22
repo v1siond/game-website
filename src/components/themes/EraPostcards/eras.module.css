@@ -1,0 +1,80 @@
+/* The era pictures. In the theatre every stage is fixed behind the text; the engine sets each stage's
+   opacity, visibility and veil and each layer's transform. Before the engine's first frame (and with no
+   JavaScript) only the hero's stage shows, at its first frame. */
+
+.theatre {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--ep-theatre);
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 50% 40%;
+  will-change: opacity, transform;
+}
+
+.stage[data-stage='hero'] {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Reduced motion: the stage sits still at the top of its own section, one screen tall, under the text. */
+.settled {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: 56% 78%;
+  will-change: transform;
+}
+
+.layer :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.layer :global(.rim) {
+  stroke: var(--era-rim);
+  stroke-width: 2;
+}
+
+/* A scrim under the text column so the titles read on the brightest frame; it fades with its stage. */
+.stage::after,
+.settled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, color-mix(in srgb, var(--ep-scrim) 82%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 46%),
+    linear-gradient(to right, color-mix(in srgb, var(--ep-scrim) 55%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 50%);
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--ep-veil);
+  opacity: 0;
+}
+
+@media (max-width: 767.98px) {
+  .stage::after,
+  .settled::after {
+    background: linear-gradient(to top, color-mix(in srgb, var(--ep-scrim) 85%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 55%);
+  }
+}
