@@ -5,7 +5,7 @@ import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import type { SectionFrames } from '@/components/cv/SectionPlanView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { MoveCard, ProjectCard, SPARK_LINES, ServiceCard, VentureCard } from './cards'
@@ -53,7 +53,7 @@ export const CARDS: SectionFrames = {
   work: function WorkCards({ slot: { jobs } }) {
     return (
       <FlightMap jobs={jobs}>
-        <ul data-stage-items="" className={MASONRY_LIST}>
+        <ul data-stage-items="" className={MASONRY_COLUMN_LIST}>
           {jobs.map((entry, index) => (
             <li key={entry.id} className={MASONRY_ITEM}>
               <FlightStop index={index}>
@@ -67,7 +67,7 @@ export const CARDS: SectionFrames = {
   },
   tech: function TechCards({ slot }) {
     return (
-      <ul data-stage-items="" className={MASONRY_LIST}>
+      <ul data-stage-items="" className={MASONRY_COLUMN_LIST}>
         {slot.categories.map((category) => (
           <li key={category.id} className={MASONRY_ITEM}>
             <MoveCard category={category} />
@@ -78,7 +78,7 @@ export const CARDS: SectionFrames = {
   },
   services: function ServiceCards({ slot }) {
     return (
-      <ul data-stage-items="" className={MASONRY_LIST}>
+      <ul data-stage-items="" className={MASONRY_COLUMN_LIST}>
         {slot.services.map((service) => (
           <li key={service.id} className={MASONRY_ITEM}>
             <ServiceCard service={service} />
@@ -93,7 +93,7 @@ export const CARDS: SectionFrames = {
         <div data-stage-items="">
           <ProjectList
             projects={slot.projects}
-            className={MASONRY_LIST}
+            className={MASONRY_COLUMN_LIST}
             itemClassName={MASONRY_ITEM}
             renderProject={(project) => (
               <HitCard>
@@ -124,7 +124,7 @@ export const CARDS: SectionFrames = {
         <div data-stage-items="">
           <BandList
             bands={bands}
-            className={MASONRY_LIST}
+            className={MASONRY_COLUMN_LIST}
             itemClassName={MASONRY_ITEM}
             renderBand={(band) => (
               <div data-band="">
