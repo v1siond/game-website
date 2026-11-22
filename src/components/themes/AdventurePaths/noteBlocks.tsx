@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -36,8 +36,7 @@ const dropCourse = (x: number): Course<'drop' | 'bounce'> => ({
 })
 
 function BandCard({ slot, onPoint }: { slot: BandSlot; onPoint: () => void }) {
-  const { band, years, linkProps } = slot
-  const { links } = useLabels()
+  const { band, years, linkProps, release } = slot
   const body = (
     <article className={`${PAPER_CARD} h-full`}>
       <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{band.name}</h3>
@@ -45,9 +44,9 @@ function BandCard({ slot, onPoint }: { slot: BandSlot; onPoint: () => void }) {
         {band.role}
         {years && <span> · {years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className="mt-2 text-sm">
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>
@@ -73,7 +72,7 @@ export function NoteBlockLevel({ bands, musician }: { bands: Band[]; musician: M
   const { ref, on, reduced } = useZoneStage<Zone>('night')
   const [at, setAt] = useState(0)
   const count = bands.length
-  const course = useCourse(dropCourse(blockX(0, count)))
+  const course = useCourse(useMemo(() => dropCourse(blockX(0, count)), [count]))
   const bouncing = course.arrived && !reduced
   const spot = { x: blockX(at, count), lift: LIFT }
   // Once he has landed he glides from block to block; the drop is the course's one leg.
@@ -119,7 +118,7 @@ export function NoteBlockLevel({ bands, musician }: { bands: Band[]; musician: M
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BandCard slot={slot} onPoint={() => setAt(bands.indexOf(slot.band))} />}
+        renderBand={(slot, index) => <BandCard slot={slot} onPoint={() => setAt(index)} />}
       />
       {musician.line && <p className="mt-6 inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1.5 text-base italic text-[color:var(--ap-coin)]">{musician.line}</p>}
     </Region>

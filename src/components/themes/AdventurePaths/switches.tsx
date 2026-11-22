@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -8,7 +8,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
-import { Actor, useCourse } from './actor'
+import { Actor, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { BigSwitch } from './blocks'
 import type { Course } from './course'
@@ -40,10 +40,10 @@ interface SwitchColour {
 }
 
 const SWITCH_COLOURS: readonly SwitchColour[] = [
-  { fill: 'bg-[color:var(--ap-gold)]', text: 'text-[color:var(--ap-ink)]', svg: TRAIL.GOLD, shade: '#9a6a14' },
+  { fill: 'bg-[color:var(--ap-gold)]', text: 'text-[color:var(--ap-ink)]', svg: TRAIL.GOLD, shade: TRAIL.GOLD_DARK },
   { fill: 'bg-[color:var(--ap-forest)]', text: 'text-white', svg: TRAIL.FOREST, shade: TRAIL.CANOPY },
-  { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: '#6e1f12' },
-  { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: '#1f3f78' },
+  { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: TRAIL.ROUTE_DARK },
+  { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: TRAIL.BLUE_DARK },
 ]
 
 const LINK = 'inline-flex min-h-[44px] items-center gap-2 rounded-sm border-2 border-[color:var(--ap-ink)] px-3 text-sm font-bold transition-transform hover:-translate-y-0.5 motion-reduce:transition-none'
@@ -79,11 +79,7 @@ const COURSE: Course<SwitchPose> = {
 
 function PipeScene({ profession, onStomp }: { profession: Profession; onStomp: () => void }) {
   const course = useCourse(COURSE)
-  const stomped = course.past('jump')
-
-  useEffect(() => {
-    if (stomped) onStomp()
-  }, [stomped, onStomp])
+  usePassed(course.past('jump'), onStomp)
 
   return <Actor motion={course.motion} profession={profession} onAnimationEnd={course.onOwnAnimationEnd} />
 }
@@ -139,9 +135,8 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         </div>
         <button
           type="button"
-          aria-pressed={pressed}
           aria-expanded={pressed}
-          aria-controls={pressed ? boxId : undefined}
+          aria-controls={boxId}
           aria-label={fillLabel(trail.pressSwitch, { name: project.name })}
           onClick={() => setPressed((now) => !now)}
           className={`shrink-0 rounded-sm p-1 ${map.switch}`}
@@ -176,7 +171,6 @@ export function SwitchPalaces({ projects, profession }: { projects: Project[]; p
   const { ref, on } = useZoneStage<Zone>('plains')
   const [filled, setFilled] = useState(false)
   const fill = useCallback(() => setFilled(true), [])
-  const colourOf = (project: Project) => SWITCH_COLOURS[projects.indexOf(project) % SWITCH_COLOURS.length]
 
   return (
     <Region title={sections.projects} stageRef={ref} on={on}>
@@ -199,7 +193,7 @@ export function SwitchPalaces({ projects, profession }: { projects: Project[]; p
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <SwitchPalace slot={slot} colour={colourOf(slot.project)} filled={filled} />}
+        renderProject={(slot, index) => <SwitchPalace slot={slot} colour={SWITCH_COLOURS[index % SWITCH_COLOURS.length]} filled={filled} />}
       />
     </Region>
   )

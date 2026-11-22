@@ -3,11 +3,11 @@
 import { useLayoutEffect } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
-import { fillLabel } from '@/lib/cv/labels'
 import { INTRO_ATTR } from '@/themes/introFlag'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { TRAIL_VARS } from './AdventurePaths/palette'
@@ -49,7 +49,7 @@ export default function AdventurePathsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { fullName } = useCVData()
-  const { navigation, professions } = useLabels()
+  const { navigation } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointerRef = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<Zone>('plains', reducedMotion)
@@ -75,9 +75,9 @@ export default function AdventurePathsTheme() {
 
       <ZoneStageProvider value={stage}>
         <main id="trail-main" className="relative z-10 pb-16">
-          <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </div>
+          </ProfessionRegion>
           <GoalPole profession={active} />
         </main>
       </ZoneStageProvider>

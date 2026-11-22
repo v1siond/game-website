@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { EYES, OUTFITS, PART_TOP, SPRITE, headRows, legRows, spriteRuns, torsoRows, type LegFrame, type TorsoFrame } from './sprite'
 import { PixelRuns } from '../shared/PixelRuns'
@@ -15,7 +16,8 @@ function Pixels({ rows, top, colours }: { rows: readonly string[]; top: number; 
   return <PixelRuns runs={spriteRuns(rows, top)} colours={colours} />
 }
 
-export function TrailWalker({ profession, className = '' }: { profession: Profession; className?: string }) {
+// Memoised on its profession and class, so the hub's renders redraw his frames only when his outfit changes.
+export const TrailWalker = memo(function TrailWalker({ profession, className = '' }: { profession: Profession; className?: string }) {
   const { headgear, colours } = OUTFITS[profession]
 
   return (
@@ -49,4 +51,4 @@ export function TrailWalker({ profession, className = '' }: { profession: Profes
       </g>
     </svg>
   )
-}
+})

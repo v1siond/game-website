@@ -35,6 +35,14 @@ export const TRAIL = {
   RUNE: '#59d8c6',
   WOOD: '#7a4e2a',
   BARK: '#3e2a1a',
+  // The light and dark ends of the map's stone, wood, gold and route red gradients (art.tsx), the darker
+  // ends the switch palaces shade their switches with, and the blue's shade on his overalls and its switch.
+  STONE_LIGHT: '#c9c1aa',
+  WOOD_LIGHT: '#a06a3a',
+  GOLD_DARK: '#9a6a14',
+  ROUTE_LIGHT: '#e77a5c',
+  ROUTE_DARK: '#6e1f12',
+  BLUE_DARK: '#1f3f78',
   // The map's watercolour washes over the parchment: the sea, the sand of the shore, the meadow on the
   // plateau tops and the brown cliff faces under them, each with its shade.
   // Bright as the 16 bit overworld map (research image 28): blue sea, light sand paths, grass green
@@ -73,7 +81,10 @@ export const TRAIL = {
   CAVE_BRICK: '#008890',
   CAVE_BRICK_DARK: '#00505c',
   NIGHT_SKY: '#203050',
+  NIGHT_SKY_LOW: '#3c5c8c',
   NIGHT_HILL: '#509070',
+  NIGHT_HILL_NEAR: '#2c6048',
+  NIGHT_CLOUD: '#8098c0',
   FORT: '#2c1c18',
   FORT_GOLD: '#e0a040',
   FORT_GOLD_DARK: '#906020',
@@ -97,6 +108,29 @@ export const TRAIL = {
 // The inks both of his pixel figures share, the map walker (sprite.ts) and the side view hero (side.ts):
 // the outline, the white gloves and the brown shoes. Drawn into SVG only, so they stay out of TRAIL_VARS.
 export const SPRITE_INK = { OUTLINE: '#160e08', GLOVE: '#fbf8ee', SHOE: '#6b3a1c' } as const
+
+// The map walker's own reds (sprite.ts): the cap and shirt, and the brim. SVG only.
+export const WALKER_INK = { CAP: '#c8301f', BRIM: '#86200f' } as const
+
+// The side view hero's own inks (side.ts): the cap and shirt red and the brim, the overall button, the
+// overalls, and the Martial Artist's gold gloves. SVG only.
+export const SIDE_INK = { RED: '#d8281c', BRIM: '#8e1a10', BUTTON: '#f8d038', OVERALLS: '#2a58c8', FIGHT_GLOVE: '#f0b030' } as const
+
+// The side view foes' inks (side.ts): the eye white and the mouth they share, the brown mushroom with its
+// orange underside and yellow feet, the green turtle and plant leaves with their shade, the turtle's skin
+// and shoes, and the plant's red head. SVG only.
+export const FOE_INK = {
+  WHITE: '#ffffff',
+  MOUTH: '#3a0c0c',
+  MUSHROOM: '#b0401c',
+  UNDERSIDE: '#f09028',
+  FEET: '#f8c820',
+  GREEN: '#38a838',
+  GREEN_SHADE: '#1c6c1c',
+  SKIN: '#f8c860',
+  SHOES: '#e04020',
+  PLANT: '#d82818',
+} as const
 
 /** The palette as CSS variables, set once on the world's root. */
 export const TRAIL_VARS = paletteVars('ap', TRAIL)

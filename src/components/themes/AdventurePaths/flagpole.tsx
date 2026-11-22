@@ -1,12 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactSigns } from './actions'
-import { Actor, useCourse } from './actor'
+import { Actor, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { Castle, Firework } from './blocks'
 import type { Course } from './course'
@@ -41,6 +41,11 @@ const COURSE: Course<GoalPose> = {
 /** Where the flag is: at the top, coming down with him, or down at the foot of the pole. */
 type FlagState = 'up' | 'down' | 'low'
 
+function flagOf(slid: boolean, sliding: boolean): FlagState {
+  if (slid) return 'low'
+  return sliding ? 'down' : 'up'
+}
+
 const FIREWORKS = [
   { place: 'right-[6%] bottom-[150px]', delay: 0 },
   { place: 'right-[16%] bottom-[190px]', delay: 260 },
@@ -49,11 +54,8 @@ const FIREWORKS = [
 
 function GoalScene({ profession, onCleared }: { profession: Profession; onCleared: () => void }) {
   const course = useCourse(COURSE)
-  const flag: FlagState = course.past('slide') ? 'low' : course.motion.pose === 'slide' ? 'down' : 'up'
-
-  useEffect(() => {
-    if (course.arrived) onCleared()
-  }, [course.arrived, onCleared])
+  const flag = flagOf(course.past('slide'), course.motion.pose === 'slide')
+  usePassed(course.arrived, onCleared)
 
   return (
     <div className="absolute inset-0" data-flag={flag} data-cleared={course.arrived}>

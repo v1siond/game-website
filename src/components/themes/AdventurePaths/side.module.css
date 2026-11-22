@@ -675,9 +675,9 @@
 .world[data-zone='night'] {
   --far: var(--ap-night-hill);
   --far-edge: var(--ap-hud);
-  --near: #2c6048;
+  --near: var(--ap-night-hill-near);
   --near-edge: var(--ap-hud);
-  --cloud: #8098c0;
+  --cloud: var(--ap-night-cloud);
 }
 
 .world[data-zone='sunset'] {
@@ -708,7 +708,7 @@
 }
 
 .sky[data-sky='night'] {
-  background: linear-gradient(var(--ap-night-sky), #3c5c8c);
+  background: linear-gradient(var(--ap-night-sky), var(--ap-night-sky-low));
 }
 
 .sky[data-sky='fortress'] {

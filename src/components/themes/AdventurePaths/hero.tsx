@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -64,11 +64,24 @@ type Reached = Record<Step, boolean>
 const NONE: Reached = { unrolled: false, inked: false, trailed: false, landed: false }
 const ALL: Reached = { unrolled: true, inked: true, trailed: true, landed: true }
 
-function useEntrance() {
+/** The latest value of a render, for a timer or an effect that reads it without rerunning when it changes.
+ *  A layout effect writes it before any passive effect or timer of that commit reads it (Next 15's own
+ *  React has no useEffectEvent, so this is the stable pattern it stands for). */
+function useLatest<T>(value: T) {
+  const ref = useRef(value)
+  useLayoutEffect(() => {
+    ref.current = value
+  })
+  return ref
+}
+
+/** The entrance's phases on their timers, and `onLanded` at WALK_AT, once he has landed, to start his walk. */
+function useEntrance(onLanded: () => void) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px' })
   const reduced = useReducedMotion()
   const preview = usePreview()
   const [reached, setReached] = useState<Reached>(NONE)
+  const landed = useLatest(onLanded)
   const skip = reduced || preview
 
   useEffect(() => {
@@ -77,9 +90,12 @@ function useEntrance() {
       return
     }
     if (!triggered) return
-    const timers = STEPS.map(([step, at]) => window.setTimeout(() => setReached((now) => ({ ...now, [step]: true })), at))
+    const timers = [
+      ...STEPS.map(([step, at]) => window.setTimeout(() => setReached((now) => ({ ...now, [step]: true })), at)),
+      window.setTimeout(() => landed.current(), WALK_AT),
+    ]
     return () => timers.forEach(window.clearTimeout)
-  }, [triggered, skip])
+  }, [triggered, skip, landed])
 
   return { ref, reached, skip, triggered }
 }
@@ -104,7 +120,7 @@ interface Pending {
 }
 
 /** His place on the hub and the walks between landmarks, plus the camera's dive on arrival. */
-function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
+function useHub(active: Profession) {
   const walker = useTrailWalker({ ...HUB, speed: WALK_SPEED })
   const { place, walk } = walker
   const at = useRef<Profession | null>(null)
@@ -116,6 +132,7 @@ function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
   const [visited, setVisited] = useState<ReadonlySet<Profession>>(() => new Set())
   const [acting, setActing] = useState(false)
   const actTimer = useRef(0)
+  const enterTimer = useRef(0)
 
   /** He plays his profession's action for a moment: on arrival, and when the visitor points at him. */
   const act = useCallback(() => {
@@ -124,7 +141,13 @@ function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
     actTimer.current = window.setTimeout(() => setActing(false), ACT_MS)
   }, [])
 
-  useEffect(() => () => window.clearTimeout(actTimer.current), [])
+  useEffect(
+    () => () => {
+      window.clearTimeout(actTimer.current)
+      window.clearTimeout(enterTimer.current)
+    },
+    [],
+  )
 
   const arrive = useCallback((target: Profession) => {
     at.current = target
@@ -135,7 +158,7 @@ function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
 
   const enter = useCallback((target: Profession) => {
     setEntering(target)
-    window.setTimeout(() => setEntering(null), ENTER_MS)
+    enterTimer.current = window.setTimeout(() => setEntering(null), ENTER_MS)
   }, [])
 
   const goTo = useCallback(
@@ -164,26 +187,23 @@ function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
     [arrive, enter, walk],
   )
 
-  // He waits on the harbour until the entrance lands him, then walks to the shown profession.
+  // The entrance walk starts once, toward the profession shown when he lands.
+  const entrance = useEntrance(() => {
+    if (ready) return
+    goTo(active, () => setReady(true))
+  })
+  const shown = useLatest(active)
+
+  // He waits on the harbour until the entrance lands him; with no entrance he stands at the shown profession.
   useEffect(() => {
     if (entrance.skip) {
-      arrive(active)
-      place(landmarkPoint(active))
+      arrive(shown.current)
+      place(landmarkPoint(shown.current))
       setReady(true)
       return
     }
     place(ARRIVAL.samples[0])
-    // Placed once per entrance; later profession changes walk through the effect below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entrance.skip, place, arrive])
-
-  useEffect(() => {
-    if (entrance.skip || !entrance.reached.landed || ready) return
-    const timer = window.setTimeout(() => goTo(active, () => setReady(true)), WALK_AT - 2700)
-    return () => window.clearTimeout(timer)
-    // The entrance walk starts once, toward the profession shown when he lands.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entrance.skip, entrance.reached.landed])
+  }, [entrance.skip, place, arrive, shown])
 
   // A profession changed without a walk (arrow keys, another control): he follows it.
   useEffect(() => {
@@ -193,7 +213,7 @@ function useHub(active: Profession, entrance: ReturnType<typeof useEntrance>) {
 
   const season = visited.size === BRANCH_COUNT ? 'fall' : 'summer'
 
-  return { ...walker, goTo, ready, entering, standing, season, acting, act }
+  return { ...walker, entrance, goTo, ready, entering, standing, season, acting, act }
 }
 
 function PlaqueRopes() {
@@ -258,10 +278,8 @@ function Landmark({ option, onPick, onPoint }: LandmarkProps) {
     >
       <span className={`pointer-events-none absolute bottom-[14%] h-[34%] w-[56%] rounded-full border-4 border-dashed border-[color:var(--ap-gold)] ${map.ring}`} aria-hidden="true" />
       <span
-        className={`relative translate-y-full rounded-sm border-2 px-2 py-0.5 text-center text-sm font-bold leading-tight sm:whitespace-nowrap ${
-          option.selected
-            ? 'border-[color:var(--ap-ink)] bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]'
-            : 'border-[color:var(--ap-ink)] bg-[color:var(--ap-page)] text-[color:var(--ap-ink)]'
+        className={`relative translate-y-full rounded-sm border-2 border-[color:var(--ap-ink)] px-2 py-0.5 text-center text-sm font-bold leading-tight text-[color:var(--ap-ink)] sm:whitespace-nowrap ${
+          option.selected ? 'bg-[color:var(--ap-gold)]' : 'bg-[color:var(--ap-page)]'
         }`}
       >
         {option.label}
@@ -291,8 +309,8 @@ function NameBox({ place }: { place: Profession | null }) {
 export function ExpeditionHero({ name }: { name: string }) {
   const { active } = useProfession()
   const { navigation, trail } = useLabels()
-  const entrance = useEntrance()
-  const hub = useHub(active, entrance)
+  const hub = useHub(active)
+  const { entrance } = hub
   const { reached } = entrance
   const [ox, oy] = shareOf(landmarkPoint(hub.entering ?? active), HUB.width, HUB.height)
 

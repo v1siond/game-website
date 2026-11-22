@@ -89,8 +89,11 @@ export function pointAt(trail: Trail, along: number): Point {
   let high = cumulative.length - 1
   while (high - low > 1) {
     const middle = (low + high) >> 1
-    if (cumulative[middle] <= along) low = middle
-    else high = middle
+    if (cumulative[middle] <= along) {
+      low = middle
+      continue
+    }
+    high = middle
   }
   const span = cumulative[high] - cumulative[low]
   const t = span === 0 ? 0 : (along - cumulative[low]) / span
@@ -107,9 +110,6 @@ export function dotsAlong(trail: Trail, spacing: number): TrailDot[] {
     return { x: round(x), y: round(y), at: round(along / trail.length) }
   })
 }
-
-/** Where each stop sits along the trail, 0 to 1. */
-export const stopShares = (trail: Trail): number[] => trail.stops.map((stop) => stop / trail.length)
 
 /** A point in map units as a share of the map's box, for an HTML layer laid over the SVG. */
 export const shareOf = ([x, y]: Point, width: number, height: number): Point => [(x / width) * 100, (y / height) * 100]

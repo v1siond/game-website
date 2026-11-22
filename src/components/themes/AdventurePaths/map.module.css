@@ -17,7 +17,9 @@
   --my: 0;
 }
 
-.root :focus-visible {
+/* The ring of the cards focused from code (a job or band card a ledge or block sends the focus to,
+ * tabindex -1), which the global ring in globals.css does not reach; every other control takes that one. */
+.root [tabindex='-1']:focus-visible {
   outline: 3px solid var(--ap-gold);
   outline-offset: 3px;
 }
@@ -458,7 +460,7 @@
   transform: translate3d(0, -2px, 0);
 }
 
-.switch[aria-pressed='true'] .switchCap {
+.switch[aria-expanded='true'] .switchCap {
   transform: scale(1.08, 0.45);
 }
 

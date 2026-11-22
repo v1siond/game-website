@@ -1,4 +1,4 @@
-import { buildTrail, dotsAlong, pointAt, shareOf, stopShares } from './trail'
+import { buildTrail, dotsAlong, pointAt, shareOf } from './trail'
 import { walkPosition } from './walk'
 
 describe('expedition trail geometry', () => {
@@ -11,7 +11,6 @@ describe('expedition trail geometry', () => {
   it('runs through every stop, the stops at their distances along it', () => {
     expect(straight.length).toBeCloseTo(200, 5)
     expect(straight.stops.map((stop) => Math.round(stop))).toEqual([0, 100, 200])
-    expect(stopShares(straight).map((share) => Math.round(share * 100))).toEqual([0, 50, 100])
     expect(straight.d.startsWith('M0 0 C')).toBe(true)
   })
 

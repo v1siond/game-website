@@ -1,18 +1,18 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { Profession } from '@/lib/cv/professions'
-import { Actor, FoeSprite, useCourse } from './actor'
+import { Actor, FoeSprite, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { Brick } from './blocks'
 import type { Course } from './course'
 import { JOURNAL_SERIF } from './palette'
-import { PAPER_CARD, Playfield, POP_CARD, Region } from './region'
+import { AgainButton, PAPER_CARD, Playfield, POP_CARD, Region } from './region'
 import type { Zone } from './world'
 import side from './side.module.css'
 
@@ -45,10 +45,7 @@ function brickOf(index: number, count: number) {
 function KickScene({ count, profession, onKick }: { count: number; profession: Profession; onKick: () => void }) {
   const course = useCourse(COURSE)
   const kicked = course.past('run')
-
-  useEffect(() => {
-    if (kicked) onKick()
-  }, [kicked, onKick])
+  usePassed(kicked, onKick)
 
   return (
     <div className="absolute inset-0" data-kicked={kicked}>
@@ -79,14 +76,9 @@ export function ShellLevel({ categories, profession }: { categories: SectionsOf<
     <Region title={sections.techStack} stageRef={ref} on={on}>
       <Playfield>{on && <KickScene key={round} count={categories.length} profession={profession} onKick={kick} />}</Playfield>
       {!reduced && (
-        <button
-          type="button"
-          onClick={() => setRound((now) => now + 1)}
-          disabled={!kicked}
-          className={`-mt-3 mb-6 min-h-[44px] rounded-md border-[3px] border-white bg-[color:var(--ap-hud)] px-4 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60 motion-reduce:transition-none ${JOURNAL_SERIF}`}
-        >
+        <AgainButton onAgain={() => setRound((now) => now + 1)} ready={kicked}>
           {trail.kickAgain}
-        </button>
+        </AgainButton>
       )}
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory} data-shown={kicked || reduced}>
         {categories.map((category, index) => (

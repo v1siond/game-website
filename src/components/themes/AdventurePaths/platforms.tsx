@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState, type AnimationEvent } from 'react'
+import { useMemo, useState, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
@@ -122,10 +122,10 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   const { sections, trail: labels } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('sky')
   const route = useMemo(() => byStart(jobs), [jobs])
+  const ledgeAt = useMemo(() => new Map(route.map((job, index) => [job, index])), [route])
   const count = route.length
-  const latest = count - 1
-  const [target, setTarget] = useState(latest)
-  const targetRef = useRef(latest)
+  // He climbs to the latest job, the last ledge, unless the visitor points him elsewhere.
+  const [target, setTarget] = useState(count - 1)
   // He starts off the left edge; the run in ends at the entry spot (-1), then he hops up the ledges.
   const [hop, setHop] = useState<Hop>({ from: -2, at: -1 })
   // The ledge he last landed on and how many landings so far (its parity picks the bump's twin).
@@ -136,11 +136,10 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   const step = (event: AnimationEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
     if (hop.at >= 0) setLanding((now) => ({ at: hop.at, count: now.count + 1 }))
-    setHop((now) => hopToward(now, targetRef.current))
+    setHop((now) => hopToward(now, target))
   }
 
   const point = (index: number) => {
-    targetRef.current = index
     setTarget(index)
     setHop((now) => (now.at >= 0 && now.from === now.at ? hopToward(now, index) : now))
   }
@@ -180,7 +179,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
 
       <ol className={MASONRY_LIST}>
         {jobs.map((job) => {
-          const index = route.indexOf(job)
+          const index = ledgeAt.get(job) ?? 0
           return (
             <li key={job.id} className={`${MASONRY_ITEM} ${bumpOf(index)}`}>
               <JobCard job={job} stop={index + 1} onPoint={() => point(index)} />
