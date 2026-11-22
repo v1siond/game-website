@@ -3,7 +3,7 @@ import d from './dog.module.css'
 
 // The wasteland dog that walks at his heel: a German shepherd in the flat poster language, facing right.
 // Tan legs, chest and face, the black saddle over the back, the black muzzle tip, tall pointed ears up,
-// the bushy tail held low (research dog-fo4 and loading-dog). Each leg turns at its hip (its transform
+// the bushy tail held low (from the research). Each leg turns at its hip (its transform
 // origin in dog.module.css); the scroll poses him (pose.ts): the trot swings the front and back pairs
 // against each other, sitting folds the hind legs under, digging pitches him nose down.
 

@@ -22,7 +22,7 @@ import { cssVars } from '@/lib/cssVars'
 // the section goes into its paused state (data-aiming on the section: every other card drains to a dim
 // tint, the page's ambient loops freeze through the root's :has rule in atomic.module.css), the corner
 // brackets close in on the target and each of its parts (role, impact, tech, links) gets its tag, the
-// way the game names each body part it can hit.
+// way a targeting sight tags each part it can hit.
 // A click (or the card's button) spends action points and plays the shot, in setTimeout phases:
 //   aim    0 ms    the letterbox bars slide in and the target pushes toward the camera
 //   hit    420 ms  the white flash and the target's hard shake

@@ -99,7 +99,7 @@ export function BadgeChart({ martialArts }: { martialArts: MartialArts }) {
           classNames={{
             facts: 'mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
             fact: `overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream ${atomic.posterDrop}`,
-            term: 'bg-atomic-poster-blue px-3 py-2 text-sm font-bold uppercase tracking-widest text-atomic-cream',
+            term: 'bg-atomic-blue-dark px-3 py-2 text-sm font-bold uppercase tracking-widest text-atomic-cream',
             value: 'px-3 py-3 text-base text-atomic-poster-ink',
             achievements: 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
             achievement: 'h-full',
