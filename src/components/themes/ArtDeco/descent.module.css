@@ -79,9 +79,6 @@
 .needle {
   transform-box: view-box;
   transform-origin: 40px 40px;
-}
-
-.needle {
   transform: rotate(calc(-120deg + var(--scene-progress, 0) * 230deg));
 }
 
