@@ -3,7 +3,7 @@
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -34,7 +34,7 @@ const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOI
 export default function BoldNoirTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
+  const { navigation } = useLabels()
   const reducedMotion = useReducedMotion()
   const rootRef = usePointerVars(!reducedMotion)
 
@@ -61,9 +61,9 @@ export default function BoldNoirTheme() {
       </div>
 
       <main className="relative z-20 px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+        <ProfessionRegion className="mx-auto max-w-6xl">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-        </div>
+        </ProfessionRegion>
       </main>
 
       <DeliveredCard />
