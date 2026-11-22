@@ -1,51 +1,52 @@
-import type { ReactNode } from 'react'
+import type { AboutFactsLook } from '@/components/cv/AboutFacts'
 import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
+import type { ContactLinkId } from '@/components/cv/SiteLinks'
 
-// The world's type and card faces. Names and counts are the game's fat cartoon capitals (Luckiest Guy,
-// --np-face); the reading text is a round sans (Nunito, --np-body). A card is one of the game's objects
-// with a plain face, never text on the art: the crate's inner panel (cream planks in a wood frame), the
-// warp sphere's glass, the time trial's black board.
+// The text layer's faces. Every line of text sits on an opaque panel (--np-panel), never on the tunnel's
+// art, so it reads from its first frame. Names and titles are the corridor's square display capitals
+// (Bungee, --np-face); the reading text is Atkinson Hyperlegible (--np-body). A room's own colours are
+// --ra1 (its edge and markers) and --ra-text (its small coloured text, the era tint), set on the section.
 
 export const FACE = 'font-[family-name:var(--np-face)] font-normal'
 export const BODY = 'font-[family-name:var(--np-body)]'
 
-/** The crate's inner panel: cream planks inside a wood frame with the crate's hard drop. */
-export const PANEL =
-  'relative rounded-md border-4 border-[color:var(--np-wood)] bg-[color:var(--np-cream)] p-4 text-[color:var(--np-ink)] shadow-[0_5px_0_var(--np-wood-dark)]'
+const CUT = '[clip-path:polygon(0_0,calc(100%-18px)_0,100%_18px,100%_100%,18px_100%,0_calc(100%-18px))]'
 
-/** The time trial's black board: gold and white on black. */
-export const BOARD = 'rounded-md border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] text-[color:var(--np-white)]'
+/** A card: the panel with its cut corners and the room's neon edge down the left. */
+export const CARD = `relative w-full max-w-[35rem] bg-[color:var(--np-panel)] py-5 pl-[1.85rem] pr-6 max-md:py-[1.15rem] max-md:pl-[1.45rem] max-md:pr-[1.15rem] ${CUT} before:absolute before:bottom-[18px] before:left-0 before:top-[18px] before:w-1 before:bg-[color:var(--ra1)] before:content-[''] [&>*+*]:mt-2.5`
 
-/** The black plate under a line of text that would otherwise cross the backdrop's art (level names, the Muay
- *  Thai title, the musician line): GOLD on it 13.6:1, MUTED 12.3:1. It sets no text colour of its own. */
-export const ART_PLATE = 'rounded-xl border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] px-4 py-1'
+export const CARD_WIDE = 'max-w-[39rem]'
 
-/** A card's name, in the game's capitals, the wood text twin on the cream face. */
-export const CARD_TITLE = `${FACE} text-xl leading-tight tracking-wide text-[color:var(--np-wood-text)]`
+export const CARD_TITLE = 'text-[1.3rem] font-bold leading-tight'
 
-/** A plain line of a card's facts on the cream face. */
-export const CARD_LINE = 'text-sm font-semibold text-[color:var(--np-ink-soft)]'
+export const CARD_TITLE_BIG = 'text-[1.6rem] font-bold leading-tight'
 
-/** A tag on the cream face: a technology, a skill, a service. */
-export const TAG = 'rounded-sm border-2 border-[color:var(--np-wood-dark)] bg-[color:var(--np-tag)] px-2 py-0.5 text-sm font-semibold text-[color:var(--np-ink)]'
+export const TINT = 'font-bold text-[color:var(--ra-text)]'
 
-/** Every tag of a card, none cut: the tech of a job, a project, a venture's services. */
-export const TAGS: TagListLook = { list: 'mt-3 flex flex-wrap gap-1.5', tag: TAG }
+export const MUTED = 'text-[color:var(--np-muted)]'
 
-/** A card's points, each behind a small berry: a job's highlights, a project's details. */
+export const TAGS: TagListLook = {
+  list: 'flex flex-wrap gap-1.5 pt-1',
+  tag: 'border border-[color:color-mix(in_srgb,var(--ra1)_50%,transparent)] bg-[color:var(--np-raised)] px-2.5 py-0.5 text-[0.92rem]',
+}
+
 export const POINTS: MarkedLinesLook = {
-  list: 'mt-3 space-y-1.5',
-  line: 'flex items-start gap-2 text-sm leading-relaxed',
-  marker: <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-[color:var(--np-ink)] bg-[color:var(--np-berry)]" aria-hidden="true" />,
+  list: 'space-y-1.5',
+  line: 'flex items-start gap-2.5',
+  marker: <span className="mt-[0.45rem] h-2.5 w-2 shrink-0 bg-[color:var(--ra1)] [clip-path:polygon(50%_0,100%_40%,50%_100%,0_40%)]" aria-hidden="true" />,
 }
 
-/** A line of facts with a heading of its own, for the fields a card shows under its title. */
-export function Fact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <p className="mt-2 text-sm leading-relaxed">
-      <span className="font-bold">{label}: </span>
-      {children}
-    </p>
-  )
-}
+export const FACTS: AboutFactsLook = { list: 'space-y-2.5', fact: '', term: TINT, value: '' }
+
+const BUTTON = `inline-flex min-h-[44px] items-center px-[1.15rem] py-2 font-bold no-underline [clip-path:polygon(0_0,calc(100%-10px)_0,100%_10px,100%_100%,10px_100%,0_calc(100%-10px))] focus-visible:[clip-path:none]`
+
+/** The outlined button: the room's tint on the panel. */
+export const BUTTON_LINE = `${BUTTON} border-2 border-[color:var(--ra-text)] bg-[color:var(--np-panel)] text-[color:var(--ra-text)] hover:bg-[color:var(--np-raised)]`
+
+/** The one lit button (Email): the panel on the room's tint. */
+export const BUTTON_LIT = `${BUTTON} border-2 border-[color:var(--ra-text)] bg-[color:var(--ra-text)] text-[color:var(--np-panel)] hover:bg-[color:var(--np-white)]`
+
+export const BUTTON_SMALL = 'min-h-[40px] px-[0.9rem] py-1.5 text-[0.95rem]'
+
+export const CONTACT_LOOK: Record<ContactLinkId, string> = { email: BUTTON_LIT, linkedin: BUTTON_LINE, cv: BUTTON_LINE, engine: BUTTON_LINE }

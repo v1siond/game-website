@@ -82,23 +82,23 @@ export const themes: Theme[] = [
     font: 'monospace',
   },
 
-  // 3. Neon Portals - a time machine's warp rooms and the levels they open, drawn in 2D, him as its grinning runner
+  // 3. Neon Portals - one neon tunnel through time, a room of its own era per CV section, him as its bandicoot styled runner
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'A warp room hub and a level for each part of the CV',
+    description: 'A neon tunnel through time with a room of its own era for each part of the CV',
     colors: {
       background: PORTAL.VOID,
-      backgroundGradient: `linear-gradient(to bottom, ${PORTAL.CHAMBER}, ${PORTAL.VOID})`,
-      accent: PORTAL.ORANGE,
-      text: PORTAL.WHITE,
+      backgroundGradient: `linear-gradient(to bottom, ${PORTAL.PANEL}, ${PORTAL.VOID})`,
+      accent: PORTAL.CYAN,
+      text: PORTAL.INK,
       textMuted: PORTAL.MUTED,
-      secondary: PORTAL.BLUE,
-      highlight: PORTAL.VIOLET,
+      secondary: PORTAL.VIOLET,
+      highlight: PORTAL.GOLD,
       border: PORTAL.SEAM,
-      borderHover: PORTAL.ORANGE,
-      surface: PORTAL.CHAMBER,
-      surfaceHover: PORTAL.PANEL,
+      borderHover: PORTAL.CYAN,
+      surface: PORTAL.PANEL,
+      surfaceHover: PORTAL.RAISED,
     },
     font: 'sans-serif',
   },
