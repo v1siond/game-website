@@ -172,7 +172,6 @@ export function SwitchPalaces({ projects, profession }: { projects: Project[]; p
   const { ref, on } = useZoneStage<Zone>('plains')
   const [filled, setFilled] = useState(false)
   const fill = useCallback(() => setFilled(true), [])
-  const colourOf = (project: Project) => SWITCH_COLOURS[projects.indexOf(project) % SWITCH_COLOURS.length]
 
   return (
     <Region title={sections.projects} stageRef={ref} on={on}>
@@ -195,7 +194,7 @@ export function SwitchPalaces({ projects, profession }: { projects: Project[]; p
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <SwitchPalace slot={slot} colour={colourOf(slot.project)} filled={filled} />}
+        renderProject={(slot, index) => <SwitchPalace slot={slot} colour={SWITCH_COLOURS[index % SWITCH_COLOURS.length]} filled={filled} />}
       />
     </Region>
   )

@@ -119,7 +119,7 @@ export function NoteBlockLevel({ bands, musician }: { bands: Band[]; musician: M
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BandCard slot={slot} onPoint={() => setAt(bands.indexOf(slot.band))} />}
+        renderBand={(slot, index) => <BandCard slot={slot} onPoint={() => setAt(index)} />}
       />
       {musician.line && <p className="mt-6 inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1.5 text-base italic text-[color:var(--ap-coin)]">{musician.line}</p>}
     </Region>

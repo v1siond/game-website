@@ -74,8 +74,7 @@ function ChainScene({ count, onStomped }: { count: number; onStomped: (stomped: 
 export function StompLevel({ martialArts }: { martialArts: MartialArts }) {
   const { sections, trail: labels } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('fortress')
-  const achievements = martialArts.primary.achievements
-  const count = achievements.length
+  const count = martialArts.primary.achievements.length
   const [round, setRound] = useState(0)
   const [cleared, setCleared] = useState(0)
   const stomped = useCallback((now: number) => setCleared((before) => Math.max(before, now)), [])
@@ -108,8 +107,7 @@ export function StompLevel({ martialArts }: { martialArts: MartialArts }) {
             achievements: 'order-1 space-y-3 lg:order-2',
             achievement: '',
           }}
-          renderAchievement={(achievement) => {
-            const index = achievements.indexOf(achievement)
+          renderAchievement={(achievement, index) => {
             const done = index < cleared
             return (
               <div className="flex items-start gap-3 rounded-md border-[3px] border-[color:var(--ap-hud)] bg-[color:var(--ap-page)] p-3 text-[color:var(--ap-ink)] shadow-[0_4px_0_var(--ap-hud)]">

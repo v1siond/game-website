@@ -122,6 +122,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   const { sections, trail: labels } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('sky')
   const route = useMemo(() => byStart(jobs), [jobs])
+  const ledgeAt = useMemo(() => new Map(route.map((job, index) => [job, index])), [route])
   const count = route.length
   const latest = count - 1
   const [target, setTarget] = useState(latest)
@@ -180,7 +181,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
 
       <ol className={MASONRY_LIST}>
         {jobs.map((job) => {
-          const index = route.indexOf(job)
+          const index = ledgeAt.get(job) ?? 0
           return (
             <li key={job.id} className={`${MASONRY_ITEM} ${bumpOf(index)}`}>
               <JobCard job={job} stop={index + 1} onPoint={() => point(index)} />
