@@ -1,5 +1,5 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
-import { MAX_STEP, endMove, motionFor, nextSpecial, startSpecial, startWalk, type MoveState } from './moves'
+import { MAX_STEP, endMove, motionFor, startSpecial, startWalk, type MoveState } from './moves'
 import { FIGHTER_POSES, framesFor } from './poses'
 
 const REST: MoveState = { playing: null, last: null, step: 0 }
@@ -19,7 +19,7 @@ describe('fighter moves', () => {
     expect(first.playing).toBe('hadouken')
     expect(startSpecial(first)).toBe(first)
     expect(startSpecial(endMove(first)).playing).toBe('shoryuken')
-    expect(nextSpecial('tatsumaki')).toBe('hadouken')
+    expect(startSpecial({ ...REST, last: 'tatsumaki' }).playing).toBe('hadouken')
   })
 
   it('walks a step at a time and stops at the edge of his ground', () => {

@@ -76,10 +76,11 @@ export function WinOrb({ className = 'h-6 w-6' }: { className?: string }) {
   )
 }
 
-// The picked profession called across the stage, like the round call before a fight.
+// The picked profession called across the stage, like the round call before a fight. It is no live
+// region: the profession switch's checked radio already tells a screen reader the pick.
 export function RoundCall({ text }: { text: string }) {
   return (
-    <div className={`relative overflow-hidden px-3 py-4 text-center ${look.roundBand}`} role="status" aria-live="polite">
+    <div className={`relative overflow-hidden px-3 py-4 text-center ${look.roundBand}`}>
       <span className="text-[clamp(1.75rem,7vw,3rem)] uppercase leading-tight">
         <CallText>{text}</CallText>
       </span>

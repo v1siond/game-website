@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { CallText } from './badges'
+import { HudBar } from './hud'
 import look from './world.module.css'
 
 // The arcade screen every section sits in: the monitor's black, a thin rule in the section's accent and a
@@ -36,7 +37,7 @@ export function ArcadePanel({ accent, title, id, children }: ArcadePanelProps) {
             <h2 id={id} className="min-w-0 text-[clamp(1.375rem,5vw,2rem)] uppercase leading-tight">
               <CallText>{title}</CallText>
             </h2>
-            <span className="hidden h-3 flex-1 border-2 border-black bg-[color:var(--fs-hud-yellow)] shadow-[0_0_0_1px_#fff] sm:block" aria-hidden="true" />
+            <HudBar className="hidden sm:block" />
           </div>
         )}
         <div className="p-4 sm:p-8">{children}</div>

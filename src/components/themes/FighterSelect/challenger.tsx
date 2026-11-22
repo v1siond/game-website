@@ -7,9 +7,10 @@ import type { Profession } from '@/lib/cv/professions'
 import { ArenaFighter } from './arena'
 import { ScreenPanel } from './frames'
 import { StageBackdrop } from './stages'
-import { CVLink, HeroAction } from './actions'
+import { ArcadeLinks } from './actions'
 import { Fighter } from './fighter'
-import { useScene } from './scenes'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './backdrop'
 import living from './living.module.css'
 import { CallText } from './badges'
 import { Cue, HudCentre, LifeBar } from './hud'
@@ -26,6 +27,8 @@ import fight from './fight.module.css'
 
 const CONTACT_HEADING = headingId('fighter-select', 'Contact')
 const CLOCK_DIGITS = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+// The win screen offers the CV beside the hero's actions; the portfolio stays on the versus screen.
+const CONTACT_SITES = ['cv'] as const
 
 // The clock under the KO badge, two digits wide in the round call lettering: the tens stay at zero
 // while the units strip ticks down.
@@ -50,7 +53,7 @@ function ChallengeClock() {
 
 export function ChallengerScene({ profession }: { profession: Profession }) {
   const { sections, arcade } = useLabels()
-  const { ref } = useScene('temple')
+  const { ref } = useZoneStage<Zone>('temple')
 
   return (
     <section aria-labelledby={CONTACT_HEADING} className="relative z-20 mx-auto mb-10 max-w-6xl px-4 sm:px-6">
@@ -111,14 +114,7 @@ export function ChallengerScene({ profession }: { profession: Profession }) {
                   <div
                     className={`flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start ${fight.enter} ${fight.rise} [--delay:860ms]`}
                   >
-                    {actions.map((action) => (
-                      <span key={action.id} className={`inline-flex justify-center ${fight.press}`}>
-                        <HeroAction action={action} />
-                      </span>
-                    ))}
-                    <span className={`inline-flex justify-center ${fight.press}`}>
-                      <CVLink />
-                    </span>
+                    <ArcadeLinks actions={actions} sites={CONTACT_SITES} frame={`inline-flex justify-center ${fight.press}`} />
                   </div>
                 </div>
               </ScreenPanel>

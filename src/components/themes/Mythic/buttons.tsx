@@ -1,9 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
 import u from './underworld.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons: carved capitals on a gold, blood or stone slab with a dark drop under it; they
 // lift on hover and press into the drop on a click (underworld.module.css, "buttons").
@@ -24,28 +22,22 @@ export function SlabButton({ tone = 'gold', className = '', type = 'button', ...
   return <button type={type} className={`${slabClass(tone)} ${className}`} {...props} />
 }
 
-// Email is the blood red action, LinkedIn the gold one.
-const HERO_TONE: Record<HeroActionSlot['id'], SlabTone> = {
+// Email is the blood red action, LinkedIn the gold one, the CV and the engine stone.
+const HERO_TONE: Record<ContactLinkId, SlabTone> = {
   email: 'blood',
   linkedin: 'gold',
+  cv: 'stone',
+  engine: 'stone',
 }
 
 /** The four ways to reach him, the same in the hero and at the last gate. */
 export function ContactActions({ actions }: { actions: readonly HeroActionSlot[] }) {
-  const labels = useLabels().actions
+  const siteLinks = useSiteLinks('engine')
   return (
     <>
-      {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={slabClass(HERO_TONE[action.id])}>
-          {action.label}
-        </a>
+      {[...actions, siteLinks.cv, siteLinks.engine].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={slabClass(HERO_TONE[slot.id])} />
       ))}
-      <Link href="/cv" className={slabClass('stone')}>
-        {labels.cv}
-      </Link>
-      <Link {...ENGINE_LINK} aria-label={labels.viewEngine} className={slabClass('stone')}>
-        {labels.engine}
-      </Link>
     </>
   )
 }

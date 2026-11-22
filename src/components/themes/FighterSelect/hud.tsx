@@ -15,6 +15,7 @@ import fight from './fight.module.css'
 //   or number under it on the outer edge in the HUD's condensed capitals.
 // - RoundPip: the red KO badge shape in the middle of the HUD carrying the round number.
 // - HudCentre: the KO badge with whatever stands under it (the clock), the centre of the fight HUD.
+// - HudBar: a full life bar run out to the edge, the yellow strip a section title or a separator stretches.
 
 export function Cue({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -61,6 +62,10 @@ export function RoundPip({ children }: { children: ReactNode }) {
       {children}
     </span>
   )
+}
+
+export function HudBar({ className = '' }: { className?: string }) {
+  return <span className={`h-3 flex-1 border-2 border-black bg-[color:var(--fs-hud-yellow)] shadow-[0_0_0_1px_#fff] ${className}`} aria-hidden="true" />
 }
 
 export function HudCentre({ children }: { children?: ReactNode }) {

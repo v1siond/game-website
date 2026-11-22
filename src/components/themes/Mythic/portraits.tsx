@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/lib/cv/sectionText'
@@ -15,12 +15,13 @@ import u from './underworld.module.css'
 // Beside them he stands at the great war drum; pointing at or focusing a band, he brings the hilts down
 // on the skin, fire bursts from it and the band's portrait flares on each hit.
 
-function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; onStrike: () => void }) {
-  const { links } = useLabels()
-  const { band, years, linkProps } = slot
+// Memoised: a strike re-renders the portraits, and only the card it flares needs to draw again.
+const BandCard = memo(function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; onStrike: (id: string) => void }) {
+  const { band, years, linkProps, release } = slot
+  const strike = () => onStrike(band.id)
 
   return (
-    <article className={`flex gap-4 ${u.bandCard}`} onPointerEnter={onStrike} onFocus={onStrike}>
+    <article className={`flex gap-4 ${u.bandCard}`} onPointerEnter={strike} onFocus={strike}>
       <div className={`relative flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden ${u.portrait}`} aria-hidden="true">
         {flare > 0 && <span key={flare} className={`absolute inset-0 bg-[radial-gradient(circle,var(--myth-fire-core),transparent_70%)] ${u.flare}`} />}
         <span className={`text-3xl text-[var(--myth-ink)] ${u.display}`}>{band.name.charAt(0)}</span>
@@ -37,27 +38,34 @@ function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; on
         </h3>
         <p className="mt-1 text-base">{band.role}</p>
         {years && <p className="text-sm text-[var(--myth-bone-shade)]">{years}</p>}
-        {band.release && (
+        {release && (
           <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">
-            <span className={`mr-2 text-sm not-italic text-[var(--myth-bone-shade)] ${u.display}`}>{links.released}</span>
-            {band.release}
+            <span className={`mr-2 text-sm not-italic text-[var(--myth-bone-shade)] ${u.display}`}>{release.label}</span>
+            {release.title}
           </p>
         )}
       </div>
     </article>
   )
-}
+})
 
 export function Portraits({ musician, bands }: { musician: Musician; bands: Band[] }) {
   const { years } = useLabels()
   const [struck, setStruck] = useState<string | null>(null)
   const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
+  const strike = useCallback(
+    (id: string) => {
+      setStruck(id)
+      play('drum')
+    },
+    [play],
+  )
 
   return (
     <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
       <div className={`p-5 ${u.panel} ${u.reveal} lg:sticky lg:top-8 lg:self-start`}>
         <div className="mx-auto h-64 w-52" aria-hidden="true">
-          <SpartanSprite key={take} profession="drummer" motion={pose} onDone={settle} className="h-full w-full" />
+          <SpartanSprite profession="drummer" motion={pose} onDone={settle} className="h-full w-full" take={take} />
         </div>
         <p className={`mt-4 text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
@@ -70,10 +78,7 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
           <BandCard
             slot={slot}
             flare={struck === slot.band.id ? take : 0}
-            onStrike={() => {
-              setStruck(slot.band.id)
-              play('drum')
-            }}
+            onStrike={strike}
           />
         )}
       />

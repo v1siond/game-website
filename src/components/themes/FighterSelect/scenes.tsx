@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -28,10 +29,6 @@ import living from './living.module.css'
 //   flash, lighting its card, then answers with the uppercut.
 // - SparRing (Muay Thai): his roundhouse and jab put the partner down, K.O., then Perfect.
 
-export function useScene(zone: Zone) {
-  return useZoneStage<Zone>(zone)
-}
-
 // ---- About: the bonus stage car ----
 
 const CAR_BOUT: Beat[] = [
@@ -47,38 +44,22 @@ const DEBRIS: { d: string; fill: string; vars: CSSProperties }[] = [
   {
     d: 'M70 30 H110 V52 H70 Z',
     fill: FS.p2,
-    vars: {
-      '--fx': '60px',
-      '--fy': '-90px',
-      '--fr': '140deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '60px', '--fy': '-90px', '--fr': '140deg' }),
   },
   {
     d: 'M112 30 H150 V52 H112 Z',
     fill: FS.p2Dark,
-    vars: {
-      '--fx': '120px',
-      '--fy': '-50px',
-      '--fr': '-120deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '120px', '--fy': '-50px', '--fr': '-120deg' }),
   },
   {
     d: 'M60 66 a12 12 0 1 0 0.1 0 Z',
     fill: FS.ink,
-    vars: {
-      '--fx': '-40px',
-      '--fy': '-70px',
-      '--fr': '300deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '-40px', '--fy': '-70px', '--fr': '300deg' }),
   },
   {
     d: 'M150 66 a12 12 0 1 0 0.1 0 Z',
     fill: FS.ink,
-    vars: {
-      '--fx': '90px',
-      '--fy': '-30px',
-      '--fr': '-260deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '90px', '--fy': '-30px', '--fr': '-260deg' }),
   },
 ]
 
@@ -87,11 +68,13 @@ const DEBRIS: { d: string; fill: string; vars: CSSProperties }[] = [
 function Car({ damage }: { damage: number }) {
   const roofDrop = Math.min(damage, 3) * 5
   const wrecked = damage >= 3
+  // The sill the body stands on: low on its belly once wrecked.
+  const sill = wrecked ? 80 : 70
   return (
     <svg viewBox="0 0 200 90" className="h-full w-full overflow-visible" focusable="false">
       <ellipse cx={100} cy={86} rx={90} ry={4} fill={FS.ink} opacity={0.4} />
       <path
-        d={`M14 ${wrecked ? 80 : 70} L22 44 H58 L76 ${18 + roofDrop} H136 L156 44 H186 L190 ${wrecked ? 80 : 70} Z`}
+        d={`M14 ${sill} L22 44 H58 L76 ${18 + roofDrop} H136 L156 44 H186 L190 ${sill} Z`}
         fill={FS.p2}
         stroke={FS.ink}
         strokeWidth={3}
@@ -122,7 +105,7 @@ const WRECK_BEAT = CAR_BOUT.findIndex((beat) => beat.mark === 'wreck')
 
 export function CarSmash({ profession, children }: { profession: Profession; children: ReactNode }) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('castle')
+  const { ref, on, reduced } = useZoneStage<Zone>('castle')
   const { index, beat, take, started, replay } = useBout(CAR_BOUT, on, reduced)
   const wrecked = reached(CAR_BOUT, index, 'wreck')
   const damage = wrecked ? 3 : marksUpTo(CAR_BOUT, index, 'hit')
@@ -191,8 +174,8 @@ interface LitListProps<T> {
 
 export function BlastRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('market')
-  const [bout] = useState(() => blastBout(items.length))
+  const { ref, on, reduced } = useZoneStage<Zone>('market')
+  const bout = useMemo(() => blastBout(items.length), [items.length])
   const { index, beat, take, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
   const blasting = beat.hero === 'hadouken'
@@ -245,16 +228,14 @@ const superBout = (count: number): Beat[] => [
 export function SuperArt({ profession, count }: { profession: Profession; count: number }) {
   const { arcade } = useLabels()
   const land = useComboLand()
-  const { ref, on, reduced } = useScene('harbour')
-  const [bout] = useState(() => superBout(count))
-  const { beat, take, started, replay } = useBout(bout, on, reduced)
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
+  const bout = useMemo(() => superBout(count), [count])
+  // Every hit of the super lands on the combo counter, once per beat, as the bout's clock reaches it.
+  const { beat, take, started, replay } = useBout(bout, on, reduced, (next) => {
+    if (!reduced && next.mark === 'hit') land()
+  })
   const flashing = !reduced && started && beat.mark === 'flash'
   const hitBeat = !reduced && beat.mark === 'hit'
-
-  // Every hit of the super lands on the combo counter, once per beat.
-  useEffect(() => {
-    if (hitBeat) land()
-  }, [hitBeat, take, land])
 
   return (
     <div ref={ref}>
@@ -315,8 +296,8 @@ const parryBout = (count: number): Beat[] => [
 
 export function ParryRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('harbour')
-  const [bout] = useState(() => parryBout(items.length))
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
+  const bout = useMemo(() => parryBout(items.length), [items.length])
   const { index, beat, take, started, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
 
@@ -351,7 +332,7 @@ const SPAR_BOUT: Beat[] = [
 
 export function SparRing({ profession }: { profession: Profession }) {
   const { arcade } = useLabels()
-  const { ref, on, reduced } = useScene('temple')
+  const { ref, on, reduced } = useZoneStage<Zone>('temple')
   const { index, beat, take, started, replay } = useBout(SPAR_BOUT, on, reduced)
   const ko = reached(SPAR_BOUT, index, 'ko')
   const perfect = reached(SPAR_BOUT, index, 'perfect')
@@ -397,30 +378,28 @@ export function SparRing({ profession }: { profession: Profession }) {
 const DECK_BOUT: Beat[] = [{ hero: 'act', partner: 'win', ms: 0 }]
 
 // He plays his flurry on the kit while his partner dances on the deck and the crowd along the rail
-// bobs; a pointer on a band's card makes them cheer, jumping higher and faster.
-export function DeckShow({ children }: { children: (cheer: (on: boolean) => void) => ReactNode }) {
-  const { ref, on, reduced } = useScene('harbour')
+// bobs; a pointer on a band's card ([data-band] in children) or the focus in it makes them cheer, jumping
+// higher and faster, all in CSS (living.module.css), so a band hover renders nothing.
+export function DeckShow({ children }: { children: ReactNode }) {
+  const { ref, on, reduced } = useZoneStage<Zone>('harbour')
   const { beat, take } = useBout(DECK_BOUT, on, reduced)
-  const [cheering, setCheering] = useState(false)
 
   return (
-    <div ref={ref}>
-      <div data-cheer={cheering || undefined}>
-        <Ring profession="drummer" stage="drummer" beat={beat} take={take} partnerAt="mid" className="mb-6 h-40 sm:h-52">
-          <svg
-            viewBox="0 0 640 60"
-            preserveAspectRatio="xMidYMax slice"
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 w-full sm:h-14"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <CrowdGroup x={20} base={60} count={5} gap={22} scale={0.9} i={0} />
-            <CrowdGroup x={250} base={60} count={4} gap={22} scale={0.9} i={1} />
-            <CrowdGroup x={460} base={60} count={6} gap={22} scale={0.9} i={2} />
-          </svg>
-        </Ring>
-      </div>
-      {children(setCheering)}
+    <div ref={ref} className={living.deck}>
+      <Ring profession="drummer" stage="drummer" beat={beat} take={take} partnerAt="mid" className="mb-6 h-40 sm:h-52">
+        <svg
+          viewBox="0 0 640 60"
+          preserveAspectRatio="xMidYMax slice"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 w-full sm:h-14"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <CrowdGroup x={20} base={60} count={5} gap={22} scale={0.9} i={0} />
+          <CrowdGroup x={250} base={60} count={4} gap={22} scale={0.9} i={1} />
+          <CrowdGroup x={460} base={60} count={6} gap={22} scale={0.9} i={2} />
+        </svg>
+      </Ring>
+      {children}
     </div>
   )
 }

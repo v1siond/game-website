@@ -49,8 +49,16 @@
     animation-play-state: paused;
   }
 
-  /* The deck crowd cheering when the pointer lands on a band: they jump higher and faster. */
-  [data-cheer] .bob {
+  /* The deck crowd cheering while a band holds the focus: they jump higher and faster. */
+  .deck:has([data-band]:focus-within) .bob {
+    animation: cheer 360ms steps(2, jump-none) infinite alternate;
+  }
+}
+
+/* And while the pointer is on a band, on a screen whose pointer hovers: a touch screen keeps :hover on the
+   card it tapped, which would leave the crowd cheering after the finger has gone. */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .deck:has([data-band]:hover) .bob {
     animation: cheer 360ms steps(2, jump-none) infinite alternate;
   }
 }

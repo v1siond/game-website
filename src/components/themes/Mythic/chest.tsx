@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { FigureSpace, SpartanSprite } from './sprite'
 import { useSceneMove, useTrack } from './track'
@@ -83,8 +82,7 @@ function Lid() {
 
 export function ChestHeave() {
   const { reduced } = useZoneStageContext()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.5 })
-  const { pose, take, settle, ms } = useSceneMove('heave', triggered)
+  const { ref, pose, take, settle, ms } = useSceneMove('heave', 0.5)
   const lidRef = useRef<SVGGElement>(null)
   const glowRef = useRef<SVGPathElement>(null)
   useTrack(lidRef, LID_TRACK, ms, take)
@@ -98,7 +96,7 @@ export function ChestHeave() {
           <path ref={glowRef} d="M148 152 L208 152 L242 0 L114 0 Z" fill={MYTH.fireCore} opacity={reduced ? 0.85 : 0} className={`${u.sceneProp} ${u.chestGlow}`} />
           <ChestBody />
         </FigureSpace>
-        <SpartanSprite key={take} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={take} />
         <FigureSpace place={HIM}>
           <g ref={lidRef} opacity={reduced ? 0 : 1} className={`${u.sceneProp} ${u.chestLid}`}>
             <Lid />

@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, type ReactNode } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SpartanSprite } from './sprite'
 import { useSceneMove, useTrack } from './track'
 import { MYTH } from './palette'
@@ -61,8 +60,7 @@ function Slab() {
 }
 
 export function ChainHaul({ children }: { children: ReactNode }) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.4 })
-  const { pose, take, settle, ms } = useSceneMove('haul', triggered)
+  const { ref, pose, take, settle, ms } = useSceneMove('haul', 0.4)
   const chainRef = useRef<SVGGElement>(null)
   const slabRef = useRef<SVGGElement>(null)
   useTrack(chainRef, CHAIN_TRACK, ms, take)
@@ -79,7 +77,7 @@ export function ChainHaul({ children }: { children: ReactNode }) {
           <Chain dy={0} />
           <Chain dy={4} />
         </g>
-        <SpartanSprite key={take} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={take} />
       </svg>
       <div className={`p-6 ${u.panel} ${u.hauled}`}>{children}</div>
     </div>

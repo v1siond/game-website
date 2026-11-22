@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
@@ -62,7 +63,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
   const rarity = rarityOf(project, links.length)
 
   return (
-    <article data-rarity={rarity} className={`relative ${u.boon}`} style={{ ['--w' as string]: waveOf(index), ['--k' as string]: index % BOONS_PER_WAVE }}>
+    <article data-rarity={rarity} className={`relative ${u.boon}`} style={cssVars({ '--w': waveOf(index), '--k': index % BOONS_PER_WAVE })}>
       <div className={`p-5 ${u.boonFrame}`}>
         <div className="flex items-start justify-between gap-3">
           <p className={`text-sm ${u.display} ${u.rarityWord}`}>{RARITY_WORD[rarity](labels)}</p>
@@ -146,7 +147,8 @@ export function Boons({ projects }: { projects: Project[] }) {
     setChosenIds((current) => (current.includes(id) ? current.filter((each) => each !== id) : [...current, id]))
   }, [])
 
-  const chosen = chosenIds.flatMap((id) => projects.filter((project) => project.id === id))
+  const byId = useMemo(() => new Map(projects.map((project) => [project.id, project])), [projects])
+  const chosen = chosenIds.flatMap((id) => byId.get(id) ?? [])
 
   return (
     <>
@@ -155,8 +157,8 @@ export function Boons({ projects }: { projects: Project[] }) {
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => (
-          <BoonCard slot={slot} index={projects.indexOf(slot.project)} chosen={chosenIds.includes(slot.project.id)} onChoose={toggle} />
+        renderProject={(slot, index) => (
+          <BoonCard slot={slot} index={index} chosen={chosenIds.includes(slot.project.id)} onChoose={toggle} />
         )}
       />
     </>

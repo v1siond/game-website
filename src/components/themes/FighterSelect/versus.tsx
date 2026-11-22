@@ -6,7 +6,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { NameWords } from '@/components/cv/NameWords'
 import { ArenaFighter } from './arena'
 import { StageBackdrop } from './stages'
-import { CVLink, HeroAction, PortfolioLink } from './actions'
+import { ArcadeLinks } from './actions'
 import { ClashEmblem } from './badges'
 import { Cue } from './hud'
 import look from './world.module.css'
@@ -21,6 +21,8 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 // 260ms he slides into his corner and lands with an overshoot (420ms),
 // 360ms a white flash over the stage and the VS burst slamming onto the seam mark the moment the
 // panels meet, 520ms his name slams down from 2.4x (360ms), 760ms the headline lines rise in turn.
+
+const HERO_SITES = ['cv', 'engine'] as const
 
 const RISE_DELAYS = ['[--delay:760ms]', '[--delay:860ms]', '[--delay:960ms]', '[--delay:1060ms]']
 
@@ -73,11 +75,7 @@ export function HeroSplash({ profession }: { profession: Profession }) {
               <p className={`mt-2 text-base text-[color:var(--fs-hud-yellow)] ${fight.enter} ${fight.rise} ${RISE_DELAYS[1]}`}>{tagline}</p>
               <p className={`mt-2 text-sm ${fight.enter} ${fight.rise} ${RISE_DELAYS[2]}`}>{line}</p>
               <nav className={`mt-6 flex flex-wrap items-center gap-3 ${fight.enter} ${fight.rise} ${RISE_DELAYS[3]}`} aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PortfolioLink />
+                <ArcadeLinks actions={actions} sites={HERO_SITES} />
               </nav>
             </div>
           </div>

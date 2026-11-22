@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
@@ -53,10 +54,8 @@ const GIANT_TRACK: Record<Strike, Keyframe[]> = {
   ],
 }
 
-const EYE_TRACK: Record<Strike, Keyframe[]> = {
-  knee: [{ opacity: 0 }, { opacity: 0 }],
-  elbow: [{ opacity: 0 }, { opacity: 0 }],
-  kick: [{ opacity: 0 }, { opacity: 0 }],
+// Only the roar lights his eye; the other strikes leave it dark, as it is drawn.
+const EYE_TRACK: Partial<Record<Strike, Keyframe[]>> = {
   roar: [
     { offset: 0, opacity: 0 },
     { offset: 0.3, opacity: 1 },
@@ -106,7 +105,7 @@ function Arena() {
       <svg viewBox={`0 0 ${SCENE.width} ${SCENE.height}`} className="h-64 w-full max-w-[19rem]" aria-hidden="true">
         <path d={`M0 ${SCENE.height - 6} L${SCENE.width} ${SCENE.height - 6}`} stroke={MYTH.goldDeep} strokeWidth={3} />
         <Ring strike={last ?? 'knee'} take={last ? take : 0} />
-        <SpartanSprite key={take} profession="fighter" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="fighter" motion={pose} place={HIM} onDone={settle} take={take} />
       </svg>
       <SlabButton tone="blood" className="mt-4" onClick={strike}>
         {myth.strike}
@@ -117,7 +116,6 @@ function Arena() {
 
 export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
   const { myth } = useLabels()
-  const { achievements } = martialArts.primary
 
   return (
     <div className="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
@@ -135,10 +133,10 @@ export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
               achievements: `space-y-3 p-5 ${u.panel}`,
               achievement: 'flex items-start justify-between gap-4 border-b border-[var(--myth-gold-deep)] pb-3 last:border-b-0 last:pb-0',
             }}
-            renderAchievement={(achievement) => (
+            renderAchievement={(achievement, index) => (
               <>
                 <span className="text-base">{achievement}</span>
-                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={{ ['--i' as string]: achievements.indexOf(achievement) }}>
+                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={cssVars({ '--i': index })}>
                   {myth.fulfilled}
                 </span>
               </>

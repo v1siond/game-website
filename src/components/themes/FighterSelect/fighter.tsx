@@ -1,6 +1,7 @@
 'use client'
 
-import { useId, type CSSProperties, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { FS } from './palette'
@@ -81,8 +82,17 @@ const GEAR: Record<Profession, Omit<Costume, keyof Look>> = {
 }
 
 // The partner always spars in his gi and wraps, whatever his opponent's profession.
-const costumeOf = (who: Who, profession: Profession): Costume =>
-  who === 'partner' ? { ...LOOKS.partner, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' } : { ...LOOKS.hero, ...GEAR[profession] }
+const PARTNER: Costume = { ...LOOKS.partner, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' }
+
+// Every costume built once at module scope, so a fighter's frames get the same object on every render.
+const COSTUME: Record<Who, Record<Profession, Costume>> = {
+  hero: {
+    engineer: { ...LOOKS.hero, ...GEAR.engineer },
+    drummer: { ...LOOKS.hero, ...GEAR.drummer },
+    fighter: { ...LOOKS.hero, ...GEAR.fighter },
+  },
+  partner: { engineer: PARTNER, drummer: PARTNER, fighter: PARTNER },
+}
 
 // ---- geometry ----
 
@@ -482,17 +492,18 @@ function Spark({ at: [x, y], r }: { at: Pt; r: number }) {
   )
 }
 
-const FX_DRAW: Record<Fx['kind'], (fx: Fx) => ReactNode> = {
-  charge: (fx) =>
-    fx.kind === 'charge' && (
-      <g>
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r + 3} fill={FS.p1} opacity={0.45} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r} fill={FS.cyan} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r * 0.45} fill={FS.flash} />
-      </g>
-    ),
+// One drawing per effect kind, each handed its own kind of effect.
+type FxDraw = { [Kind in Fx['kind']]: (fx: Extract<Fx, { kind: Kind }>) => ReactNode }
+
+const FX_DRAW: FxDraw = {
+  charge: (fx) => (
+    <g>
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r + 3} fill={FS.p1} opacity={0.45} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r} fill={FS.cyan} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={fx.r * 0.45} fill={FS.flash} />
+    </g>
+  ),
   flame: (fx) => {
-    if (fx.kind !== 'flame') return null
     const mid = lerp(fx.from, fx.to, 0.5)
     return (
       <g>
@@ -509,34 +520,35 @@ const FX_DRAW: Record<Fx['kind'], (fx: Fx) => ReactNode> = {
       </g>
     )
   },
-  spark: (fx) => fx.kind === 'spark' && <Spark at={fx.at} r={fx.r} />,
-  spin: (fx) =>
-    fx.kind === 'spin' && (
-      <ellipse
-        cx={58}
-        cy={88}
-        rx={40}
-        ry={9}
-        fill="none"
-        stroke={FS.flash}
-        strokeWidth={3}
-        strokeDasharray="46 160"
-        strokeDashoffset={fx.phase * -52}
-        opacity={0.75}
-      />
-    ),
-  kit: (fx) => fx.kind === 'kit' && <DrumKit swing={fx.swing} />,
+  spark: (fx) => <Spark at={fx.at} r={fx.r} />,
+  spin: (fx) => (
+    <ellipse
+      cx={58}
+      cy={88}
+      rx={40}
+      ry={9}
+      fill="none"
+      stroke={FS.flash}
+      strokeWidth={3}
+      strokeDasharray="46 160"
+      strokeDashoffset={fx.phase * -52}
+      opacity={0.75}
+    />
+  ),
+  kit: (fx) => <DrumKit swing={fx.swing} />,
   // The parry's blue flash: the whole body lit in a cold blue halo, a ring and a glint where the palm
   // turns the blow aside.
-  parry: (fx) =>
-    fx.kind === 'parry' && (
-      <g>
-        <ellipse cx={66} cy={100} rx={44} ry={66} fill={FS.parry} opacity={0.35} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={13} fill="none" stroke={FS.parry} strokeWidth={4} />
-        <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
-      </g>
-    ),
+  parry: (fx) => (
+    <g>
+      <ellipse cx={66} cy={100} rx={44} ry={66} fill={FS.parry} opacity={0.35} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={13} fill="none" stroke={FS.parry} strokeWidth={4} />
+      <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
+    </g>
+  ),
 }
+
+// The map is keyed by the same kind that narrows the effect, so this drawing takes this effect.
+const drawFx = (fx: Fx): ReactNode => (FX_DRAW[fx.kind] as (fx: Fx) => ReactNode)(fx)
 
 const BEHIND: ReadonlySet<Fx['kind']> = new Set(['flame', 'parry'])
 
@@ -546,7 +558,7 @@ function Effects({ fx = [], behind }: { fx?: Fx[]; behind: boolean }) {
       {fx
         .filter((item) => BEHIND.has(item.kind) === behind)
         .map((item, i) => (
-          <g key={`${item.kind}-${i}`}>{FX_DRAW[item.kind](item)}</g>
+          <g key={`${item.kind}-${i}`}>{drawFx(item)}</g>
         ))}
     </>
   )
@@ -599,15 +611,17 @@ interface FighterProps {
   onMoveEnd?: () => void
 }
 
-export function Fighter({ profession, pose, who = 'hero', take = 0, className = '', still = false, onMoveEnd }: FighterProps) {
+// Memoised: its props are plain values and a stable onMoveEnd, so a parent render that leaves them as they
+// are (a zone crossing, a beat that keeps his pose) skips the frames' geometry.
+export const Fighter = memo(function Fighter({ profession, pose, who = 'hero', take = 0, className = '', still = false, onMoveEnd }: FighterProps) {
   const clip = `fs-${useId().replace(/:/g, '')}`
   const motion = motionFor(pose, profession)
-  const costume = costumeOf(who, profession)
-  const vars = {
+  const costume = COSTUME[who][profession]
+  const vars = cssVars({
     '--cycle': `${motion.cycleMs}ms`,
     '--key': motion.key,
     '--runs': String(motion.runs),
-  } as CSSProperties
+  })
 
   return (
     <svg
@@ -635,4 +649,4 @@ export function Fighter({ profession, pose, who = 'hero', take = 0, className = 
       {motion.ball && <KiBall key={`${pose}-${take}`} kind={motion.ball} />}
     </svg>
   )
-}
+})

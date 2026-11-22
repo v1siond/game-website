@@ -1,4 +1,5 @@
 import type { Project } from '@/lib/cv/content'
+import { nextIn } from '@/lib/nextIn'
 
 // The world's rules, kept apart from the drawing so they are plain and tested: the rarity of a project's
 // boon, the wave of three it arrives in, and the order of his strikes in the arena.
@@ -33,7 +34,4 @@ export type Strike = 'knee' | 'elbow' | 'kick' | 'roar'
 export const STRIKES: readonly Strike[] = ['knee', 'elbow', 'kick', 'roar']
 
 /** The strike after the one just thrown, back to the knee after the roar; null is the first press. */
-export function nextStrike(last: Strike | null): Strike {
-  if (last === null) return STRIKES[0]
-  return STRIKES[(STRIKES.indexOf(last) + 1) % STRIKES.length]
-}
+export const nextStrike = (last: Strike | null): Strike => nextIn(STRIKES, last)

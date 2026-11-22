@@ -74,7 +74,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   )
 }
 
-export function ProjectCard({ project, years, links }: ProjectSlot) {
+export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
   const labels = useLabels()
   return (
     <FightCard accent={project.highlight ? 'gold' : 'cyan'}>
@@ -96,7 +96,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 
       <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
 
-      {links.length > 0 ? (
+      {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
             <a key={kind} {...linkProps} className={BLUE_OUTLINE}>
@@ -104,15 +104,13 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
             </a>
           ))}
         </div>
-      ) : (
-        <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
+      {noLink && <p className={`mt-4 ${BODY}`}>{noLink}</p>}
     </FightCard>
   )
 }
 
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const labels = useLabels()
+export function BandCard({ band, years, linkProps, release }: BandSlot) {
   const content = (
     <FightCard accent="p2">
       <h3 className={TITLE}>{band.name}</h3>
@@ -121,9 +119,9 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> - </span>}
         {years && <span>{years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className={`mt-3 ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </FightCard>

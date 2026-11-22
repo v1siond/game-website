@@ -1,12 +1,14 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
 import { FS } from './palette'
 import { headingTo, pinFor, type Pin } from './route'
 import { WorldMap } from './worldMap'
-import { useScene } from './scenes'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './backdrop'
 import look from './world.module.css'
 import living from './living.module.css'
 
@@ -19,22 +21,20 @@ const FlightContext = createContext<(index: number) => void>(() => undefined)
 
 export function FlightStop({ index, children }: { index: number; children: ReactNode }) {
   const arrive = useContext(FlightContext)
-  const { ref, inView } = useSectionTrigger({
+  // Each time the round comes into view, down the page or back up, the plane flies to its pin.
+  const { ref } = useSectionTrigger({
     triggerOnce: false,
     threshold: 0.5,
     rootMargin: '-20% 0px -30% 0px',
+    onEnter: () => arrive(index),
   })
-
-  useEffect(() => {
-    if (inView) arrive(index)
-  }, [inView, index, arrive])
 
   return <div ref={ref}>{children}</div>
 }
 
 function Plane({ at, heading }: { at: Pin; heading: number }) {
   return (
-    <g className={living.plane} style={{ '--px': `${at[0]}px`, '--py': `${at[1]}px` } as CSSProperties}>
+    <g className={living.plane} style={cssVars({ '--px': `${at[0]}px`, '--py': `${at[1]}px` })}>
       <g transform={`rotate(${heading})`}>
         <path
           d="M9 0 L-7 -2 L-9 -7 L-11 -7 L-10 -1.5 L-12 0 L-10 1.5 L-11 7 L-9 7 L-7 2 Z"
@@ -50,7 +50,7 @@ function Plane({ at, heading }: { at: Pin; heading: number }) {
 }
 
 export function FlightMap({ jobs, children }: { jobs: Job[]; children: ReactNode }) {
-  const { ref } = useScene('market')
+  const { ref } = useZoneStage<Zone>('market')
   const [{ stop, from }, setLeg] = useState({ stop: 0, from: 0 })
   const pins = useMemo(() => jobs.map((job) => pinFor(job.location)), [jobs])
 
@@ -81,10 +81,7 @@ export function FlightMap({ jobs, children }: { jobs: Job[]; children: ReactNode
             </WorldMap>
           </div>
           {job && (
-            <p
-              className={`mx-auto max-w-xl border-2 border-t-0 border-white bg-black px-3 py-1.5 text-center text-sm uppercase text-white ${look.display}`}
-              aria-live="polite"
-            >
+            <p className={`mx-auto max-w-xl border-2 border-t-0 border-white bg-black px-3 py-1.5 text-center text-sm uppercase text-white ${look.display}`}>
               {job.company}, {job.location}
             </p>
           )}

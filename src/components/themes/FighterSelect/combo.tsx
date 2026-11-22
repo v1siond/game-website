@@ -11,7 +11,8 @@ import fight from './fight.module.css'
 // vibrates for the hitstop, a burst flashes where the pointer entered, and the counter on player one's
 // side climbs. A pause longer than COMBO_WINDOW_MS drops the combo, like the defender recovering; the
 // counter stops at MAX_HITS, as the arcade counters did. React renders only on a hit: the burst's
-// position goes to CSS variables on the card, the burst itself is a keyed one shot animation.
+// position goes to CSS variables on the card, the burst itself is a keyed one shot animation, and the
+// shake restarts its class on the card's own element, so the card (and a focused link in it) stays mounted.
 
 const COMBO_WINDOW_MS = 1400
 const MAX_HITS = 99
@@ -58,23 +59,31 @@ export function ComboZone({ children }: { children: ReactNode }) {
   )
 }
 
+// Plays the shake again from its first frame: the class comes off, a layout read ends the running
+// animation, and the class goes back on.
+function replayShake(element: HTMLElement) {
+  element.classList.remove(fight.hitShake)
+  void element.offsetWidth
+  element.classList.add(fight.hitShake)
+}
+
 export function HitCard({ children }: { children: ReactNode }) {
-  const land = useContext(ComboContext)
+  const land = useComboLand()
   const [hit, setHit] = useState(0)
+  const shaken = useRef<HTMLDivElement>(null)
 
   const onPointerEnter = (event: PointerEvent<HTMLDivElement>) => {
     const box = event.currentTarget.getBoundingClientRect()
     event.currentTarget.style.setProperty('--hx', `${event.clientX - box.left}px`)
     event.currentTarget.style.setProperty('--hy', `${event.clientY - box.top}px`)
+    if (shaken.current) replayShake(shaken.current)
     setHit((count) => count + 1)
     land()
   }
 
   return (
     <div onPointerEnter={onPointerEnter} className="relative">
-      <div key={hit} className={hit > 0 ? fight.hitShake : ''}>
-        {children}
-      </div>
+      <div ref={shaken}>{children}</div>
       {hit > 0 && (
         <span key={hit} className={`pointer-events-none absolute left-[var(--hx)] top-[var(--hy)] z-10 ${fight.spark}`} aria-hidden="true">
           <ImpactBurst className="h-20 w-20" />

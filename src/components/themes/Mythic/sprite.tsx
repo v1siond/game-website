@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, type ReactNode, type Ref } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -520,13 +520,19 @@ interface SpriteProps {
   /** A one shot move has played out (never called for a loop, or under reduced motion). */
   onDone?: () => void
   sheathed?: boolean
+  /** Bumped to play the motion again from its start (the same move twice in a row) on the same figure. */
+  take?: number
 }
 
-/** Plays a move's keys on the figure's joints, its body and its lights, and cancels them when the move changes. */
-function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion: SpriteMotion, onDone?: () => void) {
+/** Plays a move's keys on the figure's joints, its body and its lights, and cancels them when the move or the take changes. */
+function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion: SpriteMotion, take: number, onDone?: () => void) {
   const reduced = useReducedMotion()
-  const done = useRef(onDone)
-  done.current = onDone
+  // The latest onDone, held in a ref a layout effect writes (never during render), so a new one each render
+  // never restarts the move. Next 15's own React has no useEffectEvent; this is the pattern it stands for.
+  const doneRef = useRef(onDone)
+  useLayoutEffect(() => {
+    doneRef.current = onDone
+  })
 
   useEffect(() => {
     if (!svg || reduced || motion === 'still' || typeof svg.animate !== 'function') return
@@ -544,14 +550,14 @@ function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion:
       [...svg.querySelectorAll<SVGElement>(`[data-fx="${fx}"]`)].map((element) => element.animate(track, timing)),
     )
     const all = [...joints, ...body, ...lights]
-    if (!loop) all[0]?.finished.then(() => done.current?.(), () => undefined)
+    if (!loop) all[0]?.finished.then(() => doneRef.current?.(), () => undefined)
     return () => all.forEach((animation) => animation.cancel())
-  }, [svg, reduced, motion, profession])
+  }, [svg, reduced, motion, profession, take])
 }
 
 /** Him as the chained blade Spartan, in a profession's kit, playing one motion. */
-export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false }: SpriteProps) {
+export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false, take = 0 }: SpriteProps) {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null)
-  useRigMotion(svg, profession, motion, onDone)
+  useRigMotion(svg, profession, motion, take, onDone)
   return <SpartanFigure profession={profession} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
 }
