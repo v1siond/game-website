@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLatest } from '@/hooks/useLatest'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
@@ -50,11 +51,8 @@ export function useTurnQueue(items: readonly { id: string }[], gapMs: number, on
   const lastTurn = useRef(0)
   const next = items.find((item) => entered.has(item.id) && !done.has(item.id))
 
-  // The latest onTurn, held in a ref a layout effect writes, so a new one each render never resets the clock.
-  const turnRef = useRef(onTurn)
-  useLayoutEffect(() => {
-    turnRef.current = onTurn
-  })
+  // The latest onTurn, so a new one each render never resets the clock.
+  const turnRef = useLatest(onTurn)
 
   const enter = useCallback((id: string) => {
     setEntered((current) => (current.has(id) ? current : new Set(current).add(id)))
@@ -69,7 +67,7 @@ export function useTurnQueue(items: readonly { id: string }[], gapMs: number, on
       turnRef.current()
     }, wait)
     return () => window.clearTimeout(timer)
-  }, [next, reduced, gapMs])
+  }, [next, reduced, gapMs, turnRef])
 
   const isDone = (id: string) => reduced || done.has(id)
   return { enter, isDone, take: done.size, count: reduced ? items.length : done.size }

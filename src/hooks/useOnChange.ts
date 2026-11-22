@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useLatest } from '@/hooks/useLatest'
 
 // Reacts to a value changing after the first render: `run(value)` is called from an effect on each change,
 // never for the value the component mounted with (a profession picked, not the one the page opened on).
@@ -18,11 +19,8 @@ export interface OnChangeOptions {
 
 export function useOnChange<T>(value: T, run: (value: T) => void, { timing = 'passive' }: OnChangeOptions = {}): void {
   const seen = useRef(value)
-  // A layout effect writes the latest run before either timing's effect of that commit reads it.
-  const runRef = useRef(run)
-  useLayoutEffect(() => {
-    runRef.current = run
-  })
+  // Declared first, so the latest run is written before either timing's effect of that commit reads it.
+  const runRef = useLatest(run)
 
   EFFECT[timing](() => {
     if (seen.current === value) return

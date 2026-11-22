@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLatest } from '@/hooks/useLatest'
 import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
@@ -63,17 +64,6 @@ type Reached = Record<Step, boolean>
 
 const NONE: Reached = { unrolled: false, inked: false, trailed: false, landed: false }
 const ALL: Reached = { unrolled: true, inked: true, trailed: true, landed: true }
-
-/** The latest value of a render, for a timer or an effect that reads it without rerunning when it changes.
- *  A layout effect writes it before any passive effect or timer of that commit reads it (Next 15's own
- *  React has no useEffectEvent, so this is the stable pattern it stands for). */
-function useLatest<T>(value: T) {
-  const ref = useRef(value)
-  useLayoutEffect(() => {
-    ref.current = value
-  })
-  return ref
-}
 
 /** The entrance's phases on their timers, and `onLanded` at WALK_AT, once he has landed, to start his walk. */
 function useEntrance(onLanded: () => void) {

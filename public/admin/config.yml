@@ -292,6 +292,13 @@ collections:
                   - { <<: *text, label: "Muay thai", name: muayThai }
                   - { <<: *text, label: "Contact", name: contact }
                   - { <<: *text, label: "Posts", name: posts }
+              - label: About block (his education and spoken languages)
+                name: about
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Education", name: education }
+                  - { <<: *text, label: "Languages", name: languages }
               - label: Profession names
                 name: professions
                 widget: object
@@ -320,11 +327,8 @@ collections:
                   - { <<: *text, label: "Select your profession", name: selectYourProfession }
                   - { <<: *text, label: "Primary navigation", name: primaryNavigation }
                   - { <<: *text, label: "Skip to content", name: skipToContent }
-                  - { <<: *text, label: "Loading theme", name: loadingTheme }
                   - { <<: *text, label: "Loading", name: loading }
                   - { <<: *text, label: "System terminal", name: systemTerminal }
-                  - { <<: *text, label: "Battle in progress", name: battleInProgress }
-                  - { <<: *text, label: "Content revealed", name: contentRevealed }
                   - { <<: *text, label: "Copyright", name: copyright }
                   - { <<: *text, label: "Active", name: active }
               - label: Buttons and links
