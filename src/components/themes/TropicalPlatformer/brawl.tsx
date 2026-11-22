@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useLatest } from '@/hooks/useLatest'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
 import { StatusLine, jungleButton } from './buttons'
@@ -18,7 +19,8 @@ import ring from './brawl.module.css'
 // throwing jabs; a foe walks in from the right with the source's swaggering upright walk, takes the
 // strike and is knocked spinning out of the clearing, and the next achievement is marked won. The first
 // bout plays when the section scrolls in; Next challenger brings the next; once every achievement is
-// won, the button starts the round again.
+// won, the button starts the round again. The first bout waits for the vulture's record to land
+// (`landed`, deliveries.tsx), so its walk is never played behind the bird.
 //
 // Pattern: a phase chain. Each phase is a data-phase on the clearing that CSS animates; one timer per
 // phase moves to the next. Reduced motion marks the achievement at once.
@@ -99,7 +101,7 @@ function Clearing({ phase, round, waiting }: { phase: Phase; round: number; wait
 }
 
 /** The record as a bout: each foe he knocks out wins the next achievement. */
-export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
+export function BrawlRecord({ martialArts, landed }: { martialArts: MartialArts; landed: boolean }) {
   const { jungle } = useLabels()
   const { achievements } = martialArts.primary
   const [won, setWon] = useState(0)
@@ -129,8 +131,14 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
     return () => window.clearTimeout(timer)
   }, [phase])
 
-  // The first bout plays once, when the section arrives.
-  const { ref } = useSectionTrigger({ threshold: 0.25, onEnter: fight })
+  // The first bout plays once, when the section has arrived and the record has landed: both flags only
+  // ever turn true, so the effect fights once.
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
+  const fightRef = useLatest(fight)
+  useEffect(() => {
+    if (!triggered || !landed) return
+    fightRef.current()
+  }, [triggered, landed, fightRef])
 
   return (
     <div ref={ref} className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto]">

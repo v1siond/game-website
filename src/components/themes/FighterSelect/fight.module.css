@@ -24,10 +24,6 @@
     animation: clash-jolt 300ms cubic-bezier(0.34, 1.56, 0.64, 1) 360ms both;
   }
 
-  .cue:not([data-scene-phase='idle']) .slashInRight {
-    animation: slash-in-right 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
-  }
-
   .cue:not([data-scene-phase='idle']) .portraitIn {
     animation: portrait-in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 260ms both;
   }
@@ -56,6 +52,33 @@
   .cue:not([data-scene-phase='idle']) .barFill,
   .cue:not([data-scene-phase='idle']) .barFillRight {
     animation: bar-fill 600ms cubic-bezier(0.2, 0.9, 0.2, 1) var(--delay, 900ms) both;
+  }
+
+  /* The hero's name panel and its words are readable from the first frame: the idle frame holds each one
+   * at its start pose, fully opaque, and the entrance only moves them (the panel slashes in a step from
+   * the right, the name slams down, the lines rise in turn). */
+  .cue[data-scene-phase='idle'] .panelInRight {
+    transform: translate3d(1.5rem, 0, 0) skewX(8deg);
+  }
+
+  .cue:not([data-scene-phase='idle']) .panelInRight {
+    animation: panel-in-right 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .cue[data-scene-phase='idle'] .nameSlam {
+    transform: scale(1.5);
+  }
+
+  .cue:not([data-scene-phase='idle']) .nameSlam {
+    animation: name-slam 360ms cubic-bezier(0.34, 1.56, 0.64, 1) 520ms both;
+  }
+
+  .cue[data-scene-phase='idle'] .wordRise {
+    transform: translate3d(0, 1rem, 0);
+  }
+
+  .cue:not([data-scene-phase='idle']) .wordRise {
+    animation: word-rise 320ms ease-out var(--delay, 760ms) both;
   }
 
   /* A select slot locking in: the box closes from large to size with one overshoot. */
@@ -209,14 +232,30 @@
   }
 }
 
-@keyframes slash-in-right {
+@keyframes panel-in-right {
   from {
-    opacity: 0;
-    transform: translate3d(110%, 0, 0) skewX(18deg);
+    transform: translate3d(1.5rem, 0, 0) skewX(8deg);
   }
   to {
-    opacity: 1;
     transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes name-slam {
+  from {
+    transform: scale(1.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes word-rise {
+  from {
+    transform: translate3d(0, 1rem, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
   }
 }
 

@@ -28,8 +28,9 @@ const OUTFIT_LOOK: WardrobeLook = { plate: C.barkDark, text: C.sunGold, ring: C.
 // near fronds, every plane but the sky a black shape against the light with its sunward edges lit
 // (the scenery's shapes in the sunset tone). The tree house barrel shakes, recoils with a white
 // flash and blasts him out in an arc; he flies rolled into a spinning ball, lands with a squash in silhouette
-// (only his clothes keep their colour), hoists a barrel and throws it off the scene, then his name drops onto the plank letter by letter and the headline
-// and the actions rise beside it.
+// (only his clothes keep their colour), hoists a barrel and throws it off the scene, then the plank drops
+// straight, his name bounces onto it letter by letter and the headline and the actions settle beside it.
+// The words and links are readable from the first frame; the entrance only moves them.
 //
 // Pattern: CSS off one trigger. useSectionTrigger sets data-on once; every phase is a delay off --fire
 // (sunset.module.css: sun 0 to 1.4 s, shake from 0.3 s, fire at 0.9 s, flight 0.9 s, landing at 1.8 s,

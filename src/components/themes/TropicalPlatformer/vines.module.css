@@ -15,6 +15,14 @@
   animation: hang-drop 0.9s ease-out calc(var(--i) * 80ms) forwards;
 }
 
+/* A keyboard user who tabs onto a plank before it drops in sees it hung at once. */
+.hang:has(:focus-visible),
+.grove[data-on] .hang:has(:focus-visible) {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
 .card {
   transform-origin: 50% -2.5rem;
 }

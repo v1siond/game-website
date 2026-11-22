@@ -22,7 +22,8 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 // 260ms he slides into his corner and lands with an overshoot (420ms),
 // 360ms a white flash over the stage and the VS burst slamming onto the seam mark the moment the
 // panels meet, the clash jolting the wardrobe a few pixels and back (300ms), 520ms his name slams down
-// from 2.4x (360ms), 760ms the headline lines rise in turn.
+// from 1.5x (360ms), 760ms the headline lines rise in turn.
+// The name panel and its words are opaque from the first frame; their entrance only moves them.
 
 const HERO_SITES = ['cv', 'engine'] as const
 
@@ -69,14 +70,14 @@ export function HeroSplash({ profession }: { profession: Profession }) {
               </div>
             </div>
 
-            <div className={`relative border-4 border-[color:var(--fs-p2)] bg-black px-5 pb-6 pt-14 sm:px-8 sm:pt-16 lg:pt-8 ${look.splashRight} ${fight.enter} ${fight.slashInRight}`}>
-              <h1 className={`text-[clamp(1.75rem,8vw,3rem)] uppercase leading-tight ${fight.enter} ${fight.slam}`}>
+            <div className={`relative border-4 border-[color:var(--fs-p2)] bg-black px-5 pb-6 pt-14 sm:px-8 sm:pt-16 lg:pt-8 ${look.splashRight} ${fight.panelInRight}`}>
+              <h1 className={`text-[clamp(1.75rem,8vw,3rem)] uppercase leading-tight ${fight.nameSlam}`}>
                 <NameWords name={name} wordClassName={`inline-block ${look.call}`} />
               </h1>
-              <p className={`mt-4 max-w-2xl text-base text-white md:text-lg ${fight.enter} ${fight.rise} ${RISE_DELAYS[0]}`}>{headline}</p>
-              <p className={`mt-2 text-base text-[color:var(--fs-hud-yellow)] ${fight.enter} ${fight.rise} ${RISE_DELAYS[1]}`}>{tagline}</p>
-              <p className={`mt-2 text-sm ${fight.enter} ${fight.rise} ${RISE_DELAYS[2]}`}>{line}</p>
-              <nav className={`mt-6 flex flex-wrap items-center gap-3 ${fight.enter} ${fight.rise} ${RISE_DELAYS[3]}`} aria-label={navigation.contactAndCv}>
+              <p className={`mt-4 max-w-2xl text-base text-white md:text-lg ${fight.wordRise} ${RISE_DELAYS[0]}`}>{headline}</p>
+              <p className={`mt-2 text-base text-[color:var(--fs-hud-yellow)] ${fight.wordRise} ${RISE_DELAYS[1]}`}>{tagline}</p>
+              <p className={`mt-2 text-sm ${fight.wordRise} ${RISE_DELAYS[2]}`}>{line}</p>
+              <nav className={`mt-6 flex flex-wrap items-center gap-3 ${fight.wordRise} ${RISE_DELAYS[3]}`} aria-label={navigation.contactAndCv}>
                 <ArcadeLinks actions={actions} sites={HERO_SITES} />
               </nav>
             </div>

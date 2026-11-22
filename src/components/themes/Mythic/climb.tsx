@@ -105,7 +105,7 @@ const Page = memo(function Page({ category, lit, onEnter, onPoint }: { category:
 
 export function Climb({ categories }: { categories: Category[] }) {
   const { cards } = useLabels()
-  const climber = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'still', policy: 'always' })
+  const climber = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'hang', policy: 'always' })
   const { play } = climber
   const { enter, isDone, count } = useTurnQueue(categories, CLIMB_GAP_MS, () => play('climb'))
   const chainRef = useRef<SVGSVGElement>(null)

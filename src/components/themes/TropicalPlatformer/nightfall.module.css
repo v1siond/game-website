@@ -107,6 +107,14 @@
   animation: sign-swing 1.4s ease-out 1s forwards;
 }
 
+/* A keyboard user who tabs onto a contact link before the sign swings in sees it hung at once. */
+.hanger:has(:focus-visible),
+.contact[data-on] .hanger:has(:focus-visible) {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
 @keyframes sign-swing {
   0% {
     opacity: 0;
