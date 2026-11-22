@@ -322,11 +322,18 @@ const ROOMS: Record<Room, ReactNode> = {
 }
 
 /** The room in view: the safe room once he is inside it. */
-export function RoomArt({ zone, flags }: { zone: Zone; flags: Flags }) {
+export function RoomArt({ zone, flags, replayed }: { zone: Zone; flags: Flags; replayed: boolean }) {
   const room: Room = zone === 'contact' && flags.inside ? 'safe' : zone
 
   return (
-    <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 600 300"
+      preserveAspectRatio="xMidYMax slice"
+      className="absolute inset-0 h-full w-full"
+      data-replayed={replayed || undefined}
+      aria-hidden="true"
+      focusable="false"
+    >
       <defs>
         <linearGradient id="sh-room-dark" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={SH.void} stopOpacity={0.9} />

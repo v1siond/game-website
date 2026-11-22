@@ -185,6 +185,12 @@
   animation: swing 2.4s ease-out both;
 }
 
+/* A room shown at its last frame (a return, the preview) keeps them at rest; both end at rotate(0deg). */
+[data-replayed] .settle,
+[data-replayed] .swing {
+  animation: none;
+}
+
 @keyframes swing {
   0% {
     transform: rotate(0deg);
