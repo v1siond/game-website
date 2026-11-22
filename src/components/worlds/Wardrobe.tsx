@@ -10,6 +10,8 @@ import { fillLabel } from '@/lib/cv/labels'
 import { TOUR_ORDER, WARDROBE_FAN_KEY, WARDROBE_FAN_MS, followingInTour, previousInTour } from '@/lib/worlds/nudge'
 import { outfitPlace } from '@/lib/worlds/wardrobe'
 import { useWorldsLabels } from './WorldsLabels'
+import { readStored, writeStored } from '@/lib/storage'
+import { isCapture } from '@/lib/worlds/capture'
 
 /**
  * A world's colours for its plate, read from that world's palette by the hero that places it: the plate
@@ -40,26 +42,10 @@ const SWIPE_MIN_PX = 48
 const STEP_TO: Record<Step, (id: string) => string> = { 1: followingInTour, [-1]: previousInTour }
 const KEY_STEP: Record<string, Step> = { ArrowRight: 1, ArrowLeft: -1 }
 
-// The capture script (scripts/capture-world-previews.mjs) opens a world with ?capture=<id> and crops his
-// figure, so the fan never plays over him there.
-const isCapture = (): boolean => new URLSearchParams(window.location.search).has('capture')
+// Blocked storage reads as not played, so the fan then plays on this page view only.
+const fanPlayedThisVisit = (): boolean => readStored('session', WARDROBE_FAN_KEY) !== null
 
-// Storage throws when the browser blocks site data; the fan then plays on this page view only.
-const fanPlayedThisVisit = (): boolean => {
-  try {
-    return window.sessionStorage.getItem(WARDROBE_FAN_KEY) !== null
-  } catch {
-    return false
-  }
-}
-
-const markFanPlayed = (): void => {
-  try {
-    window.sessionStorage.setItem(WARDROBE_FAN_KEY, '1')
-  } catch {
-    // nothing to keep, the fan may play again on the next page view
-  }
-}
+const markFanPlayed = (): void => writeStored('session', WARDROBE_FAN_KEY, '1')
 
 function Chevron({ step }: { step: Step }) {
   return (
@@ -94,7 +80,7 @@ function useFanOnce(anchor: RefObject<HTMLElement | null>, ready: boolean): bool
 
   useEffect(() => {
     const element = anchor.current
-    if (!ready || reducedMotion || !element || isCapture() || fanPlayedThisVisit()) return
+    if (!ready || reducedMotion || !element || isCapture(window.location.search) || fanPlayedThisVisit()) return
     const timers: number[] = []
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry?.isIntersecting) return

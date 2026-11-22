@@ -4,6 +4,8 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode 
 import { Theme, themes, DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from './themes'
 import { PreviewProvider } from './PreviewContext'
 import { WORLD_PENDING_ATTR } from './worldPending'
+import { readStored, writeStored } from '@/lib/storage'
+import { captureWorld } from '@/lib/worlds/capture'
 
 interface ThemeContextType {
   theme: Theme
@@ -19,14 +21,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
-    // `?capture=<id>` forces a specific world on load, used by the world-preview
-    // screenshot script (scripts/capture-world-previews.mjs). Harmless otherwise.
-    const capture = new URLSearchParams(window.location.search).get('capture')
+    // `?capture=<id>` forces a specific world on load (lib/worlds/capture.ts). Harmless otherwise.
+    const capture = captureWorld(window.location.search)
     if (capture && themes.some((t) => t.id === capture)) {
       setTheme(getThemeById(capture))
       return
     }
-    const stored = localStorage.getItem(THEME_STORAGE_KEY)
+    const stored = readStored('local', THEME_STORAGE_KEY)
     if (stored) setTheme(getThemeById(stored))
   }, [])
 
@@ -38,9 +39,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setThemeById = useCallback((id: string) => {
     const newTheme = getThemeById(id)
     setTheme(newTheme)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(THEME_STORAGE_KEY, newTheme.id)
-    }
+    writeStored('local', THEME_STORAGE_KEY, newTheme.id)
   }, [])
 
   // Render the default until mounted to avoid a hydration mismatch.

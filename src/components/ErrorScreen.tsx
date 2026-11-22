@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@/themes/themes'
+import { readStored } from '@/lib/storage'
 
 /**
  * THE FAILURE SCREEN, one page behind every error the site can serve.
@@ -64,19 +65,15 @@ function paletteVars(theme: Theme): CSSProperties {
  * The world the visitor is in, read without the provider.
  *
  * Starts at the default world so the server render and the first client render agree, then switches
- * to the stored one after mount. `localStorage` is wrapped because a browser set to block site data
- * throws on access, and an error screen that throws is no error screen.
+ * to the stored one after mount. Blocked site data reads as nothing stored (lib/storage.ts), so the
+ * error screen never throws.
  */
 function useStoredWorld(): Theme {
   const [theme, setTheme] = useState<Theme>(() => getThemeById(DEFAULT_THEME_ID))
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
-      if (stored) setTheme(getThemeById(stored))
-    } catch {
-      // no stored world available; the default one is already showing
-    }
+    const stored = readStored('local', THEME_STORAGE_KEY)
+    if (stored) setTheme(getThemeById(stored))
   }, [])
 
   return theme

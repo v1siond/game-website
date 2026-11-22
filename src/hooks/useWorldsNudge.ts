@@ -20,6 +20,7 @@ import {
   recordWorld,
 } from '@/lib/worlds/nudge'
 import { FACE_TURNED_KEY, FACE_TURN_MS, launcherFace, type HeroView } from '@/lib/worlds/lens'
+import { readStored, writeStored, type StorageArea } from '@/lib/storage'
 
 // A world counts as seen once it has been on screen this long. The provider renders the default world for
 // one commit before a returning visitor's own world, and this wait keeps that commit from counting.
@@ -33,32 +34,12 @@ const WORLD_IDS = WORLDS.map((world) => world.id)
 // What the hint must not cover when it opens: any text, and any control a visitor could reach.
 const CONTROLS = 'a[href], button, input, select, textarea, summary, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])'
 
-// Storage throws when the browser blocks site data; the nudge then works for this page view only.
-const readStorage = (storage: () => Storage, key: string): string | null => {
-  try {
-    return storage().getItem(key)
-  } catch {
-    return null
-  }
-}
-
-const writeStorage = (storage: () => Storage, key: string, value: string): void => {
-  try {
-    storage().setItem(key, value)
-  } catch {
-    // nothing to keep, the page goes on without it
-  }
-}
-
-const local = () => window.localStorage
-const session = () => window.sessionStorage
-
 /** The worlds this browser has seen, read from storage at the moment it is called. */
-export const loadSeenWorlds = (): string[] => readSeen(readStorage(local, SEEN_STORAGE_KEY), WORLD_IDS)
+export const loadSeenWorlds = (): string[] => readSeen(readStored('local', SEEN_STORAGE_KEY), WORLD_IDS)
 
-const recordIn = (storage: () => Storage, key: string, id: string): string[] => {
-  const next = recordWorld(readStorage(storage, key), id, WORLD_IDS)
-  writeStorage(storage, key, JSON.stringify(next))
+const recordIn = (area: StorageArea, key: string, id: string): string[] => {
+  const next = recordWorld(readStored(area, key), id, WORLD_IDS)
+  writeStored(area, key, JSON.stringify(next))
   return next
 }
 
@@ -203,8 +184,8 @@ export function useWorldsNudge() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setSeen(recordIn(local, SEEN_STORAGE_KEY, theme.id))
-      recordIn(session, VISIT_STORAGE_KEY, theme.id)
+      setSeen(recordIn('local', SEEN_STORAGE_KEY, theme.id))
+      recordIn('session', VISIT_STORAGE_KEY, theme.id)
     }, SEEN_AFTER_MS)
     return () => window.clearTimeout(timer)
   }, [theme.id])
@@ -229,13 +210,13 @@ export function useWorldsNudge() {
         scrolledPx: deepest,
         viewportPx: window.innerHeight,
         pageHeightPx: document.documentElement.scrollHeight,
-        offeredThisVisit: readStorage(session, HINT_OFFERED_KEY) !== null,
+        offeredThisVisit: readStored('session', HINT_OFFERED_KEY) !== null,
         pickerOpened: pickerOpened.current,
         seenCount: loadSeenWorlds().length,
       })
       if (!offer) return
       done = true
-      writeStorage(session, HINT_OFFERED_KEY, '1')
+      writeStored('session', HINT_OFFERED_KEY, '1')
       setHint('waiting')
     }
     const timer = window.setTimeout(check, HINT_MIN_MS + 50)
@@ -309,14 +290,14 @@ export function useWorldsNudge() {
   const [turning, setTurning] = useState(false)
 
   useEffect(() => {
-    setTurnedThisVisit(readStorage(session, FACE_TURNED_KEY) !== null)
+    setTurnedThisVisit(readStored('session', FACE_TURNED_KEY) !== null)
   }, [])
 
   const face = launcherFace({ pathname, hero, hintOpen: hint === 'open', turnedThisVisit, turning })
 
   useEffect(() => {
     if (face !== 'turn' || turning) return
-    writeStorage(session, FACE_TURNED_KEY, '1')
+    writeStored('session', FACE_TURNED_KEY, '1')
     setTurnedThisVisit(true)
     setTurning(true)
   }, [face, turning])
