@@ -20,8 +20,7 @@ import marquee from './marquee.module.css'
 // the chase. Reduced motion: the sign is lit and the bulbs still.
 
 function Board({ slot, index }: { slot: BandSlot; index: number }) {
-  const { band, years, linkProps } = slot
-  const { links } = useLabels()
+  const { band, years, linkProps, release } = slot
 
   const board = (
     <div className={`relative px-5 pb-5 pt-10 ${marquee.board}`} style={{ '--i': index } as CSSProperties}>
@@ -38,9 +37,9 @@ function Board({ slot, index }: { slot: BandSlot; index: number }) {
 
       <div className={`relative mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-2 text-sm ${marquee.rail}`}>
         {years && <span>{years}</span>}
-        {band.release && (
+        {release && (
           <span>
-            {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+            {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
           </span>
         )}
       </div>
