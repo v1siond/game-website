@@ -95,7 +95,7 @@ function ScreenTab({ label, selected, optionProps }: ProfessionOption) {
     <button
       type="button"
       {...optionProps}
-      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-wide sm:px-4 sm:text-base sm:tracking-widest ${atomic.screenTab} ${atomic.focusRing}`}
+      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-wide sm:px-4 sm:text-base sm:tracking-widest ${atomic.screenTab}`}
       data-on={selected || undefined}
     >
       {label}
@@ -111,7 +111,7 @@ function SectionTabs({ profession }: { profession: Profession }) {
       <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1">
         {sectionTabs(profession, sections).map((tab) => (
           <li key={tab.href}>
-            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim-text hover:text-atomic-phosphor ${atomic.focusRing}`}>
+            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim-text hover:text-atomic-phosphor`}>
               {tab.title}
             </a>
           </li>
@@ -172,7 +172,7 @@ function SelectorDial() {
         onClick={() => setActive(stepProfession(active, 1))}
         aria-label={hud.dialHint}
         title={hud.dialHint}
-        className={`relative h-24 w-24 rounded-full sm:h-28 sm:w-28 ${atomic.focusRing}`}
+        className={`relative h-24 w-24 rounded-full sm:h-28 sm:w-28`}
       >
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
           <defs>

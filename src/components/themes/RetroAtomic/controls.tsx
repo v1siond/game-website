@@ -11,11 +11,11 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 // hero and again on the contact terminal. Beside them the world's other controls and list pieces: the
 // outlined phosphor button, the tag chip and the "+" objective row.
 
-export const MENU_ROW = `relative flex min-h-[44px] w-full items-center gap-3 px-3 text-left text-base font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`
+export const MENU_ROW = `relative flex min-h-[44px] w-full items-center gap-3 px-3 text-left text-base font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow}`
 
 /** The outlined phosphor button (a file's Read, Close and links, the terminal's Reboot); its label sits in a
  *  `relative` span over the bar that fills in under the pointer. */
-export const PHOSPHOR_BUTTON = `relative min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`
+export const PHOSPHOR_BUTTON = `relative min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow}`
 
 /** A technology or skill tag in a card's list. */
 export function AtomicChip({ children }: { children: ReactNode }) {

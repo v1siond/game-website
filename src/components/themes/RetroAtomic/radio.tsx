@@ -85,7 +85,7 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
       )}
     </>
   )
-  const frame = `relative block p-5 ${atomic.panel} ${atomic.station} ${atomic.focusRing}`
+  const frame = `relative block p-5 ${atomic.panel} ${atomic.station}`
   const tune = { onPointerEnter: onTune, onFocus: onTune, 'data-on': tuned || undefined }
 
   if (!linkProps) {

@@ -162,7 +162,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
           <span className="relative">{actions.readFile}</span>
         </button>
         {links.map(({ kind, label, linkProps }) => (
-          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-2 text-sm uppercase tracking-widest text-atomic-phosphor underline-offset-4 hover:underline ${atomic.focusRing}`}>
+          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-2 text-sm uppercase tracking-widest text-atomic-phosphor underline-offset-4 hover:underline`}>
             {label}
           </a>
         ))}

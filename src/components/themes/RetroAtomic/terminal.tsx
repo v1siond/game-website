@@ -98,7 +98,7 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
           return (
             // each dump line is 44px tall and the pick fills it, so picks on lines above and below never share a
             // pixel; a pick under 44px wide grows an invisible band each side to 44px, a wider one keeps its width
-            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative inline-block h-11 leading-[2.75rem] before:absolute before:inset-y-0 before:left-[min(0px,calc((100%-44px)/2))] before:right-[min(0px,calc((100%-44px)/2))] before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
+            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative inline-block h-11 leading-[2.75rem] before:absolute before:inset-y-0 before:left-[min(0px,calc((100%-44px)/2))] before:right-[min(0px,calc((100%-44px)/2))] before:content-[''] ${atomic.dumpPick}`}>
               <span className="relative">{text}</span>
             </button>
           )

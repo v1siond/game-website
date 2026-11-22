@@ -162,7 +162,7 @@ export function VaultEntrance({ onOpened }: VaultEntranceProps) {
       <button
         type="button"
         onClick={finish}
-        className={`absolute bottom-6 right-6 min-h-[44px] border-2 border-atomic-yellow bg-atomic-ink px-4 text-sm font-bold uppercase tracking-widest text-atomic-yellow ${atomic.focusRing}`}
+        className={`absolute bottom-6 right-6 min-h-[44px] border-2 border-atomic-yellow bg-atomic-ink px-4 text-sm font-bold uppercase tracking-widest text-atomic-yellow`}
       >
         {hud.skipIntro}
       </button>

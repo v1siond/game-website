@@ -91,7 +91,7 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
             target="_blank"
             rel="noopener noreferrer"
             aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-            className={`group relative block ${atomic.holotape} ${atomic.focusRing}`}
+            className={`group relative block ${atomic.holotape}`}
           >
             <div className="relative">
               <Cassette />
