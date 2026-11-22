@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { REALM } from './palette'
+import ornament from './ornaments.module.css'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
@@ -407,7 +408,7 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
             opacity: 0.3 + (i % 4) * 0.1,
             borderRadius: '1px',
             transform: `rotate(${i * 15}deg)`,
-            animation: `felPulse ${2.5 + i * 0.2}s ease-in-out infinite`,
+            animation: `${ornament.felPulse} ${2.5 + i * 0.2}s ease-in-out infinite`,
           }}
         />
       ))}

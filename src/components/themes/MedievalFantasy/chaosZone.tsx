@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { REALM } from './palette'
+import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
@@ -21,7 +22,7 @@ interface RockPart {
 
 const ROCK_PARTS: RockPart[] = [
   {
-    keyframes: 'assembleHead', timing: '1.8s ease-out', brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleHead, timing: '1.8s ease-out', brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
     outline: (fill) => <ellipse cx="80" cy="25" rx="22" ry="18" fill={fill} />,
     detail: (
       <>
@@ -32,17 +33,17 @@ const ROCK_PARTS: RockPart[] = [
     ),
   },
   {
-    keyframes: 'assembleLeftShoulder', timing: '1.5s ease-out 0.2s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftShoulder, timing: '1.5s ease-out 0.2s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill={fill} />,
     detail: <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill={REALM.stone28} />,
   },
   {
-    keyframes: 'assembleRightShoulder', timing: '1.6s ease-out 0.15s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightShoulder, timing: '1.6s ease-out 0.15s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill={fill} />,
     detail: <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill={REALM.stone28} />,
   },
   {
-    keyframes: 'assembleTorso', timing: '1.4s ease-out 0.3s', brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
+    keyframes: chaos.assembleTorso, timing: '1.4s ease-out 0.3s', brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
     outline: (fill) => <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill={fill} />,
     detail: (
       <>
@@ -52,19 +53,19 @@ const ROCK_PARTS: RockPart[] = [
     ),
   },
   {
-    keyframes: 'assembleLeftArm', timing: '1.7s ease-out 0.4s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftArm, timing: '1.7s ease-out 0.4s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="15,72 8,100 18,115 30,108 28,78" fill={fill} />,
   },
   {
-    keyframes: 'assembleRightArm', timing: '1.65s ease-out 0.35s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightArm, timing: '1.65s ease-out 0.35s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="145,72 152,100 142,115 130,108 132,78" fill={fill} />,
   },
   {
-    keyframes: 'assembleLeftLeg', timing: '1.3s ease-out 0.5s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleLeftLeg, timing: '1.3s ease-out 0.5s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="50,120 42,160 55,185 68,175 62,125" fill={fill} />,
   },
   {
-    keyframes: 'assembleRightLeg', timing: '1.35s ease-out 0.45s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    keyframes: chaos.assembleRightLeg, timing: '1.35s ease-out 0.45s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
     outline: (fill) => <polygon points="110,120 118,160 105,185 92,175 98,125" fill={fill} />,
   },
 ]
@@ -76,6 +77,9 @@ const STONE_LUMINANCE = 0.22
 function flashOverlayAlpha(brightness: number): number {
   return (STONE_LUMINANCE * (brightness - 1)) / (1 - STONE_LUMINANCE)
 }
+
+// The diagonal a falling meteor takes, by the side it drifts to.
+const METEOR_RAIN: Record<'left' | 'right', string> = { left: chaos.meteorRainLeft, right: chaos.meteorRainRight }
 
 export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
   const lightningActive = false
@@ -451,7 +455,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 opacity={opacity}
                 style={animated ? {
                   transformOrigin: `${x}px ${baseY}px`,
-                  animation: `grassBlade ${2.0 + (clusterIndex % 3) * 0.4}s ease-in-out infinite`,
+                  animation: `${chaos.grassBlade} ${2.0 + (clusterIndex % 3) * 0.4}s ease-in-out infinite`,
                 } : undefined}
               />
             )
@@ -764,7 +768,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 { id: 4, x: 54, w: 18, delay: '0.36s', fill: REALM.blood28, yOff: 6 },
                 { id: 5, x: 72, w: 15, delay: '0.48s', fill: REALM.blood24, yOff: 8 },
               ].map((col) => (
-                <g key={col.id} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: col.delay }}>
+                <g key={col.id} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: col.delay }}>
                   {/* Fabric column */}
                   <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                   {/* Skull slice - clipped to this column */}
@@ -801,7 +805,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 </g>
               ))}
               {/* Banner edge fraying */}
-              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
+              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: '0.55s' }} />
             </g>
             {/* Pole shadow */}
             <ellipse cx="6" cy="235" rx="15" ry="5" fill={REALM.stone4b} opacity="0.4" />
@@ -932,7 +936,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
               radial-gradient(ellipse at ${lightningX + 10}% 40%, ${REALM.chaosFelBright}70 0%, ${REALM.chaosFelMid}40 25%, transparent 50%),
               radial-gradient(ellipse at ${lightningX - 15}% 35%, ${REALM.chaosFelMid}55 0%, transparent 40%)
             `,
-            animation: 'thunderFlash 0.15s ease-out',
+            animation: `${chaos.thunderFlash} 0.15s ease-out`,
           }} />
         )}
 
@@ -982,7 +986,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             radial-gradient(ellipse at 75% 55%, ${REALM.chaosFelBright}12 0%, transparent 30%),
             radial-gradient(ellipse at 90% 65%, ${REALM.chaosFelMid}15 0%, transparent 35%)
           `,
-          animation: 'stormPulse 6s ease-in-out infinite',
+          animation: `${chaos.stormPulse} 6s ease-in-out infinite`,
         }} />
 
         {/* Secondary flash echo - follows main flash */}
@@ -996,26 +1000,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             background: `
               radial-gradient(ellipse at ${100 - lightningX}% 50%, ${REALM.chaosFelBright}40 0%, transparent 45%)
             `,
-            animation: 'thunderFlash 0.2s ease-out 0.08s',
+            animation: `${chaos.thunderFlash} 0.2s ease-out 0.08s`,
             opacity: 0.6,
           }} />
         )}
       </div>
-
-      <style>{`
-        @keyframes stormPulse {
-          0%, 100% { opacity: 0.5; }
-          30% { opacity: 0.8; }
-          60% { opacity: 0.4; }
-          80% { opacity: 0.7; }
-        }
-        @keyframes thunderFlash {
-          0% { opacity: 1; }
-          30% { opacity: 0.9; }
-          60% { opacity: 0.4; }
-          100% { opacity: 0; }
-        }
-      `}</style>
 
       {/* === OCCASIONAL FALLING METEOR - Every 8-15 seconds === */}
       {fallingMeteor && fallingMeteor.active && (
@@ -1027,7 +1016,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             top: '-5%',
             width: '25px',
             height: '25px',
-            animation: `meteorRain${fallingMeteor.direction === 'left' ? 'Left' : 'Right'} 4s ease-in forwards`,
+            animation: `${METEOR_RAIN[fallingMeteor.direction]} 4s ease-in forwards`,
             zIndex: 4,
             pointerEvents: 'none',
           }}
@@ -1096,7 +1085,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 position: 'absolute',
                 left: '-50px',
                 top: '-200px',
-                animation: 'golemMeteorFall 1.5s ease-in forwards',
+                animation: `${chaos.golemMeteorFall} 1.5s ease-in forwards`,
               }}
             >
               {/* Meteor core - scales up during animation */}
@@ -1107,7 +1096,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
                 boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
                 transformOrigin: '0 0',
-                animation: 'meteorGrow 1.5s ease-in forwards',
+                animation: `${chaos.meteorGrow} 1.5s ease-in forwards`,
               }} />
               {/* Meteor trail - diagonal, grows with meteor */}
               <div style={{
@@ -1119,7 +1108,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
                 filter: 'blur(5px)',
                 transformOrigin: 'bottom center',
-                animation: 'meteorTrailGrow 1.5s ease-in forwards',
+                animation: `${chaos.meteorTrailGrow} 1.5s ease-in forwards`,
               }} />
             </div>
           )}
@@ -1137,7 +1126,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                   width: '250px',
                   height: '250px',
                   background: `radial-gradient(circle, ${REALM.chaosFelBright}90 0%, ${REALM.chaosFelMid}60 30%, ${REALM.chaosFelDark}30 60%, transparent 80%)`,
-                  animation: 'explosionFlash 0.6s ease-out forwards',
+                  animation: `${chaos.explosionFlash} 0.6s ease-out forwards`,
                 }} />
               )}
 
@@ -1155,8 +1144,8 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 }}
               >
                 <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
-                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out forwards' }} />
-                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out 0.1s forwards' }} />
+                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out forwards` }} />
+                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out 0.1s forwards` }} />
                 <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosFelDark} opacity="0.4" />
               </svg>
 
@@ -1186,7 +1175,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 width: '150px',
                 height: '200px',
                 background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}30 30%, transparent 70%)`,
-                animation: 'emergeGlow 2.5s ease-out forwards',
+                animation: `${chaos.emergeGlow} 2.5s ease-out forwards`,
                 pointerEvents: 'none',
               }} />
 
@@ -1208,7 +1197,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                   <g key={part.keyframes} style={{ animation: `${part.keyframes} ${part.timing} forwards`, opacity: part.startHidden ? 0 : undefined }}>
                     {part.outline(part.outlineFill)}
                     {part.detail}
-                    <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `rockFlash ${part.timing} both` } as CSSProperties}>
+                    <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${part.timing} both` } as CSSProperties}>
                       {part.outline(REALM.ash100)}
                     </g>
                   </g>
@@ -1219,7 +1208,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
 
           {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
           {golemPhase === 'final' && (
-            <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: 'golemFadeIn 1s ease-out forwards' }}>
+            <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
               <InfernalGolemSVG id="final" isIdle={true} />
             </div>
           )}
@@ -1237,7 +1226,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             width: streak.length,
             height: streak.thickness,
             background: `linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 30%, color-mix(in srgb, var(--realm-frost75) 25%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 70%, transparent 100%)`,
-            animation: `rainWindGust ${streak.duration}s linear infinite`,
+            animation: `${chaos.rainWindGust} ${streak.duration}s linear infinite`,
             animationDelay: `${streak.delay}s`,
           }}
         />
@@ -1254,7 +1243,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             width: '2px',
             height: `${drop.length}px`,
             background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 20%, color-mix(in srgb, var(--realm-frost81) 80%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 80%, transparent 100%)',
-            animation: `rainFallWindy ${drop.duration}s linear infinite`,
+            animation: `${chaos.rainFallWindy} ${drop.duration}s linear infinite`,
             animationDelay: `${drop.delay}s`,
           }}
         />
@@ -1407,7 +1396,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
               { id: 4, x: 54, w: 18, delay: '0.36s', fill: REALM.blood8, yOff: 6 },
               { id: 5, x: 72, w: 15, delay: '0.48s', fill: REALM.blood6, yOff: 8 },
             ].map((col) => (
-              <g key={col.id} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: col.delay }}>
+              <g key={col.id} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: col.delay }}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
@@ -1445,7 +1434,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 </g>
               </g>
             ))}
-            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
+            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: '0.55s' }} />
           </g>
 
           {/* Pole shadow */}
@@ -1463,7 +1452,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 fill={REALM.stone4b}
                 opacity={0.25 - i * 0.04}
                 style={{
-                  animation: 'bannerWave 1.4s ease-in-out infinite alternate',
+                  animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`,
                   animationDelay: `${i * 0.12}s`,
                   transformOrigin: `${i * 15}px ${i * 2}px`,
                 }}
@@ -1499,523 +1488,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         background: 'linear-gradient(0deg, color-mix(in srgb, var(--realm-moss8) 25%, transparent) 0%, color-mix(in srgb, var(--realm-stone6) 15%, transparent) 50%, transparent 100%)',
         filter: 'blur(15px)',
       }} />
-
-      <style>{`
-        /* Meteor rain - diagonal left (moves down and left) */
-        @keyframes meteorRainLeft {
-          0% {
-            transform: translate(0, 0);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.8;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translate(-40vw, 120vh);
-            opacity: 0;
-          }
-        }
-        /* Meteor rain - diagonal right (moves down and right) */
-        @keyframes meteorRainRight {
-          0% {
-            transform: translate(0, 0);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.8;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translate(40vw, 120vh);
-            opacity: 0;
-          }
-        }
-        /* Meteor glow pulsing while falling - must include translate to maintain centering */
-        @keyframes meteorPulse {
-          0%, 100% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0.6;
-          }
-          50% {
-            transform: translate(-50%, -50%) scale(1.15);
-            opacity: 0.9;
-          }
-        }
-        /* Shockwave ring expanding */
-        @keyframes shockwaveExpand {
-          0% {
-            transform: scale(0.3);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(2.5);
-            opacity: 0;
-          }
-        }
-        /* Smoke rising from impact */
-        @keyframes smokeRise {
-          0% {
-            transform: translateY(0) scale(1);
-            opacity: 0.6;
-          }
-          100% {
-            transform: translateY(-80px) scale(1.5);
-            opacity: 0;
-          }
-        }
-        /* Debris particles flying outward */
-        @keyframes debrisFly0 {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(-40px, -60px) scale(0.3);
-            opacity: 0;
-          }
-        }
-        @keyframes debrisFly1 {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(10px, -70px) scale(0.2);
-            opacity: 0;
-          }
-        }
-        @keyframes debrisFly2 {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translate(50px, -50px) scale(0.4);
-            opacity: 0;
-          }
-        }
-        /* Infernal creature rising from impact (legacy) */
-        @keyframes infernalRise {
-          0% {
-            transform: translateY(30px) scale(0.5);
-            opacity: 0;
-          }
-          40% {
-            transform: translateY(10px) scale(0.9);
-            opacity: 0.7;
-          }
-          100% {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-          }
-        }
-        /* === GOLEM ASSEMBLY ANIMATIONS - rocks fly from scattered to final position === */
-        /* HEAD - starts scattered left, flies to top center */
-        @keyframes assembleHead {
-          0% {
-            transform: translate(-60px, 150px) rotate(-30deg) scale(0.6);
-            opacity: 0.3;
-          }
-          20% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* LEFT SHOULDER - starts bottom left of crater */
-        @keyframes assembleLeftShoulder {
-          0% {
-            transform: translate(-40px, 130px) rotate(20deg) scale(0.5);
-            opacity: 0;
-          }
-          15% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* RIGHT SHOULDER - starts bottom right of crater */
-        @keyframes assembleRightShoulder {
-          0% {
-            transform: translate(40px, 130px) rotate(-25deg) scale(0.5);
-            opacity: 0;
-          }
-          15% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* TORSO - starts at crater center, rises up */
-        @keyframes assembleTorso {
-          0% {
-            transform: translate(0, 100px) scale(0.4);
-            opacity: 0;
-          }
-          20% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-        }
-        /* LEFT ARM - starts far left */
-        @keyframes assembleLeftArm {
-          0% {
-            transform: translate(-50px, 60px) rotate(45deg) scale(0.4);
-            opacity: 0;
-          }
-          20% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* RIGHT ARM - starts far right */
-        @keyframes assembleRightArm {
-          0% {
-            transform: translate(50px, 60px) rotate(-45deg) scale(0.4);
-            opacity: 0;
-          }
-          20% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* LEFT LEG - starts left of crater */
-        @keyframes assembleLeftLeg {
-          0% {
-            transform: translate(-30px, 70px) rotate(15deg) scale(0.5);
-            opacity: 0;
-          }
-          25% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* RIGHT LEG - starts right of crater */
-        @keyframes assembleRightLeg {
-          0% {
-            transform: translate(30px, 70px) rotate(-15deg) scale(0.5);
-            opacity: 0;
-          }
-          25% { opacity: 1; }
-          100% {
-            transform: translate(0, 0) rotate(0deg) scale(1);
-            opacity: 1;
-          }
-        }
-        /* Glow during assembly */
-        @keyframes emergeGlow {
-          0% { opacity: 0.8; transform: translateY(80px); }
-          50% { opacity: 0.6; transform: translateY(30px); }
-          100% { opacity: 0; transform: translateY(-20px); }
-        }
-        /* The lit layer over each assembling rock fades as the rock cools */
-        @keyframes rockFlash {
-          from { opacity: var(--rock-flash); }
-          to { opacity: 0; }
-        }
-        /* Detailed golem fades in on top of assembled rocks */
-        @keyframes golemFadeIn {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        /* Meteor falls diagonally from sky for golem spawn */
-        @keyframes golemMeteorFall {
-          0% {
-            transform: translate(0, 0);
-            opacity: 0;
-          }
-          8% {
-            opacity: 1;
-          }
-          100% {
-            transform: translate(130px, 400px);
-            opacity: 1;
-          }
-        }
-        /* Meteor grows as it approaches (perspective effect): the 40px core and its glow scale from the top left
-           corner, 8px, then 20px, then 40px across */
-        @keyframes meteorGrow {
-          0% { transform: scale(0.2); }
-          50% { transform: scale(0.5); }
-          100% { transform: scale(1); }
-        }
-        /* Trail grows with meteor: the 14 by 120 trail scales about its bottom centre from 3 by 30, through 8 by
-           70, and its bottom follows the core's centre (half the core's width across, its height down from -40px) */
-        @keyframes meteorTrailGrow {
-          0% { transform: translate(-3px, 30px) rotate(-25deg) scale(0.2143, 0.25); }
-          50% { transform: translate(3px, 70px) rotate(-25deg) scale(0.5714, 0.5833); }
-          100% { transform: translate(13px, 120px) rotate(-25deg) scale(1, 1); }
-        }
-        /* Explosion flash on meteor impact */
-        @keyframes explosionFlash {
-          0% {
-            transform: translate(-50%, -50%) scale(0.3);
-            opacity: 1;
-          }
-          30% {
-            transform: translate(-50%, -50%) scale(1.2);
-            opacity: 0.9;
-          }
-          100% {
-            transform: translate(-50%, -50%) scale(1.5);
-            opacity: 0;
-          }
-        }
-        /* Crater crack grows from center outward */
-        @keyframes crackGrow {
-          0% {
-            stroke-dasharray: 200;
-            stroke-dashoffset: 200;
-            opacity: 0;
-          }
-          30% {
-            opacity: 1;
-          }
-          100% {
-            stroke-dashoffset: 0;
-            opacity: 1;
-          }
-        }
-        /* Crack trembles/shakes after growing */
-        @keyframes crackTremble {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(-1px, 1px);
-          }
-          50% {
-            transform: translate(1px, -1px);
-          }
-          75% {
-            transform: translate(-1px, -1px);
-          }
-        }
-        /* Idle breathing animation - SVG only, no translateX (that's on container) */
-        @keyframes infernalBreath {
-          0%, 100% {
-            transform: scaleY(1) translateY(0);
-          }
-          50% {
-            transform: scaleY(1.02) translateY(-1px);
-          }
-        }
-        /* Head looks around - left, center, right, center (more dramatic) */
-        @keyframes headLook {
-          0%, 20%, 80%, 100% {
-            transform: rotate(0deg);
-          }
-          30%, 40% {
-            transform: rotate(-12deg);
-          }
-          55%, 70% {
-            transform: rotate(12deg);
-          }
-        }
-        /* Left arm sway - muscle flex effect */
-        @keyframes leftArmSway {
-          0%, 100% {
-            transform: rotate(0deg) scaleX(1);
-          }
-          25% {
-            transform: rotate(-8deg) scaleX(1.05);
-          }
-          50% {
-            transform: rotate(-3deg) scaleX(1);
-          }
-          75% {
-            transform: rotate(5deg) scaleX(0.98);
-          }
-        }
-        /* Right arm sway - opposite phase muscle flex */
-        @keyframes rightArmSway {
-          0%, 100% {
-            transform: rotate(0deg) scaleX(1);
-          }
-          25% {
-            transform: rotate(8deg) scaleX(1.05);
-          }
-          50% {
-            transform: rotate(3deg) scaleX(1);
-          }
-          75% {
-            transform: rotate(-5deg) scaleX(0.98);
-          }
-        }
-        /* Left leg weight shift */
-        @keyframes leftLegShift {
-          0%, 100% {
-            transform: rotate(0deg) translateX(0);
-          }
-          50% {
-            transform: rotate(-2deg) translateX(-1px);
-          }
-        }
-        /* Right leg weight shift - opposite phase */
-        @keyframes rightLegShift {
-          0%, 100% {
-            transform: rotate(0deg) translateX(0);
-          }
-          50% {
-            transform: rotate(2deg) translateX(1px);
-          }
-        }
-        /* Torso subtle sway */
-        @keyframes torsoSway {
-          0%, 100% {
-            transform: rotate(0deg);
-          }
-          25% {
-            transform: rotate(-1deg);
-          }
-          75% {
-            transform: rotate(1deg);
-          }
-        }
-        /* Body glow pulse */
-        @keyframes felPulse {
-          0%, 100% {
-            opacity: 0.15;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.25;
-            transform: scale(1.08);
-          }
-        }
-        /* Layered flame animations - outer layer (slowest, largest movement) */
-        @keyframes flameOuter {
-          0%, 100% {
-            transform: scaleY(1) scaleX(1) translateX(0);
-            opacity: 0.8;
-          }
-          25% {
-            transform: scaleY(1.15) scaleX(0.9) translateX(-1px);
-            opacity: 0.7;
-          }
-          50% {
-            transform: scaleY(1.05) scaleX(1.05) translateX(1px);
-            opacity: 0.85;
-          }
-          75% {
-            transform: scaleY(1.12) scaleX(0.95) translateX(-0.5px);
-            opacity: 0.75;
-          }
-        }
-        /* Middle flame layer */
-        @keyframes flameMid {
-          0%, 100% {
-            transform: scaleY(1) scaleX(1) translateX(0);
-            opacity: 0.9;
-          }
-          20% {
-            transform: scaleY(1.12) scaleX(0.92) translateX(0.5px);
-            opacity: 0.85;
-          }
-          45% {
-            transform: scaleY(1.08) scaleX(1.03) translateX(-0.8px);
-            opacity: 0.95;
-          }
-          70% {
-            transform: scaleY(1.18) scaleX(0.88) translateX(0.3px);
-            opacity: 0.88;
-          }
-        }
-        /* Inner flame layer (faster, more erratic) */
-        @keyframes flameInner {
-          0%, 100% {
-            transform: scaleY(1) scaleX(1) translateX(0);
-            opacity: 0.85;
-          }
-          15% {
-            transform: scaleY(1.2) scaleX(0.85) translateX(-0.5px);
-            opacity: 0.9;
-          }
-          35% {
-            transform: scaleY(1.05) scaleX(1.08) translateX(0.8px);
-            opacity: 0.8;
-          }
-          55% {
-            transform: scaleY(1.25) scaleX(0.82) translateX(-0.3px);
-            opacity: 0.92;
-          }
-          80% {
-            transform: scaleY(1.1) scaleX(0.95) translateX(0.4px);
-            opacity: 0.85;
-          }
-        }
-        /* Core flame (hottest, fastest flicker) */
-        @keyframes flameCore {
-          0%, 100% {
-            transform: scaleY(1) scaleX(1);
-            opacity: 0.7;
-          }
-          20% {
-            transform: scaleY(1.3) scaleX(0.8);
-            opacity: 0.8;
-          }
-          40% {
-            transform: scaleY(0.9) scaleX(1.1);
-            opacity: 0.65;
-          }
-          60% {
-            transform: scaleY(1.25) scaleX(0.85);
-            opacity: 0.75;
-          }
-          80% {
-            transform: scaleY(1.05) scaleX(0.95);
-            opacity: 0.7;
-          }
-        }
-        /* Eye glow intensity variation */
-        @keyframes eyeGlow {
-          0%, 100% { opacity: 0.9; }
-          25% { opacity: 1; }
-          75% { opacity: 0.7; }
-        }
-        /* The brighter fel layer over each eye flares with the glow */
-        @keyframes eyeFlare {
-          0%, 75%, 100% { opacity: 0; }
-          25% { opacity: 0.7; }
-        }
-        /* Wind gusts blowing across battlefield */
-        @keyframes rainWindGust {
-          0% { transform: translateX(0); opacity: 0; }
-          10% { opacity: 0.5; }
-          85% { opacity: 0.5; }
-          100% { transform: translateX(130vw); opacity: 0; }
-        }
-        /* Rain falling with wind - uses translate only (no rotate) for performance */
-        @keyframes rainFallWindy {
-          0% { transform: translate(0, 0) rotate(-25deg); opacity: 0.6; }
-          100% { transform: translate(25vw, 115vh) rotate(-25deg); opacity: 0; }
-        }
-        /* Grass blade wind - ondulating wave to the right, anchored at base */
-        @keyframes grassBlade {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(6deg); }
-          50% { transform: rotate(12deg); }
-          75% { transform: rotate(6deg); }
-        }
-        /* Banner wave - staggered columns create ripple effect */
-        @keyframes bannerWave {
-          0% {
-            transform: translateY(0) skewX(0deg);
-          }
-          100% {
-            transform: translateY(-6px) skewX(3deg);
-          }
-        }
-      `}</style>
     </>
   )
 })
