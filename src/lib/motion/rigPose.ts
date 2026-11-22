@@ -36,13 +36,46 @@ export function mix<Pose extends RigPose>(a: Pose, b: Pose, t: number): Pose {
   return Object.fromEntries(Object.keys(from).map((key) => [key, from[key] + (to[key] - from[key]) * t])) as unknown as Pose
 }
 
-/** The front view street stride at `phase` (one step per unit): a knee comes up, the other side's arm swings. */
-export function walk(phase: number): RigPose {
+/** Which way a figure faces: 1 right, -1 left, 0 toward the viewer. */
+export type Facing = 1 | -1 | 0
+
+// How far a thigh swings either side of straight down on a profile step, and how far the swinging shin folds back.
+const STEP_DEG = 25
+const FOLD_DEG = 30
+
+/** The front view stride: a knee comes up toward the viewer, the other side's arm swings. */
+function frontStride(phase: number): RigPose {
   const swing = Math.sin(phase * Math.PI)
   const right = Math.max(0, swing)
   const left = Math.max(0, -swing)
   return { ...STAND, rise: -2 * Math.abs(swing), kneeRight: right, kneeLeft: left, shinRight: -7 * right, shinLeft: 7 * left, armLeft: 8 * right, armRight: -8 * left }
 }
+
+/** The profile stride: one leg swings from behind him to ahead of him, the way he faces, while the planted
+ *  one slides back under him; the legs trade every unit of phase, the arms swing against them. */
+function profileStride(phase: number, facing: 1 | -1): RigPose {
+  const cycle = ((phase % 2) + 2) % 2
+  const t = cycle % 1
+  // a positive turn is clockwise on screen, which carries a hanging foot to the left
+  const swinging = facing * STEP_DEG * Math.cos(Math.PI * t)
+  const fold = facing * FOLD_DEG * Math.sin(Math.PI * t)
+  const right = cycle < 1
+  const thighRight = right ? swinging : -swinging
+  const thighLeft = right ? -swinging : swinging
+  return {
+    ...STAND,
+    rise: -2 * Math.sin(Math.PI * t),
+    thighRight,
+    thighLeft,
+    shinRight: right ? fold : 0,
+    shinLeft: right ? 0 : fold,
+    armRight: -0.6 * thighRight,
+    armLeft: -0.6 * thighLeft,
+  }
+}
+
+/** The stride at `phase` (one step per unit, the phase rising as he goes on), facing the viewer or in profile. */
+export const walk = (phase: number, facing: Facing = 0): RigPose => (facing === 0 ? frontStride(phase) : profileStride(phase, facing))
 
 /** An arm's joints and the hand as drawn, in the figure's viewBox units. */
 export interface ArmPivots {
@@ -50,6 +83,16 @@ export interface ArmPivots {
   elbow: Point
   hand: Point
 }
+
+/** A leg's joints and the foot as drawn, in the figure's viewBox units. */
+export interface LegPivots {
+  hip: Point
+  knee: Point
+  foot: Point
+}
+
+/** Where the foot ends up with the thigh turned `thigh` degrees at the hip and the shin `shin` at the knee. */
+export const footAt = ({ hip, knee, foot }: LegPivots, thigh: number, shin: number): [number, number] => turnAbout(turnAbout(foot, shin, knee), thigh, hip)
 
 /** Where the hand ends up with the upper arm turned `arm` degrees at the shoulder and the forearm `fore` at
  *  the elbow: the forearm turns first about the elbow, then the whole arm about the shoulder. */
