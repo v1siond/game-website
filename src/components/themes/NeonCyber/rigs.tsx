@@ -59,14 +59,17 @@ function Screen({ x, y, id, color }: { x: number; y: number; id: string; color: 
   )
 }
 
+// The towers through the den's window, standing on its sill at y 110, tall and short in turn.
+const DEN_TOWERS = [205, 240, 290, 330, 380, 420].map((x, i) => ({ x, height: i % 2 ? 46 : 70 }))
+
 function Den({ figure }: { figure: ReactNode }) {
   return (
     <>
       <Layer depth="far">
         <rect x={-40} y={-20} width={560} height={280} fill={NEON.dusk} />
         <rect x={190} y={18} width={270} height={92} fill={NEON.ink} stroke={NEON.steel} strokeWidth={4} />
-        {[205, 240, 290, 330, 380, 420].map((x, i) => (
-          <rect key={x} x={x} y={110 - (i % 2 ? 46 : 70)} width={28} height={i % 2 ? 46 : 70} fill={NEON.tower} />
+        {DEN_TOWERS.map(({ x, height }) => (
+          <rect key={x} x={x} y={110 - height} width={28} height={height} fill={NEON.tower} />
         ))}
         <rect x={322} y={18} width={4} height={92} fill={NEON.steel} />
         <rect x={190} y={62} width={270} height={3} fill={NEON.steel} />

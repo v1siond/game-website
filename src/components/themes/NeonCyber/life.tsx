@@ -13,7 +13,7 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
-import { MercSprite, type MercMotion } from './merc'
+import { MercSprite, stillWhen, type MercMotion } from './merc'
 import { DataChip, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { NEON } from './palette'
@@ -46,7 +46,7 @@ export function ScanAbout({ bio }: { bio: string }) {
   const { sections, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('japantown')
   const [arrived, setArrived] = useState(false)
-  const motion: MercMotion = reduced ? 'still' : arrived ? 'scan' : 'walk'
+  const motion = stillWhen(reduced, arrived ? 'scan' : 'walk')
   const tags = [
     { label: cyber.tagEducation, value: professionalSummary.education },
     { label: cyber.tagLanguages, value: professionalSummary.languages },
@@ -302,7 +302,7 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
   const [done, setDone] = useState(false)
   const last = martialArts.primary.achievements.length - 1
   const standing = done || reduced
-  const motion: MercMotion = reduced ? 'still' : standing ? 'kick' : 'sit'
+  const motion = stillWhen(reduced, standing ? 'kick' : 'sit')
 
   return (
     <div ref={ref} className={`${life.ripStage} mb-10`} data-on={on(lit)} data-done={on(standing)}>

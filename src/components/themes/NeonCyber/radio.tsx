@@ -19,6 +19,12 @@ import world from './world.module.css'
 
 const EQ_BARS = [0, 1, 2, 3, 4]
 
+// The tuned preset is ringed in HUD yellow and plays its equaliser; the others keep a faint use blue line.
+const TUNED_LOOK: Record<`${boolean}`, string> = {
+  true: `${world.tuned} border-[color:var(--neon-hud)]`,
+  false: 'border-[color-mix(in_srgb,var(--neon-use)_35%,transparent)]',
+}
+
 function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: number; tuned: boolean; onTune: () => void }) {
   const { actions, sections } = useLabels()
   const { band, years, linkProps, release } = slot
@@ -28,9 +34,7 @@ function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: numbe
       <article
         onPointerEnter={onTune}
         onFocus={onTune}
-        className={`${tuned ? world.tuned : ''} border bg-[color:var(--neon-glass)] p-4 ${
-          tuned ? 'border-[color:var(--neon-hud)]' : 'border-[color-mix(in_srgb,var(--neon-use)_35%,transparent)]'
-        }`}
+        className={`${TUNED_LOOK[`${tuned}`]} border bg-[color:var(--neon-glass)] p-4`}
       >
         <header className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -84,28 +88,26 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
 
       {/* the dial: the station marks, the needle on the tuned band */}
       <div className="mt-5 flex items-end gap-3">
-      <span className="block w-14 shrink-0 sm:w-16" aria-hidden="true">
-        <MercSprite key={drummer.take} profession="drummer" motion={drummer.move ?? drummer.pose} className="h-auto w-full" />
-      </span>
-      <div className="min-w-0 flex-1 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
-        <div className="relative h-14" style={{ '--tuned': tuned, '--count': bands.length } as CSSProperties}>
-          <div className="absolute inset-x-0 top-0 h-3 bg-[repeating-linear-gradient(90deg,var(--neon-data)_0_1px,transparent_1px_10px)] opacity-60" />
-          <div className={`absolute inset-x-0 top-5 grid ${world.stations}`}>
-            {bands.map((band, i) => (
-              <span key={band.id} className={`truncate px-1 text-center text-sm ${i === tuned ? 'text-[color:var(--neon-hud)]' : 'text-[color:var(--neon-ash)]'}`}>
-                {band.name}
-              </span>
-            ))}
-          </div>
-          <div className={`absolute inset-y-0 left-0 w-full ${world.needle}`}>
-            <span className="absolute -top-1 bottom-0 left-0 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" />
+        <span className="block w-14 shrink-0 sm:w-16" aria-hidden="true">
+          <MercSprite key={drummer.take} profession="drummer" motion={drummer.move ?? drummer.pose} className="h-auto w-full" />
+        </span>
+        <div className="min-w-0 flex-1 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
+          <div className="relative h-14" style={{ '--tuned': tuned, '--count': bands.length } as CSSProperties}>
+            <div className="absolute inset-x-0 top-0 h-3 bg-[repeating-linear-gradient(90deg,var(--neon-data)_0_1px,transparent_1px_10px)] opacity-60" />
+            <div className={`absolute inset-x-0 top-5 grid ${world.stations}`}>
+              {bands.map((band, i) => (
+                <span key={band.id} className={`truncate px-1 text-center text-sm ${i === tuned ? 'text-[color:var(--neon-hud)]' : 'text-[color:var(--neon-ash)]'}`}>
+                  {band.name}
+                </span>
+              ))}
+            </div>
+            <div className={`absolute inset-y-0 left-0 w-full ${world.needle}`}>
+              <span className="absolute -top-1 bottom-0 left-0 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" />
+            </div>
           </div>
         </div>
       </div>
-      </div>
-      <p className="mt-2 flex flex-wrap justify-between gap-2 text-sm">
-        <span className="text-[color:var(--neon-hud)]">{tunedBand ? fillLabel(hud.tunedTo, { name: tunedBand.name }) : ''}</span>
-      </p>
+      <p className="mt-2 text-sm text-[color:var(--neon-hud)]">{tunedBand ? fillLabel(hud.tunedTo, { name: tunedBand.name }) : ''}</p>
 
       <BandList
         bands={bands}

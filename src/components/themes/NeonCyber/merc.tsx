@@ -29,6 +29,9 @@ export const MERC_ACTION: Record<Profession, MercMotion> = {
   fighter: 'kick',
 }
 
+/** Him held still under reduced motion, else playing `motion`. */
+export const stillWhen = (reduced: boolean, motion: MercMotion): MercMotion => (reduced ? 'still' : motion)
+
 const MOTION_CLASS: Record<MercMotion, string> = {
   still: '',
   idle: s.idle,
