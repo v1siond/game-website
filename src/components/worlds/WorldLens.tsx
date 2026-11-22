@@ -79,6 +79,8 @@ export function useLensTrigger(enabled: boolean, button: RefObject<HTMLButtonEle
   const close = useCallback(() => {
     window.clearTimeout(holdTimer.current)
     window.clearTimeout(leaveTimer.current)
+    // A hold that turned into a scroll never clicks, so its flag must not eat the next tap.
+    heldClick.current = false
     setMode(null)
   }, [])
 
@@ -114,6 +116,7 @@ export function useLensTrigger(enabled: boolean, button: RefObject<HTMLButtonEle
       if (event.pointerType === 'mouse') open('hover')
     },
     onPointerDown: (event) => {
+      heldClick.current = false
       if (event.pointerType === 'mouse') return
       window.clearTimeout(holdTimer.current)
       holdTimer.current = window.setTimeout(() => {
