@@ -126,39 +126,3 @@ export function setPose(j: Joints, pose: Partial<Pose>): void {
   const at = poseTransforms(pose)
   for (const key of Object.keys(at) as Joint[]) j[key].setAttribute('transform', at[key])
 }
-
-// How far one full stride carries him, in canvas units at scale 1, so a walk's legs follow the ground.
-const STRIDE_PX = 110
-
-/**
- * Where a walker stands so he only ever moves forward on screen. The layers zoom in about a point to the
- * right of the stage's middle, which carries a figure standing left of it backwards as the scene plays; so
- * he walks in from ENTRY_PX behind his first mark while the scene rises, and walks on DRIFT_PX over the
- * whole scene, more than the zoom takes back. `mark` is where the cards put him.
- */
-const ENTRY_PX = 160
-const ENTRY_UNTIL = 0.2
-const DRIFT_PX = 70
-
-export const walkOn = (mark: number, p: number): number => mark - ENTRY_PX * (1 - Math.min(1, p / ENTRY_UNTIL)) + DRIFT_PX * p
-
-/** His legs for a walk at x: the stride follows the distance walked, so he stops stepping when he stops. */
-export const strideAt = (x: number, scale: number, size: number): Partial<Pose> => stride(x / (STRIDE_PX * scale), size)
-
-/** A walk or run cycle at a phase in turns (1 is one full stride). */
-export function stride(phase: number, size = 1): Partial<Pose> {
-  const a = Math.sin(phase * Math.PI * 2)
-  const b = Math.cos(phase * Math.PI * 2)
-  return {
-    hipF: 28 * a * size,
-    hipB: -28 * a * size,
-    kneeF: -Math.max(0, -b) * 50 * size - 6,
-    kneeB: -Math.max(0, b) * 50 * size - 6,
-    shF: -30 * a * size,
-    shB: 30 * a * size,
-    elF: 30,
-    elB: 30,
-    lift: Math.abs(b) * 5 * size,
-    scarf: Math.sin(phase * Math.PI * 4) * 6,
-  }
-}

@@ -1,7 +1,8 @@
+import { gaitAt, walkOn } from '@/lib/motion/gait'
 import { mulberry32 } from '@/lib/random/seeded'
 import { TOMB, TOMB_DEPTH } from '../palette'
 import { defs, fade, fx, glow, lerp, linear, radial, rect, r1, spread, svg, tf } from '../draw'
-import { courier, joints, setPose, strideAt, walkOn, type Pose } from '../courier'
+import { courier, joints, setPose, type Pose } from '../courier'
 import { clamp01, reached, type Era } from './era'
 
 // Tech: the sun tomb. A hall of columns towards a lit door; he carries a torch down it and a glyph tablet
@@ -28,7 +29,7 @@ const tabletsAt = (count: number): number[] => spread(count, 520, 1080)
 
 const carryPose = (xs: readonly number[], p: number, f: number): Partial<Pose> => {
   const x = walkOn(lerp(xs[0] - 40, xs[xs.length - 1] + 30, clamp01(f / Math.max(1, xs.length))), p)
-  return { x, y: 905, scale: 1.2, ...strideAt(x, 1.2, 0.7), shF: 150, elF: 20, head: -4 }
+  return { x, y: 905, scale: 1.2, ...gaitAt(x, 1.2, 0.7), shF: 150, elF: 20, head: -4 }
 }
 
 export const tomb: Era = {

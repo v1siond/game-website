@@ -1,6 +1,7 @@
+import { gaitAt, walkOn } from '@/lib/motion/gait'
 import { FERN } from '../palette'
 import { clouds, defs, fade, frond, fx, glow, lerp, linear, radial, rect, ridge, r1, spread, stars, svg, tf } from '../draw'
-import { courier, joints, setPose, strideAt, walkOn, type Pose } from '../courier'
+import { courier, joints, setPose, type Pose } from '../courier'
 import { reached, type Era } from './era'
 
 // About: the fern age at dawn. The volcano smokes, the long neck raises its head, pterosaurs cross the sun;
@@ -13,7 +14,7 @@ const walkPose = (xs: readonly number[], p: number, f: number): Partial<Pose> =>
   const last = xs.length - 1
   const at = Math.min(last, Math.max(0, f - 0.5))
   const x = walkOn(lerp(xs[Math.floor(at)], xs[Math.min(last, Math.floor(at) + 1)], at % 1) + 34, p)
-  return { x, y: 902, scale: 1.25, ...strideAt(x, 1.25, 0.8) }
+  return { x, y: 902, scale: 1.25, ...gaitAt(x, 1.25, 0.8) }
 }
 
 export const fern: Era = {
