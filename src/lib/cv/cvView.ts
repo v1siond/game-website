@@ -1,4 +1,4 @@
-import type { Band, CVData, Job, MartialArts, Musician, ProfessionalSummary, Project, Service, TechCategory } from './content'
+import type { Band, CVData, Job, MartialArts, Musician, ProfessionalSummary, Project, TechCategory, WorldCV } from './content'
 import type { Labels } from './labels'
 import { jobSpan, projectLinks, yearSpan, type ProjectLink } from './sectionText'
 import { DEFAULT_PROFESSION, isProfession, type Profession } from './professions'
@@ -28,7 +28,7 @@ export type ProfessionSections =
       jobs: Job[]
       projects: Project[]
       techStack: Array<TechCategory & { id: string }>
-      services: Service[]
+      services: WorldCV['services']
       companies: CVData['companies']
     }
   | { profession: 'drummer'; musician: Musician; bands: Band[] }
@@ -86,13 +86,13 @@ const bandEnd = (band: Band): number => {
   return band.endYear ?? UNDATED
 }
 
-const jobsFor = (cv: CVData, keep: Keep): Job[] =>
+const jobsFor = (cv: WorldCV, keep: Keep): Job[] =>
   cv.workExperience
     .filter((job) => keep(job, job.endDate ? job.endDate.getUTCFullYear() : null))
     .sort(byRecency(jobEnd, (job) => job.startDate.getTime()))
 
 // Projects keep the order he sets in Decap (position), the order the Contract fixes for them.
-const projectsFor = (cv: CVData, keep: Keep): Project[] =>
+const projectsFor = (cv: WorldCV, keep: Keep): Project[] =>
   cv.projects.filter((project) => keep(project, project.endYear)).sort((a, b) => a.position - b.position)
 
 /**
@@ -104,11 +104,11 @@ export const venturesFor = (companies: CVData['companies']): CVData['companies']
   ...companies.filter((company) => !company.featured),
 ]
 
-const bandsFor = (cv: CVData): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
+const bandsFor = (cv: WorldCV): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
 
 // The services, bands and the Muay Thai record are listed whole: the spec names every band and every martial arts
 // fact, and neither carries the highlight toggle the cut relies on.
-const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSections> = {
+const SECTIONS_FOR: Record<Profession, (cv: WorldCV, keep: Keep) => ProfessionSections> = {
   engineer: (cv, keep) => ({
     profession: 'engineer',
     jobs: jobsFor(cv, keep),
@@ -121,7 +121,7 @@ const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSec
   fighter: (cv) => ({ profession: 'fighter', martialArts: cv.martialArts }),
 }
 
-const heroFor = ({ fullName, professionalSummary, contact }: CVData): RecruiterHero => ({
+const heroFor = ({ fullName, professionalSummary, contact }: WorldCV): RecruiterHero => ({
   name: fullName,
   headline: professionalSummary.headline,
   tagline: professionalSummary.tagline,
@@ -137,7 +137,7 @@ const heroFor = ({ fullName, professionalSummary, contact }: CVData): RecruiterH
  * so a stale `?profession=` or stored value still renders a page. `year` is the year the five year cut
  * counts back from (yearOf), passed in so the server render and the hydrating client cut the same entries.
  */
-export function viewFor(cv: CVData, profession: string, mode: CVViewMode, year: number): CVView {
+export function viewFor(cv: WorldCV, profession: string, mode: CVViewMode, year: number): CVView {
   const picked = isProfession(profession) ? profession : DEFAULT_PROFESSION
   return {
     profession: picked,

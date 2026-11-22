@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles } from '@/lib/cv/content'
+import { CV_CONTENT_FILES, cvDataFrom, worldCV, type CVContentFiles } from '@/lib/cv/content'
 
 // The real Decap files, so the test reads what the page reads.
 const readFiles = (): CVContentFiles =>
@@ -60,6 +60,21 @@ describe('cvDataFrom', () => {
     expect(past?.endDate).toBeInstanceOf(Date)
     expect(cv.featuredProjects.length).toBeGreaterThan(0)
     expect(cv.featuredProjects.every((project) => project.featured)).toBe(true)
+  })
+})
+
+describe('worldCV', () => {
+  it('leaves out what only /cv prints and keeps the rest of the CV as loaded', () => {
+    const cv = cvDataFrom(readFiles(), 'en')
+    const world = worldCV(cv)
+
+    expect(world).not.toHaveProperty('featuredProjects')
+    expect(world).not.toHaveProperty('currentRoles')
+    expect(world.contact).not.toHaveProperty('website')
+    world.services.forEach((service) => expect(service).not.toHaveProperty('useCases'))
+    expect(world.services.map((service) => service.id)).toEqual(cv.services.map((service) => service.id))
+    expect(world.projects).toBe(cv.projects)
+    expect(world.labels).toBe(cv.labels)
   })
 })
 

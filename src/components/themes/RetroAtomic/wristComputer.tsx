@@ -7,7 +7,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
-import type { CVData } from '@/lib/cv/content'
+import type { WorldCV } from '@/lib/cv/content'
 import { NameWords } from '@/components/cv/NameWords'
 import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
@@ -135,11 +135,11 @@ function StatusFigure({ profession }: { profession: Profession }) {
   )
 }
 
-const firstJobYear = (jobs: CVData['workExperience']): number | null =>
+const firstJobYear = (jobs: WorldCV['workExperience']): number | null =>
   jobs.length > 0 ? Math.min(...jobs.map((job) => job.startDate.getUTCFullYear())) : null
 
 // How long he has been at each profession, written from the CV with the shared year labels.
-const TENURE: Record<Profession, (cv: CVData, years: Labels['years']) => string> = {
+const TENURE: Record<Profession, (cv: WorldCV, years: Labels['years']) => string> = {
   engineer: (cv, years) => {
     const year = firstJobYear(cv.workExperience)
     return year === null ? '' : fillLabel(years.since, { year })

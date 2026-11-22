@@ -5,6 +5,7 @@ import { pageMetadata } from '@/lib/seo'
 import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { yearOf } from '@/lib/cv/cvView'
+import { worldCV } from '@/lib/cv/content'
 import { BlogProvider } from '@/components/blog/BlogProvider'
 import { WORLD_PENDING_SCRIPT } from '@/themes/worldPending'
 import { INTRO_SCRIPT } from '@/themes/introFlag'
@@ -27,7 +28,7 @@ export default async function Home() {
   const [cv, posts] = await Promise.all([getAllCVData('en'), latestPosts(LATEST_POSTS, { env: process.env.NODE_ENV })])
 
   return (
-    <CVDataProvider cv={cv} year={yearOf(new Date())}>
+    <CVDataProvider cv={worldCV(cv)} year={yearOf(new Date())}>
       <BlogProvider posts={posts}>
         <ProfilePageJsonLd cv={cv} path={'/'} />
         <script dangerouslySetInnerHTML={{ __html: WORLD_PENDING_SCRIPT }} />
