@@ -60,8 +60,11 @@
 .scanStage[data-on='true'] .infoTag {
   animation: tag-pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) calc(2s + var(--i) * 0.18s) both;
 }
-.infoTag:hover {
-  animation: tag-ping 0.4s steps(3) both !important;
+/* The hover ping beats the entrance with !important, so it is kept to visitors who allow motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .infoTag:hover {
+    animation: tag-ping 0.4s steps(3) both !important;
+  }
 }
 
 @keyframes tag-pop {
