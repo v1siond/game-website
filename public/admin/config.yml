@@ -417,19 +417,24 @@ collections:
                 widget: object
                 i18n: true
                 fields:
-                  - { <<: *text, label: "Stop", name: stop }
-                  - { <<: *text, label: "Play diary", name: playDiary, hint: 'Keep {job}' }
-                  - { <<: *text, label: "Stop diary", name: stopDiary, hint: 'Keep {job}' }
-                  - { <<: *text, label: "Snap", name: snap }
-                  - { <<: *text, label: "Snap of", name: snapOf, hint: 'Keep {project}' }
-                  - { <<: *text, label: "Developed", name: developed }
-                  - { <<: *text, label: "Turn pipe", name: turnPipe, hint: 'Keep {n}' }
-                  - { <<: *text, label: "Zap again", name: zapAgain }
-                  - { <<: *text, label: "Seal leak", name: sealLeak }
-                  - { <<: *text, label: "Provoke guardian", name: provoke }
-                  - { <<: *text, label: "Pull banner cord", name: pullCord, hint: 'Keep {venture}' }
-                  - { <<: *text, label: "Flow waiting", name: flowWaiting }
-                  - { <<: *text, label: "Flow done", name: flowDone }
+                  - { <<: *text, label: "Place: hero", name: placeHero }
+                  - { <<: *text, label: "Place: about", name: placeAbout }
+                  - { <<: *text, label: "Place: work", name: placeWork }
+                  - { <<: *text, label: "Place: tech", name: placeTech }
+                  - { <<: *text, label: "Place: services", name: placeServices }
+                  - { <<: *text, label: "Place: projects", name: placeProjects }
+                  - { <<: *text, label: "Place: ventures", name: placeVentures }
+                  - { <<: *text, label: "Place: bands", name: placeBands }
+                  - { <<: *text, label: "Place: Muay Thai", name: placeMuayThai }
+                  - { <<: *text, label: "Place: contact", name: placeContact }
+                  - { <<: *text, label: "Count: about", name: countAbout, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: work", name: countWork, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: tech", name: countTech, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: services", name: countServices, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: projects", name: countProjects, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: ventures", name: countVentures, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: bands", name: countBands, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Count: Muay Thai", name: countMuayThai, hint: 'Keep {count} {total}' }
               - label: Arcade world (fighter select)
                 name: arcade
                 widget: object

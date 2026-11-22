@@ -1,4 +1,4 @@
-import { useId, type AnimationEvent } from 'react'
+import { useId } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { DECO_COLORS as C } from './palette'
@@ -20,36 +20,10 @@ import s from './sprite.module.css'
 // red prajioud on the arms, wrapped hands and his own mongkhon round the head, whose action is the knee
 // then the round kick, the plasmid veins still lit.
 //
-// Every one can idle (breath, blink, the wrench tapping), walk, swing the wrench, zap, hold an audio diary
-// up by his face and listen (a held pose that loops while the tape runs), and come back
-// through the revival chamber: a column of light, the body knitting together from the feet up. The parts
-// are groups sprite.module.css turns round their own joints (transform and opacity only). A one shot
-// motion runs a clock animation on the root group and reports its end through onDone.
-
-export type DecoMotion = 'still' | 'idle' | 'walk' | 'swing' | 'zap' | 'drum' | 'strike' | 'revive' | 'listen' | 'pull'
-
-/** The one shot motions; the rest loop. */
-export const ONE_SHOT: ReadonlySet<DecoMotion> = new Set(['swing', 'zap', 'drum', 'strike', 'revive', 'pull'])
-
-/** Each profession's action, the way the survivor would do that job. */
-export const PROFESSION_ACTION: Record<Profession, DecoMotion> = {
-  engineer: 'zap',
-  drummer: 'drum',
-  fighter: 'strike',
-}
-
-const MOTION_CLASS: Record<DecoMotion, string> = {
-  still: '',
-  idle: s.idle,
-  walk: s.walk,
-  swing: s.swing,
-  zap: s.zap,
-  drum: s.drum,
-  strike: s.strike,
-  revive: s.revive,
-  listen: s.listen,
-  pull: s.pull,
-}
+// The parts are groups that turn round their own joints (the origins in sprite.module.css): a scene poses
+// them from the scroll on the shared rig (pose.ts), walking him, swinging the wrench, throwing the bolt,
+// holding an audio diary up by his face, and showing the props each act needs (the bolt, the swing's arc,
+// the diary, the sparks, the revival chamber's light), all at rest hidden. Transform and opacity only.
 
 const KIT_CLASS: Record<Profession, string> = {
   engineer: s.kitWrench,
@@ -136,7 +110,7 @@ function Head({ profession, ids }: { profession: Profession; ids: Ids }) {
       <path d="M64 41 Q68 42.5 71.5 40.5" stroke={C.sepia} strokeWidth={0.9} fill="none" />
       <path d="M74 25.5 Q77 30.5 74.5 32.5" fill={HERO_IDENTITY.skinShade} />
       <path d="M64.5 24.5 L71 23.6 M73 23.8 L75 24.4" stroke={HERO_IDENTITY.hair} strokeWidth={1.3} strokeLinecap="round" />
-      <g className={s.eyes}>
+      <g>
         <ellipse cx={68.2} cy={28.2} rx={1.5} ry={2} fill={HERO_IDENTITY.eyes} />
         <ellipse cx={73.6} cy={28.4} rx={0.9} ry={1.8} fill={HERO_IDENTITY.eyes} />
         <circle cx={68.6} cy={27.6} r={0.45} fill={C.ivory} />
@@ -387,28 +361,20 @@ function useIds(): Ids {
 
 interface SpriteProps {
   profession: Profession
-  motion: DecoMotion
-  /** Called when a one shot motion has played out. */
-  onDone?: () => void
-  /** The walk's strides follow the scroll (--scene-progress from an ancestor) instead of the clock. */
-  scrub?: boolean
   /** Its size where it is drawn inside another SVG (the theatre's canvas). */
   box?: { width: number; height: number }
   className?: string
 }
 
-/** Him as the wrench and plasmid survivor of the undersea city, in a profession's kit, playing one motion. */
-export function SurvivorSprite({ profession, motion, onDone, scrub = false, box, className = '' }: SpriteProps) {
+/** Him as the wrench and plasmid survivor of the undersea city, standing in a profession's kit; a scene
+ *  poses his groups from the scroll (pose.ts). */
+export function SurvivorSprite({ profession, box, className = '' }: SpriteProps) {
   const ids = useIds()
-  const finish = (event: AnimationEvent<SVGGElement>) => {
-    if (event.target !== event.currentTarget || !ONE_SHOT.has(motion)) return
-    onDone?.()
-  }
 
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
-      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]} ${scrub ? s.scrub : ''}`} onAnimationEnd={finish}>
+      <g className={`${s.sprite} ${KIT_CLASS[profession]}`}>
         <RevivalLight />
         <ellipse cx={62} cy={172.5} rx={26} ry={3.4} fill={C.abyss} opacity={0.5} />
         <g className={s.body}>
@@ -416,7 +382,7 @@ export function SurvivorSprite({ profession, motion, onDone, scrub = false, box,
           <Leg side="back" profession={profession} />
           <Leg side="front" profession={profession} />
           <Waist profession={profession} />
-          <g className={s.chest}>
+          <g>
             <path d={NECK} fill={HERO_IDENTITY.skinShade} />
             <Torso profession={profession} ids={ids} />
             <Head profession={profession} ids={ids} />

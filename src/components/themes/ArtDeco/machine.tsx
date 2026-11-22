@@ -1,13 +1,12 @@
 'use client'
 
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { GlassSurvivor } from './survivor'
+import { SurvivorSprite } from './sprite'
 import { DECO_COLORS as C } from './palette'
 import machine from './machine.module.css'
 
@@ -20,8 +19,8 @@ const OUTFIT_LOOK: WardrobeLook = { plate: C.bloodDeep, text: C.goldPaleText, ri
 //
 // A pick vends: the roller blind drops over the glass and lifts again on him in the new costume, the
 // tonic bottle of that profession drops into the tray and the marquee bulbs chase. Pattern: CSS only,
-// one keyed remount per pick (the key is the profession), every step a keyframe delay; the first one
-// plays when the machine scrolls into view (data-on from the shared trigger). The rows are the shared
+// one keyed remount per pick (the key is the profession), every step a keyframe delay, played once a
+// profession has been picked (data-on); the page opens on him standing still in the glass. The rows are the shared
 // ProfessionSwitch radiogroup, so arrows, Tab and the accessible names come from it.
 
 // The glyph on each profession's bottle and row, in the ink it is drawn in.
@@ -112,13 +111,24 @@ function ItemRow({ id, label, selected, optionProps }: ProfessionOption) {
   )
 }
 
+/** Whether a profession has been picked since the machine mounted, so the vend plays on a pick only. */
+function usePicked(active: Profession): boolean {
+  const first = useRef(active)
+  const [picked, setPicked] = useState(false)
+  useEffect(() => {
+    if (active === first.current) return
+    setPicked(true)
+  }, [active])
+  return picked
+}
+
 export function VendingMachine() {
   const { active } = useProfession()
   const { navigation } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
+  const picked = usePicked(active)
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto mt-16 max-w-4xl ${machine.machine}`}>
+    <div data-on={picked || undefined} className={`relative mx-auto max-w-4xl ${machine.machine}`}>
       <Crown />
       <div className={`relative border-[3px] border-[color:var(--deco-gold)] px-4 pb-5 pt-4 sm:px-8 sm:pb-8 ${machine.cabinet}`}>
         <div className="relative mb-5 overflow-hidden border-2 border-[color:var(--deco-brass-dark)] bg-[color:var(--deco-blood-deep)] px-4 py-3 text-center">
@@ -137,7 +147,7 @@ export function VendingMachine() {
                   {PROPS[active]}
                 </svg>
                 <div data-worlds-figure="" className={`absolute bottom-6 left-[18%] h-44 w-28 sm:h-52 sm:w-32 ${machine.figure}`}>
-                  <GlassSurvivor profession={active} className="h-full w-full" />
+                  <SurvivorSprite profession={active} className="h-full w-full" />
                 </div>
                 <div className={`pointer-events-none absolute inset-0 ${machine.blind}`} aria-hidden="true" />
               </Fragment>

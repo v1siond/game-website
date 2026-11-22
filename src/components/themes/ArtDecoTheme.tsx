@@ -1,154 +1,97 @@
 'use client'
 
-import Link from 'next/link'
+import { useCallback, useMemo, useRef } from 'react'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { PostsGate } from '@/components/cv/PostsGate'
-import { usePosts } from '@/components/blog/BlogProvider'
-import { BLOG_PATH, postLinks } from '@/lib/blog/links'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
-import { DECO_COLORS as C, DECO_VARS } from './ArtDeco/palette'
-import {
-  AbyssVeil,
-  DecoPatternBackground,
-  DecoSVGDefs,
-  DepthZone,
-  DrownedSkyline,
-  UnderwaterBubbles,
-  UnderwaterRays,
-  WaterCaustics,
-  type DecoZone,
-} from './ArtDeco/backdrop'
-import { GOLD_OUTLINE } from './ArtDeco/actions'
-import { BathysphereHero } from './ArtDeco/descent'
-import { VendingMachine } from './ArtDeco/machine'
-import { BrassPanel, Chamber } from './ArtDeco/plaque'
-import { POSTS_DEPTH, SECTION_VIEWS } from './ArtDeco/sections'
-import { VitaChamber } from './ArtDeco/vita'
-import look from './ArtDeco/world.module.css'
+import { fillLabel } from '@/lib/cv/labels'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
+import { Stage, Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { GaugeBar, VitaContact } from './ArtDeco/chrome'
+import { StationHero } from './ArtDeco/hero'
+import { DECO_VARS } from './ArtDeco/palette'
+import { LAYER_MOTION, scenesOf, type DecoScene } from './ArtDeco/scenes'
+import { ChamberSection } from './ArtDeco/sections'
+import page from './ArtDeco/page.module.css'
 
 // The world's own lettering: the root carries its --deco-face variable and the world's css reads it.
 const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--deco-face' })
 
-// Art Deco, the 1920s city at the bottom of the sea in brass, gold and lamplight: the page composition.
-// The visitor arrives in the bathysphere as it sinks past the lighthouse to the city (the hero), picks a
-// profession at the city's vending machine, then goes down through the chambers of the picked profession
-// (./ArtDeco/sections) and leaves through the bulkhead hatch (contact). The root carries the palette as
-// --deco-* variables, the pointer as --mx and --my for the porthole parallax and the camera viewfinder,
-// and the depth zone in view as data-zone, which the fixed backdrop fades to (./ArtDeco/backdrop).
+// Art Deco: his CV as a descent through the 1920s city at the bottom of the sea, in brass, gold and
+// lamplight. The page keeps the rhythm of the Rockstar VI site: a big hero (the station lobby the
+// bathysphere docks at, his name in gold neon and the vending machine he picks a profession at), then every
+// section of the shown profession is one full screen chamber that rises from dark, holds while its cards
+// scroll over it, and sinks into dark while the next chamber rises: the power station, the diary archive,
+// the glass tunnel, the plasmid hall, the pipe works, propaganda square, theatre row, the fight club, and
+// the revival chamber at the end. He is the survivor with the wrench and the plasmid hand in each chamber
+// and does one thing per card of the section: throws a bolt into a fuse box, listens to a diary, seals a
+// leak, lifts a crate. Every motion is a function of the scroll position (the shared theatre on
+// useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
+// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame; the gauge
+// bar names the chamber and counts his deeds.
 //
-// The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
-// scroll container and break the fixed viewfinder's place.
+// Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
+// its settled frame.
 
-// The latest posts on the brass panel: each title a cream link with its date in mist, and the gold
-// outline button to the whole list.
-function DecoPosts() {
-  const { blog } = useLabels()
-  const links = postLinks(usePosts())
-  if (!links) return null
-
-  return (
-    <>
-      <ul className="divide-y divide-[color:var(--deco-gold)]/30">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
-            >
-              <span className="text-lg underline decoration-[color:var(--deco-gold)] underline-offset-4">{link.title}</span>
-              <time dateTime={link.date} className="shrink-0 text-sm uppercase tracking-wider text-[color:var(--deco-mist)]">
-                {link.shownDate}
-              </time>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-6 flex justify-center">
-        <Link href={BLOG_PATH} className={GOLD_OUTLINE}>
-          {blog.allPosts}
-        </Link>
-      </div>
-    </>
-  )
-}
+const hasSlot = (scene: DecoScene): scene is DecoScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, blog } = useLabels()
-  const reducedMotion = useReducedMotion()
-  const pointer = usePointerVars(!reducedMotion)
-  const { zones, stage } = useZoneStore<DecoZone>('surface', reducedMotion)
-  useZoneAttribute(zones, pointer)
+  const cv = useCVData()
+  const labels = useLabels()
+  const reduced = useReducedMotion()
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
+    [view, cv, labels, active],
+  )
+  const placeRef = useRef<HTMLSpanElement>(null)
+  const countRef = useRef<HTMLSpanElement>(null)
+
+  // The gauge bar follows the chamber the page is in: its place and, where it counts, how many of its cards are read.
+  const lead = useCallback(
+    (id: string, reached: number) => {
+      const scene = scenes.find((each) => each.id === id)
+      if (!scene) return
+      if (placeRef.current) placeRef.current.textContent = labels.deco[scene.place]
+      if (countRef.current) countRef.current.textContent = scene.tally ? fillLabel(labels.deco[scene.tally], { count: reached, total: scene.count }) : ''
+    },
+    [scenes, labels],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced, lead)
+  const hero = scenes[0]
+  const contact = scenes[scenes.length - 1]
 
   return (
-    <ZoneStageProvider value={stage}>
-      <div ref={pointer} style={DECO_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${look.root} ${decoFace.variable}`}>
-        <SkipLink />
-        <DecoSVGDefs />
-
-        <DecoPatternBackground />
-        <UnderwaterRays />
-        <DrownedSkyline />
-        <WaterCaustics />
-        <UnderwaterBubbles />
-        <AbyssVeil />
-        <div className={`pointer-events-none fixed inset-0 z-[7] ${look.vignette}`} aria-hidden="true" />
-
-        {/* the first screen: his name at the surface and the machine where he stands */}
-        <div data-worlds-hero="">
-          <header className="relative z-30 px-4 pb-6 pt-10 sm:px-6 sm:pt-16">
-            <DepthZone zone="surface">
-              <BathysphereHero />
-            </DepthZone>
-          </header>
-
-          <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
-            <VendingMachine />
-          </section>
-        </div>
-
-        <main id="main-content" className="relative z-20 px-4 py-16 sm:px-8">
-          <ProfessionRegion className="mx-auto max-w-6xl">
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-
-            <PostsGate>
-              <div className="pt-20">
-                <FadeInScene>
-                  <Chamber title={blog.latestPosts} depth={POSTS_DEPTH[active]}>
-                    <BrassPanel>
-                      <DecoPosts />
-                    </BrassPanel>
-                  </Chamber>
-                </FadeInScene>
-              </div>
-            </PostsGate>
-          </ProfessionRegion>
-        </main>
-
-        <DepthZone zone="abyss">
-          <VitaChamber />
-        </DepthZone>
-
-        <footer className="relative z-20 flex justify-center py-12" aria-hidden="true">
-          <svg width="50" height="80" viewBox="0 0 50 80" opacity="0.25" focusable="false">
-            <path d="M18 80 L13 45 L37 45 L32 80" fill={C.gold} />
-            <path d="M15 65 L35 65" stroke={C.bronzeDark} strokeWidth="2" />
-            <rect x="10" y="25" width="30" height="20" fill={C.gold} />
-            <path d="M8 25 L25 10 L42 25" fill={C.gold} />
-            <circle cx="25" cy="35" r="8" fill={C.goldBright} opacity="0.8" />
-            <path d="M25 27 L25 12 M17 30 L5 25 M33 30 L45 25" stroke={C.goldBright} strokeWidth="1.5" opacity="0.6" />
-          </svg>
-        </footer>
-      </div>
-    </ZoneStageProvider>
+    <div style={DECO_VARS} className={`${page.root} ${reduced ? page.still : ''} ${decoFace.variable}`}>
+      <SkipLink />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef} className={page.theatre}>
+          {scenes.map((scene) => (
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+          ))}
+        </Theatre>
+      )}
+      <GaugeBar placeRef={placeRef} countRef={countRef} anchor={hero.anchor} />
+      <main id="main-content" ref={textRef} className={page.main}>
+        <StationHero scene={hero} still={reduced} />
+        <ProfessionRegion>
+          {scenes.filter(hasSlot).map((scene) => (
+            <ChamberSection key={scene.id} scene={scene} still={reduced} />
+          ))}
+        </ProfessionRegion>
+        <VitaContact scene={contact} still={reduced} />
+      </main>
+      <footer className={page.footer}>
+        <p className={page.copyright}>
+          <CopyrightLine />
+        </p>
+      </footer>
+    </div>
   )
 }
