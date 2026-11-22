@@ -70,8 +70,6 @@ export interface ScriptContext {
   profession: Profession
   condition: Condition
   saves: number
-  // The hall waits for the door into the house to finish before he walks in.
-  entrance: number
 }
 
 const NO_FLAGS: Flags = {
@@ -172,11 +170,11 @@ const READY: Record<Profession, { pose: HeroPose; laser: boolean }> = {
 const byTime = (beats: Beat[]) => [...beats].sort((a, b) => a.at - b.at)
 
 // He walks into the hall under the chandelier and takes his profession's ready stance.
-function hall({ profession, entrance }: ScriptContext): Script {
+function hall({ profession }: ScriptContext): Script {
   const ready = READY[profession]
   return {
     start: { x: OFF_LEFT, hero: 'walkA' },
-    beats: [...walk({ from: entrance, start: OFF_LEFT, to: 0.8, ms: 1400, end: ready.pose }), { at: entrance + 1700, set: { laser: ready.laser } }],
+    beats: [...walk({ from: 0, start: OFF_LEFT, to: 0.8, ms: 1400, end: ready.pose }), { at: 1700, set: { laser: ready.laser } }],
   }
 }
 

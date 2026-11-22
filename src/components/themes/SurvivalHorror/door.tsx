@@ -8,12 +8,13 @@ import horror from './horror.module.css'
 
 // The world's one transition, the genre's door loading screen: the screen goes black on a single panelled
 // door, it creaks a little, then swings open away from the camera, and the view passes through it into the
-// next room. The page opens with it (the hero's entrance), and every profession change goes through it:
-// door(change) runs the change while the screen is covered, so the new room is already there when the
-// door opens. Reduced motion and the World Select preview make the change with no door.
+// next room. Every profession change goes through it: door(change) runs the change while the screen is
+// covered, so the new room is already there when the door opens. The page itself opens on the hall with
+// no door, so his name and links are readable from the first frame. Reduced motion and the World Select
+// preview make the change with no door.
 //
-// Phases by setTimeout: cover (the black and the shut door fade in, or start in place for the entrance),
-// shut (the creak), open (the swing), through (the dolly through the frame), clear.
+// Phases by setTimeout: cover (the black and the shut door fade in), shut (the creak), open (the swing),
+// through (the dolly through the frame), clear.
 
 type DoorPhase = 'clear' | 'cover' | 'shut' | 'open' | 'through'
 
@@ -21,9 +22,6 @@ const COVER_MS = 260
 const SHUT_MS = 520
 const OPEN_MS = 1000
 const THROUGH_MS = 600
-
-/** How long the page's opening door takes, so the hall can start its own beat when it ends. */
-export const ENTRANCE_MS = SHUT_MS + OPEN_MS + THROUGH_MS
 
 const PHASE_LOOK: Record<DoorPhase, string> = {
   clear: 'hidden',
@@ -78,7 +76,7 @@ function DoorArt() {
 
 export function DoorProvider({ children }: { children: ReactNode }) {
   const preview = usePreview()
-  const [phase, setPhase] = useState<DoorPhase>(preview ? 'clear' : 'shut')
+  const [phase, setPhase] = useState<DoorPhase>('clear')
   const timers = useRef<number[]>([])
 
   const play = useCallback((from: number) => {
@@ -89,15 +87,6 @@ export function DoorProvider({ children }: { children: ReactNode }) {
       window.setTimeout(() => setPhase('clear'), from + SHUT_MS + OPEN_MS + THROUGH_MS),
     ]
   }, [])
-
-  // The page's entrance: the door is already shut on the black when the page paints.
-  useEffect(() => {
-    if (preview || prefersReducedMotion()) {
-      setPhase('clear')
-      return
-    }
-    play(0)
-  }, [preview, play])
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
