@@ -51,7 +51,8 @@
   gap: 16px;
   padding: 14px clamp(16px, 6vw, 96px);
   padding-right: 200px;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--ep-scrim) 70%, transparent), transparent);
+  background: var(--ep-scrim);
+  border-bottom: 1px solid color-mix(in srgb, var(--ep-portal) 30%, transparent);
   pointer-events: none;
 }
 
@@ -150,9 +151,15 @@
   padding: 96px clamp(16px, 6vw, 96px) 9vh;
 }
 
+/* Every text over the art stands on an opaque plate of its era's card colour, so no light in the art (a sun,
+   a beam) can sit behind a letter: chalk, mist and every era accent reach 7:1 (AAA) on every card colour. */
 .heroCopy {
   max-width: 720px;
-  text-shadow: 0 2px 18px color-mix(in srgb, var(--ep-scrim) 90%, transparent);
+  padding: 28px clamp(20px, 3vw, 36px) 30px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--era-accent) 40%, transparent);
+  background: var(--era-card);
+  box-shadow: 0 24px 60px -30px rgb(0 0 0 / 0.9);
 }
 
 .name {
@@ -285,8 +292,21 @@
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: 12svh;
+  align-items: flex-start;
   max-width: 900px;
-  text-shadow: 0 2px 22px color-mix(in srgb, var(--ep-scrim) 95%, transparent);
+}
+
+.head .plate,
+.head .title {
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: var(--era-card);
+}
+
+/* The display face's line box is shorter than its glyph box, so the plate reaches past it on both sides. */
+.head .title {
+  padding: 14px 22px 18px;
+  border-radius: 20px;
 }
 
 .plate {
@@ -341,7 +361,7 @@
   margin: 0;
   padding: 24px 26px;
   list-style: none;
-  background: color-mix(in srgb, var(--era-card) 94%, transparent);
+  background: var(--era-card);
   border: 1px solid color-mix(in srgb, var(--era-accent) 40%, transparent);
   border-radius: 16px;
   box-shadow:
@@ -515,10 +535,15 @@
   padding: 30svh clamp(16px, 6vw, 96px) 20svh;
 }
 
+/* The beacon's light stands right behind the contact text, so the text sits on the opaque era plate. */
 .beaconCopy {
   max-width: 760px;
+  padding: 32px clamp(20px, 4vw, 48px) 36px;
   text-align: center;
-  text-shadow: 0 2px 22px color-mix(in srgb, var(--ep-scrim) 95%, transparent);
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--era-accent) 40%, transparent);
+  background: var(--era-card);
+  box-shadow: 0 24px 60px -30px rgb(0 0 0 / 0.9);
 }
 
 .beaconCopy .actions {
@@ -536,10 +561,12 @@
   color: var(--era-accent);
 }
 
+/* The footer is a band of the page's ink, so the copyright never sits on the beacon's light. */
 .footer {
   position: relative;
   z-index: 1;
-  padding: 0 16px 40px;
+  padding: 24px 16px 40px;
+  background: var(--ep-ink);
   text-align: center;
   color: var(--ep-mist);
   font-size: 0.9rem;
