@@ -5,7 +5,8 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
-import { cycles, PLAY_S, slice, swings } from '@/components/themes/shared/loops'
+import { cycles, slice, swings } from '@/components/themes/shared/loops'
+import { STORY_MS } from '@/lib/motion/stepWithin'
 import { SPAWN_AT_MS, spawnS } from './spawn'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
@@ -157,7 +158,7 @@ function AmbientFlash() {
     // A flash at `at` ms, then one every 2 to 5 seconds after it, while a flash and its chained one (up to
     // FLASH_TAIL_MS) still end within the 5 s the storm plays; then the sky rests dark.
     const scheduleAmbientFlash = (at: number) => {
-      if (!isActive || at + FLASH_TAIL_MS > PLAY_S * 1000) return
+      if (!isActive || at + FLASH_TAIL_MS > STORY_MS) return
       timeouts.push(setTimeout(triggerAmbientFlash, at))
       scheduleAmbientFlash(at + 2000 + Math.random() * 3000)
     }

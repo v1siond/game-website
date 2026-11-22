@@ -1,5 +1,5 @@
 import { STORY_MS } from '@/lib/motion/stepWithin'
-import { cycles, swings } from './loops'
+import { cycles, slice, sliceCount, swings } from './loops'
 
 // The shorthand's length in seconds and its iteration count, read back from what a style is given.
 function parts(shorthand: string): { seconds: number; count: number } {
@@ -44,5 +44,14 @@ describe('swings', () => {
     expect(shorthand).toContain('alternate')
     expect(parts(shorthand).count % 2).toBe(0)
     expect(endS(shorthand, 0.48)).toBeLessThanOrEqual(STORY_MS / 1000)
+  })
+})
+
+describe('slice', () => {
+  it('counts the first 5 s of a fall from where it starts, never more than the whole fall when capped', () => {
+    expect(sliceCount(9, -3)).toBeCloseTo(8 / 9, 2)
+    expect(sliceCount(9, -3)).toBeLessThanOrEqual(8 / 9)
+    expect(sliceCount(7.8, -6, 1)).toBe(1)
+    expect(parts(slice('rain', 2, 'linear', -1)).count).toBeCloseTo(3, 3)
   })
 })

@@ -47,8 +47,12 @@ export function swings(name: string, seconds: number, timing: string, delay = 0)
   return `${name} ${secs(seconds)} ${timing} alternate ${2 * cyclesIn(2 * seconds, room)} forwards`
 }
 
+/** How many falls of `seconds` the first PLAY_S plays from `delay` (s, negative when already under way), at
+ *  most `most`, rounded down to a thousandth of a fall so it never runs past PLAY_S. */
+export const sliceCount = (seconds: number, delay = 0, most = Infinity) =>
+  Math.min(Math.floor(((PLAY_S - delay) / seconds) * 1000) / 1000, most)
+
 /** The first PLAY_S of a looping fall at its own pace, from `delay` (s, negative when already under way). */
 export function slice(name: string, seconds: number, timing: string, delay = 0): string {
-  // Rounded down to a thousandth of a fall, so the slice never runs past PLAY_S.
-  return `${name} ${secs(seconds)} ${timing} ${Math.floor(((PLAY_S - delay) / seconds) * 1000) / 1000} forwards`
+  return `${name} ${secs(seconds)} ${timing} ${sliceCount(seconds, delay)} forwards`
 }
