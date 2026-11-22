@@ -94,7 +94,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 const LINK_BUTTON = `inline-flex min-h-[44px] items-center px-4 text-sm tracking-wider transition-transform hover:scale-105 motion-reduce:transition-none ${world.button} ${world.buttonRed}`
 
 // A project on a show poster: the name, the years, his role, the result line and the links.
-export function VintagePoster({ project, years, links }: ProjectSlot) {
+export function VintagePoster({ project, years, links, noLink }: ProjectSlot) {
   const labels = useLabels()
   return (
     <article className={`group relative h-full p-4 ${world.poster}`}>
@@ -115,7 +115,7 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
         </p>
       )}
       <Chips items={project.techStack} label={labels.cards.technologiesUsed} />
-      {links.length > 0 ? (
+      {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
             <a key={kind} {...linkProps} className={LINK_BUTTON}>
@@ -123,9 +123,8 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
             </a>
           ))}
         </div>
-      ) : (
-        <p className={`mt-4 italic ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
+      {noLink && <p className={`mt-4 italic ${BODY}`}>{noLink}</p>}
     </article>
   )
 }
@@ -162,8 +161,7 @@ export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
 
 // A band on a record label on the shop shelf: the disc in the corner spins up when the pointer lands
 // on the record, his role, the years and the release.
-export function BandRecord({ band, years, linkProps }: BandSlot) {
-  const labels = useLabels()
+export function BandRecord({ band, years, linkProps, release }: BandSlot) {
   // The disc's sheen, one id per record so no two cards share it.
   const sheen = useId()
   const content = (
@@ -187,9 +185,9 @@ export function BandRecord({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> • </span>}
         {years && <span>{years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className={`mt-2 ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>
