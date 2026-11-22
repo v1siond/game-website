@@ -52,14 +52,14 @@
   <g stroke="#57606a" stroke-width="2.5" fill="none" marker-end="url(#a)">
     <path d="M290,170 L366,170"/>
     <path d="M770,170 L846,170"/>
-    <path d="M770,325 L999,325"/>
-    <path d="M1005,230 L1005,416"/>
-    <path d="M850,495 L774,495"/>
+    <path d="M770,325 L880,325 L880,234"/>
+    <path d="M1100,230 L1100,416"/>
+    <path d="M960,230 L960,395 L570,395 L570,416"/>
     <path d="M370,495 L294,495"/>
   </g>
   <g font-family="system-ui, sans-serif" font-size="15" fill="#57606a">
-    <text x="885" y="315" text-anchor="middle">added to every prompt</text>
-    <text x="1015" y="395">Skill tool</text>
-    <text x="810" y="408" text-anchor="middle">a fix or a feature</text>
+    <text x="778" y="346">added to every prompt</text>
+    <text x="1110" y="330">Skill tool</text>
+    <text x="760" y="386" text-anchor="middle">a fix or a feature: autodevelopment first</text>
   </g>
 </svg>

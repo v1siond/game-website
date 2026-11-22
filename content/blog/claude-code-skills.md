@@ -8,8 +8,7 @@
   "coverAlt": "Flow from a prompt through the skill router hook to a SKILL CHECK line, the skill loading, and agents getting their skills",
   "tags": [
     "claude code skills",
-    "claude code skills github",
-    "subagents vs skills"
+    "claude code skills github"
   ],
   "series": {
     "id": "AW",
@@ -32,7 +31,7 @@ I keep a backup of the setup from the day I moved it, 2026-10-16. On that day it
 - 60 SKILL.md files spread over my projects;
 - a 66 line router hook with one regex per skill, typed by hand, for a single project folder.
 
-Every rule I added made the file longer. My notes from that week put it as "docs and frameworks nobody read became skills". A long file is loaded whole whether the task needs it or not. A skill costs one description until a request matches it.
+Every rule I added made the file longer. A long file is loaded whole whether the task needs it or not. A skill costs one description until a request matches it.
 
 ## What Claude Code skills are in my setup
 
@@ -58,7 +57,7 @@ The skills talk about "he" because they are written to the model about me. Since
 
 The diagram at the top is the whole path. A `UserPromptSubmit` hook, `skill-router.py`, reads my prompt and prints one `SKILL CHECK` line naming the skills that match. A short `protocol.txt`, 22 lines, is added to every prompt with the rules no single skill can hold: answer first, nothing leaves the machine without my yes, no dashes.
 
-When the work is a fix or a feature, the line names autodevelopment first. That skill sizes the ticket and briefs each agent with a `Skills you run:` line, so a backend agent loads the testing and engineering skills and a writer loads the blog and writing ones. The skills are a pool that any agent can pick from, and the brief names which ones apply.
+When the prompt asks for work (a word like "fix", "build" or "add") and a development skill matched too, the line names autodevelopment first, before any skill loads. That skill sizes the ticket and briefs each agent with a `Skills you run:` line, so a backend agent loads the testing and engineering skills and a writer loads the blog and writing ones. The skills are a pool that any agent can pick from, and the brief names which ones apply.
 
 ## The router builds its table from the skills
 
@@ -106,31 +105,29 @@ So "regress*" catches "regression" and "regressed", and "dig into it" catches "d
 
 ## One prompt through it
 
-The hook reads JSON on stdin, so it is easy to try. I ran it on my machine on 2026-11-21 against the skills I have installed.
+The hook reads JSON on stdin, so it is easy to try from the repo folder. These runs are from my machine on 2026-11-21, against the skills I have installed.
 
 Output of a bug report:
 
 ```text
-$ bash -c echo "{\"prompt\": \"the login page is broken again\", \"cwd\": \"/tmp\"}" | python3 harness/hooks/skill-router.py
+$ echo '{"prompt": "the login page is broken again", "cwd": "/tmp"}' | python3 harness/hooks/skill-router.py
 SKILL CHECK: bug-investigation. Invoke the ones that fit with the Skill tool before acting, and work by their steps.
-exit 0
 ```
 
 Output of the same report asked as work:
 
 ```text
-$ bash -c echo "{\"prompt\": \"fix the login page, it is broken\", \"cwd\": \"/tmp\"}" | python3 harness/hooks/skill-router.py
+$ echo '{"prompt": "fix the login page, it is broken", "cwd": "/tmp"}' | python3 harness/hooks/skill-router.py
 SKILL CHECK: autodevelopment is the workflow for this task, per ticket (the director sizes it and dispatches the agents). Give each agent the skills of its role from autodevelopment references/skill-map.md. Matched for this prompt: bug-investigation.
-exit 0
 ```
 
-"broken" matched bug-investigation both times. "fix" is a work word, so the second prompt goes to autodevelopment first and bug-investigation comes along as the skill an agent will need.
+"broken" matched bug-investigation both times. "fix" is a work word, and with a development skill matched the second prompt goes to autodevelopment first; bug-investigation comes along as the skill an agent will need.
 
 ## A correction becomes one line of a rule
 
-Before the move, a correction turned into a memory file. One of them, about the model never disowning code in my repos, was 34 lines long and quoted me word for word. Today that lesson is half a sentence of rule 4 in `protocol.txt`: "All the code in his repos is his and ours", followed by the phrases it must never use. The skill that most needs it, bug-investigation, names that rule as its source.
+Before the move, a correction turned into a memory file. One of them, about the model never disowning code in my repos, was 34 lines long. Today that lesson is half a sentence of rule 4 in `protocol.txt`: "All the code in his repos is his and ours", followed by the phrases it must never use. The skill that most needs it, bug-investigation, names the same law as its source.
 
-The same thing happened to whole skills. The ship skill lists four retired skills it replaced (git workflow, pre deploy checks, release and tag, data migrations), and writing lists four more. The memory index of this project is now three lines, and the first says lessons live in skills.
+The same thing happened to whole skills. The ship skill lists four retired skills it replaced (git workflow, pre deploy checks, release and tag, data migrations), and writing lists four more. My memory index for this project now only points at the skills.
 
 Agents write and edit the skill files, the same way they write the code. The rule in my CLAUDE.md is that a skill is never created or changed unless I ask for it; a correction goes into the work and a findings file first.
 
@@ -143,7 +140,7 @@ The count did not go down in a straight line.
 | 2026-10-16 | the backup before the move | 60 |
 | 2026-10-23 | after a week of moving every doc into skills | 83 |
 | 2026-10-30 | first commit of the public repo, generic skills only | 17 |
-| 2026-11-20 | today's repo, plus 6 project skills kept private | 18 |
+| 2026-11-20 | the repo at `1fd0a18` (6 more project skills kept private) | 18 |
 
 The jump to 83 came from turning every framework doc into its own skill. Then I split what was generic from what belonged to one project. The generic part went public, the project facts went into a private overlay that `.gitignore` keeps out, and merging skills that did the same job brought the count down. The catalogue, `SKILLS.md`, is generated on my machine and lists all of them.
 
@@ -154,12 +151,11 @@ Phrase matching only knows the phrases somebody wrote down.
 Output of a prompt no trigger covers:
 
 ```text
-$ bash -c echo "{\"prompt\": \"fix the flaky login test\", \"cwd\": \"/tmp\"}" | python3 harness/hooks/skill-router.py
-SKILL CHECK: no trigger matched. Before acting, read the name list at the top of /home/visiond/projects/claude/skills/SKILLS.md and then only the section of the skill that fits; invoke it. If none does, say so in one line; never create or change a skill without his explicit request.
-exit 0
+$ echo '{"prompt": "fix the flaky login test", "cwd": "/tmp"}' | python3 harness/hooks/skill-router.py | sed "s|$HOME|~|"
+SKILL CHECK: no trigger matched. Before acting, read the name list at the top of ~/projects/claude/skills/SKILLS.md and then only the section of the skill that fits; invoke it. If none does, say so in one line; never create or change a skill without his explicit request.
 ```
 
-"flaky" and "test" on their own are in nobody's triggers, so the hook falls back to the catalogue. The protocol then has the model read the skill names, pick the one that fits, or say in one line that none does.
+"flaky" and "test" on their own are in nobody's triggers. "fix" is still a work word, but with no development skill matched there is nothing to hand an agent, so the hook falls back to the catalogue. The `sed` only shortens my home folder in the path. The protocol then has the model read the skill names, pick the one that fits, or say in one line that none does.
 
 A few routes cannot be a phrase at all: a URL, a ticket code like C32 where case matters, "release" without "notes" after it. Those live in a short hand table.
 
