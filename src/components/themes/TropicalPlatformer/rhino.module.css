@@ -61,7 +61,7 @@
   }
 }
 
-.trail[data-charging] .cards li {
+.trail[data-charging] .item {
   animation: rammed 0.7s cubic-bezier(0.3, 0, 0.3, 1) calc(0.45s + var(--i, 0) * 0.3s) both;
 }
 
@@ -88,7 +88,7 @@
   .trail[data-charging] .gallop,
   .trail[data-charging] .legA,
   .trail[data-charging] .legB,
-  .trail[data-charging] .cards li {
+  .trail[data-charging] .item {
     animation: none;
   }
 }

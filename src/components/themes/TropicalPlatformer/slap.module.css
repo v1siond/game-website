@@ -53,7 +53,7 @@
   }
 }
 
-.shaken > ul > li {
+.shaken .item {
   animation: board-jolt 0.6s cubic-bezier(0.3, 0, 0.4, 1) calc(0.4s + var(--i, 0) * 70ms) both;
 }
 
@@ -73,7 +73,7 @@
 @media (prefers-reduced-motion: reduce) {
   .field[data-slapping] .dust,
   .shaken,
-  .shaken > ul > li {
+  .shaken .item {
     animation: none;
   }
 }

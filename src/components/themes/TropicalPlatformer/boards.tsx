@@ -19,13 +19,19 @@ import look from './jungle.module.css'
 // are the two wide planks of the first row, a bark tag in sun gold over the name; the other ventures
 // follow three to a row.
 
-export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
+// `itemClassName` is the class the section's motion gives each top level card (the ground slap's jolt, the
+// rhino's ram), so the motion's module never reaches into this markup.
+interface BoardListProps {
+  itemClassName?: string
+}
+
+export function TechBoard({ categories, itemClassName = '' }: BoardListProps & { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
   return (
     <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category, index) => (
-        <li key={category.id} className={MASONRY_ITEM} style={{ '--i': index } as CSSProperties}>
+        <li key={category.id} className={`${MASONRY_ITEM} ${itemClassName}`} style={{ '--i': index } as CSSProperties}>
           <Board>
             <h3 className={`mb-3 flex items-center gap-2 text-base uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>
               <span aria-hidden="true">{category.icon}</span>
@@ -45,13 +51,13 @@ export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
   )
 }
 
-export function VentureBoard({ companies }: { companies: CVData['companies'] }) {
+export function VentureBoard({ companies, itemClassName = '' }: BoardListProps & { companies: CVData['companies'] }) {
   const { links, cards } = useLabels()
 
   return (
     <ul className="grid gap-5 md:grid-cols-6">
       {companies.map((company, index) => (
-        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'} style={{ '--i': index } as CSSProperties}>
+        <li key={company.id} className={`${company.featured ? 'md:col-span-3' : 'md:col-span-2'} ${itemClassName}`} style={{ '--i': index } as CSSProperties}>
           <a
             href={company.url}
             target="_blank"

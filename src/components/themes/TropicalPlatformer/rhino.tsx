@@ -36,6 +36,9 @@ export function Rhino() {
   )
 }
 
+/** The class of a venture card the charge rams. */
+export const RAMMED = charge.item
+
 export function RhinoCharge({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
@@ -60,7 +63,7 @@ export function RhinoCharge({ children }: { children: ReactNode }) {
             </div>
           </div>
         </div>
-        <div className={charge.cards}>{children}</div>
+        <div>{children}</div>
       </Fragment>
       <div className="mt-6 flex justify-center">
         <button type="button" onClick={() => setCharges((count) => count + 1)} className={`min-h-[44px] rounded-xl px-5 text-base ${look.button} ${look.buttonWood} ${look.focus}`}>

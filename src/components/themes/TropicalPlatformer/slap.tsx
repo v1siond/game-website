@@ -17,6 +17,9 @@ import quake from './slap.module.css'
 
 const SLAP_MS = 1800
 
+/** The class of a tech board the slap jolts. */
+export const JOLTED = quake.item
+
 export function GroundSlap({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })

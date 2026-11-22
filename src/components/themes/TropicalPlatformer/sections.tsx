@@ -15,8 +15,8 @@ import { VineCrossing } from './crossing'
 import { ElderYard } from './elder'
 import { Board, Level } from './levelSign'
 import { CartProjects } from './projects'
-import { RhinoCharge } from './rhino'
-import { GroundSlap } from './slap'
+import { RAMMED, RhinoCharge } from './rhino'
+import { GroundSlap, JOLTED } from './slap'
 import { VineBands } from './vines'
 import { BarrelSmash, VultureDrop } from './deliveries'
 import look from './jungle.module.css'
@@ -52,7 +52,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <Level title={titles.techStack} scene="jungle">
         <GroundSlap>
-          <TechBoard categories={sections.techStack} />
+          <TechBoard categories={sections.techStack} itemClassName={JOLTED} />
         </GroundSlap>
       </Level>
 
@@ -78,7 +78,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.companies.length > 0 && (
         <Level title={titles.ventures} scene="jungle">
           <RhinoCharge>
-            <VentureBoard companies={sections.companies} />
+            <VentureBoard companies={sections.companies} itemClassName={RAMMED} />
           </RhinoCharge>
         </Level>
       )}
