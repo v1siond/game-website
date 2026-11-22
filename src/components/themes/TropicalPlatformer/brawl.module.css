@@ -31,7 +31,7 @@
 }
 
 .clearing[data-phase='walk'] .walker {
-  animation: foe-bob 0.25s ease-in-out infinite alternate;
+  animation: foe-bob 0.25s ease-in-out 4 alternate;
 }
 
 @keyframes foe-bob {
@@ -50,11 +50,11 @@
 }
 
 .clearing[data-phase='walk'] .stride {
-  animation: foe-stride 0.25s ease-in-out infinite alternate;
+  animation: foe-stride 0.25s ease-in-out 4 alternate;
 }
 
 .clearing[data-phase='walk'] .strideBack {
-  animation: foe-stride 0.25s ease-in-out infinite alternate-reverse;
+  animation: foe-stride 0.25s ease-in-out 4 alternate-reverse;
 }
 
 @keyframes foe-stride {

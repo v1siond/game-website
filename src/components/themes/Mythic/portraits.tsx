@@ -65,7 +65,7 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
     <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
       <div className={`p-5 ${u.panel} ${u.reveal} lg:sticky lg:top-8 lg:self-start`}>
         <div className="mx-auto h-64 w-52" aria-hidden="true">
-          <SpartanSprite profession="drummer" motion={pose} onDone={settle} className="h-full w-full" take={take} />
+          <SpartanSprite profession="drummer" motion={pose} onDone={settle} className="h-full w-full" take={take} waiting={take === 0} />
         </div>
         <p className={`mt-4 text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}

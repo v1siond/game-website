@@ -74,7 +74,7 @@ export function ElderYard({ children }: { children: ReactNode }) {
           </div>
         )}
         <div className={`absolute bottom-2 left-[calc(32%+0.5rem)] h-20 w-14 sm:h-24 sm:w-16 ${yard.standing}`}>
-          <HeroCharacter profession="engineer" pose="idle" className="h-full w-full" />
+          <HeroCharacter profession="engineer" pose="idle" waiting={!triggered} className="h-full w-full" />
         </div>
         <div className="absolute bottom-0 right-0 w-24 sm:w-28">
           <OldTimer />

@@ -10,6 +10,8 @@ import type { FighterPose } from './poses'
 // of a fighter the visitor can push around: a special thrown on the stage, a step toward the pointer. A
 // move cannot be cancelled once thrown, as in the arcade; it ends on the sprite's own animationend, so
 // the timing lives once, in the motion table. Under reduced motion nothing is thrown and he holds his rest.
+// The poses he rests in (stance, win, his act) play a few runs, inside 5 s with the beats before them, and
+// then hold their key frame (BD29).
 
 export type StripMode = 'pingpong' | 'forward' | 'backward'
 export type BallKind = 'ki' | 'code'
@@ -19,18 +21,18 @@ export interface Motion {
   cycleMs: number
   // The frame shown when motion is reduced: the one that reads as the move.
   key: number
-  runs: number | 'infinite'
+  runs: number
   ball?: BallKind
 }
 
 const MOTION: Record<Exclude<FighterPose, 'act'>, Motion> = {
-  stance: { mode: 'pingpong', cycleMs: 480, key: 0, runs: 'infinite' },
+  stance: { mode: 'pingpong', cycleMs: 480, key: 0, runs: 6 },
   walk: { mode: 'forward', cycleMs: 600, key: 1, runs: 1 },
   walkBack: { mode: 'backward', cycleMs: 600, key: 1, runs: 1 },
   hadouken: { mode: 'forward', cycleMs: 1000, key: 2, runs: 1, ball: 'ki' },
   shoryuken: { mode: 'forward', cycleMs: 760, key: 2, runs: 1 },
   tatsumaki: { mode: 'forward', cycleMs: 360, key: 0, runs: 3 },
-  win: { mode: 'forward', cycleMs: 520, key: 0, runs: 'infinite' },
+  win: { mode: 'forward', cycleMs: 520, key: 0, runs: 2 },
   punch: { mode: 'forward', cycleMs: 420, key: 1, runs: 1 },
   hurt: { mode: 'forward', cycleMs: 480, key: 0, runs: 1 },
   parry: { mode: 'forward', cycleMs: 400, key: 1, runs: 1 },
@@ -43,12 +45,15 @@ const ACT_MOTION: Record<Profession, Motion> = {
     mode: 'forward',
     cycleMs: 1600,
     key: 2,
-    runs: 'infinite',
+    runs: 2,
     ball: 'code',
   },
-  drummer: { mode: 'forward', cycleMs: 520, key: 0, runs: 'infinite' },
-  fighter: { mode: 'forward', cycleMs: 1300, key: 2, runs: 'infinite' },
+  drummer: { mode: 'forward', cycleMs: 520, key: 0, runs: 6 },
+  fighter: { mode: 'forward', cycleMs: 1300, key: 2, runs: 2 },
 }
+
+/** How long his win pose plays at the end of a bout, every run of it. */
+export const WIN_MS = MOTION.win.cycleMs * MOTION.win.runs
 
 export const motionFor = (pose: FighterPose, profession: Profession): Motion => (pose === 'act' ? ACT_MOTION[profession] : MOTION[pose])
 

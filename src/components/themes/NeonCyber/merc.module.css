@@ -2,7 +2,9 @@
  * The merc's motion (merc.tsx): transform and opacity only, in the snappy stepped timing of the night
  * city HUD. Every part turns round its own joint in the viewBox's units, so a forearm turns at the elbow
  * wherever the shoulder took it. Kit classes set a profession's resting pose, a motion class plays over
- * it. The blades, thrusters, ghost and reticle rest hidden. Hovering him glitches the figure.
+ * it. The blades, thrusters, ghost and reticle rest hidden. Hovering him glitches the figure. Every motion
+ * plays a bounded number of runs inside 5 s and rests (BD29): on the kit's own pose, or, where the motion
+ * holds a look (the slash, the scan's lock, the sticks on the snare, the dash's stride), on its last frame.
  */
 
 .sprite * {
@@ -155,10 +157,10 @@
 /* ---------------------------------------------------------------- idle: the breath and the optic blink */
 
 .idle .chest {
-  animation: breath 2.4s ease-in-out infinite;
+  animation: breath 2.4s ease-in-out 2;
 }
 .idle .optics {
-  animation: blink 4.2s steps(1) infinite;
+  animation: blink 4.2s steps(1);
 }
 
 @keyframes breath {
@@ -195,25 +197,25 @@
  * the right arm play the same keyframes half a cycle later (-0.4s). The body rises on each passing.
  */
 .walk .body {
-  animation: stride 0.8s ease-in-out infinite;
+  animation: stride 0.8s ease-in-out 6;
 }
 .walk .thighRight,
 .walk .thighLeft {
-  animation: knee-lift 0.8s ease-in-out infinite;
+  animation: knee-lift 0.8s ease-in-out 6;
 }
 .walk .shinRight {
-  animation: shin-tuck-right 0.8s ease-in-out infinite;
+  animation: shin-tuck-right 0.8s ease-in-out 6;
 }
 .walk .shinLeft {
-  animation: shin-tuck-left 0.8s ease-in-out infinite;
+  animation: shin-tuck-left 0.8s ease-in-out 6;
 }
 .walk .armLeft,
 .walk .armRight {
-  animation: arm-reach 0.8s ease-in-out infinite;
+  animation: arm-reach 0.8s ease-in-out 6;
 }
 .walk .foreLeft,
 .walk .foreRight {
-  animation: fore-reach 0.8s ease-in-out infinite;
+  animation: fore-reach 0.8s ease-in-out 6;
 }
 /* after the shorthands above, which reset the delay */
 .walk .thighLeft,
@@ -294,16 +296,16 @@
 
 .blades .bladeRight,
 .blades .bladeLeft {
-  animation: deploy 1.6s cubic-bezier(0.2, 0.9, 0.3, 1) infinite;
+  animation: deploy 1.6s cubic-bezier(0.2, 0.9, 0.3, 1) 3;
 }
 .blades .armRight {
-  animation: slash-right 1.6s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+  animation: slash-right 1.6s cubic-bezier(0.6, 0, 0.2, 1) 3 forwards;
 }
 .blades .armLeft {
-  animation: slash-left 1.6s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+  animation: slash-left 1.6s cubic-bezier(0.6, 0, 0.2, 1) 3 forwards;
 }
 .blades .body {
-  animation: lunge 1.6s cubic-bezier(0.6, 0, 0.2, 1) infinite;
+  animation: lunge 1.6s cubic-bezier(0.6, 0, 0.2, 1) 3;
 }
 
 @keyframes deploy {
@@ -372,10 +374,10 @@
   animation: to-temple-fore 0.4s ease-out both;
 }
 .scan .reticle {
-  animation: lock 1.2s steps(1) 0.3s infinite;
+  animation: lock 1.2s steps(1) 0.3s 3 forwards;
 }
 .scan .optics {
-  animation: flare 1.2s steps(2) infinite;
+  animation: flare 1.2s steps(2) 3;
 }
 
 /* Solved as a two bone reach: the elbow lifts out to the side and the forearm folds back so the fingers
@@ -390,9 +392,11 @@
     transform: rotate(121deg);
   }
 }
+/* Ends lit, so the reticle rests locked on once its runs are over. */
 @keyframes lock {
   0%,
-  60% {
+  60%,
+  100% {
     opacity: 1;
   }
   80% {
@@ -408,21 +412,21 @@
 /* ---------------------------------------------------------------- double jump on the cyberlegs */
 
 .jump .body {
-  animation: double-jump 1.8s cubic-bezier(0.3, 0, 0.3, 1) infinite;
+  animation: double-jump 1.8s cubic-bezier(0.3, 0, 0.3, 1) 2;
 }
 .jump .thighRight,
 .jump .thighLeft {
-  animation: tuck 1.8s ease-in-out infinite;
+  animation: tuck 1.8s ease-in-out 2;
 }
 .jump .shinRight,
 .jump .shinLeft {
-  animation: tuck-shin 1.8s ease-in-out infinite;
+  animation: tuck-shin 1.8s ease-in-out 2;
 }
 .jump .thrust {
-  animation: thrust 1.8s steps(1) infinite;
+  animation: thrust 1.8s steps(1) 2;
 }
 .jump .shadow {
-  animation: shrink 1.8s ease-in-out infinite;
+  animation: shrink 1.8s ease-in-out 2;
 }
 
 @keyframes double-jump {
@@ -507,10 +511,10 @@
   opacity: 1;
 }
 .hack .glyphs {
-  animation: climb 1s steps(4) infinite;
+  animation: climb 1s steps(4) 4;
 }
 .hack .optics {
-  animation: flare 0.6s steps(2) infinite;
+  animation: flare 0.6s steps(2) 8;
 }
 
 @keyframes deck-up {
@@ -537,13 +541,13 @@
 /* ---------------------------------------------------------------- Musician: the snare roll */
 
 .drum .foreRight {
-  animation: hit-right 0.28s ease-in infinite alternate;
+  animation: hit-right 0.28s ease-in 15 alternate forwards;
 }
 .drum .foreLeft {
-  animation: hit-left 0.28s ease-in -0.14s infinite alternate;
+  animation: hit-left 0.28s ease-in -0.14s 15 alternate forwards;
 }
 .drum .drumHead {
-  animation: flash 0.28s steps(2) infinite;
+  animation: flash 0.28s steps(2) 15;
 }
 
 /* The elbows stay out and the forearms come in over the head: lifted, then down onto the head at 96. */
@@ -572,13 +576,13 @@
 /* ---------------------------------------------------------------- Martial Artist: the knee then the roundhouse */
 
 .kick .thighLeft {
-  animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) 2;
 }
 .kick .shinLeft {
-  animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) 2;
 }
 .kick .body {
-  animation: lean 1.8s ease-in-out infinite;
+  animation: lean 1.8s ease-in-out 2;
 }
 
 @keyframes knee-kick {
@@ -641,10 +645,10 @@
   transform: rotate(-22deg);
 }
 .dash .thighRight {
-  animation: dash-thigh-a 0.36s linear infinite;
+  animation: dash-thigh-a 0.36s linear 12 forwards;
 }
 .dash .thighLeft {
-  animation: dash-thigh-b 0.36s linear infinite;
+  animation: dash-thigh-b 0.36s linear 12 forwards;
 }
 .dash .shinRight,
 .dash .shinLeft {
@@ -690,7 +694,7 @@
   transform: rotate(-70deg);
 }
 .sit .optics {
-  animation: flare 0.9s steps(2) infinite;
+  animation: flare 0.9s steps(2) 5;
 }
 
 @media (prefers-reduced-motion: reduce) {

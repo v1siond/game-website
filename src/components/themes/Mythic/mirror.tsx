@@ -85,7 +85,7 @@ function TalentPlate({ id, label, optionProps, turned }: ProfessionOption & { tu
 export function Mirror({ profession }: { profession: Profession }) {
   const { navigation } = useLabels()
   const take = useTakeOnChange(profession)
-  const { ref } = useZoneStage<Zone>('hall')
+  const { ref, on } = useZoneStage<Zone>('hall')
 
   return (
     <section ref={ref} className="relative z-20 px-4 py-12 sm:px-6" aria-label={navigation.professionSelection}>
@@ -93,7 +93,7 @@ export function Mirror({ profession }: { profession: Profession }) {
         <div className={`relative mx-auto w-44 ${u.mirrorFrame}`} aria-hidden="true">
           <div className={`relative h-64 overflow-hidden ${u.glass}`}>
             <div key={`r${take}`} data-take={take || undefined} className={`absolute inset-x-0 bottom-2 top-6 ${u.reflection}`}>
-              <SpartanSprite profession={profession} motion="idle" className="h-full w-full" />
+              <SpartanSprite profession={profession} motion="idle" waiting={!on} className="h-full w-full" />
             </div>
             <svg key={`s${take}`} data-take={take || undefined} viewBox="0 0 100 100" className={`absolute inset-0 h-full w-full ${u.swirl}`}>
               <path d="M50 50 m-40 0 a40 40 0 1 1 80 0 a30 30 0 1 1 -60 0 a20 20 0 1 1 40 0 a10 10 0 1 1 -20 0" fill="none" stroke={MYTH.darkness} strokeWidth={10} strokeLinecap="round" />

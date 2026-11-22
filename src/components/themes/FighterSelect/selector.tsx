@@ -8,7 +8,7 @@ import { Fighter } from './fighter'
 import { ArenaFighter } from './arena'
 import { StageBackdrop } from './stages'
 import { CallText, RoundCall } from './badges'
-import { HudCentre, LifeBar } from './hud'
+import { Cue, HudCentre, LifeBar } from './hud'
 import { WorldMap } from './worldMap'
 import { FS } from './palette'
 import look from './world.module.css'
@@ -22,7 +22,8 @@ import fight from './fight.module.css'
 // the slot under the pointer or focus and returns to the pick when the pointer leaves, like a cursor
 // roaming the roster. The fighter under the cursor idles in his stance while he is weighed up. A pick
 // flashes its slot white and re-runs the preview below: the stage, him landing in his stance and the
-// profession title slammed across it (keyed by the pick, so each pick plays it again).
+// profession title slammed across it (keyed by the pick, so each pick plays it again). The preview is a
+// cue, so its first play waits for it to scroll in.
 
 // Static classes so Tailwind sees each one; the cursor reads --slot.
 const SLOT_VAR = ['[--slot:0]', '[--slot:1]', '[--slot:2]']
@@ -81,6 +82,7 @@ export function SelectScreen({ active, title }: { active: Profession; title: str
         </div>
       </div>
 
+      <Cue>
       <div key={active} className="relative mt-6 h-56 overflow-hidden border-2 border-white shadow-[0_0_0_2px_#000] sm:h-72">
         <StageBackdrop profession={active} />
         <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start gap-2 sm:inset-x-4 sm:top-3" aria-hidden="true">
@@ -103,6 +105,7 @@ export function SelectScreen({ active, title }: { active: Profession; title: str
           <RoundCall text={title} />
         </div>
       </div>
+      </Cue>
     </div>
   )
 }

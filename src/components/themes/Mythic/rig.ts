@@ -77,7 +77,9 @@ export interface Key {
 
 interface MoveSpec {
   ms: number
-  loop: boolean
+  // A cycle's runs before it rests on its first key, inside 5 s (BD29); 0 for a one shot move, which ends
+  // on its own last key and reports it.
+  loop: number
   keys: (rest: Pose) => Key[]
   // hung from the hands: the planted drop is cancelled, so tucking the knees lifts the feet, not the hips
   hang?: boolean
@@ -115,20 +117,21 @@ const CLIMB_HANG: Partial<Pose> = {
 }
 
 export const MOVES: Record<Move, MoveSpec> = {
-  // the breath: the chest rises, the arms settle out and back in
+  // the breath: the chest rises, the arms settle out and back in, one breath and he stands at rest
   idle: {
     ms: 2600,
-    loop: true,
+    loop: 1,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.5, pose: { chest: r.chest - 2, head: r.head - 2, armNear: r.armNear - 4, armFar: r.armFar + 3 } },
       back(r),
     ],
   },
-  // the stride: each leg reaches forward straight and swings back bent, the arms counter swing
+  // the stride: each leg reaches forward straight and swings back bent, the arms counter swing; three
+  // strides cover the 2.6 s walk through the gate (u.walker)
   walk: {
     ms: 900,
-    loop: true,
+    loop: 3,
     keys: (r) => [
       { at: 0, pose: { thighNear: -24, shinNear: 6, thighFar: 22, shinFar: 16, armNear: r.armNear + 16, armFar: r.armFar - 16 } },
       { at: 0.25, pose: { thighNear: 0, shinNear: 6, thighFar: 2, shinFar: 55 } },
@@ -140,7 +143,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the blade combo: the near blade over the head and down, the far one, then both overhead in a leap and the slam
   combo: {
     ms: 1900,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.1, pose: { armNear: -200, foreNear: -35, armFar: 30, foreFar: -45, chest: -6 } },
@@ -156,7 +159,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the rage: he gathers low, then throws the chest back and roars with the arms flexed and the fists clenched
   roar: {
     ms: 1500,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.18, pose: { chest: 16, head: 10, armNear: 25, foreNear: -45, armFar: 30, foreFar: -45, thighNear: -30, shinNear: 40, thighFar: 22, shinFar: 40 } },
@@ -168,7 +171,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the chains: both arms wind back, fling forward straight, hold, then he hauls them in leaning back
   haul: {
     ms: 2000,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.14, pose: { armNear: 50, foreNear: -30, armFar: 45, foreFar: -30, chest: -8 } },
@@ -182,7 +185,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the finisher: he grabs the foe, lifts it overhead and slams it into the floor
   finish: {
     ms: 1700,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.18, pose: { armNear: -85, foreNear: -15, armFar: -72, foreFar: -30, chest: 16, thighNear: -30, shinNear: 26 } },
@@ -195,7 +198,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the chest: he crouches with his hands under the lid and heaves it up over his head
   heave: {
     ms: 1800,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.22, pose: { chest: 26, head: 6, armNear: -45, foreNear: -25, armFar: -40, foreFar: -25, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 } },
@@ -208,7 +211,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the axe: wound back over the shoulder, thrown overhand, then the open hand out and the catch on its return
   hurl: {
     ms: 2600,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.12, pose: { armNear: -200, foreNear: -75, armFar: -60, foreFar: -40, chest: -10 } },
@@ -223,7 +226,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the gate: both palms on the doors, then the long push leaning in, the far leg driving
   push: {
     ms: 2400,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.16, pose: { armNear: -80, foreNear: -55, armFar: -75, foreFar: -60, chest: 20, thighNear: -30, shinNear: 30, thighFar: 30, shinFar: 6 } },
@@ -235,7 +238,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // two drum hits, the near hilt then the far one, the forearms folding forward over the skin
   drum: {
     ms: 1300,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.16, pose: { armNear: -90, foreNear: -70, chest: -2 } },
@@ -250,7 +253,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // hangs as he started, one hold higher (the scene lifts him by the hold's height over the move)
   climb: {
     ms: 1100,
-    loop: false,
+    loop: 0,
     hang: true,
     keys: () => [
       { at: 0, pose: { ...CLIMB_HANG } },
@@ -262,7 +265,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // at rest on the chain: he holds the hang the climb starts and ends on, still, so his fists stay on the holds
   hang: {
     ms: 2600,
-    loop: true,
+    loop: 1,
     hang: true,
     keys: () => [
       { at: 0, pose: { ...CLIMB_HANG } },
@@ -272,7 +275,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the knee: both hands clinch the head down, the near knee drives up
   knee: {
     ms: 800,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.3, pose: { armNear: -75, foreNear: -60, armFar: -70, foreFar: -65, chest: 10 } },
@@ -284,7 +287,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the elbow: the upper arm comes up level, the forearm folded tight, the point leads
   elbow: {
     ms: 750,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.25, pose: { armNear: 10, foreNear: -140, chest: -8 } },
@@ -296,7 +299,7 @@ export const MOVES: Record<Move, MoveSpec> = {
   // the kick: chambered, then the near leg straight out at the waist, the body leaning away
   kick: {
     ms: 900,
-    loop: false,
+    loop: 0,
     keys: (r) => [
       { at: 0, pose: {} },
       { at: 0.25, pose: { thighNear: -80, shinNear: 90, armNear: 20, foreNear: -100, chest: -4 } },

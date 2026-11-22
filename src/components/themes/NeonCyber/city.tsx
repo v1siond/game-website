@@ -5,10 +5,10 @@ import world from './world.module.css'
 
 // The city behind the page, in the three eras its art direction stacks: far, the neomilitary
 // megatowers with their lit window grids in the dusk haze; mid, the kitsch towers hung with sign boxes
-// in yellow, cyan and magenta, one of them flickering, and a flying car crossing about once a minute;
+// in yellow, cyan and magenta, one of them flickering, and a flying car crossing once;
 // near, the entropism walls, a fire escape, sagging cables and an LED strip bolted on. The three
-// layers lean apart under the pointer (--mx, --my, see .depth). Rain falls in two sheets. Four loops
-// in all: two rain sheets, the car, the flicker.
+// layers lean apart under the pointer (--mx, --my, see .depth). Rain falls in two sheets. Four motions
+// in all, each played once from the page load inside 5 s: two rain sheets, the car, the flicker.
 //
 // Over the three layers the page travels through the city's districts as it scrolls (research
 // 2026-10-21-w4-neon-cyber): Watson's concrete overpass in a brown dusk, Japantown's towers hung with

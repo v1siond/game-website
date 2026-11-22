@@ -37,8 +37,9 @@ import run from './cannons.module.css'
 // arc itself is CSS (a linear horizontal layer over an eased vertical one). Reduced motion moves him at
 // once.
 
-// An empty barrel turns a full turn every 2.4 s, as the source's auto barrels do; still under reduced motion.
-const TURNING = 'motion-safe:animate-[spin_2.4s_linear_infinite]'
+// An empty barrel turns two full turns, 2.4 s each, as the source's auto barrels do, from the run's trigger
+// (the root's data-on), and rests upright; still under reduced motion.
+const TURNING = 'motion-safe:group-data-[on]:animate-[spin_2.4s_linear_2]'
 
 const AIM_MS = 280
 const FLIGHT_MS = 820
@@ -226,7 +227,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
   const complete = letters.length > 0 && found.size === letters.length
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={run.run}>
+    <div ref={ref} data-on={triggered || undefined} className={`group ${run.run}`}>
       <div className={`relative mx-auto mb-8 max-w-md rounded-3xl px-4 py-3 text-center ${look.board}`}>
         <LetterTracker letters={letters} found={found} />
         {complete && <ExtraLifeBalloon />}

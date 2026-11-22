@@ -151,10 +151,14 @@
   border-color: #9aa1c4;
 }
 
-/* The VS burst beats slowly. */
+/* The VS burst beats slowly three times once its cue arms, and rests at its own size. */
 @media (prefers-reduced-motion: no-preference) {
   .pulse {
-    animation: pulse 1.6s ease-in-out infinite;
+    animation: pulse 1.6s ease-in-out 3;
+  }
+
+  [data-scene-phase='idle'] .pulse {
+    animation-play-state: paused;
   }
 }
 

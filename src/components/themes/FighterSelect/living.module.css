@@ -2,8 +2,10 @@
  * The living page (backdrop.tsx and the bout scenes): the stage behind the page that changes as the
  * visitor scrolls, its crowds bobbing and cheering, and the one shot effects of the bouts (the car's
  * flying parts, the ki blast across a row, the super move's dark flash and cut in, the parry glow, the
- * plane between pins, the K.O. and Perfect calls). Transform and opacity only. Reduced motion drops
- * every keyframe and transition: the stage holds still and each scene shows its last beat.
+ * plane between pins, the K.O. and Perfect calls). Transform and opacity only. Nothing loops (BD29): the
+ * crowds bob a few times the first time their stage is in view and stand still after, the rider crosses
+ * once, each in under 5 s. Reduced motion drops every keyframe and transition: the stage holds still and
+ * each scene shows its last beat.
  */
 
 /* ---- the stage behind the page ---- */
@@ -21,24 +23,27 @@
     transition: opacity 700ms ease;
   }
 
-  /* Onlookers bob in groups, out of step, the way a sprite crowd loops two or three frames. */
+  /* Onlookers bob in groups, out of step, the way a sprite crowd steps two or three frames: four bobs,
+   * the last one back down, so they rest standing. */
   .bob {
-    animation: bob 900ms steps(2, jump-none) infinite alternate;
+    animation: bob 900ms steps(2, jump-none) 4 alternate;
     animation-delay: calc(var(--i, 0) * -300ms);
   }
 
+  /* One swing out and back, ending hanging straight. */
   .sway {
-    animation: sway 2400ms ease-in-out infinite alternate;
+    animation: sway 4.8s ease-in-out;
     animation-delay: calc(var(--i, 0) * -700ms);
   }
 
+  /* One roll of the yacht, back to level at its mooring. */
   .rock {
-    animation: rock 3200ms ease-in-out infinite alternate;
+    animation: rock 4.8s ease-in-out;
   }
 
-  /* A rider crossing the market street now and then. */
+  /* A rider crossing the market street once, gone off the right edge at the end. */
   .ride {
-    animation: ride 14s linear infinite;
+    animation: ride 4.8s linear forwards;
   }
 
   /* A stage that is not in view holds its crowd still. */
@@ -49,9 +54,14 @@
     animation-play-state: paused;
   }
 
-  /* The deck crowd cheering while a band holds the focus: they jump higher and faster. */
+  /* The deck crowd waits for its show to come into view. */
+  .deck:not([data-on]) .bob {
+    animation-play-state: paused;
+  }
+
+  /* The deck crowd cheering when a band takes the focus: eight jumps, higher and faster, ending down. */
   .deck:has([data-band]:focus-within) .bob {
-    animation: cheer 360ms steps(2, jump-none) infinite alternate;
+    animation: cheer 360ms steps(2, jump-none) 8 alternate;
   }
 }
 
@@ -59,7 +69,7 @@
    card it tapped, which would leave the crowd cheering after the finger has gone. */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
   .deck:has([data-band]:hover) .bob {
-    animation: cheer 360ms steps(2, jump-none) infinite alternate;
+    animation: cheer 360ms steps(2, jump-none) 8 alternate;
   }
 }
 
@@ -82,19 +92,27 @@
 }
 
 @keyframes sway {
-  from {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
     transform: rotate(-6deg);
   }
-  to {
+  75% {
     transform: rotate(6deg);
   }
 }
 
 @keyframes rock {
-  from {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
     transform: translateY(0) rotate(-0.6deg);
   }
-  to {
+  75% {
     transform: translateY(4px) rotate(0.6deg);
   }
 }

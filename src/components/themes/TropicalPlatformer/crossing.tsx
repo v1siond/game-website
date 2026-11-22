@@ -40,7 +40,7 @@ export function VineCrossing() {
       <Vine at="second" />
       <div className={`pointer-events-none absolute inset-0 ${cross.carry}`}>
         <div className={`absolute left-[calc(18%-0.8rem)] top-[calc(70%-0.7rem)] w-16 ${cross.arc}`}>
-          <HeroCharacter profession={active} pose="swing" className="block h-auto w-full" />
+          <HeroCharacter profession={active} pose="swing" waiting={!triggered} className="block h-auto w-full" />
         </div>
       </div>
     </div>

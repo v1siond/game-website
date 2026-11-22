@@ -30,7 +30,7 @@
 }
 
 .root[data-on] .rock {
-  animation: barrel-rock 2.4s ease-in-out 1s infinite;
+  animation: barrel-rock 2.4s ease-in-out 1s;
 }
 
 @keyframes barrel-rock {
