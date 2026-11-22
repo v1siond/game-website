@@ -26,12 +26,6 @@
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
-.focusRing :focus-visible {
-  outline: 3px solid var(--noir-red);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 6px var(--noir-paper);
-}
-
 /* ---- the night behind the page ---- */
 
 /* Halftone dots, densest in the top corner the red slab cuts from. */
@@ -819,7 +813,7 @@
 }
 
 .drift {
-  animation: drift 24s linear infinite;
+  animation: spin 24s linear infinite;
 }
 
 @keyframes finishDrop {
@@ -851,12 +845,6 @@
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) rotate(-1.5deg);
-  }
-}
-
-@keyframes drift {
-  to {
-    transform: rotate(360deg);
   }
 }
 

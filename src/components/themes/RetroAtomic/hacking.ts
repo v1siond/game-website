@@ -89,7 +89,7 @@ const bracketRow = (next: () => number, id: number): HackCell[] => {
   const before = Math.floor(next() * (ROW_WIDTH - inner - 2))
   return [
     { kind: 'junk', text: junk(next, before) },
-    { kind: 'bracket', id, text: `${open}${junk(next, inner).replace(/[A-Z]/g, '.')}${close}` },
+    { kind: 'bracket', id, text: `${open}${junk(next, inner)}${close}` },
     { kind: 'junk', text: junk(next, ROW_WIDTH - inner - 2 - before) },
   ]
 }

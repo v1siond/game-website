@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { CREAM_SHADE, DUST_DARK, MUTANT, MUTANT_LIGHT, MUTANT_SHADE, POSTER_INK, RUST, WARNING_RED } from './palette'
 import m from './mutant.module.css'
 
@@ -61,7 +62,8 @@ function Arm({ near }: { near: boolean }) {
   )
 }
 
-export function MutantSprite({ motion, className = '' }: { motion: MutantMotion; className?: string }) {
+// Memoised: its props are primitives, so a parent render that leaves them as they are draws nothing again.
+export const MutantSprite = memo(function MutantSprite({ motion, className = '' }: { motion: MutantMotion; className?: string }) {
   return (
     <svg viewBox="0 0 120 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <g className={`${m.sprite} ${MOTION_CLASS[motion]}`}>
@@ -90,4 +92,4 @@ export function MutantSprite({ motion, className = '' }: { motion: MutantMotion;
       </g>
     </svg>
   )
-}
+})

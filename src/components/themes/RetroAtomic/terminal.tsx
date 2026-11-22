@@ -6,7 +6,7 @@ import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
-import { ActionMenu } from './controls'
+import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { DoorArt } from './vaultDoor'
 import { atomicId } from './anchors'
@@ -98,7 +98,7 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
           return (
             // each dump line is 44px tall and the pick fills it, so picks on lines above and below never share a
             // pixel; a pick under 44px wide grows an invisible band each side to 44px, a wider one keeps its width
-            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative inline-block h-11 leading-[2.75rem] before:absolute before:inset-y-0 before:left-[min(0px,calc((100%-44px)/2))] before:right-[min(0px,calc((100%-44px)/2))] before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
+            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative inline-block h-11 leading-[2.75rem] before:absolute before:inset-y-0 before:left-[min(0px,calc((100%-44px)/2))] before:right-[min(0px,calc((100%-44px)/2))] before:content-[''] ${atomic.dumpPick}`}>
               <span className="relative">{text}</span>
             </button>
           )
@@ -133,6 +133,9 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
   const [state, dispatch] = useReducer(reducer, undefined, initialHack)
   const half = Math.ceil(board.rows.length / 2)
   const columns = [board.rows.slice(0, half), board.rows.slice(half)]
+  // The last four log entries, each keyed by its place in the whole log, so the live region gets only the new line.
+  const shown = state.log.slice(-4)
+  const firstShown = state.log.length - shown.length
 
   return (
     <div className={atomic.hackScreen} data-status={state.status}>
@@ -161,14 +164,14 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
         </div>
         <div className="flex min-h-[8rem] flex-col justify-end border-t border-atomic-phosphor/30 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
           <ol className="space-y-2 text-atomic-phosphor" aria-live="polite">
-            {state.log.slice(-4).map((entry, index) => (
-              <LogLine key={`${state.log.length}-${index}`} entry={entry} />
+            {shown.map((entry, index) => (
+              <LogLine key={firstShown + index} entry={entry} />
             ))}
           </ol>
           {state.status === 'locked' && (
             <div className="mt-3">
               <p className="text-base font-bold uppercase tracking-widest text-atomic-red-light">{hud.terminalLocked}</p>
-              <button type="button" onClick={onReboot} className={`relative mt-2 min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+              <button type="button" onClick={onReboot} className={`${PHOSPHOR_BUTTON} mt-2`}>
                 <span className="relative">{hud.reboot}</span>
               </button>
             </div>
@@ -194,7 +197,7 @@ export function ContactTerminal() {
   const { techStack } = useCVData()
   const { ref, on } = useZoneStage('town')
   const tools = useMemo(() => techStack.flatMap((category) => category.items), [techStack])
-  // The board's random seed is drawn in the browser, so the server and the first client render agree on no board.
+  // The board's random seed is drawn in an effect, so a render stays pure and draws no board until it is set.
   const [seed, setSeed] = useState<number | null>(null)
   useEffect(() => setSeed(Math.floor(Math.random() * 2 ** 31)), [])
   const board = useMemo(() => (seed === null ? null : buildBoard(tools, seed)), [tools, seed])

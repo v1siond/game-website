@@ -29,15 +29,26 @@ const CROOKS = [
 export const orderVars = (index: number): CSSProperties =>
   ({ '--i': index, '--tilt': `${index % 2 ? 1.5 : -1.5}deg`, '--crook': CROOKS[index % CROOKS.length] }) as CSSProperties
 
-function Chips({ items, label }: { items: string[]; label: string }) {
+/** A named list of tag chips; `className` places it in its card. */
+export function Chips({ items, label, className = 'mt-3' }: { items: string[]; label: string; className?: string }) {
   return (
-    <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={label}>
+    <ul className={`${className} flex flex-wrap gap-1.5`} aria-label={label}>
       {items.map((item) => (
         <li key={item} className={CHIP}>
           {item}
         </li>
       ))}
     </ul>
+  )
+}
+
+/** A list row behind a red diamond, a highlight or a detail of a card. */
+export function Bullet({ children }: { children: ReactNode }) {
+  return (
+    <li className={`flex items-start gap-2 ${BODY}`}>
+      <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
+      {children}
+    </li>
   )
 }
 
@@ -81,10 +92,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
         {entry.highlights.length > 0 && (
           <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
             {entry.highlights.map((highlight) => (
-              <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
-                <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
-                {highlight}
-              </li>
+              <Bullet key={highlight}>{highlight}</Bullet>
             ))}
           </ul>
         )}
@@ -158,8 +166,7 @@ export function CompanyTag({ company }: { company: CVData['companies'][number] }
 
 // A band as a result panel sliding in from the side.
 export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
-  const labels = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
   const body: ReactNode = (
     <>
       <span className="block text-3xl leading-none tracking-wide">{band.name}</span>
@@ -168,9 +175,9 @@ export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </span>
-      {band.release && (
+      {release && (
         <span className={`mt-2 block ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </span>
       )}
     </>

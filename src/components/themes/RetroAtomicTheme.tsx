@@ -2,10 +2,9 @@
 
 import { useCallback, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { useWorldView } from '@/components/cv/CVDataProvider'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -33,15 +32,12 @@ const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display:
 // parallax. It clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container. Under reduced motion the door is skipped and the terminal is on from the start.
 //
-// The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): the
-// browser only parts start in effects (the door's timeline, the pointer parallax, the password game's
-// random seed), and the sealed door the server draws is hidden by CSS under reduced motion until the
-// client drops it.
+// The world mounts on the client after the theme provider, so its first render already knows the reduced
+// motion answer; the door's timeline, the pointer parallax and the password game's random seed start in
+// effects.
 
 export default function RetroAtomicTheme() {
-  const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
   const [booted, setBooted] = useState(false)
   const rootRef = usePointerVars(!reducedMotion)
@@ -59,9 +55,9 @@ export default function RetroAtomicTheme() {
 
       <ZoneStageProvider value={stage}>
         <main className="relative z-20 px-4 py-10 sm:px-6">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </div>
+          </ProfessionRegion>
         </main>
 
         <ContactTerminal />

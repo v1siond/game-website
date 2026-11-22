@@ -2,10 +2,11 @@
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { headingId } from '@/lib/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HitStar, RansomWord } from './backdrop'
-import { CVLink, HeroAction } from './actions'
+import { NoirLink } from './actions'
 import world from './world.module.css'
 
 // Contact as the second calling card: thrown in from the other side once the section is in view, it
@@ -17,6 +18,7 @@ const CONTACT_HEADING = headingId('noir', 'Contact')
 export function DeliveredCard() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
   const { sections } = useLabels()
+  const { cv } = useSiteLinks()
 
   return (
     <section
@@ -34,14 +36,11 @@ export function DeliveredCard() {
             </h2>
             <p className={`mb-8 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{line}</p>
             <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-              {actions.map((action) => (
-                <span key={action.id} className={`inline-block ${world.kick}`}>
-                  <HeroAction action={action} />
+              {[...actions, cv].map((slot) => (
+                <span key={slot.id} className={`inline-block ${world.kick}`}>
+                  <NoirLink slot={slot} />
                 </span>
               ))}
-              <span className={`inline-block ${world.kick}`}>
-                <CVLink />
-              </span>
             </div>
           </div>
         )}

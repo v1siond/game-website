@@ -1,6 +1,5 @@
 'use client'
 
-import type { CSSProperties } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -9,6 +8,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { newTabName } from '@/lib/cv/sectionText'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Tech Stack as the terminal's inventory screen: every category a pocket packed in masonry columns, its
 // name on the picked, inverted row with the item count, its tools as the rows the pick sweeps over on
@@ -25,7 +25,7 @@ export function Inventory({ categories }: { categories: CVData['techStack'] }) {
     <div className={`p-4 sm:p-6 ${atomic.panel}`}>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
         {categories.map((category, index) => (
-          <li key={category.id} data-pocket className={MASONRY_ITEM} style={{ '--i': index } as CSSProperties}>
+          <li key={category.id} data-pocket className={MASONRY_ITEM} style={cssVars({ '--i': index })}>
             <h3
               data-on
               className={`relative flex min-h-[44px] items-center justify-between gap-3 px-3 text-sm font-bold uppercase tracking-widest ${atomic.pickRow}`}
@@ -61,7 +61,7 @@ function Cassette() {
       <rect x="14" y="10" width="132" height="42" rx="3" fill={CREAM} />
       <rect x="40" y="58" width="80" height="30" rx="12" fill={RUBBER} />
       {[62, 98].map((cx) => (
-        <g key={cx} className={atomic.reel}>
+        <g key={cx} className={`motion-safe:group-hover:animate-[spin_1.4s_linear_infinite] motion-safe:group-focus-visible:animate-[spin_1.4s_linear_infinite] ${atomic.reel}`}>
           <circle cx={cx} cy="73" r="11" fill={BAKELITE} stroke={CHROME} strokeWidth="2" />
           {[0, 60, 120].map((angle) => (
             <rect key={angle} x={cx - 1.5} y="64" width="3" height="18" fill={STEEL_LIGHT} transform={`rotate(${angle} ${cx} 73)`} />
@@ -91,7 +91,7 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
             target="_blank"
             rel="noopener noreferrer"
             aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-            className={`group relative block ${atomic.holotape} ${atomic.focusRing}`}
+            className={`group relative block ${atomic.holotape}`}
           >
             <div className="relative">
               <Cassette />

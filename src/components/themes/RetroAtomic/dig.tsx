@@ -1,11 +1,12 @@
 'use client'
 
-import { useMemo, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { useTimedSteps } from '@/hooks/useTimedSteps'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DogSprite, type DogMotion } from './dog'
 import { DUST, DUST_DARK, POSTER_INK } from './palette'
 import j from './journey.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Ventures dug up by the dog. When the stage turns on the shepherd trots along the dirt strip to the spot
 // over the first cassette's column, pitches nose down and digs with the clods flying off his paws; the
@@ -59,15 +60,15 @@ export function Dig({ tapes, on, children }: { tapes: number; on: boolean; child
           <span
             key={spot}
             className={`absolute bottom-3 block h-5 w-16 rounded-t-full border-2 border-atomic-poster-ink bg-atomic-dust ${j.mound}`}
-            style={{ left: `${spotAt(spot, tapes) * 100}%` }}
+            style={cssVars({ '--spot': spotAt(spot, tapes) })}
             data-dug={spot < dug || undefined}
           />
         ))}
-        <span className={`absolute inset-0 block ${j.digTrack}`} data-digging={current.motion === 'dig' || undefined} style={{ '--at': at } as CSSProperties}>
+        <span className={`absolute inset-0 block ${j.digTrack}`} data-digging={current.motion === 'dig' || undefined} style={cssVars({ '--at': at })}>
           <span className="absolute bottom-2 left-0 block h-14 w-20">
             <DogSprite motion={current.motion} className="h-full w-full" />
             {Array.from({ length: CLODS }, (_, clod) => (
-              <svg key={clod} viewBox="0 0 10 8" className={`absolute bottom-1 left-12 h-2 w-3 ${j.clod}`} style={{ '--c': clod } as CSSProperties} focusable="false">
+              <svg key={clod} viewBox="0 0 10 8" className={`absolute bottom-1 left-12 h-2 w-3 ${j.clod}`} style={cssVars({ '--c': clod })} focusable="false">
                 <ellipse cx={5} cy={4} rx={4.5} ry={3.5} fill={clod % 2 ? DUST : DUST_DARK} stroke={POSTER_INK} strokeWidth={1} />
               </svg>
             ))}

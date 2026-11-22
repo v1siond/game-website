@@ -23,8 +23,8 @@ import atomic from './atomic.module.css'
 // - Boot: once the door has rolled aside, the tube warms up (a bright line opens to the full screen),
 //   then the hero types itself out character by character on a 16 ms clock (setInterval; React holds
 //   only the count). Screen readers get the whole text at once; the typed copy is aria-hidden over an
-//   invisible full copy that holds the layout, so nothing jumps. Under reduced motion the CSS shows that
-//   full copy from the server's first paint, before the client learns the preference and fills the count.
+//   invisible full copy that holds the layout, so nothing jumps. Under reduced motion the count starts
+//   full and the CSS shows that full copy.
 // - Profession switch: the top tabs are the shared ProfessionSwitch (radio group, arrows); the dial on
 //   the right turns to the picked tab with a mechanical overshoot, and clicking the dial steps to the
 //   next one. A switch collapses the screen to a line and reopens it on the new profession (the screen's
@@ -40,19 +40,17 @@ const OUTFIT_LOOK: WardrobeLook = { plate: INK, text: PHOSPHOR, ring: GLASS }
 
 /** How many characters of the text have been typed: all of it when off, counting up once started. */
 function useTyped(total: number, running: boolean, instant: boolean): number {
-  const [typed, setTyped] = useState(instant ? total : 0)
+  const [typed, setTyped] = useState(0)
+  const done = typed >= total
 
+  // The clock runs only while characters are left, so a typed hero wakes nothing.
   useEffect(() => {
-    if (instant) {
-      setTyped(total)
-      return
-    }
-    if (!running) return
-    const timer = window.setInterval(() => setTyped((count) => (count >= total ? count : count + 1)), TYPE_TICK_MS)
+    if (instant || !running || done) return
+    const timer = window.setInterval(() => setTyped((count) => Math.min(count + 1, total)), TYPE_TICK_MS)
     return () => window.clearInterval(timer)
-  }, [running, instant, total])
+  }, [running, instant, total, done])
 
-  return typed
+  return instant ? total : typed
 }
 
 /** One line of the boot text: the full text reserves the space, the typed part sits over it. */
@@ -97,7 +95,7 @@ function ScreenTab({ label, selected, optionProps }: ProfessionOption) {
     <button
       type="button"
       {...optionProps}
-      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-wide sm:px-4 sm:text-base sm:tracking-widest ${atomic.screenTab} ${atomic.focusRing}`}
+      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-wide sm:px-4 sm:text-base sm:tracking-widest ${atomic.screenTab}`}
       data-on={selected || undefined}
     >
       {label}
@@ -113,7 +111,7 @@ function SectionTabs({ profession }: { profession: Profession }) {
       <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1">
         {sectionTabs(profession, sections).map((tab) => (
           <li key={tab.href}>
-            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim-text hover:text-atomic-phosphor ${atomic.focusRing}`}>
+            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim-text hover:text-atomic-phosphor`}>
               {tab.title}
             </a>
           </li>
@@ -174,7 +172,7 @@ function SelectorDial() {
         onClick={() => setActive(stepProfession(active, 1))}
         aria-label={hud.dialHint}
         title={hud.dialHint}
-        className={`relative h-24 w-24 rounded-full sm:h-28 sm:w-28 ${atomic.focusRing}`}
+        className={`relative h-24 w-24 rounded-full sm:h-28 sm:w-28`}
       >
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
           <defs>

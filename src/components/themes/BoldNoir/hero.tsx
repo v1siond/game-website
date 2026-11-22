@@ -3,9 +3,10 @@
 import type { CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { RansomWord, StarBurst } from './backdrop'
-import { CVLink, EngineLink, HeroAction } from './actions'
+import { NoirLink } from './actions'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
@@ -20,6 +21,7 @@ import world from './world.module.css'
 export function CallingCardHero() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px' })
   const { navigation } = useLabels()
+  const { cv, engine } = useSiteLinks('engine')
 
   return (
     <RecruiterHero
@@ -48,11 +50,9 @@ export function CallingCardHero() {
             <p className={`text-lg italic text-[color:var(--noir-paper)] ${world.copy}`}>{tagline}</p>
             <p className={`mt-2 text-base text-[color:var(--noir-paper-dim)] ${world.copy}`}>{line}</p>
             <nav className="mt-6 flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
-              {actions.map((action) => (
-                <HeroAction key={action.id} action={action} />
+              {[...actions, cv, engine].map((slot) => (
+                <NoirLink key={slot.id} slot={slot} />
               ))}
-              <CVLink />
-              <EngineLink />
             </nav>
           </div>
         </div>

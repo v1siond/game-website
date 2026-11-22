@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -11,8 +11,10 @@ import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
 import { DwellerSprite, type DwellerMotion } from './dweller'
+import { AtomicChip, PHOSPHOR_BUTTON, PlusRow } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Projects through the targeting system. The pointer or focus on a project locks the targeting on it:
 // the section goes into its paused state (data-vats on the section: every other card drains to a dim
@@ -75,7 +77,7 @@ function ActionPoints({ points }: { points: number }) {
     <div className="flex items-center gap-3 bg-atomic-glass px-2 py-1 text-sm font-bold uppercase tracking-widest text-atomic-phosphor">
       <span>{hud.ap}</span>
       <span className={`relative block h-3 w-32 overflow-hidden border border-atomic-phosphor sm:w-44 ${atomic.apTrack}`} role="img" aria-label={label}>
-        <span className={`absolute inset-y-0 left-0 w-full origin-left bg-atomic-phosphor ${atomic.apFill}`} style={{ '--ap': points / AP_TOTAL } as CSSProperties} />
+        <span className={`absolute inset-y-0 left-0 w-full origin-left bg-atomic-phosphor ${atomic.apFill}`} style={cssVars({ '--ap': points / AP_TOTAL })} />
       </span>
       <span aria-hidden="true">{label}</span>
     </div>
@@ -103,9 +105,11 @@ interface CardProps {
   onFire: (slot: ProjectSlot, trigger: HTMLElement) => void
 }
 
-function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProps) {
-  const { hud, cards, links: linkLabels, actions } = useLabels()
-  const { project, years, links } = slot
+// A memo card: the parent re-renders on every target and shot change, and only the cards whose props
+// changed (the old and the new target) draw again.
+const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProps) {
+  const { hud, cards, actions } = useLabels()
+  const { project, years, links, noLink } = slot
   const buttonRef = useRef<HTMLButtonElement>(null)
   const fire = () => buttonRef.current && onFire(slot, buttonRef.current)
 
@@ -114,7 +118,7 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
       className={`relative cursor-crosshair p-5 ${atomic.panel} ${atomic.target}`}
       data-target={targeted || undefined}
       data-shot={targeted ? phase ?? undefined : undefined}
-      style={{ '--i': index } as CSSProperties}
+      style={cssVars({ '--i': index })}
       onPointerEnter={() => onTarget(project.id)}
       onPointerLeave={() => onTarget(null)}
       onFocus={() => onTarget(project.id)}
@@ -147,51 +151,65 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
         <Part tag={cards.tech}>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.slice(0, 5).map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-                {tech}
-              </li>
+              <AtomicChip key={tech}>{tech}</AtomicChip>
             ))}
           </ul>
         </Part>
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button ref={buttonRef} type="button" onClick={fire} className={`relative min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+        <button ref={buttonRef} type="button" onClick={fire} className={PHOSPHOR_BUTTON}>
           <span className="relative">{actions.readFile}</span>
         </button>
         {links.map(({ kind, label, linkProps }) => (
-          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-2 text-sm uppercase tracking-widest text-atomic-phosphor underline-offset-4 hover:underline ${atomic.focusRing}`}>
+          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-2 text-sm uppercase tracking-widest text-atomic-phosphor underline-offset-4 hover:underline`}>
             {label}
           </a>
         ))}
-        {links.length === 0 && <span className="text-sm text-atomic-ash">{linkLabels.noPublicLink}</span>}
+        {noLink && <span className="text-sm text-atomic-ash">{noLink}</span>}
       </div>
     </article>
   )
+})
+
+interface ProjectFileProps {
+  slot: ProjectSlot
+  /** The card's button that opened the file, focused again once the file has closed. */
+  opener: RefObject<HTMLElement | null>
+  onClose: () => void
 }
 
-function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
+function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
   const { actions, cards } = useLabels()
   const { project, years, links } = slot
-  const closeRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = `atomic-file-${project.id}`
 
+  // A modal dialog keeps Tab inside the file and leaves the page under it inert. It closes as it unmounts
+  // and only then hands focus back, since the opener is inert while the dialog is open.
   useEffect(() => {
-    closeRef.current?.focus()
-    const onKey = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+    const dialog = dialogRef.current
+    const trigger = opener.current
+    dialog?.showModal()
+    return () => {
+      dialog?.close()
+      trigger?.focus()
+    }
+  }, [opener])
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-atomic-ink/80 p-4" onClick={onClose} role="presentation">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        onClick={(event) => event.stopPropagation()}
-        className={`relative max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-[1.2rem] p-6 sm:p-8 ${atomic.tube} ${atomic.powerOn}`}
-      >
+    <dialog
+      ref={dialogRef}
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault()
+        onClose()
+      }}
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+      className={`m-auto max-h-[88vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-[1.2rem] p-0 text-inherit backdrop:bg-atomic-ink/80 ${atomic.tube} ${atomic.powerOn}`}
+    >
+      {/* the padding sits on this box, so a click on it is inside the file and only the backdrop closes it */}
+      <div className="p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 id={titleId} className={`text-2xl font-bold uppercase tracking-wide text-atomic-phosphor ${atomic.glow}`}>
@@ -199,7 +217,7 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
             </h3>
             <p className="mt-1 text-base text-atomic-yellow">{[project.role, years].filter(Boolean).join(' / ')}</p>
           </div>
-          <button ref={closeRef} type="button" onClick={onClose} className={`relative min-h-[44px] shrink-0 border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+          <button type="button" autoFocus onClick={onClose} className={`${PHOSPHOR_BUTTON} shrink-0`}>
             <span className="relative">{actions.closeFile}</span>
           </button>
         </div>
@@ -210,12 +228,7 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
         {project.details.length > 0 && (
           <ul className="mt-5 space-y-1" aria-label={cards.keyAchievements}>
             {project.details.map((detail) => (
-              <li key={detail} className={`relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`}>
-                <span className="relative" aria-hidden="true">
-                  +
-                </span>
-                <span className="relative">{detail}</span>
-              </li>
+              <PlusRow key={detail}>{detail}</PlusRow>
             ))}
           </ul>
         )}
@@ -223,9 +236,7 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
         {project.techStack.length > 0 && (
           <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-                {tech}
-              </li>
+              <AtomicChip key={tech}>{tech}</AtomicChip>
             ))}
           </ul>
         )}
@@ -233,15 +244,15 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
         {links.length > 0 && (
           <div className="mt-5 flex flex-wrap gap-3">
             {links.map(({ kind, label, linkProps }) => (
-              <a key={kind} {...linkProps} className={`relative inline-flex min-h-[44px] items-center border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow} ${atomic.focusRing}`}>
+              <a key={kind} {...linkProps} className={`${PHOSPHOR_BUTTON} inline-flex items-center`}>
                 <span className="relative">{label}</span>
               </a>
             ))}
           </div>
         )}
-        <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
       </div>
-    </div>
+      <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
+    </dialog>
   )
 }
 
@@ -262,46 +273,55 @@ function Shooter({ motion }: { motion: DwellerMotion }) {
   )
 }
 
-interface Opened {
-  slot: ProjectSlot
-  trigger: HTMLElement
-}
+type Shot = { id: string; phase: ShotPhase }
 
 export function TargetingSystem({ projects }: { projects: Project[] }) {
   const { points, spend } = useActionPoints()
   const [target, setTarget] = useState<string | null>(null)
-  const [shot, setShot] = useState<{ id: string; phase: ShotPhase } | null>(null)
-  const [opened, setOpened] = useState<Opened | null>(null)
+  const [shot, setShot] = useState<Shot | null>(null)
+  const [opened, setOpened] = useState<ProjectSlot | null>(null)
   const timers = useRef<number[]>([])
+  // The shot in play and the button that opened the file, read by the card callbacks so they stay the
+  // same functions from render to render and the memo cards skip the renders that are not theirs.
+  const playing = useRef<Shot | null>(null)
+  const opener = useRef<HTMLElement | null>(null)
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
+  const play = useCallback((next: Shot | null) => {
+    playing.current = next
+    setShot(next)
+  }, [])
+
+  const onTarget = useCallback((id: string | null) => {
+    if (playing.current) return
+    setTarget(id)
+  }, [])
+
   const onFire = useCallback(
     (slot: ProjectSlot, trigger: HTMLElement) => {
-      if (shot) return
+      if (playing.current) return
+      opener.current = trigger
       if (prefersReducedMotion() || !spend()) {
-        setOpened({ slot, trigger })
+        setOpened(slot)
         return
       }
-      setShot({ id: slot.project.id, phase: 'aim' })
+      play({ id: slot.project.id, phase: 'aim' })
       timers.current = SHOT.map(([phase, at]) =>
         window.setTimeout(() => {
           if (phase === 'open') {
-            setShot(null)
-            setOpened({ slot, trigger })
+            play(null)
+            setOpened(slot)
             return
           }
-          setShot({ id: slot.project.id, phase })
+          play({ id: slot.project.id, phase })
         }, at),
       )
     },
-    [shot, spend],
+    [spend, play],
   )
 
-  const onClose = useCallback(() => {
-    opened?.trigger.focus()
-    setOpened(null)
-  }, [opened])
+  const onClose = useCallback(() => setOpened(null), [])
 
   const locked = shot?.id ?? target
 
@@ -316,13 +336,13 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
           projects={projects}
           className={`min-w-0 flex-1 ${MASONRY_LIST}`}
           itemClassName={MASONRY_ITEM}
-          renderProject={(slot) => (
+          renderProject={(slot, index) => (
             <TargetCard
               slot={slot}
-              index={projects.indexOf(slot.project)}
+              index={index}
               targeted={locked === slot.project.id}
               phase={shot?.id === slot.project.id ? shot.phase : null}
-              onTarget={(id) => !shot && setTarget(id)}
+              onTarget={onTarget}
               onFire={onFire}
             />
           )}
@@ -331,7 +351,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
       <span className={`pointer-events-none fixed inset-x-0 top-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxTop}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-x-0 bottom-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxBottom}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-0 z-[71] bg-atomic-cream ${atomic.shotFlash}`} data-on={shot?.phase === 'hit' ? 'on' : undefined} aria-hidden="true" />
-      {opened && <ProjectFile slot={opened.slot} onClose={onClose} />}
+      {opened && <ProjectFile slot={opened} opener={opener} onClose={onClose} />}
     </div>
   )
 }

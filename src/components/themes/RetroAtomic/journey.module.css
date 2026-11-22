@@ -176,17 +176,9 @@
   animation: stamp 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) 0.2s both;
 }
 
-.sunburst {
-  animation: turn 24s linear infinite;
-}
-
 @keyframes stamp {
   0% { opacity: 0; transform: scale(1.8) rotate(-8deg); }
   100% { opacity: 1; transform: scale(1) rotate(-2deg); }
-}
-
-@keyframes turn {
-  to { transform: rotate(360deg); }
 }
 
 /* ---- tech stack: the footlocker loot (footlocker.tsx) ----
@@ -300,6 +292,8 @@
 }
 
 .mound {
+  /* --spot is the mound's place along the yard, 0 to 1, set per mound by dig.tsx */
+  left: calc(var(--spot) * 100%);
   transform-origin: 50% 100%;
   transform: translateX(-50%) scaleY(0);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -357,7 +351,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .zone, .walker, .follower { transition: none; }
-  .neon, .sunburst, .dog * { animation: none !important; }
+  .neon, .dog * { animation: none !important; }
   .fetchDog, .fetch[data-on] .fetchDog { animation: none; transform: none; }
   .fetchTape, .fetch[data-on] .fetchTape { animation: none; opacity: 1; transform: translate(12px, 22px) rotate(24deg); }
   .fetch .fetchPanel, .fetch[data-on] .fetchPanel { animation: none; opacity: 1; transform: none; }

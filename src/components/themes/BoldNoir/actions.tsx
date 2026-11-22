@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
-import { ENGINE_LINK } from '@/lib/engineLink'
+import { ContactLink, type ContactLinkId } from '@/components/cv/SiteLinks'
+import type { SiteLinkSlot } from '@/lib/cv/siteLinks'
 
 // The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV, and the
 // link out to Nebulith.
@@ -16,35 +15,14 @@ const LOOK = {
   paper: 'border-[color:var(--noir-paper)] bg-[color:var(--noir-paper)] text-[color:var(--noir-ink)]',
 }
 
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: LOOK.red,
-  linkedin: LOOK.outline,
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
+  email: `${NOIR_BUTTON} ${LOOK.red}`,
+  linkedin: `${NOIR_BUTTON} ${LOOK.outline}`,
+  cv: `${NOIR_BUTTON} ${LOOK.outline}`,
+  engine: `${NOIR_BUTTON} ${LOOK.paper}`,
 }
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
-  return (
-    <a {...action.linkProps} className={`${NOIR_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-      {action.label}
-    </a>
-  )
-}
-
-export function CVLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link href="/cv" className={`${NOIR_BUTTON} ${LOOK.outline}`}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function EngineLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link {...ENGINE_LINK} className={`${NOIR_BUTTON} ${LOOK.paper}`}>
-      {actions.engine}
-    </Link>
-  )
+/** One of the world's contact links in its look: the hero's actions, the CV and the engine. */
+export function NoirLink({ slot }: { slot: HeroActionSlot | SiteLinkSlot }) {
+  return <ContactLink slot={slot} className={CONTACT_LOOK[slot.id]} />
 }

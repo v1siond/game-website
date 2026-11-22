@@ -27,11 +27,6 @@
   position: relative;
 }
 
-.focusRing:focus-visible {
-  outline: 2px solid theme('colors.atomic.yellow');
-  outline-offset: 3px;
-}
-
 /* ---- the shelter wall behind everything (backdrop.tsx) ---- */
 
 .shelterWall {
@@ -147,13 +142,6 @@
 .beaconSweep {
   border-radius: 9999px;
   background: conic-gradient(from 0deg, theme('colors.atomic.red-light / 0.75') 0deg 40deg, transparent 70deg 360deg);
-  animation: beaconTurn 900ms linear infinite;
-}
-
-@keyframes beaconTurn {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ---- the wrist terminal (wristComputer.tsx) ---- */
@@ -471,17 +459,6 @@
 .reel {
   transform-box: fill-box;
   transform-origin: center;
-}
-
-.holotape:hover .reel,
-.holotape:focus-visible .reel {
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ---- the targeting system (targeting.tsx) ---- */
@@ -897,13 +874,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ambient,
   .wallLamp,
-  .beaconSweep,
   .cursor,
   .questActive,
   .refreshBar,
   .waveSlide,
-  .holotape:hover .reel,
-  .holotape:focus-visible .reel,
   .perkCard:hover .perkHop {
     animation: none;
   }
@@ -942,13 +916,13 @@
     animation: none;
   }
 
-  /* The server draws the sealed door for every first visit; under reduced motion it never shows. */
+  /* Under reduced motion the sealed door never shows. */
   .doorWall {
     display: none;
   }
 
-  /* The boot text reads whole from the first paint: the server cannot know the preference, so the full
-     copy shows and the typed copy over it stays out of the way. */
+  /* Under reduced motion the boot text reads whole: the full copy shows and the typed copy over it stays
+     out of the way. */
   .typedFull {
     visibility: visible;
   }

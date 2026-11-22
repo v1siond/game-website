@@ -1,11 +1,12 @@
-import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { AtomicChip, PlusRow } from './controls'
 import atomic from './atomic.module.css'
+import { cssVars } from '@/lib/cssVars'
 
 // Experience as the terminal's quest log: each job an entry with its state box (the current one a
 // blinking diamond and "Active", an ended one a ticked box and "Completed"), the title, the company and
@@ -30,7 +31,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
   const { start, end } = jobYears(job, years.present)
 
   return (
-    <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={{ '--i': index } as CSSProperties}>
+    <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={cssVars({ '--i': index })}>
       <QuestState current={job.current} />
       <h3 className="mt-3 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{job.title}</h3>
       <p className="mt-1 text-base text-atomic-yellow">
@@ -43,12 +44,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       {job.highlights.length > 0 && (
         <ul className="mt-4 space-y-1 border-t border-atomic-phosphor/30 pt-3" aria-label={cards.keyAchievements}>
           {job.highlights.map((highlight) => (
-            <li key={highlight} className={`relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`}>
-              <span className="relative" aria-hidden="true">
-                +
-              </span>
-              <span className="relative">{highlight}</span>
-            </li>
+            <PlusRow key={highlight}>{highlight}</PlusRow>
           ))}
         </ul>
       )}
@@ -56,9 +52,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
           {job.skills.map((skill) => (
-            <li key={skill} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
-              {skill}
-            </li>
+            <AtomicChip key={skill}>{skill}</AtomicChip>
           ))}
         </ul>
       )}
