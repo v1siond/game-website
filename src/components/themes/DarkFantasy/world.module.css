@@ -68,11 +68,14 @@
 /* Accessibility: Reduce motion. .selector is the profession selector's box; the hashed keyframe names keep
    their own name inside them, so the attribute selectors still find the inline animations. */
 @media (prefers-reduced-motion: reduce) {
-  /* Disable energy flow animations for reduced motion */
-  .selector [style*="energyArrival"],
-  .selector [style*="nodeArrival"] {
+  /* The arrival burst is drawn only for its animation, so it hides; the picked card keeps still and stays
+     visible, its end frame. */
+  .selector [style*="energyArrival"] {
     animation: none !important;
     opacity: 0 !important;
+  }
+  .selector [style*="nodeArrival"] {
+    animation: none !important;
   }
 }
 
