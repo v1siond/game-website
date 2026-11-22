@@ -55,34 +55,37 @@
   transform-origin: 50px 81px;
 }
 
-/* Every pose moves only when the visitor allows motion; otherwise he stands at rest. */
+/* Every pose moves only when the visitor allows motion; otherwise he stands at rest. Each plays a bounded
+ * number of runs inside 5 s and rests (BD29): the breath, the pound and the blink once, a pose that holds a
+ * look (the swing's hang, the typing, the bongos, the guard) on its last frame. A figure waiting for its
+ * scene's trigger (data-waiting) stands at rest until it comes. */
 @media (prefers-reduced-motion: no-preference) {
-  .figure:not([data-pose='roll']) .eyes {
-    animation: blink 4.2s steps(1, end) infinite;
+  .figure:not([data-waiting], [data-pose='roll']) .eyes {
+    animation: blink 4.2s steps(1, end);
   }
 
   /* ---- idle: the big breath, then the chest pound ---- */
 
-  .figure[data-pose='idle'] .body,
-  .figure[data-pose='act'] .body {
-    animation: breathe 3.6s ease-in-out infinite;
+  .figure:not([data-waiting])[data-pose='idle'] .body,
+  .figure:not([data-waiting])[data-pose='act'] .body {
+    animation: breathe 3.6s ease-in-out;
   }
 
-  .figure[data-pose='idle'] .tie {
-    animation: tie-sway 3.6s ease-in-out infinite;
+  .figure:not([data-waiting])[data-pose='idle'] .tie {
+    animation: tie-sway 3.6s ease-in-out;
   }
 
-  .figure[data-pose='idle'] .armBack,
-  .figure[data-pose='idle'] .armFront {
-    animation: pound-upper 3.6s ease-in-out infinite;
+  .figure:not([data-waiting])[data-pose='idle'] .armBack,
+  .figure:not([data-waiting])[data-pose='idle'] .armFront {
+    animation: pound-upper 3.6s ease-in-out;
   }
 
-  .figure[data-pose='idle'] .foreBack {
-    animation: pound-fore 3.6s ease-in-out infinite;
+  .figure:not([data-waiting])[data-pose='idle'] .foreBack {
+    animation: pound-fore 3.6s ease-in-out;
   }
 
-  .figure[data-pose='idle'] .foreFront {
-    animation: pound-fore 3.6s ease-in-out -0.11s infinite;
+  .figure:not([data-waiting])[data-pose='idle'] .foreFront {
+    animation: pound-fore 3.6s ease-in-out -0.11s;
   }
 
   /* ---- run: the knuckle run ----
@@ -90,71 +93,71 @@
      second pair plays the same alternate loop in the same direction one iteration (half a back and
      forth) earlier; the front limbs are drawn mirrored, so the same keyframes lift them outward too. */
 
-  .figure[data-pose='run'] .body {
-    animation: run-bob 0.15s ease-in-out infinite alternate;
+  .figure:not([data-waiting])[data-pose='run'] .body {
+    animation: run-bob 0.15s ease-in-out 24 alternate;
   }
 
-  .figure[data-pose='run'] .armBack,
-  .figure[data-pose='run'] .legFront {
-    animation: knuckle-plant 0.3s ease-in-out infinite alternate;
+  .figure:not([data-waiting])[data-pose='run'] .armBack,
+  .figure:not([data-waiting])[data-pose='run'] .legFront {
+    animation: knuckle-plant 0.3s ease-in-out 12 alternate;
   }
 
-  .figure[data-pose='run'] .armFront,
-  .figure[data-pose='run'] .legBack {
-    animation: knuckle-plant 0.3s ease-in-out -0.3s infinite alternate;
+  .figure:not([data-waiting])[data-pose='run'] .armFront,
+  .figure:not([data-waiting])[data-pose='run'] .legBack {
+    animation: knuckle-plant 0.3s ease-in-out -0.3s 12 alternate;
   }
 
   /* ---- throw: hoist the barrel, wind back, throw it, settle (once) ---- */
 
-  .figure[data-pose='throw'] .body {
+  .figure:not([data-waiting])[data-pose='throw'] .body {
     animation: throw-body 1.3s ease-in-out var(--pose-delay, 0s) both;
   }
 
-  .figure[data-pose='throw'] .armBack,
-  .figure[data-pose='throw'] .armFront {
+  .figure:not([data-waiting])[data-pose='throw'] .armBack,
+  .figure:not([data-waiting])[data-pose='throw'] .armFront {
     animation: throw-upper 1.3s ease-in-out var(--pose-delay, 0s) both;
   }
 
-  .figure[data-pose='throw'] .foreBack,
-  .figure[data-pose='throw'] .foreFront {
+  .figure:not([data-waiting])[data-pose='throw'] .foreBack,
+  .figure:not([data-waiting])[data-pose='throw'] .foreFront {
     animation: throw-fore 1.3s ease-in-out var(--pose-delay, 0s) both;
   }
 
-  .figure[data-pose='throw'] .held {
+  .figure:not([data-waiting])[data-pose='throw'] .held {
     animation: throw-barrel 1.3s ease-in var(--pose-delay, 0s) both;
   }
 
   /* ---- slap: hands up, slammed flat on the ground, left then right ---- */
 
-  .figure[data-pose='slap'] .body {
-    animation: slap-body 0.9s ease-in infinite;
+  .figure:not([data-waiting])[data-pose='slap'] .body {
+    animation: slap-body 0.9s ease-in 2;
   }
 
-  .figure[data-pose='slap'] .armBack {
-    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) infinite;
+  .figure:not([data-waiting])[data-pose='slap'] .armBack {
+    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) 2;
   }
 
-  .figure[data-pose='slap'] .foreBack {
-    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) infinite;
+  .figure:not([data-waiting])[data-pose='slap'] .foreBack {
+    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) 2;
   }
 
-  .figure[data-pose='slap'] .armFront {
-    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s infinite;
+  .figure:not([data-waiting])[data-pose='slap'] .armFront {
+    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s 2;
   }
 
-  .figure[data-pose='slap'] .foreFront {
-    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s infinite;
+  .figure:not([data-waiting])[data-pose='slap'] .foreFront {
+    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s 2;
   }
 
   /* ---- swing: the back hand holds the vine overhead, the rest hangs and trails ---- */
 
-  .figure[data-pose='swing'] .armFront {
-    animation: swing-loose 1.6s ease-in-out infinite alternate;
+  .figure:not([data-waiting])[data-pose='swing'] .armFront {
+    animation: swing-loose 1.6s ease-in-out 2 alternate forwards;
   }
 
-  .figure[data-pose='swing'] .legBack,
-  .figure[data-pose='swing'] .legFront {
-    animation: swing-dangle 1.6s ease-in-out infinite alternate;
+  .figure:not([data-waiting])[data-pose='swing'] .legBack,
+  .figure:not([data-waiting])[data-pose='swing'] .legFront {
+    animation: swing-dangle 1.6s ease-in-out 2 alternate forwards;
   }
 
   /* ---- act: typing with the knuckles ---- */
@@ -164,12 +167,12 @@
     transform: rotate(-16deg);
   }
 
-  .figure[data-pose='act'][data-profession='engineer'] .foreBack {
-    animation: type-tap 0.24s ease-in-out infinite alternate;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='engineer'] .foreBack {
+    animation: type-tap 0.24s ease-in-out 16 alternate forwards;
   }
 
-  .figure[data-pose='act'][data-profession='engineer'] .foreFront {
-    animation: type-tap 0.24s ease-in-out -0.12s infinite alternate;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='engineer'] .foreFront {
+    animation: type-tap 0.24s ease-in-out -0.12s 16 alternate forwards;
   }
 
   /* ---- act: slapping the bongos ---- */
@@ -179,30 +182,30 @@
     transform: rotate(-25deg);
   }
 
-  .figure[data-pose='act'][data-profession='drummer'] .foreBack {
-    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) infinite alternate;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='drummer'] .foreBack {
+    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) 13 alternate forwards;
   }
 
-  .figure[data-pose='act'][data-profession='drummer'] .foreFront {
-    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) -0.3s infinite alternate;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='drummer'] .foreFront {
+    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) -0.3s 13 alternate forwards;
   }
 
   /* ---- act: the guard and the jabs ---- */
 
-  .figure[data-pose='act'][data-profession='fighter'] .armBack {
-    animation: jab-upper 1.4s ease-out infinite;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .armBack {
+    animation: jab-upper 1.4s ease-out 3 forwards;
   }
 
-  .figure[data-pose='act'][data-profession='fighter'] .foreBack {
-    animation: jab-fore 1.4s ease-out infinite;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .foreBack {
+    animation: jab-fore 1.4s ease-out 3 forwards;
   }
 
-  .figure[data-pose='act'][data-profession='fighter'] .armFront {
-    animation: jab-upper 1.4s ease-out -0.7s infinite;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .armFront {
+    animation: jab-upper 1.4s ease-out -0.7s 3 forwards;
   }
 
-  .figure[data-pose='act'][data-profession='fighter'] .foreFront {
-    animation: jab-fore 1.4s ease-out -0.7s infinite;
+  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .foreFront {
+    animation: jab-fore 1.4s ease-out -0.7s 3 forwards;
   }
 }
 

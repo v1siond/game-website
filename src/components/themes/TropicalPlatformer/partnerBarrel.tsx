@@ -66,7 +66,8 @@ function InsigniaBand({ active }: { active: Profession }) {
   )
 }
 
-function BarrelStage() {
+// `on` is the section trigger: his act waits for it.
+function BarrelStage({ on }: { on: boolean }) {
   const { active } = useProfession()
   const [cast, setCast] = useState<{ lead: Profession; leaving: Profession | null }>({ lead: active, leaving: null })
   if (cast.lead !== active) setCast({ lead: active, leaving: cast.lead })
@@ -89,7 +90,7 @@ function BarrelStage() {
 
       <div key={active} className="absolute inset-0">
         <div className={`absolute bottom-10 left-[8%] h-40 w-28 ${partner.pop}`}>
-          <HeroCharacter profession={active} pose="act" className="h-full w-full" />
+          <HeroCharacter profession={active} pose="act" waiting={!on} className="h-full w-full" />
         </div>
         <div className={`absolute bottom-10 left-[56%] w-32 sm:w-36 ${partner.rock}`}>
           <div className={`relative ${partner.burst}`}>
@@ -138,7 +139,7 @@ export function PartnerBarrel() {
     <div ref={ref} data-on={triggered || undefined} className={`mx-auto max-w-5xl ${partner.root}`}>
       <h2 className="sr-only">{navigation.selectYourProfession}</h2>
       <div className="grid items-center gap-6 sm:grid-cols-2 sm:gap-10">
-        <BarrelStage />
+        <BarrelStage on={triggered} />
         <ProfessionSwitch className="flex flex-col gap-4" label={navigation.profession} renderOption={(option) => <Plate {...option} />} />
       </div>
     </div>

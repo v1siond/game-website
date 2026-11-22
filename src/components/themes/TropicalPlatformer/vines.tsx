@@ -59,7 +59,7 @@ const HangingBand = memo(function HangingBand({ slot, index, here, entered, swin
         <Vines />
         {here && (
           <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${entered ? motion.swingIn : motion.swing}`} aria-hidden="true">
-            <HeroCharacter profession="drummer" pose="swing" className="block h-auto w-full" />
+            <HeroCharacter profession="drummer" pose="swing" waiting={!entered} className="block h-auto w-full" />
           </div>
         )}
         <h3 className={`pr-20 text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>

@@ -17,9 +17,9 @@ import sprite from './character.module.css'
 // behind him). The bare skin (face, ears, chest, hands, feet) is his own, from HERO_IDENTITY.
 //
 // Poses, transform keyframes in character.module.css keyed off data-pose:
-// - idle: a big breath, a blink, and every few seconds the chest pound;
+// - idle: a big breath, a blink and the chest pound, once, then he stands;
 // - run: the knuckle run, the body bouncing while the arms plant and swing;
-// - roll: tucked into a spinning ball, the roll attack (the ball turns on Tailwind's spin);
+// - roll: tucked into a spinning ball, the roll attack (the ball turns eight times on Tailwind's spin);
 // - throw: a barrel hoisted overhead and thrown, once, then back to rest;
 // - slap: the ground slap, both hands raised and slammed flat on the ground in turn, the body squashing
 //   on each slam (the section around him shakes, slap.tsx);
@@ -27,6 +27,8 @@ import sprite from './character.module.css'
 // - act: his profession, done the way this hero would: typing on a field laptop with his knuckles
 //   (engineer), slapping a pair of bongos (drummer), a guard and jabs in gloves, shorts and his mongkhon
 //   (fighter, who wears no tie).
+// Every pose plays a bounded number of runs inside 5 s and rests (BD29); `waiting` holds him at rest until
+// his scene's trigger, for a figure that is drawn before its scene comes into view.
 //
 // `silhouette` draws him the way the sunset level draws its characters: fur and skin one dark shape, the
 // rim light kept, only what he wears in colour.
@@ -262,7 +264,7 @@ function HeldBarrel() {
 // Tucked into the roll: a ball of fur with his hair, his beard and the end of the tie flying round it.
 function RollBall({ look, paints, profession }: PartProps) {
   return (
-    <g className={`${sprite.ball} motion-safe:animate-[spin_0.45s_linear_infinite]`}>
+    <g className={`${sprite.ball} motion-safe:animate-[spin_0.45s_linear_8]`}>
       <circle cx="51.5" cy="80" r="31" fill={look.rim} opacity="0.85" />
       <circle cx="50" cy="81" r="31" fill={`url(#${paints.fur})`} />
       <path d="M50 50 C56 46 62 47 66 52 C60 52 55 53 50 56 Z" fill={look.hair} />
@@ -286,11 +288,13 @@ interface HeroCharacterProps {
   silhouette?: boolean
   /** When a one shot pose (throw) starts, as a CSS time. */
   delay?: string
+  /** True until his scene's trigger: he stands at rest and no pose plays. */
+  waiting?: boolean
   onAnimationEnd?: AnimationEventHandler<SVGSVGElement>
 }
 
 // Pure on primitive props, so a parent's render that changes none of them leaves him as he is.
-export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', onAnimationEnd }: HeroCharacterProps) {
+export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', waiting = false, onAnimationEnd }: HeroCharacterProps) {
   const uid = useId()
   const look = silhouette ? SHADOW : OWN
   const paints: Paints = {
@@ -309,6 +313,7 @@ export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'i
       className={`${sprite.figure} ${className}`}
       data-pose={pose}
       data-profession={profession}
+      data-waiting={waiting || undefined}
       onAnimationEnd={onAnimationEnd}
       style={cssVars({ '--pose-delay': delay })}
       aria-hidden="true"

@@ -10,7 +10,7 @@
 }
 
 .field[data-slapping] .dust {
-  animation: dust-puff 0.9s ease-out infinite;
+  animation: dust-puff 0.9s ease-out 2;
 }
 
 .field[data-slapping] .dustLate {

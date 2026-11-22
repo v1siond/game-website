@@ -31,7 +31,7 @@ function Cart() {
       <path d="M6 4 H74" stroke={C.hoop} strokeWidth="3" />
       <path d="M10 14 H70 M12 22 H68" stroke={C.hoop} strokeWidth="1.5" opacity="0.6" />
       {[22, 58].map((cx) => (
-        <g key={cx} className={`${cart.wheel} motion-safe:group-data-[riding]:animate-[spin_0.35s_linear_infinite]`} style={cssVars({ '--cx': `${cx}px` })}>
+        <g key={cx} className={`${cart.wheel} motion-safe:group-data-[riding]:animate-[spin_0.35s_linear_3]`} style={cssVars({ '--cx': `${cx}px` })}>
           <circle cx={cx} cy="32" r="7" fill={C.barkDark} stroke={C.hoopLight} strokeWidth="2" />
           <path d={`M${cx - 6} 32 H${cx + 6} M${cx} 26 V38`} stroke={C.hoopLight} strokeWidth="1.5" />
         </g>
@@ -128,7 +128,7 @@ export function CartLine({ stops, profession, children }: CartLineProps) {
         <Rails stations={stops.length} />
         <div className={`group absolute bottom-2 left-0 ${cart.track}`} style={cssVars({ '--stop': stop })} data-riding={riding || undefined}>
           <div key={ride.count} className={`relative mx-auto w-full max-w-[6rem] ${cart.hop}`} style={cssVars({ '--hops': Math.max(ride.hops, 1) })}>
-            <HeroCharacter profession={profession} pose={riding ? 'run' : 'idle'} className="absolute bottom-[45%] left-[12%] w-[76%]" />
+            <HeroCharacter profession={profession} pose={riding ? 'run' : 'idle'} waiting={!triggered} className="absolute bottom-[45%] left-[12%] w-[76%]" />
             <Cart />
           </div>
         </div>

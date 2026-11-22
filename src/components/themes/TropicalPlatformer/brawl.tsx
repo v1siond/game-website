@@ -78,12 +78,13 @@ export function Croc() {
   )
 }
 
-function Clearing({ phase, round }: { phase: Phase; round: number }) {
+// `waiting` holds his guard and jabs until the first bout starts.
+function Clearing({ phase, round, waiting }: { phase: Phase; round: number; waiting: boolean }) {
   return (
     <div data-phase={phase} className={`relative mx-auto h-48 w-full max-w-xs overflow-hidden rounded-3xl ${ring.clearing}`} aria-hidden="true">
       <span className={`absolute inset-x-0 bottom-0 h-8 ${ring.ground}`} />
       <div className="absolute bottom-4 left-[8%] h-32 w-24">
-        <HeroCharacter profession="fighter" pose="act" className="h-full w-full" />
+        <HeroCharacter profession="fighter" pose="act" waiting={waiting} className="h-full w-full" />
       </div>
       {phase !== 'ready' && (
         <div key={round} className={`absolute bottom-4 right-[10%] w-20 ${ring.foe}`}>
@@ -155,7 +156,7 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
         }}
       />
       <div className="flex w-full flex-col items-center gap-4 md:w-80">
-        <Clearing phase={phase} round={won} />
+        <Clearing phase={phase} round={won} waiting={won === 0 && phase === 'ready'} />
         <button type="button" onClick={fight} className={FIGHT_BUTTON}>
           {all ? jungle.fightAgain : jungle.fight}
         </button>
