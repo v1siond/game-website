@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useLabels } from './CVDataProvider'
+import { useCVData } from './CVDataProvider'
 
 interface DownloadPdfButtonProps {
   /** The id of the element the PDF is made from, set by the page that renders it. */
@@ -12,7 +12,8 @@ interface DownloadPdfButtonProps {
 // stays on it; the busy text is announced through a polite live region beside it.
 export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const { cvPage } = useLabels()
+  const { fullName, labels } = useCVData()
+  const { cvPage } = labels
 
   const handleDownload = async () => {
     if (isGenerating) return
@@ -32,7 +33,7 @@ export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
       // Configure PDF options
       const options = {
         margin: [0.5, 0.5, 0.5, 0.5],
-        filename: 'Alexander_Pulido_CV.pdf',
+        filename: `${fullName.split(' ').join('_')}_CV.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,

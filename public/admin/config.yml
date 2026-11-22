@@ -828,6 +828,7 @@ collections:
                   - { <<: *text, label: "Hint line under the title when the visitor has seen one world", name: hintBodyOne }
                   - { <<: *text, label: "Hint line under the title, two or more worlds seen", name: hintBody }
                   - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
+                  - { <<: *text, label: "World switch overlay line, {world} is the world being entered", name: portalLine }
                   - { <<: *text, label: "Hint button opening the picker", name: hintAll }
                   - { <<: *text, label: "Hint close button for a screen reader", name: hintClose }
                   - { <<: *text, label: "Picker title", name: pickerTitle }
@@ -836,6 +837,7 @@ collections:
                   - { <<: *text, label: "Picker count when the visitor has seen one world", name: pickerProgressOne }
                   - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
                   - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
+                  - { <<: *text, label: "Picker filter chip showing every world", name: pickerFilterAll }
                   - { <<: *text, label: "Up next card heading", name: pickerUpNext }
                   - { <<: *text, label: "Up next card button", name: pickerEnter }
                   - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }

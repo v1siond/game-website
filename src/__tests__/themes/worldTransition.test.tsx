@@ -2,6 +2,8 @@ import { render, screen, act } from '@testing-library/react'
 import { ThemeProvider, useTheme } from '@/themes/ThemeContext'
 import { WorldTransitionProvider, useWorldTransition } from '@/themes/WorldTransitionContext'
 import { DEFAULT_THEME_ID } from '@/themes/themes'
+import { WorldsLabelsProvider } from '@/components/worlds/WorldsLabels'
+import { testCV } from '../helpers/test-utils'
 
 function Probe() {
   const { theme } = useTheme()
@@ -19,9 +21,11 @@ function Probe() {
 const setup = () =>
   render(
     <ThemeProvider>
-      <WorldTransitionProvider>
-        <Probe />
-      </WorldTransitionProvider>
+      <WorldsLabelsProvider labels={testCV().labels.worlds}>
+        <WorldTransitionProvider>
+          <Probe />
+        </WorldTransitionProvider>
+      </WorldsLabelsProvider>
     </ThemeProvider>
   )
 

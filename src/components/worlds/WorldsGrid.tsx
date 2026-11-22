@@ -17,12 +17,14 @@ const CATEGORIES_WITH_COUNTS = WORLD_CATEGORIES.map((cat) => ({
 
 function FilterChip({
   active,
+  filter,
   label,
   count,
   onClick,
 }: {
   active: boolean
-  label: Filter
+  filter: Filter
+  label: string
   count: number
   onClick: () => void
 }) {
@@ -33,7 +35,7 @@ function FilterChip({
       aria-pressed={active}
       className="ws-chip c-worlds-chip flex shrink-0 items-center gap-2 rounded-full px-4 min-h-11 text-base tracking-[0.1em] cursor-pointer"
     >
-      {CATEGORY_ICONS[label]()}
+      {CATEGORY_ICONS[filter]()}
       <span>{label}</span>
       <span aria-hidden="true">{count}</span>
     </button>
@@ -60,12 +62,13 @@ export default function WorldsGrid({ order }: { order: PickerEntry[] }) {
         // one row that scrolls sideways on a phone, so the chips never push the worlds below the screen
         className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
       >
-        <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} label="All" count={WORLDS.length} />
+        <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} filter="All" label={labels.pickerFilterAll} count={WORLDS.length} />
         {CATEGORIES_WITH_COUNTS.map((cat) => (
           <FilterChip
             key={cat.name}
             active={filter === cat.name}
             onClick={() => setFilter(cat.name)}
+            filter={cat.name}
             label={cat.name}
             count={cat.count}
           />
