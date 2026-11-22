@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { cssVars } from '@/lib/cssVars'
 import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { FS } from './palette'
 import living from './living.module.css'
 
@@ -216,7 +217,7 @@ export function TourBackdrop({ zones }: { zones: ValueStore<Zone> }) {
           key={id}
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="xMidYMax slice"
-          className={`absolute inset-0 h-full w-full ${living.zone}`}
+          className={`absolute inset-0 h-full w-full ${living.zone} ${heldUntil(id === zone)}`}
           data-on={id === zone || undefined}
           focusable="false"
         >
