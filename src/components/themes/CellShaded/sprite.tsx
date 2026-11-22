@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { CEL } from './palette'
@@ -386,7 +386,9 @@ interface VaultSpriteProps {
   className?: string
 }
 
-export function VaultSprite({ profession, motion = 'idle', className = '' }: VaultSpriteProps) {
+// Memoised on its three plain props, so a parent render that leaves his outfit, motion and box as they are
+// does not redraw the svg.
+export const VaultSprite = memo(function VaultSprite({ profession, motion = 'idle', className = '' }: VaultSpriteProps) {
   const gear = GEAR[profession]
 
   return (
@@ -408,4 +410,4 @@ export function VaultSprite({ profession, motion = 'idle', className = '' }: Vau
       {gear.prop}
     </svg>
   )
-}
+})
