@@ -37,6 +37,10 @@ export const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '')
 /** The accessible name of a link that opens a new tab: "Lumi (opens in a new tab)". */
 export const newTabName = (links: Labels['links'], name: string): string => fillLabel(links.newTab, { name })
 
+/** The new tab note alone, "(opens in a new tab)", for a card link named by its own visible text, where the
+ *  note is the one part of the name the card does not show. */
+export const newTabHint = (links: Labels['links']): string => newTabName(links, '').trim()
+
 /** "1 year", "4 years". */
 const yearCount = (count: number, labels: Labels['years']): string =>
   fillLabel(count === 1 ? labels.yearOne : labels.yearMany, { count })
