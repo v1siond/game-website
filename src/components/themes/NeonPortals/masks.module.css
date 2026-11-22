@@ -48,6 +48,7 @@
 }
 
 .mark {
+  position: relative;
   flex: none;
   width: 20px;
   height: 24px;
@@ -55,14 +56,26 @@
   border: 3px solid var(--np-ink);
   border-radius: 45% 45% 50% 50% / 30% 30% 70% 70%;
   background: var(--np-wood-dark);
-  transition:
-    background-color 0.4s ease-out,
-    transform 0.4s ease-out;
+  transition: transform 0.4s ease-out;
+}
+
+/* The lit colour is its own layer, faded in, so only opacity and transform move. */
+.mark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--np-orange);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
 }
 
 .mark[data-lit='true'] {
-  background: var(--np-orange);
   transform: scale(1.15);
+}
+
+.mark[data-lit='true']::after {
+  opacity: 1;
 }
 
 [data-still] .track,
@@ -75,7 +88,8 @@
   .track,
   .mask,
   .glow,
-  .mark {
+  .mark,
+  .mark::after {
     transition: none !important;
   }
 }
