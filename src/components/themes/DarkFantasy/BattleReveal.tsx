@@ -424,10 +424,12 @@ export const BattleReveal = memo(function BattleReveal({
         )}
         </FixedCombatLayer>
 
-        {/* Content - center, drops from above */}
+        {/* Content - center, drops from above. Inert while it waits above the screen, so a Tab never lands on
+            a contact link nobody can see. */}
         <div
           className={`relative ${COMBAT_Z.content}`}
           style={CONTENT_POSES[phase]}
+          inert={!showContent}
         >
           {/* Drop shadow that appears as content falls */}
           {showContent && (
