@@ -46,7 +46,7 @@ const GLYPHS: Record<Profession, (ink: string) => ReactNode> = {
 const PROPS: Record<Profession, ReactNode> = {
   engineer: (
     <>
-      <path d="M8 120 V60 H18 V50 H102 V60 H112 V120 Z" fill="#14324a" stroke={C.brassMid} strokeWidth="2" />
+      <path d="M8 120 V60 H18 V50 H102 V60 H112 V120 Z" fill={C.machineProp} stroke={C.brassMid} strokeWidth="2" />
       <rect x="24" y="62" width="72" height="30" fill={C.abyss} stroke={C.gold} strokeWidth="1.5" />
       <path d="M30 72 H62 M30 80 H80 M30 88 H54" stroke={C.waterGlow} strokeWidth="2" />
       {[34, 60, 86].map((x) => (

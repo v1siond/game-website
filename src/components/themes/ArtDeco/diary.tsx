@@ -36,7 +36,7 @@ interface Playing {
 function Recorder() {
   return (
     <svg viewBox="0 0 120 64" className="h-14 w-28 flex-shrink-0" aria-hidden="true" focusable="false">
-      <rect x="2" y="6" width="116" height="56" rx="6" fill="#2a1d0c" stroke={C.brassMid} strokeWidth="2" />
+      <rect x="2" y="6" width="116" height="56" rx="6" fill={C.recorderCase} stroke={C.brassMid} strokeWidth="2" />
       <path d="M8 50 H112" stroke={C.brassDark} strokeWidth="1" />
       <path d="M30 34 L60 44 L90 34" fill="none" stroke={C.sepia} strokeWidth="2" />
       {[30, 90].map((cx) => (

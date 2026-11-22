@@ -31,14 +31,14 @@ function Sea() {
     <svg viewBox="0 0 400 200" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="deco-tunnel-sea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1d5a52" />
-          <stop offset="0.6" stopColor="#0e3a3a" />
+          <stop offset="0" stopColor={C.tunnelSea} />
+          <stop offset="0.6" stopColor={C.tunnelSeaDeep} />
           <stop offset="1" stopColor={C.abyss} />
         </linearGradient>
       </defs>
       <rect width="400" height="200" fill="url(#deco-tunnel-sea)" />
-      <path d="M0 170 Q60 150 120 168 T260 160 T400 166 V200 H0 Z" fill="#08201f" />
-      <path d="M30 170 V120 M36 168 V132 M330 166 V110 M338 164 V128" stroke="#0f3a2e" strokeWidth="3" />
+      <path d="M0 170 Q60 150 120 168 T260 160 T400 166 V200 H0 Z" fill={C.seabed} />
+      <path d="M30 170 V120 M36 168 V132 M330 166 V110 M338 164 V128" stroke={C.kelp} strokeWidth="3" />
     </svg>
   )
 }
@@ -46,9 +46,9 @@ function Sea() {
 function Whale() {
   return (
     <svg viewBox="0 0 200 70" className="h-full w-full" aria-hidden="true" focusable="false">
-      <path d="M10 36 Q40 10 110 14 Q150 16 170 30 L192 16 L186 36 L196 54 L168 42 Q140 60 96 58 Q36 56 10 36 Z" fill="#0b2e33" />
-      <path d="M30 44 Q80 62 140 50" fill="none" stroke="#1b4a50" strokeWidth="3" />
-      <path d="M80 56 L66 68 L96 58 Z" fill="#0b2e33" />
+      <path d="M10 36 Q40 10 110 14 Q150 16 170 30 L192 16 L186 36 L196 54 L168 42 Q140 60 96 58 Q36 56 10 36 Z" fill={C.tunnelWhale} />
+      <path d="M30 44 Q80 62 140 50" fill="none" stroke={C.tunnelWhaleLine} strokeWidth="3" />
+      <path d="M80 56 L66 68 L96 58 Z" fill={C.tunnelWhale} />
       <circle cx="28" cy="34" r="2" fill={C.waterGlow} opacity="0.6" />
     </svg>
   )

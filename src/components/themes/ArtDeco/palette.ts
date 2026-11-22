@@ -21,6 +21,25 @@ export const DECO_COLORS = {
   lobbyGlass: '#2a7a6c',
   lobbyTowers: '#0b2a2a',
 
+  // The ride down in the hero's porthole: the storm sky over the lighthouse, its rock and its footing in
+  // the water, the whale far off in the green, the far and the near towers (the near ones also stand on
+  // the research board's skyline plate)
+  stormSky: '#0b1626',
+  lighthouseRock: '#0d1a24',
+  footing: '#0b2a36',
+  whale: '#0e3a44',
+  whaleLine: '#1d5560',
+  skylineFar: '#0a2236',
+  tower: '#0e2c44',
+
+  // The glass tunnel's sea: the water outside, the seabed, the kelp and its own whale
+  tunnelSea: '#1d5a52',
+  tunnelSeaDeep: '#0e3a3a',
+  seabed: '#08201f',
+  kelp: '#0f3a2e',
+  tunnelWhale: '#0b2e33',
+  tunnelWhaleLine: '#1b4a50',
+
   // Brass and gold
   brassDark: '#8B7320',
   brassMid: '#B8860B',
@@ -36,10 +55,33 @@ export const DECO_COLORS = {
   // The picked machine row, a paler gold under the abyss letters for the same reason (7:1 as rendered).
   goldPick: '#EFD892',
   shutter: '#2a2008',
+  // The brass in shadow: the lower shutter leaf and the machine's blind slats, the gaps between them and
+  // the porthole rim's dark lines, the rim's far edge and its bolt heads
+  brassShadow: '#6b5818',
+  brassLine: '#3a2c08',
+  brassRimDark: '#4a3a0c',
+  boltHead: '#5a4610',
 
   // Bronze
   bronzeDark: '#8B4513',
   bronze: '#CD7F32',
+
+  // The dark wood and lacquer of the city's furniture: the vending cabinet from its top to its tray, the
+  // bronze panels of the hack, the programme and the plaques, the theatre box, the recorder's case
+  cabinetTop: '#2a1a10',
+  cabinetMid: '#170d08',
+  cabinetFoot: '#0f0905',
+  bronzePanel: '#1a140a',
+  bronzePanelDeep: '#0d0a05',
+  theatreBox: '#1a0606',
+  recorderCase: '#2a1d0c',
+
+  // Sea glass: the vending machine's case and its engineer prop, the diary cards
+  machineGlass: '#0f3550',
+  machineGlassDeep: '#07182a',
+  machineProp: '#14324a',
+  diaryCard: '#0d2a42',
+  diaryCardDeep: '#071624',
 
   // Neon and the spark of an overload
   neonPink: '#FF0066',
@@ -73,7 +115,13 @@ export const DECO_COLORS = {
   portAngry: '#ff3b2a',
   diver: '#6b4a2a',
   diverDark: '#3a2814',
+  diverBoot: '#2a2a2a',
   sisterDress: '#e8b4bc',
+  sisterSkin: '#e9c4a4',
+
+  // The research board's photo paper, top to foot
+  photoPaper: '#f6ecd6',
+  photoPaperShade: '#e6d6b4',
 
   // Poster paper and text
   ivory: '#FFFFF0',

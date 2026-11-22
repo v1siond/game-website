@@ -35,7 +35,7 @@ const PLATES: Plate[] = [
         [104, 56],
         [130, 44],
       ].map(([x, h]) => (
-        <path key={x} d={`M${x} 90 V${90 - h + 10} H${x + 4} V${90 - h} H${x + 16} V${90 - h + 10} H${x + 20} V90 Z`} fill="#0e2c44" stroke={C.gold} strokeWidth="0.8" />
+        <path key={x} d={`M${x} 90 V${90 - h + 10} H${x + 4} V${90 - h} H${x + 16} V${90 - h + 10} H${x + 20} V90 Z`} fill={C.tower} stroke={C.gold} strokeWidth="0.8" />
       ))}
       {[18, 44, 78, 112].map((x) => (
         <rect key={x} x={x} y="60" width="3" height="4" fill={C.goldBright} />

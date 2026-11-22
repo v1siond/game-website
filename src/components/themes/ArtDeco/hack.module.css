@@ -9,7 +9,7 @@
   border: 2px solid var(--deco-brass-mid);
   background:
     linear-gradient(135deg, rgb(240 200 80 / 0.1), transparent 45%),
-    linear-gradient(180deg, #1a140a, #0d0a05);
+    linear-gradient(180deg, var(--deco-bronze-panel), var(--deco-bronze-panel-deep));
 }
 
 .valve {

@@ -61,7 +61,7 @@ function Shaft() {
     <svg viewBox="0 0 200 600" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="deco-shaft-water" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#0b1626" />
+          <stop offset="0" stopColor={C.stormSky} />
           <stop offset="0.27" stopColor={C.surface} />
           <stop offset="0.3" stopColor={C.tealDark} />
           <stop offset="0.6" stopColor={C.deepSea} />
@@ -79,7 +79,7 @@ function Shaft() {
       <rect width="200" height="600" fill="url(#deco-shaft-water)" />
 
       {/* the lighthouse on its rock, its lamp lit, the beam cutting the storm */}
-      <path d="M0 150 Q40 120 70 138 L130 132 Q170 120 200 146 V170 H0 Z" fill="#0d1a24" />
+      <path d="M0 150 Q40 120 70 138 L130 132 Q170 120 200 146 V170 H0 Z" fill={C.lighthouseRock} />
       <path d="M86 132 L92 60 H108 L114 132 Z" fill={C.cream} opacity="0.85" />
       <path d="M88 112 H112 M90 90 H110" stroke={C.blood} strokeWidth="6" />
       <rect x="88" y="48" width="24" height="12" fill={C.brassDark} />
@@ -90,8 +90,8 @@ function Shaft() {
 
       {/* the surface, and the lighthouse's footing going down to the station */}
       <path d="M0 168 Q25 162 50 168 T100 168 T150 168 T200 168" fill="none" stroke={C.waterGlow} strokeWidth="2" opacity="0.6" />
-      <rect x="84" y="170" width="32" height="130" fill="#0b2a36" />
-      <path d="M84 300 L70 330 H130 L116 300 Z" fill="#0b2a36" />
+      <rect x="84" y="170" width="32" height="130" fill={C.footing} />
+      <path d="M84 300 L70 330 H130 L116 300 Z" fill={C.footing} />
 
       {/* the rails the sphere rides down, and the light shafts from above */}
       <path d="M58 176 V600 M142 176 V600" stroke={C.brassDark} strokeWidth="1.5" opacity="0.7" />
@@ -108,15 +108,15 @@ function Shaft() {
 
       {/* a whale crossing the descent, far off in the green, its own layer so the scroll can carry it */}
       <g className={descent.whale}>
-        <path d="M60 300 Q80 286 112 290 Q130 292 140 298 L152 290 L150 302 L156 312 L141 306 Q128 314 106 314 Q76 314 60 300 Z" fill="#0e3a44" />
-        <path d="M76 308 Q96 318 120 312" fill="none" stroke="#1d5560" strokeWidth="1.5" />
+        <path d="M60 300 Q80 286 112 290 Q130 292 140 298 L152 290 L150 302 L156 312 L141 306 Q128 314 106 314 Q76 314 60 300 Z" fill={C.whale} />
+        <path d="M76 308 Q96 318 120 312" fill="none" stroke={C.whaleLine} strokeWidth="1.5" />
         <circle cx="72" cy="299" r="1.2" fill={C.waterGlow} opacity="0.7" />
-        <path d="M96 312 L90 324 L104 314 Z" fill="#0e3a44" />
+        <path d="M96 312 L90 324 L104 314 Z" fill={C.whale} />
       </g>
 
       {/* the far skyline of the city */}
       {FAR_TOWERS.map(({ x, width, height }) => (
-        <path key={x} d={tower(x, width, height)} fill="#0a2236" />
+        <path key={x} d={tower(x, width, height)} fill={C.skylineFar} />
       ))}
     </svg>
   )
@@ -130,7 +130,7 @@ function NearCity() {
       <path d="M-10 560 Q100 500 210 560" fill="none" stroke={C.waterGlow} strokeWidth="6" opacity="0.25" />
       {NEAR_TOWERS.map(({ x, width, height }) => (
         <g key={x}>
-          <path d={tower(x, width, height)} fill="#0e2c44" stroke={C.brassDark} strokeWidth="0.8" />
+          <path d={tower(x, width, height)} fill={C.tower} stroke={C.brassDark} strokeWidth="0.8" />
           <path d={`M${x + width / 2} ${600 - height} V${600 - height - 22}`} stroke={C.gold} strokeWidth="1.2" />
           <path
             d={`M${x + width * 0.25} ${600 - height} A${width * 0.25} ${width * 0.25} 0 0 1 ${x + width * 0.75} ${600 - height}`}
@@ -162,7 +162,7 @@ function Shutter() {
   return (
     <svg viewBox="0 0 200 200" className="h-full w-full" aria-hidden="true" focusable="false">
       <rect width="200" height="200" fill={C.brassDark} />
-      <rect y="100" width="200" height="100" fill="#6b5818" />
+      <rect y="100" width="200" height="100" fill={C.brassShadow} />
       {SHUTTER_RAYS.map((angle) => (
         <path
           key={angle}
@@ -189,15 +189,15 @@ function Rim() {
         <linearGradient id="deco-rim" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor={C.goldBright} />
           <stop offset="0.45" stopColor={C.brassMid} />
-          <stop offset="1" stopColor="#4a3a0c" />
+          <stop offset="1" stopColor={C.brassRimDark} />
         </linearGradient>
       </defs>
       <circle cx="120" cy="120" r="110" fill="none" stroke="url(#deco-rim)" strokeWidth="20" />
-      <circle cx="120" cy="120" r="100" fill="none" stroke="#3a2c08" strokeWidth="2" />
-      <circle cx="120" cy="120" r="119" fill="none" stroke="#3a2c08" strokeWidth="1.5" />
+      <circle cx="120" cy="120" r="100" fill="none" stroke={C.brassLine} strokeWidth="2" />
+      <circle cx="120" cy="120" r="119" fill="none" stroke={C.brassLine} strokeWidth="1.5" />
       {BOLTS.map((angle) => (
         <g key={angle}>
-          <circle cx={120 + Math.cos(angle) * 110} cy={120 + Math.sin(angle) * 110} r="5.5" fill="#5a4610" />
+          <circle cx={120 + Math.cos(angle) * 110} cy={120 + Math.sin(angle) * 110} r="5.5" fill={C.boltHead} />
           <circle cx={120 + Math.cos(angle) * 110 - 1.2} cy={120 + Math.sin(angle) * 110 - 1.2} r="3" fill={C.goldBright} />
         </g>
       ))}

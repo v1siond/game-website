@@ -35,7 +35,7 @@
 }
 
 .paper {
-  background: linear-gradient(180deg, #f6ecd6, #e6d6b4);
+  background: linear-gradient(180deg, var(--deco-photo-paper), var(--deco-photo-paper-shade));
   box-shadow: 0 10px 24px rgb(0 0 0 / 0.45);
 }
 
