@@ -107,6 +107,11 @@
 .stage:not([data-on]) .dropped,
 .stage[data-beat='in'] .dropped { opacity: 0; }
 
+/* A keyboard user who tabs onto the record before it drops sees it in place at once; the drop itself
+   still plays, so the record still tells the bout it has landed. */
+.stage:not([data-on]) .dropped:has(:focus-visible),
+.stage[data-beat='in'] .dropped:has(:focus-visible) { opacity: 1; transform: none; animation: none; }
+
 .stage[data-beat='act'] .dropped,
 .stage[data-beat='leave'] .dropped,
 .stage[data-beat='gone'] .dropped { animation: tp-dropped 600ms ease-in both; }

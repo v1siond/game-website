@@ -7,7 +7,6 @@ import { Survivor } from './survivor'
 import { STALKER_BOX, Stalker } from './stalker'
 import { RoomArt } from './rooms'
 import { Magazine, Props } from './props'
-import { ENTRANCE_MS } from './door'
 import type { Condition } from './ecg'
 import { FAR_SCALE, apply, lastFrame, playKey, scriptFor, startFrame, type Frame, type Zone } from './scripts'
 import look from './world.module.css'
@@ -113,13 +112,13 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
   const { herbs, saves } = useStageState()
   const condition = conditionAfter(herbs)
   const played = useRef(new Set<string>())
-  const [frame, setFrame] = useState<Frame>(() => lastFrame(scriptFor('hall', { profession, condition, saves, entrance: 0 })))
+  const [frame, setFrame] = useState<Frame>(() => lastFrame(scriptFor('hall', { profession, condition, saves })))
   // The room shows its last frame without playing (seen before, the preview, reduced motion): its one shot
   // swings stay at rest instead of playing again on the remount.
   const [replayed, setReplayed] = useState(false)
 
   useEffect(() => {
-    const context = { profession, condition, saves, entrance: ENTRANCE_MS - 200 }
+    const context = { profession, condition, saves }
     const script = scriptFor(zone, context)
     const key = playKey(zone, context)
     if (still || reduced || played.current.has(key)) {

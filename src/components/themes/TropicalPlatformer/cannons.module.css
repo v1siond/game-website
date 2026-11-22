@@ -16,6 +16,15 @@
   animation: platform-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 90ms) forwards;
 }
 
+/* A keyboard user who tabs onto a platform before it rises in sees it in place at once; the landing
+   bounce below still plays on it. */
+.platform:has(:focus-visible),
+.run[data-on] .platform:has(:focus-visible) {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
 .run[data-on] .platform[data-landed] {
   animation: platform-land 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }

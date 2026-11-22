@@ -1,6 +1,7 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useState, type AnimationEvent, type ReactNode } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import { SectionCameo } from '../shared/SectionCameo'
 import { HeroCharacter, type HeroPose } from './character'
@@ -18,8 +19,9 @@ import d from './deliveries.module.css'
 // figure wrapper's own animationend. The section's reaction is one CSS keyframe from the second beat on
 // that ends at the section's own place and look (deliveries.module.css). Timing, barrel: run 400 ms, throw 1300 ms (the barrel leaves his hands 700 ms
 // in, bursts on the boards at 900 ms and the boards are up by 1250 ms), leave 520 ms. Vulture: fly in
-// 650 ms, drop 600 ms (the record falls 300 ms and bounces twice), fly off 650 ms. Reduced motion: no
-// figure, the section rests in place from the start.
+// 650 ms, drop 600 ms (the record falls 300 ms and bounces twice), fly off 650 ms; the record tells its
+// content it has landed when the drop's keyframe ends, so the first bout starts in plain sight. Reduced
+// motion: no figure, the section rests in place and has landed from the start.
 
 type Beat = 'in' | 'act' | 'leave'
 
@@ -97,11 +99,22 @@ function Vulture() {
 
 const vulture = () => <Vulture />
 
-/** Muay Thai: the record dropped into place from the vulture's talons. */
-export function VultureDrop({ children }: { children: ReactNode }) {
+/** Muay Thai: the record dropped into place from the vulture's talons; its content learns when it has landed. */
+export function VultureDrop({ children }: { children: (landed: boolean) => ReactNode }) {
+  const reduced = useReducedMotion()
+  const [dropped, setDropped] = useState(false)
+
+  // The drop is the reaction wrapper's own keyframe; its end bubbles up here past the figure's.
+  const land = (event: AnimationEvent<HTMLDivElement>) => {
+    if (!(event.target instanceof Element) || !event.target.classList.contains(d.dropped)) return
+    setDropped(true)
+  }
+
   return (
-    <SectionCameo beats={BEATS} threshold={THRESHOLD} stage={d.stage} mark={NO_MARK} reaction={d.dropped} place={`-top-24 left-1/2 h-20 w-32 ${d.vulture}`} figure={vulture}>
-      {children}
-    </SectionCameo>
+    <div onAnimationEnd={land}>
+      <SectionCameo beats={BEATS} threshold={THRESHOLD} stage={d.stage} mark={NO_MARK} reaction={d.dropped} place={`-top-24 left-1/2 h-20 w-32 ${d.vulture}`} figure={vulture}>
+        {children(reduced || dropped)}
+      </SectionCameo>
+    </div>
   )
 }

@@ -21,7 +21,8 @@ const OUTFIT_LOOK: WardrobeLook = { plate: MYTH.panel, text: MYTH.goldPale, ring
 
 // The hero entrance, the return through the blood pool: in the great hall the pool stirs, he rises out
 // of it with the blood running off him, the tattoo and his eyes light and he roars (the hall shakes),
-// then his name is struck onto the gilded plate and the headline unrolls under it like a scroll. It
+// then his name is struck onto the gilded plate and the headline unrolls under it like a scroll (the words
+// and links are readable from the first frame; the entrance only moves them). It
 // plays once when the header first shows, and again each time the visitor returns to the house from the
 // last gate; a click on the hall, any key or the skip button ends it at once, and under reduced motion
 // it is never played. Once he stands, his figure is a button: a click throws the chain combo.

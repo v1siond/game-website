@@ -77,7 +77,7 @@
   transition: transform 0.6s ease-in;
 }
 
-/* His name typed onto the file card: a cover the colour of the card pulls back a letter at a time. */
+/* The safe room's lines typed onto their paper: a cover the colour of the paper pulls back a letter at a time. */
 .typeCover {
   position: absolute;
   inset: 0;
@@ -99,6 +99,19 @@
   }
   to {
     transform: scaleX(0);
+  }
+}
+
+/* His name on the file card (hall.tsx), readable from the first frame: the typewriter's carriage steps the
+   line home a letter at a time, transform only. */
+@media (prefers-reduced-motion: no-preference) {
+  .carriage {
+    transform: translateX(1.5ch);
+    transition: transform 1.4s steps(12, end);
+  }
+
+  .carriageHome {
+    transform: none;
   }
 }
 

@@ -22,7 +22,7 @@ describe.each([
 
 const ZONES: Zone[] = ['hall', 'store', 'about', 'experience', 'tech', 'projects', 'ventures', 'bands', 'gym', 'contact']
 const CONTEXTS = PROFESSION_ORDER.flatMap((profession) =>
-  (['danger', 'caution', 'fine'] as const).flatMap((condition) => [0, 1].map((saves) => ({ profession, condition, saves, entrance: 0 }))),
+  (['danger', 'caution', 'fine'] as const).flatMap((condition) => [0, 1].map((saves) => ({ profession, condition, saves }))),
 )
 
 describe('the room scripts', () => {
@@ -47,7 +47,7 @@ describe('the room scripts', () => {
   })
 
   it('plays the item box again for a new profession, the gym for a new condition, the safe room for a save', () => {
-    const context = { profession: 'engineer', condition: 'danger', saves: 0, entrance: 0 } as const
+    const context = { profession: 'engineer', condition: 'danger', saves: 0 } as const
     expect(playKey('store', context)).not.toBe(playKey('store', { ...context, profession: 'drummer' }))
     expect(playKey('gym', context)).not.toBe(playKey('gym', { ...context, condition: 'fine' }))
     expect(playKey('contact', context)).not.toBe(playKey('contact', { ...context, saves: 1 }))

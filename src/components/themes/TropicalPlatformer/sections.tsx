@@ -131,9 +131,7 @@ const FRAMES: SectionFrames = {
     return (
       <SectionLevel slot={slot} scene="jungle">
         <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{slot.martialArts.primary.title}</h3>
-        <VultureDrop>
-          <BrawlRecord martialArts={slot.martialArts} />
-        </VultureDrop>
+        <VultureDrop>{(landed) => <BrawlRecord martialArts={slot.martialArts} landed={landed} />}</VultureDrop>
       </SectionLevel>
     )
   },
