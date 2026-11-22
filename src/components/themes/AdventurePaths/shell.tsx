@@ -1,13 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { Profession } from '@/lib/cv/professions'
-import { Actor, FoeSprite, useCourse } from './actor'
+import { Actor, FoeSprite, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { Brick } from './blocks'
 import type { Course } from './course'
@@ -45,10 +45,7 @@ function brickOf(index: number, count: number) {
 function KickScene({ count, profession, onKick }: { count: number; profession: Profession; onKick: () => void }) {
   const course = useCourse(COURSE)
   const kicked = course.past('run')
-
-  useEffect(() => {
-    if (kicked) onKick()
-  }, [kicked, onKick])
+  usePassed(kicked, onKick)
 
   return (
     <div className="absolute inset-0" data-kicked={kicked}>

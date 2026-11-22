@@ -1,12 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactSigns } from './actions'
-import { Actor, useCourse } from './actor'
+import { Actor, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { Castle, Firework } from './blocks'
 import type { Course } from './course'
@@ -50,10 +50,7 @@ const FIREWORKS = [
 function GoalScene({ profession, onCleared }: { profession: Profession; onCleared: () => void }) {
   const course = useCourse(COURSE)
   const flag: FlagState = course.past('slide') ? 'low' : course.motion.pose === 'slide' ? 'down' : 'up'
-
-  useEffect(() => {
-    if (course.arrived) onCleared()
-  }, [course.arrived, onCleared])
+  usePassed(course.arrived, onCleared)
 
   return (
     <div className="absolute inset-0" data-flag={flag} data-cleared={course.arrived}>

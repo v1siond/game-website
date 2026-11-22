@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, type AnimationEventHandler, type ReactNode } from 'react'
+import { useEffect, useMemo, type AnimationEventHandler, type ReactNode } from 'react'
 import { useLegSequence } from '@/hooks/useLegSequence'
 import type { Profession } from '@/lib/cv/professions'
 import { pixelRuns } from '@/lib/pixelRuns'
@@ -106,9 +106,20 @@ export function Actor({ motion, profession, take = 0, onAnimationEnd, hopClassNa
   )
 }
 
-/** A scene's course played by the shared pose sequence: the motion to show, and which legs are over. */
+/** A scene's course played by the shared pose sequence: the motion to show, and which legs are over.
+ *  Pass a stable course (a module constant, or one memoised on what it is built from): its legs are read
+ *  again only when the course itself changes. */
 export function useCourse<P extends string>(course: Course<P>, moveMs?: number) {
   const entrance = useMemo(() => course.legs.map((leg) => leg.pose), [course])
   const sequence = useLegSequence<P>(entrance, course.rest.pose, { still: course.rest.pose, moveMs })
   return { ...sequence, motion: motionOf(course, sequence.pose) }
+}
+
+/** Hands what a scene's course has played past up to its level: `onPass(passed)` runs after each commit
+ *  where `passed` (a leg played past, or how many) changes to a truthy value, the first commit too, so a
+ *  course already at rest when it mounts (reduced motion) shows its level finished at once. */
+export function usePassed<T>(passed: T, onPass: (passed: T) => void) {
+  useEffect(() => {
+    if (passed) onPass(passed)
+  }, [passed, onPass])
 }

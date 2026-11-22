@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -8,7 +8,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
-import { Actor, useCourse } from './actor'
+import { Actor, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import { BigSwitch } from './blocks'
 import type { Course } from './course'
@@ -79,11 +79,7 @@ const COURSE: Course<SwitchPose> = {
 
 function PipeScene({ profession, onStomp }: { profession: Profession; onStomp: () => void }) {
   const course = useCourse(COURSE)
-  const stomped = course.past('jump')
-
-  useEffect(() => {
-    if (stomped) onStomp()
-  }, [stomped, onStomp])
+  usePassed(course.past('jump'), onStomp)
 
   return <Actor motion={course.motion} profession={profession} onAnimationEnd={course.onOwnAnimationEnd} />
 }

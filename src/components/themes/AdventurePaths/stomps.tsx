@@ -1,11 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { MartialArts } from '@/lib/cv/content'
-import { Actor, FoeSprite, useCourse } from './actor'
+import { Actor, FoeSprite, useCourse, usePassed } from './actor'
 import { cssVars } from '@/lib/cssVars'
 import type { Course, Leg } from './course'
 import { JOURNAL_SERIF } from './palette'
@@ -51,10 +51,7 @@ const scoreOf = (index: number) => 100 * 2 ** index
 function ChainScene({ count, onStomped }: { count: number; onStomped: (stomped: number) => void }) {
   const course = useCourse(useMemo(() => chainCourse(count), [count]))
   const stomped = Array.from({ length: count }, (_, index) => course.past(stompPose(index))).filter(Boolean).length
-
-  useEffect(() => {
-    onStomped(stomped)
-  }, [stomped, onStomped])
+  usePassed(stomped, onStomped)
 
   return (
     <>
