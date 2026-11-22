@@ -30,10 +30,17 @@ export const HOSE = {
   // The parry pink: the one colour a visitor may slap
   parry: '#ff4fa3',
 
-  // The watercolour washes behind the sets: a pale sky, the meadow and its shade
+  // The watercolour washes behind the sets: a pale sky, the meadow and its shade, the carnival's pale wash,
+  // the casino's felt and the sea on the isle map
   skyWash: '#d9e2d0',
   meadow: '#9aa86f',
   meadowDark: '#6f7d4a',
+  carnivalWash: '#e7d9c4',
+  feltGreen: '#2f5a3a',
+  mapSea: '#7fa6bf',
+
+  // His big cartoon shoes
+  shoe: '#6b3d1f',
 
   // The film stock round the frame and its sprocket holes
   film: '#1a1510',

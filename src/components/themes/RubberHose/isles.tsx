@@ -66,7 +66,7 @@ function Meadow() {
 function Carnival() {
   return (
     <>
-      <rect width={400} height={300} fill="#e7d9c4" />
+      <rect width={400} height={300} fill={HOSE.carnivalWash} />
       <path d="M0 150 L40 90 L70 140 L110 70 L150 150 Z M250 150 L300 80 L330 130 L360 96 L400 150 Z" fill={HOSE.shadow} opacity={0.35} />
       <g transform="translate(320 150)">
         <g className="motion-safe:animate-[spin_30s_linear_infinite]">
@@ -97,7 +97,7 @@ function Casino() {
           <path d="M-9 9 Q0 16 9 9" fill="none" stroke={HOSE.ink} strokeWidth={2} strokeLinecap="round" />
         </g>
       </g>
-      <path d="M0 220 Q200 190 400 220 V300 H0 Z" fill="#2f5a3a" stroke={HOSE.ink} strokeWidth={2.4} />
+      <path d="M0 220 Q200 190 400 220 V300 H0 Z" fill={HOSE.feltGreen} stroke={HOSE.ink} strokeWidth={2.4} />
       <path d="M0 0 Q30 120 0 300 H-1 Z M0 0 H70 Q40 140 60 300 H0 Z" fill={HOSE.redDark} />
       <path d="M400 0 H330 Q360 140 340 300 H400 Z" fill={HOSE.redDark} />
     </>

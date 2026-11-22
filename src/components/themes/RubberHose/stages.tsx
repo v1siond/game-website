@@ -186,7 +186,7 @@ export function MapRun({ profession }: { profession: Profession }) {
   return (
     <div className="relative mx-auto my-6 h-24 max-w-4xl" aria-hidden="true">
       <svg viewBox="0 0 400 60" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${world.inked}`} focusable="false">
-        <rect width={400} height={60} fill="#7fa6bf" opacity={0.6} rx={6} />
+        <rect width={400} height={60} fill={HOSE.mapSea} opacity={0.6} rx={6} />
         <path d="M0 40 Q30 18 90 22 Q140 24 150 44 L150 54 Q80 60 0 54 Z" fill={HOSE.meadow} stroke={HOSE.ink} strokeWidth={2} />
         <path d="M250 44 Q262 22 320 20 Q380 20 400 36 V54 Q330 60 250 54 Z" fill={HOSE.meadow} stroke={HOSE.ink} strokeWidth={2} />
         <path d="M146 40 Q200 50 254 40" fill="none" stroke={HOSE.shadowDark} strokeWidth={6} />

@@ -22,7 +22,6 @@ export type HeroPose = 'idle' | 'run' | 'shoot' | 'cheer' | 'type' | 'drum' | 'j
 
 const INK = HOSE.ink
 const LINE = 3
-const SHOE = '#6b3d1f'
 const HAIR = HERO_IDENTITY.hair
 
 const CUP_BODY = 'M26 14 C26 40 30 60 50 60 C70 60 74 40 74 14 Z'
@@ -88,7 +87,7 @@ function Leg({ side }: { side: 'back' | 'front' }) {
     <g transform={`translate(${front ? 55 : 45} 94)`}>
       <g className={front ? cup.legFront : cup.legBack}>
         <path d={front ? LEG_FRONT : LEG_BACK} fill="none" stroke={INK} strokeWidth={4.4} strokeLinecap="round" />
-        <ellipse cx={front ? 8 : -8} cy={46} rx={10} ry={5.4} fill={SHOE} stroke={INK} strokeWidth={LINE} />
+        <ellipse cx={front ? 8 : -8} cy={46} rx={10} ry={5.4} fill={HOSE.shoe} stroke={INK} strokeWidth={LINE} />
         <ellipse cx={front ? 11 : -5} cy={44.4} rx={3} ry={1.4} fill={HOSE.highlight} opacity={0.7} />
       </g>
     </g>
