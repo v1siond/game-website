@@ -169,6 +169,14 @@ const FRAME_STEP_MS = 60
 /** When service card `index` turns solid, counted from the start of the scene. */
 export const frameAt = (index: number): number => beatStart(IRON_BOX, 'land') + index * FRAME_STEP_MS
 
+// Projects: he stands in the row above the spheres and points his front arm at the card the visitor
+// points at or focuses: `share` is how far across the grid the card's centre sits (0 left, 1 right), and
+// the turn is his arm's, 0 hanging down, positive across his body to the left.
+const AIM_SPAN_DEG = 150
+const AIM_OUT_DEG = 20
+
+export const aimAt = (share: number): number => (0.5 - Math.min(1, Math.max(0, share))) * AIM_SPAN_DEG - AIM_OUT_DEG
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3

@@ -1,0 +1,64 @@
+/*
+ * The warp sphere cards (spheres.tsx): glass with a shine across the top, lifting and ringed with the
+ * sphere's blue white glow while the visitor points at it or focuses inside it. Transforms and opacity
+ * only.
+ *
+ * Animated: the lifted frame and its glow.
+ * Reduced motion: the frame lifts and glows with no transition.
+ */
+
+.sphere {
+  position: relative;
+  height: 100%;
+  padding: 1.5rem;
+  border: 3px solid var(--np-arc);
+  border-radius: 2rem;
+  color: var(--np-white);
+  background:
+    radial-gradient(ellipse 80% 50% at 30% 0%, var(--np-seam), transparent 70%),
+    var(--np-glass);
+  box-shadow: 0 6px 0 var(--np-ink);
+  transition: transform 0.25s ease-out;
+}
+
+.sphere::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 1.5rem;
+  width: 40%;
+  height: 14px;
+  border-top: 4px solid var(--np-white);
+  border-radius: 50%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.sphere::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 3px solid var(--np-arc);
+  border-radius: 2.4rem;
+  box-shadow: 0 0 0 3px var(--np-ink);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+  pointer-events: none;
+}
+
+.sphere:hover,
+.sphere:focus-within {
+  transform: translateY(-6px);
+}
+
+.sphere:hover::after,
+.sphere:focus-within::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sphere,
+  .sphere::after {
+    transition: none;
+  }
+}

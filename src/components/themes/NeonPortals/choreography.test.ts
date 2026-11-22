@@ -1,4 +1,4 @@
-import { COUNT_BOX, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, breakAt, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COUNT_BOX, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, breakAt, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -151,5 +151,23 @@ describe('Services: the iron box', () => {
     expect(frameAt(0)).toBe(beatStart(IRON_BOX, 'land'))
     expect(frameAt(9) - frameAt(8)).toBeGreaterThan(0)
     expect(frameAt(9)).toBeLessThan(FIVE_S)
+  })
+})
+
+describe('Projects: pointing at a sphere', () => {
+  it('turns his arm toward the card the visitor points at: across his body for the left column, out for the right', () => {
+    expect(aimAt(0)).toBeGreaterThan(aimAt(0.5))
+    expect(aimAt(0.5)).toBeGreaterThan(aimAt(1))
+    expect(aimAt(0)).toBeGreaterThan(0)
+    expect(aimAt(1)).toBeLessThan(0)
+  })
+
+  it('never swings the arm past level with his shoulder', () => {
+    ;[0, 0.25, 0.5, 0.75, 1].forEach((share) => expect(Math.abs(aimAt(share))).toBeLessThanOrEqual(100))
+  })
+
+  it('reads a share outside the grid as its nearest edge', () => {
+    expect(aimAt(-1)).toBe(aimAt(0))
+    expect(aimAt(2)).toBe(aimAt(1))
   })
 })

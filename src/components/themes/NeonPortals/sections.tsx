@@ -9,6 +9,7 @@ import { CheckpointLevel } from './checkpoints'
 import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
 import { IronBoxLevel } from './ironBox'
+import { SphereLevel } from './spheres'
 import { TechBoxLevel } from './techBoxes'
 import type { Era } from './palette'
 import { Region } from './stage'
@@ -60,7 +61,9 @@ const FRAMES: SectionFrames = {
   services: function ServicesFrame({ slot }) {
     return <IronBoxLevel services={slot.services} />
   },
-  projects: () => <Level id="projects" />,
+  projects: function ProjectsFrame({ slot }) {
+    return <SphereLevel projects={slot.projects} />
+  },
   ventures: () => <Level id="ventures" />,
   bands: () => <Level id="bands" />,
   muayThai: () => <Level id="muayThai" />,
