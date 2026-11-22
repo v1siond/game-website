@@ -6,11 +6,11 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { cssVars } from '@/lib/cssVars'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
-import { Mark, STAMP } from './cards'
+import { MarkList, PinnedTags, STAMP } from './cards'
 import horror from './horror.module.css'
 import look from './world.module.css'
 
@@ -89,9 +89,12 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
   )
 }
 
-function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; onRead: () => void; onPoint: () => void }) {
+// Every field of the job's card, the years in the label ("2019 to 2022"). The key achievements are always in
+// the page, hidden until Read file, so the server HTML carries them; leaving `display: none` plays
+// .fileOpen on the read.
+function JobFile({ job: entry, isRead, onRead, onPoint }: { job: Job; isRead: boolean; onRead: () => void; onPoint: () => void }) {
   const { cards, years, actions } = useLabels()
-  const span = jobSpanCompact(job, years)
+  const job = jobCard(entry, years)
   const bodyId = `survival-horror-job-${job.id}`
 
   return (
@@ -102,9 +105,10 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
           <p className="text-sm text-[color:var(--sh-brass-text)]">
             <SlashBreaks text={job.company} />
           </p>
+          {job.location && <p className="text-sm text-[color:var(--sh-fog-text)]">{job.location}</p>}
         </div>
         <span className={STAMP}>
-          {span}
+          {job.years}
         </span>
       </div>
       {job.description && <p className="mb-3 text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{job.description}</p>}
@@ -114,22 +118,17 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
             type="button"
             onClick={onRead}
             aria-controls={bodyId}
+            aria-expanded={isRead}
             className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`}
           >
             {actions.readFile}
           </button>
-          {isRead && (
-            <ul id={bodyId} className={`mt-3 space-y-1 border-t border-[color:var(--sh-wood)] pt-3 ${horror.fileOpen}`} aria-label={cards.keyAchievements}>
-              {job.highlights.map((highlight) => (
-                <li key={highlight} className="flex items-start gap-2 text-sm text-[color:var(--sh-cream)]">
-                  <Mark />
-                  <span>{highlight}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div id={bodyId} hidden={!isRead}>
+            <MarkList items={job.highlights} label={cards.keyAchievements} className={`mt-3 space-y-1 border-t border-[color:var(--sh-wood)] pt-3 ${horror.fileOpen}`} />
+          </div>
         </>
       )}
+      <PinnedTags items={job.skills} label={cards.skillsUsed} />
     </article>
   )
 }

@@ -5,13 +5,14 @@ import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { projectCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { cssVars } from '@/lib/cssVars'
 import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
-import { STAMP } from './cards'
+import { MarkList, PinnedTags, STAMP } from './cards'
 import { SH } from './palette'
 import horror from './horror.module.css'
 import look from './world.module.css'
@@ -82,8 +83,9 @@ interface FaceProps {
 }
 
 function ItemFront({ slot, index, turnRef, onTurn }: FaceProps & { index: number }) {
-  const { horror: words } = useLabels()
-  const { project, years } = slot
+  const labels = useLabels()
+  const { horror: words } = labels
+  const project = projectCard(slot.project, labels)
 
   return (
     <div className="flex h-full flex-col items-center gap-3 p-4 text-center">
@@ -92,7 +94,7 @@ function ItemFront({ slot, index, turnRef, onTurn }: FaceProps & { index: number
         <SlashBreaks text={project.name} />
       </h3>
       <p className="text-sm text-[color:var(--sh-cream)]">{project.role}</p>
-      {years && <span className={STAMP}>{years}</span>}
+      {project.years && <span className={STAMP}>{project.years}</span>}
       <p className="text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.tagline}</p>
       <button ref={turnRef} type="button" onClick={onTurn} aria-label={fillLabel(words.examineItem, { name: project.name })} className={`mt-auto ${TURN_PLATE}`}>
         {words.examine}
@@ -101,33 +103,26 @@ function ItemFront({ slot, index, turnRef, onTurn }: FaceProps & { index: number
   )
 }
 
-function ToolList({ project }: { project: Project }) {
-  const { cards } = useLabels()
-  if (project.techStack.length === 0) return null
-
-  return (
-    <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={fillLabel(cards.categoryTechnologies, { name: project.name })}>
-      {project.techStack.map((tech) => (
-        <li key={tech} className="border border-[color:var(--sh-felt-line)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]">
-          {tech}
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
-  const { horror: words } = useLabels()
-  const { project, links, noLink } = slot
+  const labels = useLabels()
+  const { horror: words, cards } = labels
+  const { links, noLink } = slot
+  const project = projectCard(slot.project, labels)
 
   return (
     <div className="flex h-full flex-col p-4">
       <h3 className={`text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>
         <SlashBreaks text={project.name} />
       </h3>
-      <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>
-      {project.impact && <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">{project.impact}</p>}
-      <ToolList project={project} />
+      {project.description && <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>}
+      <MarkList items={project.details} label={cards.details} className="mt-2 space-y-1" />
+      {project.impact && (
+        <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">
+          <span className="sr-only">{cards.impact}: </span>
+          {project.impact}
+        </p>
+      )}
+      <PinnedTags items={project.techStack} label={fillLabel(cards.categoryTechnologies, { name: project.name })} />
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {links.map(({ kind, label, linkProps }) => (
           <a key={kind} {...linkProps} className={LINK_PLATE}>

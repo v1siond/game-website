@@ -13,6 +13,35 @@ export function Mark() {
   return <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-[color:var(--sh-brass)]" aria-hidden="true" />
 }
 
+/** A typed list, each line behind the brass bullet. */
+export function MarkList({ items, label, className = 'mt-3 space-y-1' }: { items: string[]; label: string; className?: string }) {
+  if (items.length === 0) return null
+  return (
+    <ul className={className} aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2 text-sm text-[color:var(--sh-cream)]">
+          <Mark />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** The tags pinned on a paper: a job's skills, a project's tools. */
+export function PinnedTags({ items, label }: { items: string[]; label: string }) {
+  if (items.length === 0) return null
+  return (
+    <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className="border border-[color:var(--sh-felt-line)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]">
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
