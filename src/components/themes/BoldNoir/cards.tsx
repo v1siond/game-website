@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
@@ -134,7 +134,8 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
 }
 
 // A venture as a crooked slab; one of his own products (featured) is a wider slab with a paper tag, ink
-// capitals, pinned over the name.
+// capitals, pinned over the name. The link is named by everything the slab shows, its services included,
+// plus the new tab note a screen reader alone hears.
 export function CompanyTag({ company: entry }: { company: CVData['companies'][number] }) {
   const { links, cards, sections } = useLabels()
   const company = ventureCard(entry)
@@ -144,7 +145,6 @@ export function CompanyTag({ company: entry }: { company: CVData['companies'][nu
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
       className={`block h-full p-5 ${world.slab} ${world.kick}`}
     >
       {company.featured && (
@@ -165,6 +165,7 @@ export function CompanyTag({ company: entry }: { company: CVData['companies'][nu
       </span>
       <span className={`mt-2 block ${BODY}`}>{company.description}</span>
       {company.services.length > 0 && <Chips items={company.services} label={sections.services} />}
+      <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )
 }
