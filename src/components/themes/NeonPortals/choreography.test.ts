@@ -1,4 +1,4 @@
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskSpot, maskSteps, MASK_GUARD, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskSpot, maskSteps, MASK_GUARD, pipAt, postAt, postX, restSpot, saveScene, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -244,5 +244,32 @@ describe('Muay Thai: the carved mask', () => {
 
   it('stays at its start when there is no achievement', () => {
     expect(maskSpot(0, 0)).toEqual(maskSpot(0, 3))
+  })
+})
+
+describe('Contact: the save monitor', () => {
+  const names = (scene: Scene) => scene.beats.map((beat) => beat.name)
+
+  it('walks him to the monitor and presses it before either ending', () => {
+    expect(names(saveScene(true)).slice(0, 2)).toEqual(['walk', 'press'])
+    expect(names(saveScene(false)).slice(0, 2)).toEqual(['walk', 'press'])
+  })
+
+  it('ends a full run on the gem and his victory dance, under 2 s', () => {
+    const full = saveScene(true)
+    expect(names(full)).toEqual(['walk', 'press', 'gem'])
+    expect(full.beats.at(-1)?.pose).toBe('dance')
+    expect(full.beats.at(-1)?.ms).toBeLessThan(2000)
+  })
+
+  it('ends a run that is not full on one blink, with no dance', () => {
+    const short = saveScene(false)
+    expect(names(short)).toEqual(['walk', 'press', 'blink'])
+    expect(short.beats.map((beat) => beat.pose)).not.toContain('dance')
+  })
+
+  it('plays out in 3 s or less either way', () => {
+    expect(sceneMs(saveScene(true))).toBeLessThanOrEqual(3000)
+    expect(sceneMs(saveScene(false))).toBeLessThanOrEqual(3000)
   })
 })

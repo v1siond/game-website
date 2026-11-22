@@ -14,6 +14,7 @@ import { Backdrop } from './NeonPortals/backdrop'
 import { BODY } from './NeonPortals/cards'
 import { HubHero } from './NeonPortals/hero'
 import { PORTAL_VARS, type Era } from './NeonPortals/palette'
+import { SaveMonitorLevel } from './NeonPortals/saveMonitor'
 import { SECTION_VIEWS, useFindTotals } from './NeonPortals/sections'
 
 // The world's lettering: fat rounded cartoon capitals for his name, the level names and the tally's digits
@@ -72,6 +73,7 @@ export default function NeonPortalsTheme() {
             <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
             </div>
+            <SaveMonitorLevel />
           </main>
         </ZoneStageProvider>
 

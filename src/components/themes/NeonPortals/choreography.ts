@@ -255,3 +255,26 @@ export const maskSpot = (step: number, steps: number): typeof MASK_GUARD => {
     scale: toward(MASK_START.scale, MASK_GUARD.scale),
   }
 }
+
+// Contact: he walks to the save monitor and presses it. A full tally ends on the hologram turning into the
+// gem, the flash and his victory dance (under 2 s); a tally not yet full ends on the screen blinking once.
+const AT_MONITOR: Spot = { x: 56, lift: 0 }
+
+const SAVE_START: readonly Beat[] = [
+  { name: 'walk', pose: 'run', ms: 700, to: AT_MONITOR },
+  { name: 'press', pose: 'press', ms: 400, to: AT_MONITOR },
+]
+
+const SAVE_END: Record<'full' | 'short', Beat> = {
+  full: { name: 'gem', pose: 'dance', ms: 1800, to: AT_MONITOR },
+  short: { name: 'blink', pose: 'idle', ms: 500, to: AT_MONITOR },
+}
+
+export const SAVE_FROM: Spot = { x: 14, lift: 0 }
+
+/** The save: the same walk and press, then the ending the tally earns. */
+export const saveScene = (full: boolean): Scene => ({
+  start: SAVE_FROM,
+  beats: [...SAVE_START, SAVE_END[full ? 'full' : 'short']],
+  rest: 'idle',
+})
