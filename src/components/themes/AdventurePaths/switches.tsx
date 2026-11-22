@@ -28,8 +28,7 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 // are its secret exits.
 //
 // Above the palaces is the stretch he crosses (research images 04, 12, 20): he runs in, jumps onto the
-// big switch and stomps it flat, which presses every palace at once (its blocks fill and its message box
-// opens, so every project's story is on screen once the section has played), then hops onto the pipe at
+// big switch and stomps it flat, which fills every palace's blocks at once, then hops onto the pipe at
 // the end and sinks down it, out of sight, toward the underground room of the next section. The big
 // switch is also a button that fills or empties every palace's blocks.
 
@@ -124,14 +123,11 @@ function MessageBox({ project, id, hidden }: { project: ProjectCard; id: string;
   )
 }
 
-// The big switch, stomped as the section plays (or at once under reduced motion), opens every palace; a
-// palace's own switch then flips its palace against that, so each switch is a plain toggle.
 function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: SwitchColour; filled: boolean }) {
   const labels = useLabels()
   const { cards, trail } = labels
   const project = projectCard(slot.project, labels)
-  const [flipped, setFlipped] = useState(false)
-  const open = flipped !== filled
+  const [pressed, setPressed] = useState(false)
   const boxId = `trail-project-${project.id}`
   const [main, ...secret] = slot.links
 
@@ -145,10 +141,10 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         </div>
         <button
           type="button"
-          aria-expanded={open}
+          aria-expanded={pressed}
           aria-controls={boxId}
           aria-label={fillLabel(trail.pressSwitch, { name: project.name })}
-          onClick={() => setFlipped((now) => !now)}
+          onClick={() => setPressed((now) => !now)}
           className={`shrink-0 rounded-sm p-1 ${map.switch}`}
         >
           <SwitchBlock colour={colour} />
@@ -161,8 +157,8 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
           {project.impact}
         </p>
       )}
-      <TechBlocks items={project.techStack} colour={colour} pressed={open} label={cards.technologiesUsed} />
-      <MessageBox project={project} id={boxId} hidden={!open} />
+      <TechBlocks items={project.techStack} colour={colour} pressed={pressed || filled} label={cards.technologiesUsed} />
+      <MessageBox project={project} id={boxId} hidden={!pressed} />
       {main && (
         <div className="mt-4 flex flex-wrap gap-2">
           <a {...main.linkProps} className={`${LINK} bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]`}>
