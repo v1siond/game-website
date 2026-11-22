@@ -3,28 +3,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 
-/**
- * SECTION TRIGGER HOOK
- * ====================
- * Uses IntersectionObserver to detect when sections enter viewport.
- * This replaces hardcoded percentage-based triggers that break when
- * content changes (font sizes, spacing, etc.)
- *
- * How it works:
- * - Each section registers its element ref
- * - IntersectionObserver fires when element enters viewport
- * - Once triggered, stays triggered (no replay on scroll back)
- * - Threshold determines how much of element must be visible
- *
- * Pattern: IntersectionObserver (browser-native, performant)
- * Why chosen: Automatically handles content size changes, responsive,
- * no manual percentage calculations needed.
- */
+// Whether a section is on screen, from an IntersectionObserver on the element `ref` is set on. With
+// `triggerOnce` (the default) `triggered` turns true the first time the section shows and stays true, and
+// the element is no longer watched. With `triggerOnce: false` it follows the section in and out, and
+// `inView` says the same; outside a preview a one shot caller gets `inView` false, since nothing watches it
+// once it has shown.
 
 export interface SectionTriggerOptions {
   threshold?: number      // How much of element must be visible (0-1)
   rootMargin?: string     // Margin around viewport (e.g., "0px 0px -20% 0px")
-  triggerOnce?: boolean   // Only trigger once (default: true)
+  triggerOnce?: boolean   // Turn true once and stay (default: true); false follows the section in and out
 }
 
 // A section taller than the screen can never show `threshold` of itself on a phone, so it counts as in view
@@ -56,8 +44,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
     triggerOnce = true,
   } = options
 
-  const [triggered, setTriggered] = useState(false)
-  const [inView, setInView] = useState(false)
+  const [shown, setShown] = useState(false)
   const elementRef = useRef<HTMLElement | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
 
@@ -81,19 +68,11 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
         const entry = entries[0]
         if (!entry) return
 
-        const shown = isShown(entry, threshold)
-        setInView(shown)
-
-        if (shown) {
-          setTriggered(true)
-
-          // Unobserve if triggerOnce
-          if (triggerOnce && observerRef.current) {
-            observerRef.current.unobserve(element)
-          }
-        } else if (!triggerOnce) {
-          setTriggered(false)
-        }
+        const now = isShown(entry, threshold)
+        // A one shot section only ever turns on, and once on it is not watched again.
+        if (triggerOnce && !now) return
+        setShown(now)
+        if (triggerOnce) observerRef.current?.unobserve(element)
       },
       {
         threshold: ratioSteps(threshold),
@@ -115,7 +94,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
 
   return {
     ref: setRef,
-    triggered: isPreview || triggered,
-    inView: isPreview || inView,
+    triggered: isPreview || shown,
+    inView: isPreview || (!triggerOnce && shown),
   }
 }
