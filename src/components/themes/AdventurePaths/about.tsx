@@ -38,11 +38,16 @@ const BUMP_MS = 600
 /** Whether the block shows hit: not yet, hit on his way up, or hit again by a replay (later in the jump). */
 type HitState = 'false' | 'true' | 'again'
 
+function hitOf(replays: number, struck: boolean): HitState {
+  if (replays > 0) return 'again'
+  return struck ? 'true' : 'false'
+}
+
 export function AboutLevel({ bio, profession }: { bio: string; profession: Profession }) {
   const { sections, trail } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('plains')
   const course = useCourse(COURSE, BUMP_MS)
-  const hit: HitState = course.take > 0 ? 'again' : on && course.past('jump') ? 'true' : 'false'
+  const hit = hitOf(course.take, on && course.past('jump'))
 
   return (
     <Region title={sections.about} stageRef={ref} on={on}>

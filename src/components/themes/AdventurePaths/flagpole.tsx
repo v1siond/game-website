@@ -41,6 +41,11 @@ const COURSE: Course<GoalPose> = {
 /** Where the flag is: at the top, coming down with him, or down at the foot of the pole. */
 type FlagState = 'up' | 'down' | 'low'
 
+function flagOf(slid: boolean, sliding: boolean): FlagState {
+  if (slid) return 'low'
+  return sliding ? 'down' : 'up'
+}
+
 const FIREWORKS = [
   { place: 'right-[6%] bottom-[150px]', delay: 0 },
   { place: 'right-[16%] bottom-[190px]', delay: 260 },
@@ -49,7 +54,7 @@ const FIREWORKS = [
 
 function GoalScene({ profession, onCleared }: { profession: Profession; onCleared: () => void }) {
   const course = useCourse(COURSE)
-  const flag: FlagState = course.past('slide') ? 'low' : course.motion.pose === 'slide' ? 'down' : 'up'
+  const flag = flagOf(course.past('slide'), course.motion.pose === 'slide')
   usePassed(course.arrived, onCleared)
 
   return (

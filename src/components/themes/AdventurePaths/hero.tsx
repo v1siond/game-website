@@ -278,10 +278,8 @@ function Landmark({ option, onPick, onPoint }: LandmarkProps) {
     >
       <span className={`pointer-events-none absolute bottom-[14%] h-[34%] w-[56%] rounded-full border-4 border-dashed border-[color:var(--ap-gold)] ${map.ring}`} aria-hidden="true" />
       <span
-        className={`relative translate-y-full rounded-sm border-2 px-2 py-0.5 text-center text-sm font-bold leading-tight sm:whitespace-nowrap ${
-          option.selected
-            ? 'border-[color:var(--ap-ink)] bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]'
-            : 'border-[color:var(--ap-ink)] bg-[color:var(--ap-page)] text-[color:var(--ap-ink)]'
+        className={`relative translate-y-full rounded-sm border-2 border-[color:var(--ap-ink)] px-2 py-0.5 text-center text-sm font-bold leading-tight text-[color:var(--ap-ink)] sm:whitespace-nowrap ${
+          option.selected ? 'bg-[color:var(--ap-gold)]' : 'bg-[color:var(--ap-page)]'
         }`}
       >
         {option.label}
