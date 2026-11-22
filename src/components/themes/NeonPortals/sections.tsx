@@ -8,6 +8,7 @@ import { sectionPlan, type SectionId } from '@/lib/cv/sectionPlan'
 import { CheckpointLevel } from './checkpoints'
 import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
+import { IronBoxLevel } from './ironBox'
 import { TechBoxLevel } from './techBoxes'
 import type { Era } from './palette'
 import { Region } from './stage'
@@ -56,7 +57,9 @@ const FRAMES: SectionFrames = {
   tech: function TechFrame({ slot }) {
     return <TechBoxLevel categories={slot.categories} />
   },
-  services: () => <Level id="services" />,
+  services: function ServicesFrame({ slot }) {
+    return <IronBoxLevel services={slot.services} />
+  },
   projects: () => <Level id="projects" />,
   ventures: () => <Level id="ventures" />,
   bands: () => <Level id="bands" />,

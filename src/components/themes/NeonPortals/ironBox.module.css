@@ -1,0 +1,131 @@
+/*
+ * The iron box and the service cards (ironBox.tsx). His head hits the box (data-hit): it bumps up and back
+ * and its rays flash once. From the same moment each card's solid riveted frame fades in over its dashed
+ * outline, card i at --land + i * --frame-step ms (--i from staggerAt); a replay swaps between two
+ * identical keyframes (data-round). The frames stay solid (BD29). Transforms and opacity only.
+ *
+ * Animated: the box's bump and rays, the card frames (one class).
+ * Reduced motion and the preview (data-still): every frame solid, the box at rest.
+ */
+
+.box svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.rays {
+  opacity: 0;
+}
+
+.box[data-hit='true'] .bump {
+  animation: bump 0.3s ease-out 1;
+}
+
+.box[data-hit='true'] .rays {
+  animation: rays 0.5s ease-out 1;
+}
+
+@keyframes bump {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-9px) scale(1.06);
+  }
+}
+
+@keyframes rays {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.ghost,
+.solid {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.ghost {
+  border: 4px dashed var(--np-iron-dark);
+}
+
+.solid {
+  border: 4px solid var(--np-iron-dark);
+  box-shadow:
+    inset 0 0 0 2px var(--np-iron),
+    0 5px 0 var(--np-ink);
+  background:
+    radial-gradient(circle at 9px 9px, var(--np-iron-dark) 3px, transparent 4px),
+    radial-gradient(circle at calc(100% - 9px) 9px, var(--np-iron-dark) 3px, transparent 4px),
+    radial-gradient(circle at 9px calc(100% - 9px), var(--np-iron-dark) 3px, transparent 4px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), var(--np-iron-dark) 3px, transparent 4px);
+  opacity: 0;
+}
+
+.cards[data-solid='true'] .solid {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-delay: calc((var(--land) + var(--i, 0) * var(--frame-step)) * 1ms);
+  animation-fill-mode: both;
+}
+
+.cards[data-solid='true'][data-round='0'] .solid {
+  animation-name: solid-a;
+}
+
+.cards[data-solid='true'][data-round='1'] .solid {
+  animation-name: solid-b;
+}
+
+@keyframes solid-a {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes solid-b {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cards[data-still] .solid {
+  animation: none !important;
+  opacity: 1;
+}
+
+[data-still] .box * {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards .solid {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .box .bump,
+  .box .rays {
+    animation: none !important;
+  }
+}

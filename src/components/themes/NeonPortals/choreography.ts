@@ -149,6 +149,26 @@ export const techScene = (count: number): Scene => ({
   rest: 'idle',
 })
 
+// Services: he runs under the riveted ! iron box, jumps head first into it from below and lands; the box
+// rings and every service card's outline frame turns solid, one a moment after the other (research part 2
+// [21]: the ! box makes outline boxes real).
+const UNDER_BOX: Spot = { x: 50, lift: 0 }
+
+export const IRON_BOX: Scene = {
+  start: { x: 6, lift: 0 },
+  beats: [
+    { name: 'run', pose: 'run', ms: 400, to: UNDER_BOX },
+    { name: 'hit', pose: 'hit', ms: 500, to: { x: UNDER_BOX.x, lift: 55 } },
+    { name: 'land', pose: 'idle', ms: 300, to: UNDER_BOX },
+  ],
+  rest: 'idle',
+}
+
+const FRAME_STEP_MS = 60
+
+/** When service card `index` turns solid, counted from the start of the scene. */
+export const frameAt = (index: number): number => beatStart(IRON_BOX, 'land') + index * FRAME_STEP_MS
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3

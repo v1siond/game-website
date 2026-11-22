@@ -1,4 +1,4 @@
-import { COUNT_BOX, HERO_TIMING, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, breakAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COUNT_BOX, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, breakAt, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -131,5 +131,25 @@ describe('Tech Stack: the spin through the boxes', () => {
     expect(scene.beats.map((beat) => beat.pose)).toEqual(['spin'])
     expect(sceneMs(scene)).toBeGreaterThanOrEqual(breakAt(count - 1, count))
     expect(sceneMs(scene)).toBeLessThanOrEqual(4500)
+  })
+})
+
+describe('Services: the iron box', () => {
+  it('runs him under the box, jumps him head first into it and lands him, in 1.2 s', () => {
+    expect(IRON_BOX.beats.map((beat) => beat.pose)).toEqual(['run', 'hit', 'idle'])
+    expect(sceneMs(IRON_BOX)).toBe(1200)
+  })
+
+  it('jumps straight up under the box and comes back to the ground', () => {
+    const [run, hit, land] = IRON_BOX.beats
+    expect(hit.to.x).toBe(run.to.x)
+    expect(hit.to.lift).toBeGreaterThan(0)
+    expect(land.to).toEqual(run.to)
+  })
+
+  it('turns the frames solid from the moment his head hits, all within the scene', () => {
+    expect(frameAt(0)).toBe(beatStart(IRON_BOX, 'land'))
+    expect(frameAt(9) - frameAt(8)).toBeGreaterThan(0)
+    expect(frameAt(9)).toBeLessThan(FIVE_S)
   })
 })
