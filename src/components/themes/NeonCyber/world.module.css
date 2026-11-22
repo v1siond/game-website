@@ -460,9 +460,9 @@
   animation: fadeIn 0.12s 0.52s both;
 }
 
-/* the Muay Thai row's Installed word, set by life.tsx once the ripperdoc stage is on (--i is the row) */
+/* the Muay Thai row's Installed word, set by life.tsx once the ripperdoc stage is on (--i is the row, --step the gap between rows) */
 .installedIn {
-  animation: fadeIn 0.2s steps(2) calc(1.4s + var(--i) * 0.9s) both;
+  animation: fadeIn 0.2s steps(2) calc(1.4s + var(--i) * var(--step)) both;
 }
 
 .rigIn {

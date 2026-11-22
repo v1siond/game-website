@@ -9,6 +9,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { projectCard } from '@/lib/cv/cvView'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useModalDialog } from '@/hooks/useModalDialog'
 import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
@@ -190,22 +191,9 @@ const ProjectFile = memo(function ProjectFile({ slot, open, opener, onClose }: P
   const { actions, cards } = labels
   const { links } = slot
   const project = projectCard(slot.project, labels)
-  const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = `atomic-file-${project.id}`
-
-  // A modal dialog keeps Tab inside the file and leaves the page under it inert; showModal focuses its first
-  // control, the close button. The cleanup closes it and only then hands focus back, since the opener is inert
-  // while the dialog is open.
-  useEffect(() => {
-    if (!open) return
-    const dialog = dialogRef.current
-    const trigger = opener.current
-    dialog?.showModal()
-    return () => {
-      dialog?.close()
-      trigger?.focus()
-    }
-  }, [open, opener])
+  // showModal focuses the file's first control, the close button.
+  const dialogRef = useModalDialog(open, opener)
 
   return (
     <dialog

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -12,6 +12,7 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useModalDialog } from '@/hooks/useModalDialog'
 import { BREACH_START, BUFFER_SIZE, MATRIX_SIZE, breachPuzzle, bufferBytes, byteText, canPick, matched, outcome, pick, type BreachOutcome } from './breach'
 import { DATA_CHIPS, HUD_LINK, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
@@ -99,18 +100,7 @@ function BreachFile({ project, children }: { project: ProjectCardView; children?
  * project's file. The board mounts on each open, so every breach starts from a fresh buffer.
  */
 function BreachDialog({ project, seed, open, trigger, onClose }: BreachDialogProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const dialog = dialogRef.current
-    const opener = trigger.current
-    dialog?.showModal()
-    return () => {
-      dialog?.close()
-      opener?.focus()
-    }
-  }, [open, trigger])
+  const dialogRef = useModalDialog(open, trigger)
 
   return (
     <dialog

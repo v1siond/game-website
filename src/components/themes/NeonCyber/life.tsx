@@ -13,6 +13,8 @@ import { headingId, newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
+import { cssVars } from '@/lib/cssVars'
 import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
 import { MercSprite, stillWhen, type MercMotion } from './merc'
@@ -42,6 +44,19 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 // ---------------------------------------------------------------- About
 
+// The tags pop from 2 s, 180 ms apart, each pop 350 ms; a long list pops closer together so the last ends by 5 s.
+const TAG_LEAD_MS = 2000
+const TAG_STEP_MS = 180
+const TAG_POP_MS = 350
+const tagStep = (tags: number) => `${stepWithin({ step: TAG_STEP_MS, count: tags - 1, fixed: TAG_LEAD_MS + TAG_POP_MS, budget: STORY_MS })}ms`
+
+// Each install row starts 900 ms after the one before; the last row's Installed word lands 1.6 s after its row
+// starts (its bar fills from 0.6 s for 0.8 s, the word fades from 1.4 s for 0.2 s). Many rows install closer
+// together so the last word still lands by 5 s.
+const INSTALL_STEP_MS = 900
+const INSTALL_ROW_MS = 1600
+const installStep = (rows: number) => `${stepWithin({ step: INSTALL_STEP_MS, count: rows - 1, fixed: INSTALL_ROW_MS, budget: STORY_MS })}ms`
+
 /** The bio is the plan's; the tags read the rest of the summary (education, languages, every highlight). */
 export function ScanAbout({ bio }: { bio: string }) {
   const { facts, highlights } = useAboutBlock()
@@ -63,7 +78,7 @@ export function ScanAbout({ bio }: { bio: string }) {
             <span className={`${life.sweep} pointer-events-none absolute inset-y-0 left-0 w-1 bg-[color:var(--neon-hud)]`} aria-hidden="true" />
           </div>
         </div>
-        <ul className="mt-5 flex flex-wrap gap-3">
+        <ul className="mt-5 flex flex-wrap gap-3" style={cssVars({ '--step': tagStep(tags.length) })}>
           {tags.map((tag, i) => (
             <li
               key={tag.value}
@@ -297,6 +312,7 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
   const { ref, on: lit, reduced } = useZoneStage<District>('megablock')
   const [done, setDone] = useState(false)
   const last = martialArts.primary.achievements.length - 1
+  const step = installStep(last + 1)
   const standing = done || reduced
   const motion = stillWhen(reduced, standing ? 'kick' : 'sit')
 
@@ -325,7 +341,7 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
                 achievements: 'space-y-3',
               }}
               renderAchievement={(achievement, i) => (
-                <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={{ '--i': i } as CSSProperties}>
+                <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={cssVars({ '--i': i, '--step': step })}>
                   <span className="flex items-start justify-between gap-3">
                     <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
                     <span className={`${life.installed} ${lit ? world.installedIn : ''} shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]`}>{cyber.installed}</span>
