@@ -63,13 +63,13 @@ function Receiver({ bands, tuned }: { bands: Band[]; tuned: number }) {
         </p>
       </div>
       <div className={`relative h-24 self-center overflow-hidden border border-atomic-phosphor/50 ${atomic.wavePanel}`} aria-hidden="true">
-        <div key={tuned} className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
+        <div key={`wave-${tuned}`} className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
           <svg viewBox="0 0 400 60" preserveAspectRatio="none" className={`h-full w-full ${atomic.waveHeight}`} focusable="false">
             <path d={SINE} fill="none" stroke={PHOSPHOR} strokeWidth="2" vectorEffect="non-scaling-stroke" />
             <path d="M0 30 H400" stroke={PHOSPHOR_DEEP} strokeWidth="1" vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
-        <span key={tuned} className={`absolute inset-0 ${atomic.static}`} />
+        <span key={`static-${tuned}`} className={`absolute inset-0 ${atomic.static}`} />
       </div>
     </div>
   )

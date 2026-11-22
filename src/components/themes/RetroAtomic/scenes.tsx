@@ -90,13 +90,19 @@ export interface SceneDef {
 }
 
 // The band the props stand in: right of the text column on a wide screen, the middle a phone shows.
-const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [760, 1240], phone: [580, 860] }
+const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [940, 1340], phone: [580, 860] }
+
+/** A prop's size where many share the band: its own size while the gap between props fits its `width`,
+ *  smaller as they crowd, never under half. */
+const fitOf = (xs: readonly number[], width: number): number => (xs.length < 2 ? 1 : Math.max(0.45, Math.min(1, (xs[1] - xs[0]) / width)))
+
+const propAt = (x: number, y: number, fit: number): string => `translate(${r1(x)} ${r1(y)}) scale(${fit.toFixed(3)})`
 
 const K = 1.5
 const NONE = (): ReactNode => null
 
 // He comes in from this far left of the first prop as its card nears the reading line.
-const ENTRY = 200
+const ENTRY = 80
 
 const travel = (xs: readonly number[], f: number, offset: number) => walkAlong(xs, f, offset, ENTRY)
 
@@ -135,7 +141,7 @@ function dogWriter(stage: StageNodes, zone: Zone): (x: number, pose: DogPose) =>
 const DOOR = 320
 
 // Where the door, he and the dog stand: right of the wrist terminal on a wide screen, in the middle a phone shows.
-const HERO_AT = { wide: { door: 760, him: 1180, dog: 1330 }, phone: { door: 520, him: 760, dog: 880 } }
+const HERO_AT = { wide: { door: 760, him: 1180, dog: 1300 }, phone: { door: 520, him: 760, dog: 880 } }
 
 const doorAt = (x: number, p: number): string => `translate(${r1(x + 60 * p)} ${GROUND.shelter - DOOR}) rotate(${r1(40 * p)} ${DOOR * 1.05} ${DOOR / 2})`
 
@@ -174,7 +180,7 @@ const about: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${POSTER_Y})`}>
+        <g key={x} transform={propAt(x, POSTER_Y, fitOf(xs, 96))}>
           <rect x={-44} y={-62} width={88} height={124} fill={CREAM} stroke={POSTER_INK} strokeWidth={4} />
           <g data-fx={`poster-${i}`} opacity={0.2}>
             <rect x={-36} y={-54} width={72} height={70} fill={SHELTER_YELLOW} />
@@ -207,7 +213,7 @@ const work: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${GROUND.wasteland})`}>
+        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 76))}>
           <rect x={-3} y={-FLAG_POLE} width={6} height={FLAG_POLE} fill={STEEL} />
           <circle cx={0} cy={-FLAG_POLE} r={7} fill={BRASS} />
           <path data-fx={`flag-${i}`} d="M3 -60 H66 L54 -42 L66 -24 H3 Z" fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={3} />
@@ -234,7 +240,7 @@ const tech: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${GROUND.wasteland})`}>
+        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 92))}>
           <rect data-fx={`glow-${i}`} x={-36} y={-58} width={72} height={10} fill={PHOSPHOR} opacity={0} />
           <rect x={-40} y={-50} width={80} height={50} rx={3} fill={OLIVE} stroke={POSTER_INK} strokeWidth={3} />
           <path d="M-40 -34 H40 M-40 -16 H40" stroke={OLIVE_DARK} strokeWidth={3} />
@@ -267,7 +273,7 @@ const services: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${GROUND.wasteland})`}>
+        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 100))}>
           <rect x={-6} y={-90} width={12} height={90} fill={STEEL} />
           <rect x={-46} y={-170} width={92} height={84} rx={10} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
           <rect x={-36} y={-160} width={72} height={60} rx={8} fill={GLASS} />
@@ -296,7 +302,8 @@ const services: SceneDef = {
 
 // ---------------------------------------------------------------- Projects: the target boards
 
-const TARGET_Y = 560
+// The boards' centre over the ground.
+const TARGET_UP = -230
 
 const projects: SceneDef = {
   zone: 'wasteland',
@@ -304,14 +311,16 @@ const projects: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x + 60)} ${TARGET_Y})`}>
-          <path d={`M-4 40 V${GROUND.wasteland - TARGET_Y}`} stroke={POLE} strokeWidth={6} />
-          <circle r={42} fill={CREAM} stroke={POSTER_INK} strokeWidth={3} />
-          <circle r={28} fill={WARNING_RED} />
-          <circle r={14} fill={CREAM} />
-          <circle data-fx={`hit-${i}`} r={6} fill={POSTER_INK} opacity={0} />
-          <g data-fx={`lock-${i}`} opacity={0} stroke={PHOSPHOR} strokeWidth={4} fill="none">
-            <path d="M-54 -38 V-54 H-38 M38 -54 H54 V-38 M54 38 V54 H38 M-38 54 H-54 V38" />
+        <g key={x} transform={propAt(x + 60 * fitOf(xs, 96), GROUND.wasteland, fitOf(xs, 96))}>
+          <path d={`M-4 ${TARGET_UP + 40} V0`} stroke={POLE} strokeWidth={6} />
+          <g transform={`translate(0 ${TARGET_UP})`}>
+            <circle r={42} fill={CREAM} stroke={POSTER_INK} strokeWidth={3} />
+            <circle r={28} fill={WARNING_RED} />
+            <circle r={14} fill={CREAM} />
+            <circle data-fx={`hit-${i}`} r={6} fill={POSTER_INK} opacity={0} />
+            <g data-fx={`lock-${i}`} opacity={0} stroke={PHOSPHOR} strokeWidth={4} fill="none">
+              <path d="M-54 -38 V-54 H-38 M38 -54 H54 V-38 M54 38 V54 H38 M-38 54 H-54 V38" />
+            </g>
           </g>
         </g>
       ))}
@@ -340,7 +349,7 @@ const ventures: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x + 50)} ${GROUND.town})`}>
+        <g key={x} transform={propAt(x + 50 * fitOf(xs, 90), GROUND.town, fitOf(xs, 90))}>
           <path d="M-40 0 Q0 -30 40 0 Z" fill={RUST} stroke={POSTER_INK} strokeWidth={3} />
           <g data-fx={`tape-${i}`} transform="translate(0 10)">
             <rect x={-22} y={-14} width={44} height={28} rx={4} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
@@ -407,7 +416,7 @@ const muayThai: SceneDef = {
   back: ({ xs }) => (
     <>
       {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${STAR_Y})`}>
+        <g key={x} transform={propAt(x, STAR_Y, fitOf(xs, 60))}>
           <path d="M0 -26 L7 -8 L26 -8 L11 4 L17 23 L0 12 L-17 23 L-11 4 L-26 -8 L-7 -8 Z" fill={INK} stroke={SHELTER_YELLOW} strokeWidth={3} />
           <path data-fx={`star-${i}`} d="M0 -20 L5 -6 L20 -6 L8 3 L13 18 L0 9 L-13 18 L-8 3 L-20 -6 L-5 -6 Z" fill={SHELTER_YELLOW} opacity={0} />
         </g>
