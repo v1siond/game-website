@@ -943,9 +943,9 @@ const CARDS: SectionFrames = {
   },
   ventures: function VentureCards({ slot }) {
     return (
-      <ul data-stage-items="" className="grid md:grid-cols-6 gap-3 md:gap-4">
+      <ul data-stage-items="" className="grid md:grid-cols-2 gap-3 md:gap-4">
         {slot.companies.map((company) => (
-          <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
+          <li key={company.id}>
             <CompanyCard company={company} />
           </li>
         ))}
