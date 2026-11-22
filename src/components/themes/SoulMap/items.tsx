@@ -47,16 +47,22 @@ function SummonSign({ lit }: { lit: boolean }) {
   )
 }
 
+// Once he has faded home (.phantomHome on the figure ends) the column and the figure leave the page, so
+// his idle loop stops with them.
 function SummonedPhantom({ summoned, home, script }: { summoned: boolean; home: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
+  const [faded, setFaded] = useState(false)
 
   return (
     <div className="relative h-28" aria-hidden="true">
       <SummonSign lit={summoned} />
-      {summoned && !reduced && (
+      {summoned && !reduced && !faded && (
         <>
           <span className={`absolute bottom-2 left-1/2 h-24 w-14 -translate-x-1/2 ${souls.summonColumn} ${home ? souls.phantomHome : ''}`} />
-          <div className={`absolute bottom-2 left-1/2 h-24 w-[3.75rem] -translate-x-1/2 ${souls.phantomGather} ${home ? souls.phantomHome : ''}`}>
+          <div
+            className={`absolute bottom-2 left-1/2 h-24 w-[3.75rem] -translate-x-1/2 ${souls.phantomGather} ${home ? souls.phantomHome : ''}`}
+            onAnimationEnd={(event) => home && event.target === event.currentTarget && setFaded(true)}
+          >
             <Knight key={script.key} gear="engineer" pose={script.pose} spirit="summon" className="h-full w-full" />
           </div>
         </>

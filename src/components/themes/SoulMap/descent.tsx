@@ -66,8 +66,10 @@ const fall = (sink: () => void): PoseStep[] => [
   { pose: 'down', ms: 2600, effect: sink },
 ]
 
+// The ghost leaves the page once it has sunk (.ghostGone ends), so its pose loop stops with it.
 function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
+  const [sunk, setSunk] = useState(false)
 
   return (
     <div className="relative mx-auto h-24 w-40" aria-hidden="true">
@@ -76,8 +78,11 @@ function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; 
         <ellipse cx={70} cy={8} rx={18} ry={3} fill={SOUL.bloodBright} opacity={0.6} />
         <ellipse cx={112} cy={11} rx={6} ry={2} fill={SOUL.blood} />
       </svg>
-      {replay && !reduced && (
-        <div className={`absolute bottom-1 left-[3.6rem] h-20 w-[3.125rem] ${souls.ghost} ${gone ? souls.ghostGone : ''}`}>
+      {replay && !reduced && !sunk && (
+        <div
+          className={`absolute bottom-1 left-[3.6rem] h-20 w-[3.125rem] ${souls.ghost} ${gone ? souls.ghostGone : ''}`}
+          onAnimationEnd={(event) => gone && event.target === event.currentTarget && setSunk(true)}
+        >
           <Knight key={script.key} gear="engineer" pose={script.pose} spirit="blood" className="h-full w-full" />
         </div>
       )}
