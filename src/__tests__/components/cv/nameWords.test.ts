@@ -22,11 +22,11 @@ describe('nameWords', () => {
 
 describe('initialsOf', () => {
   it('takes the first letter of each word of the name', () => {
-    expect(initialsOf('Alexander Pulido')).toBe('AP')
+    expect(initialsOf('Grace Hopper')).toBe('GH')
   })
 
   it('skips runs of spaces', () => {
-    expect(initialsOf('  Alexander   Pulido ')).toBe('AP')
+    expect(initialsOf('  Grace   Hopper ')).toBe('GH')
   })
 
   it('gives nothing for an empty name', () => {
