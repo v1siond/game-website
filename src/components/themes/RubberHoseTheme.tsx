@@ -74,96 +74,96 @@ export default function RubberHoseTheme() {
       </a>
 
       <ZoneStageProvider value={stage}>
-      <Isles zones={zones} />
-      <FilmFrame />
-      <FilmGrain />
-      <RisingNotes />
+        <Isles zones={zones} />
+        <FilmFrame />
+        <FilmGrain />
+        <RisingNotes />
 
-      {/* the page sits inside the film frame */}
-      <div className="mx-6 sm:mx-14">
-        {/* the recruiter first screen */}
-        <IsleStage isle="meadow">
-          <header data-worlds-hero="" className="relative z-30 px-2 py-6 sm:p-6">
-            <RecruiterHero
-              render={({ name, headline, tagline, line, actions }) => (
-                <TitleCardIntro>
-                  {(look) => (
-                    <div className={`relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
-                      <div data-worlds-figure="" className={`pointer-events-none absolute -bottom-2 -left-10 hidden h-36 w-24 lg:block ${look.word}`} aria-hidden="true">
-                        <HeroCharacter profession={active} pose="idle" className="h-full w-full" />
+        {/* the page sits inside the film frame */}
+        <div className="mx-6 sm:mx-14">
+          {/* the recruiter first screen */}
+          <IsleStage isle="meadow">
+            <header data-worlds-hero="" className="relative z-30 px-2 py-6 sm:p-6">
+              <RecruiterHero
+                render={({ name, headline, tagline, line, actions }) => (
+                  <TitleCardIntro>
+                    {(look) => (
+                      <div className={`relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
+                        <div data-worlds-figure="" className={`pointer-events-none absolute -bottom-2 -left-10 hidden h-36 w-24 lg:block ${look.word}`} aria-hidden="true">
+                          <HeroCharacter profession={active} pose="idle" className="h-full w-full" />
+                        </div>
+                        <div>
+                          <CartoonTitle text={name} />
+                          <p className={`mt-4 text-base tracking-[0.1em] ${world.muted} ${staggerAt(0)} ${look.word}`}>{headline}</p>
+                          <p className={`mt-2 text-sm italic tracking-widest ${world.red} ${staggerAt(1)} ${look.word}`}>{tagline}</p>
+                          <p className={`mt-2 text-sm ${world.ink} ${staggerAt(2)} ${look.word}`}>{line}</p>
+                        </div>
+
+                        <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label={navigation.contactAndCv}>
+                          {[...actions, cv, engine].map((slot) => (
+                            <HoseLink key={slot.id} slot={slot} />
+                          ))}
+                        </nav>
+                        {/* out of the flow, across the card's bottom edge; from lg his figure stands at the card's left edge, so the
+                            plate leaves the centre and stands at his side */}
+                        <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--fan-down-below-lg sm:max-lg:[--wd-fan-gap:225px] absolute inset-x-0 -bottom-[34px] z-10 lg:right-auto lg:left-16 ${staggerAt(3)} ${look.word}`} />
                       </div>
-                      <div>
-                        <CartoonTitle text={name} />
-                        <p className={`mt-4 text-base tracking-[0.1em] ${world.muted} ${staggerAt(0)} ${look.word}`}>{headline}</p>
-                        <p className={`mt-2 text-sm italic tracking-widest ${world.red} ${staggerAt(1)} ${look.word}`}>{tagline}</p>
-                        <p className={`mt-2 text-sm ${world.ink} ${staggerAt(2)} ${look.word}`}>{line}</p>
-                      </div>
+                    )}
+                  </TitleCardIntro>
+                )}
+              />
+            </header>
+          </IsleStage>
 
-                      <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label={navigation.contactAndCv}>
-                        {[...actions, cv, engine].map((slot) => (
-                          <HoseLink key={slot.id} slot={slot} />
-                        ))}
-                      </nav>
-                      {/* out of the flow, across the card's bottom edge; from lg his figure stands at the card's left edge, so the
-                          plate leaves the centre and stands at his side */}
-                      <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--fan-down-below-lg sm:max-lg:[--wd-fan-gap:225px] absolute inset-x-0 -bottom-[34px] z-10 lg:right-auto lg:left-16 ${staggerAt(3)} ${look.word}`} />
-                    </div>
-                  )}
-                </TitleCardIntro>
-              )}
-            />
-          </header>
-        </IsleStage>
-
-        {/* the profession switch, a row of cast badges with him in each costume */}
-        <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
-          <ProfessionSwitch
-            className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
-            label={navigation.profession}
-            renderOption={(option) => <CartoonCharacter {...option} />}
-          />
-        </section>
-
-        <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
-          <ProfessionRegion className="mx-auto max-w-6xl">
-            <IrisWipe key={active}>
-              <ProfessionSet profession={active} />
-              <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-            </IrisWipe>
-          </ProfessionRegion>
-        </main>
-
-        <IsleStage isle="casino">
-          <section className="relative z-20 mx-auto max-w-3xl px-2 py-8" aria-labelledby={CONTACT_HEADING}>
-            <SunWatcher key={active} profession={active} />
-            <RecruiterHero
-              render={({ line, actions }) => (
-                <div className={`relative mt-6 p-6 text-center sm:text-left ${world.titleCard}`}>
-                  <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
-                    {sections.contact}
-                  </h2>
-                  <p className={`mb-6 text-base ${world.ink}`}>{line}</p>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-                    {[...actions, cv].map((slot) => (
-                      <HoseLink key={slot.id} slot={slot} />
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* the profession switch, a row of cast badges with him in each costume */}
+          <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
+            <ProfessionSwitch
+              className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
+              label={navigation.profession}
+              renderOption={(option) => <CartoonCharacter {...option} />}
             />
           </section>
-        </IsleStage>
 
-        <footer className="relative z-20 py-8 text-center">
-          <div className="flex items-center justify-center gap-4">
-            <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
-            <p className={`px-3 py-1 text-sm tracking-widest ${world.chip}`}>
-              <CopyrightLine />
-            </p>
-            <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
-          </div>
-        </footer>
-      </div>
+          <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
+            <ProfessionRegion className="mx-auto max-w-6xl">
+              <IrisWipe key={active}>
+                <ProfessionSet profession={active} />
+                <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+              </IrisWipe>
+            </ProfessionRegion>
+          </main>
+
+          <IsleStage isle="casino">
+            <section className="relative z-20 mx-auto max-w-3xl px-2 py-8" aria-labelledby={CONTACT_HEADING}>
+              <SunWatcher key={active} profession={active} />
+              <RecruiterHero
+                render={({ line, actions }) => (
+                  <div className={`relative mt-6 p-6 text-center sm:text-left ${world.titleCard}`}>
+                    <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
+                      {sections.contact}
+                    </h2>
+                    <p className={`mb-6 text-base ${world.ink}`}>{line}</p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+                      {[...actions, cv].map((slot) => (
+                        <HoseLink key={slot.id} slot={slot} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              />
+            </section>
+          </IsleStage>
+
+          <footer className="relative z-20 py-8 text-center">
+            <div className="flex items-center justify-center gap-4">
+              <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
+              <p className={`px-3 py-1 text-sm tracking-widest ${world.chip}`}>
+                <CopyrightLine />
+              </p>
+              <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
+            </div>
+          </footer>
+        </div>
       </ZoneStageProvider>
     </div>
   )

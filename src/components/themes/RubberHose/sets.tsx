@@ -442,11 +442,11 @@ const SETS: Record<Profession, () => ReactNode> = {
 
 // The picked profession's set in its inked frame. Decorative: the sections below carry the content.
 export const ProfessionSet = memo(function ProfessionSet({ profession }: { profession: Profession }) {
-  const Set = SETS[profession]
+  const Scene = SETS[profession]
 
   return (
     <div className={`relative mb-10 h-44 overflow-hidden sm:h-64 lg:h-72 ${styles.frame}`} aria-hidden="true">
-      <Set />
+      <Scene />
     </div>
   )
 })
