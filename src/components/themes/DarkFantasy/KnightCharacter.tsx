@@ -3,6 +3,7 @@
 import { memo, ReactNode, useState, useEffect, useRef, type CSSProperties } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
+import knight from './knight.module.css'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -61,20 +62,8 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
-    <span style={{ display: 'block', animation: breathing && !attacking ? 'knightIdleFloat 3.6s ease-in-out infinite' : undefined }}>
+    <span style={{ display: 'block', animation: breathing && !attacking ? `${knight.knightIdleFloat} 3.6s ease-in-out infinite` : undefined }}>
     {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
-    {breathing && (
-      <style>{`
-        @keyframes knightCloakBreathing {
-          0%, 100% { transform: scaleY(1) scaleX(1); }
-          50% { transform: scaleY(1.06) scaleX(1.03); }
-        }
-        @keyframes knightIdleFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-      `}</style>
-    )}
     <svg
       width={KNIGHT_VIEW_WIDTH * effectiveScale}
       height={KNIGHT_VIEW_HEIGHT * effectiveScale}
@@ -96,7 +85,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       <g
         style={{
           transformOrigin: '30px 60px',
-          animation: breathing ? 'knightCloakBreathing 3s ease-in-out infinite' : undefined,
+          animation: breathing ? `${knight.knightCloakBreathing} 3s ease-in-out infinite` : undefined,
         }}
       >
         <path
@@ -413,7 +402,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
             background: `linear-gradient(90deg, transparent 20%, ${DARK_FANTASY.soulBlue}40 50%, transparent 80%)`,
-            animation: 'slashFlash 100ms ease-out'
+            animation: `${knight.slashFlash} 100ms ease-out`
           }}
         />
       )}
@@ -460,14 +449,6 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           </div>
         </FixedCombatLayer>
       )}
-
-      <style>{`
-        @keyframes slashFlash {
-          0% { opacity: 0; transform: translateX(-100%); }
-          50% { opacity: 1; }
-          100% { opacity: 0; transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   )
 })

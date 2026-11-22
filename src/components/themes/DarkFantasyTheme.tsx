@@ -28,6 +28,7 @@ import { CopyrightLine } from './shared/CopyrightLine'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
+import world from './DarkFantasy/world.module.css'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ENGINE_LINK } from '@/lib/engineLink'
 
@@ -163,7 +164,7 @@ const EtherealRain = memo(function EtherealRain() {
             top: '-30px',
             height: d.height,
             background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
-            animation: `etherealRain ${d.speed}s linear infinite`,
+            animation: `${world.etherealRain} ${d.speed}s linear infinite`,
             animationDelay: `${d.delay}s`,
           }}
         />
@@ -205,7 +206,7 @@ const SpiritParticles = memo(function SpiritParticles() {
             width: p.size * 2.5,
             height: p.size * 2.5,
             background: `radial-gradient(circle, ${p.color} 20%, ${p.color}40 50%, transparent 70%)`,
-            animation: `spiritFloat ${p.speed}s ease-in-out infinite`,
+            animation: `${world.spiritFloat} ${p.speed}s ease-in-out infinite`,
             animationDelay: `${p.delay}s`,
           }}
         />
@@ -623,7 +624,7 @@ const WireGlow = memo(function WireGlow({
         style={{
           strokeDasharray: '100',
           strokeDashoffset: '100',
-          animation: `wireStroke ${duration}ms ease-out forwards`,
+          animation: `${world.wireStroke} ${duration}ms ease-out forwards`,
         }}
       />
     </svg>
@@ -710,7 +711,7 @@ const WaystationNode = memo(function WaystationNode({
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 38%, transparent) 0%, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 19%, transparent) 40%, transparent 70%)`,
-            animation: 'energyArrival 400ms ease-out forwards',
+            animation: `${world.energyArrival} 400ms ease-out forwards`,
           }}
           aria-hidden="true"
         />
@@ -730,7 +731,7 @@ const WaystationNode = memo(function WaystationNode({
         className={`df-card bg-df-panel relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
-        style={{ animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined }}
+        style={{ animation: isReceivingEnergy ? `${world.nodeArrival} 400ms ease-out` : undefined }}
       >
         {/* Active border and glow: the active card drawn under the content, fading in by opacity */}
         <div
@@ -1341,7 +1342,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
               left: p.x,
               top: p.y,
               background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: `spiritFloat ${8 + i * 2}s ease-in-out infinite`,
+              animation: `${world.spiritFloat} ${8 + i * 2}s ease-in-out infinite`,
               animationDelay: `${i * -2}s`,
             }}
           />
@@ -1385,7 +1386,7 @@ const ArtSectionLanterns = memo(function ArtSectionLanterns() {
             style={{
               left: `${l.x}%`,
               top: `${l.y}%`,
-              animation: `lanternFloat 4s ease-in-out infinite`,
+              animation: `${world.lanternFloat} 4s ease-in-out infinite`,
               animationDelay: `${l.delay}s`,
             }}
           >
@@ -1910,7 +1911,7 @@ export default function DarkFantasyTheme() {
           <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             <div
-              className="relative h-40 md:h-56 overflow-hidden"
+              className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
               style={{
                 background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
                 borderRadius: '4px',
@@ -2000,111 +2001,6 @@ export default function DarkFantasyTheme() {
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>
       </footer>
-
-      {/* Animations - GPU accelerated */}
-      <style jsx global>{`
-        /* Ethereal rain - transform only */
-        @keyframes etherealRain {
-          0% { transform: translateY(-30px) translateZ(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(100vh) translateZ(0); opacity: 0; }
-        }
-
-        /* Spirit float - transform and opacity */
-        @keyframes spiritFloat {
-          0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
-          25% { transform: translate3d(8px, -25px, 0); opacity: 0.5; }
-          50% { transform: translate3d(-6px, -12px, 0); opacity: 0.4; }
-          75% { transform: translate3d(4px, -35px, 0); opacity: 0.45; }
-        }
-
-        /* Fade in */
-        @keyframes fade-in-down {
-          from { opacity: 0; transform: translate3d(0, -20px, 0); }
-          to { opacity: 1; transform: translate3d(0, 0, 0); }
-        }
-        .animate-fade-in-down {
-          animation: fade-in-down 0.8s ease-out;
-          will-change: transform, opacity;
-        }
-
-        /* Light sweep reveal */
-        @keyframes lightSweep {
-          0% { transform: scaleX(0) translateZ(0); opacity: 0; }
-          50% { transform: scaleX(1) translateZ(0); opacity: 1; }
-          100% { transform: scaleX(0) translateZ(0); opacity: 0; }
-        }
-
-        /* Lantern float */
-        @keyframes lanternFloat {
-          0%, 100% { transform: translateY(0) translateZ(0); }
-          50% { transform: translateY(-8px) translateZ(0); }
-        }
-
-        /* Spirit companion wisp trail */
-        @keyframes wispTrail {
-          0%, 100% { transform: translateX(0); }
-          50% { transform: translateX(3px); }
-        }
-
-        /* Wire stroke animation - electricity through wire */
-        @keyframes wireStroke {
-          0% {
-            stroke-dashoffset: 100;
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            stroke-dashoffset: 0;
-            opacity: 0;
-          }
-        }
-
-        /* Destination node pulse when energy arrives */
-        @keyframes nodeArrival {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-          100% { transform: scale(1.1); }
-        }
-
-        /* Energy arrival burst effect */
-        @keyframes energyArrival {
-          0% {
-            opacity: 0;
-            transform: scale(0.5);
-          }
-          30% {
-            opacity: 1;
-            transform: scale(1.2);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(2);
-          }
-        }
-
-        /* Accessibility: Reduce motion */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-fade-in-down,
-          .will-animate {
-            animation: none !important;
-            transition: none !important;
-          }
-          /* Disable energy flow animations for reduced motion */
-          [style*="energyFlow"],
-          [style*="energyArrival"],
-          [style*="nodeArrival"] {
-            animation: none !important;
-            opacity: 0 !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }

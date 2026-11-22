@@ -45,3 +45,10 @@
   0%, 100% { transform: translateY(0) scaleX(1); opacity: var(--from); }
   50% { transform: translateY(var(--rise)) scaleX(2); opacity: 0; }
 }
+
+/* the pulled bug hovering once it floats: from its low height up to its high one and back, the two read from
+   BUG_HOVER as --hover-low and --hover-high on the pull stage (BugCreature.tsx) */
+@keyframes bugFloat {
+  0%, 100% { transform: translateY(var(--hover-low)); }
+  50% { transform: translateY(var(--hover-high)); }
+}

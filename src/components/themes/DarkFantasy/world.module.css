@@ -1,0 +1,106 @@
+/* Dark Fantasy's ambient motion and the profession selector's energy, GPU only (transform and opacity).
+   Keyframe names are module scoped; DarkFantasyTheme.tsx reads each one from this module's exports for its
+   inline animations. */
+
+/* Ethereal rain - transform only */
+@keyframes etherealRain {
+  0% { transform: translateY(-30px) translateZ(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) translateZ(0); opacity: 0; }
+}
+
+/* Spirit float - transform and opacity */
+@keyframes spiritFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+  25% { transform: translate3d(8px, -25px, 0); opacity: 0.5; }
+  50% { transform: translate3d(-6px, -12px, 0); opacity: 0.4; }
+  75% { transform: translate3d(4px, -35px, 0); opacity: 0.45; }
+}
+
+/* Fade in */
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translate3d(0, -20px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.8s ease-out;
+  will-change: transform, opacity;
+}
+
+/* Light sweep reveal */
+@keyframes lightSweep {
+  0% { transform: scaleX(0) translateZ(0); opacity: 0; }
+  50% { transform: scaleX(1) translateZ(0); opacity: 1; }
+  100% { transform: scaleX(0) translateZ(0); opacity: 0; }
+}
+
+/* Lantern float */
+@keyframes lanternFloat {
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50% { transform: translateY(-8px) translateZ(0); }
+}
+
+/* Spirit companion wisp trail */
+@keyframes wispTrail {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+/* Wire stroke animation - electricity through wire */
+@keyframes wireStroke {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+/* Destination node pulse when energy arrives */
+@keyframes nodeArrival {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.1); }
+}
+
+/* Energy arrival burst effect */
+@keyframes energyArrival {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+/* Accessibility: Reduce motion. .selector is the profession selector's box; the hashed keyframe names keep
+   their own name inside them, so the attribute selectors still find the inline animations. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-down,
+  .will-animate {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* Disable energy flow animations for reduced motion */
+  .selector [style*="energyFlow"],
+  .selector [style*="energyArrival"],
+  .selector [style*="nodeArrival"] {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}

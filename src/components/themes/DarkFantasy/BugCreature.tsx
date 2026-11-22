@@ -6,6 +6,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { FRAME_INSET_REM, KnightCharacter } from './KnightCharacter'
 import { BattleBug, BUG_ASPECT } from './BattleReveal'
+import bugMotion from './bug.module.css'
 
 // ============================================
 // BUG ATTACK REVEAL ANIMATION
@@ -81,7 +82,7 @@ const BUG_POSES: Record<AnimationPhase, BugPose> = {
   'complete': { track: '-16%', transform: `translateY(-${BUG_HOVER.low}px)`, opacity: 1, timing: '400ms ease-out', float: true },
 }
 
-const BUG_FLOAT = 'bugFloat 1.5s ease-in-out infinite'
+const BUG_FLOAT = `${bugMotion.bugFloat} 1.5s ease-in-out infinite`
 
 /**
  * The fight's stage. Its panel sits --panel-top inside it and draws its border --frame-inset inside that.
@@ -91,7 +92,12 @@ const BUG_FLOAT = 'bugFloat 1.5s ease-in-out infinite'
  * the line the frame draws and nothing of theirs reaches the panel or the section above.
  */
 const PULL_STAGE_CLASS = '[--panel-top:1.5rem] md:[--panel-top:2rem]'
-const PULL_STAGE = { '--frame-inset': `${FRAME_INSET_REM}rem`, minHeight: '280px' } as CSSProperties
+const PULL_STAGE = {
+  '--frame-inset': `${FRAME_INSET_REM}rem`,
+  '--hover-low': `-${BUG_HOVER.low}px`,
+  '--hover-high': `-${BUG_HOVER.high}px`,
+  minHeight: '280px',
+} as CSSProperties
 const PHONE_FIGHT_HEIGHT_PX = (PULL_BUG_SIZE * BUG_ASPECT + BUG_HOVER.high) * COMBAT_PHONE_SCALE
 const PHONE_FIGHT = { '--phone-scale': COMBAT_PHONE_SCALE, '--ground': '0px' } as CSSProperties
 const SHADOW_TIMING = '400ms ease-out'
@@ -287,13 +293,6 @@ export const BugPullReveal = memo(function BugPullReveal({
       <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
         {children}
       </div>
-
-      <style>{`
-        @keyframes bugFloat {
-          0%, 100% { transform: translateY(-${BUG_HOVER.low}px); }
-          50% { transform: translateY(-${BUG_HOVER.high}px); }
-        }
-      `}</style>
     </div>
   )
 })

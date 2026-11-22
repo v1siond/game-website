@@ -4,9 +4,11 @@ import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
+import battle from './battle.module.css'
 import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 
 /**
  * BATTLE REVEAL ANIMATION
@@ -66,6 +68,8 @@ export const BUG_ASPECT = 0.85
 const DEAD_SCALE = 0.75
 const DEAD_LIE = `translateX(-120px) translateY(${(BUG_SIZE * BUG_ASPECT * (1 - DEAD_SCALE)) / 2}px)`
 const DEAD_POSE = `${DEAD_LIE} rotateZ(540deg) scale(${DEAD_SCALE})`
+// The blood pool's pulse keyframes (battle.module.css) start from the same offset.
+const DEAD_LIE_VAR = cssVars({ '--dead-lie': DEAD_LIE })
 
 export const BattleReveal = memo(function BattleReveal({
   children,
@@ -264,7 +268,7 @@ export const BattleReveal = memo(function BattleReveal({
           transform: 'translateX(0) translateY(0) rotateZ(0deg)',
           opacity: 1,
           transition: moveAndFade('500ms ease-out'),
-          animation: 'bugWander 600ms ease-in-out infinite'
+          animation: `${battle.bugWander} 600ms ease-in-out infinite`
         }
       case 'knight-dash':
         return {
@@ -287,7 +291,7 @@ export const BattleReveal = memo(function BattleReveal({
           ...baseStyle,
           transform: 'translateX(20px) translateY(-8px) rotateZ(-8deg) scale(0.95)',
           opacity: 1,
-          animation: 'bugTremble 50ms ease-in-out infinite',
+          animation: `${battle.bugTremble} 50ms ease-in-out infinite`,
           transition: 'none'
         }
       case 'bug-death':
@@ -349,7 +353,7 @@ export const BattleReveal = memo(function BattleReveal({
         return {
           transform: 'translateY(0)',
           opacity: 1,
-          animation: 'contentDrop 400ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+          animation: `${battle.contentDrop} 400ms cubic-bezier(0.34, 1.56, 0.64, 1)`
         }
       case 'complete':
         return {
@@ -372,12 +376,9 @@ export const BattleReveal = memo(function BattleReveal({
 
   return (
     <>
-      {/* CSS Keyframes */}
-      <style>{battleRevealKeyframes}</style>
-
       <div
         ref={stageRef}
-        className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? 'animate-screenShake' : ''}`}
+        className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? battle.shaking : ''}`}
         aria-live="polite"
         aria-label={isAnimating ? navigation.battleInProgress : navigation.contentRevealed}
       >
@@ -390,7 +391,7 @@ export const BattleReveal = memo(function BattleReveal({
             className={`absolute left-[15%] ${COMBAT_GROUND} z-20`}
             style={getKnightStyle()}
           >
-            <div className={phase === 'slash' ? 'animate-knightSlash' : ''}>
+            <div className={phase === 'slash' ? battle.slashing : ''}>
               <KnightCharacter
                 scale={1.3}
                 attacking={isAttacking}
@@ -406,7 +407,7 @@ export const BattleReveal = memo(function BattleReveal({
         {showSlash && (
           <div
             className="absolute left-[30%] bottom-[30%] z-30 pointer-events-none"
-            style={{ animation: 'slashArc 150ms ease-out forwards' }}
+            style={{ animation: `${battle.slashArc} 150ms ease-out forwards` }}
           >
             <SlashEffect />
           </div>
@@ -425,7 +426,7 @@ export const BattleReveal = memo(function BattleReveal({
                 width: 80,
                 height: 16,
                 background: 'radial-gradient(ellipse, rgba(15,10,26,0.5) 0%, transparent 70%)',
-                animation: 'shadowBreathing 2s ease-in-out infinite',
+                animation: `${battle.shadowBreathing} 2s ease-in-out infinite`,
               }}
             />
           </div>
@@ -434,14 +435,14 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Bug container - all bug-related effects are children so they follow the bug */}
         {showBug && (
           <div
-            className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${bugTremble ? 'animate-bugTremble' : ''}`}
+            className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${bugTremble ? battle.trembling : ''}`}
             style={getBugStyle()}
           >
             {/* Impact Burst - centered on bug */}
             {showImpact && (
               <div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
-                style={{ animation: 'impactBurst 150ms ease-out forwards' }}
+                style={{ animation: `${battle.impactBurst} 150ms ease-out forwards` }}
               >
                 <ImpactBurst />
               </div>
@@ -481,8 +482,9 @@ export const BattleReveal = memo(function BattleReveal({
           <div
             className={`absolute right-[18%] ${COMBAT_GROUND} z-4 pointer-events-none`}
             style={{
+              ...DEAD_LIE_VAR,
               transform: DEAD_LIE,
-              animation: phase === 'complete' ? 'bloodPoolPulse 3s ease-in-out infinite' : undefined,
+              animation: phase === 'complete' ? `${battle.bloodPoolPulse} 3s ease-in-out infinite` : undefined,
             }}
           >
             <BloodPool />
@@ -501,7 +503,7 @@ export const BattleReveal = memo(function BattleReveal({
               className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] h-2 rounded-full"
               style={{
                 background: `radial-gradient(ellipse, ${DARK_FANTASY.void}80 0%, transparent 70%)`,
-                animation: 'shadowGrow 400ms ease-out forwards'
+                animation: `${battle.shadowGrow} 400ms ease-out forwards`
               }}
             />
           )}
@@ -801,7 +803,7 @@ const SlashEffect = memo(function SlashEffect() {
         style={{
           strokeDasharray: '200',
           strokeDashoffset: '200',
-          animation: 'slashDraw 200ms ease-out forwards'
+          animation: `${battle.slashDraw} 200ms ease-out forwards`
         }}
       />
       {/* Secondary trail */}
@@ -815,7 +817,7 @@ const SlashEffect = memo(function SlashEffect() {
         style={{
           strokeDasharray: '150',
           strokeDashoffset: '150',
-          animation: 'slashDraw 150ms ease-out 50ms forwards'
+          animation: `${battle.slashDraw} 150ms ease-out 50ms forwards`
         }}
       />
     </svg>
@@ -844,14 +846,14 @@ const ImpactBurst = memo(function ImpactBurst() {
         cy="40"
         r="15"
         fill={DARK_FANTASY.bone}
-        style={{ animation: 'flashPulse 150ms ease-out forwards' }}
+        style={{ animation: `${battle.flashPulse} 150ms ease-out forwards` }}
       />
       <circle
         cx="40"
         cy="40"
         r="8"
         fill={DARK_FANTASY.ethereal}
-        style={{ animation: 'flashPulse 100ms ease-out forwards' }}
+        style={{ animation: `${battle.flashPulse} 100ms ease-out forwards` }}
       />
 
       {/* Radiating sparks */}
@@ -872,7 +874,7 @@ const ImpactBurst = memo(function ImpactBurst() {
             strokeLinecap="round"
             style={{
               opacity: 0,
-              animation: `sparkShoot 150ms ease-out ${spark.delay}ms forwards`
+              animation: `${battle.sparkShoot} 150ms ease-out ${spark.delay}ms forwards`
             }}
           />
         )
@@ -928,7 +930,7 @@ const DeathParticles = memo(function DeathParticles() {
           width: 60,
           height: 60,
           background: `radial-gradient(circle, ${DARK_FANTASY.white} 0%, ${DARK_FANTASY.flameAmber} 40%, ${DARK_FANTASY.infected} 70%, transparent 100%)`,
-          animation: 'explosionFlash 200ms ease-out forwards',
+          animation: `${battle.explosionFlash} 200ms ease-out forwards`,
         }}
       />
 
@@ -943,7 +945,7 @@ const DeathParticles = memo(function DeathParticles() {
             backgroundColor: p.color,
             boxShadow: `0 0 ${p.size * 1.5}px ${p.color}, 0 0 ${p.size * 2}px ${p.color}50`,
             opacity: 0,
-            animation: `particleBurst ${p.duration}ms ease-out ${p.delay}ms forwards`,
+            animation: `${battle.particleBurst} ${p.duration}ms ease-out ${p.delay}ms forwards`,
             ['--end-x' as string]: `${p.endX}px`,
             ['--end-y' as string]: `${p.endY}px`,
           }}
@@ -963,7 +965,7 @@ const DeathParticles = memo(function DeathParticles() {
             backgroundColor: orangeColors[i % orangeColors.length],
             boxShadow: `0 0 ${p.size * 2}px ${orangeColors[i % orangeColors.length]}`,
             opacity: 0,
-            animation: `particleRise ${p.duration}ms ease-out ${p.delay}ms forwards`
+            animation: `${battle.particleRise} ${p.duration}ms ease-out ${p.delay}ms forwards`
           }}
         />
       ))}
@@ -979,7 +981,7 @@ const DeathParticles = memo(function DeathParticles() {
             backgroundColor: DARK_FANTASY.white,
             boxShadow: `0 0 4px ${DARK_FANTASY.flameAmber}`,
             opacity: 0,
-            animation: `sparkFly 250ms ease-out ${p.delay}ms forwards`,
+            animation: `${battle.sparkFly} 250ms ease-out ${p.delay}ms forwards`,
             ['--end-x' as string]: `${p.endX}px`,
             ['--end-y' as string]: `${p.endY}px`,
             transform: `rotate(${Math.atan2(p.endY, p.endX)}rad)`,
@@ -1034,7 +1036,7 @@ const BloodSplatter = memo(function BloodSplatter() {
             backgroundColor: d.color,
             boxShadow: `0 0 ${d.size}px ${d.color}`,
             opacity: 0,
-            animation: `bloodDrop ${d.duration}ms ease-out ${d.delay}ms forwards`,
+            animation: `${battle.bloodDrop} ${d.duration}ms ease-out ${d.delay}ms forwards`,
             ['--end-x' as string]: `${d.endX}px`,
             ['--end-y' as string]: `${d.endY}px`,
           }}
@@ -1051,7 +1053,7 @@ const BloodSplatter = memo(function BloodSplatter() {
             height: s.size,
             backgroundColor: bloodColors[i % bloodColors.length],
             opacity: 0,
-            animation: `bloodSpray 150ms ease-out ${s.delay}ms forwards`,
+            animation: `${battle.bloodSpray} 150ms ease-out ${s.delay}ms forwards`,
             ['--end-x' as string]: `${s.endX}px`,
             ['--end-y' as string]: `${s.endY}px`,
           }}
@@ -1100,7 +1102,7 @@ const BloodPool = memo(function BloodPool() {
             backgroundColor: p.color,
             boxShadow: `0 0 ${p.height + 4}px ${p.color}, inset 0 -2px 4px rgba(0,0,0,0.3)`,
             opacity: 0,
-            animation: `bloodPoolSpread 400ms ease-out ${p.delay}ms forwards`,
+            animation: `${battle.bloodPoolSpread} 400ms ease-out ${p.delay}ms forwards`,
           }}
         />
       ))}
@@ -1118,276 +1120,12 @@ const BloodPool = memo(function BloodPool() {
             backgroundColor: d.color,
             boxShadow: `0 0 ${d.size}px ${d.color}`,
             opacity: 0,
-            animation: `bloodDripAppear 300ms ease-out ${d.delay}ms forwards`,
+            animation: `${battle.bloodDripAppear} 300ms ease-out ${d.delay}ms forwards`,
           }}
         />
       ))}
     </div>
   )
 })
-
-// CSS Keyframes for all animations
-const battleRevealKeyframes = `
-  @keyframes bugWander {
-    0%, 100% { transform: translateX(0) translateY(0); }
-    25% { transform: translateX(12px) translateY(-8px); }
-    50% { transform: translateX(-8px) translateY(5px); }
-    75% { transform: translateX(8px) translateY(-5px); }
-  }
-
-  @keyframes knightSlash {
-    0% { transform: rotate(0deg); }
-    50% { transform: rotate(-15deg) translateX(10px); }
-    100% { transform: rotate(0deg); }
-  }
-
-  @keyframes slashDraw {
-    from { stroke-dashoffset: 200; }
-    to { stroke-dashoffset: 0; }
-  }
-
-  @keyframes slashArc {
-    0% { transform: scale(0.8) rotate(-10deg); opacity: 0; }
-    30% { transform: scale(1.1) rotate(0deg); opacity: 1; }
-    100% { transform: scale(1.2) rotate(5deg); opacity: 0; }
-  }
-
-  @keyframes flashPulse {
-    0% { transform: scale(0); opacity: 1; }
-    50% { transform: scale(1.5); opacity: 1; }
-    100% { transform: scale(2); opacity: 0; }
-  }
-
-  @keyframes sparkShoot {
-    0% { opacity: 0; transform: scale(0); }
-    30% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(1.5); }
-  }
-
-  @keyframes impactBurst {
-    0% { transform: scale(0); opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
-  }
-
-  @keyframes particleRise {
-    0% {
-      opacity: 0;
-      transform: translateY(0) scale(1);
-    }
-    20% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-60px) scale(0.3);
-    }
-  }
-
-  @keyframes particleBurst {
-    0% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) scale(0.3);
-    }
-  }
-
-  @keyframes explosionFlash {
-    0% {
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 1;
-    }
-    50% {
-      transform: translate(-50%, -50%) scale(1.5);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(2);
-      opacity: 0;
-    }
-  }
-
-  @keyframes sparkFly {
-    0% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) scale(0.5);
-    }
-  }
-
-  @keyframes bloodDrop {
-    0% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      opacity: 0.6;
-      transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) scale(0.8);
-    }
-  }
-
-  @keyframes bloodSpray {
-    0% {
-      opacity: 0.8;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) scale(0.4);
-    }
-  }
-
-  @keyframes screenShake {
-    0%, 100% { transform: translateX(0) translateY(0); }
-    10% { transform: translateX(-8px) translateY(4px); }
-    20% { transform: translateX(8px) translateY(-4px); }
-    30% { transform: translateX(-6px) translateY(3px); }
-    40% { transform: translateX(6px) translateY(-3px); }
-    50% { transform: translateX(-4px) translateY(2px); }
-    60% { transform: translateX(4px) translateY(-2px); }
-    70% { transform: translateX(-2px) translateY(1px); }
-    80% { transform: translateX(2px) translateY(-1px); }
-    90% { transform: translateX(-1px) translateY(0); }
-  }
-
-  @keyframes contentDrop {
-    0% {
-      transform: translateY(-100px);
-      opacity: 0;
-    }
-    60% {
-      transform: translateY(10px);
-      opacity: 1;
-    }
-    80% {
-      transform: translateY(-5px);
-    }
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes shadowGrow {
-    0% {
-      transform: translateX(-50%) scaleX(0.3) scaleY(0.5);
-      opacity: 0;
-    }
-    60% {
-      transform: translateX(-50%) scaleX(1.2) scaleY(1);
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateX(-50%) scaleX(1) scaleY(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes bugTremble {
-    0%, 100% { transform: translateX(20px) translateY(-8px) rotate(-8deg) scale(0.95); }
-    10% { transform: translateX(16px) translateY(-12px) rotate(-12deg) scale(0.94); }
-    20% { transform: translateX(24px) translateY(-4px) rotate(-4deg) scale(0.96); }
-    30% { transform: translateX(15px) translateY(-11px) rotate(-13deg) scale(0.94); }
-    40% { transform: translateX(25px) translateY(-5px) rotate(-3deg) scale(0.96); }
-    50% { transform: translateX(17px) translateY(-13px) rotate(-11deg) scale(0.94); }
-    60% { transform: translateX(23px) translateY(-3px) rotate(-5deg) scale(0.96); }
-    70% { transform: translateX(16px) translateY(-12px) rotate(-14deg) scale(0.93); }
-    80% { transform: translateX(24px) translateY(-4px) rotate(-2deg) scale(0.96); }
-    90% { transform: translateX(18px) translateY(-10px) rotate(-10deg) scale(0.95); }
-  }
-
-  @keyframes bloodPoolSpread {
-    0% {
-      transform: scaleX(0.2) scaleY(0.5);
-      opacity: 0;
-    }
-    50% {
-      transform: scaleX(1.1) scaleY(1);
-      opacity: 0.9;
-    }
-    100% {
-      transform: scaleX(1) scaleY(1);
-      opacity: 0.85;
-    }
-  }
-
-  @keyframes bloodDripAppear {
-    0% {
-      transform: scale(0);
-      opacity: 0;
-    }
-    60% {
-      transform: scale(1.2);
-      opacity: 0.8;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0.6;
-    }
-  }
-
-  @keyframes knightVictoryBreathing {
-    0%, 100% {
-      transform: translateX(80px) translateY(0) scale(1);
-    }
-    50% {
-      transform: translateX(80px) translateY(-4px) scale(1.02);
-    }
-  }
-
-  @keyframes bloodPoolPulse {
-    0%, 100% {
-      transform: ${DEAD_LIE} scale(1);
-      opacity: 0.8;
-    }
-    50% {
-      transform: ${DEAD_LIE} scale(1.03);
-      opacity: 0.85;
-    }
-  }
-
-  @keyframes continuousDrip {
-    0% {
-      opacity: 0;
-      transform: translateY(0) scale(0.5);
-    }
-    20% {
-      opacity: 0.7;
-      transform: translateY(5px) scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(25px) scale(0.3);
-    }
-  }
-
-  @keyframes shadowBreathing {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 0.5;
-    }
-    50% {
-      transform: scale(1.15);
-      opacity: 0.35;
-    }
-  }
-
-  .animate-knightSlash {
-    animation: knightSlash 200ms ease-out;
-  }
-
-  .animate-screenShake {
-    animation: screenShake 300ms ease-out;
-  }
-
-  .animate-bugTremble {
-    animation: bugTremble 50ms ease-in-out infinite;
-  }
-`
 
 export default BattleReveal
