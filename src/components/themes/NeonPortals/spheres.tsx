@@ -4,10 +4,11 @@ import { useRef, useState, type FocusEvent, type PointerEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { createValueStore, useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { cssVars } from '@/lib/cssVars'
 import type { Project } from '@/lib/cv/content'
 import { BODY, FACE, Fact, Points, Tags } from './cards'
-import { aimAt, pointMotion } from './choreography'
+import { aimAt, pointMotion, type Pose } from './choreography'
 import type { Era } from './palette'
 import { FigureRow, Region, Rig } from './stage'
 import css from './spheres.module.css'
@@ -25,11 +26,15 @@ import css from './spheres.module.css'
 /** The aim: his arm's turn toward the card pointed at, or null when no card is. */
 type Aim = number | null
 
+const NO_ENTRANCE: readonly Pose[] = []
+
 function PointingFigure({ aim }: { aim: ValueStore<Aim> }) {
   const angle = useStoreValue(aim)
+  // His point is the rest of the shared sequence: it turns to the card aimed at, and back to idle.
+  const { pose } = usePoseSequence<Pose>({ entrance: NO_ENTRANCE, rest: pointMotion(angle).pose })
   return (
     <div className="absolute inset-0" style={cssVars({ '--aim': `${angle ?? 0}deg` })}>
-      <Rig motion={pointMotion(angle)} step={0} run size="row" />
+      <Rig motion={{ ...pointMotion(angle), pose }} step={0} run size="row" />
     </div>
   )
 }

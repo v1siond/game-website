@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useState, type AnimationEvent } from 'react'
+import { useEffect, useMemo, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
 import type { MartialArts } from '@/lib/cv/content'
@@ -61,6 +62,9 @@ function Mark({ text, lit }: { text: string; lit: boolean }) {
   )
 }
 
+const NO_ENTRANCE: readonly string[] = []
+const REST = 'rest'
+
 export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
   const { sections, actions } = useLabels()
   const { active } = useProfession()
@@ -70,11 +74,23 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
   const still = reduced || preview
   const steps = maskSteps(martialArts.primary.achievements.length)
   const scene = useMemo(() => maskScene(steps), [steps])
-  const [asked, setAsked] = useState(0)
-  const [settled, setSettled] = useState(0)
-  const step = still ? steps : Math.min(steps, Math.max(asked, on ? 1 : 0))
-  const moving = !still && settled < step
+  // Each step is a one shot move of the shared sequence, taken only at rest; the takes count the steps.
+  const sequence = usePoseSequence<string>({ entrance: NO_ENTRANCE, rest: REST, policy: 'rest' })
+  const { play, take } = sequence
+  const step = still ? steps : Math.min(steps, take)
+  const moving = !still && sequence.move !== null
   const spot = maskSpot(step, steps)
+  const playNext = () => {
+    const next = scene.legs[step]
+    if (!next) return
+    play(next.name)
+  }
+
+  // The first step plays once, when the section shows.
+  useEffect(() => {
+    if (!on || still || steps === 0 || take > 0) return
+    play('step-1')
+  }, [on, still, steps, take, play])
 
   // A step counts the moment it starts, so no later press or scroll can lose it.
   useEffect(() => {
@@ -84,7 +100,7 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
 
   const stepped = (event: AnimationEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
-    setSettled(step)
+    sequence.settle()
   }
 
   return (
@@ -100,7 +116,7 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
           <Rig motion={maskMotion(scene, step, moving)} step={step} run={on} size="strip" onAnimationEnd={stepped} />
         </div>
       </Strip>
-      {!still && <SceneButton label={actions.next} onPress={() => setAsked(step + 1)} disabled={moving || step >= steps} className="-mt-2 mb-6" />}
+      {!still && <SceneButton label={actions.next} onPress={playNext} disabled={moving || step >= steps} className="-mt-2 mb-6" />}
       <h3 className={`${FACE} ${ART_PLATE} mb-4 inline-block text-2xl leading-tight tracking-wide text-[color:var(--np-gold)]`}>{martialArts.primary.title}</h3>
       <div className={BODY}>
         <MuayThaiRecord martialArts={martialArts} classNames={RECORD_LOOK} renderAchievement={(text, index) => <Mark text={text} lit={index < step} />} />
