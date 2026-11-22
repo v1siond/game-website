@@ -34,11 +34,12 @@ function SaveDesk({ line }: { line: string }) {
         <button
           type="button"
           onClick={() => {
+            if (ribbons === 0) return
             setRibbons((left) => Math.max(left - 1, 0))
             save()
           }}
-          disabled={ribbons === 0}
-          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] enabled:hover:border-[color:var(--sh-flame)] disabled:opacity-60`}
+          aria-disabled={ribbons === 0}
+          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)] aria-disabled:opacity-60`}
         >
           {words.save}
         </button>

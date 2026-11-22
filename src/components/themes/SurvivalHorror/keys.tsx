@@ -78,6 +78,10 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
   const { band, years, linkProps } = slot
   const suitName = words[suit]
   const behindId = `survival-horror-band-${band.id}`
+  const unlock = () => {
+    if (unlocked) return
+    setUnlocked(true)
+  }
 
   return (
     <article className={`p-4 ${look.file}`}>
@@ -114,11 +118,11 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => setUnlocked(true)}
-          disabled={unlocked}
+          onClick={unlock}
+          aria-disabled={unlocked}
           aria-controls={behindId}
           aria-label={unlocked ? undefined : fillLabel(words.useKeyOn, { suit: suitName, band: band.name })}
-          className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-ivory)] enabled:hover:border-[color:var(--sh-flame)] disabled:cursor-default`}
+          className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-ivory)] aria-[disabled=false]:hover:border-[color:var(--sh-flame)] aria-disabled:cursor-default`}
         >
           <Key suit={suit} turned={unlocked} />
           {unlocked ? words.unlocked : fillLabel(words.useKey, { suit: suitName })}

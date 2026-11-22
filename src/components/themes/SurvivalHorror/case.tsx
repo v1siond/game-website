@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
+import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
 import { STAMP } from './cards'
@@ -18,7 +19,8 @@ import look from './world.module.css'
 // lining when the section comes into view (once), and every project lies in it as an item in its own
 // felt cell. Examine picks the item up and turns it over in the light, the genre's examine view, and its
 // back reads the description, the result, the tools and the links; Put it back turns it face up again.
-// The face that is turned away is inert, so the keyboard only ever reaches the side in view.
+// The face that is turned away is inert, so the keyboard only ever reaches the side in view, and the turn
+// hands keyboard focus to the button of the face that comes up.
 //
 // Animated: the lid (once), the cells settling in (once), the item's turn on Examine.
 
@@ -72,7 +74,13 @@ function ItemPicture({ index }: { index: number }) {
 const LINK_PLATE = `${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`
 const TURN_PLATE = `${CARD_BUTTON} border-[color:var(--sh-felt-line)] bg-[color:var(--sh-void)] text-[color:var(--sh-ivory)] hover:border-[color:var(--sh-flame)]`
 
-function ItemFront({ slot, index, onExamine }: { slot: ProjectSlot; index: number; onExamine: () => void }) {
+interface FaceProps {
+  slot: ProjectSlot
+  turnRef: RefObject<HTMLButtonElement | null>
+  onTurn: () => void
+}
+
+function ItemFront({ slot, index, turnRef, onTurn }: FaceProps & { index: number }) {
   const { horror: words } = useLabels()
   const { project, years } = slot
 
@@ -85,7 +93,7 @@ function ItemFront({ slot, index, onExamine }: { slot: ProjectSlot; index: numbe
       <p className="text-sm text-[color:var(--sh-cream)]">{project.role}</p>
       {years && <span className={STAMP}>{years}</span>}
       <p className="text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.tagline}</p>
-      <button type="button" onClick={onExamine} aria-label={fillLabel(words.examineItem, { name: project.name })} className={`mt-auto ${TURN_PLATE}`}>
+      <button ref={turnRef} type="button" onClick={onTurn} aria-label={fillLabel(words.examineItem, { name: project.name })} className={`mt-auto ${TURN_PLATE}`}>
         {words.examine}
       </button>
     </div>
@@ -107,7 +115,7 @@ function ToolList({ project }: { project: Project }) {
   )
 }
 
-function ItemBack({ slot, onPutBack }: { slot: ProjectSlot; onPutBack: () => void }) {
+function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
   const { horror: words, links: linkLabels } = useLabels()
   const { project, links } = slot
 
@@ -126,7 +134,7 @@ function ItemBack({ slot, onPutBack }: { slot: ProjectSlot; onPutBack: () => voi
           </a>
         ))}
         {links.length === 0 && <span className="text-sm italic text-[color:var(--sh-cream)]">{linkLabels.noPublicLink}</span>}
-        <button type="button" onClick={onPutBack} className={TURN_PLATE}>
+        <button ref={turnRef} type="button" onClick={onTurn} className={TURN_PLATE}>
           {words.putBack}
         </button>
       </div>
@@ -137,15 +145,19 @@ function ItemBack({ slot, onPutBack }: { slot: ProjectSlot; onPutBack: () => voi
 // Both faces sit in one grid cell so the item is as tall as its longer face; the turn is a 3D flip.
 function CaseItem({ slot, index }: { slot: ProjectSlot; index: number }) {
   const [turned, setTurned] = useState(false)
+  const examine = useRef<HTMLButtonElement>(null)
+  const putBack = useRef<HTMLButtonElement>(null)
+  // Before the paint of the turn, once the face pressed has gone inert and dropped focus.
+  useOnChange(turned, (backUp) => (backUp ? putBack : examine).current?.focus(), { timing: 'layout' })
 
   return (
     <div className={horror.examineCell}>
       <div className={`grid ${horror.flip} ${turned ? horror.flipped : ''}`}>
         <div className={`col-start-1 row-start-1 ${horror.face}`} inert={turned}>
-          <ItemFront slot={slot} index={index} onExamine={() => setTurned(true)} />
+          <ItemFront slot={slot} index={index} turnRef={examine} onTurn={() => setTurned(true)} />
         </div>
         <div className={`col-start-1 row-start-1 ${horror.face} ${horror.faceBack}`} inert={!turned}>
-          <ItemBack slot={slot} onPutBack={() => setTurned(false)} />
+          <ItemBack slot={slot} turnRef={putBack} onTurn={() => setTurned(false)} />
         </div>
       </div>
     </div>
