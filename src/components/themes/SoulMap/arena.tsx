@@ -6,6 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { InView } from '@/components/themes/shared/held'
 import type { MartialArts } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
@@ -13,7 +14,6 @@ import { useRunActions, useRunState } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { Panel } from './menu'
 import { CARVED, SOUL } from './palette'
-import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
 // The Muay Thai record is fought behind the game's fog wall. The visitor walks him through the fog
@@ -33,7 +33,7 @@ import souls from './souls.module.css'
 // - The partner's bar at nothing is the gold banner, a round won, and souls; another round and the
 //   partner gets up.
 // The record itself (his dojo, rank, years, achievements) stands beside the ring the whole time. The fog
-// wall swirls once as the ring comes into view (its own section trigger, ashen.module.css .cue).
+// wall swirls once as the ring comes into view (its own InView).
 
 type Bout = 'fog' | 'parting' | 'fight' | 'down' | 'won'
 
@@ -242,7 +242,6 @@ function useBout() {
 function SparRing() {
   const { souls: words } = useLabels()
   const { ref, inView } = useSectionTrigger({ threshold: 0.4, triggerOnce: false })
-  const cue = useSectionTrigger({ threshold: 0.4 })
   const { bout, partnerHp, notice, me, partner, partnerSwing, strike, guard, again, traverse } = useBout()
   // Whether the visitor has moved since the partner's last cross: the partner answers a move, never runs on alone.
   const [owed, setOwed] = useState(false)
@@ -288,7 +287,7 @@ function SparRing() {
 
   return (
     <div ref={ref}>
-      <div ref={cue.ref} data-on={cue.triggered || undefined} className={`relative aspect-[4/3] overflow-hidden border border-[color:var(--soul-ridge)] sm:aspect-[16/9] ${ashen.cue}`}>
+      <InView threshold={0.4} className="relative aspect-[4/3] overflow-hidden border border-[color:var(--soul-ridge)] sm:aspect-[16/9]">
         <Ring />
         <div className={`absolute bottom-[18%] left-[18%] aspect-[60/96] h-[56%] ${bout === 'fog' ? '' : souls.advance}`}>
           <Knight key={me.key} gear="fighter" pose={me.pose} className="h-full w-full" />
@@ -307,7 +306,7 @@ function SparRing() {
             {notice}
           </p>
         )}
-      </div>
+      </InView>
       {inRing && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           <button ref={lead} type="button" onClick={answered(won ? again : strike)} aria-disabled={!fighting && !won} className={BUTTON_LIT}>

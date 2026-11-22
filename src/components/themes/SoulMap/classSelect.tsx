@@ -6,7 +6,7 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { drumsSince, muayThaiFacts } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useOnChange } from '@/hooks/useOnChange'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { InView } from '@/components/themes/shared/held'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
@@ -22,7 +22,7 @@ import souls from './souls.module.css'
 // wooden post), and the status sheet on the right. The sheet lists real counts from the content (how many
 // jobs, projects, ventures, bands, the Muay Thai record's own facts), never a self rated number. A pick
 // fades the stage to black and he gets up again in the new gear. The stage waits until it is in view (the
-// shared section trigger, ashen.module.css .cue), then he works his class's act once and holds it.
+// shared InView), then he works his class's act once and holds it.
 
 interface StatusRow {
   label: string
@@ -106,14 +106,13 @@ const PROP: Record<Profession, () => ReactNode> = {
 function ClassStage({ profession }: { profession: Profession }) {
   const script = usePoseScript('act')
   const { replay } = script
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   // A new class: out of the black he comes up off one knee in its gear, the way he comes back at a fire,
   // then takes up its work.
   useOnChange(profession, () => replay([{ pose: 'respawn', ms: RESPAWN_MS }]))
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={`relative aspect-[4/3] overflow-hidden ${ashen.panel} ${ashen.cue}`}>
+    <InView threshold={0.3} className={`relative aspect-[4/3] overflow-hidden ${ashen.panel}`}>
       <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
         <defs>
           <radialGradient id="class-light" cx="0.5" cy="0.35" r="0.7">
@@ -138,7 +137,7 @@ function ClassStage({ profession }: { profession: Profession }) {
       {script.key > 0 && (
         <div key={profession} className={`pointer-events-none absolute inset-0 bg-[color:var(--soul-ink)] ${souls.blackout}`} aria-hidden="true" />
       )}
-    </div>
+    </InView>
   )
 }
 

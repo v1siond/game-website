@@ -2,17 +2,17 @@
 
 import type { ReactNode } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { heldUntil } from '@/components/themes/shared/held'
 import { Knight } from './knight'
 import { useTriggeredScript, type PoseStep } from './poses'
 import { SOUL } from './palette'
-import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
 // About is behind a fog gate, the white wall the game puts at the way into a new area. When the visitor
 // reaches it he walks out of the fog under the stone arch (two heavy strides, 2.4 s), the wall thins
 // behind him and the fog lying over the panel clears, so the words are what he walked in to. Once
 // through he breathes once at the panel's edge and stands still (4.4 s in all); until the gate is reached
-// he waits on his first frame (ashen.module.css .cue). Under reduced motion he already stands through the
+// he waits on his first frame (heldUntil). Under reduced motion he already stands through the
 // gate and the fog is gone.
 
 const STRIDES: PoseStep[] = [{ pose: 'walk', ms: 2400 }]
@@ -33,7 +33,7 @@ export function FogGate({ children }: { children: ReactNode }) {
   const through = triggered || reduced
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={ashen.cue}>
+    <div ref={ref} className={heldUntil(triggered)}>
       <div className="relative h-28 overflow-hidden">
         <Arch />
         <div className={`absolute bottom-0 left-4 h-24 w-[3.75rem] ${through ? souls.gateThrough : ''}`}>
