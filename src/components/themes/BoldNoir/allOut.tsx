@@ -5,6 +5,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { GlassStar, HitStar } from './backdrop'
+import { Bullet, Chips } from './cards'
 import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -158,22 +159,11 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
         {project.details.length > 0 && (
           <ul className="mt-4 space-y-1.5" aria-label={labels.cards.details}>
             {project.details.map((detail) => (
-              <li key={detail} className={`flex items-start gap-2 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>
-                <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
-                {detail}
-              </li>
+              <Bullet key={detail}>{detail}</Bullet>
             ))}
           </ul>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={labels.sections.techStack}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className={`px-2 py-0.5 text-sm font-bold ${world.chip} ${world.copy}`}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
+        {project.techStack.length > 0 && <Chips items={project.techStack} label={labels.sections.techStack} className="mt-4" />}
         <div className="mt-6 flex flex-wrap gap-3">
           {links.length > 0 ? (
             links.map((link) => (
