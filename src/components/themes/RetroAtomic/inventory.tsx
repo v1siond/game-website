@@ -3,7 +3,7 @@
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { ventureCard } from '@/lib/cv/cvView'
@@ -24,7 +24,7 @@ export function Inventory({ categories }: { categories: CVData['techStack'] }) {
 
   return (
     <div className={`p-4 sm:p-6 ${atomic.panel}`}>
-      <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+      <ul className={MASONRY_COLUMN_LIST} aria-label={cards.techByCategory}>
         {categories.map((category) => (
           <li key={category.id} className={MASONRY_ITEM}>
             <h3

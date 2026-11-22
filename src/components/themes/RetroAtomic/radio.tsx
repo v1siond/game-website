@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { PHOSPHOR, PHOSPHOR_DEEP } from './palette'
 import atomic from './atomic.module.css'
@@ -118,7 +118,7 @@ export function Radio({ bands }: { bands: Band[] }) {
       <div data-stage-items="">
         <BandList
           bands={bands}
-          className={MASONRY_LIST}
+          className={MASONRY_COLUMN_LIST}
           itemClassName={MASONRY_ITEM}
           renderBand={(slot, index) => <Station slot={slot} tuned={index === tuned} onTune={() => setTuned(index)} />}
         />

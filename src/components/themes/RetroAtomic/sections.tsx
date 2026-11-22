@@ -6,7 +6,7 @@ import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { atomicId } from './anchors'
 import { QuestLog } from './quests'
 import { Holotapes, Inventory } from './inventory'
@@ -75,7 +75,7 @@ function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
 
 function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
   return (
-    <ul className={MASONRY_LIST} data-stage-items="">
+    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
       {slot.services.map((service) => (
         <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
           <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>

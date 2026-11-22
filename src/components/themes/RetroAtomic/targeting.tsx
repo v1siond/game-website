@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { projectCard } from '@/lib/cv/cvView'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -306,7 +306,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
       <div data-stage-items="">
         <ProjectList
           projects={projects}
-          className={MASONRY_LIST}
+          className={MASONRY_COLUMN_LIST}
           itemClassName={MASONRY_ITEM}
           renderProject={(slot, index) => (
             <>

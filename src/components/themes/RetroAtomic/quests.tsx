@@ -2,7 +2,7 @@ import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { TagList } from '@/components/cv/TagList'
 import { ATOMIC_CHIPS, PLUS_ROWS } from './controls'
@@ -50,7 +50,7 @@ function QuestCard({ job: entry }: { job: Job }) {
 
 export function QuestLog({ jobs }: { jobs: Job[] }) {
   return (
-    <ul className={MASONRY_LIST}>
+    <ul className={MASONRY_COLUMN_LIST}>
       {jobs.map((job) => (
         <li key={job.id} className={MASONRY_ITEM}>
           <QuestCard job={job} />
