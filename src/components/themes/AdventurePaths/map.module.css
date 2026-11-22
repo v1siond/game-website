@@ -1,18 +1,14 @@
 /*
- * Adventure Paths' look and motion: an explorer's hand inked map read like an overworld. Transform and
- * opacity only, never an animated shadow, blur or layout property. The resting frame of every reveal is
- * the plain style, so reduced motion (the block at the end) shows the finished map with
- * nothing playing. Colours are the --ap-* variables palette.ts sets on the root; --mx and --my
- * (-1 to 1) are the pointer from usePointerVars; --scene-progress (0 to 1) is a ScrollScene's progress.
+ * Adventure Paths' overworld map in the hero: an explorer's hand inked map read like an overworld.
+ * Transform and opacity only, never an animated shadow, blur or layout property. Colours are the --ap-*
+ * variables palette.ts sets on the root; --mx and --my (-1 to 1) are the pointer from usePointerVars.
  *
- * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites,
- * the dotted trail appears one dot at a time, a tile that is cleared flips its colour in one frame, and
- * the only smooth motions are the camera (the unroll, the zoom into a landmark) and his walk.
- *
- * The map's life plays once the map shows (the hero holds it until then, heldUntil) and has ended within
- * 5 s: each two frame loop a set number of beats, ending on its first frame, the clouds the first 5 s of
- * their drift at their own pace; his act frames a set number of beats, his step frames as many as his walk
- * takes (walk.ts). The entrance's transitions are scaled by --fit (entrance.ts), so it ends within 5 s.
+ * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites, and
+ * the only smooth motions are the camera (the zoom into a landmark) and his walk when a profession is
+ * picked. The map's life plays once on load and has ended within 5 s: each two frame loop a set number of
+ * beats, ending on its first frame, the clouds the first 5 s of their drift; his act frames a set number of
+ * beats, his step frames as many as his walk takes (walk.ts). Reduced motion (the block at the end) shows
+ * the map with nothing playing.
  */
 
 .root {
@@ -22,113 +18,15 @@
   --my: 0;
 }
 
-/* The ring of the cards focused from code (a job or band card a ledge or block sends the focus to,
- * tabindex -1), which the global ring in globals.css does not reach; every other control takes that one. */
-.root [tabindex='-1']:focus-visible {
-  outline: 3px solid var(--ap-gold);
-  outline-offset: 3px;
-}
-
-/* ---------------------------------------------------------------------------------------------------
- * The hub map: unrolled on arrival, inked, the trail dotted in, then he walks to his landmark.
- * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx). A phase hides
- * its pieces only under html[data-intro], set before the first paint when the entrance will play
- * (src/themes/introFlag.ts), so with no JavaScript or under reduced motion the server HTML is the
- * finished map. The marker is the exception: it stays hidden until the client places him.
- * ------------------------------------------------------------------------------------------------- */
-
 /* The map held in two hands: it leans a few degrees toward the pointer. */
 .mapTilt {
   transform: perspective(1400px) rotateX(calc(var(--my) * -2.5deg)) rotateY(calc(var(--mx) * 3.5deg));
   transition: transform 240ms ease-out;
 }
 
-/* The rolled part of the map slides off to the right with the wooden roller at its edge. */
-.cover {
-  transform: translate3d(101%, 0, 0);
-  transition: transform calc(1100ms * var(--fit, 1)) var(--glide);
-}
-
-:global(html[data-intro]) [data-unrolled='false'] .cover {
-  transform: none;
-  transition: none;
-}
-
-/* The ink: coast, landmarks and the woods rise into place once the paper is flat, each on its --i. */
-.inked {
-  transition:
-    opacity calc(380ms * var(--fit, 1)) ease-out calc(var(--i, 0) * 90ms * var(--fit, 1)),
-    transform calc(380ms * var(--fit, 1)) var(--pop) calc(var(--i, 0) * 90ms * var(--fit, 1));
-}
-
-:global(html[data-intro]) [data-inked='false'] .inked {
-  opacity: 0;
-  transform: translate3d(0, 10px, 0);
-  transition: none;
-}
-
-/* The trail appears one dot at a time in trail order (--at along the trail, --leg for its stretch), each
- * dot fading in on its own, as a new path appears tile by tile on the overworld map. */
-.dot {
-  transition: opacity calc(260ms * var(--fit, 1)) ease-out calc((var(--leg, 0) + var(--at, 0)) * var(--trail-ms, 560ms) * var(--fit, 1));
-}
-
-:global(html[data-intro]) [data-trailed='false'] .dot {
-  opacity: 0;
-  transition: none;
-}
-
-/* A tile keeps its colour for good; it only fades in with the trail that reaches it. */
 .tile {
   transform-box: fill-box;
   transform-origin: center;
-}
-
-.tileLit {
-  transition: opacity 260ms ease-out;
-}
-
-:global(html[data-intro]) [data-trailed='false'] .tileLit {
-  opacity: 0;
-  transition: none;
-}
-
-/* The name plaque swings down on its two ropes and settles. */
-.plaque {
-  transform-origin: 50% -40px;
-  transition:
-    transform calc(760ms * var(--fit, 1)) var(--pop),
-    opacity calc(200ms * var(--fit, 1)) ease-out;
-}
-
-:global(html[data-intro]) [data-inked='false'] .plaque {
-  opacity: 0;
-  transform: translate3d(0, -40px, 0) rotate(-6deg);
-  transition: none;
-}
-
-.plaqueSettle {
-  transform-origin: 50% -40px;
-  animation: plaque-sway calc(1400ms * var(--fit, 1)) ease-out calc(760ms * var(--fit, 1)) 1 both;
-}
-
-[data-inked='false'] .plaqueSettle {
-  animation: none;
-}
-
-@keyframes plaque-sway {
-  0% {
-    transform: rotate(0);
-  }
-  30% {
-    transform: rotate(2.2deg);
-  }
-  60% {
-    transform: rotate(-1.2deg);
-  }
-  100% {
-    transform: rotate(0);
-  }
 }
 
 /* The hills on the map breathe in two frames, out of step with each other (--i), and rest unbreathed
@@ -260,22 +158,10 @@
   opacity: 1;
 }
 
-/* ---- his marker: placed by the walker's transform; he drops onto the start tile, steps while walking ---- */
+/* ---- his marker: placed by the walker's transform; he steps while walking ---- */
 
 .marker {
   will-change: transform;
-}
-
-.markerDrop {
-  transition:
-    transform calc(420ms * var(--fit, 1)) var(--pop),
-    opacity calc(120ms * var(--fit, 1)) linear;
-}
-
-[data-landed='false'] .markerDrop {
-  opacity: 0;
-  transform: translate3d(0, -70px, 0);
-  transition: none;
 }
 
 .figure {
@@ -464,49 +350,6 @@
 /* ---- the switch palaces (switches.tsx): the switch squashes flat in two frames, the outlined blocks
  * fill solid one after another, the message box opens from its centre ---- */
 
-.switchCap {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  transition: transform 160ms steps(2, jump-none);
-}
-
-.switch:hover .switchCap {
-  transform: translate3d(0, -2px, 0);
-}
-
-.switch[aria-expanded='true'] .switchCap {
-  transform: scale(1.08, 0.45);
-}
-
-.block {
-  opacity: 0;
-  transform: scale(0.6);
-  transition:
-    opacity 120ms steps(2, jump-none) calc(var(--i, 0) * 70ms),
-    transform 220ms var(--pop) calc(var(--i, 0) * 70ms);
-}
-
-.block[data-solid='true'] {
-  opacity: 1;
-  transform: none;
-}
-
-.messageBox {
-  transform-origin: 50% 50%;
-  animation: message-open 430ms steps(6, jump-none) 1 both;
-}
-
-@keyframes message-open {
-  from {
-    opacity: 0;
-    transform: scale(0.1, 0.1);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 /* ---------------------------------------------------------------------------------------------------
  * Reduced motion: every reveal shows its resting frame, every loop stands still.
  * ------------------------------------------------------------------------------------------------- */
@@ -522,7 +365,7 @@
   .ship,
   .flame,
   .cloudDrift,
-  .plaqueSettle,
+
   .nameBox,
   .camera[data-entering='true'],
   .camera[data-entering='true'] + .mosaic,
@@ -537,19 +380,8 @@
     opacity: 1;
   }
 
-  .messageBox {
-    animation: none;
-  }
-
-  .switchCap,
-  .block,
-  .cover,
-  .inked,
-  .dot,
-  .tileLit,
   .fall,
-  .plaque,
-  .markerDrop,
+
   .landmark,
   .ring {
     transition: none;

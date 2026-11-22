@@ -1,7 +1,8 @@
+import { gaitAt, walkOn } from '@/lib/motion/gait'
 import { mulberry32 } from '@/lib/random/seeded'
 import { TOMB, TOMB_DEPTH } from '../palette'
 import { defs, fade, fx, glow, lerp, linear, radial, rect, r1, spread, svg, tf } from '../draw'
-import { courier, joints, setPose, stride, type Pose } from '../courier'
+import { courier, joints, setPose, type Pose } from '../courier'
 import { clamp01, reached, type Era } from './era'
 
 // Tech: the sun tomb. A hall of columns towards a lit door; he carries a torch down it and a glyph tablet
@@ -26,9 +27,12 @@ const glyphs = (seed: number): string => {
 
 const tabletsAt = (count: number): number[] => spread(count, 520, 1080)
 
-const carryPose = (xs: readonly number[], f: number): Partial<Pose> => {
-  const x = lerp(xs[0] - 40, xs[xs.length - 1] + 30, clamp01(f / Math.max(1, xs.length)))
-  return { x, y: 905, scale: 1.2, ...stride(f * 1.2, 0.7), shF: 150, elF: 20, head: -4 }
+// A tablet's height on the wall: over the door's arch in the middle, down to his torch's reach at the sides.
+const tabletY = (x: number): number => 350 + 150 * Math.min(1, Math.abs(x - 800) / 300)
+
+const carryPose = (xs: readonly number[], p: number, f: number): Partial<Pose> => {
+  const x = walkOn(lerp(xs[0] - 40, xs[xs.length - 1] + 30, clamp01(f / Math.max(1, xs.length))), p)
+  return { x, y: 905, scale: 1.2, ...gaitAt(x, 1.2, 0.7), shF: 150, elF: 20, head: -4 }
 }
 
 export const tomb: Era = {
@@ -36,7 +40,7 @@ export const tomb: Era = {
     const xs = tabletsAt(count)
     const tablets = xs
       .map(
-        (x, i) => `<g transform="translate(${r1(x)} 330)">
+        (x, i) => `<g transform="translate(${r1(x)} ${r1(tabletY(x))})">
     <g data-fx="tglow-${i}" opacity="0">${defs(radial(`tc-g-${i}`, [[0, TOMB.glyph, 0.8], [1, TOMB.glyph, 0]]))}<circle cy="-40" r="80" fill="url(#tc-g-${i})"/></g>
     <rect x="-28" y="-86" width="56" height="92" rx="6" fill="${TOMB.tablet}" stroke="${TOMB.goldDim}" stroke-width="3"/>
     <g data-fx="glyph-${i}" stroke="${TOMB.glyph}" fill="none" stroke-width="3" opacity="0.2">${glyphs(40 + i)}</g></g>`,
@@ -46,7 +50,7 @@ export const tomb: Era = {
       .map((d) => [-1, 1].map((side) => column(800 + side * (140 + d * 70), 700 + d * 22, 240 + d * 50, 34 + d * 10, TOMB_DEPTH[d], TOMB.gold)).join(''))
       .join('')
     const floorLines = Array.from({ length: 11 }, (_, i) => `<path d="M800,600 L${-400 + i * 240},1000" stroke="${TOMB.floorLine}" stroke-width="2"/>`).join('')
-    const start = carryPose(xs, 0)
+    const start = carryPose(xs, 0, 0)
     return {
       sky: svg(`${defs(linear('tc-wall', [[0, TOMB.wallTop], [1, TOMB.wallBottom]]), linear('tc-door', [[0, TOMB.door], [1, TOMB.doorWarm]]), linear('tc-beam', [[0, TOMB.beam, 0.55], [1, TOMB.beam, 0]]))}${rect('url(#tc-wall)')}
         ${glow('tc-door-g', 800, 520, 360, TOMB.doorGlow, 0.75)}<path d="M740,600 L740,420 Q800,380 860,420 L860,600 Z" fill="url(#tc-door)"/>
@@ -73,7 +77,7 @@ export const tomb: Era = {
         fade(glowNode, reached(f, i))
         fade(mark, 0.2 + reached(f, i) * 0.8)
       })
-      const pose = carryPose(xs, f)
+      const pose = carryPose(xs, p, f)
       tf(torchGlow, `translate(${r1((pose.x ?? 0) + 30)} 905)`)
       setPose(j, pose)
     }

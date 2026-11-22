@@ -25,7 +25,7 @@ const cratesAt = (count: number): Spot[] => {
 const spinPose = (crates: readonly Spot[], f: number): Partial<Pose> => {
   const at = Math.min(crates.length - 1, Math.max(0, Math.floor(f)))
   const spin = Math.sin(clamp01((f - Math.floor(f)) * 1.6) * Math.PI)
-  return { x: crates[at].x + 54, y: 960, scale: 1.05, lean: -spin * 14, shF: 40 + spin * 90, shB: -30 - spin * 70, elF: 10, elB: 10, hipF: 14 + spin * 12, hipB: -14, head: -4, scarf: spin * 30 }
+  return { x: crates[at].x + 54, y: 900, scale: 1.05, lean: -spin * 14, shF: 40 + spin * 90, shB: -30 - spin * 70, elF: 10, elB: 10, hipF: 14 + spin * 12, hipB: -14, head: -4, scarf: spin * 30 }
 }
 
 export const wall: Era = {

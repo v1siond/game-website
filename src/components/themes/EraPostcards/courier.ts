@@ -126,21 +126,3 @@ export function setPose(j: Joints, pose: Partial<Pose>): void {
   const at = poseTransforms(pose)
   for (const key of Object.keys(at) as Joint[]) j[key].setAttribute('transform', at[key])
 }
-
-/** A walk or run cycle at a phase in turns (1 is one full stride). */
-export function stride(phase: number, size = 1): Partial<Pose> {
-  const a = Math.sin(phase * Math.PI * 2)
-  const b = Math.cos(phase * Math.PI * 2)
-  return {
-    hipF: 28 * a * size,
-    hipB: -28 * a * size,
-    kneeF: -Math.max(0, -b) * 50 * size - 6,
-    kneeB: -Math.max(0, b) * 50 * size - 6,
-    shF: -30 * a * size,
-    shB: 30 * a * size,
-    elF: 30,
-    elB: 30,
-    lift: Math.abs(b) * 5 * size,
-    scarf: Math.sin(phase * Math.PI * 4) * 6,
-  }
-}

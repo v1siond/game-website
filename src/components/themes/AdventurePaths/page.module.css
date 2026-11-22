@@ -1,0 +1,302 @@
+/* Adventure Paths: the text over the levels. Every colour is a palette variable (--ap-*, palette.ts). The
+   text is plain HTML in normal flow over the fixed theatre; it is never scaled, faded or blurred, so it is
+   opaque from its first frame. Titles and labels sit on the black HUD plates of the 16 bit games and the
+   cards are the message windows' white pages, so every word reads on any frame of any level. */
+
+.root {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--ap-night);
+  color: var(--ap-parchment);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.theatre {
+  --theatre-ground: var(--ap-night);
+  --theatre-veil: var(--ap-hud);
+}
+
+/* The shade under the text column, so the HUD plates and cards sit on a calmer frame; it fades with its stage. */
+.scrim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, color-mix(in srgb, var(--ap-night) 45%, transparent), transparent 55%);
+}
+
+.skip {
+  position: fixed;
+  left: 16px;
+  top: -80px;
+  z-index: 40;
+  padding: 10px 16px;
+  border-radius: 4px;
+  background: var(--ap-gold);
+  color: var(--ap-ink);
+  font-weight: 700;
+}
+
+.skip:focus {
+  top: 16px;
+}
+
+/* ---- The HUD bar: his initials, the level the page is in and his count in it ---- */
+.hud {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 6px 220px 6px clamp(16px, 5vw, 80px);
+  background: var(--ap-hud);
+  border-bottom: 3px solid var(--ap-page);
+  color: white;
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 2px solid var(--ap-coin);
+  border-radius: 4px;
+  color: var(--ap-coin);
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.hudText {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hudCount {
+  color: var(--ap-coin);
+}
+
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- The hero: the plaque and his plate in one column, the overworld map beside it from lg ---- */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-areas: 'plaque' 'map' 'plate';
+  gap: 16px;
+  align-content: start;
+  min-height: 100svh;
+  padding: 72px 16px 24px;
+}
+
+.plaque {
+  grid-area: plaque;
+  width: 100%;
+  max-width: 560px;
+  justify-self: center;
+  padding-top: 24px;
+}
+
+.map {
+  grid-area: map;
+  width: 100%;
+  max-width: min(760px, calc((100svh - 340px) * 5 / 3));
+  justify-self: center;
+}
+
+.wardrobe {
+  grid-area: plate;
+  justify-self: center;
+}
+
+/* Below lg the plate comes after the map, with a band of open sky above it that its fan opens into, clear
+   of the map's landmarks and the plaque's links. */
+@media (max-width: 1023.98px) {
+  .wardrobe {
+    margin-top: 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    grid-template-columns: minmax(360px, 460px) minmax(0, 1fr);
+    grid-template-areas: 'plaque map' 'plate map';
+    grid-template-rows: auto 1fr;
+    align-content: center;
+    column-gap: clamp(24px, 4vw, 64px);
+    padding: 80px clamp(24px, 5vw, 80px) 40px;
+  }
+
+  .plaque {
+    align-self: end;
+  }
+
+  .wardrobe {
+    align-self: start;
+  }
+
+  .map {
+    align-self: center;
+    max-width: min(820px, calc((100svh - 160px) * 5 / 3));
+  }
+}
+
+/* ---- A level: a tall head that holds the picture alone, then brings the title up, then the cards ---- */
+.level {
+  position: relative;
+  padding: 0 clamp(16px, 5vw, 80px) 70svh;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 125svh;
+  padding-bottom: 12svh;
+}
+
+.place {
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: var(--ap-hud);
+  color: var(--ap-coin);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.title {
+  margin: 0;
+  padding: 0.1em 0.35em;
+  border: 4px solid white;
+  border-radius: 8px;
+  background: var(--ap-hud);
+  color: white;
+  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--ap-hud) 60%, transparent);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(640px, 46vw);
+}
+
+/* The tech stack's categories are the shared list's own items, so they take the card look from their place. */
+.tech > ul {
+  columns: 1;
+}
+
+.tech > ul > li {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 3px solid var(--ap-hud);
+  border-radius: 6px;
+  background: var(--ap-page);
+  color: var(--ap-ink);
+  box-shadow: 0 5px 0 var(--ap-hud);
+}
+
+/* ---- The goal: the contact over the flagpole run ---- */
+.goal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 150svh;
+  padding: 30svh clamp(16px, 5vw, 80px) 20svh;
+}
+
+.goalCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(640px, 100%);
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 40px;
+  text-align: center;
+}
+
+.copyright {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: var(--ap-hud);
+  color: white;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767.98px) {
+  .hud {
+    min-height: 48px;
+    padding: 4px 180px 4px 16px;
+  }
+
+  .hudText {
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    padding-top: 60px;
+    gap: 12px;
+  }
+
+  .level {
+    padding-bottom: 60svh;
+  }
+
+  .head {
+    min-height: 115svh;
+    padding-bottom: 10svh;
+  }
+
+  .body {
+    width: 100%;
+  }
+}
+
+/* Reduced motion: each stage sits still at the top of its section, so the heads need one screen only. */
+.still .hero,
+.still .level,
+.still .goal {
+  isolation: isolate;
+}
+
+.still .level {
+  padding-bottom: 20svh;
+}
+
+.still .head {
+  min-height: 100svh;
+}
+
+/* The HUD follows the scroll engine, which does not run here. */
+.still .hudText {
+  display: none;
+}
+
+.still .goal {
+  min-height: 100svh;
+  padding-top: 10svh;
+}
