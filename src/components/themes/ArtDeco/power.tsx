@@ -55,8 +55,8 @@ export function PoweredRoom({ children }: { children: ReactNode }) {
 
   return (
     <div ref={ref} className="grid items-end gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
-      <div className="flex items-end justify-center gap-1 sm:justify-start" aria-hidden={!triggered || undefined}>
-        <div className="h-36 w-24">
+      <div className="flex items-end justify-center gap-1 sm:justify-start">
+        <div className="h-36 w-24" aria-hidden="true">
           {triggered && (
             <div className={`h-full w-full ${pose === 'walk' ? s.walkIn : ''}`} onAnimationEnd={onOwnAnimationEnd}>
               <SurvivorSprite profession="engineer" motion={pose} onDone={advance} className="h-full w-full" />
