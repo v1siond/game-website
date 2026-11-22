@@ -176,6 +176,9 @@ export const HIGHWAY = {
   bike: '#d94a6a',
   bikeEdge: '#2a0e3f',
   bikeShine: '#ffd1dc',
+  seat: '#1a0b2e',
+  seatShine: '#5b2a6e',
+  wheel: '#2a0e3f',
   thrust: '#55f2ff',
 } as const
 
