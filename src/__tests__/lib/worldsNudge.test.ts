@@ -163,7 +163,7 @@ describe('nextInTour', () => {
 
   it('offers the world after the current one once every world was seen, wrapping at the end', () => {
     expect(nextInTour('neon-portals', TOUR_ORDER)).toBe('survival-horror')
-    expect(nextInTour('dark-fantasy', TOUR_ORDER)).toBe('medieval-fantasy')
+    expect(nextInTour('era-postcards', TOUR_ORDER)).toBe('medieval-fantasy')
   })
 })
 
@@ -176,8 +176,8 @@ describe('followingInTour and previousInTour', () => {
   })
 
   it('go round the tour in a circle at both ends', () => {
-    expect(followingInTour('dark-fantasy')).toBe('medieval-fantasy')
-    expect(previousInTour('medieval-fantasy')).toBe('dark-fantasy')
+    expect(followingInTour('era-postcards')).toBe('medieval-fantasy')
+    expect(previousInTour('medieval-fantasy')).toBe('era-postcards')
   })
 
   it('come back to the same world after a previous then a next, for every world', () => {
@@ -195,7 +195,7 @@ describe('followingInTour and previousInTour', () => {
 
   it('start an unknown id at the ends of the tour: next is the first world, previous the last', () => {
     expect(followingInTour('no-such-world')).toBe('medieval-fantasy')
-    expect(previousInTour('no-such-world')).toBe('dark-fantasy')
+    expect(previousInTour('no-such-world')).toBe('era-postcards')
   })
 })
 

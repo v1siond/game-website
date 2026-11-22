@@ -2,6 +2,7 @@
 import { TRAIL } from '@/components/themes/AdventurePaths/palette'
 import { DECO_COLORS } from '@/components/themes/ArtDeco/palette'
 import { DARK_FANTASY } from '@/components/themes/DarkFantasy/palette'
+import { LOOK as ERA_LOOK, PAGE as ERA_PAGE } from '@/components/themes/EraPostcards/palette'
 import { NOIR } from '@/components/themes/BoldNoir/palette'
 import { CEL } from '@/components/themes/CellShaded/palette'
 import { FS } from '@/components/themes/FighterSelect/palette'
@@ -40,6 +41,27 @@ export interface Theme {
 }
 
 export const themes: Theme[] = [
+  // Era Postcards - the default world: a scroll through the Chronoport, one era picture per part of the CV that rises from dark and sinks again
+  {
+    id: 'era-postcards',
+    name: 'Era Postcards',
+    description: 'A scroll through the time portal, one era for each part of the CV',
+    colors: {
+      background: ERA_PAGE.ink,
+      backgroundGradient: `linear-gradient(to bottom, ${ERA_PAGE.night}, ${ERA_PAGE.ink})`,
+      accent: ERA_PAGE.portal,
+      text: ERA_PAGE.chalk,
+      textMuted: ERA_PAGE.mist,
+      secondary: ERA_PAGE.padDrummer,
+      highlight: ERA_PAGE.padFighter,
+      border: ERA_LOOK.hero.rim,
+      borderHover: ERA_PAGE.portal,
+      surface: ERA_PAGE.night,
+      surfaceHover: ERA_LOOK.hero.card,
+    },
+    font: 'sans-serif',
+  },
+
   // 1. Dark Fantasy - an ethereal ruined kingdom of spirits and lanterns, him as its masked knight
   {
     id: 'dark-fantasy',
@@ -124,7 +146,7 @@ export const themes: Theme[] = [
     font: 'sans-serif',
   },
 
-  // 5. Adventure Paths - the default world: an explorer's overworld map whose regions hold each profession, ending at the goal gate
+  // 5. Adventure Paths - an explorer's overworld map whose regions hold each profession, ending at the goal gate
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
@@ -398,7 +420,7 @@ export const themes: Theme[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'adventure-paths'
+export const DEFAULT_THEME_ID = 'era-postcards'
 
 /** Where the chosen world is remembered. Exported because the failure screen has to read the world
  *  WITHOUT the ThemeProvider: a root-layout crash unmounts the providers, and the Pages Router tree

@@ -16,6 +16,14 @@
       "static/chunks/8928.5f2b4c1cd8a58960.js"
     ]
   },
+  "themes/worlds.ts -> @/components/themes/AdventurePathsTheme": {
+    "id": 54634,
+    "files": [
+      "static/css/7604ef9cbe021e94.css",
+      "static/chunks/414.191e5a1c2f248905.js",
+      "static/chunks/4634.153e238924c38c62.js"
+    ]
+  },
   "themes/worlds.ts -> @/components/themes/ArtDecoTheme": {
     "id": 74798,
     "files": [

@@ -33,6 +33,7 @@ export const TOUR_ORDER: readonly string[] = [
   'silhouette',
   'adventure-paths',
   'dark-fantasy',
+  'era-postcards',
 ]
 
 /** Set once the wardrobe's fan of outfits has played (sessionStorage), so it plays once per visit. */
