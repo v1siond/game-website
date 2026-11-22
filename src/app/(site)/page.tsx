@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getAllCVData } from '@/lib/cv-data'
-import { latestPosts } from '@/lib/blog/posts'
+import { blogOptions, latestPosts } from '@/lib/blog/posts'
 import { pageMetadata } from '@/lib/seo'
 import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // visitor whose browser will play it. The page is built once per deploy,
 // so the year it renders with is the build's; the client moves to its own clock after hydration.
 export default async function Home() {
-  const [cv, posts] = await Promise.all([getAllCVData('en'), latestPosts(LATEST_POSTS, { env: process.env.NODE_ENV })])
+  const [cv, posts] = await Promise.all([getAllCVData('en'), latestPosts(LATEST_POSTS, blogOptions())])
 
   return (
     <CVDataProvider cv={worldCV(cv)} year={yearOf(new Date())}>

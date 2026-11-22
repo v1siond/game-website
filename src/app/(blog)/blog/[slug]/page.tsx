@@ -3,10 +3,9 @@ import { notFound } from 'next/navigation'
 import { getAllCVData } from '@/lib/cv-data'
 import { blogOptions, getPost, listPosts } from '@/lib/blog/posts'
 import { renderMarkdown } from '@/lib/blog/markdown'
-import { BLOG_PATH } from '@/lib/blog/links'
 import { shownDate, type Post } from '@/lib/blog/post'
 import { blogMetadata, blogPostingJsonLd, jsonLdHtml } from '@/lib/seo'
-import { BlogFooterLinks, BlogToolbar, DraftMark, type BackLink } from '@/components/blog/BlogChrome'
+import { BlogFooterLinks, BlogToolbar, DraftMark, blogBackLinks } from '@/components/blog/BlogChrome'
 
 type Props = Readonly<{ params: Promise<{ slug: string }> }>
 
@@ -35,10 +34,7 @@ export default async function PostPage({ params }: Props) {
   const cv = await getAllCVData('en')
   const { blog, navigation } = cv.labels
   const html = await renderMarkdown(post.body, { codeLabel: blog.codeExample })
-  const links: BackLink[] = [
-    { href: BLOG_PATH, label: blog.allPosts },
-    { href: '/', label: blog.backHome },
-  ]
+  const links = blogBackLinks(blog)
 
   return (
     <>

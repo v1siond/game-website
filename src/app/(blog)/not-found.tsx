@@ -1,14 +1,10 @@
 import { getAllCVData } from '@/lib/cv-data'
-import { BLOG_PATH } from '@/lib/blog/links'
-import { BlogFooterLinks, BlogToolbar, type BackLink } from '@/components/blog/BlogChrome'
+import { BlogFooterLinks, BlogToolbar, blogBackLinks } from '@/components/blog/BlogChrome'
 
 // A /blog address with no post behind it (an unknown slug, or a draft in a production build).
 export default async function BlogNotFound() {
   const { blog, navigation } = (await getAllCVData('en')).labels
-  const links: BackLink[] = [
-    { href: BLOG_PATH, label: blog.allPosts },
-    { href: '/', label: blog.backHome },
-  ]
+  const links = blogBackLinks(blog)
 
   return (
     <>

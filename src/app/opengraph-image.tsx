@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 import { getAllCVData } from '@/lib/cv-data'
 import { PREVIEW_IMAGE, SITE_ORIGIN, shortRole } from '@/lib/seo'
-import { MARK_BACKGROUND, siteMarkSvg } from '@/lib/siteMark'
+import { MARK_BACKGROUND, MARK_OUTLINE, siteMarkSvg } from '@/lib/siteMark'
 
 // The link preview of every page (Open Graph and Twitter): the mark, his name, his role from the
 // summary and the domain, in the site's pixel face.
@@ -28,7 +28,7 @@ export default async function OpenGraphImage() {
           gap: 64,
           padding: 80,
           background: MARK_BACKGROUND,
-          color: '#f2efe6',
+          color: MARK_OUTLINE,
           fontFamily: 'Silkscreen',
         }}
       >

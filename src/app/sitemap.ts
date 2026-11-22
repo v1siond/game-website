@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { contentLastModified } from '@/lib/cv-data'
-import { listPosts } from '@/lib/blog/posts'
+import { blogOptions, listPosts } from '@/lib/blog/posts'
 import { BLOG_PATH, postPath } from '@/lib/blog/links'
 import { postDay } from '@/lib/blog/post'
 import { INDEXED_PATHS, absoluteUrl } from '@/lib/seo'
@@ -9,7 +9,7 @@ import { INDEXED_PATHS, absoluteUrl } from '@/lib/seo'
 // changed with its newest post (the list is newest first) and each post on its own date; drafts never
 // reach a production build's list.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [lastModified, posts] = await Promise.all([contentLastModified(), listPosts({ env: process.env.NODE_ENV })])
+  const [lastModified, posts] = await Promise.all([contentLastModified(), listPosts(blogOptions())])
   const blogModified = posts.length > 0 ? postDay(posts[0].date) : lastModified
 
   return [
