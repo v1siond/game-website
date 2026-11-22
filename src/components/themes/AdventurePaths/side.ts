@@ -1,6 +1,6 @@
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
-import { SPRITE_INK, TRAIL } from './palette'
+import { FOE_INK, SIDE_INK, SPRITE_INK, TRAIL } from './palette'
 
 // The side view cast of the levels, drawn as pixel rows (one letter a pixel, '.' clear) like the top view
 // map walker in sprite.ts. Him: a parody of the plumber hero in the 16 bit side view, 16 by 26, facing
@@ -221,17 +221,17 @@ export const HERO_EYE = { x: 9, y: HEAD_TOP + 5, height: 2 } as const
 
 const COSTUME = {
   K: SPRITE_INK.OUTLINE,
-  C: '#d8281c',
-  c: '#8e1a10',
-  T: '#d8281c',
+  C: SIDE_INK.RED,
+  c: SIDE_INK.BRIM,
+  T: SIDE_INK.RED,
   M: TRAIL.PAGE,
-  Y: '#f8d038',
+  Y: SIDE_INK.BUTTON,
   S: HERO_IDENTITY.skin,
   s: HERO_IDENTITY.skinShade,
   H: HERO_IDENTITY.hair,
   B: HERO_IDENTITY.beard,
   E: HERO_IDENTITY.eyes,
-  P: '#2a58c8',
+  P: SIDE_INK.OVERALLS,
   G: SPRITE_INK.GLOVE,
   F: SPRITE_INK.SHOE,
 }
@@ -245,7 +245,7 @@ export interface HeroOutfit {
 export const HERO_OUTFITS: Record<Profession, HeroOutfit> = {
   engineer: { headgear: 'cap', colours: COSTUME },
   drummer: { headgear: 'cap', colours: COSTUME },
-  fighter: { headgear: 'capRing', colours: { ...COSTUME, G: '#f0b030' } },
+  fighter: { headgear: 'capRing', colours: { ...COSTUME, G: SIDE_INK.FIGHT_GLOVE } },
 }
 
 // The foes. Keys: K outline, N body, O underside, W white, E pupil, F feet, L shell, l shell shade,
@@ -323,13 +323,13 @@ export const FOE_FRAME_NAMES = Object.keys(FOE_FRAMES) as FoeFrame[]
 
 export const foeRows = (frame: FoeFrame): readonly string[] => FOE_FRAMES[frame]
 
-const FOE_BASE = { K: SPRITE_INK.OUTLINE, W: '#ffffff', E: SPRITE_INK.OUTLINE, D: '#3a0c0c' }
+const FOE_BASE = { K: SPRITE_INK.OUTLINE, W: FOE_INK.WHITE, E: SPRITE_INK.OUTLINE, D: FOE_INK.MOUTH }
 
 /** Each foe's colours: the brown mushroom, the green turtle with its yellow skin, the red spotted plant. */
 export const FOE_COLOURS: Record<'walker' | 'turtle' | 'plant', Record<string, string>> = {
-  walker: { ...FOE_BASE, N: '#b0401c', O: '#f09028', F: '#f8c820' },
-  turtle: { ...FOE_BASE, L: '#38a838', l: '#1c6c1c', Y: '#f8c860', R: '#e04020' },
-  plant: { ...FOE_BASE, N: '#d82818', V: '#38a838', v: '#1c6c1c' },
+  walker: { ...FOE_BASE, N: FOE_INK.MUSHROOM, O: FOE_INK.UNDERSIDE, F: FOE_INK.FEET },
+  turtle: { ...FOE_BASE, L: FOE_INK.GREEN, l: FOE_INK.GREEN_SHADE, Y: FOE_INK.SKIN, R: FOE_INK.SHOES },
+  plant: { ...FOE_BASE, N: FOE_INK.PLANT, V: FOE_INK.GREEN, v: FOE_INK.GREEN_SHADE },
 }
 
 const FOE_KIND: Record<FoeFrame, keyof typeof FOE_COLOURS> = {

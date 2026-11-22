@@ -39,23 +39,23 @@ export function MapDefs() {
           <stop offset="1" stopColor={TRAIL.FOREST} />
         </radialGradient>
         <linearGradient id="ap-stone" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#c9c1aa" />
+          <stop offset="0" stopColor={TRAIL.STONE_LIGHT} />
           <stop offset="0.55" stopColor={TRAIL.STONE} />
           <stop offset="1" stopColor={TRAIL.STONE_DARK} />
         </linearGradient>
         <linearGradient id="ap-wood" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#a06a3a" />
+          <stop offset="0" stopColor={TRAIL.WOOD_LIGHT} />
           <stop offset="1" stopColor={TRAIL.BARK} />
         </linearGradient>
         <radialGradient id="ap-gold" cx="0.35" cy="0.3" r="0.75">
           <stop offset="0" stopColor={TRAIL.LANTERN} />
           <stop offset="0.6" stopColor={TRAIL.GOLD} />
-          <stop offset="1" stopColor="#9a6a14" />
+          <stop offset="1" stopColor={TRAIL.GOLD_DARK} />
         </radialGradient>
         <radialGradient id="ap-red" cx="0.35" cy="0.3" r="0.75">
-          <stop offset="0" stopColor="#e77a5c" />
+          <stop offset="0" stopColor={TRAIL.ROUTE_LIGHT} />
           <stop offset="0.6" stopColor={TRAIL.ROUTE} />
-          <stop offset="1" stopColor="#6e1f12" />
+          <stop offset="1" stopColor={TRAIL.ROUTE_DARK} />
         </radialGradient>
         <pattern id="ap-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
           <rect width="6" height="6" fill="none" />

@@ -40,10 +40,10 @@ interface SwitchColour {
 }
 
 const SWITCH_COLOURS: readonly SwitchColour[] = [
-  { fill: 'bg-[color:var(--ap-gold)]', text: 'text-[color:var(--ap-ink)]', svg: TRAIL.GOLD, shade: '#9a6a14' },
+  { fill: 'bg-[color:var(--ap-gold)]', text: 'text-[color:var(--ap-ink)]', svg: TRAIL.GOLD, shade: TRAIL.GOLD_DARK },
   { fill: 'bg-[color:var(--ap-forest)]', text: 'text-white', svg: TRAIL.FOREST, shade: TRAIL.CANOPY },
-  { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: '#6e1f12' },
-  { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: '#1f3f78' },
+  { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: TRAIL.ROUTE_DARK },
+  { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: TRAIL.BLUE_DARK },
 ]
 
 const LINK = 'inline-flex min-h-[44px] items-center gap-2 rounded-sm border-2 border-[color:var(--ap-ink)] px-3 text-sm font-bold transition-transform hover:-translate-y-0.5 motion-reduce:transition-none'
