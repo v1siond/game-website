@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { newTabName } from '@/lib/cv/sectionText'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
@@ -45,7 +44,7 @@ function WarDrum() {
   )
 }
 
-function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
+function Stage({ slot: { band, years, linkProps, nameFor } }: { slot: BandSlot }) {
   const run = useRun()
   const reduced = useReducedMotion()
   const { souls: words, links } = useLabels()
@@ -93,7 +92,7 @@ function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
             {words.encore}
           </button>
           {linkProps && (
-            <a {...linkProps} aria-label={newTabName(links, fillLabel(links.linkOf, { link: links.website, project: band.name }))} className={BUTTON}>
+            <a {...linkProps} aria-label={nameFor(links.website)} className={BUTTON}>
               {links.website}
             </a>
           )}

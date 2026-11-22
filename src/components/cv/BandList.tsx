@@ -1,16 +1,20 @@
 import { useMemo, type ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
-import type { Labels } from '@/lib/cv/labels'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
 import { bandSpan, newTabName } from '@/lib/cv/sectionText'
 
 // The bands (R5) as a list without a look, in the order viewFor gives (current first). A band with a
-// site carries `linkProps` for the world's anchor; one without carries null and is drawn as text.
+// site carries `linkProps` for the world's anchor; one without carries null and is drawn as text. A link
+// whose visible text is a word ("Website") rather than the band's name takes its accessible name from
+// `nameFor(word)`, so the name holds the visible word (WCAG 2.5.3 label in name).
 
 export interface BandSlot {
   band: Band
   years: string
   linkProps: { href: string; target: '_blank'; rel: string; 'aria-label': string } | null
+  /** "Website of {band} (opens in a new tab)" for a link that reads "Website". */
+  nameFor: (visibleText: string) => string
 }
 
 interface BandListProps {
@@ -27,6 +31,7 @@ const slotFor = (band: Band, labels: Labels): BandSlot => ({
   linkProps: band.url
     ? { href: band.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': newTabName(labels.links, band.name) }
     : null,
+  nameFor: (visibleText) => newTabName(labels.links, fillLabel(labels.links.linkOf, { link: visibleText, project: band.name })),
 })
 
 export function BandList({ bands, renderBand, className, itemClassName }: BandListProps) {
