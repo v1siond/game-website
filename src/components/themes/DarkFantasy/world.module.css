@@ -18,12 +18,6 @@
   75% { transform: translate3d(4px, -35px, 0); opacity: 0.45; }
 }
 
-/* Lantern float */
-@keyframes lanternFloat {
-  0%, 100% { transform: translateY(0) translateZ(0); }
-  50% { transform: translateY(-8px) translateZ(0); }
-}
-
 /* Wire stroke animation - electricity through wire */
 @keyframes wireStroke {
   0% {
@@ -79,21 +73,22 @@
   }
 }
 
-/* Soul motes: soft drifting specks in the depths (GPU transform and opacity), each drifting inline
-   (DarkFantasyTheme.tsx) for the first 5 s of its own drift and holding there. */
-.mote {
-  position: absolute;
-  border-radius: 9999px;
-  opacity: 0;
-  will-change: transform, opacity;
+/* The theatre's colours: the caverns' void behind every scene and the dark a scene fades into. */
+.root {
+  --theatre-ground: var(--df-void);
+  --theatre-veil: var(--df-void);
 }
-@keyframes drift {
-  0% { transform: translate3d(0, 0, 0); opacity: 0; }
-  15% { opacity: 0.6; }
-  50% { transform: translate3d(8px, -26px, 0); opacity: 0.75; }
-  85% { opacity: 0.5; }
-  100% { transform: translate3d(-6px, -52px, 0); opacity: 0; }
+
+.stage {
+  background: var(--df-void);
 }
-@media (prefers-reduced-motion: reduce) {
-  .mote { animation: none !important; opacity: 0.35; }
+
+/* Under 1024 px the screen shows only the middle of the arena, so the knight and his relics (the troupe,
+   drawn between x 1000 and 1700) shrink to two thirds about the row's middle and move to the arena's centre,
+   the part a narrow screen shows. */
+@media (max-width: 1023.98px) {
+  .troupe {
+    transform: translateX(-390px) scale(0.66);
+    transform-origin: 1350px 1000px;
+  }
 }
