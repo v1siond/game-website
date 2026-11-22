@@ -36,8 +36,9 @@
 
 /* ---- the film frame ---- */
 
-/* A strip of film stock down the page edge, its sprocket holes running past. The holes are one
-   repeating gradient on an element taller than the screen, so the loop is a single translate. */
+/* A strip of film stock down the page edge, its sprocket holes running past as the film starts and
+   coming to rest. The holes are one repeating gradient on an element taller than the screen, so each run
+   is a single translate that ends where it began. */
 .filmStrip {
   background: var(--hose-film);
 }
@@ -49,7 +50,7 @@
   background-size: 50% 2rem;
   background-repeat: repeat-y;
   background-position: center top;
-  animation: sprocketRun 1.6s linear infinite;
+  animation: sprocketRun 1.6s linear 3;
 }
 
 .sprocketsReverse {
@@ -67,13 +68,14 @@
   border: 8px double var(--hose-ink);
 }
 
-/* The film grain: a noise tile larger than the screen jumping in steps, like grain changing per frame. */
+/* The film grain: a noise tile larger than the screen jumping in steps, like grain changing per frame,
+   for the reel's first 4.5 s. */
 .grain {
   position: absolute;
   inset: -10%;
   opacity: 0.15;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  animation: grainJump 0.5s steps(5) infinite;
+  animation: grainJump 0.5s steps(5) 9;
 }
 
 @keyframes grainJump {
@@ -94,7 +96,7 @@
   }
 }
 
-/* The sepia vignette darkening the edges, and the projector's flicker over it. */
+/* The sepia vignette darkening the edges, and the projector's flicker over it, twice. */
 .vignette {
   background: radial-gradient(
     circle at 50% 50%,
@@ -107,7 +109,7 @@
 .flicker {
   background: var(--hose-ink);
   opacity: 0;
-  animation: flicker 2.4s linear infinite;
+  animation: flicker 2.4s linear 2;
 }
 
 @keyframes flicker {
@@ -127,10 +129,11 @@
   }
 }
 
-/* A note drifting up the page on its own --delay, swaying as it climbs. */
+/* A note drifting up the bottom third of the page once on its own --delay, at the old pace, swaying as it
+   climbs and fading out. */
 .noteRise {
   opacity: 0;
-  animation: noteRise 14s linear infinite;
+  animation: noteRise 4.2s linear;
   animation-delay: var(--delay, 0s);
 }
 
@@ -144,10 +147,10 @@
     opacity: 0.3;
   }
   50% {
-    transform: translate3d(1.5rem, -55vh, 0) rotate(10deg);
+    transform: translate3d(1.5rem, -16vh, 0) rotate(10deg);
   }
   100% {
-    transform: translate3d(0, -110vh, 0) rotate(-10deg);
+    transform: translate3d(0, -32vh, 0) rotate(-10deg);
     opacity: 0;
   }
 }
@@ -239,10 +242,10 @@
   color: var(--hose-paper);
 }
 
-/* The picked badge bounces on the beat, squashing as it lands. */
+/* The picked badge bounces six beats, squashing as it lands, and stands. */
 .beatBounce {
   transform-origin: 50% 100%;
-  animation: beatBounce 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  animation: beatBounce 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) 6;
 }
 
 @keyframes beatBounce {
@@ -258,7 +261,7 @@
 /* ---- lettering ---- */
 
 /* The big title: ink letters with two hard brown drops, each letter tilted the other way to its
-   neighbour like hand lettering; the whole name bounces on the beat. */
+   neighbour like hand lettering; the whole name bounces four beats. */
 .title {
   text-shadow:
     4px 4px 0 var(--hose-shadow),
@@ -275,7 +278,7 @@
 
 .titleBounce {
   transform-origin: 50% 100%;
-  animation: beatBounce 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  animation: beatBounce 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) 4;
 }
 
 .dropText {
@@ -309,14 +312,15 @@
   container-type: inline-size;
 }
 
-/* The sing along ball hopping from note to note across the line, squashing on each landing. */
+/* The sing along ball hopping from note to note across the line once, squashing on each of its five
+   landings, and resting on the last note. */
 .hop {
-  animation: hop 4s linear infinite;
+  animation: hop 4s linear forwards;
 }
 
 .hop > * {
   transform-origin: 50% 100%;
-  animation: hopBounce 0.8s ease-in-out infinite;
+  animation: hopBounce 0.8s ease-in-out 5;
 }
 
 @keyframes hop {
@@ -338,11 +342,25 @@
   }
 }
 
-/* A pie eyed ball bouncing in place on its own --delay. */
+/* A pie eyed ball bouncing in place four times on its own --delay. */
 .ballBounce {
   transform-origin: 50% 100%;
-  animation: hopBounce 1s ease-in-out infinite;
+  animation: hopBounce 1s ease-in-out 4;
   animation-delay: var(--delay, 0s);
+}
+
+/* A drawing that turns to a stop at --turn (the sun's rays, the big wheel), each angle a whole turn of
+   its own repeat, so it stops on the drawing it started on. */
+@media (prefers-reduced-motion: no-preference) {
+  .turn {
+    animation: turn 4.8s cubic-bezier(0.2, 0.6, 0.35, 1);
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(var(--turn));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -100,37 +100,38 @@
 
 /* ---- the workshop town ---- */
 
+/* The cloud drifts 12 px at its old pace and stays. */
 .cloudDrift {
-  animation: cloudDrift 18s steps(216, end) infinite alternate;
+  animation: cloudDrift 4.8s steps(58, end) forwards;
 }
 
 @keyframes cloudDrift {
   to {
-    transform: translate3d(40px, 0, 0);
+    transform: translate3d(12px, 0, 0);
   }
 }
 
 .houseBob {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: beat 0.7s steps(8, end) infinite alternate;
+  animation: beat 0.7s steps(8, end) 6 alternate;
   animation-delay: var(--delay, 0s);
 }
 
 .propBob {
-  animation: beat 0.7s steps(8, end) infinite alternate;
+  animation: beat 0.7s steps(8, end) 6 alternate;
 }
 
 .propBob:hover {
   animation: squash 0.5s steps(12, end);
 }
 
-/* A smoke ring leaves the stack, swells and fades as it climbs. */
+/* A smoke ring leaves the stack, swells and fades as it climbs; three of them, one after another. */
 .puff {
   transform-box: fill-box;
   transform-origin: 50% 50%;
   opacity: 0;
-  animation: puff 2.7s steps(32, end) infinite;
+  animation: puff 2.7s steps(32, end);
   animation-delay: var(--delay, 0s);
 }
 
@@ -153,7 +154,7 @@
 .curtainSway {
   transform-box: fill-box;
   transform-origin: 50% 0;
-  animation: curtainSway 2.4s ease-in-out infinite alternate;
+  animation: curtainSway 2.4s ease-in-out 2 alternate;
 }
 
 @keyframes curtainSway {
@@ -165,10 +166,10 @@
   }
 }
 
-/* The footlights flicker in two rows, one dimming as the other comes up. */
+/* The footlights flicker in two rows, one dimming as the other comes up, and both rest full on. */
 .footA,
 .footB {
-  animation: footlight 0.6s steps(2, jump-none) infinite alternate;
+  animation: footlight 0.6s steps(2, jump-none) 7 alternate;
 }
 
 .footB {
@@ -187,7 +188,7 @@
 .cymbalTip {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: cymbalTip 0.35s var(--hose-bounce) infinite alternate;
+  animation: cymbalTip 0.35s var(--hose-bounce) 12 alternate;
 }
 
 @keyframes cymbalTip {
@@ -200,7 +201,7 @@
 }
 
 .bassThump {
-  animation: thump 0.7s steps(8, end) infinite;
+  animation: thump 0.7s steps(8, end) 6;
 }
 
 @keyframes thump {
@@ -223,7 +224,7 @@
 .hornPump {
   transform-box: fill-box;
   transform-origin: 70% 100%;
-  animation: thump 0.7s steps(8, end) infinite;
+  animation: thump 0.7s steps(8, end) 6;
   animation-delay: -0.35s;
 }
 
@@ -232,7 +233,7 @@
 .flagWave {
   transform-box: fill-box;
   transform-origin: 0 50%;
-  animation: flagWave 0.5s steps(6, end) infinite alternate;
+  animation: flagWave 0.5s steps(6, end) 8 alternate;
 }
 
 @keyframes flagWave {
@@ -246,7 +247,7 @@
 
 .buntingSway {
   transform-origin: 50% 0;
-  animation: buntingSway 3s ease-in-out infinite alternate;
+  animation: buntingSway 2.4s ease-in-out 2 alternate;
 }
 
 @keyframes buntingSway {
@@ -258,11 +259,12 @@
   }
 }
 
-/* The bag on the jab's beat (1.4s): it waits, takes the glove at 55%, swings back and settles. */
+/* The bag on the jab's beat (1.4s): it waits, takes the glove at 55%, swings back and settles, three
+   times, and hangs still. */
 .bagSwing {
   transform-box: fill-box;
   transform-origin: 50% 0;
-  animation: bagSwing 1.4s steps(17, end) infinite;
+  animation: bagSwing 1.4s steps(17, end) 3;
 }
 
 @keyframes bagSwing {
@@ -291,7 +293,7 @@
   transform-box: fill-box;
   transform-origin: 50% 50%;
   opacity: 0;
-  animation: impact 1.4s steps(17, end) infinite;
+  animation: impact 1.4s steps(17, end) 3;
 }
 
 @keyframes impact {
@@ -311,7 +313,7 @@
 
 .crowdA,
 .crowdB {
-  animation: crowd 0.7s steps(8, end) infinite alternate;
+  animation: crowd 0.7s steps(8, end) 6 alternate;
 }
 
 .crowdB {

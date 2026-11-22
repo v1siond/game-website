@@ -4,7 +4,8 @@ import world from './world.module.css'
 // Rubber Hose's page backdrop, fixed behind the content: the film stock down both edges with its
 // sprocket holes running, the double ink rule framing the page, the projected film's grain, vignette
 // and flicker, and a few notes drifting up like a cartoon's soundtrack. Seven animated elements in all,
-// each a single transform or opacity loop that stops under reduced motion (world.module.css).
+// each a single transform or opacity loop played a few times as the page opens, at rest by 4.8 s, and
+// off under reduced motion (world.module.css).
 
 function FilmStrip({ side }: { side: 'left' | 'right' }) {
   const placement = side === 'left' ? 'left-0' : 'right-0'
@@ -40,8 +41,8 @@ export function FilmGrain() {
 // Where each note starts along the bottom edge and when it sets off, as literal classes for the build.
 const NOTES = [
   { place: 'left-[18%]', delay: '[--delay:0s]' },
-  { place: 'left-[52%]', delay: '[--delay:-5s]' },
-  { place: 'left-[80%]', delay: '[--delay:-9s]' },
+  { place: 'left-[52%]', delay: '[--delay:0.3s]' },
+  { place: 'left-[80%]', delay: '[--delay:0.6s]' },
 ]
 
 export function RisingNotes() {

@@ -11,10 +11,12 @@ import cup from './cup.module.css'
 // hair, a few spiky tufts standing above the rim, and his full dark beard covers the lower cup face
 // under the nose with the smile drawn into it. The world's film grain lies over all of it.
 //
-// Poses are transform keyframes in cup.module.css keyed off data-pose: the bounce that never stops
-// (idle), the run with its squash and stretch and a dash burst, the finger gun shot, the cheering win,
+// Poses are transform keyframes in cup.module.css keyed off data-pose: the bounce on the beat (every pose
+// but the run), the run with its squash and stretch and a dash burst, the finger gun shot, the cheering win,
 // and each profession's act (typing, drumming, the rubber hose jab). Hovering him parries: the pink
-// slap flash, from any pose.
+// slap flash, from any pose. Each loop plays a set number of beats and he rests on the pose's held angle,
+// within 5 s of his scene's start. A scrubbed run (scrub: the run bar, the map run) stands paused on the
+// stride the scroll points to, so he runs only while the page moves.
 //
 // The Martial Artist wears red boxing gloves, the prajioud on his arms and his own mongkhon round the rim.
 
@@ -146,12 +148,20 @@ export const HERO_BOX = { top: -20, height: 170, reachTop: -36 } as const
 /** His drawn height in motion over his box's height: how much taller than his box a stage leaves room for. */
 export const HERO_REACH = (HERO_BOX.top + HERO_BOX.height - HERO_BOX.reachTop) / HERO_BOX.height
 
-export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '' }: { profession: Profession; pose?: HeroPose; className?: string }) {
+interface HeroCharacterProps {
+  profession: Profession
+  pose?: HeroPose
+  /** His run follows the --scene-progress round him instead of the clock. */
+  scrub?: boolean
+  className?: string
+}
+
+export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', scrub = false, className = '' }: HeroCharacterProps) {
   const kit = KIT[profession]
   const gun = pose === 'shoot'
 
   return (
-    <svg viewBox={`0 ${HERO_BOX.top} 100 ${HERO_BOX.height}`} className={`${cup.figure} ${className}`} data-pose={pose} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 ${HERO_BOX.top} 100 ${HERO_BOX.height}`} className={`${cup.figure} ${className}`} data-pose={pose} data-scrub={scrub || undefined} aria-hidden="true" focusable="false">
       <ellipse cx={50} cy={146} rx={26} ry={3.4} fill={INK} opacity={0.3} />
       <g className={cup.dash}>
         <g className={cup.bounce}>

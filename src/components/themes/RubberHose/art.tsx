@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NameWords } from '@/components/cv/NameWords'
+import { Cue } from './cue'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
@@ -155,5 +156,9 @@ const ART_BREAKS: Record<ArtBreakKind, () => ReactNode> = {
 
 export function ArtBreak({ kind }: { kind: ArtBreakKind }) {
   const Break = ART_BREAKS[kind]
-  return <Break />
+  return (
+    <Cue>
+      <Break />
+    </Cue>
+  )
 }
