@@ -40,7 +40,8 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 // ---------------------------------------------------------------- About
 
-export function ScanAbout() {
+/** The bio is the plan's; the tags read the rest of the summary (education, languages, a highlight). */
+export function ScanAbout({ bio }: { bio: string }) {
   const { professionalSummary } = useCVData()
   const { sections, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('japantown')
@@ -60,7 +61,7 @@ export function ScanAbout() {
             <MercSprite profession="engineer" motion={motion} className="h-auto w-full" />
           </div>
           <div className={`${life.scanBox} relative min-w-0 flex-1 overflow-hidden`}>
-            <p className="max-w-prose text-base leading-relaxed text-[color:var(--neon-ice)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--neon-ice)]">{bio}</p>
             <span className={`${life.sweep} pointer-events-none absolute inset-y-0 left-0 w-1 bg-[color:var(--neon-hud)]`} aria-hidden="true" />
           </div>
         </div>
