@@ -5,6 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { Rig } from './rigs'
 import world from './world.module.css'
 
@@ -46,7 +47,8 @@ const TEARS = [
 
 export function QuickhackMenu({ active }: { active: Profession }) {
   const { navigation, professionFields, cyber } = useLabels()
-  // The rig sits under the boot hero, so its entrance and its motions wait for it to scroll in.
+  // The rig sits under the boot hero, so its entrance and its motions wait on their first
+  // frame (heldUntil) until it scrolls in.
   const { ref, triggered } = useSectionTrigger()
 
   return (
@@ -87,7 +89,7 @@ export function QuickhackMenu({ active }: { active: Profession }) {
         />
       </div>
 
-      <div key={active} ref={ref} data-on={triggered || undefined} className={`relative ${world.hackStage}`}>
+      <div key={active} ref={ref} className={`relative ${heldUntil(triggered)}`}>
         <div className={world.rigIn}>
           <Rig profession={active} on={triggered} />
         </div>
