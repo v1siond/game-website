@@ -248,6 +248,16 @@
   }
 }
 
+/* A file or a cell a keyboard user tabs into before it lands shows at once (a pointer click never matches).
+   Its drop is emptied, not removed: a removed animation would start again when the focus leaves. */
+.fileDrop:has(:focus-visible),
+.cellDrop:has(:focus-visible) {
+  opacity: 1;
+  transform: none;
+  animation-duration: 0s;
+  animation-fill-mode: none;
+}
+
 /* ---- the attache case (case.tsx) ---- */
 
 .caseHinge {
