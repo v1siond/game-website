@@ -9,6 +9,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { paletteVars } from './shared/paletteVars'
 import { CEL } from './CellShaded/palette'
 import { HatchDefs } from './CellShaded/ink'
@@ -43,13 +44,14 @@ export default function CellShadedTheme() {
 
   return (
     <div ref={pointerRef} style={ROOT_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
+      <SkipLink />
       <HatchDefs />
       <Wasteland />
       <ZoneStageProvider value={stage}>
         <FreezeIntro profession={active} reduced={reduced} />
         <QuickChange profession={active} />
 
-        <main className="relative z-20 px-4 py-8 sm:px-6">
+        <main id="main-content" className="relative z-20 px-4 py-8 sm:px-6">
           <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </ProfessionRegion>
@@ -58,7 +60,7 @@ export default function CellShadedTheme() {
         <RespawnStation profession={active} />
       </ZoneStageProvider>
 
-      <footer className="relative z-20 py-8 text-center" role="contentinfo">
+      <footer className="relative z-20 py-8 text-center">
         <p className="inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold text-[var(--cel-paper)]">
           <CopyrightLine />
         </p>

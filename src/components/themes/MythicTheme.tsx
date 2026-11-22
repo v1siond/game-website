@@ -7,7 +7,7 @@ import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { CopyrightLine } from './shared/CopyrightLine'
-import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
@@ -55,7 +55,7 @@ export default function MythicTheme() {
 
   return (
     <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${u.root} ${mythDisplay.variable}`}>
-      <SkipLink href="#main-content" />
+      <SkipLink />
       <Depths />
       <ZoneStageProvider value={stage}>
         <HouseProvider value={{ rebirths, returnToHouse }}>
@@ -72,7 +72,7 @@ export default function MythicTheme() {
         </HouseProvider>
       </ZoneStageProvider>
 
-      <footer className="relative z-20 py-8 text-center" role="contentinfo">
+      <footer className="relative z-20 py-8 text-center">
         <p className="inline-block bg-[var(--myth-ink)] px-3 py-1 text-base text-[var(--myth-bone)]">
           <CopyrightLine />
         </p>

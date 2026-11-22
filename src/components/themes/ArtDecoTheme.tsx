@@ -13,6 +13,7 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { DECO_COLORS as C, DECO_VARS } from './ArtDeco/palette'
 import {
   AbyssVeil,
@@ -91,6 +92,7 @@ export default function ArtDecoTheme() {
   return (
     <ZoneStageProvider value={stage}>
       <div ref={pointer} style={DECO_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${look.root} ${decoFace.variable}`}>
+        <SkipLink />
         <DecoSVGDefs />
 
         <DecoPatternBackground />
@@ -114,7 +116,7 @@ export default function ArtDecoTheme() {
           </section>
         </div>
 
-        <main className="relative z-20 px-4 py-16 sm:px-8">
+        <main id="main-content" className="relative z-20 px-4 py-16 sm:px-8">
           <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 

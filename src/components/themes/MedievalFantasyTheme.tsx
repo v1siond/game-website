@@ -13,6 +13,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { REALM, REALM_FACE, REALM_VARS } from './MedievalFantasy/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
 import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
@@ -73,6 +74,7 @@ export default function MedievalFantasyTheme() {
 
   return (
     <div className={`[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)] ${realmFace.variable}`} style={ROOT_STYLE}>
+      <SkipLink />
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 
@@ -152,7 +154,7 @@ export default function MedievalFantasyTheme() {
           </section>
         </ScrollScene>
 
-        <main>
+        <main id="main-content">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
         </main>
 
