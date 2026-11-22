@@ -32,24 +32,19 @@ const KNIGHT_INNER_SHADOW_RISE = 3
 
 interface KnightCharacterProps {
   scale?: number
-  size?: number
   attacking?: boolean
   attackPhase?: number
   facingDirection?: 'left' | 'right'
-  className?: string
   breathing?: boolean
 }
 
 export const KnightCharacter = memo(function KnightCharacter({
   scale = 1,
-  size,
   attacking = false,
   attackPhase = 0,
   facingDirection = 'right',
-  className = '',
   breathing = false,
 }: KnightCharacterProps) {
-  const effectiveScale = size ? size / KNIGHT_VIEW_WIDTH : scale
   const isLeft = facingDirection === 'left'
 
   const getNailRotation = () => {
@@ -65,10 +60,10 @@ export const KnightCharacter = memo(function KnightCharacter({
     <span style={{ display: 'block', animation: breathing && !attacking ? `${knight.knightIdleFloat} 3.6s ease-in-out infinite` : undefined }}>
     {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
     <svg
-      width={KNIGHT_VIEW_WIDTH * effectiveScale}
-      height={KNIGHT_VIEW_HEIGHT * effectiveScale}
+      width={KNIGHT_VIEW_WIDTH * scale}
+      height={KNIGHT_VIEW_HEIGHT * scale}
       viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} ${KNIGHT_VIEW_HEIGHT}`}
-      className={`block ${className}`}
+      className="block"
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
@@ -256,7 +251,6 @@ export const KnightCharacter = memo(function KnightCharacter({
 interface KnightSlashRevealProps {
   children: ReactNode
   triggered: boolean
-  className?: string
 }
 
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
@@ -299,7 +293,6 @@ const PHASE_TIMING = {
 export const KnightSlashReveal = memo(function KnightSlashReveal({
   children,
   triggered,
-  className = '',
 }: KnightSlashRevealProps) {
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [attackPhase, setAttackPhase] = useState(0)
@@ -394,7 +387,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const isAttacking = phase === 'knight-raise' || phase === 'slash'
 
   return (
-    <div ref={stageRef} className={`relative w-full max-lg:overflow-x-clip ${className}`} style={SLASH_STAGE}>
+    <div ref={stageRef} className="relative w-full max-lg:overflow-x-clip" style={SLASH_STAGE}>
       {showSlash && (
         <div
           className="absolute inset-0 z-10 pointer-events-none"

@@ -536,54 +536,6 @@ function getWirePath(from: Profession, to: Profession): Array<{ x: number; y: nu
     : [WAYSTATION_POSITIONS[from], WAYSTATION_POSITIONS[to]]
 }
 
-// Single energy particle that travels along a path
-const WireEnergyParticle = memo(function WireEnergyParticle({
-  pathPoints,
-  delay,
-  duration,
-  color,
-  size,
-}: {
-  pathPoints: Array<{ x: number; y: number }>
-  delay: number
-  duration: number
-  color: string
-  size: number
-}) {
-  // Generate CSS animation that follows the path waypoints
-  const keyframeId = `wirePath-${delay}-${Date.now()}`
-  const keyframes = pathPoints.map((point, i) => {
-    const progress = (i / (pathPoints.length - 1)) * 100
-    return `${progress}% { left: ${point.x}%; top: ${point.y}%; }`
-  }).join('\n')
-
-  return (
-    <>
-      <style>{`
-        @keyframes ${keyframeId} {
-          ${keyframes}
-        }
-      `}</style>
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          left: `${pathPoints[0].x}%`,
-          top: `${pathPoints[0].y}%`,
-          width: 8 * size,
-          height: 8 * size,
-          background: `radial-gradient(circle, ${color} 30%, ${color}80 60%, transparent 100%)`,
-          boxShadow: `0 0 12px ${color}, 0 0 24px ${color}60`,
-          transform: 'translate(-50%, -50%)',
-          animation: `${keyframeId} ${duration}ms ease-in-out ${delay}ms forwards`,
-          opacity: 0,
-          animationFillMode: 'forwards',
-        }}
-        aria-hidden="true"
-      />
-    </>
-  )
-})
-
 // Wire glow effect that shows the path lighting up
 const WireGlow = memo(function WireGlow({
   pathPoints,
@@ -648,33 +600,12 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
   const pathPoints = getWirePath(fromProfession, toProfession)
   const totalDuration = pathPoints.length > 2 ? 450 : 300
 
-  // Create multiple particles with staggered timing for a "stream" effect
-  const particles = [
-    { delay: 0, size: 1 },
-    { delay: 30, size: 0.85 },
-    { delay: 60, size: 0.7 },
-    { delay: 90, size: 0.9 },
-    { delay: 120, size: 0.75 },
-  ]
-
   const energyColor = DARK_FANTASY.soulBlue
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       {/* Wire glow effect */}
       <WireGlow pathPoints={pathPoints} duration={totalDuration} color={energyColor} />
-
-      {/* Energy particles following the wire */}
-      {particles.map((p, i) => (
-        <WireEnergyParticle
-          key={i}
-          pathPoints={pathPoints}
-          delay={p.delay}
-          duration={totalDuration}
-          color={energyColor}
-          size={p.size}
-        />
-      ))}
     </div>
   )
 })
@@ -778,7 +709,6 @@ const WaystationNode = memo(function WaystationNode({
           className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{
             color: isActive ? color : DARK_FANTASY.silverText,
-            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {label}
@@ -787,7 +717,6 @@ const WaystationNode = memo(function WaystationNode({
           className="text-sm tracking-wider text-center leading-tight hidden md:block"
           style={{
             color: isActive ? color : DARK_FANTASY.silverText,
-            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {sublabel}
@@ -993,10 +922,9 @@ const VoidFrame = memo(function VoidFrame({
         <div className="pt-6 pb-4 px-6 text-center">
           <HeadingTag
             id={sectionHeadingId}
-            className="text-sm tracking-[0.3em] uppercase inline-block"
+            className="text-sm uppercase inline-block"
             style={{
               color: DARK_FANTASY.bone,
-              fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
               fontWeight: 400,
               letterSpacing: '0.25em',
               // Subtle text shadow for readability on dark background
@@ -1028,15 +956,13 @@ const VoidFrame = memo(function VoidFrame({
   )
 })
 
-const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
-
 // Services: a title and its line each, read in the same frame as the tech stack.
 function ServiceList({ services }: { services: Service[] }) {
   return (
     <ul className={MASONRY_LIST}>
       {services.map((service) => (
         <li key={service.id} className={MASONRY_ITEM}>
-          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]" style={{ fontFamily: DF_FONT }}>
+          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]">
             {service.title}
           </h3>
           <p className="text-base leading-relaxed text-[color:var(--df-bone)]">{service.line}</p>
@@ -1055,7 +981,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
         <li key={category.id} className={MASONRY_ITEM}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DARK_FANTASY.silverText, fontFamily: DF_FONT }}
+            style={{ color: DARK_FANTASY.silverText }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1966,7 +1892,7 @@ export default function DarkFantasyTheme() {
             render={({ line, actions }) => (
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
-                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText, fontFamily: DF_FONT }}>
+                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText }}>
                     {actionLabels.emailMe}
                   </h2>
                   <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{line}</p>
@@ -1997,7 +1923,7 @@ export default function DarkFantasyTheme() {
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silverText }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
-          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
+          <span className="text-sm tracking-[0.2em]">
             <CopyrightLine srPrefix={navigation.copyright} />
           </span>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />

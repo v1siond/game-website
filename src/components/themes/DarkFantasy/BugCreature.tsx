@@ -15,7 +15,6 @@ import bugMotion from './bug.module.css'
 interface BugPullRevealProps {
   children: ReactNode
   triggered: boolean
-  className?: string
 }
 
 type AnimationPhase =
@@ -107,7 +106,6 @@ const LG_UP = '(min-width: 1024px)'
 export const BugPullReveal = memo(function BugPullReveal({
   children,
   triggered,
-  className = '',
 }: BugPullRevealProps) {
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [legPhase, setLegPhase] = useState(0)
@@ -262,7 +260,7 @@ export const BugPullReveal = memo(function BugPullReveal({
   const fighting = showAlex || showBug
 
   return (
-    <div ref={stageRef} className={`relative w-full ${PULL_STAGE_CLASS} ${className}`} style={PULL_STAGE}>
+    <div ref={stageRef} className={`relative w-full ${PULL_STAGE_CLASS}`} style={PULL_STAGE}>
       {/* Below lg: the fight in the page, standing on the panel frame's top line (PULL_STAGE); COMBAT_Z.fighters
           keeps it over the fixed backdrop and vignette and under the panel, as the pinned fighters are from lg.
           Only the copy for the screen's width mounts, so the per frame leg steps render one bug; each copy keeps

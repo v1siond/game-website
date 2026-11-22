@@ -205,15 +205,6 @@
   }
 }
 
-@keyframes knightVictoryBreathing {
-  0%, 100% {
-    transform: translateX(80px) translateY(0) scale(1);
-  }
-  50% {
-    transform: translateX(80px) translateY(-4px) scale(1.02);
-  }
-}
-
 @keyframes bloodPoolPulse {
   0%, 100% {
     transform: var(--dead-lie) scale(1);
@@ -222,21 +213,6 @@
   50% {
     transform: var(--dead-lie) scale(1.03);
     opacity: 0.85;
-  }
-}
-
-@keyframes continuousDrip {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0.5);
-  }
-  20% {
-    opacity: 0.7;
-    transform: translateY(5px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(25px) scale(0.3);
   }
 }
 

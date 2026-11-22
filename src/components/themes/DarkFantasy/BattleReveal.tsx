@@ -425,7 +425,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Bug shadow - stays on ground */}
         {showBug && !isBugDead && (
           <div
-            className="absolute right-[18%] bottom-[10%] z-5 pointer-events-none"
+            className="absolute right-[18%] bottom-[10%] pointer-events-none"
           >
             <div
               className="rounded-full"
@@ -457,7 +457,7 @@ export const BattleReveal = memo(function BattleReveal({
 
             {/* Blood Splatter - centered on bug */}
             {flags.splatter && (
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-35 pointer-events-none">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                 <BloodSplatter />
               </div>
             )}
@@ -487,7 +487,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Blood pool right edge should touch bug center */}
         {flags.pool && isBugDead && (
           <div
-            className={`absolute right-[18%] ${COMBAT_GROUND} z-4 pointer-events-none`}
+            className={`absolute right-[18%] ${COMBAT_GROUND} pointer-events-none`}
             style={{
               ...DEAD_LIE_VAR,
               transform: DEAD_LIE,
@@ -1134,5 +1134,3 @@ const BloodPool = memo(function BloodPool() {
     </div>
   )
 })
-
-export default BattleReveal

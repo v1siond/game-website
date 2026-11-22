@@ -18,33 +18,10 @@
   75% { transform: translate3d(4px, -35px, 0); opacity: 0.45; }
 }
 
-/* Fade in */
-@keyframes fade-in-down {
-  from { opacity: 0; transform: translate3d(0, -20px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-.animate-fade-in-down {
-  animation: fade-in-down 0.8s ease-out;
-  will-change: transform, opacity;
-}
-
-/* Light sweep reveal */
-@keyframes lightSweep {
-  0% { transform: scaleX(0) translateZ(0); opacity: 0; }
-  50% { transform: scaleX(1) translateZ(0); opacity: 1; }
-  100% { transform: scaleX(0) translateZ(0); opacity: 0; }
-}
-
 /* Lantern float */
 @keyframes lanternFloat {
   0%, 100% { transform: translateY(0) translateZ(0); }
   50% { transform: translateY(-8px) translateZ(0); }
-}
-
-/* Spirit companion wisp trail */
-@keyframes wispTrail {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(3px); }
 }
 
 /* Wire stroke animation - electricity through wire */
@@ -91,13 +68,7 @@
 /* Accessibility: Reduce motion. .selector is the profession selector's box; the hashed keyframe names keep
    their own name inside them, so the attribute selectors still find the inline animations. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-down,
-  .will-animate {
-    animation: none !important;
-    transition: none !important;
-  }
   /* Disable energy flow animations for reduced motion */
-  .selector [style*="energyFlow"],
   .selector [style*="energyArrival"],
   .selector [style*="nodeArrival"] {
     animation: none !important;
