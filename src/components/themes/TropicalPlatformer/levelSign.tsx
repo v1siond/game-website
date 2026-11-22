@@ -3,7 +3,8 @@
 import type { ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { headingId } from '@/lib/cv/sectionText'
-import { useReachLevel } from './hud'
+import { useFind } from '../shared/finds'
+import { LEVELS } from './hud'
 import { Backdrop, type SceneKind } from './scenery'
 import look from './jungle.module.css'
 import sign from './levelSign.module.css'
@@ -21,9 +22,9 @@ interface LevelProps {
 }
 
 export function Level({ title, scene, children }: LevelProps) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.1 })
   const id = headingId('jungle', title)
-  useReachLevel(id, triggered)
+  const find = useFind()
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.1, onEnter: () => find(id, LEVELS) })
 
   return (
     <section ref={ref} data-on={triggered || undefined} aria-labelledby={id} className={`relative isolate ${sign.level}`}>

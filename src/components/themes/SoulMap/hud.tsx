@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useRolling } from '../shared/finds'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
-import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import { MAX_FLASKS, MAX_HP, MAX_STAMINA, useRun, type BannerKind } from './run'
 import { CARVED } from './palette'
@@ -25,37 +25,6 @@ const BANNER_TEXT: Record<BannerKind, string> = {
   victory: 'text-[color:var(--soul-glow)]',
   summoned: 'text-[color:var(--soul-phantom)]',
   died: 'text-[color:var(--soul-blood-bright)]',
-}
-
-const ROLL_MS = 700
-
-// The counter climbs to its new total over a short roll, one state write a frame for that roll only.
-function useRolling(target: number): number {
-  const [shown, setShown] = useState(target)
-  const from = useRef(target)
-
-  useEffect(() => {
-    const start = from.current
-    if (start === target) return
-    if (prefersReducedMotion()) {
-      from.current = target
-      setShown(target)
-      return
-    }
-    const began = performance.now()
-    let frame = 0
-    const step = (now: number) => {
-      const t = Math.min(1, (now - began) / ROLL_MS)
-      const value = Math.round(start + (target - start) * (1 - (1 - t) ** 3))
-      from.current = value
-      setShown(value)
-      if (t < 1) frame = requestAnimationFrame(step)
-    }
-    frame = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(frame)
-  }, [target])
-
-  return shown
 }
 
 function BannerBand() {

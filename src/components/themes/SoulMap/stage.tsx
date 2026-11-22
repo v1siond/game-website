@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { newTabName } from '@/lib/cv/sectionText'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
@@ -45,7 +44,7 @@ function WarDrum() {
   )
 }
 
-function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
+function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: BandSlot }) {
   const run = useRun()
   const reduced = useReducedMotion()
   const { souls: words, links } = useLabels()
@@ -83,9 +82,9 @@ function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
           {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
         </div>
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{band.role}</p>
-        {band.release && (
+        {release && (
           <p className={`mt-1 ${CARD_META}`}>
-            {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+            {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
           </p>
         )}
         <div className="mt-4 flex flex-wrap gap-2">
@@ -93,7 +92,7 @@ function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
             {words.encore}
           </button>
           {linkProps && (
-            <a {...linkProps} aria-label={newTabName(links, fillLabel(links.linkOf, { link: links.website, project: band.name }))} className={BUTTON}>
+            <a {...linkProps} aria-label={nameFor(links.website)} className={BUTTON}>
               {links.website}
             </a>
           )}

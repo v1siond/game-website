@@ -5,10 +5,10 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
+import { VentureList, type VentureSlot } from '@/components/cv/VentureList'
 import { Knight } from './knight'
 import { useRun } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
@@ -31,8 +31,6 @@ import souls from './souls.module.css'
 // His own products (featured) are the wide slabs laid first across the whole floor, a gold banner tag
 // over the name; the other ventures pack into the columns under them.
 
-type Venture = CVData['companies'][number]
-
 const APPRAISE_SOULS = 100
 
 function Scribe({ writing }: { writing: boolean }) {
@@ -46,7 +44,7 @@ function Scribe({ writing }: { writing: boolean }) {
   )
 }
 
-function Slab({ venture }: { venture: Venture }) {
+function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) {
   const run = useRun()
   const { souls: words, links, cards } = useLabels()
   const [appraised, setAppraised] = useState(false)
@@ -96,8 +94,8 @@ function Slab({ venture }: { venture: Venture }) {
         >
           {appraised ? words.appraised : words.appraise}
         </button>
-        {venture.url && (
-          <a href={venture.url} target="_blank" rel="noopener noreferrer" aria-label={newTabName(links, fillLabel(links.linkOf, { link: links.website, project: venture.name }))} className={BUTTON}>
+        {linkProps && (
+          <a {...linkProps} aria-label={nameFor(links.website)} className={BUTTON}>
             {links.website}
           </a>
         )}
@@ -109,13 +107,13 @@ function Slab({ venture }: { venture: Venture }) {
 export function FloorMessages({ companies }: { companies: CVData['companies'] }) {
   return (
     <>
-      <ul className={MASONRY_LIST}>
-        {companies.map((venture) => (
-          <li key={venture.id} className={`${MASONRY_ITEM} ${venture.featured ? '[column-span:all]' : ''}`}>
-            <Slab venture={venture} />
-          </li>
-        ))}
-      </ul>
+      <VentureList
+        companies={companies}
+        className={MASONRY_LIST}
+        itemClassName={MASONRY_ITEM}
+        featuredItemClassName="[column-span:all]"
+        renderVenture={(slot) => <Slab slot={slot} />}
+      />
     </>
   )
 }

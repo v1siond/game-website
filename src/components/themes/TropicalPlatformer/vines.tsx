@@ -44,8 +44,8 @@ interface CardProps {
 }
 
 function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
-  const { jungle, links } = useLabels()
-  const { band, years, linkProps } = slot
+  const { jungle } = useLabels()
+  const { band, years, linkProps, release } = slot
 
   return (
     <div className={`relative pt-10 ${grove.hang}`} style={{ '--i': index } as CSSProperties}>
@@ -67,10 +67,10 @@ function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
         </h3>
         {band.role && <p className="mt-1 pr-20 text-base text-[color:var(--tp-parchment)]">{band.role}</p>}
         {years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{years}</p>}
-        {band.release && (
+        {release && (
           <p className="mt-2 text-sm text-[color:var(--tp-parchment)]">
-            <span className="font-bold text-[color:var(--tp-sun-gold)]">{links.released}: </span>
-            {band.release}
+            <span className="font-bold text-[color:var(--tp-sun-gold)]">{release.label}: </span>
+            {release.title}
           </p>
         )}
         <button
@@ -111,10 +111,7 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={`${MASONRY_ITEM} pt-6`}
-        renderBand={(slot) => {
-          const index = bands.indexOf(slot.band)
-          return <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />
-        }}
+        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />}
       />
       <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}

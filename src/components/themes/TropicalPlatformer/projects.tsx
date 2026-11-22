@@ -20,7 +20,7 @@ interface StationProps {
 
 function ProjectStation({ slot, here, onRide }: StationProps) {
   const labels = useLabels()
-  const { project, years, links } = slot
+  const { project, years, links, noLink } = slot
 
   return (
     <article data-here={here || undefined} className={`rounded-3xl p-5 ${look.board} ${STATION}`}>
@@ -46,15 +46,12 @@ function ProjectStation({ slot, here, onRide }: StationProps) {
         </ul>
       )}
       <div className="mt-4 flex flex-wrap gap-3">
-        {links.length > 0 ? (
-          links.map(({ kind, label, linkProps }) => (
-            <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}>
-              {label}
-            </a>
-          ))
-        ) : (
-          <p className="text-sm italic text-[color:var(--tp-plank-light)]">{labels.links.noPublicLink}</p>
-        )}
+        {links.map(({ kind, label, linkProps }) => (
+          <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}>
+            {label}
+          </a>
+        ))}
+        {noLink && <p className="text-sm italic text-[color:var(--tp-plank-light)]">{noLink}</p>}
       </div>
       <RideButton name={project.name} here={here} onRide={onRide} />
     </article>
@@ -70,10 +67,7 @@ export function CartProjects({ projects }: { projects: Project[] }) {
           projects={projects}
           className={MASONRY_LIST}
           itemClassName={MASONRY_ITEM}
-          renderProject={(slot) => {
-            const index = projects.indexOf(slot.project)
-            return <ProjectStation slot={slot} here={index === stop} onRide={() => rideTo(index)} />
-          }}
+          renderProject={(slot, index) => <ProjectStation slot={slot} here={index === stop} onRide={() => rideTo(index)} />}
         />
       )}
     </CartLine>
