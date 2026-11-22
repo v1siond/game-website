@@ -16,7 +16,7 @@
 }
 
 .box[data-pulled='true'] .plunger {
-  transform: translateY(16px);
+  transform: translateY(10px);
 }
 
 .pip {

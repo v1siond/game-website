@@ -95,7 +95,8 @@ export function heroEntranceMs(): number {
 
 // About: he walks up to the count box, pulls the plunger on its side, the three light pips on its lid
 // blink in three beats and its front panel swings open; the box stays whole (research part 2 [13]).
-const AT_PLUNGER: Spot = { x: 38, lift: 0 }
+/** Where he stops to pull; the count box is placed from it (countBox.tsx), so his hand meets the plunger. */
+export const AT_PLUNGER: Spot = { x: 38, lift: 0 }
 
 export const COUNT_BOX: Scene = {
   start: { x: 8, lift: 0 },

@@ -11,7 +11,7 @@ import { staggerAt } from '../shared/stagger'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { BODY, PANEL, Points } from './cards'
-import { COUNT_BOX, PIPS, pipAt } from './choreography'
+import { AT_PLUNGER, COUNT_BOX, PIPS, pipAt } from './choreography'
 import { findId } from './finds'
 import { PORTAL, type Era } from './palette'
 import { Region, Rig, Strip, useReplay, useScene } from './stage'
@@ -26,17 +26,19 @@ import css from './countBox.module.css'
 // Animated: him, the pips (one class), the panel.
 // Reduced motion and the preview: him at the plunger, the pips lit and the panel open.
 
-const BOX_TIMES = cssVars({ '--pip-ms': pipAt(1) - pipAt(0) })
+// The box stands from his pulling spot: --at is AT_PLUNGER's x and the box's left edge is 10 px right of it, so
+// the plunger's handle (7 px into the box) is where his front hand reaches in the pull, at the strip's fixed h-56.
+const BOX_TIMES = cssVars({ '--pip-ms': pipAt(1) - pipAt(0), '--at': AT_PLUNGER.x })
 
 function CountBoxArt() {
   return (
     <svg viewBox="0 0 120 120" className="h-full w-full overflow-visible" aria-hidden="true" focusable="false">
       <g className={css.plunger}>
-        <path d="M14 22 V62" stroke={PORTAL.INK} strokeWidth={7} strokeLinecap="round" />
-        <path d="M14 22 V62" stroke={PORTAL.IRON} strokeWidth={3.5} strokeLinecap="round" />
-        <rect x={3} y={14} width={22} height={9} rx={4} fill={PORTAL.PAD_RED} stroke={PORTAL.INK} strokeWidth={2.6} />
+        <path d="M13 78 V98" stroke={PORTAL.INK} strokeWidth={7} strokeLinecap="round" />
+        <path d="M13 78 V98" stroke={PORTAL.IRON} strokeWidth={3.5} strokeLinecap="round" />
+        <rect x={1} y={74} width={24} height={9} rx={4} fill={PORTAL.PAD_RED} stroke={PORTAL.INK} strokeWidth={2.6} />
       </g>
-      <rect x={6} y={60} width={18} height={30} rx={2} fill={PORTAL.IRON_DARK} stroke={PORTAL.INK} strokeWidth={2.6} />
+      <rect x={2} y={96} width={22} height={20} rx={2} fill={PORTAL.IRON_DARK} stroke={PORTAL.INK} strokeWidth={2.6} />
       <rect x={24} y={30} width={90} height={86} rx={3} fill={PORTAL.WOOD} stroke={PORTAL.INK} strokeWidth={3.4} />
       <path d="M24 52 H114 M24 74 H114 M24 96 H114" stroke={PORTAL.WOOD_DARK} strokeWidth={2.4} />
       <rect x={34} y={40} width={70} height={66} fill={PORTAL.LAMP} className={css.glow} />
@@ -64,7 +66,7 @@ function BoxScene({ run, still, onDone }: { run: boolean; still: boolean; onDone
   return (
     <>
       <div
-        className={`absolute bottom-[9%] left-[46%] aspect-square h-[64%] ${css.box}`}
+        className={`absolute bottom-[9%] left-[calc(var(--at)*1%_+_10px)] aspect-square h-[30%] ${css.box}`}
         style={BOX_TIMES}
         data-pulled={scene.reached('pull')}
         data-counting={scene.reached('count')}
