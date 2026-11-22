@@ -45,12 +45,16 @@ interface SignLink {
   rel: string
 }
 
+// A sign lights 180 ms after the one before it over 0.9 s (shade.module.css), so the 23rd and every one after
+// it light together, all within 5 s of the section showing however many signs there are.
+const LAST_SIGN_STEP = 22
+
 function Sign({ index, lit, href, children }: { index: number; lit: boolean; href?: SignLink; children: ReactNode }) {
   const board = (
     <>
       <div
         className={`relative border-2 border-[color:var(--sh-black)] bg-[color:var(--sh-panel)] p-4 ${lit ? shade.signOn : shade.signOff}`}
-        style={{ '--i': index } as CSSProperties}
+        style={{ '--i': Math.min(index, LAST_SIGN_STEP) } as CSSProperties}
       >
         <div
           className={`pointer-events-none absolute inset-1 border border-[color:var(--sh-rim)] bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--sh-rim)_14%,transparent),transparent)] ${shade.glow}`}
