@@ -15,7 +15,7 @@ import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MARKED_LIST, ProjectCard, VentureCard } from './cards'
-import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
+import { FrostArtDivider, FrostOrnament, ChaosArtDivider, ChaosOrnament } from './ornaments'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { heldUntil } from '@/components/themes/shared/held'
 
@@ -80,7 +80,7 @@ const FRAMES: SectionFrames<FrameProps> = {
       <>
         <ScrollScene>
           <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
-            <RealmFrame title={sections[slot.titleKey]} zone="roc">
+            <RealmFrame title={sections[slot.titleKey]} zone="chaos">
               <p className="max-w-prose" style={{
                 color: REALM.textBright,
                 lineHeight: 1.8,
@@ -93,9 +93,9 @@ const FRAMES: SectionFrames<FrameProps> = {
           </section>
         </ScrollScene>
 
-        {/* === RoC Art Divider: Crossed Weapons === */}
+        {/* === Chaos Art Divider: Crossed Weapons === */}
         <ArtDivider layout={layout}>
-          <RoCArtDivider variant="horde" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="warband" scale={layout.artDividerScale} />
         </ArtDivider>
       </>
     )
@@ -106,11 +106,11 @@ const FRAMES: SectionFrames<FrameProps> = {
       <>
         <ScrollScene>
           <SectionWithOrnament
-            leftOrnament={<RoCOrnament side="left" type="flag" />}
-            rightOrnament={<RoCOrnament side="right" type="weapons" />}
+            leftOrnament={<ChaosOrnament side="left" type="flag" />}
+            rightOrnament={<ChaosOrnament side="right" type="weapons" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <RealmFrame title={sections[slot.titleKey]} zone="roc">
+              <RealmFrame title={sections[slot.titleKey]} zone="chaos">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {slot.jobs.map((job) => (
                     <JobCard key={job.id} job={job} />
@@ -121,9 +121,9 @@ const FRAMES: SectionFrames<FrameProps> = {
           </SectionWithOrnament>
         </ScrollScene>
 
-        {/* === RoC Art Divider: War Banner === */}
+        {/* === Chaos Art Divider: War Banner === */}
         <ArtDivider layout={layout}>
-          <RoCArtDivider variant="alliance" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="kingdom" scale={layout.artDividerScale} />
         </ArtDivider>
       </>
     )
@@ -132,9 +132,9 @@ const FRAMES: SectionFrames<FrameProps> = {
     const { sections, cards } = useLabels()
     return (
       <ScrollScene>
-        <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
+        <SectionWithOrnament rightOrnament={<ChaosOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title={sections[slot.titleKey]} zone="roc">
+            <RealmFrame title={sections[slot.titleKey]} zone="chaos">
               <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
                 {slot.categories.map((category) => (
                   <li key={category.id} className={MASONRY_ITEM}>
@@ -161,11 +161,11 @@ const FRAMES: SectionFrames<FrameProps> = {
       <>
         <ScrollScene>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title={sections[slot.titleKey]} zone="roc">
+            <RealmFrame title={sections[slot.titleKey]} zone="chaos">
               <ul className={MASONRY_LIST}>
                 {slot.services.map((service) => (
                   <li key={service.id} className={MASONRY_ITEM}>
-                    <InnerCard zone="roc">
+                    <InnerCard zone="chaos">
                       <h3 style={CARD_TITLE}>{service.title}</h3>
                       <p style={CARD_BODY}>{service.line}</p>
                     </InnerCard>
@@ -176,11 +176,11 @@ const FRAMES: SectionFrames<FrameProps> = {
           </section>
         </ScrollScene>
 
-        {/* ============ TRANSITION - FROZEN THRONE ZONE ============ */}
+        {/* ============ TRANSITION - ICE THRONE ZONE ============ */}
 
         {/* === Transition Art Divider: Ice Crystals === */}
         <ArtDivider layout={layout}>
-          <FTArtDivider variant="crystals" scale={layout.artDividerScale} />
+          <FrostArtDivider variant="crystals" scale={layout.artDividerScale} />
         </ArtDivider>
       </>
     )
@@ -189,14 +189,14 @@ const FRAMES: SectionFrames<FrameProps> = {
     const { sections } = useLabels()
     return (
       <>
-        {/* Projects - FT zone begins */}
+        {/* Projects - Frost zone begins */}
         <ScrollScene>
           <SectionWithOrnament
-            leftOrnament={<FTOrnament side="left" type="shard" />}
-            rightOrnament={<FTOrnament side="right" type="rune" />}
+            leftOrnament={<FrostOrnament side="left" type="shard" />}
+            rightOrnament={<FrostOrnament side="right" type="rune" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <RealmFrame title={sections[slot.titleKey]} zone="ft">
+              <RealmFrame title={sections[slot.titleKey]} zone="frost">
                 <ProjectList
                   projects={slot.projects}
                   className="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-3"
@@ -207,9 +207,9 @@ const FRAMES: SectionFrames<FrameProps> = {
           </SectionWithOrnament>
         </ScrollScene>
 
-        {/* === FT Art Divider: Frost Rune === */}
+        {/* === Frost Art Divider: Frost Rune === */}
         <ArtDivider layout={layout}>
-          <FTArtDivider variant="rune" scale={layout.artDividerScale} />
+          <FrostArtDivider variant="rune" scale={layout.artDividerScale} />
         </ArtDivider>
       </>
     )
@@ -218,9 +218,9 @@ const FRAMES: SectionFrames<FrameProps> = {
     const { sections } = useLabels()
     return (
       <ScrollScene>
-        <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
+        <SectionWithOrnament leftOrnament={<FrostOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title={sections[slot.titleKey]} zone="ft">
+            <RealmFrame title={sections[slot.titleKey]} zone="frost">
               {/* His own products (featured) take the first row two to a row, each a gold trimmed card with
                   a gold seal over the name; the other ventures follow three to a row. */}
               <VentureList
@@ -241,13 +241,13 @@ const FRAMES: SectionFrames<FrameProps> = {
     return (
       <>
         <ArtDivider layout={layout}>
-          <RoCArtDivider variant="horde" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="warband" scale={layout.artDividerScale} />
         </ArtDivider>
 
         <ScrollScene>
-          <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
+          <SectionWithOrnament leftOrnament={<FrostOrnament side="left" type="frost" />}>
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <RealmFrame title={sections[titleKey]} zone="ft">
+              <RealmFrame title={sections[titleKey]} zone="frost">
                 <p style={{ color: REALM.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
                   {drumsSince(musician, years)}
                 </p>
@@ -269,13 +269,13 @@ const FRAMES: SectionFrames<FrameProps> = {
     return (
       <>
         <ArtDivider layout={layout}>
-          <RoCArtDivider variant="weapons" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="weapons" scale={layout.artDividerScale} />
         </ArtDivider>
 
         <ScrollScene>
-          <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
+          <SectionWithOrnament rightOrnament={<ChaosOrnament side="right" type="shield" />}>
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <RealmFrame title={sections[titleKey]} zone="roc">
+              <RealmFrame title={sections[titleKey]} zone="chaos">
                 <h3 style={{ ...CARD_TITLE, marginBottom: '1rem' }}>{martialArts.primary.title}</h3>
                 <MuayThaiRecord
                   martialArts={martialArts}

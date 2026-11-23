@@ -24,7 +24,7 @@ export function FrostHero() {
       viewBox="0 0 200 320"
     >
       <defs>
-        <linearGradient id="frostmourneGlow" x1="0%" y1="100%" x2="0%" y2="0%">
+        <linearGradient id="runebladeGlow" x1="0%" y1="100%" x2="0%" y2="0%">
           <stop offset="0%" stopColor={REALM.frostIceDark} />
           <stop offset="50%" stopColor={REALM.frostIceMid} />
           <stop offset="100%" stopColor={REALM.frostIceBright} />
@@ -151,24 +151,24 @@ export function FrostHero() {
       <polygon points="8,180 0,168 18,175" fill={REALM.night15a} />
       <polygon points="15,178 5,165 22,172" fill={REALM.night15a} />
 
-      {/* Right arm - HOLDING FROSTMOURNE */}
+      {/* Right arm - HOLDING RUNEBLADE */}
       <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#lichArmor)" />
       <path d="M185,138 L158,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
       {/* Gauntlet holding sword handle */}
       <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#lichArmor)" />
       <ellipse cx="185" cy="178" rx="12" ry="10" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
 
-      {/* === FROSTMOURNE - IN HIS RIGHT HAND === */}
+      {/* === RUNEBLADE - IN HIS RIGHT HAND === */}
       <g transform="translate(185, 175) rotate(-5)">
         {/* Blade glow */}
         <ellipse cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" {...pulse(0.1, 0.22, 2)} />
 
         {/* Blade pointing down */}
-        <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#frostmourneGlow)" />
+        <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#runebladeGlow)" />
         <path d="M0,25 L4,35 L4,135 L0,160 L-4,135 L-4,35 Z" fill={REALM.frostIceBright} opacity="0.5" />
         {/* Blade serrations */}
-        <path d="M10,60 L16,55 L12,70" fill="url(#frostmourneGlow)" />
-        <path d="M-10,60 L-16,55 L-12,70" fill="url(#frostmourneGlow)" />
+        <path d="M10,60 L16,55 L12,70" fill="url(#runebladeGlow)" />
+        <path d="M-10,60 L-16,55 L-12,70" fill="url(#runebladeGlow)" />
 
         {/* Runes - pulsing */}
         <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 1.5)} />

@@ -1,6 +1,6 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Medieval Fantasy's palette, every colour of the world once: the chaos zone (fel greens, fire, the olive
+// Medieval Fantasy's palette, every colour of the world once: the chaos zone (blight greens, fire, the olive
 // battlefield), the frost zone (ice and snow), the metal frame, gold trim and parchment text, then the art's
 // own shades named by family and lightness (stone12 is a stone shade at 12% lightness). The SVG art and
 // inline styles read REALM; REALM_VARS puts the same values on the world's root as --realm-* variables,
@@ -8,12 +8,12 @@ import { paletteVars } from '../shared/paletteVars'
 
 export const REALM = {
   // The two zones and the shared frame, gold and text
-  chaosFelBright: '#5a6a3a',
-  // Fel green as text: the same hue lifted to 7 to 1 on every metal shade a label sits on (the selected
-  // profession node's metalMid, 7.07 to 1) and higher on the dark chips; chaosFelBright stays on the glows.
-  chaosFelText: '#bdcba0',
-  chaosFelMid: '#3a4a28',
-  chaosFelDark: '#2a3518',
+  chaosBlightBright: '#5a6a3a',
+  // Blight green as text: the same hue lifted to 7 to 1 on every metal shade a label sits on (the selected
+  // profession node's metalMid, 7.07 to 1) and higher on the dark chips; chaosBlightBright stays on the glows.
+  chaosBlightText: '#bdcba0',
+  chaosBlightMid: '#3a4a28',
+  chaosBlightDark: '#2a3518',
   chaosFireBright: '#ffaa44',
   chaosFireMid: '#dd6622',
   chaosFireCore: '#ffff88',
@@ -46,8 +46,8 @@ export const REALM = {
   goldDark: '#8b6914',
   goldDeep: '#5f4c0c',
   bloodRed: '#8b0000',
-  hordeRed: '#5a1a1a',
-  allianceBlue: '#1e3a5f',
+  warbandRed: '#5a1a1a',
+  kingdomBlue: '#1e3a5f',
   textBright: '#e8dcc8',
   textMid: '#b09878',
   textDim: '#bcaf9e',
@@ -195,7 +195,7 @@ export const REALM = {
   earth56a: '#d4a84b',
   earth74: '#c8c0b0',
 
-  // Moss, grass and fel greens
+  // Moss, grass and blight greens
   moss7: '#0c1a0c',
   moss8: '#0d1a0f',
   moss9: '#0d1f15',

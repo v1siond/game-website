@@ -1,5 +1,5 @@
 /* The ice particles of the frost dividers swell and glow */
-@keyframes felPulse {
+@keyframes blightPulse {
   0%, 100% {
     opacity: 0.15;
     transform: scale(1);

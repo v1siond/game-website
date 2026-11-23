@@ -17,8 +17,8 @@ const CORNERS = [
   corner('br', { bottom: '-2px', right: '-2px' }, 180),
 ]
 
-export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactNode; title?: string; zone?: 'roc' | 'ft' }) {
-  const accentColor = zone === 'ft' ? REALM.frostIceMid : REALM.chaosFelMid
+export function RealmFrame({ children, title, zone = 'chaos' }: { children: ReactNode; title?: string; zone?: 'chaos' | 'frost' }) {
+  const accentColor = zone === 'frost' ? REALM.frostIceMid : REALM.chaosBlightMid
 
   return (
     <div style={{ position: 'relative' }}>
@@ -82,8 +82,8 @@ export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactN
   )
 }
 
-export function InnerCard({ children, highlight, zone = 'roc' }: { children: ReactNode; highlight?: boolean; zone?: 'roc' | 'ft' }) {
-  const accentColor = zone === 'ft' ? REALM.frostIceDark : REALM.chaosFelDark
+export function InnerCard({ children, highlight, zone = 'chaos' }: { children: ReactNode; highlight?: boolean; zone?: 'chaos' | 'frost' }) {
+  const accentColor = zone === 'frost' ? REALM.frostIceDark : REALM.chaosBlightDark
 
   return (
     <div style={{

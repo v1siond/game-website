@@ -36,8 +36,8 @@ const ROCK_PARTS: RockPart[] = [
     detail: (
       <>
         <ellipse cx="80" cy="24" rx="18" ry="14" fill={REALM.stone28} />
-        <ellipse cx="70" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
-        <ellipse cx="90" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
+        <ellipse cx="70" cy="24" rx="4" ry="3" fill={REALM.chaosBlightMid} />
+        <ellipse cx="90" cy="24" rx="4" ry="3" fill={REALM.chaosBlightMid} />
       </>
     ),
   },
@@ -57,7 +57,7 @@ const ROCK_PARTS: RockPart[] = [
     detail: (
       <>
         <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill={REALM.stone22} />
-        <path d="M80,65 L75,85 L82,105" stroke={REALM.chaosFelMid} strokeWidth="2" fill="none" />
+        <path d="M80,65 L75,85 L82,105" stroke={REALM.chaosBlightMid} strokeWidth="2" fill="none" />
       </>
     ),
   },
@@ -181,8 +181,8 @@ function AmbientFlash() {
       right: 0,
       height: '100%',
       background: `
-        radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${REALM.chaosFelBright}80 0%, ${REALM.chaosFelBright}45 15%, ${REALM.chaosFelMid}25 30%, transparent ${zone.spread + 45}%),
-        radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${REALM.chaosFelMid}40 0%, transparent 25%)
+        radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${REALM.chaosBlightBright}80 0%, ${REALM.chaosBlightBright}45 15%, ${REALM.chaosBlightMid}25 30%, transparent ${zone.spread + 45}%),
+        radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${REALM.chaosBlightMid}40 0%, transparent 25%)
       `,
       transition: 'opacity 0.05s ease-out',
     }} />
@@ -239,7 +239,7 @@ function FallingMeteor() {
         top: '50%',
         transform: 'translate(-50%, -50%)',
         borderRadius: '50%',
-        background: `radial-gradient(circle, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}35 35%, ${REALM.chaosFelDark}20 60%, transparent 80%)`,
+        background: `radial-gradient(circle, ${REALM.chaosBlightBright}60 0%, ${REALM.chaosBlightMid}35 35%, ${REALM.chaosBlightDark}20 60%, transparent 80%)`,
         filter: 'blur(8px)',
       }} />
       {/* Meteor body */}
@@ -248,7 +248,7 @@ function FallingMeteor() {
           <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
             <stop offset="0%" stopColor={REALM.chaosFireCore} />
             <stop offset="35%" stopColor={REALM.chaosFireBright} />
-            <stop offset="70%" stopColor={REALM.chaosFelMid} />
+            <stop offset="70%" stopColor={REALM.chaosBlightMid} />
             <stop offset="100%" stopColor={REALM.ember10} />
           </radialGradient>
         </defs>
@@ -256,7 +256,7 @@ function FallingMeteor() {
           d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
           fill={`url(#meteor${fallingMeteor.id})`}
         />
-        <path d="M10,8 L15,15 L12,22" stroke={REALM.chaosFelBright} strokeWidth="1.5" fill="none" opacity="0.6" />
+        <path d="M10,8 L15,15 L12,22" stroke={REALM.chaosBlightBright} strokeWidth="1.5" fill="none" opacity="0.6" />
         <circle cx="12" cy="12" r="3" fill={REALM.chaosFireCore} opacity="0.7" />
       </svg>
       {/* Fire trail */}
@@ -266,7 +266,7 @@ function FallingMeteor() {
         left: '50%',
         width: '15px',
         height: '90px',
-        background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}30 15%, ${REALM.chaosFelMid}55 45%, ${REALM.chaosFelBright}80 75%, ${REALM.chaosFireCore} 100%)`,
+        background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosBlightDark}30 15%, ${REALM.chaosBlightMid}55 45%, ${REALM.chaosBlightBright}80 75%, ${REALM.chaosFireCore} 100%)`,
         filter: 'blur(5px)',
         transform: `translateX(-50%) rotate(${fallingMeteor.direction === 'left' ? '25deg' : '-25deg'})`,
         transformOrigin: 'bottom center',
@@ -329,8 +329,8 @@ function GolemSpawn() {
             width: '40px',
             height: '40px',
             borderRadius: '50%',
-            background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
-            boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
+            background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosBlightMid} 85%, var(--realm-stone8c) 100%)`,
+            boxShadow: `0 0 35px ${REALM.chaosBlightBright}, 0 0 70px ${REALM.chaosFireMid}`,
             transformOrigin: '0 0',
             animation: `${chaos.meteorGrow} ${spawnS(1.5)}s ease-in forwards`,
           }} />
@@ -341,7 +341,7 @@ function GolemSpawn() {
             left: '0px',
             width: '14px',
             height: '120px',
-            background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
+            background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosBlightDark}40 30%, ${REALM.chaosBlightMid}70 60%, ${REALM.chaosBlightBright}95 85%, ${REALM.chaosFireCore} 100%)`,
             filter: 'blur(5px)',
             transformOrigin: 'bottom center',
             animation: `${chaos.meteorTrailGrow} ${spawnS(1.5)}s ease-in forwards`,
@@ -361,7 +361,7 @@ function GolemSpawn() {
               transform: 'translate(-50%, -50%)',
               width: '250px',
               height: '250px',
-              background: `radial-gradient(circle, ${REALM.chaosFelBright}90 0%, ${REALM.chaosFelMid}60 30%, ${REALM.chaosFelDark}30 60%, transparent 80%)`,
+              background: `radial-gradient(circle, ${REALM.chaosBlightBright}90 0%, ${REALM.chaosBlightMid}60 30%, ${REALM.chaosBlightDark}30 60%, transparent 80%)`,
               animation: `${chaos.explosionFlash} ${spawnS(0.6)}s ease-out forwards`,
             }} />
           )}
@@ -382,7 +382,7 @@ function GolemSpawn() {
             <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
             <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out forwards` }} />
             <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out ${spawnS(0.1)}s forwards` }} />
-            <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosFelDark} opacity="0.4" />
+            <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosBlightDark} opacity="0.4" />
           </svg>
 
           {/* Shadow */}
@@ -393,7 +393,7 @@ function GolemSpawn() {
             top: '200px',
             width: '120px',
             height: '25px',
-            background: `radial-gradient(ellipse, ${REALM.chaosFelDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
+            background: `radial-gradient(ellipse, ${REALM.chaosBlightDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
             borderRadius: '50%',
           }} />
         </>
@@ -410,7 +410,7 @@ function GolemSpawn() {
             transform: 'translateX(-50%) translateY(-50%)',
             width: '150px',
             height: '200px',
-            background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}30 30%, transparent 70%)`,
+            background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosBlightBright}60 0%, ${REALM.chaosBlightMid}30 30%, transparent 70%)`,
             animation: `${chaos.emergeGlow} ${spawnS(2.5)}s ease-out forwards`,
             pointerEvents: 'none',
           }} />
@@ -481,7 +481,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
 
   return (
     <>
-      {/* GREEN-BROWN tinted stormy sky - matching REALM RoC aesthetic */}
+      {/* GREEN-BROWN tinted stormy sky - matching REALM Chaos aesthetic */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -497,7 +497,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           var(--realm-stone5) 100%)`
       }} />
 
-      {/* === REALM ROC MENU BACKGROUND - Grassy battlefield with war debris === */}
+      {/* === REALM CHAOS BACKGROUND - Grassy battlefield with war debris === */}
       <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
           {/* Grass ground gradient */}
@@ -553,17 +553,17 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             <stop offset="70%" stopColor={REALM.moss13d} />
             <stop offset="100%" stopColor={REALM.stone10a} stopOpacity="0" />
           </radialGradient>
-          <filter id="rocDistantBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <filter id="chaosDistantBlur" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
           </filter>
-          <filter id="rocMidBlur" x="-10%" y="-10%" width="120%" height="120%">
+          <filter id="chaosMidBlur" x="-10%" y="-10%" width="120%" height="120%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
           </filter>
-          <filter id="felGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id="blightGlow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
           </filter>
           {/* Ground fade - green tint to blend with sky */}
-          <linearGradient id="rocGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="chaosGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor={REALM.frost7a} stopOpacity="0.8" />
             <stop offset="40%" stopColor={REALM.frost9} stopOpacity="0.3" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
@@ -589,14 +589,14 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         </g>
 
         {/* === DISTANT ROCKY CLIFF SILHOUETTE - Gray, far background === */}
-        <g filter="url(#rocDistantBlur)" opacity="0.7">
+        <g filter="url(#chaosDistantBlur)" opacity="0.7">
           {/* Main cliff shape - like REALM reference */}
           <path d="M550,180 L600,120 L650,140 L720,80 L780,110 L850,90 L920,130 L1000,100 L1000,350 L550,350 Z" fill={REALM.chaosRockSilhouette} />
           <path d="M600,150 L640,130 L680,145 L720,100 L750,120" stroke={REALM.chaosRockDistant} strokeWidth="3" fill="none" opacity="0.4" />
         </g>
 
         {/* === ATMOSPHERIC FOG LAYER - Creates depth === */}
-        <rect x="0" y="150" width="1000" height="200" fill="url(#rocGroundFade)" opacity="0.5" />
+        <rect x="0" y="150" width="1000" height="200" fill="url(#chaosGroundFade)" opacity="0.5" />
 
         {/* === GREENISH EARTHY GROUND - Like flagpole dirt === */}
         <g>
@@ -702,7 +702,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         </g>
 
         {/* === MID-GROUND ELEMENTS === */}
-        <g filter="url(#rocMidBlur)" opacity="0.7">
+        <g filter="url(#chaosMidBlur)" opacity="0.7">
           {/* Broken wooden structure left (like REALM banner frame) */}
           <g transform="translate(280, 380)">
             <rect x="0" y="0" width="8" height="120" fill={REALM.ember15} transform="rotate(-8)" />
@@ -724,7 +724,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         </g>
 
         {/* === MID LAYER - Remaining stone pillar === */}
-        <g filter="url(#rocMidBlur)" opacity="0.5">
+        <g filter="url(#chaosMidBlur)" opacity="0.5">
           <g transform="translate(650, 380)">
             <rect x="0" y="0" width="30" height="100" fill={REALM.chaosRockDistant} />
           </g>
@@ -950,9 +950,9 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         </g>
 
         {/* Ground plane fade */}
-        <rect x="0" y="200" width="1000" height="650" fill="url(#rocGroundFade)" />
+        <rect x="0" y="200" width="1000" height="650" fill="url(#chaosGroundFade)" />
 
-        {/* === PERSPECTIVE LINES - subtle depth like FT === */}
+        {/* === PERSPECTIVE LINES - subtle depth like Frost === */}
         <g opacity="0.04">
           {[-60, -35, -15, 0, 15, 35, 60].map((offset, i) => (
             <line key={i} x1={500 + offset * 2} y1="180" x2={500 + Math.sign(offset) * 900} y2="850" stroke={REALM.stone11a} strokeWidth="1" />
@@ -1037,7 +1037,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         </g>
       </svg>
 
-      {/* Stormy cloud glow - FEL GREEN atmospheric lighting */}
+      {/* Stormy cloud glow - BLIGHT GREEN atmospheric lighting */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -1054,9 +1054,9 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           right: 0,
           height: '100%',
           background: `
-            radial-gradient(ellipse at 20% 30%, ${REALM.chaosFelMid}40 0%, ${REALM.chaosFelDark}20 40%, transparent 70%),
-            radial-gradient(ellipse at 50% 25%, ${REALM.chaosFelBright}30 0%, ${REALM.chaosFelMid}18 35%, transparent 65%),
-            radial-gradient(ellipse at 80% 35%, ${REALM.chaosFelMid}35 0%, ${REALM.chaosFelDark}18 40%, transparent 70%)
+            radial-gradient(ellipse at 20% 30%, ${REALM.chaosBlightMid}40 0%, ${REALM.chaosBlightDark}20 40%, transparent 70%),
+            radial-gradient(ellipse at 50% 25%, ${REALM.chaosBlightBright}30 0%, ${REALM.chaosBlightMid}18 35%, transparent 65%),
+            radial-gradient(ellipse at 80% 35%, ${REALM.chaosBlightMid}35 0%, ${REALM.chaosBlightDark}18 40%, transparent 70%)
           `,
         }} />
 
@@ -1071,10 +1071,10 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           right: 0,
           height: '40%',
           background: `
-            radial-gradient(ellipse at 15% 60%, ${REALM.chaosFelBright}15 0%, transparent 35%),
-            radial-gradient(ellipse at 45% 50%, ${REALM.chaosFelMid}18 0%, transparent 40%),
-            radial-gradient(ellipse at 75% 55%, ${REALM.chaosFelBright}12 0%, transparent 30%),
-            radial-gradient(ellipse at 90% 65%, ${REALM.chaosFelMid}15 0%, transparent 35%)
+            radial-gradient(ellipse at 15% 60%, ${REALM.chaosBlightBright}15 0%, transparent 35%),
+            radial-gradient(ellipse at 45% 50%, ${REALM.chaosBlightMid}18 0%, transparent 40%),
+            radial-gradient(ellipse at 75% 55%, ${REALM.chaosBlightBright}12 0%, transparent 30%),
+            radial-gradient(ellipse at 90% 65%, ${REALM.chaosBlightMid}15 0%, transparent 35%)
           `,
           animation: cycles(chaos.stormPulse, 6, 'ease-in-out'),
         }} />
@@ -1120,7 +1120,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         />
       ))}
 
-      {/* === HORDE WAR BANNER - Positioned above infernals, scaled larger === */}
+      {/* === WARBAND WAR BANNER - Positioned above infernals, scaled larger === */}
       <div
         style={{
           position: 'fixed',
@@ -1271,7 +1271,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
-                    {/* ORC HORNS - curved, coming from skull sides */}
+                    {/* BRUTE HORNS - curved, coming from skull sides */}
                     <path d="M-18,-8 Q-28,-15 -32,-28 Q-30,-35 -25,-38" stroke={REALM.earth56} strokeWidth="5" fill="none" strokeLinecap="round" />
                     <path d="M-18,-8 Q-26,-14 -30,-26 Q-28,-32 -24,-35" stroke={REALM.ember71} strokeWidth="3" fill="none" strokeLinecap="round" />
                     <path d="M18,-8 Q28,-15 32,-28 Q30,-35 25,-38" stroke={REALM.earth56} strokeWidth="5" fill="none" strokeLinecap="round" />
@@ -1285,7 +1285,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                     {/* Eye sockets - deep and dark */}
                     <ellipse cx="-8" cy="-4" rx="5" ry="4" fill={REALM.blood7a} />
                     <ellipse cx="8" cy="-4" rx="5" ry="4" fill={REALM.blood7a} />
-                    {/* Fel green eye glow */}
+                    {/* Blight green eye glow */}
                     <ellipse cx="-8" cy="-4" rx="2.5" ry="2" fill={REALM.moss24} />
                     <ellipse cx="8" cy="-4" rx="2.5" ry="2" fill={REALM.moss24} />
                     {/* Nose hole */}
@@ -1296,7 +1296,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                     {/* Blood stains on skull */}
                     <path d="M-10,-8 Q-12,-2 -8,4" stroke={REALM.blood27} strokeWidth="1.5" fill="none" opacity="0.6" />
                     <path d="M6,0 Q8,5 4,10" stroke={REALM.blood22} strokeWidth="1" fill="none" opacity="0.5" />
-                    {/* Orc tusks - from jaw, pointing up and out */}
+                    {/* Brute tusks - from jaw, pointing up and out */}
                     <path d="M-12,12 Q-18,4 -14,-4" stroke={REALM.ember71} strokeWidth="4" fill="none" strokeLinecap="round" />
                     <path d="M-12,12 Q-16,5 -13,-2" stroke={REALM.ember77} strokeWidth="2" fill="none" strokeLinecap="round" />
                     <path d="M12,12 Q18,4 14,-4" stroke={REALM.ember71} strokeWidth="4" fill="none" strokeLinecap="round" />

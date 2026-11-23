@@ -409,7 +409,7 @@ export const themes: Theme[] = [
       accent: REALM.goldBright,
       text: REALM.textBright,
       textMuted: REALM.textMid,
-      secondary: REALM.allianceBlue,
+      secondary: REALM.kingdomBlue,
       highlight: REALM.goldBright,
       border: REALM.metalLight,
       borderHover: REALM.goldBright,

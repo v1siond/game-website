@@ -1,4 +1,4 @@
-/* The infernal golem's idle motion: breath, the head and limbs, the fel flames and the eyes, read by character.tsx. */
+/* The infernal golem's idle motion: breath, the head and limbs, the blight flames and the eyes, read by character.tsx. */
 /* Idle breathing animation - SVG only, no translateX (that's on container) */
 @keyframes infernalBreath {
   0%, 100% {
@@ -147,7 +147,7 @@
   25% { opacity: 1; }
   75% { opacity: 0.7; }
 }
-/* The brighter fel layer over each eye flares with the glow */
+/* The brighter blight layer over each eye flares with the glow */
 @keyframes eyeFlare {
   0%, 75%, 100% { opacity: 0; }
   25% { opacity: 0.7; }

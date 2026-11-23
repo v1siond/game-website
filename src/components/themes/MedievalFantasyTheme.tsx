@@ -18,8 +18,8 @@ import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
 import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
-import { FTArtDivider } from './MedievalFantasy/ornaments'
-import { FelPaths, ProfessionNode } from './MedievalFantasy/professions'
+import { FrostArtDivider } from './MedievalFantasy/ornaments'
+import { BlightPaths, ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
@@ -82,13 +82,13 @@ export default function MedievalFantasyTheme() {
       {/* ============ MAIN CONTENT ============ */}
       <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
 
-        {/* ============ REIGN OF CHAOS ZONE ============ */}
+        {/* ============ CHAOS ZONE ============ */}
 
         {/* Header - wrapped in high z-index container so it sits above the scene */}
         <div style={{ position: 'relative', zIndex: 100 }}>
         <ScrollScene>
           <header data-worlds-hero="" className="relative" style={{ marginBottom: sectionSpacing }}>
-            <RealmFrame zone="roc">
+            <RealmFrame zone="chaos">
               <RecruiterHero
                 render={({ name, headline, tagline, line, actions }) => (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
@@ -139,13 +139,13 @@ export default function MedievalFantasyTheme() {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: `radial-gradient(ellipse 80% 100% at 50% 100%, ${REALM.chaosFelDark}15 0%, transparent 70%)`,
+              background: `radial-gradient(ellipse 80% 100% at 50% 100%, ${REALM.chaosBlightDark}15 0%, transparent 70%)`,
               pointerEvents: 'none',
             }} />
 
-            {/* Profession nodes over the fel paths that join them */}
+            {/* Profession nodes over the blight paths that join them */}
             <div className={`relative w-full h-full ${isLargeScreen ? 'max-w-[700px]' : 'max-w-[500px]'}`}>
-              <FelPaths active={active} isLargeScreen={isLargeScreen} />
+              <BlightPaths active={active} isLargeScreen={isLargeScreen} />
               <ProfessionSwitch
                 label={navigation.professionSelection}
                 className="relative flex justify-between items-stretch w-full px-0 sm:px-4 h-full py-2"
@@ -161,9 +161,9 @@ export default function MedievalFantasyTheme() {
           </ProfessionRegion>
         </main>
 
-        {/* === FT Art Divider: Ice Throne === */}
+        {/* === Frost Art Divider: Ice Throne === */}
         <ArtDivider layout={layout}>
-          <FTArtDivider variant="throne" scale={layout.artDividerScale} />
+          <FrostArtDivider variant="throne" scale={layout.artDividerScale} />
         </ArtDivider>
 
         {/* Contact - no card, floating text. The last section never reaches the default end

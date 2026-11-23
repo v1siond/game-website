@@ -12,12 +12,12 @@ import { FrostAtmosphere } from './frostZone'
 const TRANSITION_POINT = 0.4
 const TRANSITION_SPAN = 0.2
 
-const crossfade = (progress: number): { roc: number; ft: number } => {
-  const ft = Math.min(1, Math.max(0, (progress - TRANSITION_POINT) / TRANSITION_SPAN))
-  return { roc: 1 - ft, ft }
+const crossfade = (progress: number): { chaos: number; frost: number } => {
+  const frost = Math.min(1, Math.max(0, (progress - TRANSITION_POINT) / TRANSITION_SPAN))
+  return { chaos: 1 - frost, frost }
 }
 
-// The scroll writes the two zone opacities as --roc and --ft on the backdrop's root once per frame, so a
+// The scroll writes the two zone opacities as --chaos and --frost on the backdrop's root once per frame, so a
 // scroll re-renders nothing; each layer reads its variable and eases into it over half a second. The chaos
 // zone shows with the page, so its storm plays from the start; the frost zone's blizzard, wind and figure
 // wait on their first frame (heldUntil) until the scroll first fades the frost in, then play once.
@@ -33,10 +33,10 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
       const root = rootRef.current
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
       if (!root || maxScroll <= 0) return
-      const { roc, ft } = crossfade(Math.min(window.scrollY / maxScroll, 1))
-      root.style.setProperty('--roc', String(roc))
-      root.style.setProperty('--ft', String(ft))
-      if (frostSeen || ft <= 0) return
+      const { chaos, frost } = crossfade(Math.min(window.scrollY / maxScroll, 1))
+      root.style.setProperty('--chaos', String(chaos))
+      root.style.setProperty('--frost', String(frost))
+      if (frostSeen || frost <= 0) return
       frostSeen = true
       setFrostShown(true)
     }
@@ -57,13 +57,13 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
       {/* Base dark */}
       <div style={{ position: 'absolute', inset: 0, background: REALM.bgVoid }} />
 
-      {/* REIGN OF CHAOS atmosphere */}
-      <div className="absolute inset-0 opacity-[var(--roc,1)] transition-opacity duration-500 ease-[ease]">
+      {/* CHAOS atmosphere */}
+      <div className="absolute inset-0 opacity-[var(--chaos,1)] transition-opacity duration-500 ease-[ease]">
         <ChaosAtmosphere />
       </div>
 
-      {/* FROZEN THRONE atmosphere */}
-      <div className={`absolute inset-0 opacity-[var(--ft,0)] transition-opacity duration-500 ease-[ease] ${heldUntil(frostShown)}`}>
+      {/* ICE THRONE atmosphere */}
+      <div className={`absolute inset-0 opacity-[var(--frost,0)] transition-opacity duration-500 ease-[ease] ${heldUntil(frostShown)}`}>
         <FrostAtmosphere />
       </div>
 

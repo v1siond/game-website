@@ -169,7 +169,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
               }}
             >
               <span>{languages[locale]}</span>
-              {currentLocale === locale && <span style={{ color: REALM.chaosFelBright }}>✓</span>}
+              {currentLocale === locale && <span style={{ color: REALM.chaosBlightBright }}>✓</span>}
             </button>
           ))}
         </div>

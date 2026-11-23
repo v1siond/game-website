@@ -67,11 +67,11 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           var(--realm-stone1a) 100%)`
       }} />
 
-      {/* === FROZEN THRONE BACKGROUND - Animated Painting === */}
+      {/* === ICE THRONE BACKGROUND - Animated Painting === */}
       <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
           {/* Gradients for depth and ice effects */}
-          <linearGradient id="ftGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="frostGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor={REALM.night7} stopOpacity="0" />
             <stop offset="40%" stopColor={REALM.night9} stopOpacity="0.2" />
             <stop offset="100%" stopColor={REALM.night4} stopOpacity="0.7" />
@@ -86,10 +86,10 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
             <stop offset="50%" stopColor={REALM.frostIceMid} stopOpacity="0.1" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
           </linearGradient>
-          <filter id="ftDistantBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <filter id="frostDistantBlur" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
           </filter>
-          <filter id="ftMidBlur" x="-10%" y="-10%" width="120%" height="120%">
+          <filter id="frostMidBlur" x="-10%" y="-10%" width="120%" height="120%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
           </filter>
           <filter id="iceGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -97,7 +97,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           </filter>
         </defs>
 
-        {/* === THE FROZEN THRONE - HIGHLY VISIBLE in center background === */}
+        {/* === THE ICE THRONE - HIGHLY VISIBLE in center background === */}
         {/* Massive throne glow - icy power emanating from the throne */}
         <ellipse cx="500" cy="150" rx="280" ry="180" fill={REALM.frostIceMid} filter="url(#iceGlow)" opacity="0.25" />
         <ellipse cx="500" cy="120" rx="180" ry="100" fill={REALM.frostIceBright} filter="url(#iceGlow)" opacity="0.2" />
@@ -112,7 +112,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="-220,320 -200,280 -160,295 -100,260 100,260 160,295 200,280 220,320" fill={REALM.night14} />
           <polygon points="-160,300 -120,275 -70,290 70,290 120,275 160,300" fill={REALM.night12} opacity="0.8" />
 
-          {/* Central throne spire - Lich King's seat - PROMINENT */}
+          {/* Central throne spire - frost king's seat - PROMINENT */}
           <polygon points="-50,180 -35,100 -20,130 0,30 20,130 35,100 50,180" fill={REALM.night23} />
           <polygon points="-35,150 -20,80 0,40 20,80 35,150" fill={REALM.frostIceDark} opacity="0.8" />
           {/* Inner ice glow of throne */}
@@ -147,7 +147,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </g>
 
         {/* === FAR LAYER - Distant mountain ranges === */}
-        <g filter="url(#ftDistantBlur)" opacity="0.35">
+        <g filter="url(#frostDistantBlur)" opacity="0.35">
           {/* Distant mountain range - far left */}
           <polygon points="0,220 30,120 60,150 100,80 140,130 180,100 220,160 260,220" fill={REALM.night8} />
           <polygon points="80,100 100,80 120,95" fill={REALM.frostIceDark} opacity="0.4" />
@@ -158,7 +158,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </g>
 
         {/* === MID LAYER - Ice citadels, frozen structures === */}
-        <g filter="url(#ftMidBlur)" opacity="0.4">
+        <g filter="url(#frostMidBlur)" opacity="0.4">
           {/* Ice citadel left */}
           <g transform="translate(120, 250)">
             <polygon points="0,150 20,60 40,80 60,30 80,70 100,50 120,150" fill={REALM.night11a} />
@@ -237,7 +237,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </g>
 
         {/* Ground plane fade */}
-        <rect x="0" y="200" width="1000" height="650" fill="url(#ftGroundFade)" />
+        <rect x="0" y="200" width="1000" height="650" fill="url(#frostGroundFade)" />
 
         {/* Perspective lines (subtle, icy) */}
         <g opacity="0.06">
@@ -352,7 +352,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         filter: 'blur(45px)',
       }} />
 
-      {/* === INVINCIBLE - Standing beside Lich King === */}
+      {/* === DEATH STEED - Standing beside frost king === */}
       <svg aria-hidden="true"
         style={{
           position: 'absolute',
