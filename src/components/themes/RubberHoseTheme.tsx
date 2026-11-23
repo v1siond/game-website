@@ -126,16 +126,16 @@ export default function RubberHoseTheme() {
               </div>
             )}
           />
-
-          {/* the profession switch, a row of cast badges with him in each costume */}
-          <section className="relative mt-16 py-8" aria-label={navigation.professionSelection}>
-            <ProfessionSwitch
-              className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
-              label={navigation.profession}
-              renderOption={(option) => <CartoonCharacter {...option} />}
-            />
-          </section>
         </header>
+
+        {/* the profession switch, a row of cast badges with him in each costume */}
+        <section className="relative py-8" aria-label={navigation.professionSelection}>
+          <ProfessionSwitch
+            className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
+            label={navigation.profession}
+            renderOption={(option) => <CartoonCharacter {...option} />}
+          />
+        </section>
 
         <main id="main-content">
           <ProfessionRegion>
