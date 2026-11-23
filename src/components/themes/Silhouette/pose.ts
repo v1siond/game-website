@@ -4,9 +4,10 @@ import { ramp } from '@/lib/scroll/stage'
 import { rigJoints, type RigJoints } from '../shared/rig'
 import s from './figure.module.css'
 
-// His figure posed by the scroll, on the shared rig (rigPose, ../shared/rig). He is seen from the side,
-// facing right, so a limb swung ahead of him turns negative (counterclockwise on screen), a shin folding
-// back turns positive, and a positive lean tips him forward. He walks with the rig's profile stride.
+// His figure posed by the scroll through the genre's few verbs (run, jump, climb, swing, push, pull, duck,
+// fall), on the shared rig (rigPose, ../shared/rig). He is seen from the side, facing right, so a limb
+// swung ahead of him turns negative (counterclockwise on screen), a shin folding back turns positive, and a
+// positive lean tips him forward. He runs with the rig's profile stride.
 
 const pose = (partial: Partial<RigPose>): RigPose => ({ ...STAND, ...partial })
 
@@ -29,27 +30,29 @@ export function walk(profession: Profession, phase: number): RigPose {
   return { ...stride, armRight: kit.armRight + swing * stride.armRight, foreRight: kit.foreRight, armLeft: kit.armLeft + swing * stride.armLeft, foreLeft: kit.foreLeft }
 }
 
-/** The front hand up at what hangs over him, `t` of the way. */
-const REACH = pose({ armRight: -150, foreRight: -10, rise: -2, lean: -3 })
-export const reach = (profession: Profession, t: number): RigPose => mix(KIT[profession], REACH, t)
-
-/** Both hands up on a rope, hanging his weight off it, the feet off the ground at the end. */
-const HANG = pose({ armRight: -170, foreRight: -5, armLeft: -165, foreLeft: -5, thighRight: -10, shinRight: 20, thighLeft: 8, shinLeft: 25 })
-export function hang(profession: Profession, t: number): RigPose {
-  const held = mix(KIT[profession], HANG, ramp(t, 0, 0.6))
-  return { ...held, rise: -8 * ramp(t, 0.5, 1) }
+/** His run between beats: the profile stride with his weight forward, the coat's arms pumping. */
+export function run(profession: Profession, phase: number): RigPose {
+  const stride = walk(profession, phase)
+  return { ...stride, lean: 6, thighRight: stride.thighRight * 1.3, thighLeft: stride.thighLeft * 1.3 }
 }
+
+/** Dropped flat under what sweeps over him: knees folded, his weight forward, his arms over his head. */
+export const DUCK = pose({ thighRight: -80, shinRight: 115, thighLeft: -65, shinLeft: 120, lean: 28, rise: 8, armRight: -150, foreRight: -70, armLeft: -140, foreLeft: -70 })
+
+/** Knees tucked in the air over a gap or a trap, his arms reaching ahead. */
+export const TUCK = pose({ thighRight: -60, shinRight: 80, thighLeft: -40, shinLeft: 85, armRight: -70, armLeft: -50, lean: 8 })
+
+/** Hauling himself over a ledge: his hands pressing down on its edge, the front knee up onto it. */
+export const CLIMB = pose({ armRight: -30, foreRight: -70, armLeft: -25, foreLeft: -70, thighRight: -95, shinRight: 105, lean: 22 })
+
+/** Crouched on what he has just climbed or landed on, ready to go on. */
+export const CROUCH = pose({ thighRight: -45, shinRight: 75, thighLeft: -30, shinLeft: 70, lean: 12, rise: 4, armRight: -40, armLeft: -25 })
+
+/** Both hands up on a rope, hanging his weight off it, his legs trailing. */
+export const HANG = pose({ armRight: -170, foreRight: -5, armLeft: -165, foreLeft: -5, thighRight: -10, shinRight: 20, thighLeft: 8, shinLeft: 25 })
 
 /** Leaning into what stands ahead of him, both hands flat on it. */
-const PUSH = pose({ armRight: -80, foreRight: -10, armLeft: -70, foreLeft: -15, lean: 12, thighRight: -20, shinRight: 10, thighLeft: 20, shinLeft: 5 })
-export const push = (profession: Profession, t: number): RigPose => mix(KIT[profession], PUSH, t)
-
-/** A hop over what lies at his feet: knees tucked at the top, landed at the end. */
-const TUCK = pose({ thighRight: -55, shinRight: 75, thighLeft: -35, shinLeft: 80, armRight: -60, armLeft: -40, lean: 6 })
-export function jump(profession: Profession, t: number): RigPose {
-  const arc = Math.sin(Math.PI * t)
-  return { ...mix(KIT[profession], TUCK, arc), rise: -16 * arc }
-}
+export const PUSH = pose({ armRight: -80, foreRight: -10, armLeft: -70, foreLeft: -15, lean: 12, thighRight: -20, shinRight: 10, thighLeft: 20, shinLeft: 5 })
 
 /** A lever thrown: the hand up on its handle, then hauled down and back with his weight on it. */
 const GRIP = pose({ armRight: -125, foreRight: -15, lean: 2 })
@@ -75,14 +78,6 @@ export function kick(profession: Profession, t: number): RigPose {
   const kit = KIT[profession]
   const leg = t < 0.45 ? mix(kit, CHAMBER, t / 0.45) : mix(CHAMBER, KICK, ramp(t, 0.45, 0.65))
   return { ...kit, thighRight: leg.thighRight, shinRight: leg.shinRight, lean: leg.lean }
-}
-
-/** Lying in the grass (`t` 0), up on his hands, then standing in his kit (`t` 1). */
-const LIE = pose({ lean: 82, rise: 0, armRight: -90, armLeft: -80, thighRight: -10, thighLeft: -5 })
-const HANDS = pose({ lean: 40, armRight: -45, foreRight: 0, armLeft: -40, thighRight: -60, shinRight: 90, thighLeft: -50, shinLeft: 95 })
-export function wake(profession: Profession, t: number): RigPose {
-  if (t < 0.5) return mix(LIE, HANDS, ramp(t, 0, 0.5))
-  return mix(HANDS, KIT[profession], ramp(t, 0.5, 1))
 }
 
 // ---- his joints: the shared rig's writer (setRigPose) poses them ----

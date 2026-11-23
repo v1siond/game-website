@@ -1,17 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, translateTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Canvas, FLOOR, gearPath } from '../forest'
+import { Canvas, gearPath } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { push } from '../pose'
+import { AT, type Place } from '../place'
+import { CLIMB, CROUCH, PUSH, rest } from '../pose'
 
-// Tech in the flooded hold of the machine hall: gears stand still in the fog behind, and a crate floats
-// at the water's edge for each group of the stack; as each is read he puts his shoulder to it, it slides
-// on and a lamp on it lights.
+// Tech in the flooded hold of the machine hall: for each group of the stack a crate floats at the water's
+// edge. He puts his shoulder to it and pushes it on against the wall, then climbs up onto it; the frame
+// holds him crouched on top as its lamp lights.
 
-// A crate he pushes slides on this far.
-const SLIDE = 40
+// The crate's near face stands where his hands meet it.
+const CRATE = { x: -60, w: 100, h: 110 }
+// A pushed crate slides on this far.
+const SLIDE = 50
 
 function Gears({ light }: { light: Light }) {
   return (
@@ -25,54 +27,31 @@ function Gears({ light }: { light: Light }) {
   )
 }
 
-function Crate() {
-  return (
-    <>
-      <rect x={-50} y={-110} width={100} height={110} fill={SHADE.black} />
-      <path d="M-50 -110 L50 0 M50 -110 L-50 0" stroke={SHADE.fog} strokeWidth={4} />
-    </>
-  )
-}
-
-function Lamp({ light }: { light: Light }) {
-  return (
-    <>
-      <circle cx={30} cy={-120} r={50} fill={light.rim} opacity={0.25} />
-      <rect x={20} y={-136} width={20} height={16} fill={light.rim} />
-    </>
-  )
-}
-
 export const tech: Place = {
   far: ({ light }) => <Gears light={light} />,
-  floor: ({ xs, profession, light }) => (
-    <>
-      <rect x={0} y={FLOOR - 6} width={1600} height={10} fill={light.rim} opacity={0.2} />
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <g data-fx={`crate-${i}`}>
-            <Crate />
-          </g>
-        )}
-        light={() => <Lamp light={light} />}
-      />
-      <Walker xs={xs} profession={profession} />
-    </>
+  obstacle: (i, { light }) => (
+    <g data-fx={`crate-${i}`}>
+      <rect x={CRATE.x} y={-CRATE.h} width={CRATE.w} height={CRATE.h} fill={SHADE.black} />
+      <path d={`M${CRATE.x} ${-CRATE.h} L${CRATE.x + CRATE.w} 0 M${CRATE.x + CRATE.w} ${-CRATE.h} L${CRATE.x} 0`} stroke={SHADE.fog} strokeWidth={4} />
+      <g data-fx={`lamp-${i}`} opacity="0">
+        <circle cx={10} cy={-CRATE.h - 10} r={50} fill={light.rim} opacity={0.25} />
+        <rect x={0} y={-CRATE.h - 26} width={20} height={16} fill={light.rim} />
+      </g>
+    </g>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, push)
-    const props = propNodes(stage, input.xs.length)
-    const crates = input.xs.map((_, i) => fx(stage, `crate-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const pushed = litOf(reached, i)
-        fadeTo(lit, pushed)
-        translateTo(lit, SLIDE * pushed, 0)
-        translateTo(crates[i], SLIDE * pushed, 0)
+  move: (profession, t) => {
+    const pushed = ramp(t, 0, 0.5)
+    const up = ramp(t, 0.5, 1)
+    const pose = t < 0.5 ? mix(rest(profession), PUSH, ramp(t, 0, 0.15)) : mix(mix(PUSH, CLIMB, ramp(t, 0.5, 0.65)), CROUCH, ramp(t, 0.8, 1))
+    return { pose, ahead: SLIDE * pushed + (AT - 20) * up, lift: CRATE.h * ramp(up, 0, 0.7), over: 0 }
+  },
+  reply: (stage, { count }) => {
+    const crates = Array.from({ length: count }, (_, i) => fx(stage, `crate-${i}`))
+    const lamps = Array.from({ length: count }, (_, i) => fx(stage, `lamp-${i}`))
+    return (played) =>
+      crates.forEach((crate, i) => {
+        translateTo(crate, SLIDE * ramp(played(i), 0, 0.5), 0)
+        fadeTo(lamps[i], ramp(played(i), 0.85, 1))
       })
-    }
   },
 }

@@ -1,21 +1,26 @@
-import { litOf } from '@/lib/scroll/propRow'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Canvas, FLOOR, gearPath } from '../forest'
+import { Canvas, gearPath } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { pull } from '../pose'
+import { still, type Place } from '../place'
+import { DUCK, pull } from '../pose'
 
-// Projects on the sawmill floor: the mill's wheel stands in the fog behind, and a saw blade stands on its
-// post over a log with its lever beside it for each project; as each is read he throws the lever, the
-// blade turns a quarter and its edge catches the light.
+// Projects on the sawmill floor: for each project a lever stands in the path under a saw blade hung on a
+// long arm. He throws the lever and the arm swings the blade down through the path; he drops flat and the
+// frame holds the blade just over his back, its edge catching the light.
 
-const BLADE_Y = -180
+const PIVOT_Y = -860
+const ARM = 600
 const BLADE_R = 56
-// A thrown blade turns this far.
-const TURN = 90
+// The arm waits this far ahead of him, in degrees, and swings through to just past his back.
+const WAIT = 60
+const OVER = -8
+const LEVER_X = -50
 
-const BLADE = gearPath(0, BLADE_Y, BLADE_R, 18)
+const BLADE = gearPath(0, ARM, BLADE_R, 18)
+
+const swungAt = (t: number): number => WAIT + (OVER - WAIT) * ramp(t, 0.4, 0.85)
 
 function MillWheel({ light }: { light: Light }) {
   return (
@@ -29,58 +34,37 @@ function MillWheel({ light }: { light: Light }) {
   )
 }
 
-function Saw() {
-  return (
-    <>
-      <rect x={-6} y={BLADE_Y} width={12} height={-BLADE_Y} fill={SHADE.black} />
-      <rect x={-70} y={-50} width={140} height={50} rx={25} fill={SHADE.black} />
-      <line x1={-70} y1={0} x2={-90} y2={-100} stroke={SHADE.black} strokeWidth={8} />
-      <circle cx={-90} cy={-104} r={12} fill={SHADE.black} />
-    </>
-  )
-}
-
-function Edge({ light }: { light: Light }) {
-  return (
-    <>
-      <circle cx={0} cy={BLADE_Y} r={BLADE_R + 40} fill={light.rim} opacity={0.18} />
-      <path d={BLADE} fill="none" stroke={light.rim} strokeWidth={4} />
-    </>
-  )
-}
-
-const turned = (t: number): string => `rotate(${(TURN * t).toFixed(1)} 0 ${BLADE_Y})`
-
 export const projects: Place = {
   far: ({ light }) => <MillWheel light={light} />,
-  floor: ({ xs, profession, light }) => (
+  obstacle: (i, { light }) => (
     <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <>
-            <Saw />
-            <path data-fx={`blade-${i}`} d={BLADE} fill={SHADE.black} fillRule="evenodd" />
-          </>
-        )}
-        light={() => <Edge light={light} />}
-      />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${LEVER_X} 0)`}>
+        <rect x={-14} y={-24} width={28} height={24} fill={SHADE.black} />
+        <g data-fx={`lever-${i}`} transform="rotate(-35 0 -20)">
+          <line x1={0} y1={-20} x2={0} y2={-120} stroke={SHADE.black} strokeWidth={8} />
+          <circle cx={0} cy={-124} r={12} fill={SHADE.black} />
+        </g>
+      </g>
+      <g data-fx={`arm-${i}`} transform={`translate(-90 ${PIVOT_Y}) rotate(${-WAIT})`}>
+        <line x1={0} y1={0} x2={0} y2={ARM} stroke={SHADE.black} strokeWidth={10} />
+        <path d={BLADE} fill={SHADE.black} fillRule="evenodd" />
+        <g data-fx={`edge-${i}`} opacity="0">
+          <path d={BLADE} fill="none" stroke={light.rim} strokeWidth={4} />
+        </g>
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, pull)
-    const props = propNodes(stage, input.xs.length)
-    const blades = input.xs.map((_, i) => fx(stage, `blade-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const thrown = litOf(reached, i)
-        fadeTo(lit, thrown)
-        transformTo(lit, turned(thrown))
-        transformTo(blades[i], turned(thrown))
+  move: (profession, t) => still(t < 0.4 ? pull(profession, t / 0.4) : mix(pull(profession, 1), DUCK, ramp(t, 0.4, 0.6))),
+  reply: (stage, { count }) => {
+    const levers = Array.from({ length: count }, (_, i) => fx(stage, `lever-${i}`))
+    const arms = Array.from({ length: count }, (_, i) => fx(stage, `arm-${i}`))
+    const edges = Array.from({ length: count }, (_, i) => fx(stage, `edge-${i}`))
+    return (played) =>
+      levers.forEach((lever, i) => {
+        const t = played(i)
+        transformTo(lever, `rotate(${(-35 + 70 * ramp(t, 0.1, 0.4)).toFixed(1)} 0 -20)`)
+        transformTo(arms[i], `translate(-90 ${PIVOT_Y}) rotate(${(-swungAt(t)).toFixed(1)})`)
+        fadeTo(edges[i], ramp(t, 0.8, 1))
       })
-    }
   },
 }
