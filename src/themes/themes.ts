@@ -272,7 +272,7 @@ export const themes: Theme[] = [
     font: 'serif',
   },
 
-  // 11. Retro Atomic - an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
+  // 11. Retro Atomic - an atomic age bomb shelter seen through his wrist terminal, out to the wasteland
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',

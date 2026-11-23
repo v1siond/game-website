@@ -5,9 +5,9 @@
 // group in tailwind.config.ts, so the class strings (text-atomic-phosphor, border-atomic-phosphor/40)
 // and atomic.module.css (theme(), with its opacity) paint the same values.
 
-// TUBE: the phosphor and the glass it glows on. The phosphor is the series' default HUD green, the
-// game ini's iHUDColor 18, 255, 21. Phosphor on glass measures 13.8:1, dim text on glass 10.7:1, glass on a
-// phosphor fill (the picked row) 13.8:1; ink on cream 14.8:1, cream on poster blue 5.3:1.
+// TUBE: the phosphor and the glass it glows on. The phosphor is a bright terminal green, 18, 255, 21.
+// Phosphor on glass measures 13.8:1, dim text on glass 10.7:1, glass on a phosphor fill (the picked row)
+// 13.8:1; ink on cream 14.8:1, cream on the dark shelter blue of the chart's term bands 10.3:1.
 export const PHOSPHOR = '#12ff15'
 export const PHOSPHOR_DIM = '#0fb812'
 // Dim phosphor as words: the same green lifted to 9 to 1 on the lit glass; PHOSPHOR_DIM stays on hair, trim and frames.
@@ -51,8 +51,8 @@ export const MUTANT = '#6f7a3a'
 export const MUTANT_LIGHT = '#b8a24a'
 export const MUTANT_SHADE = '#4f5828'
 
-// CUT OUT: the pastel blocks the poster letters are pasted on, tan, mint, blue grey and pink (research
-// special-chart). Ink on each measures over 9:1.
+// CUT OUT: the pastel blocks the poster letters are pasted on, tan, mint, blue grey and pink (from the research
+// on the poster cut outs). Ink on each measures over 9:1.
 export const CUTOUT_TAN = '#dcb98e'
 export const CUTOUT_MINT = '#bcdab4'
 export const CUTOUT_BLUE = '#b2c2d2'

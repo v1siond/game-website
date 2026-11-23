@@ -92,14 +92,14 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
   return <Gigs projects={slot.projects} />
 }
 
-// His own products (featured) are ruled in full gold with a gold tag under the contract number.
+// His own products (featured) are ruled in full gold with a gold tag over the name.
 function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
-  const { sections, links, cyber, cards } = useLabels()
+  const { sections, links, cards } = useLabels()
   const companies = useMemo(() => slot.companies.map(ventureCard), [slot.companies])
   return (
     <div data-stage-items="">
       <ul className="grid gap-4">
-        {companies.map((company, i) => (
+        {companies.map((company) => (
           <li key={company.id}>
             <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
               <a
@@ -108,8 +108,7 @@ function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
                 rel="noopener noreferrer"
                 className={`${world.cut} block border bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)] ${company.featured ? 'border-[color:var(--neon-gold)]' : 'border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)]'}`}
               >
-                <span className="block text-sm uppercase tracking-wider text-[color:var(--neon-gold)]">{fillLabel(cyber.contract, { number: String(i + 1).padStart(2, '0') })}</span>
-                {company.featured && <span className="mt-2 inline-block bg-[color:var(--neon-gold)] px-2 py-0.5 text-sm uppercase tracking-wider text-[color:var(--neon-ink)]">{cards.ownProduct}</span>}
+                {company.featured && <span className="mb-1 inline-block bg-[color:var(--neon-gold)] px-2 py-0.5 text-sm uppercase tracking-wider text-[color:var(--neon-ink)]">{cards.ownProduct}</span>}
                 <span className={`mt-1 block text-[color:var(--neon-ice)] ${company.featured ? 'text-lg' : 'text-base'}`}>
                   <SlashBreaks text={company.name} />
                 </span>

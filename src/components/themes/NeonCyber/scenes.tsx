@@ -6,7 +6,8 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Labels } from '@/lib/cv/labels'
 import { ramp } from '@/lib/scroll/stage'
 import { walkAlong } from '@/lib/scroll/walkAlong'
-import { clamp01, fadeTo, fx, lerp, r1, reached, spread, transformTo } from '../shared/stageNodes'
+import { clamp01, fadeTo, fx, lerp, r1, reached, transformTo } from '../shared/stageNodes'
+import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import type { District } from './city'
 import { NEON } from './palette'
 import { handAt } from '@/lib/motion/rigPose'
@@ -30,31 +31,10 @@ export type SceneId = 'hero' | SectionId | 'contact'
 /** The street his boots stand on, in the stage's 1600 by 900 units. */
 export const GROUND = 856
 
-/** Where a scene's props stand: one x per card, `cx` the scene's centre, all inside what a phone shows. */
-interface Layout {
-  count: number
-  /** Cards the section counts before its props (the Muay Thai record's facts), taken off before a writer reads f. */
-  lead: number
-  xs: number[]
-  cx: number
-  phone: boolean
-}
+type Layout = PropLayout
 
 /** Him in a frame: where his boots are, his size, his pose and how visible he is. */
-export interface MercState {
-  x: number
-  y: number
-  k: number
-  pose: MercPose
-  opacity: number
-}
-
-type SceneWriter = (p: number, f: number) => MercState
-
-/** What a writer reads its nodes from: a stage, or NO_NODES to compute his place alone (the first paint). */
-type StageNodes = Pick<ParentNode, 'querySelector'>
-
-export const NO_NODES: StageNodes = { querySelector: () => null }
+export type MercState = FigureState<MercPose>
 
 export interface SceneDef {
   district: District
@@ -63,22 +43,15 @@ export interface SceneDef {
   /** The props behind him and in front of him, drawn in the figure layer. */
   back: (layout: Layout) => ReactNode
   front: (layout: Layout) => ReactNode
-  bind: (stage: StageNodes, layout: Layout) => SceneWriter
+  bind: (stage: StageNodes, layout: Layout) => FigureWriter<MercPose>
 }
 
 // The band the props stand in: the right of the screen beside the text column on a wide screen, the middle
 // third a phone shows.
 const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [820, 1380], phone: [640, 960] }
 
-const layoutOf = (count: number, lead: number, phone: boolean): Layout => {
-  const [a, b] = BAND[phone ? 'phone' : 'wide']
-  return { count, lead, xs: spread(Math.max(count, 1), a, b), cx: (a + b) / 2, phone }
-}
-
 const K = 1.6
 const NONE = (): ReactNode => null
-
-const fxs = (stage: StageNodes, name: string, count: number): Array<Element | null> => Array.from({ length: count }, (_, i) => fx(stage, `${name}-${i}`))
 
 // He comes in from this far left of the first prop as its card nears the reading line.
 const ENTRY = 200
@@ -563,9 +536,9 @@ export interface Scene {
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, { lead, count }: StageItems, profession: Profession, phone: boolean): Scene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: layoutOf(count, lead, phone), kit: def.kit ?? profession, slot }
+  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot }
 }
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
