@@ -1,48 +1,72 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { HOURS } from '../desert'
 import { CEL } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { FLOOR, HOURS } from '../desert'
-import { deploy } from '../pose'
+import { still, stopsPlace } from '../place'
+import { loot } from '../pose'
 
-// Projects at dusk: a loot chest lies in the sand for each project; as each is read he deploys his gear
-// at it and the chest opens with a column of its rarity's light standing up out of it (the rarity from
-// the project's own facts, loot.ts).
+// Projects at dusk: for each project a loot chest comes to him on the run. He kneels at it and throws the
+// lid; a column of the rarity's light stands up out of it (the rarity from the project's own facts,
+// loot.ts, shown by its colour only), a weapon in the same colour floats up into the light, and he springs
+// up with a fist thrown at it.
+
+const CHEST = 170
+// The weapon floats up out of the chest to this height.
+const FLOAT = -360
 
 function Chest() {
   return (
-    <>
+    <g transform={`translate(${CHEST} 0)`}>
       <rect x={-62} y={-80} width={124} height={80} fill={CEL.steelDark} />
-      <path d="M-62 -80 Q0 -126 62 -80 Z" fill={CEL.steel} />
       <rect x={-12} y={-92} width={24} height={26} fill={CEL.sun} />
-    </>
+    </g>
   )
 }
 
-function Beam({ tone }: { tone: string }) {
+function Light({ tone }: { tone: string }) {
   return (
-    <>
+    <g transform={`translate(${CHEST} 0)`}>
       <path d="M-40 -90 L-26 -560 L26 -560 L40 -90 Z" fill={tone} opacity="0.55" data-bare />
-      <path d="M-62 -80 Q0 -126 62 -80 Z" fill={tone} />
-    </>
+      <rect x={-62} y={-84} width={124} height={8} fill={tone} />
+    </g>
   )
 }
 
-export const projects: Place = {
+// The weapon in the rarity's colour, drawn round its middle.
+function Weapon({ tone }: { tone: string }) {
+  return <path d="M-70 -10 L50 -10 L50 -18 L80 -18 L80 -6 L50 -2 L10 -2 L4 20 L-12 20 L-8 -2 L-54 -2 L-70 12 Z" fill={tone} />
+}
+
+export const projects = stopsPlace({
   hour: HOURS.dusk,
-  floor: ({ xs, tones, profession }) => (
+  back: (i, { tones }) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Chest />} light={(i) => <Beam tone={tones[i] ?? CEL.common} />} />
-      <Walker xs={xs} profession={profession} />
+      <g data-fx={`light-${i}`} opacity="0">
+        <Light tone={tones[i] ?? CEL.common} />
+      </g>
+      <Chest />
+      <g data-fx={`lid-${i}`} transform={`translate(${CHEST} -80)`}>
+        <path d="M-62 0 Q0 -46 62 0 Z" fill={CEL.steel} />
+      </g>
+      <g data-fx={`weapon-${i}`} transform={`translate(${CHEST} -60)`} opacity="0">
+        <Weapon tone={tones[i] ?? CEL.common} />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, deploy)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (_profession, t) => still(loot(t)),
+  reply: (stage, { count }) => {
+    const lights = Array.from({ length: count }, (_, i) => fx(stage, `light-${i}`))
+    const lids = Array.from({ length: count }, (_, i) => fx(stage, `lid-${i}`))
+    const weapons = Array.from({ length: count }, (_, i) => fx(stage, `weapon-${i}`))
+    return (played) =>
+      lights.forEach((light, i) => {
+        const t = played(i)
+        const open = ramp(t, 0.35, 0.5)
+        transformTo(lids[i], `translate(${(CHEST - 60 * open).toFixed(1)} ${(-80 - 90 * open).toFixed(1)}) rotate(${(-120 * open).toFixed(1)})`)
+        fadeTo(light, ramp(t, 0.4, 0.55))
+        const rise = ramp(t, 0.5, 0.85)
+        fadeTo(weapons[i], ramp(t, 0.5, 0.6))
+        transformTo(weapons[i], `translate(${CHEST} ${(-60 + (FLOAT + 60) * rise).toFixed(1)}) rotate(${(-12 + 12 * rise).toFixed(1)})`)
+      })
   },
-}
+})
