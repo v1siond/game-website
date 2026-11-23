@@ -72,40 +72,6 @@ export const LIGHTS = {
 
 export type LightName = keyof typeof LIGHTS
 
-// One profession's light: the sky and fog band as classes over the variables, the layer fills and the
-// rim as colours for SVG.
-export interface SkyLight {
-  sky: string
-  fog: string
-  far: string
-  mid: string
-  rim: string
-}
-
-export const SKY: Record<'dawn' | 'ember' | 'crimson', SkyLight> = {
-  dawn: {
-    sky: 'from-[color:var(--sh-dawn-top)] to-[color:var(--sh-dawn-low)]',
-    fog: 'via-[color:var(--sh-dawn-fog)]',
-    far: SHADE.dawnFar,
-    mid: SHADE.dawnMid,
-    rim: SHADE.dawnRim,
-  },
-  ember: {
-    sky: 'from-[color:var(--sh-ember-top)] to-[color:var(--sh-ember-low)]',
-    fog: 'via-[color:var(--sh-ember-fog)]',
-    far: SHADE.emberFar,
-    mid: SHADE.emberMid,
-    rim: SHADE.rim,
-  },
-  crimson: {
-    sky: 'from-[color:var(--sh-crimson-top)] to-[color:var(--sh-crimson-low)]',
-    fog: 'via-[color:var(--sh-crimson-fog)]',
-    far: SHADE.crimsonFar,
-    mid: SHADE.crimsonMid,
-    rim: SHADE.rim,
-  },
-}
-
 /** The palette as CSS variables (--sh-black, --sh-dawn-top and so on), set once on the world's root. */
 export const SHADE_VARS = paletteVars('sh', SHADE)
 

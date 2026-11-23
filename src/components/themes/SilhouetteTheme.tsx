@@ -1,72 +1,78 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { CopyrightLine } from './shared/CopyrightLine'
-import { useWorldView } from '@/components/cv/CVDataProvider'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
+import { Stage, Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { ClearingContact, TopBar } from './Silhouette/chrome'
+import { WakeHero } from './Silhouette/hero'
 import { SHADE_VARS, TYPEWRITER } from './Silhouette/palette'
-import { Atmosphere } from './Silhouette/backdrop'
-import { CutProvider } from './Silhouette/cut'
-import { WakeHero } from './Silhouette/wake'
-import { LeverSwitch } from './Silhouette/levers'
-import { SECTION_VIEWS } from './Silhouette/views'
-import { Clearing } from './Silhouette/clearing'
-import world from './Silhouette/world.module.css'
+import { LAYER_MOTION, scenesOf, type ShadeScene } from './Silhouette/scenes'
+import { PlaceSection } from './Silhouette/sections'
+import page from './Silhouette/page.module.css'
 
-// Silhouette: a black forest in the fog, played the way a monochrome puzzle platformer is played. He
-// wakes at the forest's edge (./Silhouette/wake), pulls a lever to change profession and respawns in
-// its place (levers), and each profession's sections are its own mechanic (views): jobs hanging on
-// ropes, projects under a spider's webbing, bands and ventures as rooftop signs, the Muay Thai record
-// in a gravity room. Contact is a clearing with a trap to spring. Every change of scene is the genre's
-// death cut to black (cut).
+// Silhouette: his CV as one walk through a black forest in the fog, black shapes against a lit sky, the
+// way a monochrome puzzle platformer is drawn. The page keeps the rhythm of the Rockstar VI site: a big
+// hero (the forest's edge at dawn, him on his mound, his name as a silent film intertitle, the levers that
+// change his profession), then every section of the shown profession is one full screen place of the walk
+// that rises from dark, holds while its cards scroll over it, and goes dark while the next one rises: the
+// spider's thicket, the ropes over the chasm, the flooded hold, the trap line, the sawmill, the edge of
+// the machine city, the live floor, the forest ring, and the clearing with its lamp at the end. He is the
+// small black figure in each place and does one thing per card of the section: lights a lantern, hangs off
+// a rope, pushes a crate. Every motion is a function of the scroll position (the shared theatre on
+// useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
+// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame.
 //
-// The root carries the palette as --sh-* variables and the pointer as --mx and --my (usePointerVars),
-// the only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden:
-// hidden would make the root a scroll container and stop the projects' lantern from sticking.
+// Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
+// its settled frame.
+
+const hasSlot = (scene: ShadeScene): scene is ShadeScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function SilhouetteTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const reducedMotion = useReducedMotion()
-  const rootRef = usePointerVars(!reducedMotion)
+  const cv = useCVData()
+  const labels = useLabels()
+  const reduced = useReducedMotion()
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
+    [view, cv, labels, active],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
+  const hero = scenes[0]
+  const contact = scenes[scenes.length - 1]
 
   return (
-    <CutProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-rim)] [--focus-halo:var(--sh-void)] ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
-        <SkipLink />
-        <Atmosphere />
-
-        <header className="relative z-30">
-          <WakeHero profession={active} />
-        </header>
-
-        <div className="relative z-20 pt-12">
-          <LeverSwitch />
-        </div>
-
-        <main id="main-content" className="relative z-20">
-          <ProfessionRegion>
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </ProfessionRegion>
-        </main>
-
-        <Clearing profession={active} />
-
-        <footer className="relative z-20 py-10 text-center">
-          <div className="mb-4 flex items-center justify-center gap-3" aria-hidden="true">
-            <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
-            <p className="text-sm tracking-[0.5em] text-[color:var(--sh-dim-text)]">. . .</p>
-            <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
-          </div>
-          <p className="text-sm text-[color:var(--sh-dim-text)]">
-            <CopyrightLine />
-          </p>
-        </footer>
-      </div>
-    </CutProvider>
+    <div style={SHADE_VARS} className={`${page.root} ${reduced ? page.still : ''} ${TYPEWRITER}`}>
+      <SkipLink />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef} className={page.theatre}>
+          {scenes.map((scene) => (
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} />
+          ))}
+        </Theatre>
+      )}
+      <TopBar anchor={hero.anchor} />
+      <main id="main-content" ref={textRef} className={page.main}>
+        <WakeHero scene={hero} still={reduced} />
+        <ProfessionRegion>
+          {scenes.filter(hasSlot).map((scene) => (
+            <PlaceSection key={scene.id} scene={scene} still={reduced} />
+          ))}
+        </ProfessionRegion>
+        <ClearingContact scene={contact} still={reduced} />
+      </main>
+      <footer className={page.footer}>
+        <p className={page.copyright}>
+          <CopyrightLine />
+        </p>
+      </footer>
+    </div>
   )
 }

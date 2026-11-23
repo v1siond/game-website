@@ -28,8 +28,8 @@ function Gears({ light }: { light: Light }) {
 function Crate() {
   return (
     <>
-      <rect x={-70} y={-140} width={140} height={140} fill={SHADE.black} />
-      <path d="M-70 -140 L70 0 M70 -140 L-70 0" stroke={SHADE.fog} strokeWidth={4} />
+      <rect x={-50} y={-110} width={100} height={110} fill={SHADE.black} />
+      <path d="M-50 -110 L50 0 M50 -110 L-50 0" stroke={SHADE.fog} strokeWidth={4} />
     </>
   )
 }
@@ -37,8 +37,8 @@ function Crate() {
 function Lamp({ light }: { light: Light }) {
   return (
     <>
-      <circle cx={40} cy={-150} r={60} fill={light.rim} opacity={0.25} />
-      <rect x={30} y={-166} width={20} height={16} fill={light.rim} />
+      <circle cx={30} cy={-120} r={50} fill={light.rim} opacity={0.25} />
+      <rect x={20} y={-136} width={20} height={16} fill={light.rim} />
     </>
   )
 }

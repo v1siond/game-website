@@ -6,12 +6,12 @@ import { SHADE, type Light } from '../palette'
 import { Walker, walkerOf, type Place } from '../place'
 import { pull } from '../pose'
 
-// Projects on the sawmill floor: the mill's wheel stands in the fog behind, and a saw stands over a log
-// with its lever beside it for each project; as each is read he throws the lever, the blade turns a
-// quarter and its edge catches the light.
+// Projects on the sawmill floor: the mill's wheel stands in the fog behind, and a saw blade stands on its
+// post over a log with its lever beside it for each project; as each is read he throws the lever, the
+// blade turns a quarter and its edge catches the light.
 
-const BLADE_Y = -230
-const BLADE_R = 90
+const BLADE_Y = -180
+const BLADE_R = 56
 // A thrown blade turns this far.
 const TURN = 90
 
@@ -32,10 +32,10 @@ function MillWheel({ light }: { light: Light }) {
 function Saw() {
   return (
     <>
-      <path d={`M-90 0 V${BLADE_Y - 120} H90 V0`} fill="none" stroke={SHADE.black} strokeWidth={10} />
-      <rect x={-110} y={-60} width={220} height={60} rx={30} fill={SHADE.black} />
-      <line x1={-110} y1={0} x2={-136} y2={-110} stroke={SHADE.black} strokeWidth={8} />
-      <circle cx={-136} cy={-114} r={12} fill={SHADE.black} />
+      <rect x={-6} y={BLADE_Y} width={12} height={-BLADE_Y} fill={SHADE.black} />
+      <rect x={-70} y={-50} width={140} height={50} rx={25} fill={SHADE.black} />
+      <line x1={-70} y1={0} x2={-90} y2={-100} stroke={SHADE.black} strokeWidth={8} />
+      <circle cx={-90} cy={-104} r={12} fill={SHADE.black} />
     </>
   )
 }

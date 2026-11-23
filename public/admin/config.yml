@@ -500,17 +500,6 @@ collections:
                   - { <<: *text, label: "Map name", name: mapOf, hint: 'Keep {name}' }
                   - { <<: *text, label: "Standing at", name: standingAt, hint: 'Keep {place}' }
                   - { <<: *text, label: "Secret exit", name: secretExit }
-              - label: Black forest world (silhouette)
-                name: shade
-                widget: object
-                i18n: true
-                fields:
-                  - { <<: *text, label: "Lever hint", name: leverHint }
-                  - { <<: *text, label: "Swing hint", name: swingHint }
-                  - { <<: *text, label: "Light hint", name: lightHint }
-                  - { <<: *text, label: "Flip gravity", name: flipGravity }
-                  - { <<: *text, label: "Spring the trap", name: springTrap }
-                  - { <<: *text, label: "Run from it again", name: chaseAgain }
               - label: Underworld world (mythic)
                 name: myth
                 widget: object

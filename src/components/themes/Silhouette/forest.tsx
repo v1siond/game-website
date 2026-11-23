@@ -81,12 +81,14 @@ const FAR_PINES = [60, 170, 260, 380, 520, 610, 760, 1180, 1290, 1420, 1530]
 /** The far forest, pale with fog: a row of pines on a low ridge. */
 export function FarPines({ light }: { light: Light }) {
   return (
-    <g fill={light.far} opacity={0.8}>
-      {FAR_PINES.map((x, i) => (
-        <path key={x} d={pinePath(x, 260 + (i % 4) * 70, 860)} />
-      ))}
-      <path d="M0 860 Q400 820 800 850 T1600 840 V1000 H0 Z" />
-    </g>
+    <Canvas>
+      <g fill={light.far} opacity={0.8}>
+        {FAR_PINES.map((x, i) => (
+          <path key={x} d={pinePath(x, 260 + (i % 4) * 70, 860)} />
+        ))}
+        <path d="M0 860 Q400 820 800 850 T1600 840 V1000 H0 Z" />
+      </g>
+    </Canvas>
   )
 }
 
@@ -105,12 +107,14 @@ const TRUNKS = [[90, 44], [300, 26], [1240, 30], [1500, 52]] as const
 /** The mid forest a shade darker: a few tall trunks out of the top of the frame, a bough off each. */
 export function Trunks({ light }: { light: Light }) {
   return (
-    <g fill={light.mid}>
-      {TRUNKS.map(([x, w]) => (
-        <path key={x} d={`M${x} 0 H${x + w} V${FLOOR} H${x - 6} Q${x + w * 0.3} 500 ${x} 0 Z`} />
-      ))}
-      <path d="M134 300 Q200 340 230 420 L222 424 Q190 360 130 320 Z M1262 240 Q1200 290 1180 380 L1188 384 Q1214 300 1268 262 Z" />
-    </g>
+    <Canvas>
+      <g fill={light.mid}>
+        {TRUNKS.map(([x, w]) => (
+          <path key={x} d={`M${x} 0 H${x + w} V${FLOOR} H${x - 6} Q${x + w * 0.3} 500 ${x} 0 Z`} />
+        ))}
+        <path d="M134 300 Q200 340 230 420 L222 424 Q190 360 130 320 Z M1262 240 Q1200 290 1180 380 L1188 384 Q1214 300 1268 262 Z" />
+      </g>
+    </Canvas>
   )
 }
 
