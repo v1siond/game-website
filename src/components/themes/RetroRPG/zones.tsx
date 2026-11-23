@@ -1,12 +1,12 @@
 import type { ComponentType, ReactNode } from 'react'
 import { RPG } from './palette'
 
-// The five places of the walk underground, each as the layers of a scene's stage (stage.tsx): the violet
-// ruins (brick wall, the light from above, red leaves on the tiles), the snow (pines and their caps, a
-// wooden fence, the drifts), the navy waterfall (the wall's ripples, the glowing crystals, the reeds, the
-// dock over black water), the heat zone (the slate vault, the red rock and its pipes, the lava channel) and
-// the pastel town (sky, the house fronts, the lamps, the lawn and the road). Every layer is drawn on the
-// game's own 320 by 180 grid of hard pixels and blown up to the 1440 by 810 canvas, so a pixel is 4.5
+// The five places of the walk, each as the layers of a scene's stage (stage.tsx): the stone ruins (a grey
+// green block wall, its broken columns and arch, moss on the flagstones), the snow town (pines, the log
+// houses, the drifts), the crystal cave (the rock strata, the crystal clusters, the stalagmites, the rock
+// floor), the volcano (the cones and their smoke, the basalt shelf, the lava channel) and the market town
+// (sky, the timbered house fronts, the awnings of the stalls, the lawn and the road). Every layer is drawn
+// on the genre's 320 by 180 grid of hard pixels and blown up to the 1440 by 810 canvas, so a pixel is 4.5
 // canvas units and the art stays crisp at any width.
 
 export const VIEW = '0 0 1440 810'
@@ -14,7 +14,7 @@ export const VIEW = '0 0 1440 810'
 /** One grid pixel in canvas units. */
 export const PX = 4.5
 
-export type Zone = 'ruins' | 'snow' | 'water' | 'heat' | 'town'
+export type Zone = 'ruins' | 'snow' | 'cave' | 'volcano' | 'town'
 
 export interface ZoneArt {
   sky: ComponentType
@@ -54,10 +54,10 @@ function Bricks({ fill, rows, top = 0, size = 10 }: { fill: string; rows: number
 function RuinsSky() {
   return (
     <Grid>
-      <rect width="320" height="180" fill={RPG.ruinsFloor} />
-      <rect width="320" height="112" fill={RPG.wall} />
-      <rect width="320" height="56" fill={RPG.wallLit} />
-      <Bricks fill={RPG.mortar} rows={7} size={16} />
+      <rect width="320" height="180" fill={RPG.stoneDark} />
+      <rect width="320" height="112" fill={RPG.stone} />
+      <rect width="320" height="40" fill={RPG.stoneLit} />
+      <Bricks fill={RPG.stoneDark} rows={7} size={16} />
     </Grid>
   )
 }
@@ -65,14 +65,15 @@ function RuinsSky() {
 function RuinsFar() {
   return (
     <Grid>
-      {[44, 248].map((x) => (
+      {[44, 248].map((x, i) => (
         <g key={x}>
-          <rect x={x} y="20" width="28" height="92" fill={RPG.ruinsWall} />
-          <rect x={x - 4} y="16" width="36" height="6" fill={RPG.ruinsPath} />
-          <rect x={x + 4} y="30" width="2" height="76" fill={RPG.mortar} />
+          <rect x={x} y={20 + i * 18} width="28" height={92 - i * 18} fill={RPG.stoneLit} />
+          <rect x={x - 4} y={16 + i * 18} width="36" height="6" fill={RPG.stoneDark} />
+          <rect x={x + 4} y={30 + i * 18} width="2" height={76 - i * 18} fill={RPG.stoneDark} />
         </g>
       ))}
-      <path d="M140 112 V64 a20 20 0 0 1 40 0 V112 Z" fill={RPG.mortar} />
+      <path d="M140 112 V64 a20 20 0 0 1 40 0 V112 Z" fill={RPG.stoneDark} />
+      <path d="M150 112 V70 a10 10 0 0 1 20 0 V112 Z" fill={RPG.void} />
     </Grid>
   )
 }
@@ -80,33 +81,36 @@ function RuinsFar() {
 function RuinsMid() {
   return (
     <Grid>
-      <polygon points="128,0 192,0 232,180 88,180" fill={RPG.beam} opacity="0.18" />
-      <rect y="112" width="320" height="3" fill={RPG.ruinsWall} />
+      {[[24, 104, 30], [120, 108, 22], [262, 102, 36]].map(([x, y, w]) => (
+        <rect key={x} x={x} y={y} width={w} height="8" fill={RPG.moss} />
+      ))}
+      <rect y="112" width="320" height="3" fill={RPG.stoneDark} />
     </Grid>
   )
 }
 
-const LEAVES: ReadonlyArray<readonly [number, number]> = [[18, 160], [40, 166], [66, 158], [250, 162], [276, 168], [300, 158], [120, 172], [200, 174]]
+const TUFTS: ReadonlyArray<readonly [number, number]> = [[18, 160], [40, 166], [66, 158], [250, 162], [276, 168], [300, 158], [120, 172], [200, 174]]
 
 function RuinsNear() {
   return (
     <Grid>
-      <rect y="115" width="320" height="65" fill={RPG.ruinsFloor} />
+      <rect y="115" width="320" height="65" fill={RPG.stone} />
       {[128, 140, 156, 176].map((y) => (
-        <rect key={y} y={y} width="320" height="1" fill={RPG.ruinsWall} />
+        <rect key={y} y={y} width="320" height="1" fill={RPG.stoneDark} />
       ))}
-      <rect x="10" y="154" width="70" height="16" fill={RPG.leafDark} />
-      <rect x="240" y="154" width="70" height="16" fill={RPG.leafDark} />
-      {LEAVES.map(([x, y]) => (
-        <rect key={x} x={x} y={y} width="3" height="2" fill={RPG.leaf} />
+      {TUFTS.map(([x, y]) => (
+        <g key={x}>
+          <rect x={x} y={y} width="5" height="2" fill={RPG.mossDark} />
+          <rect x={x + 1} y={y - 1} width="3" height="1" fill={RPG.moss} />
+        </g>
       ))}
     </Grid>
   )
 }
 
-// ---------------------------------------------------------------- the snow
+// ---------------------------------------------------------------- the snow town
 
-const PINES = [0, 40, 80, 120, 160, 200, 240, 280]
+const PINES = [0, 120, 240]
 
 function SnowSky() {
   return (
@@ -122,8 +126,7 @@ function SnowFar() {
     <Grid>
       {PINES.map((x) => (
         <g key={x}>
-          <path d={`M${x + 20} 6 L${x + 42} 96 H${x - 2} Z`} fill={RPG.pineLit} />
-          <path d={`M${x + 20} 6 L${x + 28} 34 H${x + 12} Z`} fill={RPG.snowCap} />
+          <path d={`M${x + 20} 10 L${x + 40} 96 H${x} Z`} fill={RPG.pineLit} />
           <rect x={x + 18} y="96" width="4" height="10" fill={RPG.woodDark} />
         </g>
       ))}
@@ -131,13 +134,21 @@ function SnowFar() {
   )
 }
 
+const HOUSES = [44, 164, 284]
+
 function SnowMid() {
   return (
     <Grid>
-      <rect y="112" width="320" height="3" fill={RPG.woodDark} />
-      <rect y="120" width="320" height="2" fill={RPG.woodDark} />
-      {COLS.map((col) => (
-        <rect key={col} x={col * 30 + 4} y="106" width="4" height="20" fill={RPG.wood} />
+      {HOUSES.map((x) => (
+        <g key={x}>
+          <path d={`M${x - 6} 78 L${x + 22} 62 L${x + 50} 78 Z`} fill={RPG.snowCap} />
+          <rect x={x} y="78" width="44" height="46" fill={RPG.woodDark} />
+          {[84, 92, 100, 108, 116].map((y) => (
+            <rect key={y} x={x} y={y} width="44" height="1" fill={RPG.wood} />
+          ))}
+          <rect x={x + 6} y="88" width="10" height="9" fill={RPG.lavaCore} />
+          <rect x={x + 26} y="96" width="12" height="28" fill={RPG.spriteLine} />
+        </g>
       ))}
     </Grid>
   )
@@ -146,8 +157,8 @@ function SnowMid() {
 function SnowNear() {
   return (
     <Grid>
-      <rect y="126" width="320" height="54" fill={RPG.snow} />
-      <rect y="126" width="320" height="2" fill={RPG.snowCap} />
+      <rect y="124" width="320" height="56" fill={RPG.snow} />
+      <rect y="124" width="320" height="2" fill={RPG.snowCap} />
       {[[30, 168, 40], [150, 172, 60], [250, 166, 46]].map(([x, y, w]) => (
         <rect key={x} x={x} y={y} width={w} height="3" fill={RPG.snowCap} />
       ))}
@@ -155,112 +166,114 @@ function SnowNear() {
   )
 }
 
-// ---------------------------------------------------------------- the waterfall
+// ---------------------------------------------------------------- the crystal cave
 
-const RIPPLES = 'q10 -4 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0'
-const CRYSTALS: ReadonlyArray<readonly [number, number]> = [[24, 18], [70, 40], [112, 12], [176, 30], [220, 14], [262, 44], [300, 22]]
+const CLUSTERS: ReadonlyArray<readonly [number, number, string]> = [
+  [24, 60, RPG.crystal],
+  [96, 40, RPG.crystalViolet],
+  [182, 70, RPG.crystal],
+  [250, 46, RPG.crystalViolet],
+  [300, 76, RPG.crystal],
+]
 
-function WaterSky() {
+function CaveSky() {
   return (
     <Grid>
-      <rect width="320" height="180" fill={RPG.waterFloor} />
-      <rect width="320" height="120" fill={RPG.waterWall} />
-      {[14, 30, 46, 62, 78, 94].map((y) => (
-        <path key={y} d={`M0 ${y} ${RIPPLES}`} fill="none" stroke={RPG.waterLine} strokeWidth="1" />
+      <rect width="320" height="180" fill={RPG.caveFloor} />
+      <rect width="320" height="120" fill={RPG.caveWall} />
+      {[18, 44, 70, 96].map((y, i) => (
+        <path key={y} d={`M0 ${y} L60 ${y + 4 - i} L130 ${y - 2} L210 ${y + 3} L320 ${y - 1}`} fill="none" stroke={RPG.caveLine} strokeWidth="2" />
       ))}
     </Grid>
   )
 }
 
-function WaterFar() {
+function CaveFar() {
   return (
     <Grid>
-      {CRYSTALS.map(([x, y]) => (
+      {CLUSTERS.map(([x, y, fill]) => (
         <g key={x}>
-          <rect x={x} y={y} width="2" height="2" fill={RPG.glow} />
-          <rect x={x - 1} y={y + 1} width="4" height="1" fill={RPG.glow} opacity="0.5" />
+          <path d={`M${x} ${y} L${x + 3} ${y - 12} L${x + 6} ${y} Z`} fill={fill} />
+          <path d={`M${x + 5} ${y} L${x + 9} ${y - 18} L${x + 13} ${y} Z`} fill={fill} />
+          <path d={`M${x + 12} ${y} L${x + 14} ${y - 8} L${x + 16} ${y} Z`} fill={fill} opacity="0.7" />
         </g>
       ))}
-      <rect x="130" y="0" width="22" height="120" fill={RPG.waterLine} />
-      {[8, 26, 44, 62, 80, 98].map((y) => (
-        <rect key={y} x="134" y={y} width="2" height="10" fill={RPG.glow} opacity="0.6" />
+    </Grid>
+  )
+}
+
+function CaveMid() {
+  return (
+    <Grid>
+      {[10, 70, 150, 226, 296].map((x, i) => (
+        <path key={x} d={`M${x} 124 L${x + 6} ${92 + (i % 2) * 10} L${x + 12} 124 Z`} fill={RPG.caveLine} />
       ))}
     </Grid>
   )
 }
 
-function WaterMid() {
+function CaveNear() {
   return (
     <Grid>
-      {[6, 18, 92, 104, 210, 224, 290, 304].map((x, i) => (
-        <rect key={x} x={x} y={92 + (i % 2) * 6} width="3" height={34 - (i % 2) * 6} fill={RPG.waterLine} />
+      <rect y="124" width="320" height="56" fill={RPG.caveFloor} />
+      <rect y="124" width="320" height="2" fill={RPG.caveLine} />
+      {[[20, 150], [90, 166], [170, 144], [240, 170], [292, 152]].map(([x, y]) => (
+        <rect key={x} x={x} y={y} width="8" height="3" fill={RPG.caveLine} />
       ))}
     </Grid>
   )
 }
 
-function WaterNear() {
+// ---------------------------------------------------------------- the volcano
+
+function VolcanoSky() {
   return (
     <Grid>
-      <rect y="126" width="320" height="30" fill={RPG.wood} />
-      {[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300].map((x) => (
-        <rect key={x} x={x} y="126" width="1" height="30" fill={RPG.woodDark} />
-      ))}
-      <rect y="156" width="320" height="24" fill={RPG.void} />
-      {[162, 170].map((y) => (
-        <path key={y} d={`M0 ${y} ${RIPPLES}`} fill="none" stroke={RPG.waterWall} strokeWidth="1" />
-      ))}
+      <rect width="320" height="180" fill={RPG.basalt} />
+      <rect width="320" height="60" fill={RPG.heatSky} />
+      <rect y="60" width="320" height="30" fill={RPG.ash} />
     </Grid>
   )
 }
 
-// ---------------------------------------------------------------- the heat zone
-
-function HeatSky() {
+function VolcanoFar() {
   return (
     <Grid>
-      <rect width="320" height="180" fill={RPG.heatGround} />
-      <rect width="320" height="40" fill={RPG.slate} />
-      <rect y="40" width="320" height="80" fill={RPG.heatRock} />
-      <Bricks fill={RPG.heatDeep} rows={8} top={40} />
-    </Grid>
-  )
-}
-
-function HeatFar() {
-  return (
-    <Grid>
-      {[60, 200].map((x) => (
+      {[[70, 46], [230, 34]].map(([x, top]) => (
         <g key={x}>
-          <rect x={x} y="0" width="10" height="120" fill={RPG.slate} />
-          <rect x={x - 2} y="56" width="14" height="4" fill={RPG.heatDeep} />
+          <path d={`M${x - 70} 120 L${x - 10} ${top} H${x + 10} L${x + 70} 120 Z`} fill={RPG.basaltLit} />
+          <rect x={x - 8} y={top} width="16" height="3" fill={RPG.lava} />
+          <rect x={x - 4} y={top - 14} width="8" height="6" fill={RPG.ash} />
+          <rect x={x - 10} y={top - 26} width="12" height="6" fill={RPG.ash} opacity="0.7" />
         </g>
       ))}
-      <rect y="24" width="320" height="6" fill={RPG.heatDeep} />
     </Grid>
   )
 }
 
-function HeatMid() {
+function VolcanoMid() {
   return (
     <Grid>
-      <rect y="118" width="320" height="4" fill={RPG.heatDeep} />
+      <rect y="118" width="320" height="4" fill={RPG.basaltLit} />
     </Grid>
   )
 }
 
-function HeatNear() {
+function VolcanoNear() {
   return (
     <Grid>
-      <rect y="122" width="320" height="40" fill={RPG.heatGround} />
-      <rect y="162" width="320" height="18" fill={RPG.heatDeep} />
+      <rect y="122" width="320" height="40" fill={RPG.basalt} />
+      {[134, 148].map((y) => (
+        <rect key={y} y={y} width="320" height="1" fill={RPG.basaltLit} />
+      ))}
+      <rect y="162" width="320" height="18" fill={RPG.basaltLit} />
       <rect y="166" width="320" height="8" fill={RPG.lava} />
       <rect y="169" width="320" height="2" fill={RPG.lavaCore} />
     </Grid>
   )
 }
 
-// ---------------------------------------------------------------- the town
+// ---------------------------------------------------------------- the market town
 
 const FRONTS = [0, 90, 180, 270]
 
@@ -278,11 +291,15 @@ function TownFar() {
     <Grid>
       {FRONTS.map((x) => (
         <g key={x}>
-          <rect x={x + 6} y="34" width="80" height="10" fill={RPG.townRoof} />
-          <rect x={x + 10} y="44" width="72" height="72" fill={RPG.townWall} />
-          <rect x={x + 20} y="58" width="14" height="14" fill={RPG.townMint} />
-          <rect x={x + 58} y="58" width="14" height="14" fill={RPG.townMint} />
-          <rect x={x + 38} y="88" width="16" height="28" fill={RPG.townRoof} />
+          <path d={`M${x + 4} 46 L${x + 46} 24 L${x + 88} 46 Z`} fill={RPG.townRoof} />
+          <rect x={x + 10} y="46" width="72" height="70" fill={RPG.townWall} />
+          <rect x={x + 10} y="46" width="72" height="2" fill={RPG.townBeam} />
+          <rect x={x + 10} y="80" width="72" height="2" fill={RPG.townBeam} />
+          <rect x={x + 10} y="46" width="2" height="70" fill={RPG.townBeam} />
+          <rect x={x + 80} y="46" width="2" height="70" fill={RPG.townBeam} />
+          <rect x={x + 22} y="56" width="12" height="14" fill={RPG.lavaCore} />
+          <rect x={x + 58} y="56" width="12" height="14" fill={RPG.lavaCore} />
+          <rect x={x + 38} y="88" width="16" height="28" fill={RPG.townBeam} />
         </g>
       ))}
     </Grid>
@@ -292,10 +309,15 @@ function TownFar() {
 function TownMid() {
   return (
     <Grid>
-      {[84, 174, 264].map((x) => (
+      {[60, 240].map((x) => (
         <g key={x}>
-          <rect x={x} y="80" width="2" height="44" fill={RPG.borderShade} />
-          <rect x={x - 2} y="76" width="6" height="5" fill={RPG.gold} />
+          <rect x={x} y="96" width="40" height="6" fill={RPG.awning} />
+          {[0, 10, 20, 30].map((dx) => (
+            <rect key={dx} x={x + dx} y="96" width="5" height="6" fill={RPG.townRoof} />
+          ))}
+          <rect x={x + 2} y="102" width="2" height="22" fill={RPG.townBeam} />
+          <rect x={x + 36} y="102" width="2" height="22" fill={RPG.townBeam} />
+          <rect x={x} y="114" width="40" height="4" fill={RPG.shopWood} />
         </g>
       ))}
     </Grid>
@@ -315,7 +337,7 @@ function TownNear() {
 export const ZONE_ART: Record<Zone, ZoneArt> = {
   ruins: { sky: RuinsSky, far: RuinsFar, mid: RuinsMid, near: RuinsNear },
   snow: { sky: SnowSky, far: SnowFar, mid: SnowMid, near: SnowNear },
-  water: { sky: WaterSky, far: WaterFar, mid: WaterMid, near: WaterNear },
-  heat: { sky: HeatSky, far: HeatFar, mid: HeatMid, near: HeatNear },
+  cave: { sky: CaveSky, far: CaveFar, mid: CaveMid, near: CaveNear },
+  volcano: { sky: VolcanoSky, far: VolcanoFar, mid: VolcanoMid, near: VolcanoNear },
   town: { sky: TownSky, far: TownFar, mid: TownMid, near: TownNear },
 }

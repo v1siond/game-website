@@ -28,13 +28,13 @@ import world from './RetroRPG/world.module.css'
 
 const PHONE_QUERY = '(max-width: 767.98px)'
 
-// Retro RPG, a lo-fi pixel role playing game. The hero is the game's encounter screen: him in the monster
-// area, the box with his name and lines, the stats line, and the command row that switches the profession,
-// over the ruins where a small monster faces him. Then every section of the active profession is one full
-// screen scene of a walk underground (./RetroRPG/scenes) that rises from dark, holds while its title and
-// boxes scroll over it, and sinks back into dark while the next one rises: from the violet ruins through
-// the snow, the waterfall, the heat and the pastel town, him acting once per card on the prop it lights.
-// Contact is the save point, which he walks up to back in the ruins. Every motion is a function of the
+// Retro RPG, a 16 bit role playing game. The hero is the genre's encounter screen: him on the battle
+// field, the window with his name and lines, the stats line, and the command window that switches the
+// profession, over the ruins where his critter faces him. Then every section of the active profession is
+// one full screen scene of the walk (./RetroRPG/scenes) that rises from dark, holds while its title and
+// windows scroll over it, and sinks back into dark while the next one rises: from the stone ruins through
+// the snow town, the crystal cave, the volcano and the market town, him making the genre's move once per
+// card at the stop it brings. Contact is the save point, which he walks up to back in the ruins. Every motion is a function of the
 // scroll position, on the shared theatre (./shared/theatre) and its settle: scroll up and it plays back.
 // Under reduced motion there is no theatre: each section carries its own picture, still, at its settled
 // frame.
@@ -81,7 +81,7 @@ export default function RetroRPGTheme() {
       )}
 
       <div ref={textRef} className="relative z-20">
-        {/* The encounter: him, the box, the stats line and the command row */}
+        {/* The encounter: him, the window, the stats line and the command window */}
         <header data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-16 pt-8 sm:px-6">
           {reduced && <RpgStage scene={scenes[0]} settled />}
           <Encounter profession={active}>
@@ -112,7 +112,7 @@ export default function RetroRPGTheme() {
             </div>
 
             <ProfessionSwitch
-              className="mt-4 grid grid-cols-1 gap-3 sm:flex sm:justify-between"
+              className={`mt-4 grid grid-cols-1 gap-3 p-3 sm:flex sm:justify-between ${world.box}`}
               label={labels.navigation.professionSelection}
               renderOption={(option) => <CommandOption option={option} />}
             />

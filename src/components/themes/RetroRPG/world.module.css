@@ -1,6 +1,6 @@
 /*
- * Retro RPG's look and motion: a lo-fi pixel role playing game's encounter screen. Black ground, hard
- * white boxes, orange commands that turn yellow under the red heart. Every colour reads the palette's
+ * Retro RPG's look and motion: a 16 bit role playing game's command windows. Black ground, hard white
+ * bordered windows, commands that turn yellow with the cursor arrow beside them. Every colour reads the palette's
  * CSS variables (--rpg-*, set on the root from palette.ts).
  *
  * Motion is the game's: it runs on a locked frame clock, so every move is hard steps (steps()), never an
@@ -27,26 +27,12 @@
   border: 4px solid var(--rpg-border);
 }
 
-/* The monster area of the hero: framed by the box's white line on top and bottom only. */
+/* The battle field of the hero: framed by the window's white line on top and bottom only. */
 .stage {
   border-block: 4px solid var(--rpg-border);
 }
 
-/* ---- the box steps ---- */
-
-/* A box opens the way an encounter box does: a thin line grows wide, then the box grows tall, in hard steps. */
-@keyframes boxOpen {
-  0% { transform: scale(0.04, 0.04); }
-  45% { transform: scale(1, 0.04); }
-  100% { transform: scale(1, 1); }
-}
-
-/* The bullet box opens in its profession's shape. It sits on a wrapper of the box: on the box itself the
-   hit shake below would replace it, and when the shake ends the open would play again from scale(0.04). */
-.resize {
-  transform-origin: 50% 50%;
-  animation: boxOpen 420ms steps(7, end) both;
-}
+/* ---- the sprite steps ---- */
 
 /* His sprite turns through a profession switch in four hard frames. */
 @keyframes spriteTurn {
@@ -83,10 +69,10 @@
   animation: flash 260ms steps(3, end) both;
 }
 
-/* ---- the soul (the red heart cursor) ---- */
+/* ---- the cursor arrow ---- */
 
-/* The heart steps into a command's slot, or beside an option, an item or a card, and the slot's own
-   icon steps out, under the pointer, the keyboard or the pick. */
+/* The cursor arrow steps into a command's slot, or beside an option, an item or a card, and the slot's
+   own icon steps out, under the pointer, the keyboard or the pick. */
 .cursor {
   opacity: 0;
 }
@@ -104,163 +90,56 @@
   opacity: 0;
 }
 
-/* ---- the attack on a project ---- */
+/* ---- a project's window ---- */
 
-/* A project card is the target: the heart steps in beside its name and the meter rises under the pointer
-   or the keyboard, its line crossing in 1200ms (cards.tsx METER_MS). Its own class, so its link commands
-   keep their own heart. */
-.targetCursor,
-.meter {
+/* The cursor arrow steps in beside a project's name under the pointer or the keyboard. Its own class, so
+   its link commands keep their own cursor. */
+.targetCursor {
   opacity: 0;
-}
-
-.meter {
-  overflow: hidden;
 }
 
 .target:hover .targetCursor,
-.target:focus-within .targetCursor,
-.target:hover .meter,
-.target:focus-within .meter {
+.target:focus-within .targetCursor {
   opacity: 1;
-}
-
-@keyframes sweep {
-  from { transform: translateX(0); }
-  to { transform: translateX(100%); }
-}
-
-.target:hover .meterLine,
-.target:focus-within .meterLine {
-  animation: sweep 1200ms steps(30, end) 4 forwards;
-}
-
-/* The slash a strike plays (cards.tsx animates it): red, gold on a critical strike. */
-.slash {
-  transform-origin: 0% 50%;
-  transform: rotate(-12deg) scaleX(0);
-  opacity: 0;
-  background: var(--rpg-soul);
-}
-
-.slash[data-critical='true'] {
-  background: var(--rpg-gold);
-}
-
-/* ---- the bullet box ---- */
-
-/* Each pellet, the heart and the shield are placed by the box's frame loop through --x, --y and --r. */
-.placed {
-  transform: translate3d(var(--x, 0px), var(--y, 0px), 0) rotate(var(--r, 0deg));
-}
-
-@keyframes hitShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-3px); }
-}
-
-/* A hit: the box (inside the .resize wrapper) shakes and the heart flickers while it cannot be hit again. */
-[data-hit='true'].hitBox {
-  animation: hitShake 240ms steps(4, end) both;
-}
-
-@keyframes hurt {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
-}
-
-[data-hit='true'] .hurt {
-  animation: hurt 160ms steps(1, end) 6;
-}
-
-/* At 0 HP the heart's halves part, a pixel at a time. */
-@keyframes splitLeft {
-  to { transform: translateX(-2px) rotate(-12deg); }
-}
-
-@keyframes splitRight {
-  to { transform: translateX(2px) rotate(12deg); }
-}
-
-.splitLeft,
-.splitRight {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-}
-
-.splitLeft {
-  animation: splitLeft 300ms steps(3, end) both;
-}
-
-.splitRight {
-  animation: splitRight 300ms steps(3, end) both;
-}
-
-/* The HP bar drains and refills in hard steps (--hp from 0 to 1, set by bulletBox.tsx). */
-.hpFill {
-  transform: scaleX(var(--hp, 1));
-  transition: transform 300ms steps(4, end);
 }
 
 /* ---- the save point ---- */
 
-/* The save star turns like a sprite and its glow flickers, four turns once the save point shows, then it
-   rests face on, its glow low. Clicked, it spins fast once. */
-@keyframes starTurn {
-  0%, 100% { transform: scaleX(1); }
-  50% { transform: scaleX(0.2); }
+/* The save point's rune circle pulses four times once it shows, then rests lit low. Clicked, it flares
+   once. */
+@keyframes runePulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
 }
 
-.star {
+.rune {
+  animation: runePulse 1200ms steps(3, end) 4 forwards;
+}
+
+@keyframes runeFlare {
+  from { transform: scale(1.4); opacity: 1; }
+  to { transform: scale(1); opacity: 0.8; }
+}
+
+.saveFlare {
   transform-origin: 50% 50%;
   transform-box: fill-box;
-  animation: starTurn 1200ms steps(6, end) 4 forwards;
+  animation: runeFlare 480ms steps(6, end) both;
 }
 
-@keyframes glow {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.55; }
-}
-
-.glow {
-  animation: glow 1200ms steps(3, end) 4 forwards;
-}
-
-@keyframes starSave {
-  from { transform: rotate(0deg) scale(1.3); }
-  to { transform: rotate(360deg) scale(1); }
-}
-
-.saveSpin {
-  animation: starSave 480ms steps(8, end) both;
-}
-
-/* Saved, the closing box keeps a yellow border. */
+/* Saved, the closing window keeps a yellow border. */
 [data-saved='true'] .saveBox {
   border-color: var(--rpg-gold);
 }
 
 @media (prefers-reduced-motion: reduce) {
   
-  .resize,
   .turns,
   .idle,
   .flash,
-  .meterLine,
-  .hitBox,
-  .hurt,
-  .splitLeft,
-  .splitRight,
-  .star,
-  .glow,
-  .saveSpin {
+  .rune,
+  .saveFlare {
     animation: none !important;
-  }
-
-  .hpFill {
-    transition: none;
   }
 
   
@@ -279,7 +158,7 @@
 
 /* ---- the job boxes ---- */
 
-/* The speaker's portrait in each job box talks under the pointer or the keyboard: its mouth flaps. */
+/* The villager's portrait in each job window talks under the pointer or the keyboard: its mouth moves. */
 @keyframes talk {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }

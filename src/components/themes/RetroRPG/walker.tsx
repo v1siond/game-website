@@ -2,7 +2,7 @@ import { memo, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { RPG } from './palette'
-import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, walkPose, type Facing, type Pose } from './sprite'
+import { COLOURS, EYES, MOVE_FRAMES, PART_TOP, SPRITE, actionPose, movePose, walkPose, type Facing, type MoveFrame, type Pose } from './sprite'
 import sprite from './sprite.module.css'
 import type { PixelSprite } from './npcs'
 import { PixelRuns } from '../shared/PixelRuns'
@@ -32,18 +32,6 @@ function Pixels({ pose, colours }: { pose: Pose; colours: Record<string, string>
   return <PixelRuns runs={runs} colours={colours} />
 }
 
-const SOUL_RUNS = pixelRuns(HEART.rows, HEART.y, HEART.x)
-const SOUL_COLOURS = { h: RPG.soul }
-
-/** The red heart over his chest, his soul, shown in the battle moments. */
-function ChestSoul({ className }: { className: string }) {
-  return (
-    <g className={className}>
-      <PixelRuns runs={SOUL_RUNS} colours={SOUL_COLOURS} />
-    </g>
-  )
-}
-
 function Sheet({ className, children }: { className: string; children: ReactNode }) {
   return (
     <svg
@@ -65,9 +53,9 @@ interface StageWalkerProps {
 }
 
 /**
- * Him in the monster area: he stands facing down and turns left or right to face the visitor's pointer
- * (--mx from the shared pointer hook on a parent). Hovering the stage is a battle moment: his soul shows
- * on his chest and he plays his profession's two frame action.
+ * Him on the battle field: he stands facing down and turns left or right to face the visitor's pointer
+ * (--mx from the shared pointer hook on a parent). Hovering the field is a battle moment: he plays his
+ * profession's two frame action.
  */
 const FACINGS: ReadonlyArray<readonly [Facing, string]> = [
   ['down', sprite.faceDown],
@@ -98,14 +86,13 @@ export const StageWalker = memo(function StageWalker({ profession, className = '
       <g className={sprite.actB}>
         <Pixels pose={actionPose(profession, 'actB')} colours={colours} />
       </g>
-      <ChestSoul className={sprite.soul} />
     </Sheet>
   )
 })
 
 /** His frames on a stage (stage.tsx): standing facing down, two steps facing right, his profession's two
- *  action frames. */
-export type Frame = 'stand' | 'stepA' | 'stepB' | 'actA' | 'actB'
+ *  action frames and the genre's moves facing right. */
+export type Frame = 'stand' | 'stepA' | 'stepB' | 'actA' | 'actB' | MoveFrame
 
 /**
  * Him on a stage, on his 20 by 30 grid with his feet at its bottom middle (0, 0): every frame drawn once,
@@ -120,6 +107,7 @@ export const StageFigure = memo(function StageFigure({ profession }: { professio
     ['stepB', walkPose(profession, 'right', 'stepB')],
     ['actA', actionPose(profession, 'actA')],
     ['actB', actionPose(profession, 'actB')],
+    ...MOVE_FRAMES.map((move) => [move, movePose(move)] as const),
   ]
 
   return (
@@ -134,7 +122,7 @@ export const StageFigure = memo(function StageFigure({ profession }: { professio
   )
 })
 
-/** The save sparkle: four point pixel stars that burst round him when he saves. */
+/** The save sparkle: four point pixel sparks that burst round the save point when he saves. */
 export function Sparkles({ className = '' }: { className?: string }) {
   const spots: ReadonlyArray<readonly [number, number]> = [
     [1, 6],

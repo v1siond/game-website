@@ -12,9 +12,9 @@ import { VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the place's layers from its back wall to
-// the floor he walks on, then the scene's props and him in the figure layer, all on the game's hard pixel
-// grid. The shared engine fades each stage and pushes its layers in; the scene's writer lights its props
-// and hands back his place and frame.
+// the floor he walks on, then the scene's stops and him in the figure layer, in one camera group the view
+// pushes in with, all on the genre's hard pixel grid. The shared engine fades each stage and pushes its
+// layers in; the scene's writer plays its stops' answers and hands back his place and frame.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -60,10 +60,10 @@ const layersOf = (scene: Scene): StageLayer[] => {
     {
       name: 'figure',
       node: plane(
-        <>
+        <g data-fx="camera">
           {scene.def.back(scene.layout)}
           <Walker scene={scene} />
-        </>,
+        </g>,
       ),
     },
   ]

@@ -2,22 +2,23 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { RPG } from './palette'
 
-// Him as the room walker, a parody of the striped sweater kid of the lo-fi pixel RPG (its overworld sprite
-// is 19 by 29 pixels, a head as wide as the body is tall, one dark outline the colour of the hair, flat
-// fills, no shading): a blue sweater with two magenta stripes across the chest, brown shorts, bare shins
-// and dark shoes, with his own face, short dark hair, the full dark beard and two dot eyes. 20 by 30
-// pixels: a 15 row head over a 10 row torso and 5 rows of legs.
+// Him as the room walker of the 16 bit role playing game (a head as wide as the body is tall, one dark
+// outline the colour of the hair, flat fills, no shading): his own face, short dark hair, the full dark
+// beard and two dot eyes, in his own clothes per profession, a shirt over trousers and dark shoes; the
+// Martial Artist bare chested in red shorts with gold wraps, his mongkhon (the corded Muay Thai headband,
+// its tail up behind) and white prajioud on the arms. 20 by 30 pixels: a 15 row head over a 10 row torso
+// and 5 rows of legs.
 //
 // Four facings (down, up, right, left as the mirror of right), each with two step frames; one action of
 // two frames per profession, facing down: the System Engineer types on a pocket terminal whose screen
 // scrolls, the Musician raises his sticks over a snare and brings them down on it, the Martial Artist
-// stands in guard with red gloves, his own mongkhon (the corded Muay Thai headband, its tail up behind)
-// and white prajioud on the arms, then throws the knee. The red heart (his soul) can show over his chest.
+// stands in guard, then throws the knee. And the genre's moves, facing right: the strike, the kneel, the
+// push, the cast, the side knee and the kick.
 //
 // The pixels are data: rows of one letter a pixel read through the outfit's colour key and drawn as one
 // rect per run of one colour (pixelRuns). Keys: K outline, H hair, B beard, S skin, s skin shade (ears,
-// nose), E eyes, J sweater, M stripe, P shorts, F shoes, Y waistband, R gloves, W white cord and bands,
-// T terminal case, G and g its screen, L sticks, D and d the snare and its rim, h the heart.
+// nose), E eyes, J shirt, P trousers or shorts, Q the lower legs, F shoes, Y waistband, R wraps, W white
+// cord and bands, T terminal case, G and g its screen, L sticks, D and d the snare and its rim.
 
 export const SPRITE = { width: 20, height: 30 } as const
 
@@ -86,27 +87,26 @@ const HEADS: Record<Head, string[]> = {
   ],
 }
 
-// ---- the torso, 10 rows (neck to shorts) ----
+// ---- the torso, 10 rows (neck to the top of the trousers) ----
 
 const NECK = '......KKSSSSKK......'
 const COLLAR = '....KKKJJJJJJKKK....'
 const SHOULDERS = '...KJKJJJJJJJJKJK...'
-const STRIPE = '..KJJKMMMMMMMMKJJK..'
 const KNIT = '..KJJKJJJJJJJJKJJK..'
 const HANDS = '..KSSKJJJJJJJJKSSK..'
 const HEM = '..KKKKJJJJJJJJKKKK..'
-const SHORTS = '.....KPPPPPPPPK.....'
+const TROUSERS = '.....KPPPPPPPPK.....'
 const SPLIT = '.....KPPPKKPPPK.....'
 
-const FRONT_TORSO = [NECK, COLLAR, SHOULDERS, STRIPE, KNIT, STRIPE, HANDS, HEM, SHORTS, SPLIT]
+const FRONT_TORSO = [NECK, COLLAR, SHOULDERS, KNIT, KNIT, KNIT, HANDS, HEM, TROUSERS, SPLIT]
 
 const SIDE_TORSO = [
   NECK,
   '.....KKJJJJJJKK.....',
   '.....KJJJJJJJJK.....',
-  '.....KMMMJJMMMK.....',
   '.....KJJJJJJJJK.....',
-  '.....KMMMJJMMMK.....',
+  '.....KJJJJJJJJK.....',
+  '.....KJJJJJJJJK.....',
   '.....KJJJSSJJJK.....',
   '.....KKKKKKKKKK.....',
   '......KPPPPPPK......',
@@ -116,37 +116,102 @@ const SIDE_TORSO = [
 // ---- the legs, 5 rows ----
 
 const FRONT_LEGS: Record<Step, string[]> = {
-  stand: ['....KSSSK..KSSSK....', '....KSSSK..KSSSK....', '....KFFFK..KFFFK....', '...KFFFFK..KFFFFK...', '...KKKKKK..KKKKKK...'],
-  stepA: ['....KSSSK..KSSSK....', '....KSSSK..KFFFK....', '....KFFFK.KFFFFK....', '...KFFFFK.KKKKKK....', '...KKKKKK...........'],
-  stepB: ['....KSSSK..KSSSK....', '....KFFFK..KSSSK....', '....KFFFFK.KFFFK....', '....KKKKKK.KFFFFK...', '...........KKKKKK...'],
+  stand: ['....KQQQK..KQQQK....', '....KQQQK..KQQQK....', '....KFFFK..KFFFK....', '...KFFFFK..KFFFFK...', '...KKKKKK..KKKKKK...'],
+  stepA: ['....KQQQK..KQQQK....', '....KQQQK..KFFFK....', '....KFFFK.KFFFFK....', '...KFFFFK.KKKKKK....', '...KKKKKK...........'],
+  stepB: ['....KQQQK..KQQQK....', '....KFFFK..KQQQK....', '....KFFFFK.KFFFK....', '....KKKKKK.KFFFFK...', '...........KKKKKK...'],
 }
 
 const SIDE_LEGS: Record<Step, string[]> = {
-  stand: ['.......KSSSSK.......', '.......KSSSSK.......', '.......KFFFFK.......', '.......KFFFFFK......', '.......KKKKKKK......'],
-  stepA: ['......KSSKKSSK......', '.....KSSK..KSSK.....', '....KFFK....KFFK....', '....KFFFK...KFFFK...', '....KKKKK...KKKKK...'],
-  stepB: ['.......KSSSSK.......', '.......KSSSSK.......', '.......KFFFFK.......', '.......KFFFFFK......', '.......KKKKKKK......'],
+  stand: ['.......KQQQQK.......', '.......KQQQQK.......', '.......KFFFFK.......', '.......KFFFFFK......', '.......KKKKKKK......'],
+  stepA: ['......KQQKKQQK......', '.....KQQK..KQQK.....', '....KFFK....KFFK....', '....KFFFK...KFFFK...', '....KKKKK...KKKKK...'],
+  stepB: ['.......KQQQQK.......', '.......KQQQQK.......', '.......KFFFFK.......', '.......KFFFFFK......', '.......KKKKKKK......'],
 }
+
+export interface Pose {
+  head: readonly string[]
+  torso: readonly string[]
+  legs: readonly string[]
+}
+
+// ---- the genre's moves, facing right ----
+
+const SIDE_TOP = [NECK, '.....KKJJJJJJKK.....']
+const SIDE_BELT = ['.....KKKKKKKKKK.....', '......KPPPPPPK......', '......KPPPPPPK......']
+
+const MOVE_TORSO = {
+  // the near arm straight out at the shoulder, the fist leading
+  strike: [...SIDE_TOP, '.....KJJJJJJJJKKKKK.', '.....KJJJJJJJJJJJSSK', '.....KJJJJJJJJKKKKK.', '.....KJJJJJJJJK.....', '.....KJJJJJJJJK.....', ...SIDE_BELT],
+  // both hands flat on what he leans into
+  push: [...SIDE_TOP, '.....KJJJJJJJJKKKK..', '.....KJJJJJJJJJJSSK.', '.....KJJJJJJJJKKKKK.', '.....KJJJJJJJJJJSSK.', '.....KJJJJJJJJKKKK..', ...SIDE_BELT],
+  // the near hand raised up and forward over his head
+  cast: [
+    '......KKSSSSKK.KSSK.',
+    '.....KKJJJJJJKKKJJK.',
+    '.....KJJJJJJJJJJJK..',
+    '.....KJJJJJJJJKKK...',
+    '.....KJJJJJJJJK.....',
+    '.....KJJJJJJJJK.....',
+    '.....KJJJJJJJJK.....',
+    ...SIDE_BELT,
+  ],
+  // bent low, the near hand reaching forward
+  kneel: [
+    ...SIDE_TOP,
+    '.....KJJJJJJJJK.....',
+    '.....KJJJJJJJJK.....',
+    '.....KJJJJJJJJKKK...',
+    '.....KJJJJJJJJJJSK..',
+    '.....KJJJJJJJJKKK...',
+    '.....KKKKKKKKKK.....',
+    '......KPPPPPPPPPK...',
+    '......KPPPPPPPPPK...',
+  ],
+} as const
+
+const MOVE_LEGS = {
+  // one knee down, the other foot planted ahead
+  kneel: ['......KQQKKKKQQK....', '......KQQK..KQQK....', '......KQQK..KQQK....', '.....KFFFK..KQQK....', '.....KKKKK..KKKK....'],
+  // the near knee driven up and forward
+  knee: ['......KQQQQQQQQK....', '......KQQKKKQQQK....', '......KQQK.KFFFK....', '......KQQK..KKK.....', '.....KFFFK..........'],
+  // the near leg straight out at hip height
+  kick: ['......KQQQQQQQQQQQK.', '......KQQQQKKKKKFFK.', '......KQQK.....KKK..', '......KQQK..........', '.....KFFFK..........'],
+} as const
+
+/** His frames for the genre's moves, all facing right. */
+export type MoveFrame = 'standR' | 'strike' | 'kneel' | 'push' | 'cast' | 'knee' | 'kick'
+
+/** A move frame: the profile head over the move's torso and legs. */
+export function movePose(move: MoveFrame): Pose {
+  const head = HEADS.right
+  const parts: Record<MoveFrame, Omit<Pose, 'head'>> = {
+    standR: { torso: SIDE_TORSO, legs: SIDE_LEGS.stand },
+    strike: { torso: MOVE_TORSO.strike, legs: SIDE_LEGS.stepA },
+    kneel: { torso: MOVE_TORSO.kneel, legs: MOVE_LEGS.kneel },
+    push: { torso: MOVE_TORSO.push, legs: SIDE_LEGS.stepA },
+    cast: { torso: MOVE_TORSO.cast, legs: SIDE_LEGS.stand },
+    knee: { torso: SIDE_TORSO, legs: MOVE_LEGS.knee },
+    kick: { torso: SIDE_TORSO, legs: MOVE_LEGS.kick },
+  }
+  return { head, ...parts[move] }
+}
+
+export const MOVE_FRAMES = ['standR', 'strike', 'kneel', 'push', 'cast', 'knee', 'kick'] as const satisfies readonly MoveFrame[]
 
 // ---- the profession actions, two frames each, facing down ----
 
 export type ActFrame = 'actA' | 'actB'
 
-export interface Pose {
-  head: string[]
-  torso: string[]
-  legs: string[]
-}
 
 const GUARD_TORSO = [
   NECK,
   '...KRRKJJJJJJKRRK...',
   '...KRRKJJJJJJKRRK...',
-  '..KWJKMMMMMMMMKJWK..',
+  '..KWJKJJJJJJJJKJWK..',
   KNIT,
-  '..KKKKMMMMMMMMKKKK..',
+  '..KKKKJJJJJJJJKKKK..',
   '.....KJJJJJJJJK.....',
   '.....KYYYYYYYYK.....',
-  SHORTS,
+  TROUSERS,
   SPLIT,
 ]
 
@@ -155,12 +220,12 @@ const ACTIONS: Record<Profession, Record<ActFrame, Pose>> = {
   engineer: {
     actA: {
       head: HEADS.down,
-      torso: [NECK, COLLAR, SHOULDERS, STRIPE, '..KTTTTTTTTTTTTTTK..', '..KTGGgGGGgGgGGgTK..', '..KTgGGgGgGGGgGgTK..', '..KSSTTTTTTTTTTSSK..', SHORTS, SPLIT],
+      torso: [NECK, COLLAR, SHOULDERS, KNIT, '..KTTTTTTTTTTTTTTK..', '..KTGGgGGGgGgGGgTK..', '..KTgGGgGgGGGgGgTK..', '..KSSTTTTTTTTTTSSK..', TROUSERS, SPLIT],
       legs: FRONT_LEGS.stand,
     },
     actB: {
       head: HEADS.down,
-      torso: [NECK, COLLAR, SHOULDERS, STRIPE, '..KTTTTTTTTTTTTTTK..', '..KTgGGgGgGGGgGgTK..', '..KTGgGGGgGGgGGGTK..', '..KTSSTTTTTTTTSSTK..', SHORTS, SPLIT],
+      torso: [NECK, COLLAR, SHOULDERS, KNIT, '..KTTTTTTTTTTTTTTK..', '..KTgGGgGgGGGgGgTK..', '..KTGgGGGgGGgGGGTK..', '..KTSSTTTTTTTTSSTK..', TROUSERS, SPLIT],
       legs: FRONT_LEGS.stand,
     },
   },
@@ -172,9 +237,9 @@ const ACTIONS: Record<Profession, Record<ActFrame, Pose>> = {
         '.L....KKSSSSKK....L.',
         '..L.KKKJJJJJJKKK.L..',
         '..KSKJJJJJJJJJJKSK..',
-        '...KKMMMMMMMMMMKK...',
+        '...KKJJJJJJJJJJKK...',
         '....KJJJJJJJJJJK....',
-        '....KMMMMMMMMMMK....',
+        '....KJJJJJJJJJJK....',
         '....KJJJJJJJJJJK....',
         '..KddddddddddddddK..',
         '..KDDDDDDDDDDDDDDK..',
@@ -184,7 +249,7 @@ const ACTIONS: Record<Profession, Record<ActFrame, Pose>> = {
     },
     actB: {
       head: HEADS.down,
-      torso: [NECK, COLLAR, SHOULDERS, STRIPE, KNIT, STRIPE, HANDS, '..KdLddddddddddLdK..', '..KDDDDDDDDDDDDDDK..', '..KKdDDDDDDDDDDdKK..'],
+      torso: [NECK, COLLAR, SHOULDERS, KNIT, KNIT, KNIT, HANDS, '..KdLddddddddddLdK..', '..KDDDDDDDDDDDDDDK..', '..KKdDDDDDDDDDDdKK..'],
       legs: FRONT_LEGS.stand,
     },
   },
@@ -194,7 +259,7 @@ const ACTIONS: Record<Profession, Record<ActFrame, Pose>> = {
     actB: {
       head: HEADS.ring,
       torso: GUARD_TORSO,
-      legs: ['....KSSSK.KSSSSK....', '....KSSSK.KSSSSK....', '....KSSSK..KFFK.....', '...KFFFFK...........', '...KKKKKK...........'],
+      legs: ['....KQQQK.KQQQQK....', '....KQQQK.KQQQQK....', '....KQQQK..KFFK.....', '...KFFFFK...........', '...KKKKKK...........'],
     },
   },
 }
@@ -236,29 +301,24 @@ export const EYES: ReadonlyArray<readonly [number, number]> = [
   [13, 7],
 ]
 
-/** The heart over his chest, 6 by 4 pixels, its top left corner. */
-export const HEART = { x: 7, y: 18, rows: ['hh..hh', 'hhhhhh', '.hhhh.', '..hh..'] } as const
-
-// His traits quantised for the pixel world: the hair and beard lifted to the dark brown the room's
-// outline reads in, so his head keeps its shape on the black battle screen.
-const SWEATER = {
+// His traits quantised for the pixel world: the hair and beard lifted to the dark brown the outline reads
+// in, so his head keeps its shape on the black window.
+const BODY = {
   K: RPG.spriteLine,
   H: RPG.spriteHair,
   B: RPG.spriteHair,
   S: HERO_IDENTITY.skin,
   s: HERO_IDENTITY.skinShade,
   E: HERO_IDENTITY.eyes,
-  J: RPG.sweater,
-  M: RPG.sweaterStripe,
-  P: RPG.spriteShorts,
   F: RPG.spriteLine,
-  h: RPG.soul,
 }
 
-/** The colour key per profession: the same sweater, each profession's own kit. */
+/** The colour key per profession: his own clothes and each profession's own kit. */
 export const COLOURS: Record<Profession, Record<string, string>> = {
-  engineer: { ...SWEATER, T: RPG.borderShade, G: RPG.green, g: RPG.haze },
-  drummer: { ...SWEATER, L: RPG.stickWood, D: RPG.snare, d: RPG.border },
-  // red Muay Thai shorts with the gold waistband, bare feet, red gloves, the white cord and bands
-  fighter: { ...SWEATER, P: RPG.soul, F: HERO_IDENTITY.skin, Y: RPG.gold, R: RPG.hpBack, W: RPG.border },
+  // the teal shirt and jeans, and the pocket terminal
+  engineer: { ...BODY, J: RPG.engineerShirt, P: RPG.jeans, Q: RPG.jeans, T: RPG.borderShade, G: RPG.green, g: RPG.duskHigh },
+  // the black tee and black jeans, the sticks and the snare
+  drummer: { ...BODY, J: RPG.drummerShirt, P: RPG.blackJeans, Q: RPG.blackJeans, L: RPG.stickWood, D: RPG.snare, d: RPG.border },
+  // bare chested in red Muay Thai shorts with the gold waistband, bare feet, gold wraps, the white cord and bands
+  fighter: { ...BODY, J: HERO_IDENTITY.skin, P: RPG.shorts, Q: HERO_IDENTITY.skin, F: HERO_IDENTITY.skin, Y: RPG.wraps, R: RPG.wraps, W: RPG.border },
 }

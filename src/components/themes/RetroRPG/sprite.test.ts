@@ -1,6 +1,6 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { pixelRuns } from '@/lib/pixelRuns'
-import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, walkPose, type Facing, type Pose, type Step } from './sprite'
+import { COLOURS, EYES, MOVE_FRAMES, PART_TOP, SPRITE, actionPose, movePose, walkPose, type Facing, type Pose, type Step } from './sprite'
 
 const FACINGS: Facing[] = ['down', 'up', 'right', 'left']
 const STEPS: Step[] = ['stand', 'stepA', 'stepB']
@@ -9,6 +9,7 @@ const posesOf = (profession: (typeof PROFESSION_ORDER)[number]): Pose[] => [
   ...FACINGS.flatMap((facing) => STEPS.map((step) => walkPose(profession, facing, step))),
   actionPose(profession, 'actA'),
   actionPose(profession, 'actB'),
+  ...MOVE_FRAMES.map(movePose),
 ]
 
 describe('the room walker sprite', () => {
@@ -32,10 +33,5 @@ describe('the room walker sprite', () => {
   it('finds his dot eyes where the face draws them', () => {
     const face = walkPose('drummer', 'down', 'stand').head
     EYES.forEach(([x, y]) => expect(face[y][x]).toBe('E'))
-  })
-
-  it('keeps the heart inside his chest', () => {
-    HEART.rows.forEach((row) => expect(HEART.x + row.length).toBeLessThanOrEqual(SPRITE.width))
-    expect(HEART.y).toBeGreaterThanOrEqual(PART_TOP.torso)
   })
 })

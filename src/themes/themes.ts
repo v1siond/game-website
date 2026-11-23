@@ -188,7 +188,7 @@ export const themes: Theme[] = [
     font: 'serif',
   },
 
-  // 7. Retro RPG - a lo-fi pixel role playing game's encounter screen, its boxes and the save point
+  // 7. Retro RPG - a 16 bit role playing game's encounter screen, its command windows and the save point
   {
     id: 'retro-rpg',
     name: 'Retro RPG',

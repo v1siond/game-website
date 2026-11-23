@@ -356,7 +356,7 @@ collections:
                   - { <<: *text, label: "Close file", name: closeFile }
                   - { <<: *text, label: "Stream link", name: streamLink }
                   - { <<: *text, label: "Close", name: close, hint: 'Keep {name}' }
-                  - { <<: *text, label: "Spin the star", name: spinStar }
+                  - { <<: *text, label: "Save", name: save }
               - label: Link words
                 name: links
                 widget: object

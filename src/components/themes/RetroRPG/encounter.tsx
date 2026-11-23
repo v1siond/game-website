@@ -10,11 +10,11 @@ import { PIXEL, RPG } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import world from './world.module.css'
 
-// His outfit plate: a battle box, white pixel lettering on black inside a white frame.
+// His outfit plate: a window, white pixel lettering on black inside a white frame.
 const OUTFIT_LOOK: WardrobeLook = { plate: RPG.void, text: RPG.text, ring: RPG.border }
 
-// The hero as the game's encounter screen: the monster area with the battle backdrop and him, turned to
-// the visitor's pointer, then the box with his name and lines, the stats line and the command row (the
+// The hero as the genre's encounter screen: the battle field with its backdrop and him, turned to the
+// visitor's pointer, then the window with his name and lines, the stats line and the command window (the
 // children). A profession switch plays two things once: the screen flashes white and his sprite turns
 // through four hard frames into the new outfit.
 
@@ -35,38 +35,36 @@ function useSwitchCount(profession: Profession) {
 
 // ---- the art ----
 
-const NEAR_PANELS = [0, 1, 2, 3, 4, 5, 6, 7]
-const FAR_PANELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+// The dusk sky in hard bands, top to bottom, on the 320 by 120 grid.
+const SKY_BANDS: ReadonlyArray<readonly [number, number, string]> = [
+  [0, 30, RPG.duskHigh],
+  [30, 18, RPG.duskLow],
+  [48, 10, RPG.duskHigh],
+]
 
-/** The battle backdrop: two rows of green outlined panels, the far row smaller and dimmer, over a haze. */
+const STARS: ReadonlyArray<readonly [number, number]> = [[18, 8], [64, 20], [120, 6], [176, 16], [230, 10], [292, 22]]
+
+/** The battle backdrop: a field at dusk in hard bands, the far hills and the near grass under him. */
 function BattleBackdrop() {
   return (
     <svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      <defs>
-        <linearGradient id="rpg-haze" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={RPG.void} />
-          <stop offset="0.7" stopColor={RPG.haze} />
-          <stop offset="1" stopColor={RPG.void} />
-        </linearGradient>
-      </defs>
-      <rect width="320" height="120" fill="url(#rpg-haze)" />
-      {FAR_PANELS.map((i) => (
-        <rect key={`f${i}`} x={4 + i * 26} y={18} width={22} height={34} fill="none" stroke={RPG.panelFar} strokeWidth="1" />
+      <rect width="320" height="120" fill={RPG.void} />
+      {SKY_BANDS.map(([y, height, fill]) => (
+        <rect key={y} y={y} width="320" height={height} fill={fill} />
       ))}
-      {NEAR_PANELS.map((i) => (
-        <g key={`n${i}`}>
-          <rect x={2 + i * 40} y={46} width={36} height={52} fill="none" stroke={RPG.panelNear} strokeWidth="2" />
-          <rect x={8 + i * 40} y={52} width={24} height={40} fill="none" stroke={RPG.panelFar} strokeWidth="1" />
-        </g>
+      {STARS.map(([x, y]) => (
+        <rect key={x} x={x} y={y} width="1" height="1" fill={RPG.border} />
       ))}
-      <rect y="104" width="320" height="2" fill={RPG.panelFar} />
+      <path d="M0 74 L30 58 L64 70 L104 52 L150 68 L196 50 L240 66 L282 54 L320 64 V80 H0 Z" fill={RPG.hillFar} />
+      <rect y="80" width="320" height="24" fill={RPG.hillNear} />
+      <rect y="104" width="320" height="2" fill={RPG.mossDark} />
     </svg>
   )
 }
 
 interface EncounterProps {
   profession: Profession
-  /** The box and everything under it (the stats line, the command row). */
+  /** The window and everything under it (the stats line, the command window). */
   children: ReactNode
 }
 
@@ -76,7 +74,7 @@ export function Encounter({ profession, children }: EncounterProps) {
 
   return (
     <div className="relative mx-auto max-w-3xl">
-      {/* the monster area: the backdrop and him */}
+      {/* the battle field: the backdrop and him */}
       <div ref={pointer} className={`relative h-44 overflow-hidden sm:h-56 ${world.stage} ${sprite.battle}`} aria-hidden="true">
         <BattleBackdrop />
         <div className="absolute inset-x-0 bottom-2 flex justify-center">
@@ -86,7 +84,7 @@ export function Encounter({ profession, children }: EncounterProps) {
         </div>
       </div>
 
-      {/* out of the flow: across the stage's top edge on a phone, at his right inside the stage from sm */}
+      {/* out of the flow: across the field's top edge on a phone, at his right inside the field from sm */}
       <Wardrobe look={OUTFIT_LOOK} ready className={`c-wardrobe--fan-down-below-lg absolute left-0 -top-7 z-10 sm:left-[calc(50%_+_66px)] sm:top-28 ${PIXEL}`} />
 
       {children}

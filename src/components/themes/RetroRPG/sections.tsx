@@ -12,19 +12,17 @@ import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard, SAID_LINES } from './cards'
-import { BulletBox } from './bulletBox'
 import { BODY, Box, Mark, SectionHeader } from './panels'
 import { MONO, PIXEL } from './palette'
 import type { Scene } from './scenes'
 import { RpgStage } from './stage'
 
 // One section per scene: a tall head that first shows the place alone and then brings the title up on
-// its black plate, then the cards (the game's hard white boxes), then a screen of the place alone before
-// it sinks. The cards a scene counts sit in an element marked data-stage-items, which the shared theatre
-// measures for the reading line that lights each prop. The bullet box sits under the About box and under
-// the Musician's and the Martial Artist's lists, playing that profession's soul mode (bulletBox.tsx).
+// its black plate, then the cards (the genre's hard white bordered windows), then a screen of the place
+// alone before it sinks. The cards a scene counts sit in an element marked data-stage-items, which the
+// shared theatre measures for the reading line that plays each card's beat.
 
-// The About box's stats, each label in the gold the boxes name things in.
+// The About window's stats, each label in the gold the windows name things in.
 const STAT_LINES: AboutFactsLook = {
   list: 'mt-4 max-w-prose space-y-1',
   fact: 'flex flex-wrap gap-x-2',
@@ -38,22 +36,17 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   const { cards } = useLabels()
   const { highlights } = useAboutBlock()
   return (
-    <>
-      <Box>
-        <p className={`max-w-prose whitespace-pre-line ${BODY}`}>{slot.bio}</p>
-        <div data-stage-items="">
-          <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SAID_LINES, list: 'mt-4 max-w-prose space-y-2' }} />
-        </div>
-        <AboutFacts look={STAT_LINES} />
-      </Box>
-      <div className="mt-6">
-        <BulletBox profession="engineer" />
+    <Box>
+      <p className={`max-w-prose whitespace-pre-line ${BODY}`}>{slot.bio}</p>
+      <div data-stage-items="">
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SAID_LINES, list: 'mt-4 max-w-prose space-y-2' }} />
       </div>
-    </>
+      <AboutFacts look={STAT_LINES} />
+    </Box>
   )
 }
 
-// A job box holds the speaker's portrait beside its title, so the jobs take the column one under another.
+// A job window holds the villager's portrait beside its title, so the jobs take the column one under another.
 function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
   return (
     <ul className="space-y-6" data-stage-items="">
@@ -128,45 +121,37 @@ function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
         <BandList bands={bands} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderBand={(band) => <BandCard {...band} />} />
       </div>
       <p className={`mt-4 bg-[color:var(--rpg-void)] px-3 py-2 text-center ${BODY}`}>{musician.line}</p>
-      <div className="mt-6">
-        <BulletBox profession="drummer" />
-      </div>
     </>
   )
 }
 
 function RecordCards({ slot: { martialArts } }: { slot: SlotOf<'muayThai'> }) {
   return (
-    <>
-      <Box>
-        <h3 className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}>
-          <Mark className="" />
-          {martialArts.primary.title}
-        </h3>
-        <div data-stage-items="">
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'mb-6 grid gap-3 sm:grid-cols-2',
-              fact: STAT,
-              term: `text-sm uppercase tracking-widest text-[color:var(--rpg-gold)] ${PIXEL}`,
-              value: `mt-2 ${BODY} text-[color:var(--rpg-text)]`,
-              achievements: 'space-y-3',
-              achievement: BODY,
-            }}
-            renderAchievement={(achievement) => (
-              <span className="flex items-start gap-2 text-[color:var(--rpg-green)]">
-                <Mark />
-                {achievement}
-              </span>
-            )}
-          />
-        </div>
-      </Box>
-      <div className="mt-6">
-        <BulletBox profession="fighter" />
+    <Box>
+      <h3 className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}>
+        <Mark className="" />
+        {martialArts.primary.title}
+      </h3>
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'mb-6 grid gap-3 sm:grid-cols-2',
+            fact: STAT,
+            term: `text-sm uppercase tracking-widest text-[color:var(--rpg-gold)] ${PIXEL}`,
+            value: `mt-2 ${BODY} text-[color:var(--rpg-text)]`,
+            achievements: 'space-y-3',
+            achievement: BODY,
+          }}
+          renderAchievement={(achievement) => (
+            <span className="flex items-start gap-2 text-[color:var(--rpg-green)]">
+              <Mark />
+              {achievement}
+            </span>
+          )}
+        />
       </div>
-    </>
+    </Box>
   )
 }
 

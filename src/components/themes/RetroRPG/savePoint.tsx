@@ -13,26 +13,32 @@ import { RpgStage } from './stage'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 
-// Contact as the save point: the yellow star twinkles over the closing box the way a save point flickers
-// in its room. Clicking the star saves: it spins once fast, pixel sparkles burst round it, the box flashes
-// white and stays in its saved state (yellow border, the star lit), and the box shows the save line, his
-// name beside the profession, over the contact line and the options. On the stage behind (scenes.tsx) he
-// walks up to the save star as the section comes in.
+// Contact as the save point: a journal open on its lectern over a glowing rune circle, which pulses over
+// the closing window the way a save point glows in its room. Clicking it saves: the circle flares once,
+// pixel sparks burst round it, the window flashes white and stays in its saved state (yellow border), and
+// the window shows the save line, his name beside the profession, over the contact line and the options.
+// On the stage behind (scenes.tsx) he walks up to the save point and kneels at it as the section comes in.
 //
-// Pattern: CSS loops for the twinkle (steps(), opacity and a scaleX turn), one click state (data-saved)
-// that plays the spin and the flash once per click (the key replays them).
+// Pattern: CSS loops for the pulse (steps(), opacity), one click state (data-saved) that plays the flare
+// and the flash once per click (the key replays them).
 
 const CONTACT_HEADING = headingId('rpg', 'Contact')
 
-/** The save star: a four point pixel star in its glow, the core lighter than the points. */
-function SaveStar() {
+/** The save point: the rune circle on the floor, its glow, and the journal open on its lectern. */
+function SaveRune() {
   return (
-    <svg viewBox="0 0 15 15" className="h-full w-full" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      <rect x="2" y="2" width="11" height="11" fill={RPG.starGlow} className={world.glow} />
-      <g className={world.star}>
-        <path d="M7 0 H8 V4 H9 V6 H11 V7 H15 V8 H11 V9 H9 V11 H8 V15 H7 V11 H6 V9 H4 V8 H0 V7 H4 V6 H6 V4 H7 Z" fill={RPG.gold} />
-        <rect x="6" y="6" width="3" height="3" fill={RPG.starCore} />
+    <svg viewBox="0 0 16 16" className="h-full w-full" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
+      <g className={world.rune}>
+        <rect x="1" y="12" width="14" height="3" fill={RPG.runeGlow} />
+        <rect x="3" y="11" width="10" height="1" fill={RPG.runeGlow} />
       </g>
+      <rect x="2" y="13" width="12" height="1" fill={RPG.runeCore} />
+      <rect x="7" y="7" width="2" height="6" fill={RPG.woodDark} />
+      <rect x="5" y="12" width="6" height="1" fill={RPG.woodDark} />
+      <path d="M3 4 H8 V7 H3 Z M8 4 H13 V7 H8 Z" fill={RPG.border} />
+      <rect x="7" y="4" width="2" height="3" fill={RPG.borderShade} />
+      <rect x="4" y="5" width="3" height="1" fill={RPG.borderShade} />
+      <rect x="9" y="5" width="3" height="1" fill={RPG.borderShade} />
     </svg>
   )
 }
@@ -51,10 +57,10 @@ export function SavePoint({ profession, scene, still }: { profession: Profession
             type="button"
             onClick={() => setSaves((n) => n + 1)}
             className="relative h-14 w-14 p-1"
-            aria-label={labels.actions.spinStar}
+            aria-label={labels.actions.save}
           >
-            <span key={saves} className={`block h-full w-full ${saved ? world.saveSpin : ''}`}>
-              <SaveStar />
+            <span key={saves} className={`block h-full w-full ${saved ? world.saveFlare : ''}`}>
+              <SaveRune />
             </span>
           </button>
           {saved && <Sparkles key={saves} className="pointer-events-none absolute left-1/2 top-0 h-14 w-14 -translate-x-1/2 scale-150" />}

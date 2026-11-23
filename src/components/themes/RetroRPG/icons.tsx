@@ -2,7 +2,7 @@ import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { PixelRuns } from '../shared/PixelRuns'
 
 // The small pixel icons that sit in a command's slot, the way each of the game's command buttons carries
-// its own glyph until the heart takes the slot. Each icon is a 7 by 7 grid written as rows ('#' a lit
+// its own glyph until the cursor arrow takes the slot. Each icon is a 7 by 7 grid written as rows ('#' a lit
 // pixel), turned into one rect per lit run so the SVG stays a handful of nodes. The icon draws in
 // currentColor, so it turns yellow with its command.
 

@@ -36,8 +36,7 @@
 }
 
 .actA,
-.actB,
-.soul{
+.actB {
   opacity: 0;
 }
 
@@ -64,19 +63,9 @@
   animation: frameB 480ms steps(1, end) 10 forwards;
 }
 
-/* His soul flickers on his chest the way it leaves the body when a battle starts. */
-@keyframes soulShow {
-  0%, 30%, 60%, 100% { opacity: 1; }
-  15%, 45% { opacity: 0; }
-}
-
-.battle:hover .soul {
-  animation: soulShow 600ms steps(1, end) both;
-}
-
 /* ---- walking in: two step frames while the parent says he walks, then he stands ---- */
 
-/* ---- the save: the sparkle round the star ---- */
+/* ---- the save: the sparks round the save point ---- */
 
 @keyframes sparkle {
   0% { opacity: 0; transform: scale(0); }
@@ -104,8 +93,7 @@
   .blink,
   .sparkle,
   .battle:hover .actA,
-  .battle:hover .actB,
-  .battle:hover .soul{
+  .battle:hover .actB {
     animation: none !important;
   }
 
