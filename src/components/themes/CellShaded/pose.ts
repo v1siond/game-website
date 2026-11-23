@@ -6,13 +6,14 @@ import s from './sprite.module.css'
 
 // The commando posed by the scroll, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
 // numbers, plus his own gear on top, each 0 to 1: the wrist computer's hologram, the turret deployed
-// beside him, its muzzle flash, and how far he is built up on the station's pad. He faces the viewer, so
+// beside him, its muzzle flash, how far he is built up on the station's pad, the rifle in his hands and
+// its own flash. He faces the viewer, so
 // his front side (the viewer's right, the shoulder pad) is the rig's right, his back side its left, and
-// he walks with the rig's front stride.
+// he runs with the rig's front stride.
 
-export type CelPose = RigPose & { holo: number; turret: number; flash: number; built: number }
+export type CelPose = RigPose & { holo: number; turret: number; flash: number; built: number; rifle: number; muzzle: number }
 
-const STAND: CelPose = { ...RIG_STAND, holo: 0, turret: 0, flash: 0, built: 1 }
+const STAND: CelPose = { ...RIG_STAND, holo: 0, turret: 0, flash: 0, built: 1, rifle: 0, muzzle: 0 }
 
 const pose = (partial: Partial<CelPose>): CelPose => ({ ...STAND, ...partial })
 
@@ -26,15 +27,28 @@ const KIT: Record<Profession, CelPose> = {
 /** He stands in his kit. */
 export const rest = (profession: Profession): CelPose => KIT[profession]
 
-/** His stride at `phase` (rising as he goes on), on the rig's front stride; the commando swings his arms
- *  with it, the sticks and the guard stay up. */
-export function walk(profession: Profession, phase: number): CelPose {
+// Squatting `deg` at the hips: each thigh turns out at the hip and its shin folds back twice as far, so the
+// foot comes back under him, and the body drops by what the bent legs lose in height (thigh and shin, 79
+// units long). A positive turn is clockwise on screen, which swings the viewer's right leg in.
+const LEG = 79
+const squat = (deg: number): Partial<CelPose> => ({
+  thighRight: -deg,
+  shinRight: 2 * deg,
+  thighLeft: deg,
+  shinLeft: -2 * deg,
+  rise: LEG * (1 - Math.cos((deg * Math.PI) / 180)),
+})
+
+/** His run between beats at `phase` (rising as he goes on): the rig's front stride, the commando's arms
+ *  pumping, the sticks and the guard kept up. */
+export function run(profession: Profession, phase: number): CelPose {
   const stride = rigWalk(phase, 0)
   const kit = KIT[profession]
-  const swing = profession === 'engineer' ? 1 : 0
+  const swing = profession === 'engineer' ? 2 : 0
   return {
     ...kit,
-    rise: stride.rise,
+    rise: stride.rise * 2,
+    lean: 4,
     kneeRight: stride.kneeRight,
     kneeLeft: stride.kneeLeft,
     shinRight: stride.shinRight,
@@ -44,17 +58,68 @@ export function walk(profession: Profession, phase: number): CelPose {
   }
 }
 
-/** Both fists up over his head (`t` to 0.5), then brought down hard on the prop beside him. */
-const OVERHEAD = pose({ armRight: -165, foreRight: -10, armLeft: 165, foreLeft: 10, rise: -4 })
-const POUND = pose({ armRight: -70, foreRight: 20, armLeft: 40, foreLeft: -20, lean: 6, rise: 3 })
-export function pound(profession: Profession, t: number): CelPose {
-  if (t < 0.5) return mix(KIT[profession], OVERHEAD, t / 0.5)
-  return mix(OVERHEAD, POUND, ramp(t, 0.5, 0.7))
+// The rifle shouldered and aimed right: the front arm out level along it, the back hand across under it.
+const AIM = { armRight: -90, foreRight: 0, armLeft: -62, foreLeft: -38, rifle: 1 }
+
+/** The trigger pulled through `t` 0.4 to 0.7: three flashes at the muzzle, the rifle kicking up with each. */
+const fire = (t: number): Pick<CelPose, 'muzzle' | 'foreRight'> => {
+  const burst = ramp(t, 0.4, 0.7)
+  const shot = burst > 0 && burst < 1 ? Math.abs(Math.sin(burst * Math.PI * 3)) : 0
+  return { muzzle: shot, foreRight: -6 * shot }
 }
 
-/** The front hand out flat at the prop on his right, `t` of the way. */
-const POINT = pose({ armRight: -85, foreRight: -5, lean: -2 })
-export const point = (profession: Profession, t: number): CelPose => mix(KIT[profession], POINT, t)
+/** Aim and fire standing: the rifle comes off his back into his hands, up on the target, the burst, then
+ *  held on it with the smoke clearing. */
+export function shoot(t: number): CelPose {
+  const aimed = mix(STAND, pose({ ...AIM, thighRight: -6, thighLeft: 8, lean: -2 }), ramp(t, 0, 0.35))
+  return { ...aimed, ...fire(t), rifle: ramp(t, 0, 0.15) }
+}
+
+/** The slide into cover: down on the back hip with the front leg out ahead (`t` to 0.4), then up on one
+ *  knee behind the cover with the rifle over it and the burst fired. */
+const SLIDE = pose({ ...squat(70), thighRight: -80, shinRight: 10, kneeRight: 0, lean: -10, armRight: -40, foreRight: -40, armLeft: 50, foreLeft: 20, rifle: 1 })
+const OVER = pose({ ...squat(56), kneeLeft: 0.8, ...AIM, lean: 2 })
+export function slide(t: number): CelPose {
+  const low = t < 0.4 ? mix(STAND, SLIDE, ramp(t, 0, 0.15)) : mix(SLIDE, OVER, ramp(t, 0.4, 0.55))
+  return { ...low, ...fire(t + 0.1), rifle: ramp(t, 0, 0.1) }
+}
+
+/** The ground slam: crouched to jump, tucked in the air with both fists over his head, then landed low on
+ *  two fists driven into the sand. */
+const CROUCH = pose({ ...squat(40), armRight: 30, foreRight: 30, armLeft: -30, foreLeft: -30, lean: 4 })
+const TUCK = pose({ ...squat(55), rise: 0, armRight: -165, foreRight: -10, armLeft: 165, foreLeft: 10 })
+const SLAM = pose({ ...squat(64), armRight: -40, foreRight: -30, armLeft: 40, foreLeft: 30, lean: 4 })
+export function slam(t: number): CelPose {
+  if (t < 0.2) return mix(STAND, CROUCH, t / 0.2)
+  if (t < 0.6) return mix(CROUCH, TUCK, ramp(t, 0.2, 0.35))
+  return mix(TUCK, SLAM, ramp(t, 0.6, 0.72))
+}
+
+/** At the chest: down on his knees with both hands on the lid (`t` to 0.45), then up on his feet with a
+ *  fist thrown up at the light. */
+const LID = pose({ ...squat(58), kneeRight: 0.6, kneeLeft: 0.6, armRight: -50, foreRight: -40, armLeft: -20, foreLeft: -60, lean: 6 })
+const CHEER = pose({ armRight: -165, foreRight: -10, armLeft: 20, foreLeft: -40, lean: -3 })
+export const loot = (t: number): CelPose => (t < 0.45 ? mix(STAND, LID, ramp(t, 0, 0.25)) : mix(LID, CHEER, ramp(t, 0.5, 0.75)))
+
+/** The mantle up a ledge: both hands up on its edge, a knee up, then standing on it and the rifle aimed
+ *  off it and fired. */
+const REACH_UP = pose({ armRight: -170, foreRight: 0, armLeft: 170, foreLeft: 0, rise: -4 })
+const KNEE_UP = pose({ ...squat(30), thighRight: -70, shinRight: 100, kneeRight: 1, armRight: -120, foreRight: 40, armLeft: 120, foreLeft: -40 })
+export function mantle(t: number): CelPose {
+  if (t < 0.15) return mix(STAND, REACH_UP, t / 0.15)
+  if (t < 0.4) return mix(REACH_UP, KNEE_UP, ramp(t, 0.15, 0.3))
+  const top = mix(KNEE_UP, pose({ ...AIM, thighRight: -6, thighLeft: 8 }), ramp(t, 0.4, 0.55))
+  return { ...top, ...fire(t + 0.15), rifle: ramp(t, 0.4, 0.5) }
+}
+
+/** The comeback: knocked down onto one knee, the guard dropped (`t` to 0.3), then a rising uppercut from
+ *  the knee as he springs back to his feet, the fist held high. */
+const DOWN = pose({ ...squat(60), kneeLeft: 1, lean: -14, armRight: 40, foreRight: 60, armLeft: -40, foreLeft: -60 })
+const UPPERCUT = pose({ armRight: -150, foreRight: 30, armLeft: -20, foreLeft: -140, lean: -4, rise: -6 })
+export function comeback(profession: Profession, t: number): CelPose {
+  if (t < 0.3) return mix(KIT[profession], DOWN, ramp(t, 0, 0.12))
+  return mix(DOWN, UPPERCUT, ramp(t, 0.45, 0.65))
+}
 
 /** The wrist computer up by his face, its hologram lit, working it, `t` of the way. */
 const WRIST = pose({ armRight: -30, foreRight: 110, lean: -2 })
@@ -109,6 +174,9 @@ export interface CelJoints extends RigJoints {
   holo: SVGElement | null
   turret: SVGElement | null
   flash: SVGElement | null
+  rifle: SVGElement | null
+  muzzle: SVGElement | null
+  sling: SVGElement | null
 }
 
 const one = (root: Element, className: string): SVGElement | null => root.querySelector<SVGElement>(`.${className}`)
@@ -119,6 +187,9 @@ export const celJoints = (root: Element): CelJoints => ({
   holo: one(root, s.sprHolo),
   turret: one(root, s.sprTurret),
   flash: one(root, s.sprFlash),
+  rifle: one(root, s.sprRifle),
+  muzzle: one(root, s.sprMuzzle),
+  sling: one(root, s.sprSling),
 })
 
 const opacity = (el: SVGElement | null, value: number): void => {
@@ -132,4 +203,7 @@ export function setCelPose(j: CelJoints, p: CelPose): void {
   opacity(j.holo, p.holo)
   opacity(j.turret, p.turret)
   opacity(j.flash, p.flash)
+  opacity(j.rifle, p.rifle)
+  opacity(j.muzzle, p.muzzle)
+  opacity(j.sling, 1 - p.rifle)
 }

@@ -3,7 +3,8 @@
  * view-box): the whole of him round his feet, the arms at the shoulders and elbows, the legs at the hips
  * and knees, so a forearm turns at the elbow wherever the shoulder took it. A theatre scene's writer
  * (pose.ts) poses the parts with inline transforms from the scroll. The hologram, the turret and its
- * muzzle flash rest hidden until a pose shows them. Transform and opacity only.
+ * muzzle flash, the rifle in his hand and its flash rest hidden until a pose shows them. Transform and
+ * opacity only.
  */
 
 .sprite * {
@@ -23,6 +24,8 @@
 
 .sprHolo,
 .sprTurret,
-.sprFlash {
+.sprFlash,
+.sprRifle,
+.sprMuzzle {
   opacity: 0;
 }

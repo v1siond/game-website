@@ -190,14 +190,32 @@ function boots(fill: string) {
   }
 }
 
+// The rifle in his front fist, drawn along the forearm past the hand, so it points wherever the forearm
+// does: the stock back along the forearm, the receiver and its magazine at the fist, the barrel beyond it
+// and the muzzle flash at its end. It shows while he holds it.
+const RIFLE = (
+  <g className={s.sprRifle}>
+    <Ink d="M85 96 L93 96 L93 112 L85 112 Z" fill={CEL.rock} />
+    <Ink d="M83 110 L95 110 L95 156 L83 156 Z" fill={CEL.steelDark} />
+    <Ink d="M75 128 L83 126 L83 140 L77 142 Z" fill={INK} />
+    <Ink d="M87 156 L91 156 L91 184 L87 184 Z" fill={INK} />
+    <g className={s.sprMuzzle}>
+      <path d="M89 184 L80 196 L86 194 L82 206 L89 198 L96 206 L92 194 L98 196 Z" fill={CEL.sun} stroke={INK} strokeWidth={1.8} strokeLinejoin="round" />
+    </g>
+  </g>
+)
+
 const GEAR: Record<Profession, Gear> = {
   engineer: {
     torso: (
       <>
-        {/* the assault rifle slung across his back: stock under the back hip, barrel over the far shoulder */}
-        <Ink d="M20 108 L84 30 L90 34 L28 114 Z" fill={CEL.steelDark} />
-        <Ink d="M14 106 L26 98 L32 108 L20 116 Z" fill={CEL.rock} />
-        <Ink d="M84 26 L96 14 L99 17 L88 30 Z" fill={INK} />
+        {/* the assault rifle slung across his back: stock under the back hip, barrel over the far shoulder;
+            it leaves his back while he holds it */}
+        <g className={s.sprSling}>
+          <Ink d="M20 108 L84 30 L90 34 L28 114 Z" fill={CEL.steelDark} />
+          <Ink d="M14 106 L26 98 L32 108 L20 116 Z" fill={CEL.rock} />
+          <Ink d="M84 26 L96 14 L99 17 L88 30 Z" fill={INK} />
+        </g>
         <Ink d={TORSO} fill={CEL.inkSoft} />
         {/* the plate carrier: the front plate, its shadow side, three mag pouches, the belt and buckle */}
         <Ink d="M33 58 Q60 52 87 58 L88 102 L32 102 Z" fill={CEL.scrub} />
@@ -215,6 +233,7 @@ const GEAR: Record<Profession, Gear> = {
     forearm: SKIN,
     hand: (side) => (
       <>
+        {side === 'front' && RIFLE}
         <Ink d={FIST[side]} fill={CEL.inkSoft} />
         {side === 'front' && <Ink d="M81 98 L97 98 L96 110 L82 110 Z" fill={CEL.holo} />}
       </>

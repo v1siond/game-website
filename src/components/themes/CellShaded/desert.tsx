@@ -10,7 +10,7 @@ import cel from './cel.module.css'
 // black ink line, hatching on the shadow sides. Every scene is a stack of SVG layers on one 1600 by 1000
 // canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x 570 to 1030, and a
 // desktop crop the same art: the sky in three hard bands of the scene's hour with its sun, the far mesas,
-// the near dunes, the packed sand he walks, and the scrub and dust in front. He is the commando
+// the near dunes, the packed sand he runs, and the scrub and dust in front. He is the commando
 // (sprite.tsx) drawn into the canvas and posed by the scene's writer (pose.ts).
 
 export const W = 1600
@@ -130,7 +130,8 @@ export function dustWriter(stage: ParentNode): (progress: number) => void {
   return (progress) => transformTo(dust, `translate(${(progress * DUST_DRIFT).toFixed(1)} 0)`)
 }
 
-const figureAt = (x: number): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - FIGURE_H * (SPRITE_VIEW.soles / SPRITE_VIEW.height)).toFixed(1)})`
+const figureAt = (x: number, lift = 0): string =>
+  `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (SPRITE_VIEW.soles / SPRITE_VIEW.height)).toFixed(1)})`
 
 /** Him on the sand at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Commando({ x, profession }: { x: number; profession: Profession }) {
@@ -141,5 +142,12 @@ export function Commando({ x, profession }: { x: number; profession: Profession 
   )
 }
 
-/** Moves him to `x` on the sand. */
-export const placeCommando = (node: Element | null, x: number): void => transformTo(node, figureAt(x))
+/** Moves him to `x` on the sand, `lift` above it. */
+export const placeCommando = (node: Element | null, x: number, lift = 0): void => transformTo(node, figureAt(x, lift))
+
+/** Where his rifle's muzzle is on the canvas when he aims it level, standing at `x` and `lift` above the
+ *  sand: his front shoulder (89.5, 58 in the sprite's units) plus the arm and the rifle held out along it. */
+export const muzzleAt = (x: number, lift = 0): { x: number; y: number } => {
+  const scale = FIGURE_H / SPRITE_VIEW.height
+  return { x: x - FIGURE_W / 2 + (89.5 + 126) * scale, y: FLOOR - lift - (SPRITE_VIEW.soles - 58) * scale }
+}

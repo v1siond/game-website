@@ -2,12 +2,11 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
-import { spread } from '../shared/stageNodes'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import { rarityOf } from './loot'
 import { CEL } from './palette'
-import { ROW_FROM, ROW_TO, type Place, type PlaceInput } from './place'
+import type { Place, PlaceInput } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -23,7 +22,7 @@ import { Canvas, Dunes, Front, Ground, Mesas, Sky, dustWriter } from './desert'
 // The page as scenes, one day in the desert: the mesa top at noon (hero), one place per section of the
 // shown profession in reading order, noon to the town's afternoon to dusk, and the station at night
 // (contact). Each scene names its place, its anchor and how many cards its section counts (stageItems),
-// read from the same slot the section's cards are drawn from: one prop per card.
+// read from the same slot the section's cards are drawn from: one beat per card.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -61,12 +60,12 @@ const layersOf = ({ hour, back, set, floor }: Place, input: PlaceInput): StageLa
   { name: 'fg', node: <Front /> },
 ]
 
-/** A project's prop shows its rarity's colour; no other card colours its prop. */
+/** A project's chest shows its rarity's colour; no other card colours its stop. */
 const tonesOf = (slot: SectionSlot | null): string[] => (slot?.id === 'projects' ? slot.projects.map((project) => CEL[rarityOf(project)]) : [])
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): CelScene => {
   const place = PLACES[id]
-  const input = { xs: spread(count, ROW_FROM, ROW_TO), tones: tonesOf(slot), profession }
+  const input = { count, tones: tonesOf(slot), profession }
   return {
     id,
     anchor: ANCHORS[id],
