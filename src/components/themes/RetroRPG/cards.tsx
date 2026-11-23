@@ -2,7 +2,6 @@
 
 import { useRef, type MouseEvent } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { VentureSlot } from '@/components/cv/VentureList'
@@ -14,19 +13,19 @@ import { TechList } from '@/components/cv/TechList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MONO, PIXEL } from './palette'
 import { Command } from './actions'
-import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
-import { usePlay } from './play'
+import { BODY, Mark } from './panels'
 import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_TILES } from '@/lib/cv/masonry'
-import { ITEM, SentryPortrait, TALKS } from './rooms'
+import { PORTRAIT_OPEN, PORTRAIT_SHUT } from './npcs'
+import { RPG } from './palette'
+import { PixelArt } from './walker'
 
 // Retro RPG's entries, each a box of the encounter screen:
-// - a job is a dialogue: the box opens (a line, then full height), the title types, the rest of the
-//   text appears line by line, the way the game's dialogue box speaks;
+// - a job is a dialogue box with the speaker's portrait, its mouth flapping under the pointer;
 // - a project is the target of an attack: under the pointer or the keyboard its attack meter rises with
 //   the line crossing it; a click strikes, the red slash cuts across and the box shakes; a strike with
 //   the line near the centre mark is critical (a gold slash, a harder shake, its impact line jumps);
@@ -46,47 +45,45 @@ export const SAID_LINES: MarkedLinesLook = {
   marker: <Mark />,
 }
 
-// Each achievement line shows a beat after the one before it, the way the box speaks line by line.
-const LINE_START_MS = 1400
-const LINE_GAP_MS = 300
-const lineDelay = (index: number) => cssVars({ '--show-delay': `${LINE_START_MS + index * LINE_GAP_MS}ms` })
+/** The speaker in a job box: a hooded portrait whose mouth flaps under the pointer or the keyboard. */
+function Portrait() {
+  return (
+    <svg viewBox="0 0 16 14" className="h-14 w-16 shrink-0 sm:h-[70px] sm:w-20" shapeRendering="crispEdges" aria-hidden="true" focusable="false">
+      <PixelArt sprite={PORTRAIT_SHUT} />
+      <rect x="5" y="9" width="6" height="4" fill={RPG.void} className={world.mouthOpen} />
+      <PixelArt sprite={PORTRAIT_OPEN} className={world.mouthOpen} />
+    </svg>
+  )
+}
 
 // A job's box: every field of its card, the years in the label ("2019 to 2022").
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { cards, years } = useLabels()
   const job = jobCard(entry, years)
-  const { ref, play } = usePlay(LINE_START_MS + job.highlights.length * LINE_GAP_MS + 600)
 
   return (
-    // The play scope wraps the box: the box is scaled to a dot while idle, and a dot in the middle of a tall
-    // job on a phone sits below the screen, so the observer would not see the job until long after it shows.
-    <div ref={ref} data-play={play}>
-      <article className={`p-4 sm:p-5 ${world.box} ${world.opens} ${TALKS}`}>
-        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-          <SentryPortrait />
-          <div className="min-w-0 flex-1">
-            <h3 className={TITLE}>
-              <Typed delay="open">{job.title}</Typed>
-            </h3>
-            <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={job.company} /></p>
-            {job.location && <p className={`mt-1 ${BODY} ${SHOW_AFTER.second}`}>{job.location}</p>}
-          </div>
-          <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
-            {job.years}
-          </span>
+    <article className={`p-4 sm:p-5 ${world.box} ${world.talks}`}>
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+        <Portrait />
+        <div className="min-w-0 flex-1">
+          <h3 className={TITLE}>
+            {job.title}
+          </h3>
+          <p className={`mt-1 ${META}`}><SlashBreaks text={job.company} /></p>
+          {job.location && <p className={`mt-1 ${BODY}`}>{job.location}</p>}
         </div>
-        {job.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{job.description}</p>}
-        <MarkedLines
-          items={job.highlights}
-          label={cards.keyAchievements}
-          look={SAID_LINES}
-          lineProps={(index) => ({ className: world.after, style: lineDelay(index) })}
-        />
-        <div className={SHOW_AFTER.last}>
-          <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
-        </div>
-      </article>
-    </div>
+        <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO}`}>
+          {job.years}
+        </span>
+      </div>
+      {job.description && <p className={`mb-3 ${BODY}`}>{job.description}</p>}
+      <MarkedLines
+        items={job.highlights}
+        label={cards.keyAchievements}
+        look={SAID_LINES}
+      />
+      <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
+    </article>
   )
 }
 
@@ -246,7 +243,7 @@ export function ItemBag({ categories }: { categories: CVData['techStack'] }) {
       categories={categories}
       headingClassName={`mb-3 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}
       itemsClassName={`${MASONRY_TILES} gap-x-4 gap-y-1`}
-      itemClassName={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick} ${ITEM}`}
+      itemClassName={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick}`}
       renderItem={(tech) => (
         <>
           <Soul className={`h-3 w-3.5 shrink-0 ${world.cursor}`} />

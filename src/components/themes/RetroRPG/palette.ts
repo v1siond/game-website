@@ -24,7 +24,6 @@ export const RPG = {
   muted: '#e1e1e5',
   gold: '#ffff3c',
   orange: '#ff9a2e',
-  orangeDark: '#a8501a',
   green: '#3cff6a',
   sky: '#6fe3ff',
   purple: '#c58cff',
@@ -32,19 +31,16 @@ export const RPG = {
   soulShine: '#ffb0b0',
   hpBack: '#c41818',
   pellet: '#ffffff',
-  // The encounter floor: the dark grid the boxes sit over, and the dim far layer of the starfield.
+  // The encounter floor: the dark grid the boxes sit over.
   grid: '#1c1c2a',
-  far: '#3a3a52',
   // The battle backdrop behind him: the dark green panel grid, its far rows dimmer, a low green haze.
   panelNear: '#22b04a',
   panelFar: '#0f5a26',
   haze: '#0a2a14',
-  // The room he stands in before the encounter: violet brick, a lit floor of tiles, the light from above.
+  // The ruins' wall: violet brick, its lit top and mortar, the light from above.
   wall: '#3b2457',
   wallLit: '#6a4294',
   mortar: '#1e1030',
-  floor: '#7e5aa8',
-  floorDark: '#4c3270',
   beam: '#fff6c8',
   // The save star's light.
   starCore: '#fffbe0',
@@ -58,9 +54,9 @@ export const RPG = {
   spriteShorts: '#7a4a26',
   stickWood: '#efe0b0',
   snare: '#c43a3a',
-  // The overworld zones he walks through as the page scrolls, sampled from the game's rooms (research
+  // The places he walks through as the page scrolls (zones.tsx), sampled from the game's rooms (research
   // 2026-10-21-w4-retro-rpg): the violet ruins with red leaves, the snow with its pines and wooden booth,
-  // the navy waterfall lit only by cyan glow, the orange and red heat zone, the ancestor's pastel town.
+  // the navy waterfall lit only by cyan glow, the orange and red heat zone, the pastel town.
   ruinsWall: '#84357d',
   ruinsFloor: '#a349a4',
   ruinsPath: '#b962b9',
@@ -77,7 +73,6 @@ export const RPG = {
   waterFloor: '#1a1445',
   waterLine: '#362f79',
   glow: '#40ffff',
-  glowPink: '#e07de6',
   heatGround: '#b55515',
   heatRock: '#932111',
   heatDeep: '#6a090b',
@@ -88,16 +83,9 @@ export const RPG = {
   townWall: '#f7f3bd',
   townMint: '#bdfbbd',
   townRoof: '#a4a26b',
-  taxi: '#f0c838',
-  // The shop scene: warm wood boards, a pale counter, the keeper's striped top.
+  // The chests' wood: warm boards and their dark seams.
   shopWood: '#ae853b',
-  shopBoard: '#d5b17f',
   shopDark: '#73553b',
-  shopPale: '#f6e7cc',
-  // The dog sentry: pink inner hood, tan coat, dark hood.
-  dogPink: '#f3bdd2',
-  dogTan: '#97764d',
-  dogHood: '#645b4d',
 } as const
 
 /** The palette as CSS variables (--rpg-void, --rpg-soul and so on), set once on the world's root. */

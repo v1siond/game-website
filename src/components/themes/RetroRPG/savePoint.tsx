@@ -5,26 +5,22 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/lib/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ActionOptions } from './actions'
-import { BODY, Box, Mark, Typed } from './panels'
+import { BODY, Box, Mark } from './panels'
 import { PIXEL, RPG } from './palette'
-import { usePlay } from './play'
-import { RoomWalker, Sparkles } from './walker'
+import { Sparkles } from './walker'
+import type { Scene } from './scenes'
+import { RpgStage } from './stage'
 import world from './world.module.css'
-import sprite from './sprite.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { heldUntil } from '@/components/themes/shared/held'
 
-// Contact as the save point: the yellow star twinkles over the closing box the way the game's save
-// point flickers in its room. Clicking the star saves: it spins once fast, the box flashes white and
-// stays in its saved state (yellow border, the star lit), and the box shows the save line, his name
-// beside the profession, over the contact line and the options.
-//
-// He walks up to the star from below when the section shows (two step frames, facing up); a save is his
-// determination: pixel sparkles burst round him and his soul flickers on his chest.
+// Contact as the save point: the yellow star twinkles over the closing box the way a save point flickers
+// in its room. Clicking the star saves: it spins once fast, pixel sparkles burst round it, the box flashes
+// white and stays in its saved state (yellow border, the star lit), and the box shows the save line, his
+// name beside the profession, over the contact line and the options. On the stage behind (scenes.tsx) he
+// walks up to the save star as the section comes in.
 //
 // Pattern: CSS loops for the twinkle (steps(), opacity and a scaleX turn), one click state (data-saved)
-// that plays the spin and the flash once per click (the key replays them). The box opens with the same
-// stepped reveal as every other box when it scrolls in.
+// that plays the spin and the flash once per click (the key replays them).
 
 const CONTACT_HEADING = headingId('rpg', 'Contact')
 
@@ -41,17 +37,16 @@ function SaveStar() {
   )
 }
 
-export function SavePoint({ profession }: { profession: Profession }) {
+export function SavePoint({ profession, scene, still }: { profession: Profession; scene: Scene; still: boolean }) {
   const labels = useLabels()
   const [saves, setSaves] = useState(0)
   const saved = saves > 0
-  const { ref, play } = usePlay(2400)
-  const walk = usePlay(900)
 
   return (
-    <section ref={ref} data-play={play} data-saved={saved} className={`relative z-20 px-4 pb-8 pt-16 sm:px-6 ${heldUntil(play !== 'idle')}`} aria-labelledby={CONTACT_HEADING}>
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-2 flex justify-center">
+    <section data-scene={scene.id} data-saved={saved} className="relative z-20 px-4 pb-8 pt-[60svh] motion-reduce:pt-16 sm:px-6" aria-labelledby={CONTACT_HEADING}>
+      {still && <RpgStage scene={scene} settled />}
+      <div className="relative mx-auto max-w-3xl">
+        <div className="relative mb-4 flex justify-center">
           <button
             type="button"
             onClick={() => setSaves((n) => n + 1)}
@@ -62,21 +57,15 @@ export function SavePoint({ profession }: { profession: Profession }) {
               <SaveStar />
             </span>
           </button>
-        </div>
-
-        <div ref={walk.ref} data-walk={walk.play} className="relative mx-auto mb-4 h-[60px] w-10" aria-hidden="true">
-          <RoomWalker profession={profession} facing="up" className={`h-full w-full ${sprite.walksUp}`} />
-          {saved && <Sparkles key={saves} className="absolute -inset-4" />}
+          {saved && <Sparkles key={saves} className="pointer-events-none absolute left-1/2 top-0 h-14 w-14 -translate-x-1/2 scale-150" />}
         </div>
 
         <RecruiterHero
           render={({ name, line, actions }) => (
-            <Box className={`${world.opens} ${world.saveBox}`}>
+            <Box className={world.saveBox}>
               {saved && <div key={saves} className={`pointer-events-none absolute inset-0 bg-[color:var(--rpg-text)] ${world.flash}`} aria-hidden="true" />}
               <h2 id={CONTACT_HEADING} className={`mb-4 text-base uppercase tracking-[0.2em] text-[color:var(--rpg-text)] sm:text-lg ${PIXEL}`}>
-                <Typed pace="short" delay="open">
-                  {labels.sections.contact}
-                </Typed>
+                {labels.sections.contact}
               </h2>
               <p className={`mb-4 flex flex-wrap justify-between gap-2 text-sm uppercase tracking-[0.12em] ${PIXEL} ${saved ? 'text-[color:var(--rpg-gold)]' : 'text-[color:var(--rpg-text)]'}`}>
                 <span>{name}</span>
@@ -84,9 +73,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
               </p>
               <p className={`mb-6 ${BODY}`}>
                 <Mark className="mr-2 text-[color:var(--rpg-gold)]" />
-                <Typed pace="long" delay="second">
-                  {line}
-                </Typed>
+                {line}
               </p>
               <ActionOptions actions={actions} />
             </Box>
