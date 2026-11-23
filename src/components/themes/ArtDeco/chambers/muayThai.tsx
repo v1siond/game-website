@@ -45,7 +45,8 @@ export const muayThai = stopsChamber({
         const t = played(i)
         const stagger = Math.sin(Math.PI * ramp(t, 0.55, 0.75))
         const kneel = ramp(t, 0.72, 0.9)
-        transformTo(guard, `translate(${(40 * stagger + 20 * kneel).toFixed(1)} ${(70 * kneel).toFixed(1)}) rotate(${(10 * stagger - 8 * kneel).toFixed(1)})`)
+        // down on its knee: the suit sinks into its legs from its feet up, leaning forward over them
+        transformTo(guard, `translate(${(40 * stagger + 20 * kneel).toFixed(1)} 0) rotate(${(10 * stagger - 8 * kneel).toFixed(1)}) scale(1 ${(1 - 0.3 * kneel).toFixed(3)})`)
         fadeTo(lamps[i], 1 - 0.85 * kneel)
       })
       const last = count > 0 ? ramp(played(count - 1), 0.72, 0.95) : 0
