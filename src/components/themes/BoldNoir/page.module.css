@@ -1,0 +1,390 @@
+/* Bold Noir: the text over the places of the night. Every colour is a palette variable (--noir-*,
+   palette.ts). Fills are flat, depth comes from stacked flat layers and hard offset shadows, never a
+   gradient. The text is plain HTML in normal flow over the fixed theatre; it is never scaled, faded or
+   blurred, so it is opaque from its first frame. Every word sits on an opaque slab, speech box, red panel
+   or tag, so it reads on any frame of any place. Nothing moves on its own: a hover kicks a link out, a
+   pick plays the cut-in once. */
+
+.root {
+  --snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cut: cubic-bezier(0.7, 0, 0.2, 1);
+  --crook: polygon(0 8px, 100% 0, calc(100% - 8px) 100%, 6px calc(100% - 10px));
+  /* The keyboard focus ring (globals.css) in the one loud red, and the paper halo just outside it, so the
+     pair stands out where the ring melts into a surface. */
+  --focus-ring: var(--noir-red);
+  --focus-halo: var(--noir-paper);
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+  font-family: var(--font-bebas-neue), 'Impact', 'Arial Narrow', sans-serif;
+}
+
+.copy {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.theatre {
+  --theatre-ground: var(--noir-ink);
+  --theatre-veil: var(--noir-ink);
+}
+
+/* The shade under the text column, so the slabs sit on a calmer frame; it fades with its stage. */
+.scrim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, color-mix(in srgb, var(--noir-ink) 55%, transparent), transparent 55%);
+}
+
+/* ---- surfaces: crooked boxes built from flat layers ---- */
+
+/*
+ * A crooked black slab: the paper edge (::before) and the coal fill (::after) are clipped to the same
+ * crooked polygon (--crook, set per card), the hard red drop is a static drop-shadow that follows the
+ * clipped shape. The content inside stays level so it reads.
+ */
+.slab {
+  position: relative;
+  isolation: isolate;
+  filter: drop-shadow(8px 8px 0 var(--noir-red));
+}
+
+.slab::before,
+.slab::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  clip-path: var(--crook);
+}
+
+.slab::before {
+  inset: 0;
+  background: var(--noir-paper);
+}
+
+.slab::after {
+  inset: 3px;
+  background: var(--noir-coal);
+}
+
+/* A crooked paper speech box with a tail, a hard ink shadow and a red one behind it. */
+.speech {
+  position: relative;
+  isolation: isolate;
+  color: var(--noir-ink);
+  filter: drop-shadow(10px 10px 0 var(--noir-ink)) drop-shadow(4px 4px 0 var(--noir-red));
+}
+
+.speech::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--noir-paper);
+  /* the cut in px, so a long box keeps its words inside: the tail takes the last 40px */
+  clip-path: polygon(0 14px, 100% 0, calc(100% - 18px) calc(100% - 40px), 18% calc(100% - 32px), 8% 100%, 10% calc(100% - 34px), 10px calc(100% - 28px));
+}
+
+/* A title: paper words on a crooked red panel with a hard ink drop. */
+.heading {
+  position: relative;
+  isolation: isolate;
+  color: var(--noir-paper);
+  filter: drop-shadow(5px 5px 0 var(--noir-ink));
+}
+
+.heading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--noir-red-plate);
+  clip-path: polygon(0 10%, 100% 0, 96% 100%, 3% 88%);
+}
+
+.chip {
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+}
+
+/* A line on its own ink tag: the drummer's years and line, the fight record's title. */
+.ticket {
+  margin: 0;
+  width: fit-content;
+  padding: 8px 18px;
+  border: 3px solid var(--noir-paper);
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+}
+
+.lift {
+  transition: transform 160ms var(--snap);
+}
+
+.lift:hover,
+.lift:focus-within {
+  transform: translate3d(0, -6px, 0) rotate(var(--tilt, 0deg));
+}
+
+.kick {
+  transition: transform 150ms var(--snap);
+}
+
+.kick:hover,
+.kick:focus-visible {
+  transform: translate3d(6px, -6px, 0) rotate(-1.5deg);
+}
+
+/* ---- ransom note lettering ---- */
+
+.letter {
+  display: inline-block;
+  transform: translate3d(0, var(--y, 0), 0) rotate(var(--r, 0deg));
+}
+
+.letterInk {
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+  outline: 2px solid var(--noir-paper);
+}
+
+.letterPaper {
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+}
+
+.letterRed {
+  background: var(--noir-red-plate);
+  color: var(--noir-paper);
+}
+
+/* A bare letter, no box, paper on the card's coal: the cut that keeps the word uneven. */
+.letterBare {
+  color: var(--noir-paper);
+}
+
+/* ---- the case bar: his initials, back to the top ---- */
+.hud {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 6px 220px 6px clamp(16px, 5vw, 80px);
+  border-bottom: 4px solid var(--noir-red);
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 8px;
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+  font-size: 1.5rem;
+  text-decoration: none;
+  transform: rotate(-3deg);
+}
+
+
+
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- the hero: the calling card and his lines, the wardrobe, then the menu, over the rooftop ---- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  padding-top: 36px;
+}
+
+.card {
+  transform: rotate(-3deg);
+}
+
+/* ---- the profession menu: crooked slabs, the pick swells and tilts, the red jag behind it ---- */
+
+.menuItem {
+  transform: skewX(-10deg);
+  transition: transform 160ms var(--snap);
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+  transform: skewX(-10deg) translate3d(6px, -4px, 0);
+}
+
+.menuItem[aria-checked='true'] {
+  transform: skewX(-10deg) translate3d(8px, -8px, 0) rotate(-3deg) scale(1.08);
+}
+
+.unskew {
+  transform: skewX(10deg);
+}
+
+.jag {
+  transform: scale(0, 0.6);
+  transition: transform 180ms var(--snap);
+}
+
+.menuItem:hover .jag,
+.menuItem:focus-visible .jag {
+  transform: scale(0.85, 0.85);
+}
+
+.menuItem[aria-checked='true'] .jag {
+  transform: scale(1, 1);
+}
+
+/* Him with the flat red silhouette offset behind (static, never animated). */
+.redShadow {
+  filter: drop-shadow(5px 3px 0 var(--noir-red));
+}
+
+/* The cut-in on a profession pick, once per pick: the red band and his eyes strip sweep across and out. */
+.cutBand {
+  animation: cutAcross 680ms var(--cut) both;
+}
+
+.cutStrip {
+  animation: cutAcross 680ms var(--cut) 60ms both;
+}
+
+@keyframes cutAcross {
+  0% {
+    transform: translate3d(-115%, 0, 0) skewY(-8deg);
+  }
+  32%,
+  68% {
+    transform: translate3d(0, 0, 0) skewY(-8deg);
+  }
+  100% {
+    transform: translate3d(115%, 0, 0) skewY(-8deg);
+  }
+}
+
+/* ---- a place: a tall head that holds the picture alone, then brings its title up, then the cards ---- */
+.level {
+  position: relative;
+  padding: 0 clamp(16px, 5vw, 80px) 70svh;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 14px;
+  min-height: 125svh;
+  padding-bottom: 12svh;
+}
+
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: min(640px, 46vw);
+}
+
+/* ---- the end: the calling card over the wall it is pinned to ---- */
+.goal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 150svh;
+  padding: 30svh clamp(16px, 5vw, 80px) 20svh;
+}
+
+.goalCopy {
+  width: min(640px, 100%);
+}
+
+.delivered {
+  transform: rotate(2deg);
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 16px 40px;
+}
+
+.copyright {
+  margin: 0;
+  padding: 4px 12px;
+  background: var(--noir-ink);
+  color: var(--noir-fog);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767.98px) {
+  .hud {
+    min-height: 48px;
+    padding: 4px 180px 4px 16px;
+  }
+
+  .level {
+    padding-bottom: 60svh;
+  }
+
+  .head {
+    min-height: 115svh;
+    padding-bottom: 10svh;
+  }
+
+  .body {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menuItem,
+  .jag,
+  .lift,
+  .kick {
+    transition: none;
+  }
+
+  .lift:hover,
+  .lift:focus-within,
+  .kick:hover,
+  .kick:focus-visible {
+    transform: none;
+  }
+}
+
+/* Reduced motion: each stage sits still at the top of its section, so the heads need one screen only. */
+.still .hero,
+.still .level,
+.still .goal {
+  isolation: isolate;
+}
+
+.still .level {
+  padding-bottom: 20svh;
+}
+
+.still .head {
+  min-height: 100svh;
+}
+
+.still .goal {
+  min-height: 100svh;
+  padding-top: 10svh;
+}

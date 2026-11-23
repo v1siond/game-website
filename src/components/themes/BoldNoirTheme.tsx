@@ -1,78 +1,76 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { CopyrightLine } from './shared/CopyrightLine'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { usePointerVars } from '@/hooks/usePointerVars'
-import { NoirBackdrop } from './BoldNoir/backdrop'
-import { CallingCardHero } from './BoldNoir/hero'
-import { ProfessionMenu } from './BoldNoir/menu'
-import { ProfessionSet } from './BoldNoir/sets'
-import { SECTION_VIEWS } from './BoldNoir/sections'
-import { DeliveredCard } from './BoldNoir/contact'
-import { NOIR, NOIR_VARS } from './BoldNoir/palette'
-import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
-import world from './BoldNoir/world.module.css'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
+import { Stage, Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { CallingCardContact, CaseBar } from './BoldNoir/chrome'
+import { RooftopHero } from './BoldNoir/hero'
+import { NOIR_VARS } from './BoldNoir/palette'
+import { LAYER_MOTION, scenesOf, type NoirScene } from './BoldNoir/scenes'
+import { PlaceSection } from './BoldNoir/sections'
+import page from './BoldNoir/page.module.css'
 
-// Bold Noir, a stylish heist night (black slabs and paper on crooked boxes,
-// one loud red, ransom note lettering, star bursts and glass): the page composition. The hero is a
-// calling card thrown at the screen, the profession switch is the game's menu with its cut-in over his
-// set for that profession (./BoldNoir/sets), a project
-// opens through the finisher onto its finish card, contact is the second calling card. The art, the
-// cards, his costume and the per profession sections live in ./BoldNoir.
+// Bold Noir: his CV as one heist night in the city, cut in flat ink, paper and one loud red. The page keeps
+// the rhythm of the Rockstar VI site: a big hero (the rooftop, his calling card with his name in ransom
+// note cut-outs, the game's menu where he picks a profession), then every section of the shown profession
+// is one full screen place of the night that rises from dark, holds while its cards scroll over it, and
+// goes dark while the next one rises: the evidence board, the records room, the vault, the case room, the
+// gallery, main street, the jazz club, the back alley gym, and the calling card pinned to the wall at the
+// end. He is the detective in each place and does one thing per card of the section: marks a clue, pulls a
+// file, cracks a safe, stamps a case closed. Every motion is a function of the scroll position (the shared
+// theatre on useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays
+// back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first
+// frame.
 //
-// The root carries the palette as --noir-* variables and the pointer as --mx and --my (-1 to 1), the
-// only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden:
-// hidden would make the root a scroll container.
+// Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
+// its settled frame.
 
-// The wardrobe's crooked cut-out slab over the menu: paper on ink, ringed in the red.
-const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOIR.red }
+const hasSlot = (scene: NoirScene): scene is NoirScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function BoldNoirTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation } = useLabels()
-  const reducedMotion = useReducedMotion()
-  const rootRef = usePointerVars(!reducedMotion)
+  const cv = useCVData()
+  const labels = useLabels()
+  const reduced = useReducedMotion()
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
+    [view, cv, labels, active],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
+  const hero = scenes[0]
+  const contact = scenes[scenes.length - 1]
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root}`} style={NOIR_VARS}>
+    <div style={NOIR_VARS} className={`${page.root} ${reduced ? page.still : ''}`}>
       <SkipLink />
-      <NoirBackdrop />
-
-      {/* the first screen: his calling card and the menu where he stands */}
-      <div data-worlds-hero="">
-        <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
-          <CallingCardHero />
-          {/* out of the flow, in the header so it stacks over the menu section (z-20): on a phone slim at the
-              right of the card's last link row, from sm centred on the header's foot, over the slabs, as wide as the
-              plate so a fan beside it opens from the plate's edge */}
-          <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:-44px] c-wardrobe--fan-level-md-to-lg c-wardrobe--fan-left-md-to-lg c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:-bottom-[5px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2" />
-        </header>
-
-        <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
-          <ProfessionMenu active={active} />
-          <div className="mt-10">
-            <ProfessionSet key={active} profession={active} />
-          </div>
-        </section>
-      </div>
-
-      <main id="main-content" className="relative z-20 px-4 py-10 sm:px-6">
-        <ProfessionRegion className="mx-auto max-w-6xl">
-          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef} className={page.theatre}>
+          {scenes.map((scene) => (
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+          ))}
+        </Theatre>
+      )}
+      <CaseBar anchor={hero.anchor} />
+      <main id="main-content" ref={textRef} className={page.main}>
+        <RooftopHero scene={hero} still={reduced} />
+        <ProfessionRegion>
+          {scenes.filter(hasSlot).map((scene) => (
+            <PlaceSection key={scene.id} scene={scene} still={reduced} />
+          ))}
         </ProfessionRegion>
+        <CallingCardContact scene={contact} still={reduced} />
       </main>
-
-      <DeliveredCard />
-
-      <footer className="relative z-20 flex items-center justify-center gap-3 py-10">
+      <footer className={page.footer}>
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
-        <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>
+        <p className={page.copyright}>
           <CopyrightLine />
         </p>
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />

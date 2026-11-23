@@ -1,9 +1,8 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Bold Noir's palette: a stylish heist night, black slabs and white paper
-// cut on diagonals, with one loud red that owns the screen whenever something happens (a menu pick, a
-// cut-in, the all-out rush, a calling card). Paper on red measures 5:1, so a red box that carries paper
-// text is the deeper redPlate (7:1); ink text sits on paper.
+// Bold Noir's palette: a heist night, black slabs and white paper cut on diagonals, with one loud red for
+// the menu's pick, the cut-in, the calling card and the props that light as he works them. Paper on red
+// measures 5:1, so a red box that carries paper text is the deeper redPlate (7:1); ink text sits on paper.
 
 export const NOIR = {
   // The night and its shadows, darkest first
