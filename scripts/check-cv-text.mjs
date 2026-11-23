@@ -19,7 +19,6 @@ const SKIPPED_KEYS = new Set(['id', 'slug', 'startDate', 'endDate', 'status', 'i
 
 // Strings set outside the history, each with the decision that set it.
 const APPROVED = new Map([
-  ['Built PMX, InsurAdmin and GRCTechMe. Saved the SecureBancard launch. Led the Clutch Prep B2B product through its acquisition by Pearson. Insurance, payments, education and AI products, from Elixir backends to React apps.', 'C49, the hero tagline he approved on 10-23 (5ce1942e), restored on his 11-22 ask'],
   ['AI Architecture & Compliance: Successfully navigated compliance to launch GRCTechMe on the Google Cloud Marketplace. Expert in secure LLM orchestration (Gemini, Claude), secure enterprise AI portals, and custom audio TTS synthesis pipelines (e.g., edge-tts).', 'C49, his LinkedIn About highlight as of 90d92328^ (Google Cloud Marketplace, his 10-23 correction in 5ce1942e)'],
   ['Lima, Peru', 'HISTORY: "a dojo in lima peru", written as a place'],
   ['Remote, working US Eastern and Italian hours.', 'contact availability, the hours first and remote added to the cv-site.md Contract line (HISTORY line 144); HISTORY \'His answers to the content audit\' Remote line (line 329), changelog AllThemes item 30 ("yeah sure, remote")'],
@@ -106,6 +105,7 @@ const APPROVED = new Map([
   ['React, Next and Vue interfaces, built to your design and to WCAG AA or AAA.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
   ['I\'ve worked in these markets: carrier feeds and commissions, payment platforms, video learning.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
   ['Senior Full Stack Developer', 'C51, his 11-22 ~21:20 answer to Round 2 of draft.md (headline "A")'],
+  ['I build fast, dependable software for the web, desktop and mobile.', 'C51, his 11-22 ~21:25 pick ("brytannies is cool for the hero / josh example is cool for about me")'],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()
