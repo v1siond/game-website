@@ -67,18 +67,6 @@
   border-radius: 50% / 40%;
 }
 
-.ledgerText {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--ep-mist);
-}
-
-.ledgerCount {
-  color: var(--ep-chalk);
-  font-weight: 700;
-  margin-left: 10px;
-}
-
 .rail {
   position: fixed;
   right: 18px;
@@ -307,24 +295,12 @@
   max-width: 900px;
 }
 
-.head .plate,
-.head .title {
-  padding: 4px 14px;
-  border-radius: 12px;
-  background: var(--era-card);
-}
-
-/* The display face's line box is shorter than its glyph box, so the plate reaches past it on both sides. */
+/* The title stands on its era's plate; the display face's line box is shorter than its glyph box, so the
+   plate reaches past it on both sides. */
 .head .title {
   padding: 14px 22px 18px;
   border-radius: 20px;
-}
-
-.plate {
-  margin: 0 0 10px;
-  font-weight: 600;
-  color: var(--era-accent);
-  font-size: 1.05rem;
+  background: var(--era-card);
 }
 
 .title {
@@ -614,10 +590,6 @@
     padding-right: 96px;
   }
 
-  .ledgerText {
-    font-size: 0.85rem;
-  }
-
   .hero {
     padding: 88px 16px 7svh;
   }
@@ -684,11 +656,6 @@
 
 .still .head {
   min-height: 100svh;
-}
-
-/* The ledger follows the scroll engine, which does not run here. */
-.still .ledgerText {
-  display: none;
 }
 
 .still .beacon {

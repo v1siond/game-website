@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useLayoutEffect, useRef } from 'react'
-import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
 import { heroState, itemsReached, layerTransform, leadOf, stageOpacity, stageState, veilOpacity, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
@@ -10,8 +9,8 @@ import type { EraWriter, Layer } from './eras/era'
 // The world's side of the scroll stage engine (src/hooks/useScrollStage.ts): it binds every stage of the
 // theatre once (its layers, its veil, the era's writer), measures each section and the reading line of
 // each counted card on load and resize, and per frame writes only each visible stage's opacity, its veil,
-// its layers' transforms and its era's props and pose. The ledger's place and count and the rail's current
-// mark change only when the leading scene or its count does.
+// its layers' transforms and its era's props and pose. The rail's current mark changes only when the
+// leading scene does.
 //
 // The text settles with the art: the page scroll stays native (scrollbar, keyboard, find in page, screen
 // readers and touch momentum are the browser's own) and the text layer, main with the footer under it, is drawn where the settled
@@ -73,20 +72,18 @@ const show = (bound: Bound, visible: boolean): void => {
   bound.stage.style.visibility = visible ? 'visible' : 'hidden'
 }
 
-/** The refs of the theatre, the text layer and the ledger's two lines; the engine runs while motion is allowed. */
-export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], reduced: boolean) {
+/** The refs of the theatre and the text layer; the engine runs while motion is allowed. */
+export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   const theatreRef = useRef<HTMLDivElement>(null)
-  const placeRef = useRef<HTMLSpanElement>(null)
-  const countRef = useRef<HTMLSpanElement>(null)
   const bound = useRef<Bound[]>([])
-  const lead = useRef<{ id: string; reached: number }>({ id: '', reached: -1 })
+  const lead = useRef('')
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
     bound.current = reduced || !theatre ? [] : scenes.map((scene) => bind(theatre, scene))
-    lead.current = { id: '', reached: -1 }
+    lead.current = ''
   }, [scenes, reduced])
 
   const measure = useCallback((scrollY: number, { viewport }: StageMetrics) => {
@@ -107,21 +104,12 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
     node.style.transform = shown ? `translate3d(0,${shown.toFixed(1)}px,0)` : ''
   }, [])
 
-  const mark = useCallback(
-    (leader: Bound, reachedCount: number) => {
-      if (leader.scene.id !== lead.current.id) {
-        bound.current.find((each) => each.scene.id === lead.current.id)?.rail?.removeAttribute('aria-current')
-        leader.rail?.setAttribute('aria-current', 'location')
-        if (placeRef.current) placeRef.current.textContent = words[leader.scene.place]
-        lead.current = { id: leader.scene.id, reached: -1 }
-      }
-      if (reachedCount === lead.current.reached) return
-      lead.current.reached = reachedCount
-      const line = leader.scene.count ? fillLabel(words[leader.scene.count], { count: reachedCount, total: leader.scene.input.count }) : ''
-      if (countRef.current) countRef.current.textContent = line
-    },
-    [words],
-  )
+  const mark = useCallback((leader: Bound) => {
+    if (leader.scene.id === lead.current) return
+    bound.current.find((each) => each.scene.id === lead.current)?.rail?.removeAttribute('aria-current')
+    leader.rail?.setAttribute('aria-current', 'location')
+    lead.current = leader.scene.id
+  }, [])
 
   const draw = useCallback(
     (position: number, lag: number, { viewport, phone }: StageMetrics) => {
@@ -139,8 +127,7 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
         return vis
       })
       if (all.length === 0) return
-      const leader = all[leadOf(visibilities)]
-      mark(leader, Math.floor(itemsReached(leader.triggers, position, viewport) + 0.001))
+      mark(all[leadOf(visibilities)])
     },
     [mark, settleText],
   )
@@ -153,5 +140,5 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
     },
     [stageRef],
   )
-  return { theatreRef, textRef, placeRef, countRef }
+  return { theatreRef, textRef }
 }

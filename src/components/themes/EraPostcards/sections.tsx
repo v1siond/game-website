@@ -12,14 +12,13 @@ import { TechList } from '@/components/cv/TechList'
 import { VentureList } from '@/components/cv/VentureList'
 import { cssVars } from '@/lib/cssVars'
 import { jobCard } from '@/lib/cv/cvView'
-import { fillLabel } from '@/lib/cv/labels'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince, shownUrl, yearCount } from '@/lib/cv/sectionText'
 import { lookVars, type Scene } from './scenes'
 import { Stage } from './stage'
 import css from './page.module.css'
 
-// One section per era: a tall head that first shows the picture alone and then brings the gate plate and
+// One section per era: a tall head that first shows the picture alone and then brings
 // the title up from the bottom, then the cards, then a screen of picture alone before it sinks. The cards
 // a scene counts sit in an element marked data-era-items (a list, or the record's facts), which the engine
 // measures for the reading line that lights each prop. Every field comes from the shared lists and the
@@ -245,21 +244,18 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
 
 interface EraSectionProps {
   scene: Scene & { slot: SectionSlot }
-  gate: number
-  gates: number
   still: boolean
 }
 
 /** One gate: under reduced motion its own stage sits still behind its head. */
-export function EraSection({ scene, gate, gates, still }: EraSectionProps) {
-  const { sections, eras } = useLabels()
+export function EraSection({ scene, still }: EraSectionProps) {
+  const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `era-${scene.id}`
   return (
     <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={css.era} style={cssVars(lookVars(scene.look))}>
       {still && <Stage scene={scene} settled />}
       <header className={css.head}>
-        <p className={css.plate}>{fillLabel(eras.gate, { number: gate, total: gates, place: eras[scene.place] })}</p>
         <h2 id={headingId} className={`${css.display} ${css.title}`}>
           {sections[scene.slot.titleKey]}
         </h2>
