@@ -38,6 +38,15 @@ const MOTION: Record<Exclude<FighterPose, 'act'>, Motion> = {
   parry: { mode: 'forward', cycleMs: 400, key: 1, runs: 1 },
   // Played once, then the strip rests on its key frame: flat on the floor.
   down: { mode: 'forward', cycleMs: 720, key: 3, runs: 1 },
+  guard: { mode: 'forward', cycleMs: 420, key: 1, runs: 1 },
+  strong: { mode: 'forward', cycleMs: 460, key: 1, runs: 1 },
+  roundhouse: { mode: 'forward', cycleMs: 640, key: 2, runs: 1 },
+  throw: { mode: 'forward', cycleMs: 760, key: 2, runs: 1 },
+  knee: { mode: 'forward', cycleMs: 560, key: 2, runs: 1 },
+  jump: { mode: 'forward', cycleMs: 720, key: 2, runs: 1 },
+  juggle: { mode: 'forward', cycleMs: 480, key: 0, runs: 1 },
+  dizzy: { mode: 'pingpong', cycleMs: 640, key: 0, runs: 3 },
+  splat: { mode: 'forward', cycleMs: 900, key: 3, runs: 1 },
 }
 
 const ACT_MOTION: Record<Profession, Motion> = {
