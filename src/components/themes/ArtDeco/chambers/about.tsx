@@ -1,6 +1,9 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
+import { FLOOR } from '../city'
 import { zap } from '../pose'
 
 // About: the power station, dark when he arrives. A fuse box stands on its pole for each highlight, its
@@ -43,7 +46,7 @@ export const about: Chamber = {
   light: C.goldBright,
   floor: ({ xs, profession }) => (
     <>
-      <PropRow xs={xs} art={() => <FuseBox />} light={() => <Power />} />
+      <PropRow xs={xs} floor={FLOOR} art={() => <FuseBox />} light={() => <Power />} />
       <Walker xs={xs} profession={profession} />
     </>
   ),

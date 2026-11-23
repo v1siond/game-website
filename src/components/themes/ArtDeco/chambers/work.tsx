@@ -1,6 +1,9 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
+import { FLOOR } from '../city'
 import { listen } from '../pose'
 
 // Work: the diary archive. An audio diary waits on a brass pedestal for each job, the recorder its owner
@@ -42,7 +45,7 @@ export const work: Chamber = {
   light: C.gold,
   floor: ({ xs, profession }) => (
     <>
-      <PropRow xs={xs} art={() => <Pedestal />} light={() => <Voice />} />
+      <PropRow xs={xs} floor={FLOOR} art={() => <Pedestal />} light={() => <Voice />} />
       <Walker xs={xs} profession={profession} />
     </>
   ),

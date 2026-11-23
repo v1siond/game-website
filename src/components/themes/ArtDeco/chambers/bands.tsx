@@ -1,6 +1,9 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
+import { FLOOR } from '../city'
 import { drum } from '../pose'
 
 // Bands: theatre row. A dark marquee stands on its brass legs for each band; as each band is read he walks
@@ -39,7 +42,7 @@ export const bands: Chamber = {
   light: C.neonPink,
   floor: ({ xs, profession }) => (
     <>
-      <PropRow xs={xs} art={() => <Marquee />} light={() => <Lit />} />
+      <PropRow xs={xs} floor={FLOOR} art={() => <Marquee />} light={() => <Lit />} />
       <Walker xs={xs} profession={profession} />
     </>
   ),

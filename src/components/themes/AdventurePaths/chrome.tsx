@@ -1,6 +1,5 @@
 'use client'
 
-import type { Ref } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { initialsOf } from '@/lib/cv/nameWords'
@@ -10,12 +9,10 @@ import { JOURNAL_SERIF } from './palette'
 import { LAYER_MOTION, type TrailScene } from './scenes'
 import page from './page.module.css'
 
-// The pieces round the levels: the HUD bar at the top of the screen (the level the page is in and how many
-// of its things he has done, both written by the theatre's lead callback) and the goal at the end, the
-// contact, under the flagpole run.
+// The pieces round the levels: the HUD bar at the top of the screen (his initials, back to the top) and
+// the goal at the end, the contact, under the flagpole run.
 
-export function Hud({ placeRef, countRef, anchor }: { placeRef: Ref<HTMLSpanElement>; countRef: Ref<HTMLSpanElement>; anchor: string }) {
-  const { trail } = useLabels()
+export function Hud({ anchor }: { anchor: string }) {
   const { fullName } = useCVData()
   return (
     <header className={page.hud}>
@@ -23,23 +20,18 @@ export function Hud({ placeRef, countRef, anchor }: { placeRef: Ref<HTMLSpanElem
         <span aria-hidden="true">{initialsOf(fullName)}</span>
         <span className="sr-only">{fullName}</span>
       </a>
-      <p className={page.hudText}>
-        <span ref={placeRef}>{trail.placeHero}</span>
-        <span ref={countRef} className={page.hudCount} />
-      </p>
     </header>
   )
 }
 
 export function Goal({ scene, still }: { scene: TrailScene; still: boolean }) {
-  const { sections, trail } = useLabels()
+  const { sections } = useLabels()
   return (
     <section id={scene.anchor} data-scene={scene.id} aria-labelledby="trail-contact" className={page.goal}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
       <RecruiterHero
         render={({ line, actions }) => (
           <div className={page.goalCopy}>
-            <p className={page.place}>{trail[scene.place]}</p>
             <h2 id="trail-contact" className={`${page.title} ${JOURNAL_SERIF}`}>
               {sections.contact}
             </h2>

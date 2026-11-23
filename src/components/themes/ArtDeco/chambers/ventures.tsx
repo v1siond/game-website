@@ -1,6 +1,9 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
+import { FLOOR } from '../city'
 import { pull } from '../pose'
 
 // Ventures: propaganda square. A rolled banner hangs from the hall's crown for each venture, its cord
@@ -49,6 +52,7 @@ export const ventures: Chamber = {
     <>
       <PropRow
         xs={xs}
+        floor={FLOOR}
         art={() => (
           <>
             <g data-banner="" transform={unrolled(0)}>
