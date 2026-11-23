@@ -2,7 +2,7 @@ import { paletteVars } from '../shared/paletteVars'
 
 // Dark Fantasy's palette, every colour of the world once: the void of the caverns, the ethereal soul light,
 // the spirit gold and brass of the old kingdom, forest, stone and bone, the bug's shell and its infection,
-// the knight's cloak, nail and beard, and the fire and pool sparks of a battle. The SVG art and inline styles
+// the knight's cloak, blade and beard, and the fire and pool sparks of a battle. The SVG art and inline styles
 // read DARK_FANTASY; DARK_FANTASY_VARS puts the same values on the world's root as --df-* variables, which
 // the Tailwind arbitrary values (ring-[color:var(--df-spirit-gold)]) read, so no colour is written twice.
 
@@ -35,7 +35,7 @@ export const DARK_FANTASY = {
   stoneDark: '#333333',
   bone: '#e8e4dc',
   silver: '#a0a0a0',
-  // Silver as text: lifted to 10.9 to 1 on the panels; silver itself stays on the icons and the nail.
+  // Silver as text: lifted to 10.9 to 1 on the panels; silver itself stays on the icons and the blade.
   silverText: '#c8c8c8',
   lavender: '#b7a9d9',
   white: '#ffffff',
@@ -60,11 +60,11 @@ export const DARK_FANTASY = {
   infectedDark: '#cc4420',
   infectedGlow: '#ff8833',
 
-  // The knight: mask shade, cloak, nail and beard
+  // The knight: mask shade, cloak, blade and beard
   maskShade: '#e8e8e8',
   cloak: '#3d4a5c',
   cloakDark: '#2a3545',
-  nail: '#c8c8c8',
+  blade: '#c8c8c8',
   beard: '#4a3c2e',
   beardDark: '#3a2c1e',
 

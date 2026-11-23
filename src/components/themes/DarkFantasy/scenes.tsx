@@ -13,7 +13,7 @@ import { Stage, type StageLayer } from '@/components/themes/shared/theatre/Stage
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { BattleBug, BUG_ASPECT, DeadBugCreature, HIT_FLASH_OPACITY } from './bug'
 import { HallColumns, HallFloor, HallFront, HallLamps, HallLayer, HallSky } from './hall'
-import { KNIGHT_SOLE_Y, KNIGHT_VIEW_WIDTH, KnightCharacter, nailTurn, slashAngle, slashGlow } from './KnightCharacter'
+import { KNIGHT_SOLE_Y, KNIGHT_VIEW_WIDTH, KnightCharacter, bladeTurn, slashAngle, slashGlow } from './KnightCharacter'
 import { FloatingLantern, MechanicalGear, SoulCrystal, SpiritWisp } from './relics'
 import { DARK_FANTASY } from './palette'
 import world from './world.module.css'
@@ -83,15 +83,15 @@ export const strikeOf = (reached: number, count: number): number => {
 
 interface KnightNodes {
   root: Element | null
-  nail: Element | null
+  blade: Element | null
   glow: Element | null
 }
 
-const knightNodes = (stage: ParentNode): KnightNodes => ({ root: fx(stage, 'knight'), nail: stage.querySelector('[data-nail]'), glow: stage.querySelector('[data-nail-glow]') })
+const knightNodes = (stage: ParentNode): KnightNodes => ({ root: fx(stage, 'knight'), blade: stage.querySelector('[data-blade]'), glow: stage.querySelector('[data-blade-glow]') })
 
-const poseKnight = ({ root, nail, glow }: KnightNodes, x: number, slash: number, bob = 0): void => {
+const poseKnight = ({ root, blade, glow }: KnightNodes, x: number, slash: number, bob = 0): void => {
   transformTo(root, `translate(${(x - KNIGHT_HALF).toFixed(1)} ${(KNIGHT_TOP + bob).toFixed(1)})`)
-  transformTo(nail, nailTurn(slashAngle(slash)))
+  transformTo(blade, bladeTurn(slashAngle(slash)))
   fadeTo(glow, slashGlow(slash))
 }
 
@@ -311,7 +311,7 @@ const contactScene: SceneSpec = {
   },
 }
 
-// The hero: the knight waits in the arena before the profession's boss stage, and salutes with his nail as
+// The hero: the knight waits in the arena before the profession's boss stage, and salutes with his blade as
 // the page starts to scroll.
 const HERO_KNIGHT_X = 1640
 
