@@ -38,8 +38,9 @@ import { cssVars } from '@/lib/cssVars'
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
 // side kick. Every one can take the targeting stance with the bracket reticle and give the level up thumbs
 // up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage the
-// scroll poses him instead (pose.ts): the walk, the hoist, the aim and the shot, the radio sway, the knee
-// and the kick; on the bands stage he holds the bakelite radio to his chest.
+// scroll poses him instead (pose.ts): the crouched sneak, the lockpick, keying a terminal, the aim and the
+// shot, pointing a dog out, the guard and the block, the knee and the kick, and turning the dial of the
+// bakelite radio he holds to his chest on the bands stage.
 
 export type SurvivorTone = 'poster' | 'phosphor'
 export type SurvivorMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
