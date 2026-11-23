@@ -209,7 +209,7 @@ const UPPERCUT_FRAMES: Frame[] = [
 ]
 
 // The spinning kick: off the ground, one leg straight out, the body turning through four views.
-const TATSU_BODY = {
+const SPIN_BODY = {
   head: [62, 30],
   neck: [60, 41],
   hip: [58, 86],
@@ -221,28 +221,28 @@ const TUCKED: LegPose = { k: [56, 110], a: [49, 126], toe: [57, 130] }
 
 const SPIN_KICK_FRAMES: Frame[] = [
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: TUCKED,
     frontLeg: { k: [82, 86], a: [106, 84], toe: [112, 78] },
     wind: 0,
     fx: [{ kind: 'spin', phase: 0 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: TUCKED,
     frontLeg: { k: [68, 98], a: [72, 106], toe: [80, 108] },
     wind: 1,
     fx: [{ kind: 'spin', phase: 1 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: { k: [34, 86], a: [10, 84], toe: [4, 78] },
     frontLeg: { k: [62, 110], a: [56, 126], toe: [64, 130] },
     wind: 2,
     fx: [{ kind: 'spin', phase: 2 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: { k: [50, 98], a: [46, 106], toe: [54, 109] },
     frontLeg: { k: [62, 110], a: [56, 126], toe: [64, 130] },
     wind: 3,
@@ -461,7 +461,7 @@ const HURT_FRAMES: Frame[] = [
   { ...shift(STANCE, -2, 1), wind: 0 },
 ]
 
-// The parry of the third arcade series: he steps into the attack with the lead palm open and turns it
+// The parry: he steps into the attack with the lead palm open and turns it
 // aside, the body lit in a blue flash for the frames of the parry.
 const PARRY_PUSH: Frame = {
   head: [72, 48],
