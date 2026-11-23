@@ -1,6 +1,6 @@
 import { NOIR } from './palette'
 
-// The other side of the night: a guard of the palace, or a foe in a fight, cut as one flat ink shape edged
+// The other side of the night: a guard of the building, or a foe in a fight, cut as one flat ink shape edged
 // in red with a pale mask over its face and two red slits for eyes. It is drawn round its feet (x 0, y 0),
 // facing the way it is drawn, about as tall as him. Its body and its mask are groups the scene's writer
 // moves: the body falls, the mask flies.

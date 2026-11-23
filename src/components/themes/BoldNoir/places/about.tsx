@@ -4,7 +4,7 @@ import { NOIR } from '../palette'
 import { roomPlace, still } from '../place'
 import { hug } from '../pose'
 
-// About: the palace's offices. For each line of the record a doorway comes to him on the dash, he flattens
+// About: the building's offices. For each line of the record a doorway comes to him on the dash, he flattens
 // his back into it with the brim down, and a guard's torch beam sweeps past him from the right without
 // finding him; as it passes, the pinned clue on the evidence board beside the door catches its light.
 

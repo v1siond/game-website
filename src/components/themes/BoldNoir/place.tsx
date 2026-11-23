@@ -9,7 +9,7 @@ import { FLOOR, Sleuth, placeSleuth } from './street'
 import { dash, noirJoints, rest, setNoirPose, type NoirPose } from './pose'
 
 // What every place of the heist night is, and the infiltration that most of them play: he holds his place
-// near the middle of the frame and the palace slides past him, one room's cover per card of the section.
+// near the middle of the frame and the building slides past him, one room's cover per card of the section.
 // Each card is a beat: a low dash in which the floor brings the card's cover to him, then his move at it (a
 // wall hug, a lock picked, a leap onto a guard), whose last frame is the move's own pose, held. The fights
 // are played in a battle frame of their own (battle.tsx).

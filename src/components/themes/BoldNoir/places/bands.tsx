@@ -6,7 +6,7 @@ import { FLOOR, Sleuth, placeSleuth } from '../street'
 import { drum, noirJoints, setNoirPose } from '../pose'
 import { Shadow } from '../shadow'
 
-// Bands: the club in the palace. He has slipped onto the empty drummer's stool behind the kit and plays as
+// Bands: the club upstairs. He has slipped onto the empty drummer's stool behind the kit and plays as
 // if he belonged there; for each band a guard walks the floor in front of the stage, past him without a
 // look, the other way each time, and the stage light comes up on him a little more with each one.
 
