@@ -101,7 +101,6 @@
   background: var(--cel-paper);
   border: 4px solid var(--cel-ink);
   box-shadow: 5px 5px 0 var(--cel-ink);
-  transform: rotate(-2deg);
 }
 
 /* the outfit lockers' tabs */
@@ -151,7 +150,6 @@ li:nth-child(5n + 5) > .notice { --tilt: -1.5deg; }
 .stamp {
   color: var(--cel-flavour-text);
   border: 3px solid var(--cel-flavour);
-  transform: rotate(-8deg);
 }
 
 .skill {

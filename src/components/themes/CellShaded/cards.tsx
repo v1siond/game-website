@@ -44,7 +44,7 @@ export function Notice({ job }: { job: Job }) {
   return (
     <article className={`relative p-5 ${cel.notice}`}>
       <span className="absolute -top-3 left-1/2 h-5 w-5 -translate-x-1/2 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-red)]" aria-hidden="true" />
-      <p className={`float-right ml-3 px-2 py-0.5 text-sm ${cel.display} ${cel.stamp} [-webkit-text-stroke:0]`}>{job.current ? navigation.active : hud.completed}</p>
+      <p className={`float-right ml-3 px-3 py-1.5 text-sm ${cel.display} ${cel.stamp} [-webkit-text-stroke:0]`}>{job.current ? navigation.active : hud.completed}</p>
       <h3 className={`text-2xl ${heading}`}>
         <SlashBreaks text={card.company} />
       </h3>

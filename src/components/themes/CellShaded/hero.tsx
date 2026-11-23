@@ -44,7 +44,7 @@ export function IntroHero({ scene, still }: { scene: CelScene; still: boolean })
   return (
     <section id={scene.anchor} data-scene={scene.id} data-worlds-hero="" aria-labelledby="cel-hero" className={page.hero}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
-      <div className="relative mx-auto grid max-w-6xl items-end gap-6 px-4 pb-12 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center">
+      <div className="relative mx-auto grid max-w-6xl items-end gap-6 px-4 pb-12 pt-32 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center md:pt-24">
         {/* his box, with the wardrobe at its foot */}
         <div className="relative flex flex-col items-center gap-4">
           <div data-worlds-figure="" className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
