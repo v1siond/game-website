@@ -47,11 +47,13 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   )
 }
 
+// Each job's years ride on an ink tab above its card: the room above it keeps the tab inside the item, where
+// a column's top edge would cut it.
 function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
   return (
     <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
       {slot.jobs.map((entry) => (
-        <li key={entry.id} className={MASONRY_ITEM}>
+        <li key={entry.id} className={`${MASONRY_ITEM} pt-4`}>
           <ExperienceCard entry={entry} />
         </li>
       ))}
