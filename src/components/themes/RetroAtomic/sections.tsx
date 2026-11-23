@@ -3,186 +3,147 @@
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import { heldUntil } from '@/components/themes/shared/held'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { atomicId } from './anchors'
 import { QuestLog } from './quests'
-import { Holotapes, Inventory } from './inventory'
+import { Tapes, Inventory } from './inventory'
 import { TargetingSystem } from './targeting'
 import { Radio } from './radio'
-import { PerkChart } from './perks'
-import { Fetch, LevelUp } from './events'
-import { Loot } from './footlocker'
-import { Dig } from './dig'
-import { Spar } from './spar'
-import { BeamedLog, BootedTube } from './repairs'
-import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BadgeChart } from './badges'
 import { PLUS_ROWS } from './controls'
-import type { Zone } from './journey'
+import type { Scene } from './scenes'
+import { AtomicStage } from './stage'
 import atomic from './atomic.module.css'
-import j from './journey.module.css'
 
-// The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
-// into view and the CSS plays that section's own entrance off it (the quest cards power on like the
-// tube). A moment with its own timers takes the on flag as a render prop: the tech stack's footlocker
-// loot, the ventures' dig, the bands' radio dance and the Muay Thai spar. Every heading's id is atomicId of
-// its title, the same the wrist terminal's section tabs jump to. The engineer's sections sit on the
-// terminal's glass panels (the services as plain panels under a fade), the musician's on the radio,
-// the fighter's on the printed perk chart. Two sections the dweller fixes himself (./repairs): he boots
-// the services' dead tube on, and beams the quest log onto the glass from his wrist terminal. The shared
-// plan picks which stages a profession shows and in which order.
+// One section per scene: a tall head that first shows the place alone and then brings the title up on its
+// glass plate, then the cards (the terminal's glass panels, the radio, the printed badge chart), then a
+// screen of the place alone before it sinks. The cards a scene counts sit in an element marked
+// data-stage-items, which the shared theatre measures for the reading line that drives each prop. Every
+// heading's id is atomicId of its title, the one the wrist terminal's section tabs jump to.
 
-// The title sits on its own glass plate: where a stage has no panel the wasteland's pale sky shows behind
-// it, and phosphor on that sky reads under 2 to 1.
+// The title sits on its own glass plate: the wasteland's pale haze shows behind it, and phosphor on that
+// haze reads under 2 to 1.
 function SectionTitle({ title }: { title: string }) {
   return (
-    <h2 id={atomicId(title)} className={`mb-6 flex w-fit items-center gap-3 bg-atomic-glass px-3 py-1 text-2xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor sm:text-3xl ${atomic.glow}`}>
+    <h2 id={atomicId(title)} className={`flex w-fit max-w-full items-center gap-3 bg-atomic-glass px-3 py-1 text-2xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor sm:text-3xl ${atomic.glow}`}>
       <span className="h-3 w-3 shrink-0 bg-atomic-phosphor" aria-hidden="true" />
       {title}
     </h2>
   )
 }
 
-interface StageProps {
-  title: string
-  zone: Zone
-  className?: string
-  // A moment that runs its own timers takes the stage's on flag as a render prop.
-  children: ReactNode | ((on: boolean) => ReactNode)
-}
-
-function Stage({ title, zone, className = '', children }: StageProps) {
-  const { ref, on } = useZoneStage(zone)
-
-  return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage} ${heldUntil(on)} ${className}`}>
-      <SectionTitle title={title} />
-      {typeof children === 'function' ? children(on) : children}
-    </section>
-  )
-}
-
 // The terminal's personnel record, each label in the dim phosphor capitals.
 const TERMINAL_FACTS: AboutFactsLook = {
-  list: 'mt-4 max-w-prose space-y-1 text-sm',
+  list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3 text-sm',
   fact: 'flex flex-wrap gap-x-2',
   term: 'font-bold uppercase tracking-widest text-atomic-phosphor-dim-text',
   value: 'text-atomic-ash',
 }
 
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { sections: titles, cards } = useLabels()
-    const { highlights } = useAboutBlock()
-    return (
-      <Stage title={titles[slot.titleKey]} zone="shelter" className={j.fetch}>
-        <Fetch>
-          <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
-            <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
-            <MarkedLines
-              items={highlights}
-              label={cards.keyAchievements}
-              look={{ ...PLUS_ROWS, list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3' }}
-            />
-            <AboutFacts look={TERMINAL_FACTS} />
-          </div>
-        </Fetch>
-      </Stage>
-    )
-  },
-  work: function WorkFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.stamp}>
-        <LevelUp job={slot.jobs[0]} />
-        <BeamedLog>
-          <QuestLog jobs={slot.jobs} />
-        </BeamedLog>
-      </Stage>
-    )
-  },
-  tech: function TechFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.loot}>
-        {(on) => (
-          <Loot categories={slot.categories} on={on}>
-            <Inventory categories={slot.categories} />
-          </Loot>
-        )}
-      </Stage>
-    )
-  },
-  services: function ServicesFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="wasteland">
-        <FadeInScene>
-          <BootedTube>
-            <ul className={MASONRY_LIST}>
-              {slot.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
-                  <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
-                </li>
-              ))}
-            </ul>
-          </BootedTube>
-        </FadeInScene>
-      </Stage>
-    )
-  },
-  projects: function ProjectsFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.vats}>
-        <TargetingSystem projects={slot.projects} />
-      </Stage>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="town" className={j.dig}>
-        {(on) => (
-          <Dig tapes={slot.companies.length} on={on}>
-            {(dug) => <Holotapes companies={slot.companies} dug={dug} />}
-          </Dig>
-        )}
-      </Stage>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    const labels = useLabels()
-    const { musician, bands } = slot
-    return (
-      <Stage title={labels.sections[slot.titleKey]} zone="town">
-        {(on) => (
-          <>
-            <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
-            <Radio bands={bands} on={on} />
-            <p className="mt-6 text-base italic text-atomic-phosphor-dim-text">{musician.line}</p>
-          </>
-        )}
-      </Stage>
-    )
-  },
-  muayThai: function MuayThaiFrame({ slot }) {
-    const titles = useLabels().sections
-    return (
-      <Stage title={titles[slot.titleKey]} zone="town">
-        {(on) => (
-          <Spar count={slot.martialArts.primary.achievements.length} on={on}>
-            {({ shown, ring }) => <PerkChart martialArts={slot.martialArts} shown={shown} ring={ring} />}
-          </Spar>
-        )}
-      </Stage>
-    )
-  },
+function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
+  return (
+    <div className={`p-5 sm:p-6 ${atomic.panel}`}>
+      <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
+      <div data-stage-items="">
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...PLUS_ROWS, list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3' }} />
+      </div>
+      <AboutFacts look={TERMINAL_FACTS} />
+    </div>
+  )
 }
 
-export const SECTION_VIEWS = sectionViews(FRAMES)
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  return (
+    <div data-stage-items="">
+      <QuestLog jobs={slot.jobs} />
+    </div>
+  )
+}
+
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  return (
+    <div data-stage-items="">
+      <Inventory categories={slot.categories} />
+    </div>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+      {slot.services.map((service) => (
+        <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
+          <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
+          <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  return <TargetingSystem projects={slot.projects} />
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return (
+    <div data-stage-items="">
+      <Tapes companies={slot.companies} />
+    </div>
+  )
+}
+
+function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
+  const { years } = useLabels()
+  return (
+    <div className={`p-4 sm:p-6 ${atomic.panel}`}>
+      <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, years)}</p>
+      <Radio bands={bands} />
+      <p className="mt-6 text-base italic text-atomic-phosphor-dim-text">{musician.line}</p>
+    </div>
+  )
+}
+
+function RecordCards({ slot }: { slot: SlotOf<'muayThai'> }) {
+  return <BadgeChart martialArts={slot.martialArts} />
+}
+
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: RecordCards,
+}
+
+interface SceneSectionProps {
+  scene: Scene
+  slot: SectionSlot
+  still: boolean
+}
+
+/** One scene of the page; under reduced motion its own stage sits still behind its head. */
+export function SceneSection({ scene, slot, still }: SceneSectionProps) {
+  const { sections } = useLabels()
+  const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const title = sections[slot.titleKey]
+  return (
+    <section data-scene={scene.id} aria-labelledby={atomicId(title)} className="relative scroll-mt-24 px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
+      {still && <AtomicStage scene={scene} settled />}
+      <header className="flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh]">
+        <SectionTitle title={title} />
+      </header>
+      <div className="relative max-w-[42rem]">
+        <Cards slot={slot} />
+      </div>
+    </section>
+  )
+}

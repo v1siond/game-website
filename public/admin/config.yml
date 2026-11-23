@@ -213,6 +213,7 @@ collections:
               - { label: Services, name: services, widget: list, i18n: true, required: false }
               - { <<: *fixed, label: Icon, name: icon }
               - { <<: *flag, label: 'His own product: shown first, with a badge', name: featured }
+              - { <<: *flag, label: 'Shown in Ventures', name: venture }
 
       - name: roles
         label: Current roles
@@ -491,7 +492,6 @@ collections:
                   - { <<: *text, label: "Double jump", name: doubleJump }
                   - { <<: *text, label: "Scan tag: highlight", name: tagHighlight }
                   - { <<: *text, label: "Installed (ripperdoc)", name: installed }
-                  - { <<: *text, label: "Contract (ventures map)", name: contract, hint: 'Keep {number}' }
               - label: Explorer's map world (adventure paths)
                 name: trail
                 widget: object
@@ -749,10 +749,10 @@ collections:
                   - { <<: *text, label: "Password game hint", name: hackHint }
                   - { <<: *text, label: "Attempts left", name: attemptsLeft }
                   - { <<: *text, label: "Entry denied", name: entryDenied }
-                  - { <<: *text, label: "Likeness", name: likeness, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Letters in place", name: inPlace, hint: 'Keep {count}' }
                   - { <<: *text, label: "Access granted", name: accessGranted }
                   - { <<: *text, label: "Terminal locked", name: terminalLocked }
-                  - { <<: *text, label: "Dud removed", name: dudRemoved }
+                  - { <<: *text, label: "Wrong word removed", name: dudRemoved }
                   - { <<: *text, label: "Attempts restored", name: attemptsRestored }
                   - { <<: *text, label: "Reboot", name: reboot }
               - label: Language names (each in its own language)

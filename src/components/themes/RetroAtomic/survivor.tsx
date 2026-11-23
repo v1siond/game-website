@@ -1,7 +1,6 @@
 import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
-import { svgNumber } from '@/components/themes/shared/svgNumber'
 import {
   BAKELITE,
   BRASS,
@@ -19,11 +18,11 @@ import {
   SHELTER_YELLOW,
   WARNING_RED,
 } from './palette'
-import s from './dweller.module.css'
+import s from './survivor.module.css'
 import { cssVars } from '@/lib/cssVars'
 
-// Him as this world's own figure, a parody of the shelter dweller drawn as the mascot of that game's
-// posters and perk cards (Fallout's Vault Boy and the Vault Dweller): a big round head on a small body,
+// Him as this world's own figure, the shelter survivor drawn as an atomic age poster mascot, the one on the
+// posters and the badge cards: a big round head on a small body,
 // the wide toothy grin and the wink, the blue jumpsuit with the yellow collar, placket, cuffs and belt
 // buckle, black boots, the wrist terminal strapped on the left forearm with its green screen. Drawn the
 // poster way: flat fills, one thick ink outline round every shape, a cream highlight, no gradients. The
@@ -37,82 +36,28 @@ import { cssVars } from '@/lib/cssVars'
 // tapping its keys while the screen flickers; the Musician in the jumpsuit at a snare with two sticks,
 // whose action is the drum roll; the Martial Artist with the jumpsuit rolled down to the waist and the
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
-// side kick. Every one can idle (bounce, blink), walk the jaunty poster walk, take the targeting stance
-// with the bracket reticle, and give the level up thumbs up with a wink and a star. The bands section has
-// him hold the bakelite radio to his chest, turn its knob and dance each station's step; the Muay Thai
-// spar has the clinch knee and the roundhouse kick, both landing on the foe at his left (the viewer's right).
+// side kick. Every one can take the targeting stance with the bracket reticle and give the level up thumbs
+// up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage the
+// scroll poses him instead (pose.ts): the walk, the hoist, the aim and the shot, the radio sway, the knee
+// and the kick; on the bands stage he holds the bakelite radio to his chest.
 
-export type DwellerTone = 'poster' | 'phosphor'
-export type DwellerMotion =
-  | 'still'
-  | 'idle'
-  | 'walk'
-  | 'thumbsUp'
-  | 'target'
-  | 'type'
-  | 'drum'
-  | 'strike'
-  | 'hoist'
-  | 'aim'
-  | 'fire'
-  | 'tune'
-  | 'sway'
-  | 'twist'
-  | 'shuffle'
-  | 'bop'
-  | 'knee'
-  | 'kick'
+export type SurvivorTone = 'poster' | 'phosphor'
+export type SurvivorMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
 
-/** The radio dance's motions: he holds the bakelite radio in all of them. */
-export type RadioMotion = Extract<DwellerMotion, 'tune' | 'sway' | 'twist' | 'shuffle' | 'bop'>
-
-const HOLDS_RADIO: Record<DwellerMotion, boolean> = {
-  still: false,
-  idle: false,
-  walk: false,
-  thumbsUp: false,
-  target: false,
-  type: false,
-  drum: false,
-  strike: false,
-  hoist: false,
-  aim: false,
-  fire: false,
-  tune: true,
-  sway: true,
-  twist: true,
-  shuffle: true,
-  bop: true,
-  knee: false,
-  kick: false,
-}
-
-/** Each profession's action, the way the dweller would do that job. */
-export const DWELLER_ACTION: Record<Profession, DwellerMotion> = {
+/** Each profession's action, the way the survivor would do that job. */
+export const SURVIVOR_ACTION: Record<Profession, SurvivorMotion> = {
   engineer: 'type',
   drummer: 'drum',
   fighter: 'strike',
 }
 
-const MOTION_CLASS: Record<DwellerMotion, string> = {
+const MOTION_CLASS: Record<SurvivorMotion, string> = {
   still: '',
-  idle: s.idle,
-  walk: s.walk,
   thumbsUp: s.thumbsUp,
   target: s.target,
   type: s.type,
   drum: s.drum,
   strike: s.strike,
-  hoist: s.hoist,
-  aim: s.aim,
-  fire: s.fire,
-  tune: `${s.holdRadio} ${s.tune}`,
-  sway: `${s.holdRadio} ${s.sway}`,
-  twist: `${s.holdRadio} ${s.twist}`,
-  shuffle: `${s.holdRadio} ${s.shuffle}`,
-  bop: `${s.holdRadio} ${s.bop}`,
-  knee: s.knee,
-  kick: s.kick,
 }
 
 const KIT_CLASS: Record<Profession, string> = {
@@ -141,7 +86,7 @@ interface Inks {
   highlight: string
 }
 
-const INKS: Record<DwellerTone, Inks> = {
+const INKS: Record<SurvivorTone, Inks> = {
   poster: {
     line: POSTER_INK,
     lineWidth: 2,
@@ -182,8 +127,8 @@ const INKS: Record<DwellerTone, Inks> = {
 
 // ---- shapes (viewBox 100 by 150, facing the viewer, feet on y 144) ----
 
-/** His viewBox's size, so a scene can place a prop at a point of his drawing as a fraction of his box. */
-export const VIEW = { width: 100, height: 150 }
+/** His viewBox's size. */
+const VIEW = { width: 100, height: 150 }
 
 const HEAD = 'M30 34 Q30 12 50 12 Q70 12 70 34 Q70 54 50 57 Q30 54 30 34 Z'
 const HAIR = 'M30.5 31 Q29 10 50 9.5 Q66 9 70.5 26 Q63 16.5 53 19 Q45 15 38 20 Q33 24 32.5 32 Z'
@@ -196,52 +141,20 @@ const UPPER = {
   right: 'M29 58.5 L38.5 60 L36.5 79 L27.5 77.5 Z',
   left: 'M61.5 60 L71 58.5 L72.5 77.5 L63.5 79 Z',
 }
+const HAND = { right: { x: 31.8, y: 97 }, left: { x: 68.2, y: 97 } }
 const FORE = {
   right: 'M27.5 76 L36.5 77.5 L35.5 93 L28 93 Z',
   left: 'M63.5 77.5 L72.5 76 L72 93 L64.5 93 Z',
 }
-const HAND = { right: { x: 31.8, y: 97 }, left: { x: 68.2, y: 97 } }
 
-// The right arm's joints, in viewBox units: dweller.module.css turns the arm and the forearm round them.
+// The right arm's joints, in viewBox units: survivor.module.css turns the arm and the forearm round them.
 const SHOULDER_RIGHT = { x: 34, y: 60 }
 const ELBOW_RIGHT = { x: 32, y: 77 }
 
-// The hoist's held end pose: the body this far down, the arm and the forearm turned this far (degrees,
-// clockwise as CSS turns them). The keyframes' last step reads them as CSS variables.
-const HOIST_END = { bodyDrop: 6, arm: 165, fore: 22 }
-
-export interface Point {
-  x: number
-  y: number
-}
-
-/**
- * A point turned round another by deg degrees, clockwise on screen as a CSS rotate turns it. Rounded
- * through svgNumber, so the carry's style values print the same on the server and in the browser.
- */
-export const turn = ({ x, y }: Point, about: Point, deg: number): Point => {
-  const rad = (deg * Math.PI) / 180
-  const dx = x - about.x
-  const dy = y - about.y
-  return { x: svgNumber(about.x + dx * Math.cos(rad) - dy * Math.sin(rad)), y: svgNumber(about.y + dx * Math.sin(rad) + dy * Math.cos(rad)) }
-}
-
-const HOIST_HAND = turn(turn(HAND.right, ELBOW_RIGHT, HOIST_END.fore), SHOULDER_RIGHT, HOIST_END.arm)
-
-/**
- * Where his right hand rests at the end of the hoist, in viewBox units: the hand turned by the hoist's end
- * pose round the elbow, then round the shoulder, then the body's drop. The footlocker hangs from this point.
- */
-export const HOIST_GRIP = { x: HOIST_HAND.x, y: HOIST_HAND.y + HOIST_END.bodyDrop }
-
-// The joints and the hoist's end pose as the CSS variables dweller.module.css reads, so the drawing and the
-// footlocker's grip have one owner.
+// The right arm's joints as the CSS variables survivor.module.css turns the arm round.
 const POSE_VARS = cssVars({
   '--shoulder-r': `${SHOULDER_RIGHT.x}px ${SHOULDER_RIGHT.y}px`,
   '--elbow-r': `${ELBOW_RIGHT.x}px ${ELBOW_RIGHT.y}px`,
-  '--hoist-body': `${HOIST_END.bodyDrop}px`,
-  '--hoist-arm': `${HOIST_END.arm}deg`,
-  '--hoist-fore': `${HOIST_END.fore}deg`,
 })
 
 const THIGH = {
@@ -435,36 +348,44 @@ function Overlays({ inks }: { inks: Inks }) {
   )
 }
 
-interface DwellerProps {
+interface SurvivorProps {
   profession: Profession
-  motion: DwellerMotion
-  tone?: DwellerTone
+  motion: SurvivorMotion
+  tone?: SurvivorTone
   className?: string
 }
 
-/** Him as the shelter dweller of the posters, in a profession's kit, playing one motion. Memoised: its props
- *  are primitives, so a parent render that leaves them as they are draws nothing again. */
-export const DwellerSprite = memo(function DwellerSprite({ profession, motion, tone = 'poster', className = '' }: DwellerProps) {
+/** His figure's groups in the 100 by 150 viewBox, playing `motion`; a stage places it in a nested svg of
+ *  that viewBox and poses its joints itself (pose.ts), with the motion left 'still' and `radio` set where
+ *  he holds the bakelite radio. */
+export function SurvivorFigure({ profession, motion, tone = 'poster', radio = false }: Omit<SurvivorProps, 'className'> & { radio?: boolean }) {
   const inks = INKS[tone]
+  return (
+    <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} style={POSE_VARS}>
+      {tone === 'poster' && <ellipse cx={50} cy={145} rx={22} ry={3} fill={POSTER_INK} opacity={0.35} />}
+      <g className={s.body}>
+        <Leg side="right" inks={inks} />
+        <Leg side="left" inks={inks} />
+        <g className={s.chest}>
+          <Torso profession={profession} inks={inks} />
+          <Head profession={profession} inks={inks} />
+        </g>
+        {profession === 'drummer' && <Snare inks={inks} />}
+        {radio && <HeldRadio inks={inks} />}
+        <Arm side="right" profession={profession} inks={inks} />
+        <Arm side="left" profession={profession} inks={inks} />
+      </g>
+      <Overlays inks={inks} />
+    </g>
+  )
+}
 
+/** Him as the shelter survivor of the posters, in a profession's kit, playing one motion. Memoised: its props
+ *  are primitives, so a parent render that leaves them as they are draws nothing again. */
+export const SurvivorSprite = memo(function SurvivorSprite({ profession, motion, tone = 'poster', className = '' }: SurvivorProps) {
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} style={POSE_VARS}>
-        {tone === 'poster' && <ellipse cx={50} cy={145} rx={22} ry={3} fill={POSTER_INK} opacity={0.35} />}
-        <g className={s.body}>
-          <Leg side="right" inks={inks} />
-          <Leg side="left" inks={inks} />
-          <g className={s.chest}>
-            <Torso profession={profession} inks={inks} />
-            <Head profession={profession} inks={inks} />
-          </g>
-          {profession === 'drummer' && <Snare inks={inks} />}
-          {HOLDS_RADIO[motion] && <HeldRadio inks={inks} />}
-          <Arm side="right" profession={profession} inks={inks} />
-          <Arm side="left" profession={profession} inks={inks} />
-        </g>
-        <Overlays inks={inks} />
-      </g>
+      <SurvivorFigure profession={profession} motion={motion} tone={tone} />
     </svg>
   )
 })

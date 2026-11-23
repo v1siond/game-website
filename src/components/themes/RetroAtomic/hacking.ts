@@ -1,6 +1,6 @@
 // The password terminal's rules, as plain functions the contact screen draws: a memory dump of junk
 // characters with candidate words hidden in it, one of them the password. A wrong guess costs an attempt
-// and answers with its likeness (letters in the right place); a closed bracket pair inside one row
+// and answers with how many of its letters are in the right place; a closed bracket pair inside one row
 // removes a dud or restores the attempts; at zero attempts the terminal locks until it is rebooted.
 // The candidate words are his own tools (the tech stack), so the game spells his CV.
 
@@ -27,7 +27,7 @@ export type BracketEffect = 'dud' | 'reset'
 export interface HackLogEntry {
   kind: 'denied' | 'granted' | BracketEffect
   word: string
-  likeness: number
+  inPlace: number
 }
 
 export interface HackState {
@@ -60,7 +60,7 @@ const junk = (next: () => number, length: number): string =>
   Array.from({ length }, () => JUNK[Math.floor(next() * JUNK.length)]).join('')
 
 /** Letters in the same place in both words. */
-export const likeness = (guess: string, password: string): number =>
+export const inPlace = (guess: string, password: string): number =>
   [...guess].filter((letter, index) => password[index] === letter).length
 
 /**
@@ -130,14 +130,14 @@ const bracketEffect = (id: number): BracketEffect => (id % 2 === 0 ? 'dud' : 're
 
 const guess = (state: HackState, board: HackBoard, word: string): HackState => {
   if (word === board.password) {
-    return { ...state, status: 'granted', log: [...state.log, { kind: 'granted', word, likeness: word.length }] }
+    return { ...state, status: 'granted', log: [...state.log, { kind: 'granted', word, inPlace: word.length }] }
   }
   const attempts = state.attempts - 1
   return {
     ...state,
     attempts,
     status: attempts === 0 ? 'locked' : 'playing',
-    log: [...state.log, { kind: 'denied', word, likeness: likeness(word, board.password) }],
+    log: [...state.log, { kind: 'denied', word, inPlace: inPlace(word, board.password) }],
   }
 }
 
@@ -149,9 +149,9 @@ const bracket = (state: HackState, board: HackBoard, id: number): HackState => {
   const dud = firstDud(state, board)
   const used = { ...state, usedBrackets: [...state.usedBrackets, id] }
   if (effect === 'reset' || !dud) {
-    return { ...used, attempts: MAX_ATTEMPTS, log: [...state.log, { kind: 'reset', word: '', likeness: 0 }] }
+    return { ...used, attempts: MAX_ATTEMPTS, log: [...state.log, { kind: 'reset', word: '', inPlace: 0 }] }
   }
-  return { ...used, removed: [...state.removed, dud], log: [...state.log, { kind: 'dud', word: dud, likeness: 0 }] }
+  return { ...used, removed: [...state.removed, dud], log: [...state.log, { kind: 'dud', word: dud, inPlace: 0 }] }
 }
 
 const finished = (state: HackState): boolean => state.status !== 'playing'

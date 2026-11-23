@@ -135,8 +135,7 @@
         "incomingCall": "Incoming call",
         "doubleJump": "Double jump",
         "tagHighlight": "Highlight",
-        "installed": "Installed",
-        "contract": "Contract {number}"
+        "installed": "Installed"
       },
       "trail": {
         "mapOf": "Expedition map of {name}",
@@ -344,10 +343,10 @@
         "hackHint": "Guess the password, one of my tools. A wrong guess shows how many letters are in place.",
         "attemptsLeft": "Attempts left",
         "entryDenied": "Entry denied",
-        "likeness": "Likeness {count}",
+        "inPlace": "In place {count}",
         "accessGranted": "Access granted",
         "terminalLocked": "Terminal locked",
-        "dudRemoved": "Dud removed",
+        "dudRemoved": "Wrong word removed",
         "attemptsRestored": "Attempts restored",
         "reboot": "Reboot",
         "crateScore": "{count} of {total} crates open",
@@ -578,8 +577,7 @@
         "incomingCall": "Llamada entrante",
         "doubleJump": "Doble salto",
         "tagHighlight": "Destacado",
-        "installed": "Instalado",
-        "contract": "Contrato {number}"
+        "installed": "Instalado"
       },
       "trail": {
         "mapOf": "Mapa de la expedición de {name}",
@@ -787,7 +785,7 @@
         "hackHint": "Adivina la contraseña, una de mis herramientas. Un intento fallido muestra cuántas letras están en su lugar.",
         "attemptsLeft": "Intentos restantes",
         "entryDenied": "Entrada denegada",
-        "likeness": "Similitud {count}",
+        "inPlace": "En su sitio {count}",
         "accessGranted": "Acceso concedido",
         "terminalLocked": "Terminal bloqueada",
         "dudRemoved": "Palabra descartada",
@@ -1021,8 +1019,7 @@
         "incomingCall": "Chiamata in arrivo",
         "doubleJump": "Doppio salto",
         "tagHighlight": "In evidenza",
-        "installed": "Installato",
-        "contract": "Contratto {number}"
+        "installed": "Installato"
       },
       "trail": {
         "mapOf": "Mappa della spedizione di {name}",
@@ -1230,7 +1227,7 @@
         "hackHint": "Indovina la password, uno dei miei strumenti. Un tentativo sbagliato mostra quante lettere sono al posto giusto.",
         "attemptsLeft": "Tentativi rimasti",
         "entryDenied": "Accesso negato",
-        "likeness": "Somiglianza {count}",
+        "inPlace": "Al posto giusto {count}",
         "accessGranted": "Accesso consentito",
         "terminalLocked": "Terminale bloccato",
         "dudRemoved": "Parola scartata",

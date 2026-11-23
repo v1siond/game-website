@@ -117,6 +117,8 @@ export interface Company {
   icon: string
   /** His own product rather than a client or consulting company: shown first, with a badge. */
   featured?: boolean
+  /** Listed in Ventures; a company without it is kept only for the current role that links it. */
+  venture?: boolean
 }
 
 /**
