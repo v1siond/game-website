@@ -8,7 +8,7 @@ import { still, stopsPlace } from '../place'
 import { drum } from '../pose'
 
 // Bands at dusk: for each band a speaker stack comes to him on the run, a bandit walking up beyond it. He
-// plays the drum, the stack blasts a magenta starburst, the sound goes out in rings and the bandit is
+// plays the snare in front of him, the stack blasts a magenta starburst, the sound goes out in rings and the bandit is
 // thrown off his feet and lands flat on his back.
 
 const STACK = 190
@@ -28,6 +28,17 @@ function Stack() {
 
 const RINGS = [70, 130, 190]
 
+// The snare on its stand in front of him, under his sticks.
+function Snare() {
+  return (
+    <g transform="translate(10 0)">
+      <path d="M0 0 L0 -96 M-30 0 L0 -60 L30 0" stroke={CEL.steelDark} strokeWidth="6" />
+      <rect x={-46} y={-130} width={92} height={36} fill={CEL.red} />
+      <ellipse cx={0} cy={-130} rx={46} ry={10} fill={CEL.paper} />
+    </g>
+  )
+}
+
 export const bands = stopsPlace({
   hour: HOURS.dusk,
   back: (i) => (
@@ -44,6 +55,7 @@ export const bands = stopsPlace({
       </g>
     </>
   ),
+  front: () => <Snare />,
   // The sticks keep time with the scroll: four beats a card.
   move: (_profession, t, at) => still(drum(Math.min(1, t * 3), (at + t) * 4)),
   reply: (stage, { count }) => {

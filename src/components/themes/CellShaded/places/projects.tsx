@@ -6,7 +6,7 @@ import { still, stopsPlace } from '../place'
 import { loot } from '../pose'
 
 // Projects at dusk: for each project a loot chest comes to him on the run. He kneels at it and throws the
-// lid; a column of the rarity's light stands up out of it (the rarity from the project's own facts,
+// lid off; a column of the rarity's light stands up out of it (the rarity from the project's own facts,
 // loot.ts, shown by its colour only), a weapon in the same colour floats up into the light, and he springs
 // up with a fist thrown at it.
 
@@ -63,6 +63,7 @@ export const projects = stopsPlace({
         const t = played(i)
         const open = ramp(t, 0.35, 0.5)
         transformTo(lids[i], `translate(${(CHEST - 60 * open).toFixed(1)} ${(-80 - 90 * open).toFixed(1)}) rotate(${(-120 * open).toFixed(1)})`)
+        fadeTo(lids[i], 1 - ramp(t, 0.45, 0.55))
         fadeTo(light, ramp(t, 0.4, 0.55))
         const rise = ramp(t, 0.5, 0.85)
         fadeTo(weapons[i], ramp(t, 0.5, 0.6))

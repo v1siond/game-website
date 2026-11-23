@@ -108,15 +108,16 @@ function beatsOf(stage: ParentNode, input: PlaceInput, stops: Stops): (reached: 
   }
 }
 
-/** A run and gun section as a scene: its stops behind him, him, its stops in front, run by the beat writer. */
+/** A run and gun section as a scene: its stops behind him, him, its stops in front, run by the beat writer,
+ *  all in one camera group a reply can push in on. */
 export const stopsPlace = (stops: Stops): Place => ({
   hour: stops.hour,
   floor: (input) => (
-    <>
+    <g data-fx="camera">
       <Track input={input} art={stops.back} name="stops-back" />
       <Commando x={HOLD_X} profession={input.profession} />
       {stops.front && <Track input={input} art={stops.front} name="stops-front" />}
-    </>
+    </g>
   ),
   bind: (stage, input) => {
     const beats = beatsOf(stage, input, stops)
