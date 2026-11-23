@@ -282,10 +282,9 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
 }
 
 /** The ziggurat plaque: its three stepped tiers over the board, the depth gauge and the title. */
-export function Plaque({ id, title, place, depth }: { id: string; title: string; place: string; depth: number }) {
+export function Plaque({ id, title, depth }: { id: string; title: string; depth: number }) {
   return (
     <header className={page.head}>
-      <p className={page.place}>{place}</p>
       <div className={page.plaque} style={cssVars({ '--depth': depth })}>
         <span className={page.steps} aria-hidden="true" />
         <div className={page.board}>
@@ -301,13 +300,13 @@ export function Plaque({ id, title, place, depth }: { id: string; title: string;
 
 /** One chamber: under reduced motion its own stage sits still behind its head. */
 export function ChamberSection({ scene, still }: { scene: DecoScene & { slot: SectionSlot }; still: boolean }) {
-  const { sections, deco } = useLabels()
+  const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `deco-${scene.id}`
   return (
     <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
-      <Plaque id={headingId} title={sections[scene.slot.titleKey]} place={deco[scene.place]} depth={DEPTH[scene.slot.id]} />
+      <Plaque id={headingId} title={sections[scene.slot.titleKey]} depth={DEPTH[scene.slot.id]} />
       <div className={page.body}>
         <Cards slot={scene.slot} />
       </div>

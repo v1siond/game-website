@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import type { Ref } from 'react'
 import { usePosts } from '@/components/blog/BlogProvider'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
@@ -13,14 +12,13 @@ import { DecoLinks, GOLD_OUTLINE } from './actions'
 import { LAYER_MOTION, type DecoScene } from './scenes'
 import page from './page.module.css'
 
-// The page's fixed gauge bar and its end. The bar is a brass strip across the top: his initials, the
-// chamber the page is in and, where it counts, how many of its props he has worked. The end is the revival
+// The page's fixed gauge bar and its end. The bar is a brass strip across the top with his initials, back
+// to the top. The end is the revival
 // chamber: his latest posts on a brass panel, then the contact plate with his line and the ways to reach
 // him, over the chamber where he comes back.
 
-/** The gauge bar; the theatre writes the place and the count through the refs as the page moves. */
-export function GaugeBar({ placeRef, countRef, anchor }: { placeRef: Ref<HTMLSpanElement>; countRef: Ref<HTMLSpanElement>; anchor: string }) {
-  const { deco } = useLabels()
+/** The gauge bar: his initials, back to the top of the page. */
+export function GaugeBar({ anchor }: { anchor: string }) {
   const { fullName } = useCVData()
   return (
     <header className={page.hud}>
@@ -28,10 +26,6 @@ export function GaugeBar({ placeRef, countRef, anchor }: { placeRef: Ref<HTMLSpa
         <span aria-hidden="true">{initialsOf(fullName)}</span>
         <span className="sr-only">{fullName}</span>
       </a>
-      <p className={page.hudText}>
-        <span ref={placeRef}>{deco.placeHero}</span>
-        <span ref={countRef} className={page.hudCount} />
-      </p>
     </header>
   )
 }

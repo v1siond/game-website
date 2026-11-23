@@ -19,33 +19,28 @@ import { work } from './chambers/work'
 import { Canvas, Floor, Front, Hall, Skyline, Water, bubblesWriter } from './city'
 
 // The page as scenes: the station lobby (hero), one chamber per section of the shown profession in reading
-// order, the revival chamber (contact). Each scene names its chamber, its words in labels.deco for the
-// gauge bar, its anchor and how many cards its section counts (stageItems), read from the same slot the
-// section's cards are drawn from: one prop per card.
+// order, the revival chamber (contact). Each scene names its chamber, its anchor and how many cards its
+// section counts (stageItems), read from the same slot the section's cards are drawn from: one prop per
+// card.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-type DecoWords = Labels['deco']
-
 interface SceneDef {
   chamber: Chamber
-  place: keyof DecoWords
-  /** The gauge bar's line, "{count} of {total} fuse boxes lit"; a scene that counts nothing has none. */
-  tally: keyof DecoWords | null
   anchor: string
 }
 
 const SCENE_DEFS: Record<SceneId, SceneDef> = {
-  hero: { chamber: hero, place: 'placeHero', tally: null, anchor: 'top' },
-  about: { chamber: about, place: 'placeAbout', tally: 'countAbout', anchor: 'about' },
-  work: { chamber: work, place: 'placeWork', tally: 'countWork', anchor: 'work' },
-  tech: { chamber: tech, place: 'placeTech', tally: 'countTech', anchor: 'tech' },
-  services: { chamber: services, place: 'placeServices', tally: 'countServices', anchor: 'services' },
-  projects: { chamber: projects, place: 'placeProjects', tally: 'countProjects', anchor: 'projects' },
-  ventures: { chamber: ventures, place: 'placeVentures', tally: 'countVentures', anchor: 'ventures' },
-  bands: { chamber: bands, place: 'placeBands', tally: 'countBands', anchor: 'bands' },
-  muayThai: { chamber: muayThai, place: 'placeMuayThai', tally: 'countMuayThai', anchor: 'muay-thai' },
-  contact: { chamber: contact, place: 'placeContact', tally: null, anchor: 'contact' },
+  hero: { chamber: hero, anchor: 'top' },
+  about: { chamber: about, anchor: 'about' },
+  work: { chamber: work, anchor: 'work' },
+  tech: { chamber: tech, anchor: 'tech' },
+  services: { chamber: services, anchor: 'services' },
+  projects: { chamber: projects, anchor: 'projects' },
+  ventures: { chamber: ventures, anchor: 'ventures' },
+  bands: { chamber: bands, anchor: 'bands' },
+  muayThai: { chamber: muayThai, anchor: 'muay-thai' },
+  contact: { chamber: contact, anchor: 'contact' },
 }
 
 export interface DecoScene extends TheatreScene, Omit<SceneDef, 'chamber'> {

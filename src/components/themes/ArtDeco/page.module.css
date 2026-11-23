@@ -64,21 +64,6 @@
   text-decoration: none;
 }
 
-.hudText {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 14px;
-  font-family: var(--deco-display);
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.hudCount {
-  color: var(--deco-gold-bright-text);
-}
-
 .main {
   position: relative;
   z-index: 1;
@@ -153,18 +138,6 @@
   gap: 12px;
   min-height: 125svh;
   padding-bottom: 12svh;
-}
-
-.place {
-  margin: 0;
-  padding: 4px 12px;
-  border: 1px solid var(--deco-brass-dark);
-  background: var(--deco-abyss);
-  color: var(--deco-gold-bright-text);
-  font-family: var(--deco-display);
-  font-size: 1rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .plaque {
@@ -347,10 +320,6 @@
     padding: 4px 180px 4px 16px;
   }
 
-  .hudText {
-    font-size: 0.85rem;
-  }
-
   .hero {
     padding-top: 68px;
   }
@@ -390,11 +359,6 @@
 
 .still .head {
   min-height: 100svh;
-}
-
-/* The gauge bar follows the scroll engine, which does not run here. */
-.still .hudText {
-  display: none;
 }
 
 .still .goal {

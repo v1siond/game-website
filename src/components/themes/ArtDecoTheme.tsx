@@ -1,12 +1,11 @@
 'use client'
 
-import { useCallback, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { fillLabel } from '@/lib/cv/labels'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from './shared/SkipLink'
@@ -32,8 +31,7 @@ const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap'
 // and does one thing per card of the section: throws a bolt into a fuse box, listens to a diary, seals a
 // leak, lifts a crate. Every motion is a function of the scroll position (the shared theatre on
 // useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
-// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame; the gauge
-// bar names the chamber and counts his deeds.
+// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame.
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
@@ -50,20 +48,7 @@ export default function ArtDecoTheme() {
     () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
     [view, cv, labels, active],
   )
-  const placeRef = useRef<HTMLSpanElement>(null)
-  const countRef = useRef<HTMLSpanElement>(null)
-
-  // The gauge bar follows the chamber the page is in: its place and, where it counts, how many of its cards are read.
-  const lead = useCallback(
-    (id: string, reached: number) => {
-      const scene = scenes.find((each) => each.id === id)
-      if (!scene) return
-      if (placeRef.current) placeRef.current.textContent = labels.deco[scene.place]
-      if (countRef.current) countRef.current.textContent = scene.tally ? fillLabel(labels.deco[scene.tally], { count: reached, total: scene.count }) : ''
-    },
-    [scenes, labels],
-  )
-  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced, lead)
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
   const contact = scenes[scenes.length - 1]
 
@@ -77,7 +62,7 @@ export default function ArtDecoTheme() {
           ))}
         </Theatre>
       )}
-      <GaugeBar placeRef={placeRef} countRef={countRef} anchor={hero.anchor} />
+      <GaugeBar anchor={hero.anchor} />
       <main id="main-content" ref={textRef} className={page.main}>
         <StationHero scene={hero} still={reduced} />
         <ProfessionRegion>

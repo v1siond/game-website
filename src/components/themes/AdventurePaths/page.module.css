@@ -70,20 +70,6 @@
   text-decoration: none;
 }
 
-.hudText {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 14px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.hudCount {
-  color: var(--ap-coin);
-}
-
 .main {
   position: relative;
   z-index: 1;
@@ -168,16 +154,6 @@
   padding-bottom: 12svh;
 }
 
-.place {
-  margin: 0;
-  padding: 4px 12px;
-  border-radius: 4px;
-  background: var(--ap-hud);
-  color: var(--ap-coin);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
 .title {
   margin: 0;
   padding: 0.1em 0.35em;
@@ -253,10 +229,6 @@
     padding: 4px 180px 4px 16px;
   }
 
-  .hudText {
-    font-size: 0.85rem;
-  }
-
   .hero {
     padding-top: 60px;
     gap: 12px;
@@ -289,11 +261,6 @@
 
 .still .head {
   min-height: 100svh;
-}
-
-/* The HUD follows the scroll engine, which does not run here. */
-.still .hudText {
-  display: none;
 }
 
 .still .goal {
