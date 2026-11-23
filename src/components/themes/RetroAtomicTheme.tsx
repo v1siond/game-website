@@ -25,7 +25,7 @@ const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display:
 
 const PHONE_QUERY = '(max-width: 767.98px)'
 
-// Retro Atomic: a fallout shelter of the atomic age seen through his wrist terminal, as a walk out of the
+// Retro Atomic: a bomb shelter of the atomic age seen through his wrist terminal, as a walk out of the
 // shelter, through the wasteland and into the town at dusk. The hero is the wrist terminal over the
 // shelter, its cog door rolled aside, him and the dog by the opening (./RetroAtomic/wristComputer); the
 // terminal's tabs and dial switch the profession. Then every section of the active profession is one full
