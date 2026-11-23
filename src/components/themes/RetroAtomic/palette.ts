@@ -64,10 +64,15 @@ export const PANEL = '#121410'
 export const BUNKER = '#1b1d17'
 export const ASH = '#bcbdaa'
 
-// DOG: the shepherd at his heel, tan coat, black saddle, pale muzzle.
+// DOG: his three dogs. The shepherds' tan coat (the second one's a shade darker), black saddle and pale
+// muzzle; the husky's white underside and mask, grey cap and back, and blue eyes.
 export const DOG_COAT = '#c08a4e'
+export const DOG_COAT_DARK = '#a26f38'
 export const DOG_SADDLE = '#1f1a14'
 export const DOG_MUZZLE = '#e2c08d'
+export const HUSKY_WHITE = '#eceee8'
+export const HUSKY_GREY = '#6f7782'
+export const HUSKY_EYE = '#4fb0ee'
 
 // WASTELAND: the hazy sky from top to horizon, the pale sun and the far ridge (journey.tsx).
 export const HAZE_TOP = '#8a9a6a'
