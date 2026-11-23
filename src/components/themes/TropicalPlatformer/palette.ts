@@ -1,9 +1,10 @@
 import type { CSSProperties } from 'react'
 import { paletteVars } from '../shared/paletteVars'
 
-// Tropical Platformer's palette: a jungle at sunset turning to night, warm barrel wood, steel hoops and
-// sun gold, the saturated pre-rendered colours of 3D jungle platformers. SVG art reads COLORS directly; Tailwind
-// classes read the same values as CSS variables, set once on the world's root by PALETTE_VARS.
+// Tropical Platformer's palette: a jungle at sunset turning to night, warm wood and sun gold, river and
+// lagoon water, the temple's stone, the saturated colours of 16-bit jungle platformers. SVG art reads
+// COLORS directly; Tailwind classes read the same values as CSS variables, set once on the world's root
+// by PALETTE_VARS.
 
 export const COLORS = {
   // the world's card on the worlds list (src/themes/themes.ts reads these)
@@ -16,15 +17,21 @@ export const COLORS = {
   woodDark: '#4a2208',
   // the light text on dark wood and leaf
   parchment: '#f6e7c8',
-  // the pure light and dark his volumes are lit and shaded toward
-  white: '#ffffff',
-  black: '#000000',
-  // his own fur and his tie
-  heroFur: '#6a3a1c',
-  heroTie: '#d42a1e',
-  // the laptop screen, and the fighter's mongkhon and shorts band
+  // his own clothes: the System Engineer's tee, jeans and trainers, the Musician's vest and black jeans
+  tee: '#2f7f8f',
+  jeans: '#35527e',
+  trainers: '#e8e2d4',
+  vest: '#262322',
+  blackJeans: '#3a3533',
+  // the worlds list's secondary, the lagoon's water light to deep, and the temple's stone
   lagoon: '#00CED1',
-  seaDeep: '#1f4fbf',
+  water: '#2b8fb0',
+  waterDeep: '#155a78',
+  stone: '#8d8a7a',
+  stoneDark: '#55534a',
+  // the coconut's husk and the gem inside it
+  husk: '#6b4a2a',
+  gem: '#7fe3d0',
   // the sunset the hero stands in, and the black shapes in front of it
   sunCore: '#fff4c2',
   sunGold: '#ffc93c',
@@ -39,63 +46,35 @@ export const COLORS = {
   jungle: '#17401f',
   moss: '#2f6b2c',
   fern: '#5fa83a',
-  // barrels, planks and steel hoops
+  // bark and planks
   bark: '#6b3f1d',
   barkDark: '#2e1a0b',
   plank: '#c98d4a',
   // The plank under body text only, a step lighter: under the grain it paints #c7a485, 7.15:1 with
-  // bark-dark; barrels, borders and letters keep plank.
+  // bark-dark; borders and letters keep plank.
   plankText: '#deba91',
   plankLight: '#e8b874',
-  // the dark boards the sections are read on, top to bottom, and the deep wood under the plates and the
-  // mine cart's tunnel
+  // the nail heads in a plank's corners
+  nail: '#b9bec6',
+  nailShade: '#4f545c',
+  // the dark boards the sections are read on, top to bottom, and the deep wood under the plates
   boardTop: '#24150a',
   boardBottom: '#160c05',
   plateTop: '#2a180b',
   woodDeep: '#1a0f06',
-  hoop: '#4f545c',
-  hoopLight: '#b9bec6',
-  burst: '#fffdf4',
-  // the four letters, the target rings
-  letter: '#ffd23f',
-  target: '#d1301f',
-  // night at the end of the level
+  // night at the end of the run: the sky, the moon, the camp's fire and lanterns
   nightSky: '#101a3a',
   nightDeep: '#070c20',
   moon: '#f6f0cf',
-  firefly: '#e9ff8f',
   lamp: '#ffb347',
-  // the banana bunch on the counter and beside every level sign
-  banana: '#ffd84a',
-  bananaLit: '#fff3a6',
-  bananaShade: '#c9861b',
-  stem: '#5a3a1a',
-  // the sandy jungle path
-  dirt: '#c99a5a',
-  dirtDark: '#8a5a2c',
-  // the old timer in his rocking chair (about): grey brown fur, a long white beard
-  elderFur: '#7b6555',
-  elderSkin: '#d9a77c',
-  elderBeard: '#f2efe8',
-  // the walking crocodile foes (Muay Thai): green hide, a tan belly
-  croc: '#3f8a3a',
-  crocDark: '#1f4f24',
-  crocBelly: '#d9b77a',
-  // the bout's clearing, top to bottom
-  clearingTop: '#1d5a2a',
-  clearingBottom: '#0f3519',
-  // the rhino he rides through the ventures: grey hide, an ivory horn
-  rhino: '#8a8f99',
-  rhinoDark: '#4d5159',
-  horn: '#efe6d2',
 } as const
 
 export type ColorName = keyof typeof COLORS
 
-// The light of each scene, after the source's levels: the backlit sunset, the dusk jungle with its
-// banded treeline, the day jungle under a pale sky, the misty treetop village with its lanterns, the
-// purple cave of the hoard, and night. Every scenery shape reads its colours from the tone it sits in
-// (scenery.tsx sets them as --tone-* variables), so one drawing serves every scene.
+// The light of each scene: the backlit sunset, the dusk jungle with its banded treeline, the day jungle
+// under a pale sky, the misty giant tree with its lanterns, and night. Every scenery shape reads its
+// colours from the tone it sits in (scenery.tsx sets them as --tone-* variables), so one drawing serves
+// every scene.
 export interface ToneColors {
   skyHigh: string
   skyLow: string
@@ -109,7 +88,7 @@ export interface ToneColors {
   bloom: string
 }
 
-export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'cave' | 'night'
+export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'night'
 
 export const TONES: Record<Tone, ToneColors> = {
   // the sunset's planes are its dusk and orange and the black shapes in front of the light
@@ -160,18 +139,6 @@ export const TONES: Record<Tone, ToneColors> = {
     rim: '#ffcf6b',
     trunk: '#5a3a22',
     bloom: '#ffb347',
-  },
-  cave: {
-    skyHigh: '#1a0b24',
-    skyLow: '#3a1d4a',
-    farLit: '#7a4a96',
-    far: '#4a2a62',
-    leafLit: '#a87acb',
-    leaf: '#6a3e88',
-    leafShade: '#25122f',
-    rim: '#d8b4f0',
-    trunk: '#3a1f48',
-    bloom: COLORS.banana,
   },
   night: {
     skyHigh: COLORS.nightDeep,

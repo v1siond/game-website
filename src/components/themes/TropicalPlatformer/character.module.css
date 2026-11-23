@@ -1,478 +1,64 @@
 /*
- * His poses (character.tsx), transform keyframes keyed off the svg's data-pose. The right arm and leg are
- * the left ones mirrored on x = 50, so one set of keyframes moves both sides as mirror images; where the
- * two must alternate (the pound, the run, the slaps, the jabs) the right side runs half a beat behind.
- * Pivots in the left half's own units: the shoulder (24, 50), the elbow (19, 78), the hip (38, 90). A
- * positive angle swings the hand outward and up, a negative one in toward his middle.
+ * His poses on a page (character.tsx), transform keyframes keyed off the svg's data-pose. Pivots: the feet
+ * for the breath and the stage body (50, 146); the shoulders, elbows, hips and knees are the origins of the
+ * limb groups, each translated there, so they turn about 0 0. On a stage the shared rig writes the same
+ * groups' turns. The held angle of each pose sits outside the motion query, so reduced motion shows it still.
  */
 
 .figure {
   overflow: visible;
 }
 
-.body,
-.eyes,
-.tie,
-.armBack,
-.armFront,
-.foreBack,
-.foreFront,
-.legBack,
-.legFront,
-.ball,
-.held {
-  transform-box: view-box;
-}
-
+.breath,
 .body {
-  transform-origin: 50px 116px;
+  transform-box: view-box;
+  transform-origin: 50px 146px;
 }
 
-.eyes {
-  transform-origin: 50px 29.5px;
+.armLeft,
+.armRight,
+.foreLeft,
+.foreRight,
+.thighLeft,
+.thighRight,
+.shinLeft,
+.shinRight {
+  transform-origin: 0 0;
 }
 
-.tie {
-  transform-origin: 50px 48px;
+/* ---- held angles ---- */
+
+.figure[data-pose='wave'] .armRight {
+  transform: rotate(-150deg);
 }
 
-.armBack,
-.armFront {
-  transform-origin: 24px 50px;
-}
-
-.foreBack,
-.foreFront {
-  transform-origin: 19px 78px;
-}
-
-.legBack,
-.legFront {
-  transform-origin: 38px 90px;
-}
-
-.ball {
-  transform-origin: 50px 81px;
-}
-
-/* Every pose moves only when the visitor allows motion; otherwise he stands at rest. Each plays a bounded
- * number of runs inside 5 s and rests (BD29): the breath, the pound and the blink once, a pose that holds a
- * look (the swing's hang, the typing, the bongos, the guard) on its last frame. A figure waiting for its
- * scene's trigger (data-waiting) stands at rest until it comes. */
 @media (prefers-reduced-motion: no-preference) {
-  .figure:not([data-waiting], [data-pose='roll']) .eyes {
-    animation: blink 4.2s steps(1, end);
+  /* The idle: two slow breaths, then he stands. */
+  .figure[data-pose='idle'] .breath {
+    animation: breath 1.6s ease-in-out 2;
   }
 
-  /* ---- idle: the big breath, then the chest pound ---- */
-
-  .figure:not([data-waiting])[data-pose='idle'] .body,
-  .figure:not([data-waiting])[data-pose='act'] .body {
-    animation: breathe 3.6s ease-in-out;
+  /* The wave: the raised hand waves at the visitor, eight beats, and holds up. */
+  .figure[data-pose='wave'] .foreRight {
+    animation: wave 0.4s ease-in-out 8 alternate;
   }
+}
 
-  .figure:not([data-waiting])[data-pose='idle'] .tie {
-    animation: tie-sway 3.6s ease-in-out;
+@keyframes breath {
+  0%,
+  100% {
+    transform: scale(1, 1);
   }
-
-  .figure:not([data-waiting])[data-pose='idle'] .armBack,
-  .figure:not([data-waiting])[data-pose='idle'] .armFront {
-    animation: pound-upper 3.6s ease-in-out;
+  50% {
+    transform: scale(1.03, 1.02);
   }
+}
 
-  .figure:not([data-waiting])[data-pose='idle'] .foreBack {
-    animation: pound-fore 3.6s ease-in-out;
-  }
-
-  .figure:not([data-waiting])[data-pose='idle'] .foreFront {
-    animation: pound-fore 3.6s ease-in-out -0.11s;
-  }
-
-  /* ---- run: the knuckle run ----
-     Diagonal pairs: one arm lifts with the leg on the other side while the other pair plants. The
-     second pair plays the same alternate loop in the same direction one iteration (half a back and
-     forth) earlier; the front limbs are drawn mirrored, so the same keyframes lift them outward too. */
-
-  .figure:not([data-waiting])[data-pose='run'] .body {
-    animation: run-bob 0.15s ease-in-out 24 alternate;
-  }
-
-  .figure:not([data-waiting])[data-pose='run'] .armBack,
-  .figure:not([data-waiting])[data-pose='run'] .legFront {
-    animation: knuckle-plant 0.3s ease-in-out 12 alternate;
-  }
-
-  .figure:not([data-waiting])[data-pose='run'] .armFront,
-  .figure:not([data-waiting])[data-pose='run'] .legBack {
-    animation: knuckle-plant 0.3s ease-in-out -0.3s 12 alternate;
-  }
-
-  /* ---- throw: hoist the barrel, wind back, throw it, settle (once) ---- */
-
-  .figure:not([data-waiting])[data-pose='throw'] .body {
-    animation: throw-body 1.3s ease-in-out var(--pose-delay, 0s) both;
-  }
-
-  .figure:not([data-waiting])[data-pose='throw'] .armBack,
-  .figure:not([data-waiting])[data-pose='throw'] .armFront {
-    animation: throw-upper 1.3s ease-in-out var(--pose-delay, 0s) both;
-  }
-
-  .figure:not([data-waiting])[data-pose='throw'] .foreBack,
-  .figure:not([data-waiting])[data-pose='throw'] .foreFront {
-    animation: throw-fore 1.3s ease-in-out var(--pose-delay, 0s) both;
-  }
-
-  .figure:not([data-waiting])[data-pose='throw'] .held {
-    animation: throw-barrel 1.3s ease-in var(--pose-delay, 0s) both;
-  }
-
-  /* ---- slap: hands up, slammed flat on the ground, left then right ---- */
-
-  .figure:not([data-waiting])[data-pose='slap'] .body {
-    animation: slap-body 0.9s ease-in 2;
-  }
-
-  .figure:not([data-waiting])[data-pose='slap'] .armBack {
-    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) 2;
-  }
-
-  .figure:not([data-waiting])[data-pose='slap'] .foreBack {
-    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) 2;
-  }
-
-  .figure:not([data-waiting])[data-pose='slap'] .armFront {
-    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s 2;
-  }
-
-  .figure:not([data-waiting])[data-pose='slap'] .foreFront {
-    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s 2;
-  }
-
-  /* ---- swing: the back hand holds the vine overhead, the rest hangs and trails ---- */
-
-  .figure:not([data-waiting])[data-pose='swing'] .armFront {
-    animation: swing-loose 1.6s ease-in-out 2 alternate forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='swing'] .legBack,
-  .figure:not([data-waiting])[data-pose='swing'] .legFront {
-    animation: swing-dangle 1.6s ease-in-out 2 alternate forwards;
-  }
-
-  /* ---- act: typing with the knuckles ---- */
-
-  .figure[data-pose='act'][data-profession='engineer'] .armBack,
-  .figure[data-pose='act'][data-profession='engineer'] .armFront {
-    transform: rotate(-16deg);
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='engineer'] .foreBack {
-    animation: type-tap 0.24s ease-in-out 16 alternate forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='engineer'] .foreFront {
-    animation: type-tap 0.24s ease-in-out -0.12s 16 alternate forwards;
-  }
-
-  /* ---- act: slapping the bongos ---- */
-
-  .figure[data-pose='act'][data-profession='drummer'] .armBack,
-  .figure[data-pose='act'][data-profession='drummer'] .armFront {
+@keyframes wave {
+  from {
     transform: rotate(-25deg);
   }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='drummer'] .foreBack {
-    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) 13 alternate forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='drummer'] .foreFront {
-    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) -0.3s 13 alternate forwards;
-  }
-
-  /* ---- act: the guard and the jabs ---- */
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .armBack {
-    animation: jab-upper 1.4s ease-out 3 forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .foreBack {
-    animation: jab-fore 1.4s ease-out 3 forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .armFront {
-    animation: jab-upper 1.4s ease-out -0.7s 3 forwards;
-  }
-
-  .figure:not([data-waiting])[data-pose='act'][data-profession='fighter'] .foreFront {
-    animation: jab-fore 1.4s ease-out -0.7s 3 forwards;
-  }
-}
-
-@keyframes blink {
-  0%,
-  94% {
-    transform: scale(1, 1);
-  }
-  95%,
-  98% {
-    transform: scale(1, 0.1);
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1, 1);
-  }
-  25% {
-    transform: translate(0, -1.5px) scale(1.035, 1.04);
-  }
-  50% {
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes tie-sway {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  30% {
-    transform: rotate(4deg);
-  }
-  70% {
-    transform: rotate(-3deg);
-  }
-}
-
-@keyframes pound-upper {
-  0%,
-  55%,
-  100% {
-    transform: rotate(0deg);
-  }
-  62%,
-  90% {
-    transform: rotate(50deg);
-  }
-}
-
-@keyframes pound-fore {
-  0%,
-  55%,
-  100% {
-    transform: rotate(0deg);
-  }
-  62%,
-  71%,
-  80%,
-  90% {
-    transform: rotate(-150deg);
-  }
-  66%,
-  75%,
-  85% {
-    transform: rotate(-128deg);
-  }
-}
-
-@keyframes run-bob {
-  from {
-    transform: translate(0, 0) scale(1.04, 0.96);
-  }
   to {
-    transform: translate(0, -7px) scale(0.98, 1.03);
-  }
-}
-
-@keyframes knuckle-plant {
-  from {
-    transform: translate(0, 0) rotate(-12deg);
-  }
-  to {
-    transform: translate(0, -5px) rotate(16deg);
-  }
-}
-
-@keyframes throw-body {
-  0%,
-  100% {
-    transform: scale(1, 1);
-  }
-  15% {
-    transform: scale(1.06, 0.9);
-  }
-  40% {
-    transform: translate(-2px, 0) scale(0.98, 1.05);
-  }
-  55% {
-    transform: translate(4px, 0) scale(1.04, 0.96);
-  }
-}
-
-@keyframes throw-upper {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25%,
-  40% {
-    transform: rotate(160deg);
-  }
-  55% {
-    transform: rotate(120deg);
-  }
-}
-
-@keyframes throw-fore {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25%,
-  40% {
-    transform: rotate(-35deg);
-  }
-  55% {
-    transform: rotate(-10deg);
-  }
-}
-
-@keyframes throw-barrel {
-  0% {
-    opacity: 0;
-    transform: translate(0, 50px);
-  }
-  20%,
-  42% {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-  75% {
-    opacity: 0;
-    transform: translate(90px, -30px) rotate(220deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(90px, -30px);
-  }
-}
-
-@keyframes type-tap {
-  from {
-    transform: rotate(-8deg);
-  }
-  to {
-    transform: rotate(-18deg) translate(0, 1.5px);
-  }
-}
-
-@keyframes bongo-slap {
-  from {
-    transform: rotate(30deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes jab-upper {
-  0%,
-  20%,
-  45%,
-  100% {
-    transform: rotate(-20deg);
-  }
-  28% {
-    transform: rotate(80deg);
-  }
-}
-
-@keyframes jab-fore {
-  0%,
-  20%,
-  45%,
-  100% {
-    transform: rotate(-150deg);
-  }
-  28% {
-    transform: rotate(0deg);
-  }
-}
-
-/* The hanging grip holds even when nothing moves: the back arm straight up to the vine. */
-.figure[data-pose='swing'] .armBack {
-  transform: rotate(168deg);
-}
-
-.figure[data-pose='swing'] .armFront {
-  transform: rotate(28deg);
-}
-
-@keyframes slap-body {
-  0%,
-  100% {
-    transform: translate(0, 3px) scale(1.08, 0.9);
-  }
-  25%,
-  75% {
-    transform: translate(0, -2px) scale(0.98, 1.04);
-  }
-  50% {
-    transform: translate(0, 3px) scale(1.08, 0.9);
-  }
-}
-
-/* Up over the head (outward and up), then down hard to the hip with the forearm reaching out flat. */
-@keyframes slap-upper {
-  0%,
-  10% {
-    transform: rotate(20deg);
-  }
-  40% {
-    transform: rotate(150deg);
-  }
-  55%,
-  100% {
-    transform: rotate(20deg);
-  }
-}
-
-@keyframes slap-fore {
-  0%,
-  10% {
-    transform: rotate(-10deg);
-  }
-  40% {
-    transform: rotate(-30deg);
-  }
-  55%,
-  100% {
-    transform: rotate(-10deg);
-  }
-}
-
-@keyframes swing-loose {
-  from {
-    transform: rotate(18deg);
-  }
-  to {
-    transform: rotate(40deg);
-  }
-}
-
-@keyframes swing-dangle {
-  from {
-    transform: rotate(-8deg);
-  }
-  to {
-    transform: rotate(10deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .figure[data-pose='throw'] .held {
-    opacity: 0;
+    transform: rotate(25deg);
   }
 }

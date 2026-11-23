@@ -80,29 +80,11 @@
   opacity: 0.45;
 }
 
-.deck {
-  fill: var(--tp-plank);
+/* The sky's gradient stops: the tone's high colour down to its horizon. */
+.skyHigh {
+  stop-color: var(--tone-sky-high);
 }
 
-.deckEdge {
-  fill: var(--tp-bark);
-}
-
-.rope {
-  fill: none;
-  stroke: var(--tp-plank-light);
-}
-
-.lamp {
-  fill: var(--tp-lamp);
-}
-
-/* The sky behind the treeline: the tone's high colour fading to its horizon, then to nothing. */
-.sky {
-  background: linear-gradient(180deg, var(--tone-sky-high), var(--tone-sky-low) 62%, transparent);
-}
-
-/* A section's backdrop fades in and out at its ends, so one level's jungle runs into the next. */
-.fade {
-  mask-image: linear-gradient(180deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+.skyLow {
+  stop-color: var(--tone-sky-low);
 }

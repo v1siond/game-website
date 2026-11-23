@@ -1,365 +1,189 @@
-'use client'
-
-import { memo, useId, type AnimationEventHandler, type ReactNode } from 'react'
-import { mix } from '@/lib/color'
+import { memo } from 'react'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
-import { cssVars } from '@/lib/cssVars'
-import { COLORS } from './palette'
-import { usePlayedOut } from './playedOut'
-import sprite from './character.module.css'
+import { STAND as RIG_STAND, type RigPose } from '@/lib/motion/rigPose'
+import { rigJoints, setRigPose, type RigClasses, type RigJoints } from '../shared/rig'
+import { COLORS as C } from './palette'
+import figure from './character.module.css'
 
-// Him as a parody of the source's hero, the big tie wearing gorilla, in the look of its pre rendered 3D
-// sprites: a gorilla build (a huge chest and shoulders, long thick arms with heavy knuckles, short legs
-// and big feet), a heavy brow, a tuft of his own dark hair on top, his face with the full dark beard and
-// black oval eyes, and a red tie with nothing written on it. No ink outline: every volume is shaded by a
-// radial gradient lit from the upper left and edged by a warm rim light on the right (the level's sun
-// behind him). The bare skin (face, ears, chest, hands, feet) is his own, from HERO_IDENTITY.
+// Him as a jungle platformer hero, in his own clothes: round shaded volumes with a dark edge and a warm rim
+// light from the level's sun, his short dark hair, his full dark beard, black oval eyes and his own skin.
+// The System Engineer in a teal tee, jeans and trainers; the Musician in a black vest and black jeans with
+// his sticks; the Martial Artist bare chested in red shorts, his hand wraps and his mongkhon, barefoot.
 //
-// Poses, transform keyframes in character.module.css keyed off data-pose:
-// - idle: a big breath, a blink and the chest pound, once, then he stands;
-// - run: the knuckle run, the body bouncing while the arms plant and swing;
-// - roll: tucked into a spinning ball, the roll attack (the ball turns eight times on Tailwind's spin);
-// - throw: a barrel hoisted overhead and thrown, once, then back to rest;
-// - slap: the ground slap, both hands raised and slammed flat on the ground in turn, the body squashing
-//   on each slam (the section around him shakes, slap.tsx);
-// - swing: hanging from a vine by one hand overhead, the other arm and the legs loose (vines.tsx);
-// - act: his profession, done the way this hero would: typing on a field laptop with his knuckles
-//   (engineer), slapping a pair of bongos (drummer), a guard and jabs in gloves, shorts and his mongkhon
-//   (fighter, who wears no tie).
-// Every pose plays a bounded number of runs inside 5 s and rests (BD29); `waiting` holds him at rest until
-// his scene's trigger, for a figure that is drawn before its scene comes into view.
-//
-// `silhouette` draws him the way the sunset level draws its characters: fur and skin one dark shape, the
-// rim light kept, only what he wears in colour.
+// On a page (the hero card, the profession plates) his poses are transform keyframes in
+// character.module.css keyed off data-pose: a breath and a look round (idle), or a wave (the picked
+// plate); each plays a set number of beats and rests within 5 s. On a stage (StageFigure) every limb turns
+// at its joint on the shared rig (../shared/rig) and the scroll writes the pose.
 
-export type HeroPose = 'idle' | 'run' | 'roll' | 'throw' | 'slap' | 'swing' | 'act'
+export type HeroPose = 'idle' | 'wave'
 
-const { white: WHITE, black: BLACK, heroFur: FUR, heroTie: TIE } = COLORS
+const EDGE = C.shadow
+const SKIN = HERO_IDENTITY.skin
 
-interface Look {
-  fur: string
-  skin: string
-  hair: string
-  beard: string
-  eyes: string
-  rim: string
+interface Kit {
+  shirt: string | null
+  sleeve: boolean
+  legs: string
+  shorts: string | null
+  feet: string | null
+  hands: string
+  sticks: boolean
 }
 
-const OWN_LOOK: Look = {
-  fur: FUR,
-  skin: HERO_IDENTITY.skin,
-  hair: HERO_IDENTITY.hair,
-  beard: HERO_IDENTITY.beard,
-  eyes: HERO_IDENTITY.eyes,
-  rim: COLORS.sunCore,
+const KIT: Record<Profession, Kit> = {
+  engineer: { shirt: C.tee, sleeve: true, legs: C.jeans, shorts: null, feet: C.trainers, hands: SKIN, sticks: false },
+  drummer: { shirt: C.vest, sleeve: false, legs: C.blackJeans, shorts: null, feet: C.shadowSoft, hands: SKIN, sticks: true },
+  fighter: { shirt: null, sleeve: false, legs: SKIN, shorts: C.sunsetRed, feet: null, hands: C.parchment, sticks: false },
 }
 
-const SHADOW_LOOK: Look = {
-  fur: COLORS.shadow,
-  skin: COLORS.shadowSoft,
-  hair: COLORS.shadow,
-  beard: COLORS.shadow,
-  eyes: COLORS.shadow,
-  rim: COLORS.sunsetOrange,
+/** The rig's groups of his drawing, by the css module's classes. */
+const RIG_CLASSES: RigClasses = {
+  body: figure.body,
+  armRight: figure.armRight,
+  foreRight: figure.foreRight,
+  armLeft: figure.armLeft,
+  foreLeft: figure.foreLeft,
+  thighRight: figure.thighRight,
+  shinRight: figure.shinRight,
+  thighLeft: figure.thighLeft,
+  shinLeft: figure.shinLeft,
 }
 
-// The gradient ids of one drawing; useId keeps two heroes on a page from sharing them.
-interface Paints {
-  fur: string
-  skin: string
-  tie: string
-  glove: string
-  shorts: string
-}
-
-// A volume's radial stops: lit from the upper left, its own colour, its shade.
-interface Stops {
-  light: string
-  base: string
-  dark: string
-}
-
-const stopsOf = (color: string): Stops => ({ light: mix(color, WHITE, 0.3), base: color, dark: mix(color, BLACK, 0.5) })
-
-// A look with every colour mixed from it, worked out once per look at module scope instead of per render:
-// the stops of each volume and the darker lines drawn over the skin and the beard.
-interface Shaded extends Look {
-  volumes: Record<keyof Paints, Stops>
-  knuckles: string
-  chest: string
-  mouth: string
-}
-
-const TIE_STOPS = stopsOf(TIE)
-const GLOVE_STOPS = stopsOf(COLORS.target)
-const SHORTS_STOPS = stopsOf(COLORS.sunGold)
-const TIE_STRIPE = mix(TIE, BLACK, 0.35)
-const TIE_KNOT = mix(TIE, BLACK, 0.2)
-
-const shaded = (look: Look): Shaded => ({
-  ...look,
-  volumes: { fur: stopsOf(look.fur), skin: stopsOf(look.skin), tie: TIE_STOPS, glove: GLOVE_STOPS, shorts: SHORTS_STOPS },
-  knuckles: mix(look.skin, BLACK, 0.4),
-  chest: mix(look.skin, BLACK, 0.35),
-  mouth: mix(look.beard, WHITE, 0.18),
-})
-
-const OWN = shaded(OWN_LOOK)
-const SHADOW = shaded(SHADOW_LOOK)
-
-function Volume({ id, stops }: { id: string; stops: Stops }) {
-  return (
-    <radialGradient id={id} cx="0.34" cy="0.3" r="0.8">
-      <stop offset="0" stopColor={stops.light} />
-      <stop offset="0.45" stopColor={stops.base} />
-      <stop offset="1" stopColor={stops.dark} />
-    </radialGradient>
-  )
-}
-
-// A shape with its rim light: the same shape in the rim colour, nudged right and up, under the shaded one.
-function Lit({ d, fill, rim }: { d: string; fill: string; rim: string }) {
+/** A limb's length: the dark edge, then its colour down the middle. */
+function Limb({ to, fill, width }: { to: readonly [number, number]; fill: string; width: number }) {
+  const d = `M0 0 L${to[0]} ${to[1]}`
   return (
     <>
-      <path d={d} fill={rim} opacity="0.85" transform="translate(1.6 -0.8)" />
-      <path d={d} fill={fill} />
+      <path d={d} stroke={EDGE} strokeWidth={width + 2.4} strokeLinecap="round" />
+      <path d={d} stroke={fill} strokeWidth={width} strokeLinecap="round" />
     </>
   )
 }
 
-// The left half of the drawing; the right half is the same shapes mirrored on x = 50.
-const UPPER_ARM = 'M15 48 C11 58 11 70 12 80 H28 C30 70 32 60 33 51 Z'
-const FOREARM = 'M10 76 C7 86 7 96 8 103 H25 C27 95 28 86 28 78 Z'
-const LEG = 'M31 88 C29 97 30 105 31 110 H45 C46 104 46 96 45 88 Z'
-const TORSO = 'M20 46 C30 37 70 37 80 46 C87 60 83 84 70 95 H30 C17 84 13 60 20 46 Z'
-const HEAD_FUR = 'M50 9 C63 9 70 18 70 30 C70 42 62 50 50 50 C38 50 30 42 30 30 C30 18 37 9 50 9 Z'
-const TIE_SHAPE = 'M46.5 50 H53.5 L57 76 L50 83 L43 76 Z'
-const SHORTS = 'M27 84 H73 C73 92 71 98 67 101 H54 L50 95 L46 101 H33 C29 98 27 92 27 84 Z'
-
-const MIRROR = 'translate(100 0) scale(-1 1)'
-
-interface PartProps {
-  look: Shaded
-  paints: Paints
-  profession: Profession
-}
-
-function Hand({ look, paints, profession }: PartProps) {
-  if (profession === 'fighter') {
-    return (
-      <>
-        <circle cx="17.5" cy="105" r="10.5" fill={look.rim} opacity="0.85" />
-        <circle cx="16.5" cy="106" r="10.5" fill={`url(#${paints.glove})`} />
-        <path d="M9 111 H24" stroke={COLORS.burst} strokeWidth="2.2" strokeLinecap="round" />
-      </>
-    )
-  }
+// One arm from the shoulder: the upper arm (a tee's sleeve over it), the forearm and the hand, the
+// drummer's stick in it. The right arm is the one nearer the things he acts on.
+function Arm({ side, kit }: { side: 'left' | 'right'; kit: Kit }) {
+  const s = side === 'right' ? 1 : -1
   return (
-    <>
-      <ellipse cx="17.5" cy="105.2" rx="10" ry="7.5" fill={look.rim} opacity="0.85" />
-      <ellipse cx="16.5" cy="106" rx="10" ry="7.5" fill={`url(#${paints.skin})`} />
-      <path d="M11 104 v4 M16 103.5 v4.5 M21 104 v4" stroke={look.knuckles} strokeWidth="1.2" strokeLinecap="round" />
-    </>
-  )
-}
-
-// One long arm, hinged at the shoulder (24, 50) and the elbow (19, 78).
-function Arm({ side, ...part }: PartProps & { side: 'back' | 'front' }) {
-  const back = side === 'back'
-  return (
-    <g transform={back ? undefined : MIRROR}>
-      <g className={back ? sprite.armBack : sprite.armFront}>
-        <Lit d={UPPER_ARM} fill={`url(#${part.paints.fur})`} rim={part.look.rim} />
-        <g className={back ? sprite.foreBack : sprite.foreFront}>
-          <Lit d={FOREARM} fill={`url(#${part.paints.fur})`} rim={part.look.rim} />
-          <Hand {...part} />
+    <g transform={`translate(${50 + 13 * s} 64)`}>
+      <g className={side === 'right' ? figure.armRight : figure.armLeft}>
+        <Limb to={[3 * s, 16]} fill={SKIN} width={8} />
+        {kit.sleeve && kit.shirt && <Limb to={[1.4 * s, 7]} fill={kit.shirt} width={10} />}
+        <g transform={`translate(${3 * s} 16)`}>
+          <g className={side === 'right' ? figure.foreRight : figure.foreLeft}>
+            <Limb to={[1 * s, 14]} fill={SKIN} width={7} />
+            {kit.sticks && <path d={`M${1 * s} 17 L${12 * s} 34`} stroke={C.plankLight} strokeWidth={2.6} strokeLinecap="round" />}
+            <circle cx={1 * s} cy={17} r={kit.hands === SKIN ? 4.8 : 5.6} fill={kit.hands} stroke={EDGE} strokeWidth={1.6} />
+          </g>
         </g>
       </g>
     </g>
   )
 }
 
-function Leg({ side, look, paints }: { side: 'back' | 'front'; look: Shaded; paints: Paints }) {
-  const back = side === 'back'
+// One leg from the hip: the thigh and the shin, then the shoe or his bare foot.
+function Leg({ side, kit }: { side: 'left' | 'right'; kit: Kit }) {
+  const s = side === 'right' ? 1 : -1
   return (
-    <g transform={back ? undefined : MIRROR}>
-      <g className={back ? sprite.legBack : sprite.legFront}>
-        <Lit d={LEG} fill={`url(#${paints.fur})`} rim={look.rim} />
-        <Lit d="M27 112 C27 106 46 106 48 111 C49 117 26 118 27 112 Z" fill={`url(#${paints.skin})`} rim={look.rim} />
-      </g>
-    </g>
-  )
-}
-
-// His mongkhon in the jungle's look: a thick twisted cord ring round the head, blue wound with white, and
-// the raised point at the front.
-function JungleMongkhon() {
-  return (
-    <g>
-      <path d="M31 21 C38 15 62 15 69 21" fill="none" stroke={COLORS.seaDeep} strokeWidth="5.5" strokeLinecap="round" />
-      <path d="M31 21 C38 15 62 15 69 21" fill="none" stroke={COLORS.burst} strokeWidth="2.2" strokeDasharray="3 3" strokeLinecap="round" />
-      <path d="M46 17 Q50 3 54 17 Z" fill={COLORS.seaDeep} />
-      <path d="M48.5 15 Q50 7 51.5 15" fill="none" stroke={COLORS.burst} strokeWidth="1.2" />
-    </g>
-  )
-}
-
-function Head({ look, paints, profession }: PartProps) {
-  return (
-    <g className={sprite.head}>
-      <Lit d={HEAD_FUR} fill={`url(#${paints.fur})`} rim={look.rim} />
-      <path d="M43 12 Q45 1 49 9 Q51 -1 54 9 Q58 2 58 13 Z" fill={look.hair} />
-      <ellipse cx="32" cy="31" rx="4" ry="5" fill={`url(#${paints.skin})`} />
-      <ellipse cx="68" cy="31" rx="4" ry="5" fill={`url(#${paints.skin})`} />
-      <path d="M50 17 C60 17 63 24 63 32 C63 41 58 47 50 47 C42 47 37 41 37 32 C37 24 40 17 50 17 Z" fill={`url(#${paints.skin})`} />
-      <path d="M36 25 Q50 15 64 25 Q60 21.5 50 21.5 Q40 21.5 36 25 Z" fill={`url(#${paints.fur})`} />
-      <path d="M37 31 C37 44 42 52 50 52 C58 52 63 44 63 31 C61 36 58 37.5 55 37.5 C53 39.5 51.5 40 50 40 C48.5 40 47 39.5 45 37.5 C42 37.5 39 36 37 31 Z" fill={look.beard} />
-      <path d="M45.5 43.5 Q50 46 54.5 43.5" fill="none" stroke={look.mouth} strokeWidth="1.4" strokeLinecap="round" />
-      <g className={sprite.eyes}>
-        <ellipse cx="44.5" cy="29.5" rx="2.6" ry="3.8" fill={look.eyes} />
-        <ellipse cx="55.5" cy="29.5" rx="2.6" ry="3.8" fill={look.eyes} />
-        <circle cx="45.3" cy="28.1" r="0.9" fill={WHITE} opacity="0.85" />
-        <circle cx="56.3" cy="28.1" r="0.9" fill={WHITE} opacity="0.85" />
-      </g>
-      {profession === 'fighter' && <JungleMongkhon />}
-    </g>
-  )
-}
-
-// What he works with in the act pose, on the ground in front of him.
-const ACT_PROPS: Record<Profession, ReactNode> = {
-  engineer: (
-    <g>
-      <path d="M28 104 L34 90 H66 L72 104 Z" fill={COLORS.hoop} />
-      <path d="M31 102 L36 92 H64 L69 102 Z" fill={COLORS.lagoon} opacity="0.85" />
-      <path d="M39 96 H52 M40 99 H59" stroke={COLORS.burst} strokeWidth="1.2" />
-      <rect x="25" y="104" width="50" height="4.5" rx="2.2" fill={COLORS.hoopLight} />
-    </g>
-  ),
-  drummer: (
-    <g>
-      {[38, 62].map((cx, i) => (
-        <g key={cx}>
-          <path d={`M${cx - 11} ${98 + i * 2} V112 Q${cx} 118 ${cx + 11} 112 V${98 + i * 2}`} fill="url(#tp-wood)" />
-          <ellipse cx={cx} cy={98 + i * 2} rx="11" ry="4" fill={COLORS.parchment} />
-          <path d={`M${cx - 11} ${104 + i * 2} Q${cx} ${109 + i * 2} ${cx + 11} ${104 + i * 2}`} fill="none" stroke={COLORS.hoopLight} strokeWidth="1.6" />
+    <g transform={`translate(${50 + 6 * s} 96)`}>
+      <g className={side === 'right' ? figure.thighRight : figure.thighLeft}>
+        <Limb to={[1 * s, 22]} fill={kit.legs} width={10} />
+        <g transform={`translate(${1 * s} 22)`}>
+          <g className={side === 'right' ? figure.shinRight : figure.shinLeft}>
+            <Limb to={[0, 21]} fill={kit.legs} width={9} />
+            <ellipse cx={3.5 * s} cy={26} rx={kit.feet ? 8 : 6.5} ry={kit.feet ? 4.4 : 3.4} fill={kit.feet ?? SKIN} stroke={EDGE} strokeWidth={1.6} />
+          </g>
         </g>
-      ))}
-    </g>
-  ),
-  fighter: null,
-}
-
-// The barrel he hoists in the throw pose, over his head in both hands.
-function HeldBarrel() {
-  return (
-    <g className={sprite.held}>
-      <ellipse cx="50" cy="-8" rx="24" ry="15" fill="url(#tp-wood)" />
-      <path d="M28 -15 Q50 -10 72 -15 M28 0 Q50 5 72 0" fill="none" stroke="url(#tp-hoop)" strokeWidth="3" />
+      </g>
     </g>
   )
 }
 
-// Tucked into the roll: a ball of fur with his hair, his beard and the end of the tie flying round it.
-function RollBall({ look, paints, profession }: PartProps) {
+// His mongkhon round his head: the wound cord ring and its tail.
+function Mongkhon() {
   return (
-    <g className={`${sprite.ball} motion-safe:animate-[spin_0.45s_linear_8]`}>
-      <circle cx="51.5" cy="80" r="31" fill={look.rim} opacity="0.85" />
-      <circle cx="50" cy="81" r="31" fill={`url(#${paints.fur})`} />
-      <path d="M50 50 C56 46 62 47 66 52 C60 52 55 53 50 56 Z" fill={look.hair} />
-      <path d="M79 72 A31 31 0 0 1 78 94 C72 88 70 80 72 72 Z" fill={look.beard} />
-      <ellipse cx="34" cy="84" rx="9" ry="7" fill={`url(#${paints.skin})`} />
-      <ellipse cx="60" cy="104" rx="9" ry="5" fill={`url(#${paints.skin})`} />
-      {profession === 'fighter' ? (
-        <path d="M22 70 Q50 58 78 70" fill="none" stroke={COLORS.seaDeep} strokeWidth="4" />
-      ) : (
-        <path d="M70 58 L84 50 L86 58 Z" fill={`url(#${paints.tie})`} />
-      )}
-      <path d="M26 70 Q50 58 74 74" fill="none" stroke={look.volumes.fur.light} strokeWidth="1.6" opacity="0.5" />
+    <>
+      <path d="M31 24 C36 31 64 31 69 24" fill="none" stroke={EDGE} strokeWidth={5.4} strokeLinecap="round" />
+      <path d="M31 24 C36 31 64 31 69 24" fill="none" stroke={C.parchment} strokeWidth={3} strokeLinecap="round" strokeDasharray="2.4 1.6" />
+      <path d="M31 25 C25 27 22 31 20 36" fill="none" stroke={C.parchment} strokeWidth={2.4} strokeLinecap="round" />
+    </>
+  )
+}
+
+function Head({ profession }: { profession: Profession }) {
+  return (
+    <g>
+      <circle cx={50} cy={34} r={20} fill={SKIN} stroke={EDGE} strokeWidth={2} />
+      <path d="M33 26 C33 13 42 10 50 10 C58 10 67 13 67 26 C62 20 56 18 50 18 C44 18 38 20 33 26 Z" fill={HERO_IDENTITY.hair} />
+      <path d="M31.5 36 C33 48 40 54.5 50 54.5 C60 54.5 67 48 68.5 36 C63 40 57 41 54 41.5 C52 40 48 40 46 41.5 C43 41 37 40 31.5 36 Z" fill={HERO_IDENTITY.beard} />
+      <path d="M45 46 Q50 50 55 46" fill="none" stroke={C.sunsetRed} strokeWidth={1.8} strokeLinecap="round" />
+      <ellipse cx={43.5} cy={31} rx={2.6} ry={3.6} fill={HERO_IDENTITY.eyes} />
+      <ellipse cx={56.5} cy={31} rx={2.6} ry={3.6} fill={HERO_IDENTITY.eyes} />
+      <path d="M64 22 C68 30 67 40 62 47" fill="none" stroke={C.sunCore} strokeWidth={1.8} strokeLinecap="round" opacity={0.7} />
+      {profession === 'fighter' && <Mongkhon />}
     </g>
   )
 }
+
+/** Everything but the shadow: the far leg and arm, the body, the head, the near leg and arm. */
+function Body({ profession }: { profession: Profession }) {
+  const kit = KIT[profession]
+  return (
+    <>
+      <Leg side="left" kit={kit} />
+      <Leg side="right" kit={kit} />
+      <Arm side="left" kit={kit} />
+      <rect x={37} y={56} width={26} height={42} rx={11} fill={kit.shirt ?? SKIN} stroke={EDGE} strokeWidth={2} />
+      {kit.shorts && <path d="M37 86 H63 V100 Q57 102 51 99 H49 Q43 102 37 100 Z" fill={kit.shorts} stroke={EDGE} strokeWidth={2} strokeLinejoin="round" />}
+      {!kit.shorts && <path d="M38 90 H62 V97 Q50 100 38 97 Z" fill={kit.legs} stroke={EDGE} strokeWidth={1.6} />}
+      <path d="M60 62 Q63 76 61 92" fill="none" stroke={C.sunCore} strokeWidth={1.6} strokeLinecap="round" opacity={0.55} />
+      <Head profession={profession} />
+      <Arm side="right" kit={kit} />
+    </>
+  )
+}
+
+// His drawing's box in viewBox units, with room above his hair for a raised arm.
+const HERO_BOX = { top: -20, height: 170 } as const
 
 interface HeroCharacterProps {
   profession: Profession
   pose?: HeroPose
   className?: string
-  silhouette?: boolean
-  /** When a one shot pose (throw) starts, as a CSS time. */
-  delay?: string
-  /** True until his scene's trigger: he stands at rest and no pose plays. */
-  waiting?: boolean
-  onAnimationEnd?: AnimationEventHandler<SVGSVGElement>
 }
 
-// Pure on primitive props, so a parent's render that changes none of them leaves him as he is.
-export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', waiting = false, onAnimationEnd }: HeroCharacterProps) {
-  const uid = useId()
-  const look = silhouette ? SHADOW : OWN
-  const paints: Paints = {
-    fur: `${uid}-fur`,
-    skin: `${uid}-skin`,
-    tie: `${uid}-tie`,
-    glove: `${uid}-glove`,
-    shorts: `${uid}-shorts`,
-  }
-  const part = { look, paints, profession }
-  const fighter = profession === 'fighter'
-
+/** Him on a page, posed by the css keyframes of `pose`. */
+export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '' }: HeroCharacterProps) {
   return (
-    <svg
-      viewBox="0 -24 100 144"
-      className={`${sprite.figure} ${className}`}
-      data-pose={pose}
-      data-profession={profession}
-      data-waiting={waiting || undefined}
-      onAnimationEnd={onAnimationEnd}
-      style={cssVars({ '--pose-delay': delay })}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        <Volume id={paints.fur} stops={look.volumes.fur} />
-        <Volume id={paints.skin} stops={look.volumes.skin} />
-        <Volume id={paints.tie} stops={look.volumes.tie} />
-        <Volume id={paints.glove} stops={look.volumes.glove} />
-        <Volume id={paints.shorts} stops={look.volumes.shorts} />
-      </defs>
-      <ellipse cx="50" cy="116" rx="34" ry="4.5" fill={BLACK} opacity="0.3" />
-      {pose === 'roll' ? (
-        <RollBall {...part} />
-      ) : (
-        <g className={sprite.body}>
-          <Leg side="back" look={look} paints={paints} />
-          <Leg side="front" look={look} paints={paints} />
-          <Lit d={TORSO} fill={`url(#${paints.fur})`} rim={look.rim} />
-          <ellipse cx="50" cy="69" rx="18" ry="21" fill={`url(#${paints.skin})`} />
-          <path d="M40 62 Q45 66 49 62 M51 62 Q55 66 60 62" fill="none" stroke={look.chest} strokeWidth="1.4" strokeLinecap="round" />
-          {fighter && <Lit d={SHORTS} fill={`url(#${paints.shorts})`} rim={look.rim} />}
-          {fighter && <path d="M27 86 H73" stroke={COLORS.seaDeep} strokeWidth="3" />}
-          {!fighter && (
-            <g className={sprite.tie}>
-              <path d={TIE_SHAPE} fill={`url(#${paints.tie})`} />
-              <path d="M48 56 L54 62 M47 64 L55 70" stroke={TIE_STRIPE} strokeWidth="1.6" />
-              <path d="M45.5 46 H54.5 L53.5 52 H46.5 Z" fill={TIE_KNOT} />
-            </g>
-          )}
-          {pose === 'act' && ACT_PROPS[profession]}
-          <Arm side="back" {...part} />
-          <Arm side="front" {...part} />
-          <Head {...part} />
-          {pose === 'throw' && <HeldBarrel />}
-        </g>
-      )}
+    <svg viewBox={`0 ${HERO_BOX.top} 100 ${HERO_BOX.height}`} className={`${figure.figure} ${className}`} data-pose={pose} aria-hidden="true" focusable="false">
+      <ellipse cx={50} cy={146} rx={24} ry={3.4} fill={EDGE} opacity={0.35} />
+      <g className={figure.breath}>
+        <Body profession={profession} />
+      </g>
     </svg>
   )
 })
 
-/** Him for one moment the scene's class plays on the figure itself, gone once that animation ends, until
- *  the scene remounts him for the next play. */
-export function PassingHero(props: Omit<HeroCharacterProps, 'onAnimationEnd'>) {
-  const { over, onOwnEnd } = usePlayedOut()
-  if (over) return null
-  return <HeroCharacter {...props} onAnimationEnd={onOwnEnd} />
-}
+/** His pose on a stage: the shared rig's turns. */
+export type FigurePose = RigPose
+
+export const FIGURE_STAND: FigurePose = RIG_STAND
+
+/** His rig's groups inside a stage's figure group. */
+export const figureJoints = (root: Element): RigJoints => rigJoints(root, RIG_CLASSES)
+
+/** Writes `p` on his groups. */
+export const setFigurePose = (j: RigJoints, p: FigurePose): void => setRigPose(j, p)
+
+/** Him on a stage, his feet at 0 0 and his box 100 wide, standing until the scroll writes his pose. */
+export const StageFigure = memo(function StageFigure({ profession }: { profession: Profession }) {
+  return (
+    <g transform="translate(-50 -146)">
+      <ellipse cx={50} cy={146} rx={24} ry={3.4} fill={EDGE} opacity={0.35} />
+      <g className={figure.body}>
+        <Body profession={profession} />
+      </g>
+    </g>
+  )
+})
