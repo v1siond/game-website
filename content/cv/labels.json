@@ -38,8 +38,7 @@
         "skipToContent": "Skip to main content",
         "loading": "Loading...",
         "copyright": "Copyright",
-        "active": "Active",
-        "findTally": "{found} of {total}"
+        "active": "Active"
       },
       "actions": {
         "close": "Close {name}",
@@ -270,18 +269,6 @@
         "inkRibbons": "Ink ribbons: {count}",
         "saved": "Saved"
       },
-      "warp": {
-        "hub": "The Chronoport",
-        "observatory": "Observatory, 3000 BC",
-        "speedway": "Desert speedway, 1958",
-        "forge": "Iron forge, 1250",
-        "relay": "Sky relay, 2350",
-        "sands": "Vault of sands, 1320 BC",
-        "keystone": "The keystone",
-        "arena": "Neon arena, 1986",
-        "pavilion": "Ring pavilion, 1930",
-        "beacon": "The beacon, today"
-      },
       "souls": {
         "kindled": "Fire kindled",
         "rest": "Rest at the fire",
@@ -493,8 +480,7 @@
         "skipToContent": "Saltar al contenido principal",
         "loading": "Cargando...",
         "copyright": "Derechos de autor",
-        "active": "Activo",
-        "findTally": "{found} de {total}"
+        "active": "Activo"
       },
       "actions": {
         "close": "Cerrar {name}",
@@ -725,18 +711,6 @@
         "inkRibbons": "Cintas de tinta: {count}",
         "saved": "Guardado"
       },
-      "warp": {
-        "hub": "El Cronopuerto",
-        "observatory": "Observatorio, 3000 a. C.",
-        "speedway": "Autódromo del desierto, 1958",
-        "forge": "Forja de hierro, 1250",
-        "relay": "Relé del cielo, 2350",
-        "sands": "Cámara de las arenas, 1320 a. C.",
-        "keystone": "La clave del arco",
-        "arena": "Arena de neón, 1986",
-        "pavilion": "Pabellón del ring, 1930",
-        "beacon": "El faro, hoy"
-      },
       "souls": {
         "kindled": "Hoguera encendida",
         "rest": "Descansar junto al fuego",
@@ -948,8 +922,7 @@
         "skipToContent": "Vai al contenuto principale",
         "loading": "Caricamento...",
         "copyright": "Copyright",
-        "active": "Attivo",
-        "findTally": "{found} su {total}"
+        "active": "Attivo"
       },
       "actions": {
         "close": "Chiudi {name}",
@@ -1179,18 +1152,6 @@
         "save": "Salva",
         "inkRibbons": "Nastri inchiostrati: {count}",
         "saved": "Salvato"
-      },
-      "warp": {
-        "hub": "Il Cronoporto",
-        "observatory": "Osservatorio, 3000 a.C.",
-        "speedway": "Autodromo nel deserto, 1958",
-        "forge": "Forgia del ferro, 1250",
-        "relay": "Ripetitore del cielo, 2350",
-        "sands": "Camera delle sabbie, 1320 a.C.",
-        "keystone": "La chiave di volta",
-        "arena": "Arena al neon, 1986",
-        "pavilion": "Padiglione del ring, 1930",
-        "beacon": "Il faro, oggi"
       },
       "souls": {
         "kindled": "Falò acceso",

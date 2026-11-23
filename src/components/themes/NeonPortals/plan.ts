@@ -1,4 +1,3 @@
-import type { Labels } from '@/lib/cv/labels'
 import type { SectionId } from '@/lib/cv/sectionPlan'
 import type { Era } from './palette'
 
@@ -18,20 +17,18 @@ export interface RoomPlan {
   action: Action
   /** The keystone door that slides open after the room's last item. */
   door: boolean
-  /** The era line under the room's title, a key of labels.warp. */
-  line: keyof Labels['warp']
 }
 
 export const ROOM_PLAN: Record<RoomId, RoomPlan> = {
-  about: { era: 'observatory', prop: 'shard', action: 'reach', door: false, line: 'observatory' },
-  work: { era: 'speedway', prop: 'checkpoint', action: 'cheer', door: false, line: 'speedway' },
-  tech: { era: 'forge', prop: 'ironCrate', action: 'spin', door: false, line: 'forge' },
-  services: { era: 'relay', prop: 'pylon', action: 'reach', door: false, line: 'relay' },
-  projects: { era: 'sands', prop: 'crate', action: 'jump', door: false, line: 'sands' },
-  ventures: { era: 'keystone', prop: 'socket', action: 'jump', door: true, line: 'keystone' },
-  bands: { era: 'arena', prop: 'speaker', action: 'drum', door: false, line: 'arena' },
-  muayThai: { era: 'pavilion', prop: 'bag', action: 'kick', door: false, line: 'pavilion' },
-  contact: { era: 'beacon', prop: 'beacon', action: 'wave', door: false, line: 'beacon' },
+  about: { era: 'observatory', prop: 'shard', action: 'reach', door: false },
+  work: { era: 'speedway', prop: 'checkpoint', action: 'cheer', door: false },
+  tech: { era: 'forge', prop: 'ironCrate', action: 'spin', door: false },
+  services: { era: 'relay', prop: 'pylon', action: 'reach', door: false },
+  projects: { era: 'sands', prop: 'crate', action: 'jump', door: false },
+  ventures: { era: 'keystone', prop: 'socket', action: 'jump', door: true },
+  bands: { era: 'arena', prop: 'speaker', action: 'drum', door: false },
+  muayThai: { era: 'pavilion', prop: 'bag', action: 'kick', door: false },
+  contact: { era: 'beacon', prop: 'beacon', action: 'wave', door: false },
 }
 
 export const HUB_ERA: Era = 'hub'

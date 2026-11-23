@@ -628,21 +628,6 @@ collections:
                   - { <<: *text, label: "Save hint", name: saveHint }
                   - { <<: *text, label: "Ink ribbons", name: inkRibbons, hint: 'Keep {count}' }
                   - { <<: *text, label: "Saved", name: saved }
-              - label: Neon Portals world (the era line under each room)
-                name: warp
-                widget: object
-                i18n: true
-                fields:
-                  - { <<: *text, label: "The hub", name: hub }
-                  - { <<: *text, label: "About room era", name: observatory }
-                  - { <<: *text, label: "Work room era", name: speedway }
-                  - { <<: *text, label: "Tech room era", name: forge }
-                  - { <<: *text, label: "Services room era", name: relay }
-                  - { <<: *text, label: "Projects room era", name: sands }
-                  - { <<: *text, label: "Ventures room era", name: keystone }
-                  - { <<: *text, label: "Bands room era", name: arena }
-                  - { <<: *text, label: "Muay Thai room era", name: pavilion }
-                  - { <<: *text, label: "Contact room era", name: beacon }
               - label: Bonfire world (soul-map)
                 name: souls
                 widget: object

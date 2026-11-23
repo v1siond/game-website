@@ -78,14 +78,12 @@ export default function NeonPortalsTheme() {
     () => rooms.map(({ id, slot }) => ({ id, ...ROOM_PLAN[id], metas: roomMetas(slot, labels, year, highlights) })),
     [rooms, labels, year, highlights],
   )
-  const titles = useMemo(() => rooms.map((room) => room.title), [rooms])
   const sections = rooms.slice(0, -1)
   const contact = rooms[rooms.length - 1]
 
   return (
     <CorridorWorld
       specs={specs}
-      titles={titles}
       style={PORTAL_VARS}
       className={`relative min-h-screen overflow-x-clip bg-[color:var(--np-void)] text-[1.0625rem] leading-relaxed text-[color:var(--np-ink)] [--focus-ring:var(--np-white)] [--focus-halo:var(--np-void)] ${BODY} ${face.variable} ${body.variable}`}
     >

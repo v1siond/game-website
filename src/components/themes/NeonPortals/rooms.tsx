@@ -30,7 +30,7 @@ import type { PropMeta } from './world'
 // The text layer: plain HTML in normal flow over the fixed tunnel, never scaled by the art and never faded.
 // The hero is the Chronoport hub: his name, the recruiter copy and the three profession wings (the shared
 // switch). Each room is a transit spacer (the flight through the dark to the next gate, [data-transit]),
-// the gate plate with the room's title and its era line ([data-gate]), one card per item ([data-item],
+// the gate plate with the room's title ([data-gate]), one card per item ([data-item],
 // each the anchor of one prop in the tunnel) and a tail. The stage measures these marks.
 
 /** A room's colours as the CSS variables its text reads: its edge and its tint. */
@@ -326,8 +326,7 @@ interface RoomProps {
 }
 
 export function Room({ id, slot, title, wing, last }: RoomProps) {
-  const { warp } = useLabels()
-  const { era, line } = ROOM_PLAN[id]
+  const { era } = ROOM_PLAN[id]
   const flat = slot?.id === 'projects' || slot?.id === 'ventures'
   return (
     <section data-room="" id={roomAnchor(id)} aria-labelledby={`${roomAnchor(id)}-title`} style={eraVars(era)} className="px-[max(16px,6vw)]">
@@ -338,7 +337,6 @@ export function Room({ id, slot, title, wing, last }: RoomProps) {
           <h2 id={`${roomAnchor(id)}-title`} className={`${FACE} mb-1.5 mt-0.5 text-[clamp(2.2rem,5vw,4.25rem)] leading-none text-[color:var(--np-white)]`}>
             {title}
           </h2>
-          <p className={TINT}>{warp[line]}</p>
         </div>
       </div>
       {flat && <RoomItems slot={slot} />}
@@ -393,14 +391,12 @@ const PLATE = 'bg-[color:var(--np-panel)] border-l-4 border-[color:var(--ra1)]'
  *  short of the vanishing point (58vw from the gutter, less 9.5rem), so neither he nor the plate covers a
  *  panel at any width. */
 export function HubHero() {
-  const { warp } = useLabels()
   return (
     <header data-worlds-hero="" style={eraVars(HUB_ERA)} className="relative flex min-h-[100svh] items-center px-[max(16px,6vw)] pb-12 pt-20 max-md:items-start max-md:pt-[5.5rem]">
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
           <div data-hero-inner="" className="w-full max-w-[38rem] origin-left md:max-w-[min(38rem,calc(58vw-9.5rem))]">
             <div className={`${PLATE} px-6 pb-5 pt-4`}>
-              <p className={TINT}>{warp.hub}</p>
               <h1 className={`${FACE} mt-1 text-[clamp(2.2rem,5vw,5.25rem)] leading-[0.95] text-[color:var(--np-white)]`}>
                 <NameWords name={name} wordClassName="block" />
               </h1>
