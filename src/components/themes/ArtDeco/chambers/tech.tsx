@@ -1,14 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo, fx } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
+import { still, stopsChamber } from '../chamber'
 import { Canvas, FLOOR } from '../city'
-import { swing } from '../pose'
+import { Raider, foeOf } from '../foes'
+import { hack } from '../pose'
 
-// Tech stack: the glass tunnel, the sea pressing on its brass ribs, and a burst pipe leaking for each
-// category. As each category is read he walks up to its pipe and brings the wrench down on the joint: the
-// spray stops and the joint's gauge lights, sealed.
+// Tech stack: the glass tunnel, the sea pressing on its brass ribs. For each category a security turret
+// stands by its panel with a raider coming down the tunnel beyond it; he drops to one knee at the panel and
+// works its dial, the panel's gauge swings to gold, the turret turns on its post to face the raider and
+// fires, and the raider goes down.
+
+const PANEL = 120
+const TURRET = 230
+const FOE = 420
 
 const RIBS = [260, 520, 800, 1080, 1340]
 
@@ -25,70 +30,60 @@ function Tunnel() {
   )
 }
 
-function Pipe() {
+function Panel() {
   return (
-    <>
-      <rect x={-18} y={-420} width={36} height={420} fill={C.steelShade} stroke={C.brassDark} strokeWidth="3" />
-      <rect x={-30} y={-236} width={60} height={34} fill={C.brassMid} stroke={C.gold} strokeWidth="2" />
-      <circle cx={0} cy={-290} r={20} fill={C.cabinetMid} stroke={C.gold} strokeWidth="3" />
-      <path d="M0 -290 L-10 -300" stroke={C.blood} strokeWidth="3" />
-    </>
-  )
-}
-
-function Jet() {
-  return (
-    <g fill="none" stroke={C.waterGlow} strokeLinecap="round" opacity="0.8">
-      <path d="M30 -220 Q90 -250 150 -170" strokeWidth="8" />
-      <path d="M30 -212 Q80 -220 120 -140" strokeWidth="5" />
-      <path d="M30 -226 Q110 -290 190 -230" strokeWidth="4" />
+    <g transform={`translate(${PANEL} 0)`}>
+      <rect x={-6} y={-120} width={12} height={120} fill={C.brassDark} />
+      <rect x={-36} y={-180} width={72} height={64} fill={C.cabinetTop} stroke={C.brassMid} strokeWidth="4" />
+      <circle cx={0} cy={-148} r={18} fill={C.cabinetMid} stroke={C.gold} strokeWidth="3" />
     </g>
   )
 }
 
-function Sealed() {
+// The turret on its post, its barrel and lamp drawn facing right round its pivot.
+function Turret() {
   return (
     <>
-      <circle cx={0} cy={-290} r={60} fill={C.waterGlow} opacity="0.2" />
-      <circle cx={0} cy={-290} r={16} fill={C.cream} />
-      <path d="M0 -290 L10 -302" stroke={C.blood} strokeWidth="3" />
-      <rect x={-30} y={-236} width={60} height={34} fill="none" stroke={C.goldBright} strokeWidth="4" />
+      <path d="M-30 0 L0 -150 L30 0" fill="none" stroke={C.brassDark} strokeWidth="8" />
+      <circle cx={0} cy={-170} r={34} fill={C.bronze} stroke={C.sepia} strokeWidth="4" />
+      <rect x={20} y={-180} width={60} height={20} fill={C.steelShade} stroke={C.sepia} strokeWidth="3" />
     </>
   )
 }
 
-export const tech: Chamber = {
+export const tech = stopsChamber({
   light: C.waterGlow,
   set: () => <Tunnel />,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <>
-            <Pipe />
-            <g data-fx={`jet-${i}`}>
-              <Jet />
-            </g>
-          </>
-        )}
-        light={() => <Sealed />}
-      />
-      <Walker xs={xs} profession={profession} />
+      <Panel />
+      <g data-fx={`gauge-${i}`} transform={`translate(${PANEL} 0)`} opacity="0">
+        <circle cx={0} cy={-148} r={14} fill={C.goldBright} />
+      </g>
+      <g transform={`translate(${TURRET} 0)`}>
+        <g data-fx={`turret-${i}`} transform="rotate(180 0 -170)">
+          <Turret />
+        </g>
+      </g>
+      <path data-fx={`shot-${i}`} d={`M${TURRET + 80} -170 L${FOE} -170`} stroke={C.goldBright} strokeWidth="6" opacity="0" />
+      <g transform={`translate(${FOE} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, swing)
-    const props = propNodes(stage, input.xs.length)
-    const jets = input.xs.map((_, i) => fx(stage, `jet-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const sealed = litOf(reached, i)
-        fadeTo(lit, sealed)
-        fadeTo(jets[i], 1 - sealed)
+  move: (profession, t) => still(hack(profession, t)),
+  reply: (stage, { count }) => {
+    const gauges = Array.from({ length: count }, (_, i) => fx(stage, `gauge-${i}`))
+    const turrets = Array.from({ length: count }, (_, i) => fx(stage, `turret-${i}`))
+    const shots = Array.from({ length: count }, (_, i) => fx(stage, `shot-${i}`))
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    return (played) =>
+      foes.forEach((foe, i) => {
+        const t = played(i)
+        fadeTo(gauges[i], ramp(t, 0.45, 0.55))
+        transformTo(turrets[i], `rotate(${(180 * (1 - ramp(t, 0.5, 0.65))).toFixed(1)} 0 -170)`)
+        fadeTo(shots[i], t > 0.68 && t < 0.82 ? 1 : 0)
+        foe(t, null, [0.75, 0.9])
       })
-    }
   },
-}
+})

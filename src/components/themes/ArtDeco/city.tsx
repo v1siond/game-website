@@ -8,7 +8,7 @@ import { SOLE_DROP, SurvivorSprite } from './sprite'
 // 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x 570
 // to 1030, and a desktop crop the same art: the water lit in the scene's own light, the drowned towers in
 // the fog beyond the great window, the hall's brass frame (its stepped crown, the sunburst and the two
-// columns), the marble floor he walks, and the bubbles and kelp in front. He is the survivor (sprite.tsx)
+// columns), the marble floor he runs, and the bubbles and kelp in front. He is the survivor (sprite.tsx)
 // drawn into the canvas and posed by the scene's writer (pose.ts).
 
 export const W = 1600
@@ -183,7 +183,7 @@ export function bubblesWriter(stage: ParentNode): (progress: number) => void {
   return (progress) => transformTo(bubbles, `translate(0 ${(-progress * BUBBLE_RISE).toFixed(1)})`)
 }
 
-const figureAt = (x: number): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - FIGURE_H * (1 - SOLE_DROP)).toFixed(1)})`
+const figureAt = (x: number, lift = 0): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (1 - SOLE_DROP)).toFixed(1)})`
 
 /** Him on the floor at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Survivor({ x, profession }: { x: number; profession: Profession }) {
@@ -194,5 +194,9 @@ export function Survivor({ x, profession }: { x: number; profession: Profession 
   )
 }
 
-/** Moves him to `x` on the floor. */
-export const placeSurvivor = (node: Element | null, x: number): void => transformTo(node, figureAt(x))
+/** Moves him to `x` on the floor, `lift` above it. */
+export const placeSurvivor = (node: Element | null, x: number, lift = 0): void => transformTo(node, figureAt(x, lift))
+
+/** Where his charged hand is, from his place on the floor, when he thrusts it out level: his front shoulder
+ *  (73, 53 in the sprite's 120 by 180 units) plus the arm held out ahead of it. */
+export const HAND = { x: -FIGURE_W / 2 + 119 * (FIGURE_H / 180), y: -FIGURE_H * (1 - SOLE_DROP) + 53 * (FIGURE_H / 180) }

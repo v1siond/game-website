@@ -607,8 +607,11 @@
     gap: 52svh;
   }
 
+  /* Back in the flow under the hero's text, without the wide screen offsets, and still the fan's containing box,
+     so the fan opens from the plate, downward into the free band under it. */
   .wardrobe {
-    position: static;
+    position: relative;
+    inset: auto;
     margin-top: 24px;
   }
 

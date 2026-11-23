@@ -1,14 +1,17 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx } from '../../shared/stageNodes'
+import { HAND } from '../city'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
-import { FLOOR } from '../city'
-import { listen } from '../pose'
+import { still, stopsChamber } from '../chamber'
+import { Raider } from '../foes'
+import { study } from '../pose'
 
-// Work: the diary archive. An audio diary waits on a brass pedestal for each job, the recorder its owner
-// left behind; as each job is read he walks up to its pedestal and holds his own diary up by his face to
-// listen, and the recorder on the pedestal glows gold, its reels lit and the voice rising off it in rings.
+// Work: the diary archive. For each job a raider prowls behind a brass pedestal with its owner's audio
+// diary; he brings his camera up to his eye and takes the raider's picture, the flash goes off, the raider
+// is outlined in gold, studied, and the recorder on the pedestal glows gold with the voice rising off it.
+
+const PEDESTAL = 160
+const FOE = 320
 
 function Pedestal() {
   return (
@@ -41,20 +44,41 @@ function Voice() {
   )
 }
 
-export const work: Chamber = {
+// The raider's outline in gold, drawn over it once it is studied.
+function Studied() {
+  return <path d="M-30 0 L-24 -116 L-40 -110 L-34 -214 Q0 -228 34 -214 L40 -110 L30 0 Z M0 -276 A28 28 0 1 1 0 -220 A28 28 0 1 1 0 -276" fill="none" stroke={C.goldBright} strokeWidth="6" />
+}
+
+export const work = stopsChamber({
   light: C.gold,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Pedestal />} light={() => <Voice />} />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${PEDESTAL} 0)`}>
+        <Pedestal />
+        <g data-fx={`voice-${i}`} opacity="0">
+          <Voice />
+        </g>
+      </g>
+      <g transform={`translate(${FOE} 0)`}>
+        <Raider name={`raider-${i}`} />
+        <g data-fx={`studied-${i}`} opacity="0">
+          <Studied />
+        </g>
+      </g>
+      <circle data-fx={`flash-${i}`} cx={HAND.x - 20} cy={HAND.y - 20} r={90} fill={C.cream} opacity="0" />
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, listen)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (profession, t) => still(study(profession, t)),
+  reply: (stage, { count }) => {
+    const flashes = Array.from({ length: count }, (_, i) => fx(stage, `flash-${i}`))
+    const outlines = Array.from({ length: count }, (_, i) => fx(stage, `studied-${i}`))
+    const voices = Array.from({ length: count }, (_, i) => fx(stage, `voice-${i}`))
+    return (played) =>
+      flashes.forEach((flash, i) => {
+        const t = played(i)
+        fadeTo(flash, 0.9 * Math.max(0, 1 - Math.abs(t - 0.45) / 0.08))
+        fadeTo(outlines[i], ramp(t, 0.5, 0.6))
+        fadeTo(voices[i], ramp(t, 0.7, 0.85))
+      })
   },
-}
+})

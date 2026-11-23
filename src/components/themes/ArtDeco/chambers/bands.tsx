@@ -1,14 +1,16 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
-import { FLOOR } from '../city'
+import { still, stopsChamber } from '../chamber'
+import { Arc, Raider, foeOf } from '../foes'
 import { drum } from '../pose'
 
-// Bands: theatre row. A dark marquee stands on its brass legs for each band; as each band is read he walks
-// up to it and plays a roll on the snare at his waist, the charged stick sparking, and the marquee's bulbs
-// and its neon frame come on and stay lit.
+// Bands: theatre row. For each band he plays a roll on the snare at his waist under a dark marquee while a
+// raider comes at him; the roll charges the stick, the spark leaps off it into the raider, who goes down,
+// and the marquee's bulbs and its neon frame come on.
+
+const MARQUEE = 160
+const FOE = 320
 
 const BULBS = Array.from({ length: 9 }, (_, i) => -96 + i * 24)
 
@@ -38,20 +40,32 @@ function Lit() {
   )
 }
 
-export const bands: Chamber = {
+export const bands = stopsChamber({
   light: C.neonPink,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Marquee />} light={() => <Lit />} />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${MARQUEE} 0)`}>
+        <Marquee />
+        <g data-fx={`lit-${i}`} opacity="0">
+          <Lit />
+        </g>
+      </g>
+      <g transform={`translate(${FOE} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
+      <Arc name={`raider-${i}`} x={FOE} />
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, (_profession, t) => drum(t, t * 4))
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  // The sticks keep time with the scroll: four beats a card.
+  move: (_profession, t) => still(drum(Math.min(1, t * 3), t * 4)),
+  reply: (stage, { count }) => {
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    const lits = Array.from({ length: count }, (_, i) => fx(stage, `lit-${i}`))
+    return (played) =>
+      foes.forEach((foe, i) => {
+        const t = played(i)
+        foe(t, [0.5, 0.65], [0.62, 0.8])
+        fadeTo(lits[i], ramp(t, 0.8, 0.9))
+      })
   },
-}
+})

@@ -1,18 +1,23 @@
-import { litOf } from '@/lib/scroll/propRow'
+import { ramp } from '@/lib/scroll/stage'
+import { drop, hop } from '@/lib/motion/arc'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
+import { stopsChamber } from '../chamber'
 import { Canvas, FLOOR } from '../city'
-import { grip } from '../pose'
+import { Raider, foeOf } from '../foes'
+import { hang, landed } from '../pose'
 
-// Projects: the pipe works under the research lab. The lab's shutter is down and a pipe runs along the wall
-// over a valve wheel for each project; as each project is read he walks up to its wheel and hacks it round
-// with both hands, and the pipe glows teal past it. When the last project is read the flow reaches the
+// Projects: the pipe works under the research lab, a freight rail running overhead. For each project a
+// raider guards a valve; he leaps up onto the rail, rides it in on the hook and drops on the raider with the
+// wrench, and the pipe glows teal past the valve. When the last project is read the flow reaches the lab's
 // shutter and it rolls up on the lit lab.
 
-// A turned wheel has gone this far round.
-const TURN = 180
+const FOE = 330
+// The rail runs this high: his hands on the hook put his soles this far up.
+const RAIL = -560
+const ON_RAIL = 240
+// He rides in to here, just short of the raider.
+const RIDE = FOE - 120
 const SHUTTER = { x: 1200, width: 320, top: 260, height: 360 }
 
 /** The lab's shutter on the back wall over its lit window, and the pipe the flow runs along. */
@@ -40,59 +45,63 @@ function Lab() {
 // The stem runs up to the flow pipe at FLOOR - 320 whatever the row's size.
 const STEM = 320
 
-function Valve({ size }: { size: number }) {
+function Valve() {
   return (
-    <>
-      <rect x={-10} y={-STEM / size} width={20} height={STEM / size} fill={C.steelShade} />
-      <g data-wheel="">
-        <circle cx={0} cy={-170} r={40} fill="none" stroke={C.blood} strokeWidth="9" />
-        <path d="M-40 -170 H40 M0 -210 V-130" stroke={C.blood} strokeWidth="6" />
-        <circle cx={0} cy={-170} r={9} fill={C.gold} />
-      </g>
-    </>
+    <g transform={`translate(${FOE + 120} 0)`}>
+      <rect x={-10} y={-STEM} width={20} height={STEM} fill={C.steelShade} />
+      <circle cx={0} cy={-170} r={40} fill="none" stroke={C.blood} strokeWidth="9" />
+      <path d="M-40 -170 H40 M0 -210 V-130" stroke={C.blood} strokeWidth="6" />
+      <circle cx={0} cy={-170} r={9} fill={C.gold} />
+    </g>
   )
 }
 
-function Flowing({ size }: { size: number }) {
+function Flowing() {
   return (
-    <>
+    <g transform={`translate(${FOE + 120} 0)`}>
       <circle cx={0} cy={-170} r={80} fill={C.tealLight} opacity="0.18" />
-      <rect x={-5} y={-STEM / size} width={10} height={STEM / size} fill={C.tealLight} opacity="0.8" />
-    </>
+      <rect x={-5} y={-STEM} width={10} height={STEM} fill={C.tealLight} opacity="0.8" />
+    </g>
   )
 }
 
-export const projects: Chamber = {
+export const projects = stopsChamber({
   light: C.tealLight,
   set: () => <Lab />,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(_i, size) => <Valve size={size} />}
-        light={(_i, size) => <Flowing size={size} />}
-      />
-      <Walker xs={xs} profession={profession} />
+      <path d={`M-260 ${RAIL} H${FOE + 260}`} stroke={C.brassDark} strokeWidth="12" />
+      <Valve />
+      <g data-fx={`flowing-${i}`} opacity="0">
+        <Flowing />
+      </g>
+      <g transform={`translate(${FOE} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const count = input.xs.length
-    const walker = walkerOf(stage, input, (profession, t) => grip(profession, t, t))
-    const props = propNodes(stage, count)
-    const wheels = props.map(({ move }) => move?.querySelector('[data-wheel]') ?? null)
+  move: (profession, t) => {
+    const up = ramp(t, 0, 0.25)
+    const ride = ramp(t, 0.25, 0.55)
+    const fall = ramp(t, 0.55, 0.7)
+    const lift = t < 0.25 ? ON_RAIL * up + hop(up, 60) : ON_RAIL - drop(fall, ON_RAIL)
+    const pose = t < 0.55 ? hang(profession, ramp(t, 0, 0.15)) : landed(profession, ramp(t, 0.5, 0.85))
+    return { pose, ahead: RIDE * ride, lift }
+  },
+  reply: (stage, { count }) => {
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    const flows = Array.from({ length: count }, (_, i) => fx(stage, `flowing-${i}`))
     const shutter = fx(stage, 'shutter')
     const flow = fx(stage, 'flow')
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const turned = litOf(reached, i)
-        fadeTo(lit, turned)
-        transformTo(wheels[i], `rotate(${(turned * TURN).toFixed(1)} 0 -170)`)
+    return (played) => {
+      foes.forEach((foe, i) => {
+        const t = played(i)
+        foe(t, null, [0.68, 0.82])
+        fadeTo(flows[i], ramp(t, 0.8, 0.95))
       })
-      const open = count > 0 ? litOf(reached, count - 1) : 0
+      const open = count > 0 ? ramp(played(count - 1), 0.85, 1) : 0
       fadeTo(flow, open)
       transformTo(shutter, `translate(0 ${(-open * SHUTTER.height).toFixed(1)})`)
     }
   },
-}
+})

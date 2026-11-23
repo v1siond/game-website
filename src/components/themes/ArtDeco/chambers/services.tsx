@@ -1,17 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo, transformTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
-import { FLOOR } from '../city'
-import { lift } from '../pose'
+import { still, stopsChamber } from '../chamber'
+import { Raider, foeOf } from '../foes'
+import { fling } from '../pose'
 
-// Services: the telekinesis hall. A sealed crate of the city stands on the floor for each service; as each
-// service is read he walks up to its crate and raises the charged hand, and the crate lifts off the floor
-// in the blue of the telekinesis and hangs there, lit, over its own shadow.
+// Services: the levitation hall. For each service a sealed crate of the city stands between him and a
+// raider; he raises the charged hand and the crate lifts off the floor in its blue light, hangs, and is
+// flung at the raider, who goes down with the crate fallen beside him.
 
-// A lifted crate hangs this far up.
-const LIFT = 150
+const CRATE = 150
+const FOE = 380
+// The crate lifts this high before it is flung, and lands here.
+const LIFTED = -170
+const LANDS = FOE - 110
 
 function Crate() {
   return (
@@ -24,34 +26,34 @@ function Crate() {
   )
 }
 
-function Telekinesis() {
-  return (
-    <>
-      <ellipse cx={0} cy={-4} rx={70} ry={10} fill={C.abyss} opacity="0.6" />
-      <circle cx={0} cy={-60 - LIFT} r={110} fill={C.bolt} opacity="0.16" />
-      <path d="M-70 -40 Q-90 -110 -70 -170 M70 -40 Q90 -110 70 -170" fill="none" stroke={C.bolt} strokeWidth="3" strokeDasharray="6 10" opacity="0.8" />
-    </>
-  )
-}
-
-export const services: Chamber = {
+export const services = stopsChamber({
   light: C.bolt,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Crate />} light={() => <Telekinesis />} />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${FOE} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
+      <ellipse data-fx={`glow-${i}`} cx={CRATE} cy={LIFTED - 60} rx={110} ry={110} fill={C.bolt} opacity="0" />
+      <g data-fx={`crate-${i}`} transform={`translate(${CRATE} 0)`}>
+        <Crate />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, lift)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ move, lit }, i) => {
-        const lifted = litOf(reached, i)
-        fadeTo(lit, lifted)
-        transformTo(move, `translate(0 ${(-lifted * LIFT).toFixed(1)})`)
+  move: (profession, t) => still(fling(profession, t)),
+  reply: (stage, { count }) => {
+    const crates = Array.from({ length: count }, (_, i) => fx(stage, `crate-${i}`))
+    const glows = Array.from({ length: count }, (_, i) => fx(stage, `glow-${i}`))
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    return (played) =>
+      crates.forEach((crate, i) => {
+        const t = played(i)
+        const up = ramp(t, 0.15, 0.45)
+        const flown = ramp(t, 0.58, 0.72)
+        const x = CRATE + (LANDS - CRATE) * flown
+        const y = LIFTED * up * (1 - flown) - 60 * Math.sin(Math.PI * flown)
+        transformTo(crate, `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(200 * flown).toFixed(1)} 0 -60)`)
+        fadeTo(glows[i], 0.2 * up * (1 - flown))
+        foes[i](t, null, [0.7, 0.85])
       })
-    }
   },
-}
+})

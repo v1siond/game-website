@@ -267,8 +267,8 @@ function Arm({ side, profession, ids }: { side: 'back' | 'front'; profession: Pr
 
 // ---- the action props ----
 
-// The audio diary in the charged hand, shown only while he listens. Drawn turned with the forearm's
-// listening angle undone (about 185 degrees round the hand), so it stands upright by his face.
+// The audio diary in the charged hand, shown only while he holds it up as his camera. Drawn turned with the
+// forearm's raised angle undone (about 185 degrees round the hand), so it stands upright by his face.
 function Recorder() {
   return (
     <g className={s.recorder} transform="rotate(185 73.8 99)">

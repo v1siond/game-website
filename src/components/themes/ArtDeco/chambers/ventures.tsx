@@ -1,19 +1,21 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo, transformTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx, transformTo, translateTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
-import { FLOOR } from '../city'
-import { pull } from '../pose'
+import { still, stopsChamber } from '../chamber'
+import { Raider, foeOf } from '../foes'
+import { lay } from '../pose'
 
-// Ventures: propaganda square. A rolled banner hangs from the hall's crown for each venture, its cord
-// down by the floor; as each venture is read he walks up, reaches for the cord and yanks it, and the
-// maroon banner drops open under its gold rod, its sunburst lit.
+// Ventures: propaganda square. For each venture he crouches and lays a glowing ring on the floor with the
+// charged hand, and waits; a raider walks into it, the ring sparks and the raider falls, and the maroon
+// banner over the square drops open under its gold rod, its sunburst lit.
 
-// The rod hangs this high over the floor; the banner drops this far below it; the cord ends at his reach.
+const RING = 220
+const FOE_FROM = 560
+const BANNER = 420
+
+// The rod hangs this high over the floor; the banner drops this far below it.
 const ROD = -720
 const DROP = 430
-const CORD_END = -300
 
 const unrolled = (open: number): string => `translate(0 ${ROD}) scale(1 ${Math.max(0.02, open).toFixed(3)}) translate(0 ${-ROD})`
 
@@ -32,51 +34,50 @@ function Banner() {
   )
 }
 
-function Rod() {
-  return (
-    <>
-      <rect x={-104} y={ROD - 14} width={208} height={16} rx={8} fill={C.gold} stroke={C.brassDark} strokeWidth="2" />
-      <path d={`M-70 ${ROD + 2} V${CORD_END}`} stroke={C.goldBright} strokeWidth="3" />
-      <circle cx={-70} cy={CORD_END} r={9} fill={C.blood} stroke={C.gold} strokeWidth="2" />
-    </>
-  )
-}
-
 function Lit() {
   return <circle cx={0} cy={ROD + 230} r={140} fill={C.neonPink} opacity="0.16" />
 }
 
-export const ventures: Chamber = {
+// The rod the banner hangs from.
+function Rod() {
+  return <rect x={-104} y={ROD - 14} width={208} height={16} rx={8} fill={C.gold} stroke={C.brassDark} strokeWidth="2" />
+}
+
+export const ventures = stopsChamber({
   light: C.neonPink,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={() => (
-          <>
-            <g data-banner="" transform={unrolled(0)}>
-              <Banner />
-            </g>
-            <Rod />
-          </>
-        )}
-        light={() => <Lit />}
-      />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${BANNER} 0)`}>
+        <g data-fx={`banner-${i}`} transform={unrolled(0)}>
+          <Banner />
+        </g>
+        <Rod />
+        <g data-fx={`lit-${i}`} opacity="0">
+          <Lit />
+        </g>
+      </g>
+      <ellipse data-fx={`ring-${i}`} cx={RING} cy={0} rx={70} ry={14} fill="none" stroke={C.bolt} strokeWidth="8" opacity="0" />
+      <g data-fx={`walk-${i}`} transform={`translate(${FOE_FROM} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, pull)
-    const props = propNodes(stage, input.xs.length)
-    const banners = props.map(({ move }) => move?.querySelector('[data-banner]') ?? null)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const open = litOf(reached, i)
-        fadeTo(lit, open)
+  move: (profession, t) => still(lay(profession, t)),
+  reply: (stage, { count }) => {
+    const rings = Array.from({ length: count }, (_, i) => fx(stage, `ring-${i}`))
+    const walks = Array.from({ length: count }, (_, i) => fx(stage, `walk-${i}`))
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    const banners = Array.from({ length: count }, (_, i) => fx(stage, `banner-${i}`))
+    const lits = Array.from({ length: count }, (_, i) => fx(stage, `lit-${i}`))
+    return (played) =>
+      rings.forEach((ring, i) => {
+        const t = played(i)
+        fadeTo(ring, ramp(t, 0.3, 0.4) * (1 - 0.5 * ramp(t, 0.8, 1)))
+        translateTo(walks[i], FOE_FROM + (RING - FOE_FROM) * ramp(t, 0.4, 0.65), 0)
+        foes[i](t, [0.65, 0.75], [0.72, 0.85])
+        const open = ramp(t, 0.85, 1)
         transformTo(banners[i], unrolled(open))
+        fadeTo(lits[i], open)
       })
-    }
   },
-}
+})
