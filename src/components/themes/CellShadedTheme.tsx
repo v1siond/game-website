@@ -1,67 +1,85 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { CopyrightLine } from './shared/CopyrightLine'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
 import { paletteVars } from './shared/paletteVars'
-import { CEL } from './CellShaded/palette'
+import { Stage, Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { StationContact, TopBar } from './CellShaded/chrome'
+import { IntroHero } from './CellShaded/hero'
 import { HatchDefs } from './CellShaded/ink'
-import { Wasteland, type Zone } from './CellShaded/wasteland'
-import { FreezeIntro } from './CellShaded/freezeIntro'
-import { QuickChange } from './CellShaded/quickChange'
-import { SECTION_VIEWS } from './CellShaded/sections'
-import { RespawnStation } from './CellShaded/respawn'
-import cel from './CellShaded/cel.module.css'
+import { CEL } from './CellShaded/palette'
+import { LAYER_MOTION, scenesOf, type CelScene } from './CellShaded/scenes'
+import { PlaceSection } from './CellShaded/sections'
+import page from './CellShaded/page.module.css'
 
 // The world's own lettering: the root carries its --cel-face variable and the world's css reads it.
 const celFace = Bangers({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--cel-face' })
 
-// Cell Shaded, the inked wasteland looter shooter: the page is one day in the desert. He arrives in a
-// freeze frame intro card at noon, the quick change station switches his outfit, the town's bounty
-// board and skill tree hold his work and his tools in the afternoon, his projects drop as loot at dusk
-// and the respawn station rebuilds him at night by the contact panel. The fixed sky follows the
-// section in view (data-zone). Every part is drawn in ./CellShaded.
-//
-// The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
-// container chain.
-
 const ROOT_VARS = paletteVars('cel', CEL)
+
+// Cell Shaded: his CV as one day in an inked desert, drawn like a comic in flat saturated fills under one
+// black ink line. The page keeps the rhythm of the Rockstar VI site: a big hero (the intro card at noon on
+// the mesa top, his name in sun letters, the outfit lockers where he picks a profession), then every
+// section of the shown profession is one full screen place of the day that rises from dark, holds while
+// its cards scroll over it, and goes dark while the next one rises: the signposts at noon, the bounty
+// board, the relay pylons and the supply crates in the town's afternoon, the loot chests, the makers'
+// plates, the speaker stacks and the heavy bags at dusk, and the station at night that builds him at the
+// end. He is the commando in each place and does one thing per card of the section: slams a notice, works
+// a pylon from his wrist computer, kicks a crate open. Every motion is a function of the scroll position
+// (the shared theatre on useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and
+// it plays back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from
+// its first frame.
+//
+// Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
+// its settled frame.
+
+const hasSlot = (scene: CelScene): scene is CelScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function CellShadedTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const cv = useCVData()
+  const labels = useLabels()
   const reduced = useReducedMotion()
-  const pointerRef = usePointerVars(!reduced)
-  const { zones, stage } = useZoneStore<Zone>('noon', reduced)
-  useZoneAttribute(zones, pointerRef)
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
+    [view, cv, labels, active],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
+  const hero = scenes[0]
+  const contact = scenes[scenes.length - 1]
 
   return (
-    <div ref={pointerRef} style={ROOT_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
+    <div style={ROOT_VARS} className={`${page.root} ${reduced ? page.still : ''} ${celFace.variable}`}>
       <SkipLink />
       <HatchDefs />
-      <Wasteland />
-      <ZoneStageProvider value={stage}>
-        <FreezeIntro profession={active} reduced={reduced} />
-        <QuickChange profession={active} />
-
-        <main id="main-content" className="relative z-20 px-4 py-8 sm:px-6">
-          <ProfessionRegion className="mx-auto max-w-6xl">
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </ProfessionRegion>
-        </main>
-
-        <RespawnStation profession={active} />
-      </ZoneStageProvider>
-
-      <footer className="relative z-20 py-8 text-center">
-        <p className="inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold text-[var(--cel-paper)]">
+      {!reduced && (
+        <Theatre theatreRef={theatreRef} className={page.theatre}>
+          {scenes.map((scene) => (
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+          ))}
+        </Theatre>
+      )}
+      <TopBar anchor={hero.anchor} />
+      <main id="main-content" ref={textRef} className={page.main}>
+        <IntroHero scene={hero} still={reduced} />
+        <ProfessionRegion>
+          {scenes.filter(hasSlot).map((scene) => (
+            <PlaceSection key={scene.id} scene={scene} still={reduced} />
+          ))}
+        </ProfessionRegion>
+        <StationContact scene={contact} still={reduced} />
+      </main>
+      <footer className={page.footer}>
+        <p className={page.copyright}>
           <CopyrightLine />
         </p>
       </footer>

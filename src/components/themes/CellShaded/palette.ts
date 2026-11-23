@@ -1,8 +1,8 @@
-// Cell Shaded's palette, every colour of the world once: the inked wasteland of a looter shooter drawn
-// like a comic. Flat saturated fills under one black ink line, hatching in the shadows: the teal noon
-// sky over ochre dunes and rust mesas, the dusk and the night the page crosses, the bounty board's wood,
-// the rarity ladder of the loot (white, green, blue, purple, orange), the red of the flavour text and
-// the critical hit, the respawn station's hologram blue. The SVG art reads the constants; the root sets
+// Cell Shaded's palette, every colour of the world once: the inked desert drawn like a comic. Flat
+// saturated fills under one black ink line, hatching in the shadows: the teal noon sky over ochre dunes
+// and rust mesas, the dusk and the night the page crosses, the bounty board's wood, the rarity ladder of
+// the loot (white, green, blue, purple, orange), the red of the flavour text and the achievement stars,
+// the station's hologram blue. The SVG art reads the constants; the root sets
 // them all as --cel-<key> (paletteVars), so cel.module.css and the class strings paint the same values.
 
 export const CEL = {
@@ -10,26 +10,25 @@ export const CEL = {
   ink: '#141414',
   inkSoft: '#2b2b33',
   paper: '#fbf3df',
+  // The paper's shade, for the site chrome's surfaces (themes.ts)
   paperShade: '#eadcb8',
   white: '#ffffff',
 
   // The comic accents of the lettering
-  sky: '#3fc4e8',
+  // The deep sky blue, the site chrome's accent (themes.ts)
   skyDeep: '#1d6fa8',
   sun: '#ffd23f',
   orange: '#ff7a1a',
   magenta: '#e8318a',
-  violet: '#5b3a9a',
   night: '#24214a',
   red: '#e2362c',
   // The red's cel shadow side: his tee, his Muay Thai shorts and the heavy bag
   redShade: '#9e2219',
-  green: '#5fc14a',
   sand: '#f2c66d',
   steel: '#8a93a6',
   steelDark: '#4d5466',
 
-  // The sky per zone, high to low: noon over the desert, dusk over the loot field, night at the station
+  // The sky per hour, high to low: noon over the desert, dusk over the loot chests, night at the station
   noonHigh: '#2a9fb0',
   noonMid: '#5cc4c9',
   noonLow: '#8fe0d8',
@@ -56,32 +55,24 @@ export const CEL = {
   plankShade: '#6e4524',
   notice: '#f6ecd2',
 
-  // The loot rarity ladder, lowest to highest
   // The musician's jeans and their shadow side
   denim: '#2c3a5c',
   denimShade: '#1b2440',
 
+  // The loot rarity ladder, lowest to highest
   common: '#f4f4f0',
   uncommon: '#4ccf3a',
   rare: '#2f7bff',
   epic: '#9b3df0',
   legendary: '#ff8a00',
-  // The rare and epic colour bands under their rarity word: blue a step lighter under ink, purple a step
-  // deeper under white, so the word reads 7:1; the beams and borders keep rare and epic.
-  rareBand: '#69a0ff',
-  epicBand: '#7c11dc',
 
-  // The red flavour line on a card and the critical hit text
+  // The red flavour line on a card and the achievement star
   flavour: '#b3170c',
   // The flavour red a step deeper for its words on the card paper (7:1); the stamp's frame keeps flavour.
   flavourText: '#9c140a',
   crit: '#ff2a1a',
-  // A compare mark that goes up on a card: green deep enough for its words on the card paper
-  upText: '#1d7a12',
 
-  // The respawn station's hologram and its glow
+  // The station's hologram and its glow
   holo: '#38d6ff',
   holoDeep: '#0c6f9a',
 } as const
-
-export type CelColor = keyof typeof CEL

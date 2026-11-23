@@ -1,0 +1,161 @@
+/* Cell Shaded: the page over the desert's day. The text is plain HTML in normal flow over the fixed
+   theatre; it is never scaled, faded or blurred, so it is opaque from its first frame. Every word sits on a
+   printed paper, an ink panel, a notice or a slab, so it reads on any frame of any place. */
+
+.root {
+  /* The keyboard focus ring (globals.css) in the ink line, and the paper halo just outside it, so the pair
+     stands out where the ring melts into a surface. */
+  --focus-ring: var(--cel-ink);
+  --focus-halo: var(--cel-paper);
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--cel-noon-low);
+  color: var(--cel-ink);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.theatre {
+  --theatre-ground: var(--cel-night-high);
+  --theatre-veil: var(--cel-ink);
+}
+
+/* The shade under the text column, so the cards sit on a calmer frame; it fades with its stage. */
+.scrim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, color-mix(in srgb, var(--cel-ink) 40%, transparent), transparent 55%);
+}
+
+/* ---- the top bar: his initials, back to the top ---- */
+.hud {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 6px 220px 6px clamp(16px, 5vw, 80px);
+  border-bottom: 4px solid var(--cel-ink);
+  background: var(--cel-ink-soft);
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 3px solid var(--cel-ink);
+  background: var(--cel-sun);
+  color: var(--cel-ink);
+  font-size: 1.5rem;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 var(--cel-ink);
+  -webkit-text-stroke: 0;
+}
+
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- the hero: the intro card and the outfit lockers over the mesa top ---- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+}
+
+/* ---- a place: a tall head that holds the picture alone, then brings its title up, then the cards ---- */
+.level {
+  position: relative;
+  padding: 0 clamp(16px, 5vw, 80px) 70svh;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-height: 125svh;
+  padding-bottom: 12svh;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(640px, 46vw);
+}
+
+/* ---- the end: the contact panel over the station ---- */
+.goal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 150svh;
+  padding: 30svh clamp(16px, 5vw, 80px) 20svh;
+}
+
+.goalCopy {
+  width: min(640px, 100%);
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 40px;
+  text-align: center;
+}
+
+.copyright {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 12px;
+  background: var(--cel-ink);
+  color: var(--cel-paper);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 767.98px) {
+  .hud {
+    min-height: 48px;
+    padding: 4px 180px 4px 16px;
+  }
+
+  .level {
+    padding-bottom: 60svh;
+  }
+
+  .head {
+    min-height: 115svh;
+    padding-bottom: 10svh;
+  }
+
+  .body {
+    width: 100%;
+  }
+}
+
+/* Reduced motion: each stage sits still at the top of its section, so the heads need one screen only. */
+.still .hero,
+.still .level,
+.still .goal {
+  isolation: isolate;
+}
+
+.still .level {
+  padding-bottom: 20svh;
+}
+
+.still .head {
+  min-height: 100svh;
+}
+
+.still .goal {
+  min-height: 100svh;
+  padding-top: 10svh;
+}
