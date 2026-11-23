@@ -1,14 +1,17 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Canvas, FLOOR } from '../forest'
+import { hop } from '@/lib/motion/arc'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx } from '../../shared/stageNodes'
+import { Canvas } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { drum } from '../pose'
+import { AT, type Place } from '../place'
+import { CROUCH, TUCK, drum, rest } from '../pose'
 
-// Bands on the electrified floor: pylons carry the city's power in the fog behind, and an oil drum stands
-// on a live plate for each band; as each is read he plays it with his sticks and the plate under it
-// sparks.
+// Bands on the live floor: the floor is a run of electrified plates, and for each band an oil drum stands
+// on one, the only safe footing. He leaps up onto the drum and lands on it beating once with his sticks as
+// the plate he left behind sparks; the frame holds him on the drum, sticks down.
+
+const DRUM = 140
 
 function Pylons({ light }: { light: Light }) {
   return (
@@ -23,39 +26,27 @@ function Pylons({ light }: { light: Light }) {
   )
 }
 
-function Drum() {
-  return (
-    <>
-      <rect x={-100} y={-12} width={200} height={12} fill={SHADE.black} />
-      <rect x={-54} y={-150} width={108} height={138} rx={8} fill={SHADE.black} />
-      <path d="M-54 -110 H54 M-54 -54 H54" stroke={SHADE.fog} strokeWidth={5} />
-    </>
-  )
-}
-
-function Sparks({ light }: { light: Light }) {
-  return (
-    <>
-      <rect x={-110} y={-18} width={220} height={22} fill={light.rim} opacity={0.35} />
-      <path d="M-90 -12 L-76 -44 L-66 -20 L-52 -52 M60 -12 L72 -40 L82 -18 L96 -48" stroke={light.rim} strokeWidth={5} fill="none" />
-    </>
-  )
-}
-
 export const bands: Place = {
   far: ({ light }) => <Pylons light={light} />,
-  floor: ({ xs, profession, light }) => (
+  obstacle: (i, { light }) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Drum />} light={() => <Sparks light={light} />} />
-      <Walker xs={xs} profession={profession} />
+      <rect x={-300} y={-12} width={380} height={12} fill={SHADE.black} />
+      <rect x={-54} y={-DRUM} width={108} height={DRUM} rx={8} fill={SHADE.black} />
+      <path d={`M-54 ${-DRUM + 30} H54 M-54 ${-DRUM + 90} H54`} stroke={SHADE.fog} strokeWidth={5} />
+      <g data-fx={`spark-${i}`} opacity="0">
+        <rect x={-300} y={-18} width={230} height={22} fill={light.rim} opacity={0.35} />
+        <path d="M-280 -12 L-266 -44 L-256 -20 L-242 -52 M-150 -12 L-138 -40 L-128 -18 L-114 -48" stroke={light.rim} strokeWidth={5} fill="none" />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, (_profession, t, at) => drum(t, (at + t) * 4))
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (profession, t) => {
+    const leap = ramp(t, 0, 0.55)
+    const landed = ramp(t, 0.55, 1)
+    const pose = t < 0.55 ? mix(rest(profession), TUCK, Math.sin(Math.PI * leap)) : profession === 'drummer' ? drum(landed, landed * 1.5) : mix(CROUCH, rest(profession), landed)
+    return { pose, ahead: AT * leap, lift: DRUM * leap + hop(leap, 120), over: 0 }
+  },
+  reply: (stage, { count }) => {
+    const sparks = Array.from({ length: count }, (_, i) => fx(stage, `spark-${i}`))
+    return (played) => sparks.forEach((spark, i) => fadeTo(spark, ramp(played(i), 0.55, 0.7)))
   },
 }

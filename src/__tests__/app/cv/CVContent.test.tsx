@@ -23,8 +23,11 @@ describe('CVContent', () => {
     it('shows his name, headline, email, LinkedIn, website and availability from the content files', () => {
       renderCV()
 
-      expect(screen.getByRole('heading', { level: 1, name: cv.fullName })).toBeInTheDocument()
-      expect(screen.getByText(cv.professionalSummary.headline)).toBeInTheDocument()
+      const name = screen.getByRole('heading', { level: 1, name: cv.fullName })
+      const header = name.closest('header')
+      if (!header) throw new Error('the name sits outside the header')
+      // A job title can read the same as the headline (Senior Full Stack Developer), so the header is searched.
+      expect(within(header).getByText(cv.professionalSummary.headline)).toBeInTheDocument()
       expect(screen.getByText(cv.contact.email)).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /linkedin\.com/i })).toHaveAttribute('href', cv.contact.linkedin)
       expect(screen.getByRole('link', { name: /alexanderpulido\.dev/i })).toHaveAttribute('href', cv.contact.website)

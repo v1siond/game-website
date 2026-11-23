@@ -35,7 +35,7 @@ function AboutCards() {
   const { cards } = useLabels()
   return (
     <Slab>
-      <p className="text-sm leading-relaxed text-[color:var(--sh-text)]">{bio}</p>
+      <p className="whitespace-pre-line text-sm leading-relaxed text-[color:var(--sh-text)]">{bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={DASH_LIST} />
       </div>

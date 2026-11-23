@@ -901,7 +901,7 @@ const CARDS: SectionFrames = {
     const { highlights } = useAboutBlock()
     return (
       <>
-        <p className="max-w-prose mx-auto leading-relaxed text-[color:var(--df-bone)]">{slot.bio}</p>
+        <p className="max-w-prose mx-auto whitespace-pre-line leading-relaxed text-[color:var(--df-bone)]">{slot.bio}</p>
         <div data-stage-items="">
           <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SPIRIT_LINES, list: 'max-w-prose mx-auto mt-4 space-y-1' }} />
         </div>

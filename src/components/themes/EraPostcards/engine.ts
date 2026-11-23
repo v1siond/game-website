@@ -16,7 +16,7 @@ import type { EraWriter, Layer } from './eras/era'
 // readers and touch momentum are the browser's own) and the text layer, main with the footer under it, is drawn where the settled
 // position puts it, a translateY of the lag (scrollY minus the drawn position) written in the same frame
 // as the stages. So art and text trail the wheel or the finger together and come to rest together, about
-// half a second after it stops. At rest the transform is cleared, so nothing is left translated. The
+// a second after it stops. At rest the transform is cleared, so nothing is left translated. The
 // measures subtract the lag written at the time, so a resize mid settle reads the boxes where the layout
 // puts them.
 

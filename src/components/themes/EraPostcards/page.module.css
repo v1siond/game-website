@@ -463,9 +463,11 @@
   border-width: 2px;
 }
 
+/* The bio is short paragraphs split by blank lines in summary.json. */
 .card .bio {
   font-size: 1.15rem;
   margin: 0;
+  white-space: pre-line;
 }
 
 .facts {

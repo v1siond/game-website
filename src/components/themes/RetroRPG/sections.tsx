@@ -40,7 +40,7 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   return (
     <>
       <Box>
-        <p className={`max-w-prose ${BODY}`}>{slot.bio}</p>
+        <p className={`max-w-prose whitespace-pre-line ${BODY}`}>{slot.bio}</p>
         <div data-stage-items="">
           <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SAID_LINES, list: 'mt-4 max-w-prose space-y-2' }} />
         </div>
