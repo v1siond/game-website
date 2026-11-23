@@ -55,7 +55,6 @@ const APPROVED = new Map([
   ['Truth Social: backend engineer in the early stages. Scaled the Rails backend with Mastodon core developers.', 'C42 copy audit, his 11-09 words'],
   ['Planned and ran the migration of the legacy SQL data into Pearson\'s NoSQL stores.', 'C42 copy audit, his 11-09 words'],
   ['Built exam preps, video lessons and shared widgets.', 'C42 copy audit, his 11-09 words'],
-  ['Engineering lead of the Clutch Prep B2B product through its acquisition by Pearson.', 'C42 copy audit, his 11-09 words'],
   ['Online courses for software developers. I built the platform and taught on it, mostly frontend.', 'C42 copy audit, his 11-09 words'],
   ['Pixel perfect builds from designs, before Figma existed.', 'C42 copy audit, his 11-09 words'],
   ['The marketing suite behind My New Retirement, Wealth United and Debt Action Plan.', 'C42 copy audit, his 11-09 words'],
@@ -76,9 +75,7 @@ const APPROVED = new Map([
   ['A game engine and map editor for generated worlds. Launching soon.', 'C42 copy audit, his 11-09 words'],
   ['Exact and AI judged grading', 'C42 copy audit, his 11-09 words'],
   ['Speech to text and text to speech', 'C42 copy audit, his 11-09 words'],
-  ['I\'m the core engineer and architect for enterprise clients and startups. I rewrite systems, ship launches against compliance deadlines and build new products.', 'C42 wording audit round 2 (score/C42/audit.md) finding 9, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Datepal: co PM and development lead of a dating app on Phoenix and Ash.', 'C42 wording audit round 2 (score/C42/audit.md) finding 11, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['SecureBancard: saved the launch by building most of the Dual BIN support alone, in time for the compliance deadline.', 'C42 wording audit round 2 (score/C42/audit.md) finding 10 (the 80% lives in the project impact), his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Co-architected Pearson Channels with the core team, nearly from the ground up.', 'C42 wording audit round 2 (score/C42/audit.md) finding 6, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['I led the B2B system that kept schools running through the pandemic.', 'C42 wording audit round 2 (score/C42/audit.md) finding 12, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['One of my most popular series: pixel art characters with shadows in pure CSS.', 'C42 wording audit round 2 (score/C42/audit.md) finding 14, his 11-21 ask to remove the AI patterns, facts unchanged'],
@@ -105,6 +102,9 @@ const APPROVED = new Map([
   ['Sillabo turns a course written by people into an AI course. Italian for Spanish speakers.', 'C42 wording audit round 2 (score/C42/audit.md) finding 31, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Hey! I\'m Alexander. I write software, play drums and teach Muay Thai, usually all in the same week.\n\nHome is Lima, Peru, where I live with my three dogs, two German Shepherds and a husky.\n\nI studied systems engineering at UNEFA and started out in Falcón, Venezuela, as a junior programmer and an instructor teaching HTML, PHP, MySQL, JavaScript and CSS courses. Teaching never left: at SmoothTerminal and DailyDrip I built the platform and taught on it, from pixel art made with CSS shadows to WCAG AAA audits.\n\nRight now I\'m a senior staff engineer at Daring Bit Assembly, working remote on US Eastern and Italian hours. On the side I build Nebulith, my own game engine and map editor, and Sillabo, an AI course that teaches Italian to Spanish speakers.\n\nI\'ve played drums since 2011. Today I play in Eon and Zero Nexus, and before that in Behated Reign and En Carne Muerta, plus party bands like Retrogroove and Arpegio at bars and private events.\n\nI\'ve trained martial arts since I was 19. I train and teach Muay Thai at Moving Zen in Lima, I\'m training for the national championship, and I roll jiu-jitsu at Monkey Jiujutsu Academy.\n\nI speak Spanish and English, and a little Italian.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
   ['I\'m always happy to hear new ideas and proposals. Email me or find me on LinkedIn.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
+  ['Core engineer and architect for enterprise clients and startups: rewrites, launches with a compliance date and new products.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
+  ['Led engineering on the Clutch Prep B2B product, through the pandemic and the acquisition by Pearson.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
+  ['SecureBancard: built most of the Dual BIN support, in time for the compliance deadline.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()
