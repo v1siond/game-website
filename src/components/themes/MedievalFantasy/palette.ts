@@ -33,6 +33,11 @@ export const REALM = {
   frostIceDark: '#3a7fba',
   frostFrostWhite: '#e8f4ff',
   frostFrostMid: '#a0c8e8',
+  // The field's commands: the ring under a selected unit, the order marker on the ground, and the gold of a
+  // level gained.
+  selectRing: '#4fe36a',
+  selectGlow: '#9dffb0',
+  levelGold: '#ffd75a',
   bgVoid: '#060608',
   bgDeep: '#0a0c0e',
   metalDark: '#2a2428',

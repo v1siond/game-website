@@ -18,22 +18,19 @@
   background: radial-gradient(ellipse at 50% 50%, transparent 20%, rgb(0 0 0 / 0.7) 100%);
 }
 
-/* The golem's 160 by 200 box, his feet near its foot. */
-.golem {
-  position: absolute;
-  right: 10%;
-  bottom: 5%;
-  width: clamp(140px, 17vw, 250px);
-  aspect-ratio: 160 / 200;
-}
+/* The field's bands: chaos units play right of the text column (about x 1080 to 1660 of the 1920 field), frost
+   units left of it (about 280 to 820). Under 1024 px the screen shows only the field's middle, so each band
+   shrinks to two thirds about its own middle and moves there. */
+@media (max-width: 1023.98px) {
+  .chaosBand {
+    transform: translateX(-410px) scale(0.66);
+    transform-origin: 1370px 1000px;
+  }
 
-/* The spires' 560 by 200 box, from just past the frost king's right side (left 11%, 120 px wide). */
-.spires {
-  position: absolute;
-  left: calc(11% + 128px);
-  bottom: 3%;
-  width: clamp(160px, 22vw, 320px);
-  aspect-ratio: 560 / 200;
+  .frostBand {
+    transform: translateX(410px) scale(0.66);
+    transform-origin: 550px 1000px;
+  }
 }
 
 /* The contact's call and the footer stand on the frost land, no frame of their own: a plate of the realm's

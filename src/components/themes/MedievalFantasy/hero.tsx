@@ -1,26 +1,26 @@
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { REALM } from './palette'
 
-// Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
-// cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY; the armour,
-// the blade and the frost come from the world's palette. He holds still: the glow along the blade
-// (data-fx="blade-glow") is the one part the frost scenes move (scenes.tsx). `figure` marks him as the world's
+// Him as the death knight king, the hero unit of every scene: the spiked pauldrons, the skull chest plate, the
+// fur trimmed cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY;
+// the armour, the blade and the frost come from the world's palette. Drawn in a 200 by 320 box, his feet at
+// KING_FEET. The scenes move two parts: his free arm (data-fx="king-hand", turning about its shoulder
+// KING_HAND_AT) for an order, and his blade arm (data-fx="king-blade", about KING_BLADE_AT) to point or raise
+// the blade for a spell, its glow (data-fx="blade-glow") lit as he casts. `figure` marks him as the world's
 // figure, on one stage only, the one the preview capture and the wardrobe read.
 
-export function FrostHero({ figure = false }: { figure?: boolean }) {
+export const KING_BOX = { width: 200, height: 320 }
+export const KING_FEET = { x: 100, y: 312 }
+export const KING_HAND_AT = { x: 42, y: 102 }
+export const KING_BLADE_AT = { x: 158, y: 102 }
+
+export function King({ figure = false }: { figure?: boolean }) {
   return (
-    <svg aria-hidden="true" data-worlds-figure={figure ? '' : undefined}
-      style={{
-        position: 'absolute',
-        left: '11%',
-        bottom: '3%',
-        width: '120px',
-        height: '190px',
-        filter: `drop-shadow(0 0 18px ${REALM.frostIceMid}50)`,
-      }}
-      viewBox="0 0 200 320"
-    >
+    <g data-worlds-figure={figure ? '' : undefined} filter="url(#kingFrostShadow)">
       <defs>
+        <filter id="kingFrostShadow" x="-30%" y="-20%" width="160%" height="140%">
+          <feDropShadow dx="0" dy="0" stdDeviation="9" floodColor={REALM.frostIceMid} floodOpacity="0.31" />
+        </filter>
         <linearGradient id="runebladeGlow" x1="0%" y1="100%" x2="0%" y2="0%">
           <stop offset="0%" stopColor={REALM.frostIceDark} />
           <stop offset="50%" stopColor={REALM.frostIceMid} />
@@ -142,50 +142,54 @@ export function FrostHero({ figure = false }: { figure?: boolean }) {
       </g>
 
       {/* === MASSIVE ARMS - Strong warrior, with gauntlets === */}
-      {/* Left arm - raised, no weapon */}
-      <path d="M32,100 L15,138 L8,180 L32,185 L42,145 L52,105" fill="url(#kingArmor)" />
-      <path d="M15,138 L42,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
-      <polygon points="8,180 0,168 18,175" fill={REALM.night15a} />
-      <polygon points="15,178 5,165 22,172" fill={REALM.night15a} />
+      {/* Left arm - his free hand, raised for an order */}
+      <g data-fx="king-hand">
+        <path d="M32,100 L15,138 L8,180 L32,185 L42,145 L52,105" fill="url(#kingArmor)" />
+        <path d="M15,138 L42,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+        <polygon points="8,180 0,168 18,175" fill={REALM.night15a} />
+        <polygon points="15,178 5,165 22,172" fill={REALM.night15a} />
+      </g>
 
       {/* Right arm - HOLDING RUNEBLADE */}
-      <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#kingArmor)" />
-      <path d="M185,138 L158,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
-      {/* Gauntlet holding sword handle */}
-      <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#kingArmor)" />
-      <ellipse cx="185" cy="178" rx="12" ry="10" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
+      <g data-fx="king-blade">
+        <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#kingArmor)" />
+        <path d="M185,138 L158,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+        {/* Gauntlet holding sword handle */}
+        <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#kingArmor)" />
+        <ellipse cx="185" cy="178" rx="12" ry="10" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
 
-      {/* === RUNEBLADE - IN HIS RIGHT HAND === */}
-      <g transform="translate(185, 175) rotate(-5)">
-        {/* Blade glow */}
-        <ellipse data-fx="blade-glow" cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" />
+        {/* === RUNEBLADE - IN HIS RIGHT HAND === */}
+        <g transform="translate(185, 175) rotate(-5)">
+          {/* Blade glow */}
+          <ellipse data-fx="blade-glow" cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" />
 
-        {/* Blade pointing down */}
-        <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#runebladeGlow)" />
-        <path d="M0,25 L4,35 L4,135 L0,160 L-4,135 L-4,35 Z" fill={REALM.frostIceBright} opacity="0.5" />
-        {/* Blade serrations */}
-        <path d="M10,60 L16,55 L12,70" fill="url(#runebladeGlow)" />
-        <path d="M-10,60 L-16,55 L-12,70" fill="url(#runebladeGlow)" />
+          {/* Blade pointing down */}
+          <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#runebladeGlow)" />
+          <path d="M0,25 L4,35 L4,135 L0,160 L-4,135 L-4,35 Z" fill={REALM.frostIceBright} opacity="0.5" />
+          {/* Blade serrations */}
+          <path d="M10,60 L16,55 L12,70" fill="url(#runebladeGlow)" />
+          <path d="M-10,60 L-16,55 L-12,70" fill="url(#runebladeGlow)" />
 
-        {/* Runes - pulsing */}
-        <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} />
-        <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright} />
-        <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright} />
+          {/* Runes - pulsing */}
+          <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} />
+          <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright} />
+          <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright} />
 
-        {/* Crossguard - skull motif - at hand level */}
-        <path d="M-30,8 L0,15 L30,8 L24,20 L0,25 L-24,20 Z" fill={REALM.night15a} />
-        <path d="M-30,8 L0,15 L30,8" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
-        <ellipse cx="0" cy="12" rx="8" ry="6" fill={REALM.night9c} />
-        <circle cx="-4" cy="10" r="2" fill={REALM.frostIceMid} opacity="0.6" />
-        <circle cx="4" cy="10" r="2" fill={REALM.frostIceMid} opacity="0.6" />
+          {/* Crossguard - skull motif - at hand level */}
+          <path d="M-30,8 L0,15 L30,8 L24,20 L0,25 L-24,20 Z" fill={REALM.night15a} />
+          <path d="M-30,8 L0,15 L30,8" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+          <ellipse cx="0" cy="12" rx="8" ry="6" fill={REALM.night9c} />
+          <circle cx="-4" cy="10" r="2" fill={REALM.frostIceMid} opacity="0.6" />
+          <circle cx="4" cy="10" r="2" fill={REALM.frostIceMid} opacity="0.6" />
 
-        {/* Handle - in gauntlet */}
-        <rect x="-5" y="-8" width="10" height="20" fill={REALM.night7a} rx="2" />
-        <path d="M-5,-8 L5,-8 M-5,12 L5,12" stroke="url(#goldTrim)" strokeWidth="1" />
-        {/* Pommel */}
-        <circle cx="0" cy="-14" r="7" fill={REALM.night15a} />
-        <circle cx="0" cy="-14" r="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
-        <circle cx="0" cy="-14" r="4" fill={REALM.night9c} />
+          {/* Handle - in gauntlet */}
+          <rect x="-5" y="-8" width="10" height="20" fill={REALM.night7a} rx="2" />
+          <path d="M-5,-8 L5,-8 M-5,12 L5,12" stroke="url(#goldTrim)" strokeWidth="1" />
+          {/* Pommel */}
+          <circle cx="0" cy="-14" r="7" fill={REALM.night15a} />
+          <circle cx="0" cy="-14" r="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
+          <circle cx="0" cy="-14" r="4" fill={REALM.night9c} />
+        </g>
       </g>
 
       {/* Neck gorget with gold trim */}
@@ -253,6 +257,6 @@ export function FrostHero({ figure = false }: { figure?: boolean }) {
 
       {/* Ground frost */}
       <ellipse cx="100" cy="315" rx="90" ry="12" fill={REALM.frostIceMid} opacity="0.1" filter="url(#frostGlow)" />
-    </svg>
+    </g>
   )
 }
