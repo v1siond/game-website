@@ -42,6 +42,7 @@
       },
       "actions": {
         "close": "Close {name}",
+        "spinStar": "Spin the star",
         "cv": "CV",
         "engine": "Nebulith",
         "engineShort": "Game",
@@ -420,6 +421,7 @@
       },
       "actions": {
         "close": "Cerrar {name}",
+        "spinStar": "Girar la estrella",
         "cv": "CV",
         "engine": "Nebulith",
         "engineShort": "Juego",
@@ -798,6 +800,7 @@
       },
       "actions": {
         "close": "Chiudi {name}",
+        "spinStar": "Fai girare la stella",
         "cv": "CV",
         "engine": "Nebulith",
         "engineShort": "Gioco",
