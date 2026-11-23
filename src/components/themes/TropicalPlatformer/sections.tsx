@@ -63,7 +63,7 @@ const FRAMES: SectionFrames = {
       <SectionLevel slot={slot} scene="jungle">
         <ElderYard>
           <Board>
-            <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
+            <p className="mx-auto max-w-prose whitespace-pre-line text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
             <div className="mx-auto max-w-prose">
               <MarkedLines items={highlights} label={cards.keyAchievements} look={SUN_POINTS} />
               <AboutFacts look={SUN_FACTS} />

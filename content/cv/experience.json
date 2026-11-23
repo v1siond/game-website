@@ -7,13 +7,13 @@
         "endDate": "",
         "current": true,
         "employment": "Independent",
-        "description": "I'm the core engineer and architect for enterprise clients and startups. I rewrite systems, ship launches against compliance deadlines and build new products.",
+        "description": "Core engineer and architect for enterprise clients and startups: rewrites, launches with a compliance date and new products.",
         "highlights": [
           "InsurAdmin: built it from scratch to manage carrier feeds and agency teams.",
           "Agency Rocket: built the annuity, IUL and whole life parsers and the Stripe billing for the suite (My New Retirement, Wealth United, Debt Action Plan).",
           "Datepal: co PM and development lead of a dating app on Phoenix and Ash.",
           "PMX Affiliate Marketplace: built and launched the whole stack and its native Shopify integration.",
-          "SecureBancard: saved the launch by building most of the Dual BIN support alone, in time for the compliance deadline.",
+          "SecureBancard: built most of the Dual BIN support, in time for the compliance deadline.",
           "Truth Social: backend engineer in the early stages. Scaled the Rails backend with Mastodon core developers."
         ],
         "skills": [],
@@ -48,7 +48,7 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Full time",
-        "description": "Engineering lead of the Clutch Prep B2B product through its acquisition by Pearson.",
+        "description": "Led engineering on the Clutch Prep B2B product, through the pandemic and the acquisition by Pearson.",
         "highlights": [
           "I led the B2B system that kept schools running through the pandemic."
         ],
@@ -144,13 +144,13 @@
         "endDate": "",
         "current": true,
         "employment": "Independiente",
-        "description": "Soy el ingeniero y arquitecto central para clientes empresariales y startups. Reescribo sistemas, saco lanzamientos con plazos de cumplimiento y construyo productos nuevos.",
+        "description": "Ingeniero y arquitecto central para clientes empresariales y startups: reescrituras, lanzamientos con fecha de cumplimiento y productos nuevos.",
         "highlights": [
           "InsurAdmin: lo construí desde cero para gestionar los feeds de aseguradoras y los equipos de agencia.",
           "Agency Rocket: construí los parsers de Annuity, IUL y Whole Life y el cobro con Stripe de la suite. La suite incluye My New Retirement, Wealth United y Debt Action Plan.",
           "Datepal: co PM y líder de desarrollo de una app de citas sobre Phoenix y Ash.",
           "PMX Affiliate Marketplace: construí y lancé todo el stack y su integración nativa con Shopify.",
-          "SecureBancard: salvé el lanzamiento construyendo yo solo la mayor parte del soporte Dual BIN, a tiempo para el plazo de cumplimiento.",
+          "SecureBancard: construí la mayor parte del soporte Dual BIN, a tiempo para el plazo de cumplimiento.",
           "Truth Social: ingeniero backend en las primeras etapas. Escalé el backend en Rails con desarrolladores del núcleo de Mastodon."
         ],
         "skills": [],
@@ -185,7 +185,7 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Tiempo completo",
-        "description": "Líder de ingeniería del producto B2B de Clutch Prep hasta su adquisición por Pearson.",
+        "description": "Lideré la ingeniería del producto B2B de Clutch Prep, durante la pandemia y hasta la adquisición por Pearson.",
         "highlights": [
           "Lideré el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia."
         ],
@@ -281,13 +281,13 @@
         "endDate": "",
         "current": true,
         "employment": "Indipendente",
-        "description": "Sono l'ingegnere e architetto centrale per clienti enterprise e startup. Riscrivo sistemi, porto a termine lanci con scadenze di conformità e costruisco nuovi prodotti.",
+        "description": "Ingegnere e architetto centrale per clienti enterprise e startup: riscritture, lanci con una scadenza di conformità e nuovi prodotti.",
         "highlights": [
           "InsurAdmin: l'ho costruito da zero per gestire i feed delle compagnie e i team di agenzia.",
           "Agency Rocket: ho costruito i parser Annuity, IUL e Whole Life e la fatturazione Stripe della suite (My New Retirement, Wealth United, Debt Action Plan).",
           "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri su Phoenix e Ash.",
           "PMX Affiliate Marketplace: ho costruito e lanciato l'intero stack e la sua integrazione nativa con Shopify.",
-          "SecureBancard: ho salvato il lancio costruendo da solo la maggior parte del supporto Dual BIN, in tempo per la scadenza di conformità.",
+          "SecureBancard: ho costruito la maggior parte del supporto Dual BIN, in tempo per la scadenza di conformità.",
           "Truth Social: ingegnere backend nelle prime fasi. Ho scalato il backend Rails con gli sviluppatori core di Mastodon."
         ],
         "skills": [],
@@ -322,7 +322,7 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Tempo pieno",
-        "description": "Responsabile tecnico del prodotto B2B di Clutch Prep fino all'acquisizione da parte di Pearson.",
+        "description": "Ho guidato l'ingegneria del prodotto B2B di Clutch Prep, durante la pandemia e fino all'acquisizione da parte di Pearson.",
         "highlights": [
           "Ho guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia."
         ],
