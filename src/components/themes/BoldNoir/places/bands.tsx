@@ -18,9 +18,9 @@ const WALK_TO = 420
 function Kit() {
   return (
     <>
-      <rect x={SEAT_X - 200} y={FLOOR - 40} width={400} height={40} fill={NOIR.coal} stroke={NOIR.smoke} strokeWidth="4" />
-      <circle cx={SEAT_X} cy={FLOOR - 110} r={74} fill={NOIR.red} stroke={NOIR.ink} strokeWidth="6" />
-      <circle cx={SEAT_X} cy={FLOOR - 110} r={50} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="4" />
+      <rect x={SEAT_X - 200} y={FLOOR - 16} width={400} height={16} fill={NOIR.coal} stroke={NOIR.smoke} strokeWidth="4" />
+      <circle cx={SEAT_X} cy={FLOOR - 62} r={46} fill={NOIR.red} stroke={NOIR.ink} strokeWidth="6" />
+      <circle cx={SEAT_X} cy={FLOOR - 62} r={30} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="4" />
       <path d={`M${SEAT_X + 120} ${FLOOR - 40} V${FLOOR - 260} M${SEAT_X + 70} ${FLOOR - 270} H${SEAT_X + 180}`} stroke={NOIR.paperDim} strokeWidth="6" />
       <ellipse cx={SEAT_X + 125} cy={FLOOR - 270} rx={60} ry={8} fill={NOIR.paperDim} />
       <path d={`M${SEAT_X - 130} ${FLOOR - 40} V${FLOOR - 170}`} stroke={NOIR.paperDim} strokeWidth="6" />
