@@ -55,7 +55,7 @@ const FRAMES: SectionFrames = {
       <Block titleKey="about">
         <FogGate>
           <MenuPanel>
-            <p className="max-w-prose text-base leading-relaxed text-[color:var(--soul-text)]">{slot.bio}</p>
+            <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-[color:var(--soul-text)]">{slot.bio}</p>
             <AboutFacts look={MENU_FACTS} />
             <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...EMBER_LIST, list: 'space-y-1.5 mt-4' }} />
           </MenuPanel>

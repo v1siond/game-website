@@ -40,7 +40,7 @@ export const CARDS: SectionFrames = {
     const { highlights } = useAboutBlock()
     return (
       <>
-        <p className={`max-w-prose ${LEAD}`}>{slot.bio}</p>
+        <p className={`max-w-prose whitespace-pre-line ${LEAD}`}>{slot.bio}</p>
         <div className="mt-6 max-w-prose">
           <div data-stage-items="">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={SPARK_LINES} />

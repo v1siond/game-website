@@ -1,68 +1,61 @@
-import { litOf } from '@/lib/scroll/propRow'
+import { drop } from '@/lib/motion/arc'
+import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { FLOOR } from '../forest'
+import { Canvas, FIGURE_H, FLOOR, W } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { kick } from '../pose'
+import { AT, type Place } from '../place'
+import { CROUCH, kick } from '../pose'
 
-// Muay Thai in the forest ring: a heavy bag hangs from a bough for each achievement; as each is read he
-// kicks it out of his guard and the bag swings away on its chain, light catching its edge.
+// Muay Thai in the gravity room: a machine room with a ceiling, and for each achievement a heavy bag hangs
+// from the ceiling ahead of him. Gravity flips: he falls up to the ceiling, lands on it upside down in a
+// crouch and kicks the bag hanging beside him, which swings away; the frame holds him on the ceiling at the
+// end of the kick. The next beat flips him back down as the floor runs on.
 
-const HOOK = -520
+const CEILING = 170
+// Standing on the ceiling upside down, his soles are on it: the lift that puts the top of his box there.
+const UP = FLOOR - CEILING - FIGURE_H
+const BAG = 330
 // A kicked bag swings away from him this far.
-const SWING = 16
+const SWING = 18
+// Turned over on the ceiling he faces back the way he came, so the bag hangs behind his place on the floor.
+const BAG_X = -2 * AT
 
-function Bough() {
-  return <path d={`M-120 ${HOOK - 30} Q0 ${HOOK - 50} 120 ${HOOK - 20}`} fill="none" stroke={SHADE.black} strokeWidth={22} strokeLinecap="round" />
-}
-
-function Bag() {
+/** The room's ceiling and its girders over the path. */
+function Ceiling({ light }: { light: Light }) {
   return (
-    <>
-      <line x1={0} y1={HOOK - 30} x2={0} y2={HOOK + 60} stroke={SHADE.black} strokeWidth={5} />
-      <path d={`M-44 ${HOOK + 70} Q0 ${HOOK + 56} 44 ${HOOK + 70} L44 ${HOOK + 330} Q0 ${HOOK + 346} -44 ${HOOK + 330} Z`} fill={SHADE.black} />
-    </>
+    <Canvas>
+      <rect width={W} height={CEILING} fill={SHADE.black} />
+      <path d={`M0 ${CEILING} H${W}`} stroke={light.rim} strokeOpacity={0.3} strokeWidth={3} />
+    </Canvas>
   )
 }
 
-function Edge({ light }: { light: Light }) {
-  return <path d={`M44 ${HOOK + 70} L44 ${HOOK + 330} Q20 ${HOOK + 342} 0 ${HOOK + 344}`} fill="none" stroke={light.rim} strokeWidth={6} />
-}
-
-const swung = (t: number): string => `rotate(${(-SWING * t).toFixed(1)} 0 ${HOOK - 30})`
+const swung = (t: number): string => `translate(${BAG_X} 0) rotate(${(SWING * t).toFixed(1)} 0 ${CEILING - FLOOR})`
 
 export const muayThai: Place = {
-  floor: ({ xs, profession, light }) => (
-    <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <>
-            <Bough />
-            <g data-fx={`bag-${i}`}>
-              <Bag />
-            </g>
-          </>
-        )}
-        light={() => <Edge light={light} />}
-      />
-      <Walker xs={xs} profession={profession} />
-    </>
+  mid: ({ light }) => <Ceiling light={light} />,
+  obstacle: (i, { light }) => (
+    <g data-fx={`bag-${i}`} transform={swung(0)}>
+      <line x1={0} y1={CEILING - FLOOR} x2={0} y2={CEILING - FLOOR + 60} stroke={SHADE.black} strokeWidth={5} />
+      <path d={`M-44 ${CEILING - FLOOR + 60} H44 L44 ${CEILING - FLOOR + BAG} Q0 ${CEILING - FLOOR + BAG + 16} -44 ${CEILING - FLOOR + BAG} Z`} fill={SHADE.black} />
+      <g data-fx={`edge-${i}`} opacity="0">
+        <path d={`M44 ${CEILING - FLOOR + 60} V${CEILING - FLOOR + BAG}`} stroke={light.rim} strokeWidth={6} />
+      </g>
+    </g>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, kick)
-    const props = propNodes(stage, input.xs.length)
-    const bags = input.xs.map((_, i) => fx(stage, `bag-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const hit = litOf(reached, i)
-        fadeTo(lit, hit)
-        transformTo(lit, swung(hit))
-        transformTo(bags[i], swung(hit))
+  move: (profession, t) => {
+    const fall = ramp(t, 0, 0.35)
+    const pose = t < 0.45 ? CROUCH : kick(profession, ramp(t, 0.45, 1))
+    return { pose, ahead: 0, lift: drop(fall, UP), over: ramp(t, 0, 0.3) }
+  },
+  reply: (stage, { count }) => {
+    const bags = Array.from({ length: count }, (_, i) => fx(stage, `bag-${i}`))
+    const edges = Array.from({ length: count }, (_, i) => fx(stage, `edge-${i}`))
+    return (played) =>
+      bags.forEach((bag, i) => {
+        const hit = ramp(played(i), 0.75, 0.9)
+        transformTo(bag, swung(hit))
+        fadeTo(edges[i], hit)
       })
-    }
   },
 }

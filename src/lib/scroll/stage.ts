@@ -3,13 +3,13 @@
 // Rockstar VI hand over (score C47 research vi.md). Every value is a function of a scroll position, so the
 // stages play forwards on the way down and backwards on the way up, and nothing moves while the scroll
 // rests. The settle is the eased follow that draws the stages a little behind the scroll and brings them to
-// rest about half a second after it stops. No DOM here.
+// rest about a second after it stops. No DOM here.
 
 import { clamp01 } from './progress'
 
 /** The settle's time constant in ms: after the scroll stops the drawing covers 95 percent of the way left
- *  in 3 x SETTLE_TAU_MS and sits within a few pixels by half a second. */
-export const SETTLE_TAU_MS = 100
+ *  in 3 x SETTLE_TAU_MS and sits within a few pixels by a second (his 11-22 ask, C53: "1s instead of .5"). */
+export const SETTLE_TAU_MS = 200
 
 /** The drawn position counts as at rest once this close to the scroll, in px; the loop then stops. */
 export const SETTLE_EPSILON_PX = 0.5

@@ -73,7 +73,7 @@ function AboutCards() {
   const { cards } = useLabels()
   return (
     <div className={page.panel}>
-      <p className="text-base leading-relaxed text-[color:var(--deco-cream)]">{bio}</p>
+      <p className="whitespace-pre-line text-base leading-relaxed text-[color:var(--deco-cream)]">{bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={GOLD_DIAMONDS} />
       </div>

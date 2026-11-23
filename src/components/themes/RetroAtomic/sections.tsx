@@ -48,7 +48,7 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   const { highlights } = useAboutBlock()
   return (
     <div className={`p-5 sm:p-6 ${atomic.panel}`}>
-      <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
+      <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...PLUS_ROWS, list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3' }} />
       </div>

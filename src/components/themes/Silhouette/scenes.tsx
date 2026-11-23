@@ -2,12 +2,11 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
-import { spread } from '../shared/stageNodes'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import { Canvas, FarPines, Fog, Front, Ground, Sky, Trunks } from './forest'
 import { LIGHTS, type LightName } from './palette'
-import { ROW_FROM, ROW_TO, type Place, type PlaceInput } from './place'
+import { scenePlace, type PlaceInput, type Scene } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -28,7 +27,18 @@ import { work } from './places/work'
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-const PLACES: Record<SceneId, Place> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
+const PLACES: Record<SceneId, Scene> = {
+  hero,
+  about: scenePlace(about),
+  work: scenePlace(work),
+  tech: scenePlace(tech),
+  services: scenePlace(services),
+  projects: scenePlace(projects),
+  ventures: scenePlace(ventures),
+  bands: scenePlace(bands),
+  muayThai: scenePlace(muayThai),
+  contact,
+}
 
 const ANCHORS: Record<SceneId, string> = {
   hero: 'top',
@@ -53,7 +63,7 @@ export interface ShadeScene extends TheatreScene {
   slot: SectionSlot | null
 }
 
-const layersOf = ({ far, mid, floor }: Place, input: PlaceInput, light: LightName): StageLayer[] => [
+const layersOf = ({ far, mid, floor }: Scene, input: PlaceInput, light: LightName): StageLayer[] => [
   { name: 'sky', node: <Sky light={light} /> },
   { name: 'far', node: far ? far(input) : <FarPines light={input.light} /> },
   { name: 'fog', node: <Fog light={input.light} /> },
@@ -66,7 +76,7 @@ const layersOf = ({ far, mid, floor }: Place, input: PlaceInput, light: LightNam
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): ShadeScene => {
   const place = PLACES[id]
   const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
-  const input = { xs: spread(count, ROW_FROM, ROW_TO), profession, light: LIGHTS[light] }
+  const input = { count, profession, light: LIGHTS[light] }
   return {
     id,
     anchor: ANCHORS[id],

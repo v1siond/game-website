@@ -42,7 +42,7 @@ const FRAMES: SectionFrames = {
     return (
       <Stage title={titles.about} zone="hall">
         <ChainHaul>
-          <p className="max-w-prose text-lg leading-relaxed">{slot.bio}</p>
+          <p className="max-w-prose whitespace-pre-line text-lg leading-relaxed">{slot.bio}</p>
           <div className="max-w-prose">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
             <AboutFacts look={GOLD_FACTS} />

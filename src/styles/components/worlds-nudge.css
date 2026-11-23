@@ -4,8 +4,8 @@
    The launcher (top right, every world), its turned face, the lens under it, the hint card and the worlds picker paint from custom
    properties the React components set from the current world's palette (launcherColors in
    src/lib/worlds/nudge.ts): --wl-text the label colour, --wl-body running text, --wl-fill the world's
-   background, --wl-edge the black or white outer hairline. Both text pairs read at 7 to 1 or more; the rings
-   keep 3 to 1 from any page behind. The defaults (Retro Atomic's colours) only cover a paint before the component
+   background, --wl-edge the black or white hairline (the launcher's has a band of the fill outside it). Both
+   text pairs read at 7 to 1 or more; the rings keep 3 to 1 from the fill and any page behind. The defaults (Retro Atomic's colours) only cover a paint before the component
    sets its own.
    =================================================================== */
 
@@ -52,8 +52,11 @@
   }
 }
 
+/* Outside the black or white edge, a solid band of the fill: text scrolling under the fixed launcher meets
+   the fill, never the edge, so a white edge never touches white letters (Bold Noir's "Since 2026" and a
+   Fighter Select About line at 390). */
 .c-worlds-launcher {
-  box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 6px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 0 0 7px var(--wl-fill), 0 6px 24px rgba(0, 0, 0, 0.45);
   transition: transform 0.15s ease;
 }
 .c-worlds-launcher:hover { transform: scale(1.05); }
@@ -124,7 +127,7 @@
   color: var(--wl-text);
   background-color: var(--wl-fill);
   border: 2px solid var(--wl-text);
-  box-shadow: 0 0 0 1.5px var(--wl-edge);
+  box-shadow: 0 0 0 1.5px var(--wl-edge), 0 0 0 5.5px var(--wl-fill);
   transform-origin: 100% 50%;
   animation: worlds-face-grow 2.6s ease-out both;
 }

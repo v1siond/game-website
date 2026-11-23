@@ -60,7 +60,7 @@ function AboutItems() {
   return (
     <>
       <Item>
-        <p className="text-[1.2rem] leading-normal">{bio}</p>
+        <p className="whitespace-pre-line text-[1.2rem] leading-normal">{bio}</p>
         <AboutFacts look={FACTS} />
       </Item>
       {highlights.map((text) => (

@@ -38,7 +38,7 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   const { highlights } = useAboutBlock()
   return (
     <div className={`p-5 ${world.titleCard}`}>
-      <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
+      <p className={`whitespace-pre-line leading-relaxed ${LEAD}`}>{slot.bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
       </div>
