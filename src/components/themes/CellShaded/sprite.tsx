@@ -3,45 +3,29 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { CEL } from './palette'
 import { HATCH } from './ink'
-import cel from './cel.module.css'
+import s from './sprite.module.css'
 
-// Him as this world's own sprite, a parody of the inked looter shooter's commando hunter (Borderlands 2's
-// Axton): plate carrier vest, one armoured shoulder pad, an assault rifle slung on his back and the
-// deployable turret as his action skill, drawn the way that game draws its heroes. Heroic proportions (about six heads, broad shoulders, chunky hands and boots), every
-// shape outlined in a thick, uneven black ink line (a heavier ink copy sits a little down and right of
-// each shape, so the line swells on the shadow side), hard two tone cel shading (each part has its
-// shadow shape on the right, in the darker tone, with diagonal hatching over it) and gritty gear.
-// His traits come from HERO_IDENTITY: brown skin, short dark hair, the full dark beard, black oval eyes.
+// Him as this world's own sprite, a desert commando drawn the way an inked comic shooter draws its heroes:
+// plate carrier vest, one armoured shoulder pad, an assault rifle slung on his back and a deployable
+// turret as his gadget. Heroic proportions (about six heads, broad shoulders, chunky hands and boots),
+// every shape outlined in a thick, uneven black ink line (a heavier ink copy sits a little down and right
+// of each shape, so the line swells on the shadow side), hard two tone cel shading (each part has its
+// shadow shape on the right, in the darker tone, with diagonal hatching over it) and gritty gear. His
+// traits come from HERO_IDENTITY: brown skin, short dark hair, the full dark beard, black oval eyes.
 //
 // Per profession: the System Engineer in the full commando kit (olive plate carrier with pouches over a
-// dark tee, cargo trousers, boots, the rifle slung) whose action deploys the turret: it drops in beside
-// him, he works its wrist computer and it fires in hard impact frames; the Musician in the same vest
-// open over a red tee, jeans and boots, two sticks in his fists; the Martial Artist bare chested in red
-// Muay Thai shorts with a sun trim, wrapped red gloves and his own mongkhon (a thick red and white rope
-// crown tied at the back with two tails). Every outfit keeps the commando's shoulder pad.
+// dark tee, cargo trousers, boots, the rifle slung), with the wrist computer's hologram and the turret
+// he deploys; the Musician in the same vest open over a red tee, jeans and boots, two sticks in his
+// fists; the Martial Artist bare chested in red Muay Thai shorts with a sun trim, wrapped red gloves and
+// his own mongkhon (a thick red and white rope crown tied at the back with two tails). Every outfit keeps
+// the commando's shoulder pad.
 //
-// The parts are groups the world's CSS moves with transforms only (cel.module.css, "Sprite"): the body
-// breathes, the eyes blink, the limbs swing from shoulder and hip and fold at the elbow and the knee.
-// `motion` picks the cycle.
+// He faces the viewer. Every part is a group that turns round its own joint (sprite.module.css): the
+// shoulders, elbows, hips and knees, the whole of him round his feet. Nothing moves on its own: a theatre
+// scene poses him from the scroll (pose.ts), everywhere else he stands at rest.
 
-export type SpriteMotion = 'still' | 'idle' | 'run' | 'leap' | 'action' | 'kick' | 'knee' | 'elbow'
-
-const MOTION_CLASS: Record<SpriteMotion, string> = {
-  still: '',
-  idle: cel.motionIdle,
-  run: cel.motionRun,
-  leap: cel.motionLeap,
-  action: cel.motionAction,
-  kick: cel.motionKick,
-  knee: cel.motionKnee,
-  elbow: cel.motionElbow,
-}
-
-const ACTION_CLASS: Record<Profession, string> = {
-  engineer: cel.actsTurret,
-  drummer: cel.actsDrum,
-  fighter: cel.actsStrike,
-}
+/** His box: the viewBox's size and the y his soles stand on. */
+export const SPRITE_VIEW = { width: 120, height: 200, soles: 196 } as const
 
 const SKIN = HERO_IDENTITY.skin
 const SKIN_SHADE = HERO_IDENTITY.skinShade
@@ -74,7 +58,6 @@ interface SideParts {
   fore: string
   leg: string
   shin: string
-  stick: string
   /** The boot's sole line. */
   sole: string
   /** The drumstick, tip up and out, and the fist's grip line over it. */
@@ -92,11 +75,10 @@ interface SideParts {
 // What differs between his back limbs and his front ones: each part's class and the strokes across it.
 const SIDE: Record<Side, SideParts> = {
   back: {
-    arm: cel.sprArmB,
-    fore: cel.sprForeB,
-    leg: cel.sprLegB,
-    shin: cel.sprShinB,
-    stick: cel.sprStickB,
+    arm: s.sprArmB,
+    fore: s.sprForeB,
+    leg: s.sprLegB,
+    shin: s.sprShinB,
     sole: 'M34 190 L56 190',
     stickLine: 'M30 118 L8 84',
     grip: 'M25 104 L38 104',
@@ -106,11 +88,10 @@ const SIDE: Record<Side, SideParts> = {
     hem: 'M37 138 L57 136',
   },
   front: {
-    arm: cel.sprArmF,
-    fore: cel.sprForeF,
-    leg: cel.sprLegF,
-    shin: cel.sprShinF,
-    stick: cel.sprStickF,
+    arm: s.sprArmF,
+    fore: s.sprForeF,
+    leg: s.sprLegF,
+    shin: s.sprShinF,
     sole: 'M63 190 L88 190',
     stickLine: 'M90 118 L112 84',
     grip: 'M82 104 L95 104',
@@ -245,13 +226,13 @@ const GEAR: Record<Profession, Gear> = {
     head: null,
     prop: (
       <>
-        {/* the wrist computer's hologram, beside his front hand; it lights while he works the turret */}
-        <g className={cel.sprHolo}>
+        {/* the wrist computer's hologram, beside his front hand; it lights while he works it */}
+        <g className={s.sprHolo}>
           <path d="M100 66 L118 60 L118 98 L100 104 Z" fill={CEL.holo} opacity={0.75} stroke={CEL.holoDeep} strokeWidth={1.6} />
           <path d="M103 72 L115 68 M103 79 L113 76 M103 86 L116 82 M103 93 L110 91" stroke={CEL.night} strokeWidth={1.6} />
         </g>
         {/* the deployable turret: tripod, armoured box with its shield, the barrel, the muzzle flash */}
-        <g className={cel.sprTurret}>
+        <g className={s.sprTurret}>
           <path d="M138 150 L124 196 M138 150 L152 196 M138 150 L138 196" stroke={INK} strokeWidth={5} strokeLinecap="round" />
           <path d="M138 150 L124 196 M138 150 L152 196 M138 150 L138 196" stroke={CEL.steel} strokeWidth={2.4} strokeLinecap="round" />
           <Ink d="M122 128 L154 128 L156 152 L120 152 Z" fill={CEL.orange} />
@@ -259,7 +240,7 @@ const GEAR: Record<Profession, Gear> = {
           <Ink d="M118 120 L130 116 L130 156 L118 158 Z" fill={CEL.steelDark} />
           <Ink d="M154 134 L184 134 L184 142 L154 142 Z" fill={INK} />
           <circle cx={134} cy={140} r={4} fill={CEL.holo} stroke={INK} strokeWidth={1.6} />
-          <g className={cel.sprFlash}>
+          <g className={s.sprFlash}>
             <path d="M184 138 L196 126 L194 134 L206 132 L196 140 L208 148 L194 144 L196 152 Z" fill={CEL.sun} stroke={INK} strokeWidth={1.8} strokeLinejoin="round" />
           </g>
         </g>
@@ -288,7 +269,7 @@ const GEAR: Record<Profession, Gear> = {
     hand: (side) => (
       <>
         {/* the stick held in the fist, tip up and out */}
-        <g className={SIDE[side].stick}>
+        <g>
           <path d={SIDE[side].stickLine} stroke={INK} strokeWidth={6} strokeLinecap="round" />
           <path d={SIDE[side].stickLine} stroke={CEL.sand} strokeWidth={3} strokeLinecap="round" />
         </g>
@@ -342,7 +323,7 @@ const GEAR: Record<Profession, Gear> = {
 
 function Head({ extra }: { extra: ReactNode }) {
   return (
-    <g className={cel.sprHead}>
+    <g>
       <Ink d="M53 42 L67 42 L67 56 L53 56 Z" fill={SKIN_SHADE} />
       <Ink d="M40 27 Q40 23 44 24 L45 35 Q41 35 40 31 Z" fill={SKIN} />
       <Ink d="M80 27 Q80 23 76 24 L75 35 Q79 35 80 31 Z" fill={SKIN_SHADE} />
@@ -357,8 +338,8 @@ function Head({ extra }: { extra: ReactNode }) {
       {/* the brows, low and set, and the nose */}
       <path d="M49 21 L57 23.5 M63 23.5 L71 21" stroke={INK} strokeWidth={2.6} strokeLinecap="round" />
       <path d="M60 27 L58 31.5 L61.5 31.5" fill="none" stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
-      {/* the black oval eyes, a group so they can blink */}
-      <g className={cel.sprEyes}>
+      {/* the black oval eyes */}
+      <g>
         <ellipse cx={54} cy={27} rx={1.9} ry={2.7} fill={HERO_IDENTITY.eyes} />
         <ellipse cx={66} cy={27} rx={1.9} ry={2.7} fill={HERO_IDENTITY.eyes} />
       </g>
@@ -385,7 +366,7 @@ function ShoulderPad() {
 function Arm({ side, gear }: { side: Side; gear: Gear }) {
   const parts = SIDE[side]
   return (
-    <g className={`${cel.limb} ${parts.arm}`}>
+    <g className={parts.arm}>
       <Ink d={UPPER_ARM[side]} fill={gear.sleeve} />
       <Shade d={parts.sleeveEdge} fill={gear.sleeveShade} />
       {gear.shorts && <path d={parts.armBand} stroke={CEL.red} strokeWidth={4} />}
@@ -432,7 +413,7 @@ function Thigh({ side, gear }: { side: Side; gear: Gear }) {
 function Leg({ side, gear }: { side: Side; gear: Gear }) {
   const parts = SIDE[side]
   return (
-    <g className={`${cel.limb} ${parts.leg}`}>
+    <g className={parts.leg}>
       <g className={parts.shin}>
         <Shin side={side} gear={gear} />
         {gear.feet(side)}
@@ -442,34 +423,32 @@ function Leg({ side, gear }: { side: Side; gear: Gear }) {
   )
 }
 
-interface VaultSpriteProps {
+interface SpriteProps {
   profession: Profession
-  motion?: SpriteMotion
+  /** His drawn size, when he is drawn into a larger picture. */
+  box?: { width: number; height: number }
   className?: string
 }
 
-// Memoised on its three plain props, so a parent render that leaves his outfit, motion and box as they are
-// does not redraw the svg.
-export const VaultSprite = memo(function VaultSprite({ profession, motion = 'idle', className = '' }: VaultSpriteProps) {
+// Memoised on its plain props, so a parent render that leaves his outfit and box as they are does not
+// redraw the svg.
+export const CommandoSprite = memo(function CommandoSprite({ profession, box, className = '' }: SpriteProps) {
   const gear = GEAR[profession]
 
   return (
-    <svg
-      viewBox="0 0 120 200"
-      className={`overflow-visible ${cel.sprite} ${ACTION_CLASS[profession]} ${MOTION_CLASS[motion]} ${className}`}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox={`0 0 ${SPRITE_VIEW.width} ${SPRITE_VIEW.height}`} {...box} className={`overflow-visible ${s.sprite} ${className}`} aria-hidden="true" focusable="false">
       <ellipse cx={60} cy={196} rx={34} ry={4.5} fill={INK} opacity={0.35} />
-      <Arm side="back" gear={gear} />
-      <Leg side="back" gear={gear} />
-      <g className={cel.sprBody}>
-        {gear.torso}
-        <Head extra={gear.head} />
+      <g className={s.sprRoot}>
+        <Arm side="back" gear={gear} />
+        <Leg side="back" gear={gear} />
+        <g>
+          {gear.torso}
+          <Head extra={gear.head} />
+        </g>
+        <Leg side="front" gear={gear} />
+        <Arm side="front" gear={gear} />
+        {gear.prop}
       </g>
-      <Leg side="front" gear={gear} />
-      <Arm side="front" gear={gear} />
-      {gear.prop}
     </svg>
   )
 })
