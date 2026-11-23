@@ -1,56 +1,13 @@
 'use client'
 
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { FrostHero } from './hero'
 import { REALM } from './palette'
-import frost from './frostZone.module.css'
-import { drift, pulse } from './pulse'
-import { cycles, slice } from '@/components/themes/shared/loops'
 
-// The frost zone backdrop: snow layers, frost wind and the ice field.
+// The frost realm's land, held still for the theatre (scenes.tsx): the ice throne, the frozen lake and its
+// spires, the death steed and the frost king with his runeblade.
 
-export const FrostAtmosphere = memo(function FrostAtmosphere() {
-  // Snow layers - reduced counts for performance
-  const snowLayers = useMemo(() => ({
-    // Far layer - small, slow
-    far: Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 120 - 10,
-      delay: Math.random() * -15,
-      duration: 10 + Math.random() * 8,
-      size: 1 + Math.random() * 2,
-    })),
-    // Mid layer - medium size
-    mid: Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 120 - 10,
-      delay: Math.random() * -10,
-      duration: 6 + Math.random() * 4,
-      size: 2 + Math.random() * 3,
-    })),
-    // Near layer - large, fast
-    near: Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 120 - 10,
-      delay: Math.random() * -5,
-      duration: 3 + Math.random() * 2,
-      size: 4 + Math.random() * 4,
-    })),
-  }), [])
-
-  // Wind/frost streaks - reduced for performance
-  const windStreaks = useMemo(() =>
-    Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      y: i * 12.5,
-      delay: Math.random() * -8,
-      duration: 1.5 + Math.random() * 1,
-      length: 80 + Math.random() * 120,
-      thickness: 1 + Math.random(),
-    })),
-    []
-  )
-
+export const FrostLand = memo(function FrostLand({ figure = false }: { figure?: boolean }) {
   return (
     <>
       {/* Deep cold sky with depth */}
@@ -67,7 +24,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           var(--realm-stone1a) 100%)`
       }} />
 
-      {/* === ICE THRONE BACKGROUND - Animated Painting === */}
+      {/* === ICE THRONE BACKGROUND === */}
       <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
           {/* Gradients for depth and ice effects */}
@@ -382,7 +339,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </defs>
 
         {/* Ghostly aura around entire horse */}
-        <ellipse cx="110" cy="180" rx="100" ry="70" fill={REALM.frostIceMid} opacity="0.08" filter="url(#frostGlowHorse)" {...pulse(0.05, 0.12, 4)} />
+        <ellipse cx="110" cy="180" rx="100" ry="70" fill={REALM.frostIceMid} opacity="0.08" filter="url(#frostGlowHorse)" />
 
         {/* === BACK LEGS with SMOKE === */}
         <g>
@@ -390,8 +347,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="160,250 150,252 148,260 158,262" fill={REALM.stone7} />
           {/* Blue smoke from back left hoof */}
           <g filter="url(#smokeBlur)">
-            <g opacity="0.25" {...pulse(0.25, 0.1, 2)}>
-              <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} {...drift(2, { '--drift-y': '-10px', '--drift-sy': 1.875 })} />
+            <g opacity="0.25">
+              <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} />
             </g>
           </g>
         </g>
@@ -400,8 +357,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="184,245 174,248 172,256 182,258" fill={REALM.stone7} />
           {/* Blue smoke from back right hoof */}
           <g filter="url(#smokeBlur)">
-            <g opacity="0.2" {...pulse(0.2, 0.08, 2.3)}>
-              <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} {...drift(2.3, { '--drift-y': '-12px', '--drift-sy': 2 })} />
+            <g opacity="0.2">
+              <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} />
             </g>
           </g>
         </g>
@@ -412,8 +369,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="34,255 44,257 46,265 36,267" fill={REALM.stone7} />
           {/* Blue smoke from front left hoof */}
           <g filter="url(#smokeBlur)">
-            <g opacity="0.3" {...pulse(0.3, 0.1, 1.8)}>
-              <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} {...drift(1.8, { '--drift-y': '-12px', '--drift-sy': 2 })} />
+            <g opacity="0.3">
+              <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} />
             </g>
           </g>
         </g>
@@ -422,8 +379,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="55,250 65,252 67,260 57,262" fill={REALM.stone7} />
           {/* Blue smoke from front right hoof */}
           <g filter="url(#smokeBlur)">
-            <g opacity="0.22" {...pulse(0.22, 0.08, 2.1)}>
-              <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} {...drift(2.1, { '--drift-y': '-13px', '--drift-sy': 2 })} />
+            <g opacity="0.22">
+              <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} />
             </g>
           </g>
         </g>
@@ -437,7 +394,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* ARMOR PLATE */}
         <path d="M75,100 Q125,80 175,105 L168,118 Q125,100 82,118 Z" fill={REALM.night15a} />
         <path d="M85,108 Q125,95 165,110" stroke={REALM.frostIceMid} strokeWidth="2" opacity="0.3" fill="none" />
-        <circle cx="125" cy="102" r="5" fill="none" stroke={REALM.frostIceMid} strokeWidth="1.5" opacity="0.5" {...pulse(0.3, 0.7, 3)} />
+        <circle cx="125" cy="102" r="5" fill="none" stroke={REALM.frostIceMid} strokeWidth="1.5" opacity="0.5" />
 
         {/* NECK */}
         <polygon points="50,115 25,80 10,55 30,45 50,65 65,105" fill="url(#horseBody)" />
@@ -451,24 +408,24 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
 
           {/* GLOWING EYES - intense blue */}
           <ellipse cx="0" cy="-22" rx="7" ry="5" fill={REALM.stone5a} />
-          <ellipse cx="0" cy="-22" rx="5" ry="4" fill={REALM.frostIceBright} filter="url(#frostGlowHorse)" {...pulse(0.7, 1, 1.5)} />
+          <ellipse cx="0" cy="-22" rx="5" ry="4" fill={REALM.frostIceBright} filter="url(#frostGlowHorse)" />
           <ellipse cx="0" cy="-22" rx="2" ry="1.5" fill={REALM.ash100} opacity="0.8" />
 
           {/* BLUE SMOKE from eyes */}
           <g filter="url(#smokeBlur)">
-            <g opacity="0.35" {...pulse(0.35, 0.1, 2)}>
-              <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} {...drift(2, { '--drift-x': '10px' })} />
+            <g opacity="0.35">
+              <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} />
             </g>
-            <g opacity="0.2" {...pulse(0.2, 0.05, 2.5)}>
-              <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} {...drift(2.5, { '--drift-x': '13px' })} />
+            <g opacity="0.2">
+              <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} />
             </g>
           </g>
 
           {/* BLUE SMOKE from nostrils */}
           <ellipse cx="-28" cy="-45" rx="3" ry="4" fill={REALM.stone4a} />
           <g filter="url(#smokeBlur)">
-            <g opacity="0.3" {...pulse(0.3, 0.08, 3)}>
-              <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} {...drift(3, { '--drift-y': '-13px' })} />
+            <g opacity="0.3">
+              <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} />
             </g>
           </g>
 
@@ -477,14 +434,14 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </g>
 
         {/* MANE - ghostly ice wisps */}
-        <g style={{ animation: cycles(frost.capeWave, 3, 'ease-in-out') }}>
+        <g>
           <path d="M30,45 Q50,15 38,-15 Q65,10 58,45" fill={REALM.frostIceDark} opacity="0.4" />
           <path d="M42,55 Q68,15 62,-20" stroke={REALM.frostIceMid} strokeWidth="3" fill="none" opacity="0.35" />
           <path d="M52,70 Q78,30 72,0" stroke={REALM.frostIceBright} strokeWidth="2" fill="none" opacity="0.25" />
         </g>
 
         {/* TAIL - ghostly */}
-        <g style={{ animation: cycles(frost.capeWave, 4, 'ease-in-out reverse') }}>
+        <g>
           <path d="M200,120 Q225,115 245,135 Q240,160 215,155 Q222,135 200,128" fill={REALM.frostIceDark} opacity="0.35" />
           <path d="M205,128 Q230,122 242,145" stroke={REALM.frostIceMid} strokeWidth="2.5" fill="none" opacity="0.3" />
         </g>
@@ -493,83 +450,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         <ellipse cx="110" cy="265" rx="80" ry="12" fill={REALM.frostIceMid} opacity="0.15" filter="url(#frostGlowHorse)" />
       </svg>
 
-      <FrostHero />
-
-      {/* Horizontal wind/frost streaks - blow RIGHT to LEFT */}
-      {windStreaks.map((streak) => (
-        <div
-          key={streak.id}
-          style={{
-            position: 'absolute',
-            top: `${streak.y}%`,
-            right: '-15%',
-            width: streak.length,
-            height: streak.thickness,
-            background: `linear-gradient(270deg, transparent 0%, ${REALM.frostFrostWhite}30 30%, ${REALM.frostFrostWhite}50 50%, ${REALM.frostFrostWhite}30 70%, transparent 100%)`,
-            animation: slice(frost.windStreak, streak.duration, 'linear', streak.delay),
-            animationDelay: `${streak.delay}s`,
-            filter: 'blur(1px)',
-          }}
-        />
-      ))}
-
-      {/* Far snow layer */}
-      {snowLayers.far.map((flake) => (
-        <div
-          key={`far-${flake.id}`}
-          style={{
-            position: 'absolute',
-            left: `${flake.x}%`,
-            top: '-3%',
-            width: flake.size,
-            height: flake.size,
-            borderRadius: '50%',
-            background: REALM.frostFrostMid,
-            opacity: 0.4,
-            animation: slice(frost.blizzardFar, flake.duration, 'linear', flake.delay),
-            animationDelay: `${flake.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* Mid snow layer */}
-      {snowLayers.mid.map((flake) => (
-        <div
-          key={`mid-${flake.id}`}
-          style={{
-            position: 'absolute',
-            left: `${flake.x}%`,
-            top: '-5%',
-            width: flake.size,
-            height: flake.size,
-            borderRadius: '50%',
-            background: REALM.frostFrostWhite,
-            opacity: 0.6,
-            animation: slice(frost.blizzardMid, flake.duration, 'linear', flake.delay),
-            animationDelay: `${flake.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* Near snow layer - motion blur effect */}
-      {snowLayers.near.map((flake) => (
-        <div
-          key={`near-${flake.id}`}
-          style={{
-            position: 'absolute',
-            left: `${flake.x}%`,
-            top: '-8%',
-            width: flake.size,
-            height: flake.size * 2.5,
-            borderRadius: '40%',
-            background: `linear-gradient(180deg, ${REALM.frostFrostWhite}80 0%, ${REALM.frostFrostWhite}20 100%)`,
-            opacity: 0.7,
-            animation: slice(frost.blizzardNear, flake.duration, 'linear', flake.delay),
-            animationDelay: `${flake.delay}s`,
-            filter: 'blur(1px)',
-          }}
-        />
-      ))}
+      <FrostHero figure={figure} />
 
       {/* === SEMI-BURIED SKELETONS near footer === */}
       {/* Skeleton 1 - left side, arm reaching up */}
@@ -762,8 +643,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* Hunched ghoul silhouette */}
         <path d="M18,10 Q25,8 22,18 L20,25 Q25,30 23,40 L20,55 L15,55 L12,40 Q10,30 15,25 L13,18 Q10,8 18,10" fill={REALM.night15a} />
         {/* Glowing eyes */}
-        <ellipse cx="14" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" {...pulse(0.3, 0.6, 2)} />
-        <ellipse cx="20" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" {...pulse(0.3, 0.6, 2)} />
+        <ellipse cx="14" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" />
+        <ellipse cx="20" cy="15" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.4" />
       </svg>
 
       {/* Undead ghoul 2 - far background */}

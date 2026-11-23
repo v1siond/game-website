@@ -104,8 +104,7 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
 // BLIGHT PATHS - the trails from the engineer node out to the musician and the martial artist. They are drawn
 // in a 0 to 100 box stretched over the row of nodes, so each curve runs from the centre of a side node (low,
 // near the row's edge) up to the raised centre node at any width; the stroke keeps its pixel width. The trail
-// of the chosen profession is lit: its solid line and a pre-drawn blurred glow fade in over the dashed line,
-// and the glow pulses on opacity.
+// of the chosen profession is lit: its solid line and a pre-drawn blurred glow fade in over the dashed line.
 // =============================================================================
 
 type BlightPathProfession = Extract<Profession, 'drummer' | 'fighter'>
@@ -147,7 +146,7 @@ export function BlightPaths({ active, isLargeScreen }: { active: Profession; isL
                 strokeWidth="8"
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
-                className={`blur-[3px] ${lit ? 'motion-safe:animate-pulse' : ''}`}
+                className="blur-[3px]"
               />
               <path d={d} stroke="url(#blightPathGradient)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
             </g>

@@ -1,484 +1,12 @@
 'use client'
 
-import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { memo } from 'react'
 import { REALM } from './palette'
-import chaos from './chaosZone.module.css'
-import { InfernalGolemSVG } from './character'
-import { cycles, slice, swings } from '@/components/themes/shared/loops'
-import { STORY_MS } from '@/lib/motion/stepWithin'
-import { SPAWN_AT_MS, spawnS } from './spawn'
 
-// The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
+// The chaos realm's land, held still for the theatre (scenes.tsx): the storm sky, the olive battlefield with its
+// war debris and the warband's banner. The golem that rises on it is the scene's figure (golem.tsx).
 
-// The golem's rocks fly from the crater to their place. Each one lands lit (the brightness it starts at) and
-// cools to its stone colour; the light is a pre-drawn white copy of its outline whose opacity fades out, so
-// only opacity and transform animate.
-interface RockPart {
-  keyframes: string
-  /** The flight's length and delay as drawn, in seconds; spawnS fits them. */
-  seconds: number
-  delay: number
-  brightness: number
-  startHidden: boolean
-  outlineFill: string
-  outline: (fill: string) => ReactElement
-  detail?: ReactNode
-}
-
-// A rock's flight as the shorthand's length, timing and delay, fitted to the spawn.
-const partTiming = (part: RockPart) => `${spawnS(part.seconds)}s ease-out ${spawnS(part.delay)}s`
-
-const ROCK_PARTS: RockPart[] = [
-  {
-    keyframes: chaos.assembleHead, seconds: 1.8, delay: 0, brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
-    outline: (fill) => <ellipse cx="80" cy="25" rx="22" ry="18" fill={fill} />,
-    detail: (
-      <>
-        <ellipse cx="80" cy="24" rx="18" ry="14" fill={REALM.stone28} />
-        <ellipse cx="70" cy="24" rx="4" ry="3" fill={REALM.chaosBlightMid} />
-        <ellipse cx="90" cy="24" rx="4" ry="3" fill={REALM.chaosBlightMid} />
-      </>
-    ),
-  },
-  {
-    keyframes: chaos.assembleLeftShoulder, seconds: 1.5, delay: 0.2, brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill={fill} />,
-    detail: <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill={REALM.stone28} />,
-  },
-  {
-    keyframes: chaos.assembleRightShoulder, seconds: 1.6, delay: 0.15, brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill={fill} />,
-    detail: <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill={REALM.stone28} />,
-  },
-  {
-    keyframes: chaos.assembleTorso, seconds: 1.4, delay: 0.3, brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
-    outline: (fill) => <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill={fill} />,
-    detail: (
-      <>
-        <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill={REALM.stone22} />
-        <path d="M80,65 L75,85 L82,105" stroke={REALM.chaosBlightMid} strokeWidth="2" fill="none" />
-      </>
-    ),
-  },
-  {
-    keyframes: chaos.assembleLeftArm, seconds: 1.7, delay: 0.4, brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="15,72 8,100 18,115 30,108 28,78" fill={fill} />,
-  },
-  {
-    keyframes: chaos.assembleRightArm, seconds: 1.65, delay: 0.35, brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="145,72 152,100 142,115 130,108 132,78" fill={fill} />,
-  },
-  {
-    keyframes: chaos.assembleLeftLeg, seconds: 1.3, delay: 0.5, brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="50,120 42,160 55,185 68,175 62,125" fill={fill} />,
-  },
-  {
-    keyframes: chaos.assembleRightLeg, seconds: 1.35, delay: 0.45, brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
-    outline: (fill) => <polygon points="110,120 118,160 105,185 92,175 98,125" fill={fill} />,
-  },
-]
-
-// The stones sit near 22% luminance (c). A white layer at alpha a lifts c to c + a(1 - c), which equals the
-// c * brightness a part lands at when a = c(brightness - 1) / (1 - c).
-const STONE_LUMINANCE = 0.22
-
-function flashOverlayAlpha(brightness: number): number {
-  return (STONE_LUMINANCE * (brightness - 1)) / (1 - STONE_LUMINANCE)
-}
-
-// The diagonal a falling meteor takes, by the side it drifts to.
-const METEOR_RAIN: Record<'left' | 'right', string> = { left: chaos.meteorRainLeft, right: chaos.meteorRainRight }
-
-// Cloud zones for realistic sequential flashing (left, center-left, center, center-right, right)
-const CLOUD_ZONES = [
-  { x: 12, y: 25, spread: 15 },   // left
-  { x: 30, y: 35, spread: 18 },   // center-left
-  { x: 50, y: 28, spread: 20 },   // center
-  { x: 70, y: 32, spread: 18 },   // center-right
-  { x: 88, y: 30, spread: 15 },   // right
-]
-
-// The first flash after the page opens, and the longest a flash with its chained one lasts.
-const FIRST_FLASH_MS = 1200
-const FLASH_TAIL_MS = 400
-
-// The ambient lightning over the clouds. Its state lives here, so each flash re-renders this layer alone and
-// never the backdrop around it or the golem on it.
-function AmbientFlash() {
-  const [ambientFlash, setAmbientFlash] = useState(false)
-  const [ambientFlashX, setAmbientFlashX] = useState(30)
-  const [activeZone, setActiveZone] = useState(0)
-  const lastZoneRef = useRef(-1)
-  const reduced = useReducedMotion()
-
-  // Ambient thunder flashes - realistic sequential cloud zone flashing; none under reduced motion.
-  useEffect(() => {
-    if (reduced) return
-    let isActive = true
-    const timeouts: NodeJS.Timeout[] = []
-
-    const triggerAmbientFlash = () => {
-      if (!isActive) return
-
-      // Pick a cloud zone different from the last one
-      let newZone = Math.floor(Math.random() * CLOUD_ZONES.length)
-      while (newZone === lastZoneRef.current && CLOUD_ZONES.length > 1) {
-        newZone = Math.floor(Math.random() * CLOUD_ZONES.length)
-      }
-      lastZoneRef.current = newZone
-
-      const zone = CLOUD_ZONES[newZone]
-      // Add slight variation within the zone
-      const flashX = zone.x + (Math.random() - 0.5) * zone.spread * 0.5
-      setAmbientFlashX(flashX)
-      setActiveZone(newZone)
-      setAmbientFlash(true)
-
-      // Quick double-flash effect (realistic lightning flicker)
-      timeouts.push(setTimeout(() => setAmbientFlash(false), 80))
-      timeouts.push(setTimeout(() => setAmbientFlash(true), 120))
-      timeouts.push(setTimeout(() => setAmbientFlash(false), 200))
-
-      // Sometimes chain to adjacent zone (30% chance)
-      if (Math.random() > 0.7) {
-        const adjacentZone = newZone + (Math.random() > 0.5 ? 1 : -1)
-        if (adjacentZone >= 0 && adjacentZone < CLOUD_ZONES.length) {
-          const adjZone = CLOUD_ZONES[adjacentZone]
-          timeouts.push(setTimeout(() => {
-            setAmbientFlashX(adjZone.x + (Math.random() - 0.5) * 8)
-            setActiveZone(adjacentZone)
-            setAmbientFlash(true)
-          }, 300))
-          timeouts.push(setTimeout(() => setAmbientFlash(false), 400))
-        }
-      }
-    }
-
-    // A flash at `at` ms, then one every 2 to 5 seconds after it, while a flash and its chained one (up to
-    // FLASH_TAIL_MS) still end within the 5 s the storm plays; then the sky rests dark.
-    const scheduleAmbientFlash = (at: number) => {
-      if (!isActive || at + FLASH_TAIL_MS > STORY_MS) return
-      timeouts.push(setTimeout(triggerAmbientFlash, at))
-      scheduleAmbientFlash(at + 2000 + Math.random() * 3000)
-    }
-
-    scheduleAmbientFlash(FIRST_FLASH_MS)
-
-    return () => {
-      isActive = false
-      timeouts.forEach(t => clearTimeout(t))
-    }
-  }, [reduced])
-
-  if (reduced || !ambientFlash) return null
-  const zone = CLOUD_ZONES[activeZone] || { x: 50, y: 30, spread: 18 }
-  return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '100%',
-      background: `
-        radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${REALM.chaosBlightBright}80 0%, ${REALM.chaosBlightBright}45 15%, ${REALM.chaosBlightMid}25 30%, transparent ${zone.spread + 45}%),
-        radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${REALM.chaosBlightMid}40 0%, transparent 25%)
-      `,
-      transition: 'opacity 0.05s ease-out',
-    }} />
-  )
-}
-
-// The meteor that crosses the sky once, METEOR_AT_MS after the page opens, over METEOR_MS, so it has landed
-// within the 5 s the realm's motion plays (shared/loops.ts); its state kept apart from the backdrop like the flash.
-const METEOR_AT_MS = 1000
-const METEOR_MS = 4000
-
-function FallingMeteor() {
-  const [fallingMeteor, setFallingMeteor] = useState<{
-    id: number
-    startX: number
-    direction: 'left' | 'right'
-    active: boolean
-  } | null>(null)
-  const reduced = useReducedMotion()
-
-  // No meteor crosses the sky under reduced motion.
-  useEffect(() => {
-    if (reduced) return
-    const startX = 15 + Math.random() * 70
-    const direction = Math.random() > 0.5 ? 'left' : 'right'
-    const timeouts = [
-      setTimeout(() => setFallingMeteor({ id: 0, startX, direction, active: true }), METEOR_AT_MS),
-      setTimeout(() => setFallingMeteor(null), METEOR_AT_MS + METEOR_MS),
-    ]
-    return () => timeouts.forEach((t) => clearTimeout(t))
-  }, [reduced])
-
-  if (reduced || !fallingMeteor || !fallingMeteor.active) return null
-  return (
-    <div
-      key={`meteor-${fallingMeteor.id}`}
-      style={{
-        position: 'absolute',
-        left: `${fallingMeteor.startX}%`,
-        top: '-5%',
-        width: '25px',
-        height: '25px',
-        animation: `${METEOR_RAIN[fallingMeteor.direction]} ${METEOR_MS}ms ease-in forwards`,
-        zIndex: 4,
-        pointerEvents: 'none',
-      }}
-    >
-      {/* Meteor glow */}
-      <div style={{
-        position: 'absolute',
-        width: '70px',
-        height: '70px',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        borderRadius: '50%',
-        background: `radial-gradient(circle, ${REALM.chaosBlightBright}60 0%, ${REALM.chaosBlightMid}35 35%, ${REALM.chaosBlightDark}20 60%, transparent 80%)`,
-        filter: 'blur(8px)',
-      }} />
-      {/* Meteor body */}
-      <svg aria-hidden="true" width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
-        <defs>
-          <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
-            <stop offset="0%" stopColor={REALM.chaosFireCore} />
-            <stop offset="35%" stopColor={REALM.chaosFireBright} />
-            <stop offset="70%" stopColor={REALM.chaosBlightMid} />
-            <stop offset="100%" stopColor={REALM.ember10} />
-          </radialGradient>
-        </defs>
-        <path
-          d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
-          fill={`url(#meteor${fallingMeteor.id})`}
-        />
-        <path d="M10,8 L15,15 L12,22" stroke={REALM.chaosBlightBright} strokeWidth="1.5" fill="none" opacity="0.6" />
-        <circle cx="12" cy="12" r="3" fill={REALM.chaosFireCore} opacity="0.7" />
-      </svg>
-      {/* Fire trail */}
-      <div style={{
-        position: 'absolute',
-        top: '-80px',
-        left: '50%',
-        width: '15px',
-        height: '90px',
-        background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosBlightDark}30 15%, ${REALM.chaosBlightMid}55 45%, ${REALM.chaosBlightBright}80 75%, ${REALM.chaosFireCore} 100%)`,
-        filter: 'blur(5px)',
-        transform: `translateX(-50%) rotate(${fallingMeteor.direction === 'left' ? '25deg' : '-25deg'})`,
-        transformOrigin: 'bottom center',
-      }} />
-    </div>
-  )
-}
-
-// The golem that lands on the right: a meteor, the explosion, the rocks assembling and the golem itself.
-// Its phases re-render this branch alone.
-function GolemSpawn() {
-  const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
-  const [hideAssembly, setHideAssembly] = useState(false)
-  const reduced = useReducedMotion()
-
-  useEffect(() => {
-    if (reduced) return
-    const timeouts: NodeJS.Timeout[] = []
-
-    // The meteor falls, explodes on impact, the rocks assemble, the final golem fades in over them and the
-    // assembly hides once he is fully visible, each at its fitted moment (spawn.ts).
-    timeouts.push(setTimeout(() => setGolemPhase('meteor'), SPAWN_AT_MS.meteor))
-    timeouts.push(setTimeout(() => setGolemPhase('explosion'), SPAWN_AT_MS.explosion))
-    timeouts.push(setTimeout(() => setGolemPhase('assembling'), SPAWN_AT_MS.assembling))
-    timeouts.push(setTimeout(() => setGolemPhase('final'), SPAWN_AT_MS.final))
-    timeouts.push(setTimeout(() => setHideAssembly(true), SPAWN_AT_MS.hidden))
-
-    return () => timeouts.forEach(t => clearTimeout(t))
-  }, [reduced])
-
-  // Under reduced motion the golem stands from the start: no meteor, explosion or assembly plays.
-  const phase = reduced ? 'final' : golemPhase
-  const assemblyDone = reduced || hideAssembly
-
-  if (phase === 'waiting') return null
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        right: '15%',
-        top: '25vh',
-        transform: 'scale(0.6)',
-        transformOrigin: 'center top',
-        zIndex: 5,
-        pointerEvents: 'none',
-      }}
-    >
-      {/* PHASE 1: METEOR FALLING - diagonal, starts small and grows */}
-      {phase === 'meteor' && (
-        <div
-          style={{
-            position: 'absolute',
-            left: '-50px',
-            top: '-200px',
-            animation: `${chaos.golemMeteorFall} ${spawnS(1.5)}s ease-in forwards`,
-          }}
-        >
-          {/* Meteor core - scales up during animation */}
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosBlightMid} 85%, var(--realm-stone8c) 100%)`,
-            boxShadow: `0 0 35px ${REALM.chaosBlightBright}, 0 0 70px ${REALM.chaosFireMid}`,
-            transformOrigin: '0 0',
-            animation: `${chaos.meteorGrow} ${spawnS(1.5)}s ease-in forwards`,
-          }} />
-          {/* Meteor trail - diagonal, grows with meteor */}
-          <div style={{
-            position: 'absolute',
-            top: '-160px',
-            left: '0px',
-            width: '14px',
-            height: '120px',
-            background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosBlightDark}40 30%, ${REALM.chaosBlightMid}70 60%, ${REALM.chaosBlightBright}95 85%, ${REALM.chaosFireCore} 100%)`,
-            filter: 'blur(5px)',
-            transformOrigin: 'bottom center',
-            animation: `${chaos.meteorTrailGrow} ${spawnS(1.5)}s ease-in forwards`,
-          }} />
-        </div>
-      )}
-
-      {/* PHASE 2: EXPLOSION */}
-      {(phase === 'explosion' || phase === 'assembling' || phase === 'final') && (
-        <>
-          {/* Explosion flash - only during explosion phase */}
-          {phase === 'explosion' && (
-            <div style={{
-              position: 'absolute',
-              left: '80px',
-              top: '200px',
-              transform: 'translate(-50%, -50%)',
-              width: '250px',
-              height: '250px',
-              background: `radial-gradient(circle, ${REALM.chaosBlightBright}90 0%, ${REALM.chaosBlightMid}60 30%, ${REALM.chaosBlightDark}30 60%, transparent 80%)`,
-              animation: `${chaos.explosionFlash} ${spawnS(0.6)}s ease-out forwards`,
-            }} />
-          )}
-
-          {/* Crater - appears after explosion */}
-          <svg aria-hidden="true"
-            width="160"
-            height="40"
-            viewBox="0 0 160 40"
-            style={{
-              position: 'absolute',
-              left: '0px',
-              top: '200px',
-              transform: 'translateY(-50%)',
-              zIndex: -1,
-            }}
-          >
-            <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
-            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out forwards` }} />
-            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} ${spawnS(0.8)}s ease-out ${spawnS(0.1)}s forwards` }} />
-            <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosBlightDark} opacity="0.4" />
-          </svg>
-
-          {/* Shadow */}
-          <div style={{
-            position: 'absolute',
-            left: '80px',
-            transform: 'translateX(-50%) translateY(-50%)',
-            top: '200px',
-            width: '120px',
-            height: '25px',
-            background: `radial-gradient(ellipse, ${REALM.chaosBlightDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
-            borderRadius: '50%',
-          }} />
-        </>
-      )}
-
-      {/* PHASE 3: ROCK ASSEMBLY - stays visible until final golem fades in */}
-      {(phase === 'assembling' || phase === 'explosion' || (phase === 'final' && !assemblyDone)) && (
-        <>
-          {/* Emergence glow */}
-          <div style={{
-            position: 'absolute',
-            left: '80px',
-            top: '200px',
-            transform: 'translateX(-50%) translateY(-50%)',
-            width: '150px',
-            height: '200px',
-            background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosBlightBright}60 0%, ${REALM.chaosBlightMid}30 30%, transparent 70%)`,
-            animation: `${chaos.emergeGlow} ${spawnS(2.5)}s ease-out forwards`,
-            pointerEvents: 'none',
-          }} />
-
-          {/* Assembling rocks */}
-          <svg aria-hidden="true"
-            width="160"
-            height="200"
-            viewBox="0 0 160 200"
-            style={{
-              position: 'absolute',
-              left: '-10px',
-              top: '0px',
-              overflow: 'visible',
-              opacity: (phase === 'assembling' || phase === 'final') ? 1 : 0,
-              transition: `opacity ${spawnS(0.5)}s ease`,
-            }}
-          >
-            {ROCK_PARTS.map((part) => (
-              <g key={part.keyframes} style={{ animation: `${part.keyframes} ${partTiming(part)} forwards`, opacity: part.startHidden ? 0 : undefined }}>
-                {part.outline(part.outlineFill)}
-                {part.detail}
-                <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${partTiming(part)} both` } as CSSProperties}>
-                  {part.outline(REALM.ash100)}
-                </g>
-              </g>
-            ))}
-          </svg>
-        </>
-      )}
-
-      {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
-      {phase === 'final' && (
-        <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} ${spawnS(1)}s ease-out forwards` }}>
-          <InfernalGolemSVG id="final" />
-        </div>
-      )}
-    </div>
-  )
-}
-
-export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
-  // Rain drops - longer animation cycles = fewer repaints = better performance
-  // Reduced particle counts for performance
-  const raindrops = useMemo(() =>
-    Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 130 - 15,
-      delay: Math.random() * -4,
-      duration: 2.5 + Math.random() * 1.5, // 2.5-4s, long cycles repaint less
-      length: 25 + Math.random() * 30,
-    })),
-    []
-  )
-
-  // Wind streaks - reduced for performance
-  const rainWindStreaks = useMemo(() =>
-    Array.from({ length: 5 }, (_, i) => ({
-      id: i,
-      y: 15 + i * 16,
-      delay: Math.random() * -6,
-      duration: 2 + Math.random() * 1.5,
-      length: 100 + Math.random() * 150,
-      thickness: 1 + Math.random() * 0.5,
-    })),
-    []
-  )
-
+export const ChaosLand = memo(function ChaosLand() {
   return (
     <>
       {/* GREEN-BROWN tinted stormy sky - matching REALM Chaos aesthetic */}
@@ -663,7 +191,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             const color = colors[(i + bladeInCluster) % 6]
 
             // Animate some foreground blades
-            const animated = bladeInCluster === 2 && perspectiveFactor > 0.6 && clusterIndex % 4 === 0
 
             return (
               <path
@@ -674,10 +201,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 fill="none"
                 strokeLinecap="round"
                 opacity={opacity}
-                style={animated ? {
-                  transformOrigin: `${x}px ${baseY}px`,
-                  animation: cycles(chaos.grassBlade, 2.0 + (clusterIndex % 3) * 0.4, 'ease-in-out'),
-                } : undefined}
               />
             )
           })}
@@ -1060,9 +583,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           `,
         }} />
 
-        {/* === AMBIENT THUNDER FLASH - Localized to specific cloud zones === */}
-        <AmbientFlash />
-
         {/* Cloud underlighting - ambient glow within clouds */}
         <div style={{
           position: 'absolute',
@@ -1076,54 +596,13 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             radial-gradient(ellipse at 75% 55%, ${REALM.chaosBlightBright}12 0%, transparent 30%),
             radial-gradient(ellipse at 90% 65%, ${REALM.chaosBlightMid}15 0%, transparent 35%)
           `,
-          animation: cycles(chaos.stormPulse, 6, 'ease-in-out'),
-        }} />
+          }} />
       </div>
-
-      {/* === OCCASIONAL FALLING METEOR - Every 8-15 seconds === */}
-      <FallingMeteor />
-
-      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM - Full spawn sequence === */}
-      <GolemSpawn />
-
-      {/* === WIND STREAKS - Horizontal gusts across battlefield === */}
-      {rainWindStreaks.map((streak) => (
-        <div
-          key={`wind-${streak.id}`}
-          style={{
-            position: 'absolute',
-            top: `${streak.y}%`,
-            left: '-15%',
-            width: streak.length,
-            height: streak.thickness,
-            background: `linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 30%, color-mix(in srgb, var(--realm-frost75) 25%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 70%, transparent 100%)`,
-            animation: slice(chaos.rainWindGust, streak.duration, 'linear', streak.delay),
-            animationDelay: `${streak.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* === RAIN - Falling diagonally with wind === */}
-      {raindrops.map((drop) => (
-        <div
-          key={`rain-${drop.id}`}
-          style={{
-            position: 'absolute',
-            left: `${drop.x}%`,
-            top: '-5%',
-            width: '2px',
-            height: `${drop.length}px`,
-            background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 20%, color-mix(in srgb, var(--realm-frost81) 80%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 80%, transparent 100%)',
-            animation: slice(chaos.rainFallWindy, drop.duration, 'linear', drop.delay),
-            animationDelay: `${drop.delay}s`,
-          }}
-        />
-      ))}
 
       {/* === WARBAND WAR BANNER - Positioned above infernals, scaled larger === */}
       <div
         style={{
-          position: 'fixed',
+          position: 'absolute',
           left: '8vw',
           top: '58vh',
           transform: 'rotate(-10deg) scale(1.8)',
@@ -1261,13 +740,13 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
 
             {/* Worn, rain-soaked bloody banner - brownish red tones */}
             {[
-              { id: 1, x: 0, w: 18, delay: 0, fill: REALM.blood19, yOff: 0 },
-              { id: 2, x: 18, w: 18, delay: 0.12, fill: REALM.blood15b, yOff: 2 },
-              { id: 3, x: 36, w: 18, delay: 0.24, fill: REALM.blood11a, yOff: 4 },
-              { id: 4, x: 54, w: 18, delay: 0.36, fill: REALM.blood8, yOff: 6 },
-              { id: 5, x: 72, w: 15, delay: 0.48, fill: REALM.blood6, yOff: 8 },
+              { id: 1, x: 0, w: 18, fill: REALM.blood19, yOff: 0 },
+              { id: 2, x: 18, w: 18, fill: REALM.blood15b, yOff: 2 },
+              { id: 3, x: 36, w: 18, fill: REALM.blood11a, yOff: 4 },
+              { id: 4, x: 54, w: 18, fill: REALM.blood8, yOff: 6 },
+              { id: 5, x: 72, w: 15, fill: REALM.blood6, yOff: 8 },
             ].map((col) => (
-              <g key={col.id} style={{ animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', col.delay), animationDelay: `${col.delay}s` }}>
+              <g key={col.id}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
@@ -1305,13 +784,13 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 </g>
               </g>
             ))}
-            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', 0.55), animationDelay: '0.55s' }} />
+            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} />
           </g>
 
           {/* Pole shadow */}
           <ellipse cx="12" cy="285" rx="15" ry="5" fill={REALM.stone4b} opacity="0.4" />
 
-          {/* Animated flag shadow on ground - sways with banner */}
+          {/* The flag's shadow on the ground */}
           <g transform="translate(45, 280)">
             {[0, 1, 2, 3, 4].map((i) => (
               <ellipse
@@ -1322,11 +801,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 ry={6 - i * 0.5}
                 fill={REALM.stone4b}
                 opacity={0.25 - i * 0.04}
-                style={{
-                  animation: swings(chaos.bannerWave, 1.4, 'ease-in-out', i * 0.12),
-                  animationDelay: `${i * 0.12}s`,
-                  transformOrigin: `${i * 15}px ${i * 2}px`,
-                }}
               />
             ))}
           </g>

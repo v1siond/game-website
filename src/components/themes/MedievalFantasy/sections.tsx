@@ -5,19 +5,17 @@ import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
+import type { SectionFrames } from '@/components/cv/SectionPlanView'
+import type { SectionId } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
-import { ScrollScene } from '@/components/scroll/ScrollScene'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MARKED_LIST, ProjectCard, VentureCard } from './cards'
 import { FrostArtDivider, FrostOrnament, ChaosArtDivider, ChaosOrnament } from './ornaments'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { heldUntil } from '@/components/themes/shared/held'
 
 // Each profession's sections, framed per zone between ornaments and art dividers.
 
@@ -45,14 +43,9 @@ export interface SectionLayout {
   artDividerScale: number
 }
 
-// A divider's glints pulse once it shows (heldUntil), never at mount below the first screen.
+// An art divider between the realm's frames, still.
 export function ArtDivider({ layout, children }: { layout: SectionLayout; children: ReactNode }) {
-  const { ref, triggered } = useSectionTrigger()
-  return (
-    <ScrollScene>
-      <div ref={ref} className={heldUntil(triggered)} style={{ margin: `${layout.artDividerMargin} 0` }}>{children}</div>
-    </ScrollScene>
-  )
+  return <div style={{ margin: `${layout.artDividerMargin} 0` }}>{children}</div>
 }
 
 // The page's spacing for its height (the root picks one) and whether the copy sits at the larger size.
@@ -78,7 +71,6 @@ const FRAMES: SectionFrames<FrameProps> = {
     const { highlights } = useAboutBlock()
     return (
       <>
-        <ScrollScene>
           <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
             <RealmFrame title={sections[slot.titleKey]} zone="chaos">
               <p className="max-w-prose" style={{
@@ -88,10 +80,11 @@ const FRAMES: SectionFrames<FrameProps> = {
                 padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
               }}>{slot.bio}</p>
               <AboutFacts look={REALM_FACTS} />
-              <MarkedLines items={highlights} label={cards.keyAchievements} look={MARKED_LIST} />
+              <div data-stage-items="">
+                <MarkedLines items={highlights} label={cards.keyAchievements} look={MARKED_LIST} />
+              </div>
             </RealmFrame>
           </section>
-        </ScrollScene>
 
         {/* === Chaos Art Divider: Crossed Weapons === */}
         <ArtDivider layout={layout}>
@@ -104,22 +97,22 @@ const FRAMES: SectionFrames<FrameProps> = {
     const { sections } = useLabels()
     return (
       <>
-        <ScrollScene>
           <SectionWithOrnament
             leftOrnament={<ChaosOrnament side="left" type="flag" />}
             rightOrnament={<ChaosOrnament side="right" type="weapons" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
               <RealmFrame title={sections[slot.titleKey]} zone="chaos">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <ul data-stage-items="" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', listStyle: 'none', padding: 0, margin: 0 }}>
                   {slot.jobs.map((job) => (
-                    <JobCard key={job.id} job={job} />
+                    <li key={job.id}>
+                      <JobCard job={job} />
+                    </li>
                   ))}
-                </div>
+                </ul>
               </RealmFrame>
             </section>
           </SectionWithOrnament>
-        </ScrollScene>
 
         {/* === Chaos Art Divider: War Banner === */}
         <ArtDivider layout={layout}>
@@ -131,11 +124,10 @@ const FRAMES: SectionFrames<FrameProps> = {
   tech: function TechFrame({ slot, layout }) {
     const { sections, cards } = useLabels()
     return (
-      <ScrollScene>
         <SectionWithOrnament rightOrnament={<ChaosOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={sections[slot.titleKey]} zone="chaos">
-              <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+              <ul data-stage-items="" className={MASONRY_COLUMN_LIST} aria-label={cards.techByCategory}>
                 {slot.categories.map((category) => (
                   <li key={category.id} className={MASONRY_ITEM}>
                     <h3 style={{ color: REALM.goldText, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${REALM.metalDark}`, paddingBottom: '0.25rem' }}>
@@ -152,17 +144,15 @@ const FRAMES: SectionFrames<FrameProps> = {
             </RealmFrame>
           </section>
         </SectionWithOrnament>
-      </ScrollScene>
     )
   },
   services: function ServicesFrame({ slot, layout }) {
     const { sections } = useLabels()
     return (
       <>
-        <ScrollScene>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={sections[slot.titleKey]} zone="chaos">
-              <ul className={MASONRY_LIST}>
+              <ul data-stage-items="" className={MASONRY_COLUMN_LIST}>
                 {slot.services.map((service) => (
                   <li key={service.id} className={MASONRY_ITEM}>
                     <InnerCard zone="chaos">
@@ -174,7 +164,6 @@ const FRAMES: SectionFrames<FrameProps> = {
               </ul>
             </RealmFrame>
           </section>
-        </ScrollScene>
 
         {/* ============ TRANSITION - ICE THRONE ZONE ============ */}
 
@@ -190,22 +179,22 @@ const FRAMES: SectionFrames<FrameProps> = {
     return (
       <>
         {/* Projects - Frost zone begins */}
-        <ScrollScene>
           <SectionWithOrnament
             leftOrnament={<FrostOrnament side="left" type="shard" />}
             rightOrnament={<FrostOrnament side="right" type="rune" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
               <RealmFrame title={sections[slot.titleKey]} zone="frost">
-                <ProjectList
-                  projects={slot.projects}
-                  className="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-3"
-                  renderProject={(project) => <ProjectCard slot={project} />}
-                />
+                <div data-stage-items="">
+                  <ProjectList
+                    projects={slot.projects}
+                    className="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-3"
+                    renderProject={(project) => <ProjectCard slot={project} />}
+                  />
+                </div>
               </RealmFrame>
             </section>
           </SectionWithOrnament>
-        </ScrollScene>
 
         {/* === Frost Art Divider: Frost Rune === */}
         <ArtDivider layout={layout}>
@@ -217,23 +206,23 @@ const FRAMES: SectionFrames<FrameProps> = {
   ventures: function VenturesFrame({ slot, layout }) {
     const { sections } = useLabels()
     return (
-      <ScrollScene>
         <SectionWithOrnament leftOrnament={<FrostOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={sections[slot.titleKey]} zone="frost">
-              {/* His own products (featured) take the first row two to a row, each a gold trimmed card with
-                  a gold seal over the name; the other ventures follow three to a row. */}
-              <VentureList
-                companies={slot.companies}
-                className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6"
-                itemClassName="grid lg:col-span-2"
-                featuredItemClassName="grid sm:col-span-2 lg:col-span-3"
-                renderVenture={(venture) => <VentureCard slot={venture} />}
-              />
+              {/* His own products (featured) first, each a gold trimmed card with a gold seal over the name,
+                  every venture two to a row in the screen column. */}
+              <div data-stage-items="">
+                <VentureList
+                  companies={slot.companies}
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                  itemClassName="grid"
+                  featuredItemClassName="grid"
+                  renderVenture={(venture) => <VentureCard slot={venture} />}
+                />
+              </div>
             </RealmFrame>
           </section>
         </SectionWithOrnament>
-      </ScrollScene>
     )
   },
   bands: function BandsFrame({ slot: { titleKey, musician, bands }, layout }) {
@@ -243,24 +232,23 @@ const FRAMES: SectionFrames<FrameProps> = {
         <ArtDivider layout={layout}>
           <ChaosArtDivider variant="warband" scale={layout.artDividerScale} />
         </ArtDivider>
-
-        <ScrollScene>
           <SectionWithOrnament leftOrnament={<FrostOrnament side="left" type="frost" />}>
             <section style={{ marginBottom: layout.sectionSpacing }}>
               <RealmFrame title={sections[titleKey]} zone="frost">
                 <p style={{ color: REALM.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
                   {drumsSince(musician, years)}
                 </p>
-                <BandList
-                  bands={bands}
-                  className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3"
-                  renderBand={(band) => <BandCard {...band} />}
-                />
+                <div data-stage-items="">
+                  <BandList
+                    bands={bands}
+                    className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3"
+                    renderBand={(band) => <BandCard {...band} />}
+                  />
+                </div>
                 <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>
               </RealmFrame>
             </section>
           </SectionWithOrnament>
-        </ScrollScene>
       </>
     )
   },
@@ -271,12 +259,11 @@ const FRAMES: SectionFrames<FrameProps> = {
         <ArtDivider layout={layout}>
           <ChaosArtDivider variant="weapons" scale={layout.artDividerScale} />
         </ArtDivider>
-
-        <ScrollScene>
           <SectionWithOrnament rightOrnament={<ChaosOrnament side="right" type="shield" />}>
             <section style={{ marginBottom: layout.sectionSpacing }}>
               <RealmFrame title={sections[titleKey]} zone="chaos">
                 <h3 style={{ ...CARD_TITLE, marginBottom: '1rem' }}>{martialArts.primary.title}</h3>
+                <div data-stage-items="">
                 <MuayThaiRecord
                   martialArts={martialArts}
                   classNames={{
@@ -294,13 +281,26 @@ const FRAMES: SectionFrames<FrameProps> = {
                     </>
                   )}
                 />
+                </div>
               </RealmFrame>
             </section>
           </SectionWithOrnament>
-        </ScrollScene>
       </>
     )
   },
 }
 
-export const SECTION_VIEWS = sectionViews(FRAMES)
+export const CARDS = FRAMES
+
+// The realm each section's frame and scene stand in: chaos up to the services, then frost; the Muay Thai record
+// is fought back in the chaos realm.
+export const REALM_OF: Record<SectionId, 'chaos' | 'frost'> = {
+  about: 'chaos',
+  work: 'chaos',
+  tech: 'chaos',
+  services: 'chaos',
+  projects: 'frost',
+  ventures: 'frost',
+  bands: 'frost',
+  muayThai: 'chaos',
+}

@@ -1,18 +1,15 @@
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { REALM } from './palette'
-import frost from './frostZone.module.css'
-import { drift, pulse } from './pulse'
-import hero from './hero.module.css'
-import { cycles } from '@/components/themes/shared/loops'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
 // cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY; the armour,
-// the blade and the frost come from the world's palette. The cape sways on capeWave and the frost breath on
-// the drift class, both from the frost zone's module because the horse's mane, tail and smoke use them too.
+// the blade and the frost come from the world's palette. He holds still: the glow along the blade
+// (data-fx="blade-glow") is the one part the frost scenes move (scenes.tsx). `figure` marks him as the world's
+// figure, on one stage only, the one the preview capture and the wardrobe read.
 
-export function FrostHero() {
+export function FrostHero({ figure = false }: { figure?: boolean }) {
   return (
-    <svg aria-hidden="true" data-worlds-figure=""
+    <svg aria-hidden="true" data-worlds-figure={figure ? '' : undefined}
       style={{
         position: 'absolute',
         left: '11%',
@@ -29,7 +26,7 @@ export function FrostHero() {
           <stop offset="50%" stopColor={REALM.frostIceMid} />
           <stop offset="100%" stopColor={REALM.frostIceBright} />
         </linearGradient>
-        <linearGradient id="lichArmor" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="kingArmor" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={REALM.night22} />
           <stop offset="50%" stopColor={REALM.night15a} />
           <stop offset="100%" stopColor={REALM.night9c} />
@@ -52,8 +49,8 @@ export function FrostHero() {
         </filter>
       </defs>
 
-      {/* Cape - dark with fur trim, wave animation */}
-      <g style={{ animation: cycles(frost.capeWave, 3, 'ease-in-out'), transformOrigin: '100px 120px' }}>
+      {/* Cape - dark with fur trim */}
+      <g>
         <path d="M55,95 Q20,150 12,240 L8,310 L192,310 L188,240 Q180,150 145,95" fill={REALM.night6} opacity="0.9" />
         <path d="M60,100 Q28,155 22,235 L18,305 L182,305 L178,235 Q172,155 140,100" fill={REALM.night7a} />
         {/* Fur trim at shoulders */}
@@ -62,8 +59,8 @@ export function FrostHero() {
       </g>
 
       {/* === MASSIVE LEGS - Strong warrior === */}
-      <path d="M60,215 L50,265 L45,305 L75,310 L82,272 L88,220" fill="url(#lichArmor)" />
-      <path d="M112,215 L118,272 L125,310 L155,305 L150,265 L140,220" fill="url(#lichArmor)" />
+      <path d="M60,215 L50,265 L45,305 L75,310 L82,272 L88,220" fill="url(#kingArmor)" />
+      <path d="M112,215 L118,272 L125,310 L155,305 L150,265 L140,220" fill="url(#kingArmor)" />
       {/* Gold trim on massive legs */}
       <path d="M50,265 L82,270 M150,265 L118,270" stroke="url(#goldTrim)" strokeWidth="2.5" fill="none" />
       {/* Skull knee guards - positioned for bigger legs */}
@@ -81,9 +78,9 @@ export function FrostHero() {
       <path d="M45,305 L75,305 M125,305 L155,305" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
 
       {/* === TORSO with skull chest plate === */}
-      <g style={{ animation: cycles(hero.breathe, 4, 'ease-in-out'), transformOrigin: '100px 160px' }}>
+      <g>
         {/* Main chest plate */}
-        <path d="M60,92 L68,75 L100,68 L132,75 L140,92 L145,160 L135,200 L100,210 L65,200 L55,160 Z" fill="url(#lichArmor)" />
+        <path d="M60,92 L68,75 L100,68 L132,75 L140,92 L145,160 L135,200 L100,210 L65,200 L55,160 Z" fill="url(#kingArmor)" />
         {/* Gold trim on chest */}
         <path d="M60,92 L68,75 L100,68 L132,75 L140,92" stroke="url(#goldTrim)" strokeWidth="2.5" fill="none" />
         <path d="M65,200 L100,210 L135,200" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
@@ -95,8 +92,8 @@ export function FrostHero() {
         <ellipse cx="100" cy="123" rx="12" ry="10" fill={REALM.night15a} />
         <ellipse cx="94" cy="120" rx="4" ry="3" fill={REALM.night9c} />
         <ellipse cx="106" cy="120" rx="4" ry="3" fill={REALM.night9c} />
-        <ellipse cx="94" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" {...pulse(0.3, 0.6, 2)} />
-        <ellipse cx="106" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" {...pulse(0.3, 0.6, 2)} />
+        <ellipse cx="94" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" />
+        <ellipse cx="106" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" />
         <path d="M100,126 L97,132 L103,132 Z" fill={REALM.night9c} />
         {/* Belt with skull buckle */}
         <rect x="60" y="175" width="80" height="15" fill={REALM.night15a} />
@@ -107,7 +104,7 @@ export function FrostHero() {
       {/* === MASSIVE SHOULDER PAULDRONS with spikes === */}
       {/* Left pauldron */}
       <g>
-        <ellipse cx="45" cy="88" rx="28" ry="18" fill="url(#lichArmor)" />
+        <ellipse cx="45" cy="88" rx="28" ry="18" fill="url(#kingArmor)" />
         <ellipse cx="45" cy="88" rx="24" ry="15" fill={REALM.night15a} />
         {/* Gold trim */}
         <ellipse cx="45" cy="88" rx="28" ry="18" fill="none" stroke="url(#goldTrim)" strokeWidth="2" />
@@ -128,7 +125,7 @@ export function FrostHero() {
       </g>
       {/* Right pauldron */}
       <g>
-        <ellipse cx="155" cy="88" rx="28" ry="18" fill="url(#lichArmor)" />
+        <ellipse cx="155" cy="88" rx="28" ry="18" fill="url(#kingArmor)" />
         <ellipse cx="155" cy="88" rx="24" ry="15" fill={REALM.night15a} />
         <ellipse cx="155" cy="88" rx="28" ry="18" fill="none" stroke="url(#goldTrim)" strokeWidth="2" />
         <polygon points="145,78 142,48 148,74" fill={REALM.night15a} />
@@ -146,22 +143,22 @@ export function FrostHero() {
 
       {/* === MASSIVE ARMS - Strong warrior, with gauntlets === */}
       {/* Left arm - raised, no weapon */}
-      <path d="M32,100 L15,138 L8,180 L32,185 L42,145 L52,105" fill="url(#lichArmor)" />
+      <path d="M32,100 L15,138 L8,180 L32,185 L42,145 L52,105" fill="url(#kingArmor)" />
       <path d="M15,138 L42,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
       <polygon points="8,180 0,168 18,175" fill={REALM.night15a} />
       <polygon points="15,178 5,165 22,172" fill={REALM.night15a} />
 
       {/* Right arm - HOLDING RUNEBLADE */}
-      <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#lichArmor)" />
+      <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#kingArmor)" />
       <path d="M185,138 L158,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
       {/* Gauntlet holding sword handle */}
-      <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#lichArmor)" />
+      <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#kingArmor)" />
       <ellipse cx="185" cy="178" rx="12" ry="10" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
 
       {/* === RUNEBLADE - IN HIS RIGHT HAND === */}
       <g transform="translate(185, 175) rotate(-5)">
         {/* Blade glow */}
-        <ellipse cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" {...pulse(0.1, 0.22, 2)} />
+        <ellipse data-fx="blade-glow" cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" />
 
         {/* Blade pointing down */}
         <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#runebladeGlow)" />
@@ -171,9 +168,9 @@ export function FrostHero() {
         <path d="M-10,60 L-16,55 L-12,70" fill="url(#runebladeGlow)" />
 
         {/* Runes - pulsing */}
-        <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 1.5)} />
-        <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 1.8)} />
-        <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 2.1)} />
+        <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} />
+        <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright} />
+        <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright} />
 
         {/* Crossguard - skull motif - at hand level */}
         <path d="M-30,8 L0,15 L30,8 L24,20 L0,25 L-24,20 Z" fill={REALM.night15a} />
@@ -227,8 +224,8 @@ export function FrostHero() {
       {/* EYES */}
       <ellipse cx="90" cy="40" rx="5" ry="4" fill={HERO_IDENTITY.eyes} />
       <ellipse cx="110" cy="40" rx="5" ry="4" fill={HERO_IDENTITY.eyes} />
-      <ellipse cx="90" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" {...pulse(0.15, 0.3, 3)} />
-      <ellipse cx="110" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" {...pulse(0.15, 0.3, 3)} />
+      <ellipse cx="90" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" />
+      <ellipse cx="110" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" />
 
       {/* NOSE */}
       <path d="M100,46 L96,56 L104,56 Z" fill={HERO_IDENTITY.skinShade} />
@@ -250,8 +247,8 @@ export function FrostHero() {
       <path d="M116,72 Q110,88 102,102" stroke={REALM.stone10} strokeWidth="1.5" fill="none" opacity="0.25" />
 
       {/* Frost breath */}
-      <g opacity="0.15" {...pulse(0.1, 0.22, 3)}>
-        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} filter="url(#frostGlow)" {...drift(3, { '--drift-sx': 1.6667 })} />
+      <g opacity="0.15">
+        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} filter="url(#frostGlow)" />
       </g>
 
       {/* Ground frost */}

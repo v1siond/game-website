@@ -1,8 +1,6 @@
 import { memo, type ReactNode } from 'react'
 import { REALM } from './palette'
-import ornament from './ornaments.module.css'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
-import { cycles } from '@/components/themes/shared/loops'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
 
@@ -414,8 +412,7 @@ export const FrostArtDivider = memo(function FrostArtDivider({ variant = 'crysta
             opacity: 0.3 + (i % 4) * 0.1,
             borderRadius: '1px',
             transform: `rotate(${i * 15}deg)`,
-            animation: cycles(ornament.blightPulse, 2.5 + i * 0.2, 'ease-in-out'),
-          }}
+            }}
         />
       ))}
     </div>
