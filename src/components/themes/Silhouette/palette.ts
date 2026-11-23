@@ -53,39 +53,24 @@ export const SHADE = {
   crimsonFog: '#e3893a33',
 } as const
 
-// One profession's light: the sky and fog band as classes over the variables, the layer fills and the
-// rim as colours for SVG.
-export interface SkyLight {
-  sky: string
-  fog: string
+// One light of the forest: the sky top to horizon, the far and mid layers in front of it, the fog band
+// over the ground (with its own transparency) and the rim of light on the edges that face the sky.
+export interface Light {
+  top: string
+  low: string
   far: string
   mid: string
+  fog: string
   rim: string
 }
 
-export const SKY: Record<'dawn' | 'ember' | 'crimson', SkyLight> = {
-  dawn: {
-    sky: 'from-[color:var(--sh-dawn-top)] to-[color:var(--sh-dawn-low)]',
-    fog: 'via-[color:var(--sh-dawn-fog)]',
-    far: SHADE.dawnFar,
-    mid: SHADE.dawnMid,
-    rim: SHADE.dawnRim,
-  },
-  ember: {
-    sky: 'from-[color:var(--sh-ember-top)] to-[color:var(--sh-ember-low)]',
-    fog: 'via-[color:var(--sh-ember-fog)]',
-    far: SHADE.emberFar,
-    mid: SHADE.emberMid,
-    rim: SHADE.rim,
-  },
-  crimson: {
-    sky: 'from-[color:var(--sh-crimson-top)] to-[color:var(--sh-crimson-low)]',
-    fog: 'via-[color:var(--sh-crimson-fog)]',
-    far: SHADE.crimsonFar,
-    mid: SHADE.crimsonMid,
-    rim: SHADE.rim,
-  },
-}
+export const LIGHTS = {
+  dawn: { top: SHADE.dawnTop, low: SHADE.dawnLow, far: SHADE.dawnFar, mid: SHADE.dawnMid, fog: SHADE.dawnFog, rim: SHADE.dawnRim },
+  ember: { top: SHADE.emberTop, low: SHADE.emberLow, far: SHADE.emberFar, mid: SHADE.emberMid, fog: SHADE.emberFog, rim: SHADE.rim },
+  crimson: { top: SHADE.crimsonTop, low: SHADE.crimsonLow, far: SHADE.crimsonFar, mid: SHADE.crimsonMid, fog: SHADE.crimsonFog, rim: SHADE.rim },
+} as const satisfies Record<string, Light>
+
+export type LightName = keyof typeof LIGHTS
 
 /** The palette as CSS variables (--sh-black, --sh-dawn-top and so on), set once on the world's root. */
 export const SHADE_VARS = paletteVars('sh', SHADE)

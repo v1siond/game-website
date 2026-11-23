@@ -1,0 +1,20 @@
+/*
+ * His figure (figure.tsx). Every part turns round its own joint in the 40 by 64 viewBox (transform-box:
+ * view-box): the whole of him round his feet, the arms at the shoulders and elbows, the legs at the hips
+ * and knees, so a forearm turns at the elbow wherever the shoulder took it. A theatre scene's writer
+ * (pose.ts) poses the parts with inline transforms from the scroll. Transform only.
+ */
+
+.figure * {
+  transform-box: view-box;
+}
+
+.root { transform-origin: 20px 63px; }
+.armB { transform-origin: 16.4px 24.8px; }
+.armF { transform-origin: 23.4px 24.8px; }
+.foreB { transform-origin: 16.4px 32.2px; }
+.foreF { transform-origin: 23.4px 32.2px; }
+.legB { transform-origin: 18.2px 39.8px; }
+.legF { transform-origin: 21.8px 39.8px; }
+.shinB { transform-origin: 18.2px 50px; }
+.shinF { transform-origin: 21.8px 50px; }
