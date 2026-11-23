@@ -303,12 +303,6 @@
         "souls": "Souls",
         "gained": "{count} souls"
       },
-      "rpg": {
-        "check": "Check",
-        "checkAgain": "Check again",
-        "resetPuzzle": "Reset the puzzle",
-        "sparAgain": "Spar again"
-      },
       "cvPage": {
         "backToSite": "Back to the site",
         "downloadPdf": "Download PDF",
@@ -745,12 +739,6 @@
         "souls": "Almas",
         "gained": "{count} almas"
       },
-      "rpg": {
-        "check": "Examinar",
-        "checkAgain": "Examinar otra vez",
-        "resetPuzzle": "Reiniciar el acertijo",
-        "sparAgain": "Entrenar otra vez"
-      },
       "cvPage": {
         "backToSite": "Volver al sitio",
         "downloadPdf": "Descargar PDF",
@@ -1186,12 +1174,6 @@
         "healthFull": "La salute è piena",
         "souls": "Anime",
         "gained": "{count} anime"
-      },
-      "rpg": {
-        "check": "Esamina",
-        "checkAgain": "Esamina di nuovo",
-        "resetPuzzle": "Ripristina l'enigma",
-        "sparAgain": "Allenati di nuovo"
       },
       "cvPage": {
         "backToSite": "Torna al sito",

@@ -1,159 +1,139 @@
-"use client";
+'use client'
 
-import { useProfession } from "@/contexts/ProfessionContext";
-import { ProfessionSwitch } from "@/components/cv/ProfessionSwitch";
-import { useWorldView, useLabels } from "@/components/cv/CVDataProvider";
-import { SkipLink } from "@/components/themes/shared/SkipLink";
-import { RecruiterHero } from "@/components/cv/RecruiterHero";
-import { ProfessionSectionsView } from "@/components/cv/ProfessionSectionsView";
-import { ProfessionRegion } from "@/components/cv/ProfessionRegion";
-import { NameWords } from "@/components/cv/NameWords";
-import { CopyrightLine } from "./shared/CopyrightLine";
-import { MONO, PIXEL, RPG_VARS } from "./RetroRPG/palette";
-import { ActionOptions } from "./RetroRPG/actions";
-import { Box, Mark, SHOW_AFTER, Typed } from "./RetroRPG/panels";
-import { CommandOption } from "./RetroRPG/selector";
-import { Encounter } from "./RetroRPG/encounter";
-import { SavePoint } from "./RetroRPG/savePoint";
-import { SECTION_VIEWS } from "./RetroRPG/sections";
-import { ZoneStageProvider, useZoneStore } from "@/hooks/useZoneStage";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { Overworld, type Zone } from "./RetroRPG/overworld";
-import { ZoneArea } from "./RetroRPG/rooms";
-import world from "./RetroRPG/world.module.css";
+import { useMemo } from 'react'
+import { useProfession } from '@/contexts/ProfessionContext'
+import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView, useLabels } from '@/components/cv/CVDataProvider'
+import { useAboutBlock } from '@/components/cv/AboutFacts'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
+import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { NameWords } from '@/components/cv/NameWords'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { sectionPlan } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { MONO, PIXEL, RPG_VARS } from './RetroRPG/palette'
+import { ActionOptions } from './RetroRPG/actions'
+import { Box, Mark } from './RetroRPG/panels'
+import { CommandOption } from './RetroRPG/selector'
+import { Encounter } from './RetroRPG/encounter'
+import { SavePoint } from './RetroRPG/savePoint'
+import { scenesOf, type Scene } from './RetroRPG/scenes'
+import { SceneSection } from './RetroRPG/sections'
+import { LAYER_MOTION, RpgStage, theatreScene } from './RetroRPG/stage'
+import world from './RetroRPG/world.module.css'
 
-// Retro RPG, a lo-fi pixel role playing game's encounter screen: the page composition. It reads top to
-// bottom like the game's battle screen: him in the monster area, the box with his name and lines, the
-// stats line, and the command row that switches the profession. Under it the profession's sections, each
-// a box (the bullet box above the main list), and the save point as the contact. The palette, buttons,
-// boxes, cards, the bullet box, the encounter and the save point live in ./RetroRPG.
-//
-// Behind it all the overworld (overworld.tsx): the zone of the section in view, handed up through the
-// shared zone stage, so he walks from the violet ruins through the snow, the waterfall, the heat and the
-// pastel town as the page scrolls, and comes home to the ruins at the save point.
+const PHONE_QUERY = '(max-width: 767.98px)'
+
+// Retro RPG, a lo-fi pixel role playing game. The hero is the game's encounter screen: him in the monster
+// area, the box with his name and lines, the stats line, and the command row that switches the profession,
+// over the ruins where a small monster faces him. Then every section of the active profession is one full
+// screen scene of a walk underground (./RetroRPG/scenes) that rises from dark, holds while its title and
+// boxes scroll over it, and sinks back into dark while the next one rises: from the violet ruins through
+// the snow, the waterfall, the heat and the pastel town, him acting once per card on the prop it lights.
+// Contact is the save point, which he walks up to back in the ruins. Every motion is a function of the
+// scroll position, on the shared theatre (./shared/theatre) and its settle: scroll up and it plays back.
+// Under reduced motion there is no theatre: each section carries its own picture, still, at its settled
+// frame.
 //
 // The root sets the palette as CSS variables (RPG_VARS), the only inline style, and clips sideways
 // overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container.
 
-const LINE = `text-sm leading-relaxed sm:text-base ${MONO}`;
+const LINE = `text-sm leading-relaxed sm:text-base ${MONO}`
 
-function Said({
-  children,
-  className,
-}: {
-  children: string;
-  className: string;
-}) {
+function Said({ children, className }: { children: string; className: string }) {
   return (
     <p className={`flex items-start gap-2 ${LINE} ${className}`}>
       <Mark className="text-[color:var(--rpg-text)]" />
       <span>{children}</span>
     </p>
-  );
+  )
 }
 
 export default function RetroRPGTheme() {
-  const labels = useLabels();
-  const { active } = useProfession();
-  const view = useWorldView();
-  const reduced = useReducedMotion();
-  const { zones, stage } = useZoneStore<Zone>("ruins", reduced);
+  const labels = useLabels()
+  const { active } = useProfession()
+  const view = useWorldView()
+  const { professionalSummary } = useCVData()
+  const { highlights } = useAboutBlock()
+  const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
+    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+  )
+  const staged = useMemo(() => scenes.map(theatreScene), [scenes])
+  const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)
+  const sections = scenes.filter((scene): scene is Scene & { slot: NonNullable<Scene['slot']> } => scene.slot !== null)
 
   return (
-    <ZoneStageProvider value={stage}>
-      <div
-        className={`relative min-h-screen overflow-x-clip ${world.world}`}
-        style={RPG_VARS}
-      >
-        <Overworld zones={zones} />
+    <div className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--rpg-void)] [--theatre-veil:var(--rpg-void)] ${world.world}`} style={RPG_VARS}>
+      <SkipLink className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2" />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef}>
+          {scenes.map((scene) => (
+            <RpgStage key={scene.id} scene={scene} />
+          ))}
+        </Theatre>
+      )}
 
-        <SkipLink className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2" />
-
+      <div ref={textRef} className="relative z-20">
         {/* The encounter: him, the box, the stats line and the command row */}
-        <header data-worlds-hero="" className="relative z-30 px-4 pb-6 pt-8 sm:px-6">
-          <ZoneArea zone="ruins">
-            <Encounter profession={active}>
-              <RecruiterHero
-                render={({ name, headline, tagline, line, actions }) => (
-                  <Box className={`mt-4 ${world.opens}`}>
-                    <h1
-                      className={`text-[clamp(1.125rem,5.5vw,1.5rem)] uppercase tracking-[0.15em] text-[color:var(--rpg-text)] ${PIXEL}`}
-                    >
-                      <Typed pace="short" delay="open">
-                        <NameWords name={name} />
-                      </Typed>
-                    </h1>
-                    <div className="mt-4 space-y-2">
-                      <Said
-                        className={`text-[color:var(--rpg-text)] ${SHOW_AFTER.second}`}
-                      >
-                        {headline}
-                      </Said>
-                      <Said
-                        className={`text-[color:var(--rpg-sky)] ${SHOW_AFTER.third}`}
-                      >
-                        {tagline}
-                      </Said>
-                      <Said
-                        className={`text-[color:var(--rpg-muted)] ${SHOW_AFTER.third}`}
-                      >
-                        {line}
-                      </Said>
-                    </div>
-                    <nav
-                      className={`mt-6 ${SHOW_AFTER.last}`}
-                      aria-label={labels.navigation.contactAndCv}
-                    >
-                      <ActionOptions actions={actions} />
-                    </nav>
-                  </Box>
-                )}
-              />
+        <header data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-16 pt-8 sm:px-6">
+          {reduced && <RpgStage scene={scenes[0]} settled />}
+          <Encounter profession={active}>
+            <RecruiterHero
+              render={({ name, headline, tagline, line, actions }) => (
+                <Box className="mt-4">
+                  <h1 className={`text-[clamp(1.125rem,5.5vw,1.5rem)] uppercase tracking-[0.15em] text-[color:var(--rpg-text)] ${PIXEL}`}>
+                    <NameWords name={name} />
+                  </h1>
+                  <div className="mt-4 space-y-2">
+                    <Said className="text-[color:var(--rpg-text)]">{headline}</Said>
+                    <Said className="text-[color:var(--rpg-sky)]">{tagline}</Said>
+                    <Said className="text-[color:var(--rpg-muted)]">{line}</Said>
+                  </div>
+                  <nav className="mt-6" aria-label={labels.navigation.contactAndCv}>
+                    <ActionOptions actions={actions} />
+                  </nav>
+                </Box>
+              )}
+            />
 
-              <div
-                className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] ${PIXEL} ${SHOW_AFTER.last}`}
-              >
-                <span>
-                  <NameWords name={view.hero.name} />
-                </span>
-                <span className="text-[color:var(--rpg-gold)]">
-                  {labels.professions[active]}
-                </span>
-                <span
-                  className="h-4 w-24 bg-[color:var(--rpg-gold)]"
-                  aria-hidden="true"
-                />
-              </div>
+            <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 bg-[color:var(--rpg-void)] px-3 py-2 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] ${PIXEL}`}>
+              <span>
+                <NameWords name={view.hero.name} />
+              </span>
+              <span className="text-[color:var(--rpg-gold)]">{labels.professions[active]}</span>
+              <span className="h-4 w-24 bg-[color:var(--rpg-gold)]" aria-hidden="true" />
+            </div>
 
-              <ProfessionSwitch
-                className={`mt-4 grid grid-cols-1 gap-3 sm:flex sm:justify-between ${SHOW_AFTER.last}`}
-                label={labels.navigation.professionSelection}
-                renderOption={(option) => <CommandOption option={option} />}
-              />
-            </Encounter>
-          </ZoneArea>
+            <ProfessionSwitch
+              className="mt-4 grid grid-cols-1 gap-3 sm:flex sm:justify-between"
+              label={labels.navigation.professionSelection}
+              renderOption={(option) => <CommandOption option={option} />}
+            />
+          </Encounter>
         </header>
 
-        {/* The picked profession's sections, and only those */}
-        <main id="main-content" className="relative z-20">
+        <main id="main-content">
           <ProfessionRegion>
-            <ProfessionSectionsView
-              views={SECTION_VIEWS}
-              sections={view.sections}
-            />
+            {sections.map((scene) => (
+              <SceneSection key={scene.id} scene={scene} slot={scene.slot} still={reduced} />
+            ))}
           </ProfessionRegion>
+          <SavePoint profession={active} scene={scenes[scenes.length - 1]} still={reduced} />
         </main>
 
-        <ZoneArea zone="ruins">
-          <SavePoint profession={active} />
-        </ZoneArea>
-
-        <footer className="relative z-20 py-10 text-center">
-          <p className={`text-sm text-[color:var(--rpg-muted)] ${MONO}`}>
+        <footer className="relative py-10 text-center">
+          <p className={`inline-block bg-[color:var(--rpg-void)] px-2 text-sm text-[color:var(--rpg-muted)] ${MONO}`}>
             <CopyrightLine />
           </p>
         </footer>
       </div>
-    </ZoneStageProvider>
-  );
+    </div>
+  )
 }

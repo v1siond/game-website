@@ -4,9 +4,8 @@
  * CSS variables (--rpg-*, set on the root from palette.ts).
  *
  * Motion is the game's: it runs on a locked frame clock, so every move is hard steps (steps()), never an
- * eased slide. Transform and opacity only. A reveal plays when its element or a parent carries
- * data-play="on" and rests on its final frame at data-play="done" or under reduced motion, which also
- * drops every loop. The hero encounter adds data-phase (encounter.tsx) for its own beats.
+ * eased slide. Transform and opacity only, and only on the visitor's own moves (a pointer, a click, a
+ * profession switch); reduced motion drops every loop. The walk itself is the scroll's, on the stages.
  */
 
 .world {
@@ -33,32 +32,13 @@
   border-block: 4px solid var(--rpg-border);
 }
 
-/* ---- the reveal steps ---- */
+/* ---- the box steps ---- */
 
-/* A box opens like the encounter box: a thin line grows wide, then the box grows tall, in hard steps. */
+/* A box opens the way an encounter box does: a thin line grows wide, then the box grows tall, in hard steps. */
 @keyframes boxOpen {
   0% { transform: scale(0.04, 0.04); }
   45% { transform: scale(1, 0.04); }
   100% { transform: scale(1, 1); }
-}
-
-.opens {
-  transform-origin: 50% 50%;
-}
-
-/* The services box (monsterTurn.tsx) reads the monster's beat instead: closed while it hops in, opening from
-   its landing on. */
-[data-play='idle'] .opens,
-[data-play='idle'].opens,
-[data-beat='hop'] .opens {
-  transform: scale(0.04, 0.04);
-}
-
-[data-play='on'] .opens,
-[data-play='on'].opens,
-[data-beat='sit'] .opens,
-[data-beat='off'] .opens {
-  animation: boxOpen 420ms steps(7, end) both;
 }
 
 /* The bullet box opens in its profession's shape. It sits on a wrapper of the box: on the box itself the
@@ -66,110 +46,6 @@
 .resize {
   transform-origin: 50% 50%;
   animation: boxOpen 420ms steps(7, end) both;
-}
-
-/* A line types itself: a black block over it slides off to the right in one step per letter group
-   (--type-steps), after --type-delay. Once typed the block folds to nothing (scaleX(0)) instead of
-   resting past the right edge, so the line's box is only as wide as its text and nothing clips at 320 px. */
-.type {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: top;
-}
-
-.type::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: var(--rpg-void);
-  transform: translateX(0);
-}
-
-@keyframes typeOut {
-  from { transform: translateX(0); }
-  to { transform: translateX(102%); }
-}
-
-[data-play='on'] .type::after,
-[data-play='done'] .type::after {
-  transform: scaleX(0);
-}
-
-[data-play='on'] .type::after {
-  animation: typeOut var(--type-ms, 900ms) steps(var(--type-steps, 18), end) var(--type-delay, 0ms) backwards;
-}
-
-/* Text or a row that appears all at once after the line before it is typed (--show-delay). */
-@keyframes popIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-[data-play='idle'] .after {
-  opacity: 0;
-}
-
-[data-play='on'] .after {
-  animation: popIn 1ms steps(1, end) var(--show-delay, 0ms) both;
-}
-
-/* ---- the hero encounter (data-phase) ---- */
-
-/* The room he stands in covers the encounter; at the cut its art goes and the black stays, at the open
-   the black goes too. */
-.room > * {
-  opacity: 1;
-}
-
-[data-phase='cut'] .room > * {
-  opacity: 0;
-}
-
-[data-phase='open'] .room,
-[data-phase='ready'] .room {
-  opacity: 0;
-}
-
-/* The exclamation mark pops over his head in three frames. */
-@keyframes alertPop {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-.alert {
-  transform-origin: 50% 100%;
-  transform: scale(0);
-}
-
-[data-phase='alert'] .alert,
-[data-phase='cut'] .alert {
-  animation: alertPop 240ms steps(3, end) both;
-}
-
-/* The heart blinks three times on the black screen, then drops toward the box and is gone. */
-@keyframes soulBlink {
-  0%, 33%, 66%, 100% { opacity: 1; }
-  16%, 50%, 83% { opacity: 0; }
-}
-
-@keyframes soulDrop {
-  0% { transform: translateY(0); opacity: 1; }
-  80% { transform: translateY(72px); opacity: 1; }
-  100% { transform: translateY(72px); opacity: 0; }
-}
-
-.encounterSoul {
-  opacity: 0;
-}
-
-[data-phase='cut'] .encounterSoul {
-  animation: soulBlink 540ms steps(1, end) both;
-}
-
-[data-phase='open'] .encounterSoul {
-  animation: soulDrop 300ms steps(6, end) both;
 }
 
 /* His sprite turns through a profession switch in four hard frames. */
@@ -367,12 +243,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .opens,
+  
   .resize,
-  .after,
-  .type::after,
-  .alert,
-  .encounterSoul,
   .turns,
   .idle,
   .flash,
@@ -391,25 +263,40 @@
     transition: none;
   }
 
-  [data-play] .opens {
-    transform: none;
-  }
+  
 
-  [data-play] .after {
-    opacity: 1;
-  }
+  
 
-  .type::after {
-    transform: scaleX(0);
-  }
+  
 
-  .room,
-  .encounterSoul,
+  
   .flash {
     opacity: 0;
   }
 
-  .alert {
-    transform: none;
+  
+}
+
+/* ---- the job boxes ---- */
+
+/* The speaker's portrait in each job box talks under the pointer or the keyboard: its mouth flaps. */
+@keyframes talk {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.mouthOpen {
+  opacity: 0;
+}
+
+.talks:hover .mouthOpen,
+.talks:focus-within .mouthOpen {
+  animation: talk 240ms steps(1, end) 6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talks:hover .mouthOpen,
+  .talks:focus-within .mouthOpen {
+    animation: none;
   }
 }

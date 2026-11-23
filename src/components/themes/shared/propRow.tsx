@@ -12,7 +12,7 @@ export interface PropNodes {
 }
 
 /** Every prop's nodes, found once. */
-export const propNodes = (stage: ParentNode, count: number): PropNodes[] =>
+export const propNodes = (stage: Pick<ParentNode, 'querySelector'>, count: number): PropNodes[] =>
   Array.from({ length: count }, (_, i) => ({ move: fx(stage, `move-${i}`), lit: fx(stage, `lit-${i}`) }))
 
 /** The props standing at `xs` on the `floor` line, each drawn round its foot (x 0, y 0) at the row's size. */

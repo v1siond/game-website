@@ -1,289 +1,206 @@
-"use client";
+'use client'
 
-import type { ReactNode } from "react";
-import { useLabels } from "@/components/cv/CVDataProvider";
-import { AboutFacts, useAboutBlock, type AboutFactsLook } from "@/components/cv/AboutFacts";
-import {
-  sectionViews,
-  type SectionFrames,
-} from "@/components/cv/SectionPlanView";
-import { ProjectList } from "@/components/cv/ProjectList";
-import { BandList } from "@/components/cv/BandList";
-import { VentureList } from "@/components/cv/VentureList";
-import { MarkedLines } from "@/components/cv/MarkedLines";
-import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
-import { MASONRY_ITEM, MASONRY_LIST } from "@/lib/cv/masonry";
-import { drumsSince } from "@/lib/cv/sectionText";
-import type { Labels } from "@/lib/cv/labels";
-import {
-  BandCard,
-  CompanyCard,
-  ExperienceCard,
-  ItemBag,
-  ProjectCard,
-  SAID_LINES,
-} from "./cards";
-import { BulletBox } from "./bulletBox";
-import { MonsterTurnBox } from "./monsterTurn";
-import { BODY, Box, Mark, SectionHeader } from "./panels";
-import { MONO, PIXEL } from "./palette";
-import { usePlay } from "./play";
-import {
-  BridgeRoom,
-  EncounterRoom,
-  PuzzleRoom,
-  RingsFlower,
-  SentryRoom,
-  ShopRoom,
-  SparRoom,
-  StreetRoom,
-} from "./rooms";
-import world from "./world.module.css";
+import type { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
+import { ProjectList } from '@/components/cv/ProjectList'
+import { BandList } from '@/components/cv/BandList'
+import { VentureList } from '@/components/cv/VentureList'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
+import { drumsSince } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard, SAID_LINES } from './cards'
+import { BulletBox } from './bulletBox'
+import { BODY, Box, Mark, SectionHeader } from './panels'
+import { MONO, PIXEL } from './palette'
+import type { Scene } from './scenes'
+import { RpgStage } from './stage'
 
-// Each profession's sections, and only those, as the encounter's boxes; the shared section plan picks which
-// a profession shows and in which order, and each is one frame here. Light blocks (About, Tech stack,
-// Services, Ventures, the band lines) are one box each; heavy blocks are the long lists in masonry columns
-// (MASONRY_LIST), each entry its own box with its own reveal (cards.tsx). The bullet box sits above
-// each profession's main list, playing that profession's soul mode (bulletBox.tsx).
-//
-// The services box is opened by the About monster landing on it (monsterTurn.tsx).
-//
-// Every reveal has its own play scope (usePlay), so a block's heading, its box and each card in a list
-// open and type once, each when it shows, and never drive one another.
-
-const WIDE = "max-w-6xl";
-const NARROW = "max-w-3xl";
-
-function Heading({ title }: { title: string }) {
-  const { ref, play } = usePlay(600);
-
-  return (
-    <div ref={ref} data-play={play}>
-      <SectionHeader title={title} />
-    </div>
-  );
-}
-
-/** A single box that opens in steps, then shows what it holds, when it first shows. */
-function OpenBox({ children }: { children: ReactNode }) {
-  const { ref, play } = usePlay(1400);
-
-  return (
-    <div ref={ref} data-play={play}>
-      <Box className={world.opens}>{children}</Box>
-    </div>
-  );
-}
-
-type SectionKey = keyof Labels["sections"];
-
-/** A section: its box title over what it holds; the region is named by labelKey, the title by titleKey. */
-function Block({
-  labelKey,
-  titleKey = labelKey,
-  width = NARROW,
-  children,
-}: {
-  labelKey: SectionKey;
-  titleKey?: SectionKey;
-  width?: string;
-  children: ReactNode;
-}) {
-  const titles = useLabels().sections;
-
-  return (
-    <section className="px-4 py-10 sm:px-6" aria-label={titles[labelKey]}>
-      <div className={`mx-auto ${width}`}>
-        <Heading title={titles[titleKey]} />
-        {children}
-      </div>
-    </section>
-  );
-}
+// One section per scene: a tall head that first shows the place alone and then brings the title up on
+// its black plate, then the cards (the game's hard white boxes), then a screen of the place alone before
+// it sinks. The cards a scene counts sit in an element marked data-stage-items, which the shared theatre
+// measures for the reading line that lights each prop. The bullet box sits under the About box and under
+// the Musician's and the Martial Artist's lists, playing that profession's soul mode (bulletBox.tsx).
 
 // The About box's stats, each label in the gold the boxes name things in.
 const STAT_LINES: AboutFactsLook = {
-  list: "mt-4 max-w-prose space-y-1",
-  fact: "flex flex-wrap gap-x-2",
+  list: 'mt-4 max-w-prose space-y-1',
+  fact: 'flex flex-wrap gap-x-2',
   term: `text-sm uppercase text-[color:var(--rpg-gold)] ${MONO}`,
   value: BODY,
-};
+}
 
-const STAT =
-  "border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3";
+const STAT = 'border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3'
 
-// One frame per section of the shared plan, each in its room of the zone it belongs to.
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { cards } = useLabels();
-    const { highlights } = useAboutBlock();
-    return (
-      <Block labelKey={slot.titleKey}>
-        <EncounterRoom>
-          <OpenBox>
-            <p className={`max-w-prose ${BODY}`}>{slot.bio}</p>
-            <MarkedLines
-              items={highlights}
-              label={cards.keyAchievements}
-              look={{ ...SAID_LINES, list: "mt-4 max-w-prose space-y-2" }}
-            />
-            <AboutFacts look={STAT_LINES} />
-          </OpenBox>
-          <div className="mt-6">
-            <BulletBox profession="engineer" />
-          </div>
-        </EncounterRoom>
-      </Block>
-    );
-  },
-  work: function WorkFrame({ slot }) {
-    return (
-      <Block labelKey={slot.titleKey} width={WIDE}>
-        <SentryRoom profession="engineer">
-          <ul className={MASONRY_LIST}>
-            {slot.jobs.map((entry) => (
-              <li key={entry.id} className={MASONRY_ITEM}>
-                <ExperienceCard entry={entry} />
-              </li>
-            ))}
-          </ul>
-        </SentryRoom>
-      </Block>
-    );
-  },
-  tech: function TechFrame({ slot }) {
-    return (
-      <Block labelKey={slot.titleKey} width={WIDE}>
-        <ShopRoom profession="engineer">
-          <OpenBox>
-            <ItemBag categories={slot.categories} />
-          </OpenBox>
-        </ShopRoom>
-      </Block>
-    );
-  },
-  services: function ServicesFrame({ slot }) {
-    return (
-      <Block labelKey={slot.titleKey} width={WIDE}>
-        <MonsterTurnBox>
-          <ul className={MASONRY_LIST}>
-            {slot.services.map((service) => (
-              <li key={service.id} className={MASONRY_ITEM}>
-                <h3
-                  className={`mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}
-                >
-                  <Mark />
-                  {service.title}
-                </h3>
-                <p className={BODY}>{service.line}</p>
-              </li>
-            ))}
-          </ul>
-        </MonsterTurnBox>
-      </Block>
-    );
-  },
-  projects: function ProjectsFrame({ slot }) {
-    return (
-      <Block labelKey={slot.titleKey} titleKey="featuredWork" width={WIDE}>
-        <PuzzleRoom profession="engineer">
-          <ProjectList
-            projects={slot.projects}
-            className={MASONRY_LIST}
-            itemClassName={MASONRY_ITEM}
-            renderProject={(project) => <ProjectCard {...project} />}
-          />
-        </PuzzleRoom>
-      </Block>
-    );
-  },
-  ventures: function VenturesFrame({ slot }) {
-    return (
-      <Block labelKey={slot.titleKey} width={WIDE}>
-        <StreetRoom profession="engineer">
-          <VentureList
-            companies={slot.companies}
-            className="grid gap-6 md:grid-cols-6"
-            itemClassName="md:col-span-2"
-            featuredItemClassName="md:col-span-3"
-            renderVenture={(venture) => <CompanyCard {...venture} />}
-          />
-        </StreetRoom>
-      </Block>
-    );
-  },
-  bands: function BandsFrame({ slot }) {
-    const { years } = useLabels();
-    const { musician, bands } = slot;
+function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
+  return (
+    <>
+      <Box>
+        <p className={`max-w-prose ${BODY}`}>{slot.bio}</p>
+        <div data-stage-items="">
+          <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SAID_LINES, list: 'mt-4 max-w-prose space-y-2' }} />
+        </div>
+        <AboutFacts look={STAT_LINES} />
+      </Box>
+      <div className="mt-6">
+        <BulletBox profession="engineer" />
+      </div>
+    </>
+  )
+}
 
-    return (
-      <Block labelKey={slot.titleKey} width={WIDE}>
-        <p
-          className={`mb-6 inline-block bg-[color:var(--rpg-void)] px-3 py-1 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}
-        >
-          {drumsSince(musician, years)}
-        </p>
-        <BridgeRoom profession="drummer" count={bands.length}>
-          <BandList
-            bands={bands}
-            className={MASONRY_LIST}
-            itemClassName={MASONRY_ITEM}
-            renderBand={(band, index) => (
-              <RingsFlower index={index}>
-                <BandCard {...band} />
-              </RingsFlower>
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  return (
+    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+      {slot.jobs.map((entry) => (
+        <li key={entry.id} className={MASONRY_ITEM}>
+          <ExperienceCard entry={entry} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  // the shared tech list's masonry, held to two columns in the screen column
+  return (
+    <Box>
+      <div data-stage-items="" className="xl:[&>ul]:columns-2">
+        <ItemBag categories={slot.categories} />
+      </div>
+    </Box>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <Box>
+      <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+        {slot.services.map((service) => (
+          <li key={service.id} className={MASONRY_ITEM}>
+            <h3 className={`mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>
+              <Mark />
+              {service.title}
+            </h3>
+            <p className={BODY}>{service.line}</p>
+          </li>
+        ))}
+      </ul>
+    </Box>
+  )
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  return (
+    <div data-stage-items="">
+      <ProjectList projects={slot.projects} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderProject={(project) => <ProjectCard {...project} />} />
+    </div>
+  )
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return (
+    <div data-stage-items="">
+      <VentureList
+        companies={slot.companies}
+        className="grid gap-6 md:grid-cols-6"
+        itemClassName="md:col-span-3"
+        featuredItemClassName="md:col-span-6"
+        renderVenture={(venture) => <CompanyCard {...venture} />}
+      />
+    </div>
+  )
+}
+
+function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
+  const { years } = useLabels()
+  return (
+    <>
+      <p className={`mb-6 inline-block bg-[color:var(--rpg-void)] px-3 py-1 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>
+        {drumsSince(musician, years)}
+      </p>
+      <div data-stage-items="">
+        <BandList bands={bands} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderBand={(band) => <BandCard {...band} />} />
+      </div>
+      <p className={`mt-4 bg-[color:var(--rpg-void)] px-3 py-2 text-center ${BODY}`}>{musician.line}</p>
+      <div className="mt-6">
+        <BulletBox profession="drummer" />
+      </div>
+    </>
+  )
+}
+
+function RecordCards({ slot: { martialArts } }: { slot: SlotOf<'muayThai'> }) {
+  return (
+    <>
+      <Box>
+        <h3 className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}>
+          <Mark className="" />
+          {martialArts.primary.title}
+        </h3>
+        <div data-stage-items="">
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-6 grid gap-3 sm:grid-cols-2',
+              fact: STAT,
+              term: `text-sm uppercase tracking-widest text-[color:var(--rpg-gold)] ${PIXEL}`,
+              value: `mt-2 ${BODY} text-[color:var(--rpg-text)]`,
+              achievements: 'space-y-3',
+              achievement: BODY,
+            }}
+            renderAchievement={(achievement) => (
+              <span className="flex items-start gap-2 text-[color:var(--rpg-green)]">
+                <Mark />
+                {achievement}
+              </span>
             )}
           />
-          <p
-            className={`mt-4 bg-[color:var(--rpg-void)] px-3 py-2 text-center ${BODY}`}
-          >
-            {musician.line}
-          </p>
-          <div className="mt-6">
-            <BulletBox profession="drummer" />
-          </div>
-        </BridgeRoom>
-      </Block>
-    );
-  },
-  muayThai: function MuayThaiFrame({ slot }) {
-    const { martialArts } = slot;
+        </div>
+      </Box>
+      <div className="mt-6">
+        <BulletBox profession="fighter" />
+      </div>
+    </>
+  )
+}
 
-    return (
-      <Block labelKey={slot.titleKey}>
-        <SparRoom profession="fighter">
-          <OpenBox>
-            <h3
-              className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}
-            >
-              <Mark className="" />
-              {martialArts.primary.title}
-            </h3>
-            <MuayThaiRecord
-              martialArts={martialArts}
-              classNames={{
-                facts: `mb-6 grid gap-3 sm:grid-cols-2 ${world.after} [--show-delay:500ms]`,
-                fact: STAT,
-                term: `text-sm uppercase tracking-widest text-[color:var(--rpg-gold)] ${PIXEL}`,
-                value: `mt-2 ${BODY} text-[color:var(--rpg-text)]`,
-                achievements: `space-y-3 ${world.after} [--show-delay:900ms]`,
-                achievement: BODY,
-              }}
-              renderAchievement={(achievement) => (
-                <span className="flex items-start gap-2 text-[color:var(--rpg-green)]">
-                  <Mark />
-                  {achievement}
-                </span>
-              )}
-            />
-          </OpenBox>
-          <div className="mt-6">
-            <BulletBox profession="fighter" />
-          </div>
-        </SparRoom>
-      </Block>
-    );
-  },
-};
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: RecordCards,
+}
 
-export const SECTION_VIEWS = sectionViews(FRAMES);
+interface SceneSectionProps {
+  scene: Scene
+  slot: SectionSlot
+  still: boolean
+}
+
+/** One scene of the page; under reduced motion its own stage sits still behind its head. */
+export function SceneSection({ scene, slot, still }: SceneSectionProps) {
+  const { sections } = useLabels()
+  const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const label = sections[slot.titleKey]
+  const title = slot.id === 'projects' ? sections.featuredWork : label
+  return (
+    <section data-scene={scene.id} aria-label={label} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
+      {still && <RpgStage scene={scene} settled />}
+      <header className="relative flex min-h-[90svh] items-end pb-4 motion-reduce:min-h-[70svh]">
+        <SectionHeader title={title} />
+      </header>
+      <div className="relative max-w-[42rem]">
+        <Cards slot={slot} />
+      </div>
+    </section>
+  )
+}

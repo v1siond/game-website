@@ -1,0 +1,21 @@
+/* Retro RPG's look on the shared theatre's stages (../shared/theatre): the pixels kept hard when the stage
+   scales, and a scrim of the black screen under the text column, so the white boxes' edges and the titles
+   read on the brightest place (the town's pale lawn); it fades with its stage. The theatre's ground and veil
+   are the game's black (--theatre-ground and --theatre-veil on the world's root). */
+
+.screen {
+  image-rendering: pixelated;
+}
+
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, color-mix(in srgb, black 70%, transparent), transparent 55%);
+}
+
+@media (max-width: 767.98px) {
+  .screen::after {
+    background: linear-gradient(to top, color-mix(in srgb, black 70%, transparent), transparent 55%);
+  }
+}

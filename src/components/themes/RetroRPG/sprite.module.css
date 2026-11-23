@@ -37,8 +37,7 @@
 
 .actA,
 .actB,
-.soul,
-.savedSoul {
+.soul{
   opacity: 0;
 }
 
@@ -77,56 +76,7 @@
 
 /* ---- walking in: two step frames while the parent says he walks, then he stands ---- */
 
-.stepA,
-.stepB {
-  opacity: 0;
-}
-
-[data-phase='walk'] .stepA,
-[data-walk='on'] .stepA {
-  animation: frameA 320ms steps(1, end) 15 forwards;
-}
-
-[data-phase='walk'] .stepB,
-[data-walk='on'] .stepB {
-  animation: frameB 320ms steps(1, end) 15 forwards;
-}
-
-[data-phase='walk'] .arrived,
-[data-walk='on'] .arrived,
-[data-walk='idle'] .arrived {
-  opacity: 0;
-}
-
-/* The room: he crosses three tiles from the left, a tile a step. */
-@keyframes walkInRight {
-  from { transform: translateX(-72px); }
-  to { transform: translateX(0); }
-}
-
-[data-phase='wait'] .walksRight {
-  transform: translateX(-72px);
-}
-
-[data-phase='walk'] .walksRight {
-  animation: walkInRight 600ms steps(6, end) both;
-}
-
-/* The save point: he walks up to the star from below. */
-@keyframes walkInUp {
-  from { transform: translateY(36px); }
-  to { transform: translateY(0); }
-}
-
-[data-walk='idle'] .walksUp {
-  opacity: 0;
-}
-
-[data-walk='on'] .walksUp {
-  animation: walkInUp 900ms steps(6, end) both;
-}
-
-/* ---- the save: the determination sparkle, his soul lit ---- */
+/* ---- the save: the sparkle round the star ---- */
 
 @keyframes sparkle {
   0% { opacity: 0; transform: scale(0); }
@@ -150,39 +100,23 @@
   animation-delay: 300ms;
 }
 
-[data-saved='true'] .savedSoul {
-  animation: soulShow 600ms steps(1, end) both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .blink,
-  .stepA,
-  .stepB,
-  .walksRight,
-  .walksUp,
   .sparkle,
   .battle:hover .actA,
   .battle:hover .actB,
-  .battle:hover .soul,
-  [data-saved='true'] .savedSoul {
+  .battle:hover .soul{
     animation: none !important;
   }
 
-  .walksRight,
-  .walksUp {
-    transform: none !important;
-    opacity: 1 !important;
-  }
+  
 
-  .stepA,
-  .stepB,
+  
   .sparkle {
     opacity: 0 !important;
   }
 
-  .arrived {
-    opacity: 1 !important;
-  }
+  
 
   .battle:hover .actA {
     opacity: 1;
