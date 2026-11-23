@@ -83,8 +83,8 @@ Artistic.
   before. Both step around `TOUR_ORDER` in a circle (`followingInTour` and `previousInTour` in
   `src/lib/worlds/nudge.ts`), so previous then next comes back. On the first visit (sessionStorage
   `portfolio-worlds-wardrobe-fan`) his previous and next outfits, each his full figure in that world, fan out
-  of the plate for `WARDROBE_FAN_MS` (2750, 2.75 s) and settle back; never under reduced motion. Dark Fantasy,
-  Medieval Fantasy and Silhouette get the plate beside the figure and keep their own look. Each hero marks
+  of the plate for `WARDROBE_FAN_MS` (2750, 2.75 s) and settle back; never under reduced motion. Dark Fantasy
+  and Medieval Fantasy get the plate beside the figure and keep their own look. Each hero marks
   his figure `data-worlds-figure` (the capture crops it) and its hero section `data-worlds-hero` (the
   launcher watches it).
 - The launcher's face (`useWorldsNudge`, `launcherFace` in `src/lib/worlds/lens.ts`): while the hero is in

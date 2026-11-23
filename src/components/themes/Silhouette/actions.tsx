@@ -1,12 +1,12 @@
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
-import world from './world.module.css'
+import page from './page.module.css'
 
-// Silhouette's buttons, on the offset block (world.module.css): email and the engine are lit fog white,
+// Silhouette's buttons, on the offset block (page.module.css): email and the engine are lit fog white,
 // LinkedIn and the CV are outlined in it.
 
-const BUTTON = `${world.button} inline-flex min-h-[44px] items-center justify-center px-4 py-1.5 text-sm uppercase tracking-[0.2em]`
+const BUTTON = `${page.button} inline-flex min-h-[44px] items-center justify-center px-4 py-1.5 text-sm uppercase tracking-[0.2em]`
 
 const LIT = `${BUTTON} bg-[color:var(--sh-text)] text-[color:var(--sh-black)]`
 const OUTLINED = `${BUTTON} border-2 border-[color:var(--sh-text)] bg-[color:var(--sh-void)] text-[color:var(--sh-text)] hover:bg-[color:var(--sh-glow)] hover:text-[color:var(--sh-black)]`

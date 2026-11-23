@@ -178,12 +178,6 @@
         "beaten": "Knocked out: {achievement}",
         "allBeaten": "Every challenger knocked out"
       },
-      "shade": {
-        "lightHint": "Point into the dark to light a project",
-        "flipGravity": "Flip gravity",
-        "springTrap": "Spring the trap",
-        "chaseAgain": "Run from it again"
-      },
       "myth": {
         "combo": "Strike the chain combo",
         "rolesCleared": "{count} of {total} roles cleared",
@@ -563,12 +557,6 @@
         "beaten": "Noqueado: {achievement}",
         "allBeaten": "Todos los rivales noqueados"
       },
-      "shade": {
-        "lightHint": "Apunta a la oscuridad para iluminar un proyecto",
-        "flipGravity": "Invertir la gravedad",
-        "springTrap": "Activar la trampa",
-        "chaseAgain": "Huye otra vez"
-      },
       "myth": {
         "combo": "Lanzar el combo de cadenas",
         "rolesCleared": "{count} de {total} puestos superados",
@@ -947,12 +935,6 @@
         "fightAgain": "Combatti di nuovo il round",
         "beaten": "Al tappeto: {achievement}",
         "allBeaten": "Tutti gli sfidanti al tappeto"
-      },
-      "shade": {
-        "lightHint": "Punta nel buio per illuminare un progetto",
-        "flipGravity": "Inverti la gravità",
-        "springTrap": "Fai scattare la trappola",
-        "chaseAgain": "Scappa di nuovo"
       },
       "myth": {
         "combo": "Sferra la combo di catene",
