@@ -73,7 +73,7 @@ function AboutCards() {
   const { cards } = useLabels()
   return (
     <div className={WINDOW}>
-      <p className={`text-lg leading-relaxed ${JOURNAL_SERIF}`}>{bio}</p>
+      <p className={`whitespace-pre-line text-lg leading-relaxed ${JOURNAL_SERIF}`}>{bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={WHITE_COINS} />
       </div>

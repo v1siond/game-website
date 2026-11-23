@@ -1,16 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Canvas, FLOOR } from '../forest'
+import { hop } from '@/lib/motion/arc'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx } from '../../shared/stageNodes'
+import { Canvas, FLOOR, H } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { pull } from '../pose'
+import { AT, type Place } from '../place'
+import { CLIMB, CROUCH, TUCK, rest } from '../pose'
 
-// Ventures at the edge of the machine city: its roofs and chimneys stand in the fog behind, and a dark
-// sign stands on a pole for each venture with its switch at the foot; as each is read he throws the switch
-// and the sign's tubes light.
+// Ventures over the roofs at the edge of the machine city: for each venture a gap opens in the roof and a
+// higher roof stands past it with a dark sign. He leaps the gap, catches the higher roof's edge and climbs
+// up; the frame holds him crouched on the ledge as the sign's tubes light.
 
-const SIGN = -520
+const GAP = { from: -20, to: 90 }
+const ROOF = { h: 130, w: 240 }
+const SIGN = ROOF.h + 260
 
 function City({ light }: { light: Light }) {
   return (
@@ -24,40 +27,33 @@ function City({ light }: { light: Light }) {
   )
 }
 
-function Sign() {
-  return (
-    <>
-      <rect x={-8} y={SIGN} width={16} height={-SIGN} fill={SHADE.black} />
-      <rect x={-110} y={SIGN - 120} width={220} height={120} fill={SHADE.black} />
-      <path d={`M-80 ${SIGN - 90} H80 M-80 ${SIGN - 60} H40 M-80 ${SIGN - 30} H60`} stroke={SHADE.fog} strokeWidth={8} />
-      <rect x={-50} y={-70} width={30} height={70} fill={SHADE.black} />
-    </>
-  )
-}
-
-function Tubes({ light }: { light: Light }) {
-  return (
-    <>
-      <rect x={-130} y={SIGN - 140} width={260} height={160} fill={light.rim} opacity={0.18} />
-      <path d={`M-80 ${SIGN - 90} H80 M-80 ${SIGN - 60} H40 M-80 ${SIGN - 30} H60`} stroke={light.rim} strokeWidth={8} />
-    </>
-  )
+function Tubes({ color }: { color: string }) {
+  return <path d={`M${GAP.to + 40} ${-SIGN + 30} H${GAP.to + 200} M${GAP.to + 40} ${-SIGN + 60} H${GAP.to + 160} M${GAP.to + 40} ${-SIGN + 90} H${GAP.to + 180}`} stroke={color} strokeWidth={8} />
 }
 
 export const ventures: Place = {
   far: ({ light }) => <City light={light} />,
-  floor: ({ xs, profession, light }) => (
+  obstacle: (i, { light }) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Sign />} light={() => <Tubes light={light} />} />
-      <Walker xs={xs} profession={profession} />
+      <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={H - FLOOR + 2} fill={light.mid} />
+      <rect x={GAP.to} y={-ROOF.h} width={ROOF.w} height={ROOF.h} fill={SHADE.black} />
+      <rect x={GAP.to + 110} y={-SIGN + 120} width={14} height={SIGN - ROOF.h - 120} fill={SHADE.black} />
+      <rect x={GAP.to + 20} y={-SIGN} width={200} height={120} fill={SHADE.black} />
+      <Tubes color={SHADE.fog} />
+      <g data-fx={`sign-${i}`} opacity="0">
+        <rect x={GAP.to} y={-SIGN - 20} width={240} height={160} fill={light.rim} opacity={0.18} />
+        <Tubes color={light.rim} />
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, pull)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (profession, t) => {
+    const leap = ramp(t, 0, 0.5)
+    const up = ramp(t, 0.5, 1)
+    const pose = t < 0.5 ? mix(rest(profession), TUCK, ramp(t, 0, 0.2)) : mix(mix(TUCK, CLIMB, ramp(t, 0.5, 0.6)), CROUCH, ramp(t, 0.85, 1))
+    return { pose, ahead: (AT + GAP.to - 20) * leap + 50 * up, lift: hop(leap, 90) * (1 - up) + ROOF.h * ramp(up, 0, 0.7), over: 0 }
+  },
+  reply: (stage, { count }) => {
+    const signs = Array.from({ length: count }, (_, i) => fx(stage, `sign-${i}`))
+    return (played) => signs.forEach((sign, i) => fadeTo(sign, ramp(played(i), 0.85, 1)))
   },
 }

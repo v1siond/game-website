@@ -34,7 +34,7 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   const tags = [...facts, ...highlights.map((value) => ({ label: cyber.tagHighlight, value }))]
   return (
     <>
-      <p className={`${CARD} mb-5 text-base leading-relaxed text-[color:var(--neon-ice)]`}>{slot.bio}</p>
+      <p className={`${CARD} mb-5 whitespace-pre-line text-base leading-relaxed text-[color:var(--neon-ice)]`}>{slot.bio}</p>
       <div data-stage-items="">
         <ul className="grid gap-3 sm:grid-cols-2">
           {tags.map((tag) => (

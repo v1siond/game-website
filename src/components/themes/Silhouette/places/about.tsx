@@ -1,62 +1,43 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Canvas, FLOOR } from '../forest'
-import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { reach } from '../pose'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
+import { fx, translateTo } from '../../shared/stageNodes'
+import { Canvas } from '../forest'
+import { SHADE } from '../palette'
+import { still, type Place } from '../place'
+import { DUCK, rest } from '../pose'
 
-// About in the thicket: a giant spider's legs reach down out of the dark boughs behind, and a dead lantern
-// hangs on a thread for each line of the record; as each is read he reaches up and it lights.
+// About in the spider's thicket: its body hangs in the dark boughs, and for each line of the record one of
+// its legs stabs down at the path ahead of him. He drops flat and the leg spears into the ground just over
+// his back, held there.
 
-const HOOK = -400
+const TIP = -190
+// How far above its strike a leg waits in the dark.
+const RAISED = 760
 
-function Lantern() {
-  return (
-    <>
-      <line x1={0} y1={-1000} x2={0} y2={HOOK} stroke={SHADE.black} strokeWidth={3} />
-      <path d={`M-22 ${HOOK} H22 L30 ${HOOK + 24} L22 ${HOOK + 80} H-22 L-30 ${HOOK + 24} Z`} fill={SHADE.black} />
-    </>
-  )
+function Leg() {
+  return <path d={`M-120 ${TIP - 900} L-40 ${TIP - 420} L0 ${TIP}`} fill="none" stroke={SHADE.black} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
 }
 
-function Flame({ light }: { light: Light }) {
-  return (
-    <>
-      <circle cx={0} cy={HOOK + 44} r={70} fill={light.rim} opacity={0.25} />
-      <path d={`M-14 ${HOOK + 20} H14 L18 ${HOOK + 36} L14 ${HOOK + 66} H-14 L-18 ${HOOK + 36} Z`} fill={light.rim} />
-    </>
-  )
-}
-
-/** The spider's legs, bent at the knee, out of the boughs top left. */
-function Spider() {
+/** The spider's body in the boughs over the path. */
+function Body() {
   return (
     <Canvas>
-      <g fill="none" stroke={SHADE.black} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M120 -20 L360 260 L420 700" />
-        <path d="M60 -20 L250 300 L250 760" />
-        <path d="M200 -20 L520 200 L620 620" />
-      </g>
-      <ellipse cx={130} cy={20} rx={180} ry={110} fill={SHADE.black} />
+      <ellipse cx={1250} cy={40} rx={260} ry={150} fill={SHADE.black} />
+      <path d="M1040 60 L860 300 L820 520 M1460 60 L1560 300" fill="none" stroke={SHADE.black} strokeWidth={14} strokeLinecap="round" />
     </Canvas>
   )
 }
 
 export const about: Place = {
-  mid: () => <Spider />,
-  floor: ({ xs, profession, light }) => (
-    <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <Lantern />} light={() => <Flame light={light} />} />
-      <Walker xs={xs} profession={profession} />
-    </>
+  mid: () => <Body />,
+  obstacle: (i) => (
+    <g data-fx={`leg-${i}`} transform={`translate(0 ${-RAISED})`}>
+      <Leg />
+    </g>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, reach)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (profession, t) => still(mix(rest(profession), DUCK, ramp(t, 0, 0.35))),
+  reply: (stage, { count }) => {
+    const legs = Array.from({ length: count }, (_, i) => fx(stage, `leg-${i}`))
+    return (played) => legs.forEach((leg, i) => translateTo(leg, 0, -RAISED * (1 - ramp(played(i), 0.25, 0.5))))
   },
 }

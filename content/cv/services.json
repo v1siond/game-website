@@ -4,7 +4,7 @@
       {
         "id": "full-stack-mobile-apps",
         "title": "Full stack and mobile apps",
-        "line": "Your product built end to end, web or mobile, from the first commit to paying users.",
+        "line": "Web and mobile products end to end, from the first commit to the first users.",
         "useCases": [
           "PMX",
           "InsurAdmin",
@@ -15,7 +15,7 @@
       {
         "id": "ai-features-agents-prototypes",
         "title": "AI features, agents and prototypes",
-        "line": "LLM features, agents, chat and voice on Claude or Gemini. I prototype them fast and take them to production.",
+        "line": "LLM features, agents, chat and voice on Claude or Gemini, from the prototype to production.",
         "useCases": [
           "Sillabo",
           "GRCTechMe"
@@ -45,7 +45,7 @@
       {
         "id": "frontend-development",
         "title": "Frontend development",
-        "line": "React, Next and Vue interfaces built pixel perfect to your design and to WCAG AA or AAA.",
+        "line": "React, Next and Vue interfaces, built to your design and to WCAG AA or AAA.",
         "useCases": [
           "Agency Rocket",
           "PMX",
@@ -66,7 +66,7 @@
       {
         "id": "insurance-fintech-edtech",
         "title": "Insurance, fintech and edtech software",
-        "line": "I already know your market: carrier feeds and commissions, payment platforms, video learning.",
+        "line": "I've worked in these markets: carrier feeds and commissions, payment platforms, video learning.",
         "useCases": [
           "InsurAdmin",
           "Agency Rocket",
@@ -110,7 +110,7 @@
       {
         "id": "full-stack-mobile-apps",
         "title": "Apps full stack y móviles",
-        "line": "Tu producto construido de principio a fin, web o móvil, del primer commit a los primeros clientes que pagan.",
+        "line": "Productos web y móviles de principio a fin, del primer commit a los primeros usuarios.",
         "useCases": [
           "PMX",
           "InsurAdmin",
@@ -121,7 +121,7 @@
       {
         "id": "ai-features-agents-prototypes",
         "title": "Funciones de IA, agentes y prototipos",
-        "line": "Funciones LLM, agentes, chat y voz con Claude o Gemini. Los prototipo rápido y los llevo a producción.",
+        "line": "Funciones LLM, agentes, chat y voz con Claude o Gemini, del prototipo a producción.",
         "useCases": [
           "Sillabo",
           "GRCTechMe"
@@ -151,7 +151,7 @@
       {
         "id": "frontend-development",
         "title": "Desarrollo frontend",
-        "line": "Interfaces en React, Next y Vue hechas al píxel según tu diseño y con WCAG AA o AAA.",
+        "line": "Interfaces en React, Next y Vue, hechas según tu diseño y con WCAG AA o AAA.",
         "useCases": [
           "Agency Rocket",
           "PMX",
@@ -172,7 +172,7 @@
       {
         "id": "insurance-fintech-edtech",
         "title": "Software para seguros, fintech y edtech",
-        "line": "Ya conozco tu mercado: feeds de aseguradoras y comisiones, plataformas de pago, aprendizaje en video.",
+        "line": "He trabajado en estos mercados: feeds de aseguradoras y comisiones, plataformas de pago, aprendizaje en video.",
         "useCases": [
           "InsurAdmin",
           "Agency Rocket",
@@ -216,7 +216,7 @@
       {
         "id": "full-stack-mobile-apps",
         "title": "App full stack e mobile",
-        "line": "Il tuo prodotto costruito da cima a fondo, web o mobile, dal primo commit ai primi clienti paganti.",
+        "line": "Prodotti web e mobile da cima a fondo, dal primo commit ai primi utenti.",
         "useCases": [
           "PMX",
           "InsurAdmin",
@@ -227,7 +227,7 @@
       {
         "id": "ai-features-agents-prototypes",
         "title": "Funzioni IA, agenti e prototipi",
-        "line": "Funzioni LLM, agenti, chat e voce con Claude o Gemini. Li prototipo in fretta e li porto in produzione.",
+        "line": "Funzioni LLM, agenti, chat e voce con Claude o Gemini, dal prototipo alla produzione.",
         "useCases": [
           "Sillabo",
           "GRCTechMe"
@@ -257,7 +257,7 @@
       {
         "id": "frontend-development",
         "title": "Sviluppo frontend",
-        "line": "Interfacce in React, Next e Vue curate al pixel secondo il tuo design e conformi a WCAG AA o AAA.",
+        "line": "Interfacce in React, Next e Vue, costruite secondo il tuo design e conformi a WCAG AA o AAA.",
         "useCases": [
           "Agency Rocket",
           "PMX",
@@ -278,7 +278,7 @@
       {
         "id": "insurance-fintech-edtech",
         "title": "Software per assicurazioni, fintech ed edtech",
-        "line": "Conosco già il tuo mercato: feed delle compagnie e provvigioni, piattaforme di pagamento, formazione video.",
+        "line": "Ho lavorato in questi mercati: feed delle compagnie e provvigioni, piattaforme di pagamento, formazione video.",
         "useCases": [
           "InsurAdmin",
           "Agency Rocket",

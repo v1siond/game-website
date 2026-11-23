@@ -2,7 +2,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { fx, transformTo } from '../../shared/stageNodes'
 import { FLOOR } from '../forest'
 import { SHADE } from '../palette'
-import type { Place } from '../place'
+import type { Scene } from '../place'
 
 // The hero: the edge of the forest at dawn, where he wakes (his figure stands in the hero itself, with the
 // outfit plate), a rope hanging out of the boughs ahead of him. As the page starts to scroll the rope
@@ -26,7 +26,7 @@ function Rope() {
   )
 }
 
-export const hero: Place = {
+export const hero: Scene = {
   floor: () => <Rope />,
   bind: (stage) => {
     const rope = fx(stage, 'rope')

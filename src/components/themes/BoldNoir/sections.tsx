@@ -37,7 +37,7 @@ function AboutCards() {
   const { cards } = useLabels()
   return (
     <div className={`px-6 pb-14 pt-8 sm:px-8 ${page.speech}`}>
-      <p className={`text-base leading-relaxed ${page.copy}`}>{bio}</p>
+      <p className={`whitespace-pre-line text-base leading-relaxed ${page.copy}`}>{bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...BULLETS, list: 'mt-4 space-y-1.5', line: `flex items-start gap-2 text-sm ${page.copy}` }} />
       </div>

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { transformTo } from '../shared/stageNodes'
 import { FIGURE_VIEW, ShadeFigure } from './figure'
 import { LIGHTS, SHADE, type Light, type LightName } from './palette'
 
@@ -149,7 +148,13 @@ export function Front() {
   )
 }
 
-const figureAt = (x: number): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - FIGURE_H * (FIGURE_VIEW.soles / FIGURE_VIEW.height)).toFixed(1)})`
+/** His group's transform: his centre at `x`, his soles `lift` above the floor, turned `over` of a half
+ *  turn round his middle (1 upside down, standing on a ceiling). */
+export const figureAt = (x: number, lift = 0, over = 0): string => {
+  const top = FLOOR - lift - FIGURE_H * (FIGURE_VIEW.soles / FIGURE_VIEW.height)
+  const turn = over ? ` rotate(${(180 * over).toFixed(1)} ${(FIGURE_W / 2).toFixed(1)} ${(FIGURE_H / 2).toFixed(1)})` : ''
+  return `translate(${(x - FIGURE_W / 2).toFixed(1)} ${top.toFixed(1)})${turn}`
+}
 
 /** Him on the ground at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Figure({ x, profession }: { x: number; profession: Profession }) {
@@ -160,5 +165,3 @@ export function Figure({ x, profession }: { x: number; profession: Profession })
   )
 }
 
-/** Moves him to `x` on the ground. */
-export const placeFigure = (node: Element | null, x: number): void => transformTo(node, figureAt(x))

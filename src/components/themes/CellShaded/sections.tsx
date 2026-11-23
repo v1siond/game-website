@@ -36,7 +36,7 @@ function AboutCards() {
   const { cards } = useLabels()
   return (
     <div className={`p-5 sm:p-6 ${cel.paper}`}>
-      <p className="text-base leading-relaxed">{bio}</p>
+      <p className="whitespace-pre-line text-base leading-relaxed">{bio}</p>
       <div data-stage-items="">
         <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
       </div>

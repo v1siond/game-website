@@ -55,7 +55,7 @@ const FRAMES: SectionFrames = {
     const { highlights } = useAboutBlock()
     return (
       <Room zone="about" titleKey="about" fade>
-        <p className="max-w-prose text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
+        <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
         <AboutFacts look={PAPER_FACTS} />
         <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...MARK_LIST, list: 'mt-4 space-y-1' }} />
       </Room>
