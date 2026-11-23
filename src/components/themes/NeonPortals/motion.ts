@@ -1,3 +1,4 @@
+import { hop } from '@/lib/motion/arc'
 import { clamp01 } from '@/lib/scroll/progress'
 import type { Action } from './plan'
 import { DF, smooth, STEP, type ItemSpot, type RoomGeometry } from './world'
@@ -72,12 +73,13 @@ export const doorStateAt = (room: RoomGeometry, door: number, camZ: number): Doo
 
 // ---- the runner ----
 
-export const POSE_KEYS = ['jump', 'lean', 'spin', 'liftL', 'bendL', 'rotL', 'liftR', 'bendR', 'rotR', 'aL', 'sL', 'fL', 'aR', 'sR', 'fR', 'sticks', 'wave', 'look'] as const
+export const POSE_KEYS = ['jump', 'lean', 'spin', 'liftL', 'bendL', 'rotL', 'liftR', 'bendR', 'rotR', 'aL', 'sL', 'fL', 'aR', 'sR', 'fR', 'sticks', 'wave', 'look', 'board', 'boulder'] as const
 
 export type Pose = Record<(typeof POSE_KEYS)[number], number>
 
-// `look` is how far he has turned his head to the camera: 0 seen from behind, 1 his face.
-const IDLE: Pose = { jump: 0, lean: 0, spin: 1, liftL: 0, bendL: 1, rotL: 3, liftR: 0, bendR: 1, rotR: -3, aL: 10, sL: 1, fL: 0, aR: -10, sR: 1, fR: 0, sticks: 0, wave: 0, look: 1 }
+// `look` is how far he has turned his head to the camera: 0 seen from behind, 1 his face. `board` shows the
+// hover board under his feet, `boulder` how close the rolling boulder behind him has come (0 to 1).
+const IDLE: Pose = { jump: 0, lean: 0, spin: 1, liftL: 0, bendL: 1, rotL: 3, liftR: 0, bendR: 1, rotR: -3, aL: 10, sL: 1, fL: 0, aR: -10, sR: 1, fR: 0, sticks: 0, wave: 0, look: 1, board: 0, boulder: 0 }
 
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
 
@@ -108,22 +110,59 @@ function runPose(phase: number): Pose {
 
 type ActionPose = (phase: number, side: 1 | -1, beat: Beat) => Pose
 
-// Each action at its peak, from the action's phase (0 to 1), the prop's side and the scroll beat.
-const ACTIONS: Record<Action, ActionPose> = {
-  reach: (phase, side) => ({ ...IDLE, jump: -8, lean: side * 6, aL: side > 0 ? 18 : 150, fL: side > 0 ? 0 : 20, aR: side > 0 ? -150 : -18, fR: side > 0 ? -20 : 0 }),
-  cheer: () => ({ ...IDLE, jump: -36, liftL: 22, bendL: 0.7, liftR: 22, bendR: 0.7, aL: 150, fL: 25, aR: -150, fR: -25 }),
-  spin: (phase) => ({ ...IDLE, spin: Math.cos(phase * Math.PI * 4), aL: 92, aR: -92, liftL: 12, bendL: 0.8, jump: -14 }),
-  jump: () => ({ ...IDLE, jump: -160, liftL: 44, bendL: 0.45, liftR: 44, bendR: 0.45, aL: 160, fL: 30, aR: -160, fR: -30 }),
-  drum: (phase, side, beat) => ({ ...IDLE, rotL: 10, rotR: -10, aL: 28 + 22 * beat.left, sL: 0.8, fL: -75 + 45 * beat.left, aR: -28 - 22 * beat.right, sR: 0.8, fR: 75 - 45 * beat.right, sticks: 1 }),
-  kick: (phase, side) => {
-    if (side > 0) return { ...IDLE, lean: -14, rotR: -84, aL: 34, fL: -125, aR: -46, fR: 115 }
-    return { ...IDLE, lean: 14, rotL: 84, aL: 46, fL: -115, aR: -34, fR: 125 }
-  },
-  wave: (phase, side, beat) => ({ ...IDLE, aL: 12, aR: -158, fR: 30 * beat.wave }),
+// Low on the board, knees bent, arms out for balance, leaning into the turn the scroll gives.
+const ridePose = (turn: number): Pose => ({ ...IDLE, jump: 18, lean: 12 * turn, liftL: 8, bendL: 0.72, liftR: 8, bendR: 0.72, aL: 64, fL: -20, aR: -64, fR: 20, look: 0, board: 1 })
+
+// Arms out, one knee up: the spin that smashes a crate, turning twice as the move plays.
+const smashPose = (phase: number): Pose => ({ ...IDLE, jump: -14, spin: Math.cos(phase * Math.PI * 4), aL: 92, aR: -92, liftL: 14, bendL: 0.8 })
+
+// The kick of the boss round: chambered on the side of the bag.
+const kickPose = (side: 1 | -1): Pose => {
+  if (side > 0) return { ...IDLE, lean: -14, rotR: -84, aL: 34, fL: -125, aR: -46, fR: 115 }
+  return { ...IDLE, lean: 14, rotL: 84, aL: 46, fL: -115, aR: -34, fR: 125 }
 }
 
-// How far toward its prop the runner steps for each action (1 is on top of it, a crate he jumps on).
-const REACH: Record<Action, number> = { jump: 1, spin: 0.55, kick: 0.62, drum: 0.5, reach: 0.5, cheer: 0.3, wave: 0 }
+const tucked = (height: number): Pose => ({ ...IDLE, jump: -height, liftL: 40, bendL: 0.5, liftR: 40, bendR: 0.5, aL: 150, fL: 30, aR: -150, fR: -30 })
+
+// Each action from its phase (0 to 1), the prop's side and the scroll beat. Most peak at phase 0.5; the two
+// that come in two parts (a double bounce, a dodge then a kick) peak on their second part (PEAK).
+const ACTIONS: Record<Action, ActionPose> = {
+  smash: (phase) => smashPose(phase),
+  ride: (phase, side) => ({ ...ridePose(side), jump: 18 - hop(phase, 70) }),
+  // Up, a beat in the air spread flat, then down on the iron crate.
+  flop: (phase) => ({ ...IDLE, jump: -hop(phase, 190), liftL: 26, bendL: 0.9, rotL: 34, liftR: 26, bendR: 0.9, rotR: -34, aL: 118, fL: 10, aR: -118, fR: -10 }),
+  // A low skid on one hip under the beam, the lead leg out ahead.
+  slide: (phase, side) => ({ ...IDLE, jump: 70, lean: side * 28, liftL: 46, bendL: 0.42, rotL: 18, liftR: 8, bendR: 0.6, aL: 40, fL: -30, aR: -126, fR: -20, look: 0 }),
+  chase: (phase) => ({ ...smashPose(phase), boulder: 1 }),
+  bounce: (phase) => {
+    if (phase < 0.5) return tucked(hop(phase * 2, 90))
+    return tucked(hop(phase * 2 - 1, 210))
+  },
+  drum: (phase, side, beat) => ({ ...IDLE, rotL: 10, rotR: -10, aL: 28 + 22 * beat.left, sL: 0.8, fL: -75 + 45 * beat.left, aR: -28 - 22 * beat.right, sR: 0.8, fR: 75 - 45 * beat.right, sticks: 1 }),
+  // The bag swings at him: he jumps it, then kicks back.
+  boss: (phase, side) => {
+    if (phase < 0.5) return tucked(hop(phase * 2, 120))
+    return kickPose(side)
+  },
+  dance: (phase, side, beat) => ({ ...IDLE, jump: -12 * Math.abs(beat.wave), lean: 10 * beat.wave, liftL: 20 * beat.left, bendL: 1 - 0.3 * beat.left, liftR: 20 * beat.right, bendR: 1 - 0.3 * beat.right, aL: 120 + 30 * beat.left, fL: 40, aR: -120 - 30 * beat.right, fR: -40 }),
+}
+
+/** The phase at which an action shows its move whole: the frame reduced motion holds. */
+const PEAK: Record<Action, number> = { smash: 0.5, ride: 0.5, flop: 0.5, slide: 0.5, chase: 0.5, bounce: 0.75, drum: 0.5, boss: 0.75, dance: 0.5 }
+
+// How far toward its prop the runner steps for each action (1 is on top of it, a platform he lands on).
+const REACH: Record<Action, number> = { smash: 0.55, ride: 0.3, flop: 1, slide: 0.4, chase: 0.5, bounce: 1, drum: 0.5, boss: 0.62, dance: 0 }
+
+// How far through the room's items the camera is, fractional: the boulder closes in a step per item.
+const itemsReached = (room: RoomGeometry, camZ: number): number => room.items.reduce((sum, item) => sum + clamp01(progressOf(item, camZ) + 1), 0) / room.items.length
+
+// Between props: the run into the screen, the board in the ride room, the front run with the boulder in the chase.
+const baseOf = (room: RoomGeometry, camZ: number): Pose => {
+  const run = runPose(camZ / 46)
+  if (room.action === 'ride') return ridePose(Math.sin(camZ / 90))
+  if (room.action === 'chase') return { ...run, look: 1, boulder: itemsReached(room, camZ) }
+  return run
+}
 
 /** The runner at a camera depth: his pose and how far across the floor he has stepped toward the prop. */
 export interface RunnerState {
@@ -140,13 +179,14 @@ export function hubRunner(camZ: number): RunnerState {
 export function roomRunner(room: RoomGeometry, camZ: number): RunnerState {
   const item = nearestItem(room, camZ)
   const { phase, amount } = actionOf(progressOf(item, camZ))
-  const base = mix(IDLE, runPose(camZ / 46), 1 - amount)
+  const base = baseOf(room, camZ)
   if (amount <= 0) return { pose: base, x: 0 }
-  return { pose: mix(base, ACTIONS[room.action](phase, item.side, beatAt(camZ)), amount), x: item.x * REACH[room.action] * amount }
+  const pose = mix(base, ACTIONS[room.action](phase, item.side, beatAt(camZ)), amount)
+  return { pose: { ...pose, boulder: base.boulder }, x: item.x * REACH[room.action] * amount }
 }
 
 /** Reduced motion: he holds the room's action at its peak, facing the camera; the hub's idle above. */
 export function settledRunner(room: RoomGeometry | null): RunnerState {
   if (!room) return { pose: IDLE, x: 0 }
-  return { pose: ACTIONS[room.action](0.5, 1, beatAt(0)), x: 0 }
+  return { pose: ACTIONS[room.action](PEAK[room.action], 1, beatAt(0)), x: 0 }
 }

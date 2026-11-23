@@ -57,7 +57,7 @@ export type Era = keyof typeof ERAS
 /** The colour a room's small text takes on its panel: its a1 lifted toward white, so it reads at 9:1. */
 export const ERA_TINT_SHARE = 0.45
 
-/** Him as the corridor's runner: an orange furred bandicoot styled hero with his own skin on the muzzle,
+/** Him as the corridor's runner: an orange furred original hero with his own skin on the muzzle,
  *  his dark hair as the spiky tuft, his short boxed beard, his brows and his black oval pupils, in rolled
  *  jeans and red high tops. Fur, jeans and shoes are 3:1 or more on VOID (non text), so he never sinks
  *  into the night. */
@@ -84,6 +84,11 @@ export const FIGURE = {
   sole: '#f2e6c8',
   pack: '#2a1f5e',
   stick: '#ffe1a8',
+  board: '#2fd6ff',
+  boardStripe: '#fff2a8',
+  boulder: '#8a6a4a',
+  boulderShade: '#5a4028',
+  boulderLit: '#d8b48a',
   line: PORTAL.VOID,
 } as const
 
