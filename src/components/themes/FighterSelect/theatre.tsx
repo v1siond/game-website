@@ -24,9 +24,9 @@ import look from './world.module.css'
 // card scrolls up, the close after the last card. About is the bonus stage, a punch per highlight denting
 // the car and the uppercut wrecking it; Work walks him across the market a step per job; the Tech Stack
 // throws a ki blast per category, lighting its target; Services launches a crate per service with the
-// rising uppercut; Projects is the super move, a hit per project on the combo counter; Ventures is the
+// rising uppercut; Projects is the super move, its flash then a spin kick per project; Ventures is the
 // parry, his partner's punch per venture turned aside; Bands is the show on the yacht's deck, a flurry per
-// band; the Muay Thai record is the sparring round, K.O. and Perfect. Scroll up and it all plays back.
+// band; the Muay Thai record is the sparring round, ending with the partner down. Scroll up and it all plays back.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -46,32 +46,6 @@ const HERO_STEP = 120
 const PARTNER_X = 1300
 
 const place = (x: number): string => `translate(${x.toFixed(1)} ${TOP}) scale(${SIZE})`
-
-// The centre of every call: on the stage's right half, inside what a 1024 by 768 screen still shows of the canvas
-// (x 200 to 1400) and clear of the screen column on the left; below 1024 the troupe's move brings it to the middle.
-const CALL_X = 1180
-
-// ---- the calls slammed on the screen: the round call lettering in gold on an ink outline ----
-
-function Call({ x, y, size, name, children }: { x: number; y: number; size: number; name: string; children: string }) {
-  return (
-    <text
-      data-fx={name}
-      opacity="0"
-      x={x}
-      y={y}
-      textAnchor="middle"
-      fontSize={size}
-      fill={FS.hudYellow}
-      stroke={FS.ink}
-      strokeWidth={size / 10}
-      paintOrder="stroke"
-      className={`${look.face} uppercase`}
-    >
-      {children}
-    </text>
-  )
-}
 
 // ---- About's bonus car, side on, in four states of damage (data-frame 0 to 3) ----
 
@@ -140,7 +114,7 @@ interface SceneSpec {
   zone: Zone
   bout: Bout
   /** The poses each fighter plays in the bout, the first shown before the scene's writer runs. */
-  props?: (xs: readonly number[], labels: Labels) => ReactNode
+  props?: (xs: readonly number[]) => ReactNode
   /** The partner stands across from him in this bout. */
   partner?: boolean
   /** Where he stands at beat `index` of `beats`: forward of HERO_X as the bout moves him. */
@@ -157,30 +131,20 @@ const about: SceneSpec = {
   zone: 'castle',
   bout: { lead: [{ hero: 'walk' }], item: { hero: 'punch', mark: 'hit' }, close: [{ hero: 'uppercut', mark: 'wreck' }, { hero: 'win' }] },
   heroX: ({ index, t }) => HERO_X + (index === 0 ? t : 1) * HERO_STEP,
-  props: (_xs, labels) => (
+  props: () => (
     <>
       <g data-fx="car" transform={`translate(${CAR_X} ${FLOOR - 86 * CAR_SCALE}) scale(${CAR_SCALE})`}>
         {DAMAGES.map((damage) => (
           <Car key={damage} damage={damage} />
         ))}
       </g>
-      <Call x={CALL_X} y={170} size={64} name="bonus">
-        {labels.arcade.bonus}
-      </Call>
-      <Call x={CALL_X} y={420} size={80} name="perfect">
-        {labels.arcade.perfect}
-      </Call>
     </>
   ),
   write: (stage, xs) => {
     const car = frames(fx(stage, 'car'), '0')
-    const bonus = fx(stage, 'bonus')
-    const perfect = fx(stage, 'perfect')
     return (beats, index) => {
       const wrecked = markReached(beats, index, 'wreck')
       car(String(wrecked ? 3 : Math.min(2, Math.ceil((marksUpTo(beats, index, 'hit') * 2) / Math.max(1, xs.length)))))
-      fadeTo(bonus, wrecked ? 0 : 1)
-      fadeTo(perfect, wrecked ? 1 : 0)
     }
   },
 }
@@ -225,41 +189,16 @@ const services: SceneSpec = {
   },
 }
 
-/** Projects: the super move; the screen dims to the flash, then a hit per project on the combo counter. */
+/** Projects: the super move; the screen dims to the flash, then a spin kick per project. */
 const projects: SceneSpec = {
   zone: 'harbour',
   bout: { lead: [{ hero: 'stance' }, { hero: 'fireball', mark: 'flash' }], item: { hero: 'spinKick', mark: 'hit' }, close: [{ hero: 'win' }] },
-  props: (_xs, labels) => (
-    <>
-      <rect data-fx="flash" width={W} height={H} fill={FS.flash} opacity="0" />
-      <g data-fx="combo" opacity="0">
-        <text data-fx="hits" x={CALL_X + 60} y={300} textAnchor="end" fontSize={120} fill={FS.hudYellow} stroke={FS.ink} strokeWidth={12} paintOrder="stroke" className={look.face}>
-          0
-        </text>
-        <text x={CALL_X + 80} y={300} fontSize={48} fill={FS.callTop} stroke={FS.ink} strokeWidth={6} paintOrder="stroke" className={`${look.face} uppercase`}>
-          {labels.hud.hits}
-        </text>
-      </g>
-      <Call x={CALL_X} y={170} size={64} name="super">
-        {labels.arcade.superMove}
-      </Call>
-    </>
-  ),
+  props: () => <rect data-fx="flash" width={W} height={H} fill={FS.flash} opacity="0" />,
   write: (stage) => {
     const flash = fx(stage, 'flash')
-    const combo = fx(stage, 'combo')
-    const hits = fx(stage, 'hits')
-    const call = fx(stage, 'super')
-    let shown = -1
     return (beats, index, t) => {
       const flashing = beats[index]?.mark === 'flash'
       fadeTo(flash, flashing ? 0.8 * Math.max(0, 1 - Math.abs(t - 0.5) * 3) : 0)
-      fadeTo(call, flashing || index < 1 ? 1 : 0)
-      const count = marksUpTo(beats, index, 'hit')
-      fadeTo(combo, count > 1 ? 1 : 0)
-      if (count === shown || !hits) return
-      shown = count
-      hits.textContent = String(count)
     }
   },
 }
@@ -289,32 +228,14 @@ const bands: SceneSpec = {
   ),
 }
 
-/** The Muay Thai record: the sparring round, a strike per line of his record, K.O., then Perfect. */
+/** The Muay Thai record: the sparring round, a strike per line of his record, then the partner down. */
 const muayThai: SceneSpec = {
   zone: 'temple',
   partner: true,
   bout: {
     lead: [{ hero: 'stance', partner: 'walk' }],
     item: { hero: 'act', partner: 'hurt', mark: 'hit' },
-    close: [{ hero: 'act', partner: 'down', mark: 'ko' }, { hero: 'win', partner: 'down', mark: 'perfect' }],
-  },
-  props: (_xs, labels) => (
-    <>
-      <Call x={CALL_X} y={260} size={110} name="ko">
-        {labels.arcade.ko}
-      </Call>
-      <Call x={CALL_X} y={420} size={90} name="perfect">
-        {labels.arcade.perfect}
-      </Call>
-    </>
-  ),
-  write: (stage) => {
-    const ko = fx(stage, 'ko')
-    const perfect = fx(stage, 'perfect')
-    return (beats, index) => {
-      fadeTo(ko, markReached(beats, index, 'ko') ? 1 : 0)
-      fadeTo(perfect, markReached(beats, index, 'perfect') ? 1 : 0)
-    }
+    close: [{ hero: 'act', partner: 'down' }, { hero: 'win', partner: 'down' }],
   },
 }
 
@@ -379,7 +300,7 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
 }
 
 /** A scene's picture: its stage of the tour, then the fighters and the section's props. */
-export function TourStage({ scene, profession, labels, settled = false }: { scene: TourScene; profession: Profession; labels: Labels; settled?: boolean }) {
+export function TourStage({ scene, profession, settled = false }: { scene: TourScene; profession: Profession; settled?: boolean }) {
   const spec = SCENES[scene.id]
   return (
     <Stage
@@ -401,7 +322,7 @@ export function TourStage({ scene, profession, labels, settled = false }: { scen
           node: (
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
               <g className={look.troupe}>
-                {spec.props?.(scene.xs, labels)}
+                {spec.props?.(scene.xs)}
                 {spec.partner && (
                   <g data-fx="partner" transform={place(PARTNER_X)}>
                     <ScrubFighter profession={profession} who="partner" mirror poses={posesOf(scene.beats, 'partner')} />

@@ -46,7 +46,7 @@ function ChallengeClock() {
 }
 
 export function ChallengerScene({ profession }: { profession: Profession }) {
-  const { sections, arcade } = useLabels()
+  const { sections } = useLabels()
 
   return (
     <section aria-labelledby={CONTACT_HEADING} className="relative z-20 mx-auto mb-10 max-w-6xl px-4 sm:px-6">
@@ -56,10 +56,7 @@ export function ChallengerScene({ profession }: { profession: Profession }) {
             <ScreenPanel accent="gold">
               <div className="mb-3 flex items-start gap-3" aria-hidden="true">
                 <LifeBar side="p1" label={name} delay="[--delay:300ms]" />
-                <span className="flex shrink-0 flex-col items-center">
-                  <ChallengeClock />
-                  <span className={`mt-1 text-sm uppercase text-white ${look.display} ${fight.blink}`}>{arcade.continueCall}</span>
-                </span>
+                <ChallengeClock />
                 <LifeBar side="p2" label={<span className={fight.blink}>?</span>} empty />
               </div>
 

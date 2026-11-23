@@ -9,7 +9,7 @@ import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { MoveCard, ProjectCard, SPARK_LINES, ServiceCard, VentureCard } from './cards'
-import { ComboZone, HitCard } from './combo'
+import { HitCard } from './combo'
 import { BandStage, ResultRecord, RoundEntry } from './rounds'
 import { FlightMap, FlightStop } from './flight'
 import look from './world.module.css'
@@ -19,7 +19,7 @@ import look from './world.module.css'
 // [data-stage-items]:
 // - Work Experience: the plane flies the world map from job to job as each round scrolls in (./flight);
 //   each job is still a round of the match (./rounds), in masonry.
-// - Projects: the cards take hits under the pointer, counted on the combo counter (./combo).
+// - Projects: the cards take hits under the pointer (./combo).
 // - Bands: the cards follow the pointer like the crowd's cheer.
 // - Muay Thai: the result screen.
 
@@ -89,20 +89,18 @@ export const CARDS: SectionFrames = {
   },
   projects: function ProjectCards({ slot }) {
     return (
-      <ComboZone>
-        <div data-stage-items="">
-          <ProjectList
-            projects={slot.projects}
-            className={MASONRY_COLUMN_LIST}
-            itemClassName={MASONRY_ITEM}
-            renderProject={(project) => (
-              <HitCard>
-                <ProjectCard {...project} />
-              </HitCard>
-            )}
-          />
-        </div>
-      </ComboZone>
+      <div data-stage-items="">
+        <ProjectList
+          projects={slot.projects}
+          className={MASONRY_COLUMN_LIST}
+          itemClassName={MASONRY_ITEM}
+          renderProject={(project) => (
+            <HitCard>
+              <ProjectCard {...project} />
+            </HitCard>
+          )}
+        />
+      </div>
     )
   },
   ventures: function VentureCards({ slot }) {

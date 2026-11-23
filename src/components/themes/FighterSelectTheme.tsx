@@ -74,7 +74,7 @@ function TourSection({ scene, profession, labels, still }: SectionProps) {
   const { accent, id } = SCREENS[scene.slot.id]
   return (
     <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
-      {still && <TourStage scene={scene} profession={profession} labels={labels} settled />}
+      {still && <TourStage scene={scene} profession={profession} settled />}
       <div className="min-h-[100svh]" />
       <div className={COLUMN}>
         <ArcadePanel accent={accent} title={labels.sections[scene.slot.titleKey]} id={id}>
@@ -107,7 +107,7 @@ export default function FighterSelectTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef}>
           {scenes.map((scene) => (
-            <TourStage key={scene.id} scene={scene} profession={active} labels={labels} />
+            <TourStage key={scene.id} scene={scene} profession={active} />
           ))}
         </Theatre>
       )}
@@ -115,7 +115,7 @@ export default function FighterSelectTheme() {
 
       <div ref={textRef} className="relative z-10">
         <header className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          {reduced && <TourStage scene={scenes[0]} profession={active} labels={labels} settled />}
+          {reduced && <TourStage scene={scenes[0]} profession={active} settled />}
           <HeroSplash profession={active} />
         </header>
 
@@ -133,7 +133,7 @@ export default function FighterSelectTheme() {
           </ProfessionRegion>
 
           <div data-scene="contact" className="relative pb-[30svh] pt-[60svh]">
-            {reduced && <TourStage scene={contact} profession={active} labels={labels} settled />}
+            {reduced && <TourStage scene={contact} profession={active} settled />}
             <ChallengerScene profession={active} />
           </div>
         </main>
