@@ -413,24 +413,6 @@ collections:
                   - { <<: *text, label: "Training", name: training, hint: 'Keep {discipline} {academy} {instructor}' }
                   - { <<: *text, label: "Training now", name: trainingNow, hint: 'Keep {discipline} {academy} {instructor}' }
                   - { <<: *text, label: "Practice", name: practice, hint: 'Keep {training} {teaching}' }
-              - label: City under the sea world (art deco)
-                name: deco
-                widget: object
-                i18n: true
-                fields:
-                  - { <<: *text, label: "Stop", name: stop }
-                  - { <<: *text, label: "Play diary", name: playDiary, hint: 'Keep {job}' }
-                  - { <<: *text, label: "Stop diary", name: stopDiary, hint: 'Keep {job}' }
-                  - { <<: *text, label: "Snap", name: snap }
-                  - { <<: *text, label: "Snap of", name: snapOf, hint: 'Keep {project}' }
-                  - { <<: *text, label: "Developed", name: developed }
-                  - { <<: *text, label: "Turn pipe", name: turnPipe, hint: 'Keep {n}' }
-                  - { <<: *text, label: "Zap again", name: zapAgain }
-                  - { <<: *text, label: "Seal leak", name: sealLeak }
-                  - { <<: *text, label: "Provoke guardian", name: provoke }
-                  - { <<: *text, label: "Pull banner cord", name: pullCord, hint: 'Keep {venture}' }
-                  - { <<: *text, label: "Flow waiting", name: flowWaiting }
-                  - { <<: *text, label: "Flow done", name: flowDone }
               - label: Arcade world (fighter select)
                 name: arcade
                 widget: object
@@ -517,32 +499,8 @@ collections:
                 i18n: true
                 fields:
                   - { <<: *text, label: "Map name", name: mapOf, hint: 'Keep {name}' }
-                  - { <<: *text, label: "Walk hint", name: walkHint }
                   - { <<: *text, label: "Standing at", name: standingAt, hint: 'Keep {place}' }
                   - { <<: *text, label: "Secret exit", name: secretExit }
-                  - { <<: *text, label: "Switch hint", name: switchHint }
-                  - { <<: *text, label: "Job hint", name: jobHint }
-                  - { <<: *text, label: "Band hint", name: bandHint }
-                  - { <<: *text, label: "Fortress hint", name: fortressHint }
-                  - { <<: *text, label: "Block hint", name: blockHint }
-                  - { <<: *text, label: "World 1 (hero)", name: placeHero }
-                  - { <<: *text, label: "About level", name: placeAbout }
-                  - { <<: *text, label: "Work level", name: placeWork }
-                  - { <<: *text, label: "Tech level", name: placeTech }
-                  - { <<: *text, label: "Services level", name: placeServices }
-                  - { <<: *text, label: "Projects level", name: placeProjects }
-                  - { <<: *text, label: "Ventures level", name: placeVentures }
-                  - { <<: *text, label: "Bands level", name: placeBands }
-                  - { <<: *text, label: "Muay Thai level", name: placeMuayThai }
-                  - { <<: *text, label: "Goal level", name: placeContact }
-                  - { <<: *text, label: "Blocks hit", name: countAbout, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Ledges reached", name: countWork, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Bricks broken", name: countTech, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Mushrooms stomped", name: countServices, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Switches pressed", name: countProjects, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Coins taken", name: countVentures, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Note blocks played", name: countBands, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Foes stomped", name: countMuayThai, hint: 'Keep {count} {total}' }
               - label: Black forest world (silhouette)
                 name: shade
                 widget: object

@@ -17,32 +17,27 @@ import { ventures } from './scenes/ventures'
 import { work } from './scenes/work'
 
 // The page as scenes: the hub (hero), one level per section of the shown profession in reading order,
-// the goal (contact). Each scene names its picture, its words in labels.trail for the HUD, its anchor and
-// how many cards its section counts (stageItems), read from the same slot the section's cards are drawn from.
+// the goal (contact). Each scene names its picture, its anchor and how many cards its section counts
+// (stageItems), read from the same slot the section's cards are drawn from.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-type TrailWords = Labels['trail']
-
 interface SceneDef {
   level: Level
-  place: keyof TrailWords
-  /** The HUD's line, "{count} of {total} blocks hit"; a scene that counts nothing has none. */
-  tally: keyof TrailWords | null
   anchor: string
 }
 
 const SCENE_DEFS: Record<SceneId, SceneDef> = {
-  hero: { level: hub, place: 'placeHero', tally: null, anchor: 'top' },
-  about: { level: about, place: 'placeAbout', tally: 'countAbout', anchor: 'about' },
-  work: { level: work, place: 'placeWork', tally: 'countWork', anchor: 'work' },
-  tech: { level: tech, place: 'placeTech', tally: 'countTech', anchor: 'tech' },
-  services: { level: services, place: 'placeServices', tally: 'countServices', anchor: 'services' },
-  projects: { level: projects, place: 'placeProjects', tally: 'countProjects', anchor: 'projects' },
-  ventures: { level: ventures, place: 'placeVentures', tally: 'countVentures', anchor: 'ventures' },
-  bands: { level: bands, place: 'placeBands', tally: 'countBands', anchor: 'bands' },
-  muayThai: { level: muayThai, place: 'placeMuayThai', tally: 'countMuayThai', anchor: 'muay-thai' },
-  contact: { level: goal, place: 'placeContact', tally: null, anchor: 'contact' },
+  hero: { level: hub, anchor: 'top' },
+  about: { level: about, anchor: 'about' },
+  work: { level: work, anchor: 'work' },
+  tech: { level: tech, anchor: 'tech' },
+  services: { level: services, anchor: 'services' },
+  projects: { level: projects, anchor: 'projects' },
+  ventures: { level: ventures, anchor: 'ventures' },
+  bands: { level: bands, anchor: 'bands' },
+  muayThai: { level: muayThai, anchor: 'muay-thai' },
+  contact: { level: goal, anchor: 'contact' },
 }
 
 export interface TrailScene extends TheatreScene, Omit<SceneDef, 'level'> {
