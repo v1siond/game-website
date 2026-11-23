@@ -9,6 +9,7 @@ import { Stage } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { ChaosLand } from './chaosZone'
 import { FrostLand } from './frostZone'
+import { FrostHero } from './hero'
 import { GolemRise, RISEN, ROCK_COUNT, riseWriter } from './golem'
 import { REALM } from './palette'
 import { REALM_OF } from './sections'
@@ -18,7 +19,7 @@ import look from './world.module.css'
 // whole, each section a stage of its realm (REALM_OF), and the contact before the ice throne. On a chaos
 // stage the golem rises once more: a meteor falls on the field as the stage rises from the dark and bursts,
 // then a card's share of his rocks flies home as each card scrolls up, and he stands whole after the last.
-// On a frost stage he waits as the frost king among his spires: one ice spire grows beside him per card, his
+// On a frost stage he stands as the frost king among his spires: one ice spire grows beside him per card, his
 // runeblade glinting as it grows. Scroll up and it all plays back.
 
 export type SceneId = 'hero' | SectionId | 'contact'
@@ -123,16 +124,19 @@ function ChaosFigure({ scene }: { scene: RealmScene }) {
   )
 }
 
-/** A frost stage's figure: the section's spires beside the frost king (drawn with his land). */
+/** A frost stage's figure: the frost king, and the section's spires beside him. */
 function FrostFigure({ scene }: { scene: RealmScene }) {
   return (
-    <div className={look.spires}>
-      <svg className="block h-full w-full" viewBox={`0 0 ${SPIRE_BOX.width} ${SPIRE_BOX.height}`} overflow="visible" aria-hidden="true" focusable="false">
-        {scene.xs.map((_, i) => (
-          <Spire key={i} i={i} />
-        ))}
-      </svg>
-    </div>
+    <>
+      <FrostHero figure={scene.figure} />
+      <div className={look.spires}>
+        <svg className="block h-full w-full" viewBox={`0 0 ${SPIRE_BOX.width} ${SPIRE_BOX.height}`} overflow="visible" aria-hidden="true" focusable="false">
+          {scene.xs.map((_, i) => (
+            <Spire key={i} i={i} />
+          ))}
+        </svg>
+      </div>
+    </>
   )
 }
 
@@ -150,7 +154,7 @@ export function RealmStage({ scene, settled = false }: { scene: RealmScene; sett
           name: 'land',
           node: (
             <>
-              {chaos ? <ChaosLand /> : <FrostLand figure={scene.figure} />}
+              {chaos ? <ChaosLand /> : <FrostLand />}
               <div className={look.vignette} />
             </>
           ),

@@ -1,13 +1,12 @@
 'use client'
 
 import { memo } from 'react'
-import { FrostHero } from './hero'
 import { REALM } from './palette'
 
 // The frost realm's land, held still for the theatre (scenes.tsx): the ice throne, the frozen lake and its
-// spires, the death steed and the frost king with his runeblade.
+// spires and the death steed. The frost king stands on it as the scene's figure (scenes.tsx).
 
-export const FrostLand = memo(function FrostLand({ figure = false }: { figure?: boolean }) {
+export const FrostLand = memo(function FrostLand() {
   return (
     <>
       {/* Deep cold sky with depth */}
@@ -449,8 +448,6 @@ export const FrostLand = memo(function FrostLand({ figure = false }: { figure?: 
         {/* Ground frost */}
         <ellipse cx="110" cy="265" rx="80" ry="12" fill={REALM.frostIceMid} opacity="0.15" filter="url(#frostGlowHorse)" />
       </svg>
-
-      <FrostHero figure={figure} />
 
       {/* === SEMI-BURIED SKELETONS near footer === */}
       {/* Skeleton 1 - left side, arm reaching up */}

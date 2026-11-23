@@ -1,7 +1,7 @@
 /* Medieval Fantasy's theatre: the realm's void behind every stage and the dark a stage fades into, the
    vignette over each land, and where each realm's figure stands. The golem rises on the right of the chaos
    field, clear of the text column on the left; the spires grow on the right of the frost king, who stands at
-   the left of his land (frostZone.tsx), clear of the text column on the right. */
+   the left of the ice (hero.tsx), clear of the text column on the right. */
 
 .root {
   --theatre-ground: var(--realm-bg-void);
