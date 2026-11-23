@@ -53,11 +53,12 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
   )
 }
 
+// A job box holds the speaker's portrait beside its title, so the jobs take the column one under another.
 function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
   return (
-    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+    <ul className="space-y-6" data-stage-items="">
       {slot.jobs.map((entry) => (
-        <li key={entry.id} className={MASONRY_ITEM}>
+        <li key={entry.id}>
           <ExperienceCard entry={entry} />
         </li>
       ))}
