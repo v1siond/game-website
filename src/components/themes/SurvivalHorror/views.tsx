@@ -3,42 +3,24 @@
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { Labels } from '@/lib/cv/labels'
-import { PaperPanel } from './panels'
 import { MarkedLines } from '@/components/cv/MarkedLines'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import { PANEL_HEADING, sectionHeadingId } from './panels'
 import { MARK_LIST, ServiceNotes, TechCloud } from './cards'
-import { MapFiles } from './files'
-import { AttacheCase } from './case'
-import { TraderWares } from './trader'
-import { SuitDoors } from './keys'
-import { HerbRecovery } from './condition'
-import { RoomWindow } from './stage'
-import type { Zone } from './scripts'
+import { JobFiles } from './files'
+import { ProjectItems } from './items'
+import { VentureBoard } from './board'
+import { BandPapers } from './bands'
+import { FightRecord } from './record'
+import type { Scene } from './scenes'
+import { SurvivorStage } from './stage'
+import look from './world.module.css'
 
-// The picked profession's sections, each one of the genre's own screens: Work Experience is the house map
-// and its files (./files), Projects the attache case (./case), Ventures the trader's wares (./trader), Bands
-// the suit key doors (./keys), the Muay Thai record the herb recovery (./condition). About and Tech Stack
-// are papers found on the desk and fade in, and so are the Services, typed notes in the same room as the
-// Tech Stack. Each is a window onto its room of the house behind the page (RoomWindow, ./stage): the study,
-// the corridor, the armoury, the back door, the trader, the suit door, the gym. The shared section plan
-// picks which a profession shows and in which order.
-
-interface RoomProps {
-  zone: Zone
-  titleKey: keyof Labels['sections']
-  // The papers found on the desk fade in; the genre's own screens stand as they are.
-  fade?: boolean
-  children: ReactNode
-}
-
-// A section as a window onto its room, its paper panel titled from the labels.
-function Room({ zone, titleKey, fade = false, children }: RoomProps) {
-  const { sections: titles } = useLabels()
-  const panel = <PaperPanel title={titles[titleKey]}>{children}</PaperPanel>
-  return <RoomWindow zone={zone}>{fade ? <FadeInScene>{panel}</FadeInScene> : panel}</RoomWindow>
-}
+// One section per scene: a screen of the room alone first, then its paper panel in the text column (on
+// the left from lg, the room playing on the right), then a stretch of the room alone before the next. The
+// cards a scene counts sit in an element marked data-stage-items, which the shared theatre measures for the
+// reading line that drives each beat (./scenes). Every field comes from the shared lists and the card view
+// models.
 
 // His education and languages typed under the bio on the same paper, each label in brass.
 const PAPER_FACTS: AboutFactsLook = {
@@ -48,68 +30,83 @@ const PAPER_FACTS: AboutFactsLook = {
   value: 'text-sm text-[color:var(--sh-cream)]',
 }
 
-// One frame per section of the shared plan, which picks the ones a profession shows and their order.
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { cards } = useLabels()
-    const { highlights } = useAboutBlock()
-    return (
-      <Room zone="about" titleKey="about" fade>
-        <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
+function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
+  return (
+    <>
+      <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
+      <div data-stage-items="">
         <AboutFacts look={PAPER_FACTS} />
         <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...MARK_LIST, list: 'mt-4 space-y-1' }} />
-      </Room>
-    )
-  },
-  work: function WorkFrame({ slot }) {
-    return (
-      <Room zone="experience" titleKey="workExperience">
-        <MapFiles jobs={slot.jobs} />
-      </Room>
-    )
-  },
-  tech: function TechFrame({ slot }) {
-    return (
-      <Room zone="tech" titleKey="techStack" fade>
-        <TechCloud categories={slot.categories} />
-      </Room>
-    )
-  },
-  services: function ServicesFrame({ slot }) {
-    return (
-      <Room zone="tech" titleKey="services" fade>
-        <ServiceNotes services={slot.services} />
-      </Room>
-    )
-  },
-  projects: function ProjectsFrame({ slot }) {
-    return (
-      <Room zone="projects" titleKey="projects">
-        <AttacheCase projects={slot.projects} />
-      </Room>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    return (
-      <Room zone="ventures" titleKey="ventures">
-        <TraderWares companies={slot.companies} />
-      </Room>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    return (
-      <Room zone="bands" titleKey="bands">
-        <SuitDoors musician={slot.musician} bands={slot.bands} />
-      </Room>
-    )
-  },
-  muayThai: function MuayThaiFrame({ slot }) {
-    return (
-      <Room zone="gym" titleKey="muayThai">
-        <HerbRecovery martialArts={slot.martialArts} />
-      </Room>
-    )
-  },
+      </div>
+    </>
+  )
 }
 
-export const SECTION_VIEWS = sectionViews(FRAMES)
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  return (
+    <div data-stage-items="">
+      <TechCloud categories={slot.categories} />
+    </div>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <div data-stage-items="">
+      <ServiceNotes services={slot.services} />
+    </div>
+  )
+}
+
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  return <JobFiles jobs={slot.jobs} />
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  return <ProjectItems projects={slot.projects} />
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return <VentureBoard companies={slot.companies} />
+}
+
+function BandCards({ slot }: { slot: SlotOf<'bands'> }) {
+  return <BandPapers musician={slot.musician} bands={slot.bands} />
+}
+
+function RecordCards({ slot }: { slot: SlotOf<'muayThai'> }) {
+  return <FightRecord martialArts={slot.martialArts} />
+}
+
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: RecordCards,
+}
+
+/** One scene of the page; under reduced motion its own stage sits still above its panel. */
+export function SceneSection({ scene, slot, still }: { scene: Scene; slot: SectionSlot; still: boolean }) {
+  const { sections } = useLabels()
+  const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const title = sections[slot.titleKey]
+  const id = sectionHeadingId(title)
+  return (
+    <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[4vw]">
+      {still && <SurvivorStage scene={scene} settled />}
+      <div className="min-h-[80svh] motion-reduce:min-h-[70svh]" aria-hidden="true" />
+      <div className={`relative p-4 sm:p-6 lg:w-[min(42rem,46vw)] ${look.panel}`}>
+        <h2 id={id} className={PANEL_HEADING}>
+          {title}
+        </h2>
+        <Cards slot={slot} />
+      </div>
+    </section>
+  )
+}

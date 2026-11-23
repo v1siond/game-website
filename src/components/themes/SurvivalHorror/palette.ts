@@ -8,7 +8,7 @@ import { paletteVars } from '../shared/paletteVars'
 // same values as --sh-* variables (SH_VARS, set once on the world's root).
 //
 // Text pairs: cream on paper 9.2:1, fogText on paper 8.5:1, brassText on paper 8.8:1, flameText on paper 8.5:1,
-// ivory on the rust plate 7.7:1, void on flame 9.6:1; brass, fog and flame keep painting lamps, frames and lines; on the monitor black: fine 10.0:1, caution 11.4:1, danger 5.7:1; ivory on the left map room 7.7:1, on the searched one 5.7:1.
+// ivory on the rust plate 7.7:1, void on flame 9.6:1; brass, fog and flame keep painting lamps, frames and lines.
 export const SH = {
   void: '#0f0a08',
   shadow: '#1a1410',
@@ -31,46 +31,24 @@ export const SH = {
   fogText: '#c6c1b6',
   ash: '#706860',
   steel: '#4a5258',
-  // The boots, his and the stalker's.
+  // His boots.
   boot: '#20160f',
-  // The survivor's kit: the brown leather bomber lit and in shade, its fur collar, the black top, the grey
-  // cargo trousers, the rig's straps, the gun metal, the laser.
-  bomber: '#6e4426',
-  bomberLit: '#8f5c34',
-  bomberShade: '#43281a',
-  fur: '#d9c39b',
-  furShade: '#a08960',
+  // His kit: the worn canvas jacket in shade and in the lamp light, the dark top, the grey trousers, the
+  // belt and holster, the gun metal.
+  jacket: '#5e5136',
+  jacketShade: '#3b3222',
+  jacketLit: '#7d6c48',
   top: '#1a1a1e',
   cargo: '#45443e',
-  cargoShade: '#2e2d29',
   strap: '#2a1c12',
   gunmetal: '#2c3034',
-  laser: '#ff3b30',
-  // The condition screen: the trace and its word in each state.
-  fine: '#62d26a',
-  caution: '#e8c547',
-  danger: '#f05a4a',
-  monitor: '#07120a',
-  // The map: a room with something left in it, a searched room, the floor between.
-  roomLeft: '#7c2b28',
-  roomSearched: '#2a5a9c',
-  mapFloor: '#141b24',
-  // The herbs.
-  herbGreen: '#3f9a46',
-  herbRed: '#c23a32',
-  pot: '#6a4630',
-  // The pursuer: the long coat closed with straps, its buckles, the pale grey stitched head, the bared
-  // teeth and raw gums, the olive launcher on his back.
+  // The shapes in the dark: the pursuer's long coat and the hunched shape's skin.
   coat: '#16171a',
   coatLit: '#2b2d32',
-  stalkerSkin: '#8c857b',
-  gums: '#7a2a2a',
-  launcher: '#4f5f2c',
-  launcherLit: '#6d7d3e',
-  // The case lining and the trader's eyes.
-  felt: '#24402e',
-  feltLine: '#335a40',
+  shape: '#3a3530',
+  // The night through the windows, and the dawn through the front door.
   moon: '#9fb4c8',
+  dawn: '#f2c890',
 } as const
 
 export const SH_VARS = paletteVars('sh', SH)

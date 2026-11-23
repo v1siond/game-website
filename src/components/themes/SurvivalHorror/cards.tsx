@@ -1,6 +1,6 @@
 import type { CVData, Service } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
@@ -8,6 +8,9 @@ import look from './world.module.css'
 
 // The small marks the house's papers share: the brass bullet of a typed list, the rust date stamp, and the
 // Tech Stack as the labels pinned on the desk, one group per category, and the Services as typed notes.
+
+/** A section's cards in the text column: two up from md, one in the narrow column beside the room from lg. */
+export const COLUMN_LIST = 'columns-1 gap-6 md:columns-2 lg:columns-1'
 
 export const STAMP = `whitespace-nowrap border border-[color:var(--sh-rust)] px-2 py-1 text-sm text-[color:var(--sh-flame-text)] ${look.typed}`
 
@@ -25,14 +28,14 @@ export const MARK_LIST: MarkedLinesLook = {
 /** The tags pinned on a paper: a job's skills, a project's tools. */
 export const PINNED_TAGS: TagListLook = {
   list: 'mt-3 flex flex-wrap gap-1.5',
-  tag: 'border border-[color:var(--sh-felt-line)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]',
+  tag: 'border border-[color:var(--sh-wood)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]',
 }
 
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
   return (
-    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+    <ul className={COLUMN_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
         <li key={category.id} className={MASONRY_ITEM}>
           <h3 className={`mb-3 text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>{category.name}</h3>
@@ -51,7 +54,7 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
 
 export function ServiceNotes({ services }: { services: Service[] }) {
   return (
-    <ul className={MASONRY_LIST}>
+    <ul className={COLUMN_LIST}>
       {services.map((service) => (
         <li key={service.id} className={`${MASONRY_ITEM} border border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] p-4`}>
           <h3 className="flex gap-3 text-base font-bold text-[color:var(--sh-cream)]">
