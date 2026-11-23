@@ -49,7 +49,6 @@ const APPROVED = new Map([
   ['BCharitable', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; fintech HISTORY lines 200, 247 (ACH and Stripe)'],
   ['WJV', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; parsers HISTORY line 235 (wjv-parser)'],
   ['ProctorU', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; audits HISTORY lines 322 to 323 (WCAG AAA updates)'],
-  ['Send me the project and the date it has to ship.', 'C42 copy audit, his 11-09 words'],
   ['InsurAdmin: built it from scratch to manage carrier feeds and agency teams.', 'C42 copy audit, his 11-09 words'],
   ['Agency Rocket: built the annuity, IUL and whole life parsers and the Stripe billing for the suite (My New Retirement, Wealth United, Debt Action Plan).', 'C42 copy audit, his 11-09 words'],
   ['PMX Affiliate Marketplace: built and launched the whole stack and its native Shopify integration.', 'C42 copy audit, his 11-09 words'],
@@ -105,6 +104,7 @@ const APPROVED = new Map([
   ['I audit your app for security and WCAG and fix what I find. I also do the process work for ISO 9001 and ISO 27001.', 'C42 wording audit round 2 (score/C42/audit.md) finding 34, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Sillabo turns a course written by people into an AI course. Italian for Spanish speakers.', 'C42 wording audit round 2 (score/C42/audit.md) finding 31, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Hey! I\'m Alexander. I write software, play drums and teach Muay Thai, usually all in the same week.\n\nHome is Lima, Peru, where I live with my three dogs, two German Shepherds and a husky.\n\nI studied systems engineering at UNEFA and started out in Falcón, Venezuela, as a junior programmer and an instructor teaching HTML, PHP, MySQL, JavaScript and CSS courses. Teaching never left: at SmoothTerminal and DailyDrip I built the platform and taught on it, from pixel art made with CSS shadows to WCAG AAA audits.\n\nRight now I\'m a senior staff engineer at Daring Bit Assembly, working remote on US Eastern and Italian hours. On the side I build Nebulith, my own game engine and map editor, and Sillabo, an AI course that teaches Italian to Spanish speakers.\n\nI\'ve played drums since 2011. Today I play in Eon and Zero Nexus, and before that in Behated Reign and En Carne Muerta, plus party bands like Retrogroove and Arpegio at bars and private events.\n\nI\'ve trained martial arts since I was 19. I train and teach Muay Thai at Moving Zen in Lima, I\'m training for the national championship, and I roll jiu-jitsu at Monkey Jiujutsu Academy.\n\nI speak Spanish and English, and a little Italian.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
+  ['I\'m always happy to hear new ideas and proposals. Email me or find me on LinkedIn.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()
