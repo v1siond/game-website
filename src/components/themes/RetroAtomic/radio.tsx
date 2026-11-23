@@ -11,7 +11,7 @@ import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
 
 // Bands as the terminal's radio: each band a station, the stations the cards the bands scene counts (he
-// sways with the bakelite radio on the stage, scenes.tsx). Above the stations the receiver: the tuning
+// turns the dial of the bakelite radio on the stage, scenes.tsx). Above the stations the receiver: the tuning
 // scale with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
 // slides to that station's place on the scale (transform, an eased glide), the wave's height and speed
 // change to that station's (the --amp and --wave variables the CSS reads), a short burst of static

@@ -11,7 +11,7 @@ import { atomicId } from './anchors'
 import { buildBoard, hackReducer, initialHack, MAX_ATTEMPTS, type HackAction, type HackBoard, type HackCell, type HackLogEntry, type HackState } from './hacking'
 import atomic from './atomic.module.css'
 
-// Contact, outside in the town at dusk: on the stage he and the dog walk out to a public terminal on its
+// Contact, outside in the town at dusk: on the stage he and his three dogs walk out to a public terminal on its
 // post (scenes.tsx). Over it, the terminal itself: the contact menu on the left, always open, and on the
 // right the password game (hacking.ts holds the rules): his tools hidden in a memory dump, the attempts as
 // blocks, every guess answered in the log. A granted password powers on the reward line and he raises his
