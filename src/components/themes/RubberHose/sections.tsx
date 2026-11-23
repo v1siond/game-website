@@ -97,7 +97,7 @@ const FRAMES: SectionFrames = {
               <CurlBanner id={HEADING.about}>{titles.about}</CurlBanner>
               <FlowerKnockout on={on} reduced={reduced} profession="engineer">
                 <div className={`mx-auto max-w-prose p-5 ${world.titleCard}`}>
-                  <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
+                  <p className={`whitespace-pre-line leading-relaxed ${LEAD}`}>{slot.bio}</p>
                   <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
                   <AboutFacts look={BILL_LINES} />
                 </div>

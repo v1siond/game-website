@@ -65,7 +65,7 @@ const FRAMES: SectionFrames = {
       <Hour slot={slot}>
         <SlamLanding>
           <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
-            <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
+            <p className="max-w-prose whitespace-pre-line text-base leading-relaxed">{slot.bio}</p>
             <div className="max-w-prose">
               <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
               <AboutFacts look={INKED_FACTS} />

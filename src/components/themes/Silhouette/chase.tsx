@@ -88,7 +88,7 @@ export function ChaseAbout({ bio }: { bio: string }) {
 
   return (
     <div ref={ref}>
-      <p className="mx-auto max-w-prose border-y border-[color:var(--sh-fog)] py-5 text-center text-sm leading-loose tracking-wide text-[color:var(--sh-text)] sm:text-base">{bio}</p>
+      <p className="mx-auto max-w-prose whitespace-pre-line border-y border-[color:var(--sh-fog)] py-5 text-center text-sm leading-loose tracking-wide text-[color:var(--sh-text)] sm:text-base">{bio}</p>
       <div className="relative mt-6 aspect-[3/1] overflow-hidden border-y-2 border-[color:var(--sh-black)]" aria-hidden="true">
         <Sky light={SKY.dawn} />
         {triggered && <ChaseStrip key={run} onDone={() => setDone(true)} />}

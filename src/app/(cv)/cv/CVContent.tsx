@@ -78,7 +78,7 @@ export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale 
         </header>
 
         <CVSection title={cvPage.professionalSummary}>
-          <p className="text-sm leading-relaxed">{professionalSummary.bio}</p>
+          <p className="whitespace-pre-line text-sm leading-relaxed">{professionalSummary.bio}</p>
         </CVSection>
 
         {professionalSummary.highlights.length > 0 && (

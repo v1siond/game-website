@@ -81,7 +81,7 @@ const FRAMES: SectionFrames<FrameProps> = {
         <ScrollScene>
           <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
             <RealmFrame title={sections[slot.titleKey]} zone="roc">
-              <p className="max-w-prose" style={{
+              <p className="max-w-prose whitespace-pre-line" style={{
                 color: REALM.textBright,
                 lineHeight: 1.8,
                 fontSize: isLargeScreen ? '1.125rem' : '1rem',
