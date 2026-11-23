@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useId, type ReactNode } from 'react'
-import { fadeTo, frames, transformTo } from '@/components/themes/shared/stageNodes'
+import { frames, transformTo } from '@/components/themes/shared/stageNodes'
 import { cssVars } from '@/lib/cssVars'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
@@ -546,6 +546,22 @@ const FX_DRAW: FxDraw = {
       <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
     </g>
   ),
+  // The guard spark: a white arc where the blow meets his raised forearms, lit at its middle.
+  guard: (fx) => (
+    <g>
+      <path d={`M${fx.at[0] + 2} ${fx.at[1] - 20} Q${fx.at[0] + 16} ${fx.at[1]} ${fx.at[0] + 2} ${fx.at[1] + 20}`} fill="none" stroke={FS.cyan} strokeWidth={5} strokeLinecap="round" />
+      <path d={`M${fx.at[0] + 2} ${fx.at[1] - 14} Q${fx.at[0] + 11} ${fx.at[1]} ${fx.at[0] + 2} ${fx.at[1] + 14}`} fill="none" stroke={FS.flash} strokeWidth={3} strokeLinecap="round" />
+      <circle cx={fx.at[0] + 9} cy={fx.at[1]} r={4} fill={FS.flash} />
+    </g>
+  ),
+  // Dizzy: three small stars circling over his head, turned a quarter of the way on per frame.
+  stars: (fx) => (
+    <g transform={`translate(${fx.at[0]} ${fx.at[1]}) rotate(${fx.phase * 30})`}>
+      {[0, 120, 240].map((angle) => (
+        <path key={angle} transform={`rotate(${angle}) translate(16 0)`} d="M0 -5 L1.6 -1.6 L5 0 L1.6 1.6 L0 5 L-1.6 1.6 L-5 0 L-1.6 -1.6 Z" fill={FS.gold} stroke={INK} strokeWidth={1} />
+      ))}
+    </g>
+  ),
 }
 
 // The map is keyed by the same kind that narrows the effect, so this drawing takes this effect.
@@ -586,7 +602,7 @@ function FrameArt({ frame, costume, index }: { frame: Frame; costume: Costume; i
 }
 
 // The thrown ball of light; the System Engineer's carries a terminal prompt.
-function KiBall({ kind, className = sprite.ball }: { kind: BallKind; className?: string }) {
+export function KiBall({ kind, className = sprite.ball }: { kind: BallKind; className?: string }) {
   return (
     <g className={className} transform="translate(118 72)">
       <path d="M-4 -9 Q-26 -5 -36 0 Q-26 5 -4 9 Z" fill={FS.cyan} opacity={0.55} />
@@ -654,10 +670,6 @@ export const Fighter = memo(function Fighter({ profession, pose, who = 'hero', t
 
 // ---- the fighter a scroll scene poses ----
 
-// The ki ball leaves his hands at this share of a throw and flies this far across the stage by its end.
-const BALL_FROM = 0.4
-const BALL_FLIGHT = 320
-
 /** Every pose a scene plays, as one strip each; the scene's writer (scrubWriter) shows one and steps it. */
 interface ScrubFighterProps {
   profession: Profession
@@ -667,11 +679,12 @@ interface ScrubFighterProps {
   mirror?: boolean
 }
 
-/** Him or his partner in a theatre scene: an SVG element one cell big (160 by 170), placed by its parent. */
+/** Him or his partner in a theatre scene: an SVG element one cell big (160 by 170), placed by its parent. The
+ *  scene draws the energy waves itself, so they can meet in the middle. */
 export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who = 'hero', mirror = false }: ScrubFighterProps) {
   const clip = `fs-${useId().replace(/:/g, '')}`
   const costume = COSTUME[who][profession]
-  const ball = poses.map((pose) => motionFor(pose, profession).ball).find(Boolean)
+  const facing = mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined
   return (
     <svg viewBox={`0 0 ${CELL.width} ${CELL.height}`} width={CELL.width} height={CELL.height} overflow="visible" aria-hidden="true" focusable="false">
       <defs>
@@ -679,8 +692,8 @@ export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who 
           <rect x={0} y={-30} width={CELL.width} height={CELL.height + 30} />
         </clipPath>
       </defs>
-      <ellipse cx={62} cy={CELL.ground} rx={34} ry={3.8} fill={INK} opacity={0.4} transform={mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined} />
-      <g transform={mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined}>
+      <ellipse data-shadow="" cx={62} cy={CELL.ground} rx={34} ry={3.8} fill={INK} opacity={0.4} transform={facing} />
+      <g transform={facing}>
         {poses.map((pose, i) => (
           <g key={pose} data-frame={pose} visibility={i === 0 ? 'visible' : 'hidden'} clipPath={`url(#${clip})`}>
             <g data-strip={pose}>
@@ -690,27 +703,18 @@ export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who 
             </g>
           </g>
         ))}
-        {ball && (
-          <g data-ball="" opacity="0">
-            <KiBall kind={ball} className="" />
-          </g>
-        )}
       </g>
     </svg>
   )
 })
 
-/** The writer of a ScrubFighter: shows `pose` at `t` of its strip (0 to 1) and flies its ki ball. */
+/** The writer of a ScrubFighter: shows `pose` at `t` of its strip (0 to 1). */
 export function scrubWriter(root: Element | null, profession: Profession, poses: readonly FighterPose[]): (pose: FighterPose, t: number) => void {
   const show = frames(root, poses[0])
   const strips = new Map(poses.map((pose) => [pose, root?.querySelector(`[data-strip="${pose}"]`) ?? null]))
-  const ball = root?.querySelector('[data-ball]') ?? null
   return (pose, t) => {
     show(pose)
     const count = framesFor(pose, profession).length
     transformTo(strips.get(pose) ?? null, `translate(${-Math.min(count - 1, Math.floor(t * count)) * CELL.width} 0)`)
-    const thrown = motionFor(pose, profession).ball && t > BALL_FROM ? (t - BALL_FROM) / (1 - BALL_FROM) : 0
-    transformTo(ball, `translate(${(thrown * BALL_FLIGHT).toFixed(1)} 0)`)
-    fadeTo(ball, thrown > 0 && thrown < 1 ? 1 : 0)
   }
 }

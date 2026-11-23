@@ -32,6 +32,8 @@ export type Fx =
   | { kind: 'spin'; phase: number }
   | { kind: 'kit'; swing: number }
   | { kind: 'parry'; at: Pt }
+  | { kind: 'guard'; at: Pt }
+  | { kind: 'stars'; at: Pt; phase: number }
 
 export interface Frame {
   head: Pt
@@ -52,6 +54,7 @@ export interface Frame {
 
 export const FIGHTER_POSES = [
   'stance', 'walk', 'walkBack', 'fireball', 'uppercut', 'spinKick', 'win', 'punch', 'hurt', 'parry', 'down', 'act',
+  'guard', 'strong', 'roundhouse', 'throw', 'knee', 'jump', 'juggle', 'dizzy', 'splat',
 ] as const
 
 export type FighterPose = (typeof FIGHTER_POSES)[number]
@@ -206,7 +209,7 @@ const UPPERCUT_FRAMES: Frame[] = [
 ]
 
 // The spinning kick: off the ground, one leg straight out, the body turning through four views.
-const TATSU_BODY = {
+const SPIN_BODY = {
   head: [62, 30],
   neck: [60, 41],
   hip: [58, 86],
@@ -218,28 +221,28 @@ const TUCKED: LegPose = { k: [56, 110], a: [49, 126], toe: [57, 130] }
 
 const SPIN_KICK_FRAMES: Frame[] = [
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: TUCKED,
     frontLeg: { k: [82, 86], a: [106, 84], toe: [112, 78] },
     wind: 0,
     fx: [{ kind: 'spin', phase: 0 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: TUCKED,
     frontLeg: { k: [68, 98], a: [72, 106], toe: [80, 108] },
     wind: 1,
     fx: [{ kind: 'spin', phase: 1 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: { k: [34, 86], a: [10, 84], toe: [4, 78] },
     frontLeg: { k: [62, 110], a: [56, 126], toe: [64, 130] },
     wind: 2,
     fx: [{ kind: 'spin', phase: 2 }],
   },
   {
-    ...TATSU_BODY,
+    ...SPIN_BODY,
     backLeg: { k: [50, 98], a: [46, 106], toe: [54, 109] },
     frontLeg: { k: [62, 110], a: [56, 126], toe: [64, 130] },
     wind: 3,
@@ -458,7 +461,7 @@ const HURT_FRAMES: Frame[] = [
   { ...shift(STANCE, -2, 1), wind: 0 },
 ]
 
-// The parry of the third arcade series: he steps into the attack with the lead palm open and turns it
+// The parry: he steps into the attack with the lead palm open and turns it
 // aside, the body lit in a blue flash for the frames of the parry.
 const PARRY_PUSH: Frame = {
   head: [72, 48],
@@ -489,22 +492,239 @@ const FLOORED: Frame = {
   stream: true,
 }
 
+// Knocked off his feet into the air, the body thrown back and the limbs loose: the knockdown's fall and,
+// held up by each hit, the juggle.
+const AIRBORNE: Frame = {
+  head: [38, 86],
+  tilt: -52,
+  neck: [45, 94],
+  hip: [74, 126],
+  back: { s: [44, 99], e: [30, 92], h: [18, 98], hand: 'palm' },
+  front: { s: [52, 98], e: [52, 114], h: [62, 122], hand: 'palm' },
+  backLeg: { k: [94, 132], a: [114, 150], toe: [121, 145] },
+  frontLeg: { k: [90, 142], a: [106, 160], toe: [114, 160] },
+  wind: 1,
+  stream: true,
+}
+
 const DOWN_FRAMES: Frame[] = [
   { ...HURT_SNAP, wind: 0, fx: [{ kind: 'spark', at: [64, 48], r: 12 }] },
-  {
-    head: [38, 86],
-    tilt: -52,
-    neck: [45, 94],
-    hip: [74, 126],
-    back: { s: [44, 99], e: [30, 92], h: [18, 98], hand: 'palm' },
-    front: { s: [52, 98], e: [52, 114], h: [62, 122], hand: 'palm' },
-    backLeg: { k: [94, 132], a: [114, 150], toe: [121, 145] },
-    frontLeg: { k: [90, 142], a: [106, 160], toe: [114, 160] },
-    wind: 1,
-    stream: true,
-  },
+  AIRBORNE,
   { ...FLOORED, head: [26, 147], neck: [37, 149], hip: [82, 150], wind: 2 },
   FLOORED,
+]
+
+// The standing guard: both forearms up in front of the face, leaning back from the blow; it takes the hit
+// with a guard spark and slides back on its feet, then settles.
+const GUARD: Frame = {
+  head: [60, 50],
+  tilt: 4,
+  neck: [58, 60],
+  hip: [54, 104],
+  back: { s: [54, 67], e: [70, 74], h: [76, 52], hand: 'fist' },
+  front: { s: [66, 66], e: [82, 72], h: [84, 50], hand: 'fist' },
+  backLeg: { k: [40, 134], a: [28, 160], toe: [37, 163] },
+  frontLeg: { k: [76, 132], a: [86, 160], toe: [96, 163] },
+  wind: 0,
+}
+
+const GUARD_FRAMES: Frame[] = [
+  GUARD,
+  { ...shift(GUARD, -6, 1), wind: 1, fx: [{ kind: 'guard', at: [92, 54] }] },
+  { ...shift(GUARD, -8, 1), wind: 2, fx: [{ kind: 'guard', at: [90, 55] }] },
+  { ...shift(GUARD, -4, 0), wind: 3 },
+]
+
+// The strong punch: the rear fist drives straight out at chest height, the lead fist tucked to the chin.
+const STRONG_OUT: Frame = {
+  head: [78, 48],
+  tilt: -4,
+  neck: [72, 59],
+  hip: [62, 103],
+  back: { s: [66, 64], e: [92, 62], h: [120, 61], hand: 'fist' },
+  front: { s: [76, 65], e: [80, 80], h: [90, 68], hand: 'fist' },
+  backLeg: { k: [46, 134], a: [28, 160], toe: [36, 164] },
+  frontLeg: { k: [88, 130], a: [96, 160], toe: [106, 163] },
+  wind: 2,
+  fx: [{ kind: 'spark', at: [127, 61], r: 10 }],
+}
+
+const STRONG_FRAMES: Frame[] = [
+  { ...shift(STANCE, 1, 1), back: { s: [57, 65], e: [58, 83], h: [67, 74], hand: 'fist' }, wind: 1 },
+  STRONG_OUT,
+  { ...STRONG_OUT, wind: 3, fx: [] },
+  { ...shift(STANCE, 1, 0), wind: 0 },
+]
+
+// The clinch knee: both hands high on the partner's neck, the rear knee driven up into his body.
+const CLINCH_BACK: ArmPose = { s: [60, 62], e: [82, 58], h: [100, 50], hand: 'palm' }
+const CLINCH_FRONT: ArmPose = { s: [72, 61], e: [92, 62], h: [106, 52], hand: 'palm' }
+const PLANTED: LegPose = { k: [74, 130], a: [76, 160], toe: [86, 163] }
+
+const KNEE_FRAMES: Frame[] = [
+  { head: [72, 46], neck: [68, 57], hip: [60, 102], back: CLINCH_BACK, front: CLINCH_FRONT, backLeg: STANCE.backLeg, frontLeg: { k: [82, 130], a: [90, 160], toe: [100, 163] }, wind: 0 },
+  { head: [74, 48], tilt: 6, neck: [70, 59], hip: [64, 102], back: CLINCH_BACK, front: CLINCH_FRONT, backLeg: { k: [84, 108], a: [64, 128], toe: [70, 134] }, frontLeg: PLANTED, wind: 1, kickFront: true },
+  {
+    head: [76, 50],
+    tilt: 10,
+    neck: [72, 61],
+    hip: [66, 102],
+    back: CLINCH_BACK,
+    front: CLINCH_FRONT,
+    backLeg: { k: [104, 90], a: [84, 114], toe: [90, 120] },
+    frontLeg: PLANTED,
+    wind: 2,
+    kickFront: true,
+    fx: [{ kind: 'spark', at: [108, 86], r: 10 }],
+  },
+  { head: [72, 46], neck: [68, 57], hip: [62, 102], back: CLINCH_BACK, front: CLINCH_FRONT, backLeg: { k: [70, 128], a: [56, 156], toe: [64, 160] }, frontLeg: { k: [80, 130], a: [88, 160], toe: [98, 163] }, wind: 3 },
+]
+
+// The throw: both hands reach and grab, pull him in, heave him up and over, then lean in after him.
+const THROW_FRAMES: Frame[] = [
+  {
+    head: [74, 48],
+    neck: [70, 58],
+    hip: [60, 103],
+    back: { s: [64, 64], e: [88, 68], h: [108, 70], hand: 'palm' },
+    front: { s: [74, 64], e: [96, 66], h: [114, 66], hand: 'palm' },
+    backLeg: STANCE.backLeg,
+    frontLeg: { k: [86, 130], a: [94, 160], toe: [104, 163] },
+    wind: 0,
+  },
+  {
+    head: [64, 50],
+    tilt: 6,
+    neck: [62, 60],
+    hip: [58, 104],
+    back: { s: [56, 66], e: [72, 74], h: [90, 66], hand: 'fist' },
+    front: { s: [68, 65], e: [84, 70], h: [98, 62], hand: 'fist' },
+    backLeg: { k: [44, 134], a: [30, 160], toe: [39, 163] },
+    frontLeg: { k: [80, 132], a: [88, 160], toe: [98, 163] },
+    wind: 1,
+  },
+  {
+    head: [56, 44],
+    tilt: -14,
+    neck: [57, 55],
+    hip: [60, 102],
+    back: { s: [52, 62], e: [60, 40], h: [76, 24], hand: 'fist' },
+    front: { s: [64, 61], e: [78, 40], h: [92, 26], hand: 'fist' },
+    backLeg: { k: [48, 132], a: [38, 160], toe: [47, 163] },
+    frontLeg: { k: [78, 130], a: [86, 160], toe: [96, 163] },
+    wind: 2,
+  },
+  {
+    head: [80, 52],
+    tilt: 12,
+    neck: [75, 62],
+    hip: [62, 104],
+    back: { s: [68, 68], e: [86, 84], h: [104, 92], hand: 'palm' },
+    front: { s: [78, 68], e: [96, 82], h: [112, 90], hand: 'palm' },
+    backLeg: { k: [44, 134], a: [28, 160], toe: [36, 164] },
+    frontLeg: { k: [88, 132], a: [96, 160], toe: [106, 163] },
+    wind: 3,
+  },
+]
+
+// The jump in: a crouch, the tuck in the air, the flying kick down at him, the landing. The scene lifts the
+// whole figure along a jump arc; the frames are the body's shape in the air.
+const JUMP_FRAMES: Frame[] = [
+  { ...shift(STANCE, 0, 8), wind: 0 },
+  {
+    head: [66, 40],
+    neck: [63, 51],
+    hip: [60, 92],
+    back: { s: [56, 58], e: [50, 74], h: [60, 80], hand: 'fist' },
+    front: { s: [68, 57], e: [80, 66], h: [82, 54], hand: 'fist' },
+    backLeg: { k: [56, 114], a: [44, 126], toe: [50, 132] },
+    frontLeg: { k: [80, 110], a: [70, 128], toe: [78, 132] },
+    wind: 1,
+  },
+  {
+    head: [60, 40],
+    tilt: -8,
+    neck: [58, 51],
+    hip: [62, 94],
+    back: { s: [54, 58], e: [44, 70], h: [50, 80], hand: 'fist' },
+    front: { s: [66, 57], e: [76, 64], h: [74, 50], hand: 'fist' },
+    backLeg: { k: [60, 118], a: [48, 130], toe: [54, 136] },
+    frontLeg: { k: [88, 116], a: [112, 132], toe: [118, 128] },
+    wind: 2,
+    kickFront: true,
+  },
+  { ...shift(STANCE, 0, 6), wind: 3 },
+]
+
+// The juggle: kept in the air by each hit, a spark where it lands.
+const JUGGLE_FRAMES: Frame[] = [
+  { ...AIRBORNE, wind: 0, fx: [{ kind: 'spark', at: [56, 104], r: 12 }] },
+  { ...AIRBORNE, tilt: -60, wind: 1 },
+  { ...AIRBORNE, tilt: -66, wind: 2 },
+  { ...AIRBORNE, tilt: -70, wind: 3 },
+]
+
+// Dizzy: slumped on his feet, the head lolling, the arms hanging, stars circling over his head.
+const DIZZY: Frame = {
+  head: [60, 52],
+  tilt: 14,
+  neck: [60, 62],
+  hip: [58, 104],
+  back: { s: [54, 69], e: [50, 90], h: [52, 108], hand: 'palm' },
+  front: { s: [66, 68], e: [70, 90], h: [72, 108], hand: 'palm' },
+  backLeg: { k: [48, 134], a: [40, 160], toe: [49, 163] },
+  frontLeg: { k: [70, 134], a: [74, 160], toe: [83, 163] },
+  wind: 0,
+}
+
+const DIZZY_FRAMES: Frame[] = [0, 1, 2, 3].map((phase) => ({
+  ...shift(DIZZY, phase % 2 === 0 ? -2 : 2, 0),
+  tilt: phase % 2 === 0 ? 10 : 18,
+  wind: phase,
+  fx: [{ kind: 'stars', at: [60, 26], phase }],
+}))
+
+// The wall splat: thrown back flat against the edge of the arena behind him, arms spread, then sliding
+// down it to sit slumped at its foot.
+const SPLAT: Frame = {
+  head: [30, 44],
+  tilt: -10,
+  neck: [32, 55],
+  hip: [32, 102],
+  back: { s: [28, 62], e: [14, 52], h: [8, 38], hand: 'palm' },
+  front: { s: [38, 62], e: [48, 48], h: [46, 32], hand: 'palm' },
+  backLeg: { k: [30, 132], a: [26, 160], toe: [35, 163] },
+  frontLeg: { k: [40, 132], a: [44, 160], toe: [53, 163] },
+  wind: 0,
+  stream: true,
+}
+
+const SPLAT_FRAMES: Frame[] = [
+  { ...SPLAT, fx: [{ kind: 'spark', at: [22, 70], r: 14 }] },
+  { ...SPLAT, wind: 1, fx: [{ kind: 'spark', at: [22, 70], r: 10 }] },
+  {
+    ...SPLAT,
+    head: [32, 72],
+    neck: [33, 83],
+    hip: [34, 128],
+    back: { s: [29, 90], e: [16, 98], h: [12, 112], hand: 'palm' },
+    front: { s: [39, 90], e: [48, 102], h: [52, 116], hand: 'palm' },
+    backLeg: { k: [52, 140], a: [40, 160], toe: [49, 163] },
+    frontLeg: { k: [58, 138], a: [56, 160], toe: [65, 163] },
+    wind: 2,
+  },
+  {
+    ...SPLAT,
+    head: [34, 100],
+    tilt: 16,
+    neck: [34, 110],
+    hip: [36, 150],
+    back: { s: [30, 118], e: [22, 134], h: [20, 150], hand: 'palm' },
+    front: { s: [40, 118], e: [50, 134], h: [56, 148], hand: 'palm' },
+    backLeg: { k: [60, 140], a: [76, 158], toe: [84, 160] },
+    frontLeg: { k: [64, 136], a: [82, 156], toe: [90, 158] },
+    wind: 3,
+  },
 ]
 
 const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
@@ -519,6 +739,15 @@ const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
   hurt: HURT_FRAMES,
   parry: PARRY_FRAMES,
   down: DOWN_FRAMES,
+  guard: GUARD_FRAMES,
+  strong: STRONG_FRAMES,
+  roundhouse: KICK_FRAMES,
+  throw: THROW_FRAMES,
+  knee: KNEE_FRAMES,
+  jump: JUMP_FRAMES,
+  juggle: JUGGLE_FRAMES,
+  dizzy: DIZZY_FRAMES,
+  splat: SPLAT_FRAMES,
 }
 
 // Each profession's action, done the way this hero would: the System Engineer throws the ki blast

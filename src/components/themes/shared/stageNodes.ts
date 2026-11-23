@@ -40,3 +40,9 @@ export function frames(node: Element | null, first: string): (frame: string) => 
     shown = frame
   }
 }
+
+/**
+ * The camera pushed in `zoom` times on the canvas point (x, y), as an SVG transform for a group that holds a
+ * plane's art: that point stays where it is on screen and the rest of the picture grows away from it.
+ */
+export const focusOn = (x: number, y: number, zoom: number): string => `translate(${r1(x * (1 - zoom))} ${r1(y * (1 - zoom))}) scale(${zoom.toFixed(3)})`
