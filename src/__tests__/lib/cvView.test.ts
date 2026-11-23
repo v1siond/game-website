@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData, type Job, type Project } from '@/lib/cv/content'
-import { viewFor, yearOf } from '@/lib/cv/cvView'
+import { venturesFor, viewFor, yearOf } from '@/lib/cv/cvView'
 
 // The real Decap files, so every fixture has the shape and the strings the page reads. They are read
 // once at load, so no test waits on the disk; each test still builds its own CV from them.
@@ -82,7 +82,7 @@ describe('viewFor: the recruiter hero', () => {
 })
 
 describe('viewFor: System Engineer', () => {
-  it('lists jobs, projects, the tech stack and the companies, and nothing of the other professions', () => {
+  it('lists jobs, projects, the tech stack and the ventures, and nothing of the other professions', () => {
     const cv = realCV()
     const view = viewFor(cv, 'engineer', 'full', NOW)
     const sections = engineerOf(view)
@@ -90,7 +90,7 @@ describe('viewFor: System Engineer', () => {
     expect(sections.jobs.length).toBe(cv.workExperience.length)
     expect(ids(sections.projects).sort()).toEqual(ids(cv.projects).sort())
     expect(sections.techStack).toEqual(cv.techStack)
-    expect(sections.companies).toEqual(cv.companies)
+    expect(sections.companies).toEqual(venturesFor(cv.companies))
     expect(sections.services).toEqual(cv.services)
     expect(Object.keys(sections).sort()).toEqual(['companies', 'jobs', 'profession', 'projects', 'services', 'techStack'])
   })
@@ -131,11 +131,11 @@ describe('viewFor: System Engineer', () => {
     expect(ids(sections.companies)).toEqual(['nebulith', 'sillabo', 'dba', 'pmx', 'grctechme'])
   })
 
-  it('shows the five ventures of companies.json with Nebulith and Sillabo first, the only featured ones', () => {
+  it('shows only the three ventures he named, Sillabo and Nebulith first, the only featured ones', () => {
     const { companies } = engineerOf(viewFor(realCV(), 'engineer', 'world', NOW))
 
-    expect(ids(companies)).toEqual(['nebulith', 'sillabo', 'dba', 'pmx', 'grctechme'])
-    expect(companies.filter((company) => company.featured).map((company) => company.id)).toEqual(['nebulith', 'sillabo'])
+    expect(ids(companies)).toEqual(['sillabo', 'nebulith', 'insuradmin'])
+    expect(companies.filter((company) => company.featured).map((company) => company.id)).toEqual(['sillabo', 'nebulith'])
   })
 })
 
