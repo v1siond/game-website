@@ -2,7 +2,7 @@ import { forwardRef } from 'react'
 import type { Pose } from './motion'
 import { FIGURE } from './palette'
 
-// The runner: him as an original bandicoot styled hero, running down the corridor ahead of the camera, seen
+// The runner: him as an original orange furred hero, running down the corridor ahead of the camera, seen
 // from behind. Orange fur, two upright pointed ears and his dark hair as the spiky tuft on top; rolled
 // jeans and red high tops; brown fingerless gloves; a small chrono pack on his back whose ring glows in the
 // colour of the era he is in. When he stops to act at a prop (and in the hub) he turns his head to the
@@ -130,7 +130,21 @@ export const Runner = forwardRef<SVGSVGElement>(function Runner(_, ref) {
       focusable="false"
       className="block overflow-visible"
     >
+      <g data-f="boulder" opacity={0}>
+        <g data-f="boulderRoll">
+          <path d="M -150 -300 Q -40 -372 80 -350 Q 172 -300 168 -190 Q 176 -80 90 -26 Q -20 18 -120 -30 Q -182 -100 -174 -200 Q -178 -262 -150 -300 Z" fill={FIGURE.boulder} stroke={LINE} strokeWidth={6} />
+          <path d="M -110 -250 L -60 -210 L -80 -150 M 40 -300 L 70 -240 L 130 -220 M -20 -120 L 30 -80" fill="none" stroke={LINE} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+        <ellipse cx={40} cy={-120} rx={120} ry={90} fill={FIGURE.boulderShade} opacity={0.45} />
+        <ellipse cx={-70} cy={-280} rx={46} ry={20} fill={FIGURE.boulderLit} opacity={0.6} transform="rotate(-24 -70 -280)" />
+      </g>
       <ellipse data-f="shadow" cx={0} cy={4} rx={70} ry={14} fill="#000" opacity={0.5} />
+      <g data-f="board" opacity={0}>
+        <path d="M -96 -2 Q -100 -18 -80 -20 H 80 Q 100 -18 96 -2 Q 90 8 70 8 H -70 Q -90 8 -96 -2 Z" fill={FIGURE.board} stroke={LINE} strokeWidth={3} />
+        <path d="M -70 -10 H 70" stroke={FIGURE.boardStripe} strokeWidth={4} strokeLinecap="round" />
+        <ellipse cx={-50} cy={14} rx={26} ry={6} className="np-pack-halo" />
+        <ellipse cx={50} cy={14} rx={26} ry={6} className="np-pack-halo" />
+      </g>
       <g data-f="root">
         <Leg side="L" hip={HIP_L} />
         <Leg side="R" hip={HIP_R} />
@@ -186,4 +200,9 @@ export function applyPose(parts: RunnerParts, pose: Pose): void {
   // Facing the camera he shows his chest; from behind, the chrono pack on his back.
   parts.chest.setAttribute('opacity', pct(pose.look))
   parts.pack.setAttribute('opacity', pct(1 - pose.look))
+  parts.board.setAttribute('opacity', pct(pose.board))
+  parts.boulder.setAttribute('opacity', pct(Math.min(1, pose.boulder * 4)))
+  // The boulder grows as it closes in on him and rolls as it comes.
+  set('boulder', `translate(0 -190) scale(${pct(0.6 + 0.4 * pose.boulder)}) translate(0 190)`)
+  set('boulderRoll', `rotate(${r1(pose.boulder * 540)} 0 -190)`)
 }

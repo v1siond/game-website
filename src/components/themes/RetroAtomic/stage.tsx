@@ -30,10 +30,10 @@ const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
 export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG)
 
-/** A layer's plane; its art sits in the camera's group (data-fx="cam-<layer>"), which a scene pushes in. */
+/** A layer's plane, marked data-fx="cam-<layer>" for the camera a scene pushes in (scenes.tsx). */
 const plane = (name: string, children: ReactNode): ReactNode => (
-  <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
-    <g data-fx={`cam-${name}`}>{children}</g>
+  <svg data-fx={`cam-${name}`} viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
+    {children}
   </svg>
 )
 

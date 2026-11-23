@@ -9,7 +9,7 @@ export type RoomId = SectionId | 'contact'
 
 export type PropKind = 'shard' | 'checkpoint' | 'ironCrate' | 'pylon' | 'crate' | 'socket' | 'speaker' | 'bag' | 'beacon'
 
-export type Action = 'reach' | 'cheer' | 'spin' | 'jump' | 'drum' | 'kick' | 'wave'
+export type Action = 'smash' | 'ride' | 'flop' | 'slide' | 'chase' | 'bounce' | 'drum' | 'boss' | 'dance'
 
 export interface RoomPlan {
   era: Era
@@ -20,15 +20,15 @@ export interface RoomPlan {
 }
 
 export const ROOM_PLAN: Record<RoomId, RoomPlan> = {
-  about: { era: 'observatory', prop: 'shard', action: 'reach', door: false },
-  work: { era: 'speedway', prop: 'checkpoint', action: 'cheer', door: false },
-  tech: { era: 'forge', prop: 'ironCrate', action: 'spin', door: false },
-  services: { era: 'relay', prop: 'pylon', action: 'reach', door: false },
-  projects: { era: 'sands', prop: 'crate', action: 'jump', door: false },
-  ventures: { era: 'keystone', prop: 'socket', action: 'jump', door: true },
+  about: { era: 'observatory', prop: 'shard', action: 'smash', door: false },
+  work: { era: 'speedway', prop: 'checkpoint', action: 'ride', door: false },
+  tech: { era: 'forge', prop: 'ironCrate', action: 'flop', door: false },
+  services: { era: 'relay', prop: 'pylon', action: 'slide', door: false },
+  projects: { era: 'sands', prop: 'crate', action: 'chase', door: false },
+  ventures: { era: 'keystone', prop: 'socket', action: 'bounce', door: true },
   bands: { era: 'arena', prop: 'speaker', action: 'drum', door: false },
-  muayThai: { era: 'pavilion', prop: 'bag', action: 'kick', door: false },
-  contact: { era: 'beacon', prop: 'beacon', action: 'wave', door: false },
+  muayThai: { era: 'pavilion', prop: 'bag', action: 'boss', door: false },
+  contact: { era: 'beacon', prop: 'beacon', action: 'dance', door: false },
 }
 
 export const HUB_ERA: Era = 'hub'

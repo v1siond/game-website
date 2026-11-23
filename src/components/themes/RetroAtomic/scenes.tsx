@@ -4,7 +4,7 @@ import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import type { Labels } from '@/lib/cv/labels'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, focusOn, fx, lerp, r1, transformTo } from '../shared/stageNodes'
+import { clamp01, fadeTo, fx, lerp, r1, transformTo } from '../shared/stageNodes'
 import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { DoorArt } from './shelterDoor'
 import { DogFigure, PACK } from './dog'
@@ -155,11 +155,26 @@ function station(xs: readonly number[], f: number, offset: number, run: number):
 
 // ---------------------------------------------------------------- the camera and the freeze
 
-/** The camera of the scene: every plane's art (stage.tsx wraps each in data-fx="cam-<layer>") pushed in on
- *  one point. */
+// One canvas unit on screen: the planes cover the screen sliced from the 1440 by 900 canvas (stage.tsx).
+const UNIT = 'max(100vw / 1440, 100vh / 900)'
+
+/** The canvas point (x, y) on its plane as a CSS transform origin: the canvas sits centred across and on the
+ *  bottom edge. */
+const originOf = (x: number, y: number): string => `calc(50% + ${r1(x - 720)} * ${UNIT}) calc(100% - ${r1(900 - y)} * ${UNIT})`
+
+/** The camera of the scene: every plane (stage.tsx marks each data-fx="cam-<layer>") pushed in on one point. A
+ *  CSS scale on the plane, so the push is composited rather than the planes redrawn each frame. */
 function cameraWriter(stage: StageNodes): (x: number, y: number, zoom: number) => void {
-  const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`))
-  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, focusOn(x, y, zoom)))
+  const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`) as SVGElement | null)
+  return (x, y, zoom) => {
+    const pushed = zoom > 1
+    planes.forEach((plane) => {
+      if (!plane) return
+      plane.style.transformOrigin = originOf(x, y)
+      plane.style.transform = pushed ? `scale(${zoom.toFixed(3)})` : ''
+      plane.style.willChange = pushed ? 'transform' : ''
+    })
+  }
 }
 
 // How far the camera pushes in on the target for the slow shot.
