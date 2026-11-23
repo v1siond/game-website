@@ -29,12 +29,12 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
       <svg viewBox="0 0 200 100" preserveAspectRatio="none" className={`absolute -inset-x-3 -inset-y-2 h-[calc(100%+1rem)] w-[calc(100%+1.5rem)] ${page.jag}`} aria-hidden="true" focusable="false">
         <path d={JAG} fill={NOIR.red} />
       </svg>
-      <span className={`relative flex w-full flex-col items-center ${page.slab} px-1 pb-2 pt-3 sm:px-2`}>
+      <span className={`relative flex w-full flex-col items-center ${page.slab} px-2 pb-3 pt-3 sm:px-3`}>
         {/* the picked slab's figure is the one the wardrobe names */}
         <span data-worlds-figure={selected ? '' : undefined} className={`block ${page.unskew}`}>
           <Detective profession={id} className={`h-24 w-16 sm:h-32 sm:w-20 ${page.redShadow}`} />
         </span>
-        <span className={`mt-1 block text-center text-base uppercase leading-tight tracking-wider sm:text-2xl ${page.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
+        <span className={`mt-1 block px-1 text-center text-base uppercase leading-tight tracking-wider sm:text-2xl ${page.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
           {label}
         </span>
       </span>

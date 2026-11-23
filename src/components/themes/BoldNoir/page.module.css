@@ -8,7 +8,7 @@
 .root {
   --snap: cubic-bezier(0.34, 1.56, 0.64, 1);
   --cut: cubic-bezier(0.7, 0, 0.2, 1);
-  --crook: polygon(0 2%, 100% 0, 98.5% 100%, 1.2% 97%);
+  --crook: polygon(0 8px, 100% 0, calc(100% - 8px) 100%, 6px calc(100% - 10px));
   /* The keyboard focus ring (globals.css) in the one loud red, and the paper halo just outside it, so the
      pair stands out where the ring melts into a surface. */
   --focus-ring: var(--noir-red);
@@ -118,11 +118,6 @@
   border: 3px solid var(--noir-paper);
   background: var(--noir-ink);
   color: var(--noir-paper);
-}
-
-/* the years stamped crooked on a job's corner */
-.stamp {
-  transform: rotate(-6deg);
 }
 
 .lift {

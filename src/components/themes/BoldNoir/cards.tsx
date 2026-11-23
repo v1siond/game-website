@@ -20,11 +20,12 @@ import page from './page.module.css'
 const BODY = `text-sm text-[color:var(--noir-paper-dim)] ${page.copy}`
 const CHIP = `px-2 py-0.5 text-sm font-bold ${page.chip} ${page.copy}`
 
-// Three crooked outlines the cards take in turn, so no two neighbours share their slant.
+// Three crooked outlines the cards take in turn, so no two neighbours share their slant. The cut is in px,
+// so a tall card slants as little as a short one and its words stay inside the paper edge.
 const CROOKS = [
-  'polygon(0 2%, 100% 0, 98.5% 100%, 1.2% 97%)',
-  'polygon(1.5% 0, 99% 3%, 100% 96%, 0 100%)',
-  'polygon(0 0, 98% 2.5%, 100% 100%, 2% 97.5%)',
+  'polygon(0 8px, 100% 0, calc(100% - 8px) 100%, 6px calc(100% - 10px))',
+  'polygon(8px 0, calc(100% - 6px) 10px, 100% calc(100% - 12px), 0 100%)',
+  'polygon(0 0, calc(100% - 10px) 8px, 100% 100%, 10px calc(100% - 8px))',
 ]
 
 /** The tilt a card rests at on hover and its crooked outline, by its place in its list. */
@@ -56,7 +57,7 @@ export function TechSlab({ category, index }: { category: CVData['techStack'][nu
   )
 }
 
-// A job as a rank card: the years stamped on its corner in big tilted calendar digits. A phone card is
+// A job as a rank card: the years stamped on its corner in big calendar digits on the red. A phone card is
 // too narrow for the title to run beside the stamp, so there the title starts below it.
 export function RankCard({ entry, index }: { entry: Job; index: number }) {
   const { cards, years } = useLabels()
@@ -65,7 +66,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
   return (
     <article className={`p-6 pt-14 sm:pt-9 ${page.slab} ${page.lift}`} style={crookOf(index)}>
       <p className="absolute -top-1 right-4">
-        <span className={`block bg-[color:var(--noir-red-plate)] px-4 py-2 text-2xl text-[color:var(--noir-paper)] ${page.stamp}`}>{job.years}</span>
+        <span className="block bg-[color:var(--noir-red-plate)] px-4 py-2 text-2xl text-[color:var(--noir-paper)]">{job.years}</span>
       </p>
       <h3 className="text-3xl leading-none tracking-wide">{job.title}</h3>
       <p className={`mt-1 text-sm font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${page.copy}`}>
