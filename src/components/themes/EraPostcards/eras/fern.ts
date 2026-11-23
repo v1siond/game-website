@@ -8,11 +8,12 @@ import { ease, peakOf, reached, type Era } from './era'
 // the era, drops onto a stack at his feet. On the last one he turns the phone on himself for a selfie with
 // the long neck behind him, and the neck turns to the flash.
 
-const AT = { x: 760, y: 884, scale: 1.25 } as const
+// Right of the cards' column at 1440, so no card covers him.
+const AT = { x: 900, y: 884, scale: 1.25 } as const
 
 // Where the phone is at the top of the aim, and the stack the photos land on, in the layer.
-const PHONE_AT = [836, 716] as const
-const stackAt = (i: number): readonly [number, number, number] => [900 + (i % 3) * 14, 900 - i * 5, ((i * 37) % 15) - 7]
+const PHONE_AT = [AT.x + 76, 716] as const
+const stackAt = (i: number): readonly [number, number, number] => [AT.x + 140 + (i % 3) * 14, 900 - i * 5, ((i * 37) % 15) - 7]
 
 const STANDING: Partial<Pose> = { ...AT, shF: 14, elF: 30, shB: -8, elB: 12, head: 0 }
 const AIM: Partial<Pose> = { ...AT, shF: 96, elF: 18, shB: 8, elB: 26, head: -4, lean: 2 }
@@ -84,7 +85,7 @@ const photoAt = (f: number, i: number): readonly [number, number, number] => {
 }
 
 // The rock he stands on.
-const ROCK = `<path d="M690,${AT.y + 26} Q700,${AT.y - 6} 760,${AT.y - 4} Q822,${AT.y - 8} 836,${AT.y + 26} Z" fill="${FERN.rock}" stroke="${FERN.rockEdge}" stroke-width="3"/>`
+const ROCK = `<path d="M${AT.x - 70},${AT.y + 26} Q${AT.x - 60},${AT.y - 6} ${AT.x},${AT.y - 4} Q${AT.x + 62},${AT.y - 8} ${AT.x + 76},${AT.y + 26} Z" fill="${FERN.rock}" stroke="${FERN.rockEdge}" stroke-width="3"/>`
 
 export const fern: Era = {
   build: ({ count }) => {

@@ -82,11 +82,12 @@ const huntAt = (f: number, count: number): [number, number] => {
   return [x, y - 60]
 }
 
-// The gaps in the wall he hurdles, one per project, along the run.
+// The gaps in the wall he hurdles, one per project, along the run; drawn cleared (the settled frame) and
+// opened by the writer for the ones still ahead of him.
 const gaps = (count: number): string =>
   Array.from({ length: count }, (_, i) => {
     const { x, y, scale } = placeOf(Math.min(1, (i + 0.5) / Math.max(1, count - 0.6)))
-    return `<ellipse cx="${r1(x + 40 * scale)}" cy="${r1(y + 4)}" rx="${r1(34 * scale)}" ry="${r1(7 * scale)}" fill="${WALL.gap}"/>`
+    return `<ellipse data-fx="gap-${i}" opacity="0" cx="${r1(x + 40 * scale)}" cy="${r1(y + 4)}" rx="${r1(34 * scale)}" ry="${r1(7 * scale)}" fill="${WALL.gap}"/>`
   }).join('')
 
 export const wall: Era = {
@@ -118,10 +119,13 @@ export const wall: Era = {
   bind: (stage, { count }) => {
     const j = joints(stage)
     const lit = Array.from({ length: STARS }, (_, k) => fx(stage, `star-${k}`))
+    const gapNodes = Array.from({ length: count }, (_, i) => fx(stage, `gap-${i}`))
     const [petals, search, getaway, hull] = ['petals', 'search', 'getaway', 'getaway-hull'].map((name) => fx(stage, name))
     return (p, f) => {
       tf(petals, `translate(${r1(-p * 500)} ${r1(p * 420)})`)
       lit.forEach((node, k) => fade(node, starLit(f, count, k)))
+      // A gap he has cleared closes behind him, so only the ones ahead show.
+      gapNodes.forEach((node, i) => fade(node, 1 - reached(f, i)))
       const leap = leapOf(f, count)
       search?.setAttribute('d', beamTo(huntAt(f, count)))
       fade(search, 0.35 * (1 - leap) * Math.min(1, p * 6))
