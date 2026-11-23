@@ -177,7 +177,9 @@ export default function MedievalFantasyTheme() {
           </div>
 
           {/* Profession Selector - REALM Style Command Card */}
-          <section aria-label={navigation.professionSelection} style={{
+          {/* From lg to xl the outfit fan opens down over the right of the header: the row is drawn 2rem lower so
+              its right node stays clear of the fan (C38 at 1024 by 768). */}
+          <section aria-label={navigation.professionSelection} className="lg:max-xl:top-8" style={{
             marginBottom: sectionSpacing,
             position: 'relative',
             height: isLargeScreen ? '12rem' : '9rem',

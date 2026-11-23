@@ -14,7 +14,6 @@ import { FrostLand } from './frostZone'
 import { GolemRise, RISEN, ROCK_COUNT, riseWriter } from './golem'
 import { King, KING_BLADE_AT, KING_FEET, KING_HAND_AT } from './hero'
 import { REALM } from './palette'
-import { REALM_OF } from './sections'
 import {
   AuraRing,
   Barracks,
@@ -205,7 +204,7 @@ const hero: SceneSpec = {
       <g data-fx="golem-at" transform={golemAt(HERO.golem, HERO.golemSize)}>
         <GolemRise id={`golem-${scene.id}`} />
       </g>
-      <KingUnit x={HERO.king} />
+      <KingUnit x={HERO.king} figure={scene.figure} />
     </>
   ),
   bind: (stage) => {
@@ -513,7 +512,7 @@ const projects: SceneSpec = {
       }
     }
   },
-  peak: (count) => ({ progress: SETTLED_PROGRESS, reached: count - 1 + 0.55 }),
+  peak: (count) => ({ progress: SETTLED_PROGRESS, reached: count - 1 + 0.62 }),
 }
 
 // Ventures, claiming the mines: per venture he orders a dead worker to a gold mine, the worker walks to it and the
@@ -683,7 +682,8 @@ export interface RealmScene extends TheatreScene {
   id: SceneId
   slot: SectionSlot | null
   realm: Realm
-  /** This stage's king is the world's figure (data-worlds-figure): the first frost stage only. */
+  /** This stage's king is the world's figure (data-worlds-figure): the hero's only, the one on screen at first
+   *  paint at every width. */
   figure: boolean
 }
 
@@ -710,11 +710,10 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, figure: b
 
 /** The page's scenes in order: the hero, the profession's sections, the contact. */
 export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[]): RealmScene[] {
-  const firstFrost = slots.find((slot) => REALM_OF[slot.id] === 'frost')?.id ?? 'contact'
   return [
-    sceneOf('hero', null, 0, false),
-    ...slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, labels, highlights), slot.id === firstFrost)),
-    sceneOf('contact', null, 0, firstFrost === 'contact'),
+    sceneOf('hero', null, 0, true),
+    ...slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, labels, highlights), false)),
+    sceneOf('contact', null, 0, false),
   ]
 }
 

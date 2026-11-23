@@ -36,6 +36,6 @@
 /* The contact's call and the footer stand on the frost land, no frame of their own: a plate of the realm's
    void under them keeps the lettering at AAA over the brightest ice behind. */
 .plate {
-  background: color-mix(in srgb, var(--realm-bg-void) 94%, transparent);
+  background: color-mix(in srgb, var(--realm-bg-void) 97%, transparent);
   border-radius: 4px;
 }
