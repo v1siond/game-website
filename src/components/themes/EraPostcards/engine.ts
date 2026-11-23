@@ -27,7 +27,7 @@ const TEXT_REST_PX = 0.5
 const READ_LINE = 0.62
 // On a phone the layers zoom and lift this share of the desktop motion.
 const PHONE_MOTION = 0.6
-// The hero's whole stage shrinks by this much over the first screen (the Rockstar hero), more on a phone.
+// The hero's whole stage shrinks by this much over the first screen, more on a phone.
 const HERO_SHRINK = 0.1
 const HERO_SHRINK_PHONE = 0.15
 

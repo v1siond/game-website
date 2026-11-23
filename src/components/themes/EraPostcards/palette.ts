@@ -113,7 +113,7 @@ export const HUB = {
   nightGround: '#02010a',
 } as const
 
-/** About: the fern age at dawn, the volcano, the long neck, the rune stones. */
+/** About: the fern age at dawn, the volcano, the long neck, his phone and the photos it takes. */
 export const FERN = {
   skyTop: '#1a0a30',
   skyMid: '#5e1a4c',
@@ -137,11 +137,13 @@ export const FERN = {
   ground: '#1a0818',
   groundEdge: '#ff9a5a',
   fern: '#0d040c',
-  stone: '#3b2a3a',
-  stoneEdge: '#120814',
-  rune: '#ffcf5a',
-  runeGlow: '#ffd27a',
-  runeGlowEdge: '#ff7a3d',
+  rock: '#2e1428',
+  rockEdge: '#120814',
+  phone: '#0d0a14',
+  screen: '#7fd6ff',
+  flash: '#fff6d8',
+  postcard: '#f4ead8',
+  postcardEdge: '#a8886a',
 } as const
 
 /** Work: the desert highway, 1957, the hover bike and the mile signs. */
@@ -198,15 +200,16 @@ export const TOMB = {
   goldDim: '#c99a3c',
   columnNear: '#3b200d',
   columnMid: '#331a0b',
-  tablet: '#2a1608',
+  vault: '#3a2410',
+  vaultEdge: '#d9a441',
+  vaultLight: '#ffe7a3',
+  ring: '#7a5a26',
   glyph: '#5ff2d8',
+  rope: '#c9a06a',
+  guardLight: '#ffe7a3',
   mote: '#ffe7a3',
-  torchGlow: '#ffb02e',
   frame: '#120803',
   sand: '#e8b866',
-  stick: '#6b4423',
-  flame: '#ffb02e',
-  flameCore: '#fff3c4',
 } as const
 
 /** The far columns of the tomb, darkest at the back: one shade per depth step. */
@@ -245,7 +248,7 @@ export const MARKET = {
   awningEdge: '#ffcf6a',
 } as const
 
-/** Projects: the long wall at sunset, its towers and the crates on the walkway. */
+/** Projects: the long wall at sunset, its towers, the searchlight and the wanted stars of the chase. */
 export const WALL = {
   skyTop: '#26093f',
   skyMid: '#86164e',
@@ -264,15 +267,11 @@ export const WALL = {
   merlon: '#4a1a28',
   merlonLit: '#ff9a6b',
   walkEdge: '#ffb07a',
-  crate: '#b8702a',
-  crateEdge: '#4a2608',
-  crateBrace: '#7a4214',
-  lid: '#d38a3c',
-  burst: '#fff2b0',
-  burstMid: '#ffb02e',
-  burstEdge: '#ff7a3d',
-  gem: '#7af5ff',
-  gemEdge: '#ffffff',
+  gap: '#0c0310',
+  star: '#ffd36b',
+  starOff: '#3a1430',
+  starEdge: '#2a0a26',
+  search: '#fff2b0',
   branch: '#14030f',
   petal: '#ffb3cf',
 } as const

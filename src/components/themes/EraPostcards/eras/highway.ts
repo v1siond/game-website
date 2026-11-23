@@ -22,20 +22,20 @@ const cacti = Array.from({ length: 10 }, (_, i) => {
 const dashes = Array.from({ length: 40 }, (_, i) => `<rect x="${i * 160}" y="872" width="80" height="8" rx="3" fill="${HIGHWAY.roadDash}"/>`).join('')
 
 // The saddle under his hips (about 838,768) and the wheel at his hands (about 930,747) for the RIDE pose.
-const cockpit = `<g data-fx="bike-cockpit">
+export const cockpit = `<g data-fx="bike-cockpit">
   <path d="M942,750 L984,810" stroke="${HIGHWAY.wheel}" stroke-width="9" stroke-linecap="round"/>
   <ellipse cx="934" cy="744" rx="8" ry="25" transform="rotate(-24 934 744)" fill="none" stroke="${HIGHWAY.wheel}" stroke-width="7"/>
   <ellipse cx="934" cy="744" rx="8" ry="25" transform="rotate(-24 934 744)" fill="none" stroke="${HIGHWAY.bikeShine}" stroke-width="1.5" opacity="0.6"/>
   <path d="M796,808 L804,780 Q810,766 836,766 L866,768 Q878,770 876,782 L870,808 Z" fill="${HIGHWAY.seat}" stroke="${HIGHWAY.bikeEdge}" stroke-width="3"/>
   <path d="M812,772 Q836,768 864,772" stroke="${HIGHWAY.seatShine}" stroke-width="3" stroke-linecap="round" fill="none"/></g>`
 
-const bike = `<g data-fx="bike-hull">
+export const bike = `<g data-fx="bike-hull">
   ${glow('wk-thrust', 690, 860, 90, HIGHWAY.thrust, 0.8)}
   <path d="M700,850 Q720,810 790,806 L930,800 Q990,800 1010,830 L1000,856 Q900,868 760,866 Z" fill="${HIGHWAY.bike}" stroke="${HIGHWAY.bikeEdge}" stroke-width="4"/>
   <path d="M780,812 L900,806" stroke="${HIGHWAY.bikeShine}" stroke-width="4" stroke-linecap="round"/>
   <ellipse cx="760" cy="872" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/><ellipse cx="960" cy="868" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/></g>`
 
-const RIDE: Partial<Pose> = { x: 850, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
+export const RIDE: Partial<Pose> = { x: 850, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
 
 // The bob of the bike and its rider on the air cushion.
 const bob = (p: number): number => Math.sin(p * 60) * 3
