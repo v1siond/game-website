@@ -105,6 +105,7 @@ const APPROVED = new Map([
   ['LLM features, agents, chat and voice on Claude or Gemini, from the prototype to production.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
   ['React, Next and Vue interfaces, built to your design and to WCAG AA or AAA.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
   ['I\'ve worked in these markets: carrier feeds and commissions, payment platforms, video learning.', 'C51, his 11-22 20:44 yes to draft.md ("Yes, build both")'],
+  ['Senior Full Stack Developer', 'C51, his 11-22 ~21:20 answer to Round 2 of draft.md (headline "A")'],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()
