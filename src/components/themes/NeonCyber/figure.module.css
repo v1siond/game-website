@@ -1,11 +1,11 @@
 /*
- * The merc's motion (merc.tsx): transform and opacity only, in the snappy stepped timing of the night
- * city HUD. Every part turns round its own joint in the viewBox's units, so a forearm turns at the elbow
- * wherever the shoulder took it. Kit classes set a profession's resting pose, a motion class plays over
- * it. The blades, thrusters, ghost and reticle rest hidden. Hovering him glitches the figure. Every motion
- * plays a bounded number of runs inside 5 s and rests (BD29): on the kit's own pose, or, where the motion
- * holds a look (the sticks on the snare), on its last frame. In the scroll scenes no motion plays: the
- * scene writes every joint itself (pose.ts) over the same origins.
+ * His motion (figure.tsx): transform and opacity only, in the snappy stepped timing of the city's HUD.
+ * Every part turns round its own joint in the viewBox's units, so a forearm turns at the elbow wherever the
+ * shoulder took it. Kit classes set a profession's resting pose, a motion class plays over it. The drawn
+ * blade, the ghost and the glyphs rest hidden; the visor and the deck rest dim. Hovering him glitches the
+ * figure. Every motion plays a bounded number of runs inside 5 s and rests (BD29): on the kit's own pose,
+ * or, where the motion holds a look (the sticks on the snare), on its last frame. In the scroll scenes no
+ * motion plays: the scene writes every joint itself (pose.ts) over the same origins.
  */
 
 .sprite * {
@@ -21,8 +21,8 @@
 .head {
   transform-origin: 50px 42px;
 }
-.optics {
-  transform-origin: 50px 25px;
+.visor {
+  transform-origin: 50px 24px;
 }
 .armRight {
   transform-origin: 32px 48px;
@@ -48,28 +48,19 @@
 .shinLeft {
   transform-origin: 58px 117px;
 }
-.bladeRight {
-  transform-origin: 30px 75px;
-}
-.bladeLeft {
-  transform-origin: 70px 75px;
-}
-.reticle {
-  transform-origin: 87px 24px;
-}
 .shadow {
   transform-origin: 50px 145px;
 }
 
-.bladeRight,
-.bladeLeft {
-  opacity: 0;
-  transform: scale(0.2);
-}
-.thrust,
+.blade,
 .ghost,
-.reticle {
+.glyphs,
+.visor {
   opacity: 0;
+}
+
+.deck {
+  opacity: 0.35;
 }
 
 /* ---------------------------------------------------------------- resting poses per kit */
@@ -155,7 +146,7 @@
   }
 }
 
-/* ---------------------------------------------------------------- System Engineer: jack in and run the quickhack */
+/* ---------------------------------------------------------------- System Engineer: the deck raised, data climbing off it */
 
 .hack .armLeft {
   animation: deck-up 0.5s ease-out both;
@@ -163,17 +154,14 @@
 .hack .foreLeft {
   animation: deck-up-fore 0.5s ease-out both;
 }
-/* the cable and the deck belong to this pose only; anywhere else the deck would float beside him */
-.jack {
-  opacity: 0;
-}
-.hack .jack {
-  opacity: 1;
-}
 .hack .glyphs {
   animation: climb 1s steps(4) 4;
 }
-.hack .optics {
+.hack .deck {
+  opacity: 1;
+}
+
+.hack .visor {
   animation: flare 0.6s steps(2) 8;
 }
 
@@ -187,6 +175,12 @@
     transform: rotate(-50deg);
   }
 }
+@keyframes flare {
+  50% {
+    opacity: 1;
+  }
+}
+
 @keyframes climb {
   from {
     opacity: 1;

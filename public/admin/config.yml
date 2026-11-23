@@ -466,32 +466,13 @@ collections:
                 widget: object
                 i18n: true
                 fields:
-                  - { <<: *text, label: "Scan", name: scan }
-                  - { <<: *text, label: "Stop scan", name: scanStop }
-                  - { <<: *text, label: "Scan hint", name: scanHint }
                   - { <<: *text, label: "Uploading", name: uploading }
                   - { <<: *text, label: "Timeline", name: timeline }
-                  - { <<: *text, label: "Layer", name: layer }
-                  - { <<: *text, label: "Visual layer", name: layerVisual }
-                  - { <<: *text, label: "Audio layer", name: layerAudio }
-                  - { <<: *text, label: "Thermal layer", name: layerThermal }
-                  - { <<: *text, label: "Replay", name: replay }
-                  - { <<: *text, label: "Breach", name: breach }
-                  - { <<: *text, label: "Breach the file of", name: breachOf, hint: 'Keep {project}' }
-                  - { <<: *text, label: "Breach hint", name: breachHint }
-                  - { <<: *text, label: "Code matrix", name: matrix }
-                  - { <<: *text, label: "Buffer", name: buffer }
-                  - { <<: *text, label: "Sequence", name: sequence }
-                  - { <<: *text, label: "Code cell", name: code, hint: 'Keep {code} {row} {column}' }
-                  - { <<: *text, label: "Open now", name: openNow }
+                  - { <<: *text, label: "Decrypt", name: decrypt }
+                  - { <<: *text, label: "Decrypt the file of", name: decryptOf, hint: 'Keep {project}' }
                   - { <<: *text, label: "File open", name: fileOpen }
-                  - { <<: *text, label: "Buffer full", name: bufferFull }
-                  - { <<: *text, label: "Try again", name: retry }
-                  - { <<: *text, label: "Data tab", name: dataTab }
                   - { <<: *text, label: "Incoming call", name: incomingCall }
-                  - { <<: *text, label: "Double jump", name: doubleJump }
-                  - { <<: *text, label: "Scan tag: highlight", name: tagHighlight }
-                  - { <<: *text, label: "Installed (ripperdoc)", name: installed }
+                  - { <<: *text, label: "Tag: highlight", name: tagHighlight }
               - label: Explorer's map world (adventure paths)
                 name: trail
                 widget: object

@@ -2,29 +2,30 @@ import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
-import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Labels } from '@/lib/cv/labels'
 import { ramp } from '@/lib/scroll/stage'
-import { walkAlong } from '@/lib/scroll/walkAlong'
-import { clamp01, fadeTo, fx, lerp, r1, reached, transformTo } from '../shared/stageNodes'
+import { trackAt, trackEase } from '@/lib/scroll/track'
+import { drop, hop } from '@/lib/motion/arc'
+import { handAt, type ArmPivots } from '@/lib/motion/rigPose'
+import { clamp01, fadeTo, focusOn, fx, lerp, r1, spread, transformTo } from '../shared/stageNodes'
 import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import type { District } from './city'
 import { NEON } from './palette'
-import { handAt } from '@/lib/motion/rigPose'
-import { RIGHT_ARM, SIT, STAND, dash, drum, hack, hop, kick, mix, scan, slash, walk, type MercPose } from './pose'
+import { CROUCH, LEAP, SIT, STAND, WIND, cut, deflect, guard, hack, hang, mix, run, takedown, type HeroPose } from './pose'
 
-// Each part of the page as a scene of the night city: its district, his kit, the props it holds (one per
-// card the section counts) and, per frame, what the props and he do at the scene's progress p (0 when its
-// stage starts to rise, 1 when it has sunk) with f of its cards reached (0 to count, fractional).
-// About: he walks a row of holo tags and scans each one. Work: the braindance edit hangs over the street,
-// one clip per job, and he hops on the playhead under each. Tech: one Sandevistan dash with his after
-// images, a data shard snapping lit per category. Services: he double jumps from access point to access
-// point and jacks in, each screen booting. Projects: he breaches a column of ICE per gig, red to green.
-// Ventures: the fixer's contract pins drop on the Badlands road and he cuts each loose with the mantis
-// blades. Bands: the car radio's dial over the street, the needle on each band while he drums the neon
-// snare. Muay Thai: the ripperdoc installs each achievement while he sits in the chair, then he stands and
-// takes the gang punk with the roundhouse. Contact: he sits on his car's rear deck, then drives off into
-// the Badlands. The hero: him in Watson under the overpass, or up on a fire escape landing on a phone.
+// Each part of the page as a scene of the neon city: its district, his kit, the props it holds (one per card
+// the section counts) and, per frame, what the props and he do at the scene's progress p (0 when its stage
+// starts to rise, 1 when it has sunk) with f of its cards reached (0 to count, fractional). One beat per card,
+// each a move of the genre and the answer to it, held at its end (trackAt: a short lead in, then the move):
+// About: he hacks the wall cameras one by one, each lens turning from red to cyan. Work: from behind a crate
+// he takes down each guard who walks past it. Tech: he runs along one lit wall panel per category and leaps
+// the gap to the next, the wall carried past on trackAt. Services: per service his grapple line fires to the
+// next sign anchor and he swings the gap. Projects: each drone fires, his blade turns the bolt back and the
+// drone drops. Ventures: each runner who charges him is held in stasis by his hack. Bands: the heavy walker
+// fires a salvo per band, time slows, he dashes through and cuts its leg, the camera pulled out to frame it.
+// Muay Thai: the duel with a chrome armed fighter, a parry and a counter per line, the last a finisher with
+// the camera pushed in. Contact: a flying cab comes down, he steps in and it lifts away. The hero: he stands
+// under the overpass and draws his blade as the page starts to scroll, up on a fire escape on a phone.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -34,7 +35,7 @@ export const GROUND = 856
 type Layout = PropLayout
 
 /** Him in a frame: where his boots are, his size, his pose and how visible he is. */
-export type MercState = FigureState<MercPose>
+export type HeroState = FigureState<HeroPose>
 
 export interface SceneDef {
   district: District
@@ -43,7 +44,7 @@ export interface SceneDef {
   /** The props behind him and in front of him, drawn in the figure layer. */
   back: (layout: Layout) => ReactNode
   front: (layout: Layout) => ReactNode
-  bind: (stage: StageNodes, layout: Layout) => FigureWriter<MercPose>
+  bind: (stage: StageNodes, layout: Layout) => FigureWriter<HeroPose>
 }
 
 // The band the props stand in: the right of the screen beside the text column on a wide screen, the middle
@@ -53,12 +54,29 @@ const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [820, 
 const K = 1.6
 const NONE = (): ReactNode => null
 
-// He comes in from this far left of the first prop as its card nears the reading line.
-const ENTRY = 200
+const him = (x: number, pose: HeroPose, k = K, y = GROUND, opacity = 1): HeroState => ({ x, y, k, pose, opacity })
 
-const travel = (xs: readonly number[], f: number, offset: number) => walkAlong(xs, f, offset, ENTRY)
+// His deck hand's joints in his viewBox (the origins in figure.module.css), for where a hack or a line leaves.
+const LEFT_ARM: ArmPivots = { shoulder: [68, 48], elbow: [69.5, 66], hand: [69.8, 88] }
 
-const merc = (x: number, pose: MercPose, k = K, y = GROUND, opacity = 1): MercState => ({ x, y, k, pose, opacity })
+/** His deck hand on the stage in `state`. */
+const deckHand = ({ x, y, k, pose }: HeroState): readonly [number, number] => {
+  const [hx, hy] = handAt(LEFT_ARM, pose.armLeft, pose.foreLeft)
+  return [x + (hx - 50) * k, y + (hy - 144 + pose.rise) * k]
+}
+
+/** The beat `f` cards in: the card at, its lead in and its move (trackAt on the spot, no floor to scroll). */
+const beatOf = (f: number, count: number, lead = 0.3) => trackAt(f, Math.max(count, 1), 0, lead)
+
+/** The move held at its end, or let go over its last stretch when another beat follows. */
+const heldIn = (act: number, at: number, count: number): number => (at >= count - 1 ? 1 : 1 - ramp(act, 0.88, 1))
+
+/** How far card `i`'s own beat has played when the beat at `at` is `t` through: done before it, none after. */
+const beatShare = (i: number, at: number, t: number): number => (i < at ? 1 : i === at ? t : 0)
+
+/** Where he stands and where the scene's targets stand: him on the left of the band, the targets spread right of him. */
+const lineUp = ({ phone, count }: Layout): { stand: number; xs: number[] } =>
+  phone ? { stand: 660, xs: spread(Math.max(count, 1), 790, 980) } : { stand: 880, xs: spread(Math.max(count, 1), 1020, 1440) }
 
 /** The city's own motions in every scene, carried by p: the flying car crosses, one sign flickers. */
 function cityWriter(stage: StageNodes): (p: number) => void {
@@ -83,8 +101,8 @@ const withCity =
 
 // ---------------------------------------------------------------- the hero
 
-// On a phone the HUD panel takes the screen below the first half, so he stands up on a fire escape landing
-// in the top half, over Watson's street, where the hero shows him before the panel.
+// On a phone the text panel takes the screen below the first half, so he stands up on a fire escape landing
+// in the top half, over the street, where the hero shows him before the panel.
 const LANDING_Y = 400
 
 function FireEscape() {
@@ -99,425 +117,506 @@ function FireEscape() {
 }
 
 const hero: SceneDef = {
-  district: 'watson',
+  district: 'overpass',
   kit: null,
   back: ({ phone }) => (phone ? <FireEscape /> : null),
   front: NONE,
   bind: withCity((_stage, { phone }) => (p) => {
-    const idle = { ...STAND, rise: -1.5 * Math.sin(p * 12) }
-    return phone ? merc(800, idle, 1.7, LANDING_Y) : merc(1200, idle, 2.3)
+    const stance = guard(ramp(p, 0.04, 0.25))
+    return phone ? him(800, stance, 1.7, LANDING_Y) : him(1200, stance, 2.3)
   }),
 }
 
-// ---------------------------------------------------------------- About: the holo tags
+// ---------------------------------------------------------------- About: the hacked cameras
 
-const TAG_Y = 500
+// The cameras hang in two staggered rows, so a long About keeps each one clear of its neighbours.
+const camY = (i: number): number => (i % 2 === 0 ? 340 : 460)
+
+// A wall camera on its bracket, its lens toward him on the left: red while it watches, cyan once hacked.
+function WallCamera({ i }: { i: number }) {
+  return (
+    <>
+      <path d="M22 -60 V-8 M10 -8 H34" stroke={NEON.steel} strokeWidth={6} />
+      <g data-fx={`cam-${i}`} transform="rotate(-24)">
+        <path d="M-34 -14 H30 L36 -6 V10 H-34 Z" fill={NEON.panel} stroke={NEON.ink} strokeWidth={3} />
+        <circle cx={-34} cy={-2} r={10} fill={NEON.ink} />
+        <circle cx={-34} cy={-2} r={6} fill={NEON.chromeRed} />
+        <circle data-fx={`fixed-${i}`} cx={-34} cy={-2} r={6} fill={NEON.data} opacity={0} />
+      </g>
+    </>
+  )
+}
 
 const about: SceneDef = {
-  district: 'japantown',
+  district: 'lanterns',
   kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${TAG_Y})`}>
-          <path d={`M0 30 V${GROUND - TAG_Y - 120}`} stroke={NEON.hud} strokeOpacity={0.35} strokeWidth={2} strokeDasharray="6 8" />
-          <g data-fx={`tag-${i}`} opacity={0.25}>
-            <path d="M-46 -28 H34 L46 -16 V28 H-46 Z" fill={NEON.ink} fillOpacity={0.8} stroke={NEON.hud} strokeWidth={3} />
-            <path d="M-34 -10 H22 M-34 6 H8" stroke={NEON.hud} strokeWidth={5} />
-          </g>
-        </g>
-      ))}
-      <path data-fx="beam" d="M0 0" stroke={NEON.hud} strokeWidth={3} strokeDasharray="10 6" opacity={0} />
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count }) => {
-    const tags = fxs(stage, 'tag', count)
-    const beam = fx(stage, 'beam')
-    return (p, f) => {
-      tags.forEach((tag, i) => fadeTo(tag, 0.25 + 0.75 * reached(f, i)))
-      const { x, at, act } = travel(xs, f, -110)
-      const pose = mix(walk(f * 3 + p * 2), scan(1), act)
-      // the beam leaves from his hand at the temple, where the reticle locks
-      const [hx, hy] = handAt(RIGHT_ARM, pose.armRight, pose.foreRight)
-      beam?.setAttribute('d', `M${r1(x + (hx - 50) * K)} ${r1(GROUND + (hy - 144) * K)} L${r1(xs[at] - 40)} ${TAG_Y + 10}`)
-      fadeTo(beam, act * 0.9)
-      return merc(x, pose)
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Work: the braindance edit
-
-const EDIT_Y = 430
-
-const work: SceneDef = {
-  district: 'japantown',
-  kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      <rect x={r1(xs[0] - 90)} y={EDIT_Y + 52} width={r1(xs[xs.length - 1] - xs[0] + 180)} height={10} fill={NEON.ink} stroke={NEON.chromeRed} strokeWidth={2} />
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${EDIT_Y})`}>
-          <rect x={-46} y={-34} width={92} height={64} fill={NEON.ink} stroke={NEON.data} strokeWidth={3} />
-          <rect data-fx={`clip-${i}`} x={-38} y={-26} width={76} height={48} fill={NEON.data} opacity={0.12} />
-          <path d="M-30 -12 H18 M-30 2 H30 M-30 14 H6" stroke={NEON.ice} strokeOpacity={0.5} strokeWidth={4} />
-        </g>
-      ))}
-      <g data-fx="head">
-        <path d={`M0 ${EDIT_Y + 44} V${GROUND - 250}`} stroke={NEON.hud} strokeWidth={3} />
-        <path d={`M0 ${EDIT_Y + 40} l12 14 l-12 14 l-12 -14 Z`} fill={NEON.hud} />
-      </g>
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count }) => {
-    const clips = fxs(stage, 'clip', count)
-    const head = fx(stage, 'head')
-    return (p, f) => {
-      clips.forEach((clip, i) => fadeTo(clip, 0.12 + 0.78 * reached(f, i)))
-      const { x, moving, act } = travel(xs, f, 0)
-      transformTo(head, `translate(${r1(x)} 0)`)
-      // the hop on the playhead under each clip: up and tucked while he is at it
-      return merc(x, mix(walk(f * 3 + p * 2), hop(Math.sin(Math.PI * act) * (1 - moving)), act))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Tech stack: the Sandevistan dash
-
-const SHARD_Y = 700
-const ECHOES = [0.5, 0.32, 0.18]
-
-const tech: SceneDef = {
-  district: 'megablock',
-  kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${SHARD_Y})`}>
-          <path d="M0 -30 L20 0 L0 30 L-20 0 Z" fill={NEON.ink} stroke={NEON.hack} strokeWidth={3} />
-          <path data-fx={`shard-${i}`} d="M0 -22 L14 0 L0 22 L-14 0 Z" fill={NEON.hack} opacity={0.15} />
-        </g>
-      ))}
-      {ECHOES.map((_, i) => (
-        <g key={i} data-fx={`echo-${i}`} opacity={0}>
-          <use href="#nc-merc-tech" />
-        </g>
-      ))}
-    </>
-  ),
-  front: () => <rect data-fx="slow" width={1600} height={900} fill={NEON.hack} opacity={0} />,
-  bind: withCity((stage, { xs, count }) => {
-    const shards = fxs(stage, 'shard', count)
-    const echoes = fxs(stage, 'echo', ECHOES.length)
-    const slow = fx(stage, 'slow')
-    const start = xs[0] - 260
-    const end = xs[xs.length - 1] + 160
-    return (p, f) => {
-      shards.forEach((shard, i) => fadeTo(shard, 0.15 + 0.85 * reached(f, i)))
-      const speed = ramp(f, 0, 0.3) * (1 - ramp(f, count - 0.3, count))
-      const x = lerp(start, end, clamp01(f / Math.max(count, 1)))
-      echoes.forEach((echo, i) => {
-        transformTo(echo, `translate(${r1(x - 46 * (i + 1) * speed)} ${GROUND}) scale(${K})`)
-        fadeTo(echo, ECHOES[i] * speed)
-      })
-      fadeTo(slow, 0.1 * speed)
-      return merc(x, mix(STAND, dash(f * 4), Math.max(speed, ramp(f, 0, 0.1))))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Services: the access points
-
-const services: SceneDef = {
-  district: 'watson',
-  kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${GROUND})`}>
-          <rect x={-8} y={-110} width={16} height={110} fill={NEON.steel} />
-          <rect x={-40} y={-200} width={80} height={96} fill={NEON.ink} stroke={NEON.data} strokeWidth={3} />
-          <g data-fx={`screen-${i}`} opacity={0.1}>
-            <rect x={-32} y={-192} width={64} height={60} fill={NEON.data} fillOpacity={0.5} />
-            <path d="M-26 -178 H18 M-26 -164 H26 M-26 -150 H4" stroke={NEON.ice} strokeWidth={4} />
-          </g>
-          <rect x={-32} y={-126} width={64} height={12} fill={NEON.hack} fillOpacity={0.5} />
-        </g>
-      ))}
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count }) => {
-    const screens = fxs(stage, 'screen', count)
-    return (_p, f) => {
-      screens.forEach((screen, i) => fadeTo(screen, 0.1 + 0.9 * reached(f, i)))
-      const { x, moving, act } = travel(xs, f, -120)
-      // the double jump on the cyberlegs from one access point to the next
-      return merc(x, mix(hop(moving), hack(1, (f * 2) % 1), act), K, GROUND - 120 * moving * Math.min(1, f * 2))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Projects: the ICE
-
-const projects: SceneDef = {
-  district: 'megablock',
-  kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${GROUND - 260})`}>
-          <rect x={-34} y={0} width={68} height={250} fill={NEON.ink} fillOpacity={0.85} />
-          <rect data-fx={`ice-${i}`} x={-34} y={0} width={68} height={250} fill="none" stroke={NEON.chromeRed} strokeWidth={3} />
-          <rect data-fx={`open-${i}`} x={-34} y={0} width={68} height={250} fill={NEON.hack} fillOpacity={0.25} stroke={NEON.hack} strokeWidth={3} opacity={0} />
-          <path d="M-22 30 H22 M-22 60 H10 M-22 90 H22 M-22 120 H14 M-22 150 H22 M-22 180 H6" stroke={NEON.hud} strokeOpacity={0.55} strokeWidth={5} strokeDasharray="8 5" />
-        </g>
-      ))}
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count }) => {
-    const ice = fxs(stage, 'ice', count)
-    const open = fxs(stage, 'open', count)
-    return (p, f) => {
-      ice.forEach((node, i) => fadeTo(node, 1 - reached(f, i)))
-      open.forEach((node, i) => fadeTo(node, reached(f, i)))
-      const { x, act } = travel(xs, f, -110)
-      return merc(x, mix(walk(f * 3 + p * 2), hack(1, (f * 3) % 1), act))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Ventures: the fixer's contracts
-
-const PIN_Y = GROUND - 30
-
-const ventures: SceneDef = {
-  district: 'badlands',
-  kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} 0)`}>
-          <g data-fx={`pin-${i}`} transform="translate(0 -300)">
-            <path d="M0 30 L-30 -30 A35 35 0 1 1 30 -30 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={4} />
-            <circle cx={0} cy={-42} r={12} fill={NEON.ink} />
-          </g>
-          <ellipse data-fx={`ring-${i}`} cx={0} cy={PIN_Y + 32} rx={46} ry={10} fill="none" stroke={NEON.gold} strokeWidth={3} opacity={0} />
-        </g>
-      ))}
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count }) => {
-    const pins = fxs(stage, 'pin', count)
-    const rings = fxs(stage, 'ring', count)
-    return (p, f) => {
-      pins.forEach((pin, i) => {
-        const drop = reached(f, i) ** 2
-        transformTo(pin, `translate(0 ${r1(lerp(-300, PIN_Y, drop))})`)
-        fadeTo(rings[i], drop)
-      })
-      const { x, act } = travel(xs, f, -120)
-      return merc(x, mix(walk(f * 3 + p * 2), slash(1), act))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Bands: the car radio's dial
-
-const DIAL_Y = 330
-const EQ = [0.5, 0.9, 0.7, 1, 0.6]
-
-const bands: SceneDef = {
-  district: 'japantown',
-  kit: 'drummer',
-  back: ({ xs }) => (
-    <>
-      <rect x={r1(xs[0] - 110)} y={DIAL_Y - 80} width={r1(xs[xs.length - 1] - xs[0] + 220)} height={150} fill={NEON.ink} fillOpacity={0.9} stroke={NEON.data} strokeWidth={3} />
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${DIAL_Y})`}>
-          <rect x={-3} y={-70} width={6} height={22} fill={NEON.data} />
-          <g data-fx={`eq-${i}`} transform="scale(1 0.15)">
-            {EQ.map((h, b) => (
-              <rect key={b} x={-30 + b * 13} y={-60 * h + 50} width={9} height={60 * h} fill={NEON.hud} />
-            ))}
-          </g>
-        </g>
-      ))}
-      <rect data-fx="needle" x={-2} y={DIAL_Y - 80} width={4} height={150} fill={NEON.hud} />
-    </>
-  ),
-  front: NONE,
-  bind: withCity((stage, { xs, count, cx }) => {
-    const eqs = fxs(stage, 'eq', count)
-    const needle = fx(stage, 'needle')
-    const last = xs.length - 1
-    return (p, f) => {
-      eqs.forEach((eq, i) => {
-        const level = 0.15 + 0.85 * reached(f, i)
-        transformTo(eq, `translate(0 ${r1(50 * (1 - level))}) scale(1 ${level.toFixed(3)})`)
-      })
-      const along = Math.min(last, Math.max(0, f - 0.5))
-      const at = Math.floor(along)
-      transformTo(needle, `translate(${r1(lerp(xs[at], xs[Math.min(last, at + 1)], along - at))} 0)`)
-      return merc(cx, drum(f * 6 + p * 4))
-    }
-  }),
-}
-
-// ---------------------------------------------------------------- Muay Thai: the ripperdoc's chair
-
-const CHAIR_K = 2.4
-
-// The ripperdoc's chair from the side, its back on the left, the seat facing right, the clamp arm with its
-// LED row, the cable bundle; over it the clinic's green neon cross. In its own 100 by 150 box.
-function Chair() {
-  return (
-    <g>
-      <path data-fx="cross" d="M10 2 H18 V10 H26 V18 H18 V26 H10 V18 H2 V10 H10 Z" fill="none" stroke={NEON.hack} strokeWidth={2.5} strokeLinejoin="round" opacity={0.4} />
-      <path d="M8 40 L22 40 L26 112 L12 112 Z" fill={NEON.steel} stroke={NEON.ink} strokeWidth={2} />
-      <path d="M12 112 H80 V120 H12 Z" fill={NEON.steel} stroke={NEON.ink} strokeWidth={2} />
-      <path d="M40 120 V142 M24 145 H60" stroke={NEON.chrome} strokeWidth={5} />
-      <path d="M2 30 H34 L38 38 H2 Z" fill={NEON.panel} stroke={NEON.ink} strokeWidth={2} />
-      <path d="M8 34 H30" stroke={NEON.hack} strokeWidth={2} strokeDasharray="3 2" />
-      <path d="M8 104 Q-6 130 10 150" stroke={NEON.data} strokeWidth={2} fill="none" />
-    </g>
-  )
-}
-
-// The gang punk who steps in when he leaves the chair: a dark silhouette facing left with a hot pink
-// mohawk, three red optic dots, a studded jacket lit along its edge and a chrome fist up; feet on y 144.
-function Punk() {
-  return (
-    <g>
-      <path d="M14 96 L24 96 L22 144 L12 144 Z M27 96 L37 96 L39 144 L29 144 Z" fill={NEON.ink} stroke={NEON.steel} strokeWidth={1.4} />
-      <path d="M10 48 Q25 42 40 48 L42 98 L8 98 Z" fill={NEON.alley} stroke={NEON.steel} strokeWidth={1.4} strokeLinejoin="round" />
-      <path d="M9 50 L8 96" stroke={NEON.chromeRed} strokeWidth={1.4} />
-      <path d="M18 58 h2 M18 66 h2 M18 74 h2" stroke={NEON.chrome} strokeWidth={2} />
-      <path d="M14 24 Q14 12 25 12 Q36 12 36 25 Q36 38 25 41 Q14 38 14 24 Z" fill={NEON.surface} stroke={NEON.steel} strokeWidth={1.4} />
-      <path d="M20 13 Q24 0 28 2 Q29 8 30 13 Z" fill={NEON.hotPink} />
-      <g fill={NEON.chromeRed}>
-        <circle cx={17} cy={23} r={1.6} />
-        <circle cx={21} cy={21.5} r={1.6} />
-        <circle cx={20} cy={26} r={1.3} />
-      </g>
-      <path d="M10 50 L2 64 L6 74" fill="none" stroke={NEON.chrome} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={6} cy={76} r={4} fill={NEON.chrome} stroke={NEON.ink} strokeWidth={1.2} />
-      <path data-fx="impact" d="M2 74 L-6 66 M0 82 L-9 82 M2 90 L-6 98" stroke={NEON.hud} strokeWidth={2} strokeLinecap="round" opacity={0} />
-    </g>
-  )
-}
-
-const chairX = ({ cx, phone }: Layout): number => cx - (phone ? 120 : 200)
-const SCREEN_W = 300
-const CHAIR_TOP = GROUND - 144 * CHAIR_K
-
-const muayThai: SceneDef = {
-  district: 'megablock',
-  kit: 'fighter',
   back: (layout) => (
     <>
-      <g transform={`translate(${r1(chairX(layout) - 60)} ${r1(CHAIR_TOP)}) scale(${CHAIR_K})`}>
-        <Chair />
-      </g>
-      {!layout.phone && (
-        <g transform={`translate(${r1(chairX(layout) + 90)} 300)`}>
-          <rect width={SCREEN_W} height={40 + layout.count * 34} fill={NEON.ink} fillOpacity={0.9} stroke={NEON.hack} strokeWidth={3} />
-          {layout.xs.map((x, i) => (
-            <g key={x} transform={`translate(20 ${30 + i * 34})`}>
-              <rect width={SCREEN_W - 40} height={12} fill={NEON.glass} />
-              <rect data-fx={`bar-${i}`} width={SCREEN_W - 40} height={12} fill={NEON.gold} transform="scale(0 1)" />
-            </g>
-          ))}
+      {lineUp(layout).xs.map((x, i) => (
+        <g key={x} transform={`translate(${r1(x)} ${camY(i)}) scale(0.8)`}>
+          <WallCamera i={i} />
         </g>
-      )}
+      ))}
+      <path data-fx="line" d="M0 0" stroke={NEON.data} strokeWidth={3} strokeDasharray="10 6" opacity={0} />
     </>
   ),
-  front: (layout) => (
-    <g data-fx="punk" transform={`translate(${r1(layout.cx + 600)} ${r1(CHAIR_TOP)}) scale(${CHAIR_K})`}>
-      <Punk />
+  front: NONE,
+  bind: withCity((stage, layout) => {
+    const { count } = layout
+    const { stand: x, xs } = lineUp(layout)
+    const cams = fxs(stage, 'cam', count)
+    const fixed = fxs(stage, 'fixed', count)
+    const line = fx(stage, 'line')
+    return (_p, f) => {
+      const { at, run: lead, act } = beatOf(f, count)
+      cams.forEach((cam, i) => transformTo(cam, `rotate(${r1(lerp(-24, 12, beatShare(i, at, lead)))})`))
+      fixed.forEach((lens, i) => fadeTo(lens, beatShare(i, at, ramp(act, 0.55, 0.75))))
+      const state = him(x, hack(ramp(act, 0, 0.3) * heldIn(act, at, count), act))
+      const [hx, hy] = deckHand(state)
+      line?.setAttribute('d', `M${r1(hx)} ${r1(hy)} L${r1(lerp(hx, xs[at] - 27, ramp(act, 0.25, 0.55)))} ${r1(lerp(hy, camY(at), ramp(act, 0.25, 0.55)))}`)
+      fadeTo(line, ramp(act, 0.25, 0.3) * (1 - ramp(act, 0.8, 0.9)))
+      return state
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Work: the takedowns from cover
+
+// A guard in his patrol armour facing left toward the crate, a rifle across his chest; feet on (0, 0).
+function Guard() {
+  return (
+    <g transform="translate(-25 -144)">
+      <path d="M14 96 L24 96 L22 144 L12 144 Z M27 96 L37 96 L39 144 L29 144 Z" fill={NEON.ink} stroke={NEON.steel} strokeWidth={1.4} />
+      <path d="M10 48 Q25 42 40 48 L42 98 L8 98 Z" fill={NEON.alley} stroke={NEON.steel} strokeWidth={1.4} strokeLinejoin="round" />
+      <path d="M14 22 Q14 8 25 8 Q36 8 36 22 L36 34 Q25 40 14 34 Z" fill={NEON.steel} stroke={NEON.ink} strokeWidth={1.4} />
+      <path d="M14 22 H28" stroke={NEON.chromeRed} strokeWidth={2.4} />
+      <path d="M-4 64 L36 72" stroke={NEON.chrome} strokeWidth={4} strokeLinecap="round" />
+    </g>
+  )
+}
+
+const crateX = ({ phone }: Layout): number => (phone ? 780 : 1000)
+
+const work: SceneDef = {
+  district: 'slab',
+  kit: 'engineer',
+  back: (layout) => (
+    <g transform={`translate(${crateX(layout)} ${GROUND})`}>
+      <rect x={-60} y={-120} width={120} height={120} fill={NEON.panel} stroke={NEON.ink} strokeWidth={4} />
+      <path d="M-60 -60 H60 M-60 -120 L60 0" stroke={NEON.steel} strokeWidth={3} />
+      <path d="M-60 -116 H60" stroke={NEON.hud} strokeOpacity={0.5} strokeWidth={2} />
+    </g>
+  ),
+  front: () => (
+    <g data-fx="guard">
+      <Guard />
     </g>
   ),
   bind: withCity((stage, layout) => {
-    const { count, cx } = layout
-    const bars = fxs(stage, 'bar', count)
-    const cross = fx(stage, 'cross')
-    const punk = fx(stage, 'punk')
-    const impact = fx(stage, 'impact')
-    const seat = chairX(layout) + 60
-    return (p, f) => {
-      bars.forEach((bar, i) => transformTo(bar, `scale(${reached(f, i).toFixed(3)} 1)`))
-      fadeTo(cross, f > 0 && f < count ? 0.6 + 0.4 * Math.abs(Math.sin(f * 6)) : 0.4)
-      const stand = ramp(f, count - 0.35, count)
-      const strike = stand * ramp(p, 0.62, 0.8)
-      const foeAt = lerp(cx + 600, cx + 40, ramp(f, count - 0.6, count)) + 70 * strike
-      transformTo(punk, `translate(${r1(foeAt)} ${r1(CHAIR_TOP)}) scale(${CHAIR_K}) rotate(${r1(14 * strike)} 25 144)`)
-      fadeTo(impact, strike > 0.5 ? 1 : 0)
-      const pose = stand < 1 ? mix(SIT, kick(0), stand) : kick(strike)
-      return merc(lerp(seat, cx - 110, stand), pose, K, lerp(GROUND - 40, GROUND, stand))
+    const { count } = layout
+    const crate = crateX(layout)
+    const cover = crate - 110
+    const out = crate + 40
+    const guardNode = fx(stage, 'guard')
+    return (_p, f) => {
+      const { at, run: lead, act } = beatOf(f, count, 0.45)
+      const fall = ramp(act, 0.35, 0.7)
+      transformTo(guardNode, `translate(${r1(lerp(crate + 480, crate + 130, lead) + 30 * fall)} ${GROUND}) rotate(${r1(82 * fall)}) scale(${K})`)
+      fadeTo(guardNode, 1 - 0.45 * fall)
+      const strike = ramp(act, 0, 0.4)
+      if (act > 0) return him(lerp(cover, out, strike), mix(CROUCH, takedown(1), strike))
+      const back = at > 0 ? ramp(lead, 0, 0.5) : 1
+      return him(lerp(out, cover, back), mix(takedown(1), CROUCH, back))
     }
   }),
 }
 
-// ---------------------------------------------------------------- Contact: the drive off
+// ---------------------------------------------------------------- Tech stack: the wall run
 
-const CAR_K = 2.6
+const WALL = { spacing: 420, width: 300, top: 300, bottom: 690, runY: 660 }
+const RUN_SPAN = 180
 
-// His car in profile, low and long: the black body, the cabin glass with him at the wheel (the beard and the
-// cyan optic), the wheels lit at the rims, the headlight ahead and the tail light streaks behind. 240 by 80.
-function Car() {
-  return (
-    <g>
-      <g data-fx="streaks" opacity={0}>
-        <rect x={-160} y={44} width={160} height={4} fill={NEON.chromeRed} />
-        <rect x={-110} y={52} width={110} height={3} fill={NEON.hotPink} />
-      </g>
-      <path d="M6 58 L14 40 L70 34 L104 16 H160 L196 34 L232 40 L236 58 Z" fill={NEON.ink} stroke={NEON.data} strokeWidth={2} />
-      <path d="M110 20 H156 L184 34 H96 Z" fill={NEON.data} fillOpacity={0.3} />
-      <g data-fx="driver" opacity={0}>
-        <circle cx={140} cy={26} r={6} fill={HERO_IDENTITY.hair} />
-        <path d="M135 29 Q140 36 145 29" fill={HERO_IDENTITY.hair} />
-        <rect x={140} y={24} width={5} height={2} fill={NEON.data} />
-      </g>
-      <rect x={6} y={44} width={8} height={5} fill={NEON.chromeRed} />
-      <rect x={226} y={42} width={10} height={5} fill={NEON.ice} />
-      {[52, 190].map((x) => (
-        <g key={x}>
-          <circle cx={x} cy={60} r={14} fill={NEON.ink} stroke={NEON.chrome} strokeWidth={3} />
-          <circle cx={x} cy={60} r={8} fill="none" stroke={NEON.hack} strokeWidth={2} />
+const wallStart = ({ phone }: Layout): number => (phone ? 640 : 860)
+
+const tech: SceneDef = {
+  district: 'slab',
+  kit: 'engineer',
+  back: (layout) => (
+    <g data-fx="wall">
+      {Array.from({ length: Math.max(layout.count, 1) }, (_, i) => (
+        <g key={i} transform={`translate(${wallStart(layout) - 60 + i * WALL.spacing} 0)`}>
+          <rect y={WALL.top} width={WALL.width} height={WALL.bottom - WALL.top} fill={NEON.panel} stroke={NEON.data} strokeOpacity={0.6} strokeWidth={4} />
+          <path d={`M0 ${WALL.top + 40} H${WALL.width} M0 ${WALL.bottom - 40} H${WALL.width}`} stroke={NEON.steel} strokeWidth={3} />
+          <rect data-fx={`panel-${i}`} x={16} y={WALL.top + 60} width={WALL.width - 32} height={WALL.bottom - WALL.top - 120} fill={NEON.hack} opacity={0.12} />
         </g>
       ))}
+    </g>
+  ),
+  front: NONE,
+  bind: withCity((stage, layout) => {
+    const count = Math.max(layout.count, 1)
+    const x0 = wallStart(layout)
+    const wall = fx(stage, 'wall')
+    const panels = fxs(stage, 'panel', count)
+    return (p, f) => {
+      const { offset, at, run: leap, act } = trackAt(f, count, WALL.spacing, 0.35)
+      transformTo(wall, `translate(${r1(-offset)} 0)`)
+      panels.forEach((panel, i) => fadeTo(panel, 0.12 + 0.5 * beatShare(i, at, ramp(act, 0, 0.2))))
+      const land = ramp(p, 0.62, 0.76)
+      const airborne = leap > 0 && leap < 1 && act === 0
+      const x = airborne ? lerp(x0 + RUN_SPAN, x0, leap) : x0 + RUN_SPAN * act
+      const y = WALL.runY - hop(airborne ? leap : 0, 90) + drop(land, GROUND - WALL.runY)
+      return him(x, mix(airborne ? LEAP : run(act * 4 + f), CROUCH, land), K, y)
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Services: the grapple swings
+
+const SWING = { spacing: 440, length: 360, roof: GROUND - 120 }
+const ANCHOR_Y = SWING.roof - Math.sqrt(SWING.length ** 2 - (SWING.spacing / 2) ** 2)
+
+const swingAt = ({ phone }: Layout): number => (phone ? 720 : 980)
+
+const services: SceneDef = {
+  district: 'overpass',
+  kit: 'engineer',
+  back: (layout) => (
+    <>
+      <g data-fx="roofs">
+        {Array.from({ length: Math.max(layout.count, 1) + 1 }, (_, i) => {
+          const x = swingAt(layout) + i * SWING.spacing
+          return (
+            <g key={i}>
+              <rect x={x - 90} y={SWING.roof} width={180} height={900 - SWING.roof} fill={NEON.alley} stroke={NEON.ink} strokeWidth={4} />
+              <path d={`M${x - 90} ${SWING.roof + 6} H${x + 90}`} stroke={NEON.data} strokeOpacity={0.5} strokeWidth={2} />
+              {i < Math.max(layout.count, 1) && (
+                <g transform={`translate(${x + SWING.spacing / 2} ${r1(ANCHOR_Y)})`}>
+                  <rect x={-56} y={-70} width={112} height={56} fill={NEON.ink} stroke={NEON.magenta} strokeWidth={3} />
+                  <path d="M-40 -48 H40 M-40 -34 H16" stroke={NEON.magenta} strokeWidth={5} />
+                  <circle r={7} fill={NEON.steel} stroke={NEON.data} strokeWidth={2} />
+                </g>
+              )}
+            </g>
+          )
+        })}
+      </g>
+      <path data-fx="grapple" d="M0 0" stroke={NEON.data} strokeWidth={3} opacity={0} />
+    </>
+  ),
+  front: NONE,
+  bind: withCity((stage, layout) => {
+    const count = Math.max(layout.count, 1)
+    const x0 = swingAt(layout)
+    const roofs = fx(stage, 'roofs')
+    const grapple = fx(stage, 'grapple')
+    return (_p, f) => {
+      const at = Math.min(Math.max(0, Math.floor(f)), count - 1)
+      const into = clamp01(f - at)
+      const fire = ramp(into, 0, 0.25)
+      const swing = trackEase(ramp(into, 0.25, 0.92))
+      const offset = SWING.spacing * (at + swing)
+      transformTo(roofs, `translate(${r1(-offset)} 0)`)
+      const reach = SWING.spacing * (swing - 0.5)
+      const y = ANCHOR_Y + Math.sqrt(SWING.length ** 2 - reach ** 2)
+      const landed = ramp(into, 0.92, 1)
+      const pose = swing > 0 ? mix(hang(lerp(-1, 1, swing)), CROUCH, landed) : mix(CROUCH, hang(-1), fire)
+      const state = him(x0, pose, K, swing > 0 ? y : SWING.roof)
+      const [hx, hy] = deckHand(state)
+      const anchorX = x0 + SWING.spacing / 2 + at * SWING.spacing - offset
+      grapple?.setAttribute('d', `M${r1(hx)} ${r1(hy)} L${r1(lerp(hx, anchorX, fire))} ${r1(lerp(hy, ANCHOR_Y, fire))}`)
+      fadeTo(grapple, fire * (1 - landed))
+      return state
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Projects: the deflected shots
+
+const DRONE_Y = 430
+
+// A hover drone facing him: a dark hull, its rotor arms and the red eye of its gun under it.
+function Drone({ i }: { i: number }) {
+  return (
+    <g data-fx={`drone-${i}`}>
+      <path d="M-60 -18 H-24 M24 -18 H60" stroke={NEON.steel} strokeWidth={5} />
+      <ellipse cx={-48} cy={-24} rx={18} ry={4} fill={NEON.data} opacity={0.6} />
+      <ellipse cx={48} cy={-24} rx={18} ry={4} fill={NEON.data} opacity={0.6} />
+      <path d="M-30 -16 H30 L22 16 H-22 Z" fill={NEON.panel} stroke={NEON.ink} strokeWidth={3} />
+      <circle cx={-14} cy={10} r={6} fill={NEON.chromeRed} />
     </g>
   )
 }
 
-const carLeft = ({ cx }: Layout): number => cx - 120 * CAR_K
-const CAR_TOP = GROUND - 76 * CAR_K
+// Where each drone comes to hover: one at a time, a little right of the band's middle.
+const droneAt = ({ phone, cx }: Layout): number => (phone ? 900 : cx + 160)
+
+const projects: SceneDef = {
+  district: 'slab',
+  kit: 'engineer',
+  back: (layout) => (
+    <>
+      {Array.from({ length: Math.max(layout.count, 1) }, (_, i) => (
+        <g key={i} transform={`translate(${r1(droneAt(layout))} 0)`}>
+          <Drone i={i} />
+        </g>
+      ))}
+    </>
+  ),
+  front: () => <circle data-fx="bolt" r={9} fill={NEON.hotPink} stroke={NEON.ice} strokeWidth={3} opacity={0} />,
+  bind: withCity((stage, layout) => {
+    const { count } = layout
+    const { stand: x } = lineUp(layout)
+    const hover = droneAt(layout)
+    const drones = fxs(stage, 'drone', count)
+    const bolt = fx(stage, 'bolt')
+    const target: readonly [number, number] = [x + 60, GROUND - 100 * K]
+    return (_p, f) => {
+      const { at, act } = beatOf(f, count)
+      drones.forEach((drone, i) => {
+        // the drone flies in over its card's lead in, drops when its bolt comes back, and its wreck clears for the next
+        const shown = i === at ? 1 : 0
+        const fall = beatShare(i, at, ramp(act, 0.85, 1))
+        const rise = i === at ? (1 - trackEase(ramp(f - at, 0, 0.3))) * 260 : 0
+        transformTo(drone, `translate(0 ${r1(DRONE_Y - rise + drop(fall, GROUND - 30 - DRONE_Y))}) rotate(${r1(30 * fall)})`)
+        fadeTo(drone, shown * (1 - 0.5 * fall))
+      })
+      const coming = ramp(act, 0.05, 0.45)
+      const going = ramp(act, 0.5, 0.85)
+      const from: readonly [number, number] = [hover - 14, DRONE_Y + 10]
+      const [bx, by] = going > 0 ? [lerp(target[0], from[0], going), lerp(target[1], from[1], going)] : [lerp(from[0], target[0], coming), lerp(from[1], target[1], coming)]
+      transformTo(bolt, `translate(${r1(bx)} ${r1(by)})`)
+      fadeTo(bolt, act > 0.05 && act < 0.86 ? 1 : 0)
+      return him(x, mix(guard(1), deflect(1), ramp(act, 0.3, 0.48) * heldIn(act, at, count)))
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Ventures: the stasis hacks
+
+// A runner charging him from the right, mid stride, a short blade low; feet on (0, 0). The lattice of the hack
+// closes over him when it lands.
+function Runner({ i }: { i: number }) {
+  return (
+    <g data-fx={`runner-${i}`} opacity={0}>
+      <g transform="translate(-25 -144)">
+        <path d="M24 96 L12 120 L4 144 L14 144 L24 122 Z M28 96 L40 118 L48 144 L38 144 L30 122 Z" fill={NEON.ink} stroke={NEON.steel} strokeWidth={1.4} />
+        <path d="M12 50 Q26 44 40 52 L36 98 L14 98 Z" fill={NEON.alley} stroke={NEON.steel} strokeWidth={1.4} strokeLinejoin="round" />
+        <path d="M14 26 Q14 12 25 12 Q36 12 36 26 Q36 38 25 41 Q14 38 14 26 Z" fill={NEON.surface} stroke={NEON.steel} strokeWidth={1.4} />
+        <path d="M14 24 H26" stroke={NEON.hotPink} strokeWidth={2.4} />
+        <path d="M12 56 L-2 76 M-2 76 L-14 70" stroke={NEON.chrome} strokeWidth={4} strokeLinecap="round" />
+      </g>
+      <g data-fx={`lattice-${i}`} opacity={0} stroke={NEON.data} strokeWidth={2} fill={NEON.data} fillOpacity={0.12}>
+        <rect x={-34} y={-150} width={68} height={150} />
+        <path d="M-34 -112 H34 M-34 -75 H34 M-34 -38 H34 M-11 -150 V0 M11 -150 V0" fill="none" />
+      </g>
+    </g>
+  )
+}
+
+const ventures: SceneDef = {
+  district: 'outskirts',
+  kit: 'engineer',
+  back: NONE,
+  front: (layout) => (
+    <>
+      {lineUp(layout).xs.map((x, i) => (
+        <Runner key={x} i={i} />
+      ))}
+    </>
+  ),
+  bind: withCity((stage, layout) => {
+    const { count, phone } = layout
+    const { stand: x, xs } = lineUp(layout)
+    const runners = fxs(stage, 'runner', count)
+    const lattices = fxs(stage, 'lattice', count)
+    const edge = phone ? 1080 : 1640
+    return (p, f) => {
+      const { at, act } = beatOf(f, count, 0.2)
+      const drops = ramp(p, 0.62, 0.76)
+      runners.forEach((runner, i) => {
+        const t = beatShare(i, at, act)
+        const charge = ramp(t, 0, 0.6)
+        transformTo(runner, `translate(${r1(lerp(edge, xs[i], charge))} ${GROUND}) rotate(${r1(-80 * drops)}) scale(${K})`)
+        fadeTo(runner, i < at || (i === at && act > 0) ? 1 : 0)
+        fadeTo(lattices[i], ramp(t, 0.55, 0.7) * (1 - drops))
+      })
+      return him(x, hack(ramp(act, 0.35, 0.55) * (1 - drops), act))
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Bands: the heavy walker
+
+const WALKER_K = 2.4
+
+// The heavy walker in profile facing him: two jointed legs, the armoured hull, the rocket pod over it and the
+// red sensor eye. In its own 200 by 220 box, feet on y 220; the near knee's actuator is the cut's target.
+function Walker() {
+  return (
+    <g transform="translate(-100 -220)">
+      <path d="M60 120 L30 170 L50 220 M140 120 L170 170 L150 220" fill="none" stroke={NEON.steel} strokeWidth={14} strokeLinejoin="round" />
+      <circle data-fx="knee" cx={30} cy={170} r={10} fill={NEON.panel} stroke={NEON.hud} strokeWidth={3} />
+      <path d="M30 220 H70 M130 220 H170" stroke={NEON.ink} strokeWidth={10} />
+      <path d="M36 60 L164 60 L176 96 L150 128 L50 128 L24 96 Z" fill={NEON.panel} stroke={NEON.ink} strokeWidth={4} />
+      <path d="M40 96 H160" stroke={NEON.magenta} strokeWidth={3} />
+      <rect x={70} y={30} width={60} height={30} fill={NEON.tower} stroke={NEON.ink} strokeWidth={3} />
+      <circle cx={34} cy={80} r={8} fill={NEON.chromeRed} />
+      <path d="M24 70 L-10 64" stroke={NEON.chrome} strokeWidth={8} />
+    </g>
+  )
+}
+
+const ROCKETS = [0, 1, 2]
+
+const walkerAt = ({ phone }: Layout): number => (phone ? 930 : 1300)
+
+const bands: SceneDef = {
+  district: 'lanterns',
+  kit: 'engineer',
+  back: (layout) => (
+    <g data-fx="walker" transform={`translate(${walkerAt(layout)} ${GROUND}) scale(${layout.phone ? WALKER_K * 0.7 : WALKER_K})`}>
+      <Walker />
+    </g>
+  ),
+  front: () => (
+    <>
+      {ROCKETS.map((i) => (
+        <rect key={i} data-fx={`rocket-${i}`} x={-14} y={-4} width={28} height={8} fill={NEON.hud} stroke={NEON.ink} strokeWidth={2} opacity={0} />
+      ))}
+      <rect data-fx="spark" x={-26} y={-26} width={52} height={52} fill="none" stroke={NEON.hud} strokeWidth={4} transform="rotate(45)" opacity={0} />
+      <rect data-fx="slow" x={-1600} y={-900} width={4800} height={2700} fill={NEON.void} opacity={0} />
+    </>
+  ),
+  bind: withCity((stage, layout) => {
+    const { count, cx, phone } = layout
+    const scale = phone ? WALKER_K * 0.7 : WALKER_K
+    const wx = walkerAt(layout)
+    const start = phone ? 660 : 880
+    const knee: readonly [number, number] = [wx - 70 * scale, GROUND - 50 * scale]
+    const gun: readonly [number, number] = [wx - 110 * scale, GROUND - 156 * scale]
+    const walker = fx(stage, 'walker')
+    const rockets = fxs(stage, 'rocket', ROCKETS.length)
+    const spark = fx(stage, 'spark')
+    const slow = fx(stage, 'slow')
+    const camera = fx(stage, 'camera')
+    return (p, f) => {
+      const { at, run: back, act } = beatOf(f, count, 0.25)
+      transformTo(camera, focusOn(cx, GROUND, lerp(1, 0.86, ramp(f, 0, 0.4))))
+      const kneel = ramp(p, 0.62, 0.78)
+      transformTo(walker, `translate(${wx} ${r1(GROUND + 40 * kneel)}) rotate(${r1(-6 * kneel)}) scale(${scale})`)
+      const fly = ramp(act, 0, 0.45)
+      rockets.forEach((rocket, i) => {
+        const tx = lerp(gun[0], start - 40 + 50 * i, fly)
+        const ty = lerp(gun[1], GROUND - 60, fly) - hop(fly, 120)
+        transformTo(rocket, `translate(${r1(tx)} ${r1(ty)}) rotate(${r1(lerp(10, 40, fly))})`)
+        fadeTo(rocket, act > 0 && fly < 1 ? 1 : 0)
+      })
+      fadeTo(slow, 0.4 * ramp(act, 0.15, 0.25) * (1 - ramp(act, 0.6, 0.7)))
+      const dash = ramp(act, 0.25, 0.6)
+      const strike = ramp(act, 0.6, 0.85)
+      transformTo(spark, `translate(${r1(knee[0])} ${r1(knee[1])}) rotate(45) scale(${(0.6 + strike).toFixed(3)})`)
+      fadeTo(spark, strike > 0.5 ? 1 - ramp(strike, 0.9, 1) * 0.5 : 0)
+      const reach = knee[0] - 60
+      if (act > 0) return him(lerp(start, reach, dash), dash < 1 ? run(act * 6) : cut(strike))
+      if (at === 0) return him(start, guard(1))
+      return him(lerp(reach, start, back), LEAP, K, GROUND - hop(back, 140))
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Muay Thai: the duel
+
+// The duelist facing him: a dark fighter with a chrome right arm and a red visor slit, fists up; feet on (0, 0).
+function Duelist() {
+  return (
+    <g transform="translate(-25 -144)">
+      <path d="M14 96 L24 96 L20 144 L8 144 Z M27 96 L37 96 L42 144 L30 144 Z" fill={NEON.ink} stroke={NEON.steel} strokeWidth={1.4} />
+      <path d="M10 48 Q25 42 40 48 L42 98 L8 98 Z" fill={NEON.alley} stroke={NEON.steel} strokeWidth={1.4} strokeLinejoin="round" />
+      <path d="M14 24 Q14 12 25 12 Q36 12 36 25 Q36 38 25 41 Q14 38 14 24 Z" fill={NEON.surface} stroke={NEON.steel} strokeWidth={1.4} />
+      <path d="M14 23 H27" stroke={NEON.chromeRed} strokeWidth={2.6} />
+      <path data-fx="duel-arm" d="M10 50 L-2 62 L2 72" fill="none" stroke={NEON.chrome} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={2} cy={74} r={5} fill={NEON.chrome} stroke={NEON.ink} strokeWidth={1.2} />
+    </g>
+  )
+}
+
+const muayThai: SceneDef = {
+  district: 'slab',
+  kit: 'fighter',
+  back: NONE,
+  front: () => (
+    <g data-fx="duelist">
+      <Duelist />
+    </g>
+  ),
+  bind: withCity((stage, layout) => {
+    const { count, cx, phone } = layout
+    const x = phone ? cx - 70 : cx - 150
+    const rival = phone ? cx + 90 : cx + 170
+    const duelist = fx(stage, 'duelist')
+    const camera = fx(stage, 'camera')
+    return (_p, f) => {
+      const { at, act } = beatOf(f, count)
+      const last = at === count - 1
+      const lunge = ramp(act, 0, 0.35) * (1 - ramp(act, 0.45, 0.6))
+      const knocked = ramp(act, 0.55, 0.8)
+      const down = last ? ramp(act, 0.6, 0.85) : 0
+      transformTo(duelist, `translate(${r1(rival - 70 * lunge + 40 * knocked + 60 * down)} ${GROUND}) rotate(${r1(84 * down)}) scale(${K})`)
+      const push = last ? ramp(act, 0.2, 0.6) : 0
+      transformTo(camera, focusOn(rival, GROUND - 160, 1 + 0.2 * push))
+      if (f <= 0) return him(x, guard(1))
+      if (last) return him(x + 120 * ramp(act, 0.35, 0.6), act < 0.35 ? mix(deflect(1), WIND, ramp(act, 0.1, 0.35)) : cut(ramp(act, 0.35, 0.6)))
+      const pose = act < 0.45 ? mix(guard(1), deflect(1), ramp(act, 0.2, 0.35)) : cut(ramp(act, 0.5, 0.75))
+      return him(x, pose)
+    }
+  }),
+}
+
+// ---------------------------------------------------------------- Contact: the flying cab
+
+const CAB_K = 2.4
+
+// The flying cab in profile: the low body, its lit cabin glass, the yellow roof sign and the cyan thrusters
+// under it. In its own 240 by 80 box.
+function Cab() {
+  return (
+    <g>
+      <path d="M6 50 L18 34 L70 30 L100 14 H160 L192 30 L234 36 L236 52 Z" fill={NEON.ink} stroke={NEON.data} strokeWidth={2} />
+      <path d="M106 18 H156 L182 30 H96 Z" fill={NEON.data} fillOpacity={0.3} />
+      <rect x={112} y={4} width={34} height={9} fill={NEON.hud} stroke={NEON.ink} strokeWidth={1.5} />
+      <rect x={6} y={40} width={8} height={5} fill={NEON.chromeRed} />
+      <rect x={226} y={38} width={10} height={5} fill={NEON.ice} />
+      <g data-fx="thrust">
+        <ellipse cx={50} cy={58} rx={26} ry={5} fill={NEON.data} opacity={0.7} />
+        <ellipse cx={190} cy={58} rx={26} ry={5} fill={NEON.data} opacity={0.7} />
+      </g>
+    </g>
+  )
+}
+
+const cabLeft = ({ cx }: Layout): number => cx - 60
+const CAB_Y = GROUND - 70 * CAB_K
 
 const contact: SceneDef = {
-  district: 'badlands',
+  district: 'outskirts',
   kit: null,
   back: NONE,
   front: (layout) => (
-    <g data-fx="ride" transform={`translate(${r1(carLeft(layout))} ${r1(CAR_TOP)}) scale(${CAR_K})`}>
-      <Car />
+    <g data-fx="cab" transform={`translate(${r1(cabLeft(layout))} -400) scale(${CAB_K})`}>
+      <Cab />
     </g>
   ),
   bind: (stage, layout) => {
-    const ride = fx(stage, 'ride')
-    const streaks = fx(stage, 'streaks')
-    const driver = fx(stage, 'driver')
-    const left = carLeft(layout)
+    const cab = fx(stage, 'cab')
+    const left = cabLeft(layout)
+    const x = left - 50
     return (p) => {
-      const off = ramp(p, 0.55, 0.95) ** 2
-      transformTo(ride, `translate(${r1(left + 1500 * off)} ${r1(CAR_TOP)}) scale(${CAR_K})`)
-      fadeTo(streaks, ramp(p, 0.55, 0.7))
-      const inside = ramp(p, 0.42, 0.52)
-      fadeTo(driver, inside)
-      return merc(left + 48 * CAR_K, SIT, 1.2, CAR_TOP + 52 * CAR_K, 1 - inside)
+      const down = trackEase(ramp(p, 0.08, 0.35))
+      const away = ramp(p, 0.55, 0.95) ** 2
+      transformTo(cab, `translate(${r1(left + 1300 * away)} ${r1(lerp(-400, CAB_Y, down) - 700 * away)}) scale(${CAB_K})`)
+      const step = ramp(p, 0.4, 0.52)
+      return him(x + 110 * step, mix(STAND, SIT, step), K, GROUND - 40 * step, 1 - step)
     }
   },
 }
