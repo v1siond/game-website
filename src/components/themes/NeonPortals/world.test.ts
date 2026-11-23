@@ -4,9 +4,9 @@ import { camAt, cameraPath, eraSwitchAt, layoutCorridor, planeView, settledCam, 
 // play backwards on the way up and dip to dark only between eras.
 
 const rooms: RoomSpec[] = [
-  { id: 'about', era: 'observatory', prop: 'shard', action: 'reach', door: false, metas: [{}, {}, {}] },
-  { id: 'ventures', era: 'keystone', prop: 'socket', action: 'jump', door: true, metas: [{ featured: true }, {}] },
-  { id: 'contact', era: 'beacon', prop: 'beacon', action: 'wave', door: false, metas: [{}] },
+  { id: 'about', era: 'observatory', prop: 'shard', action: 'smash', door: false, metas: [{}, {}, {}] },
+  { id: 'ventures', era: 'keystone', prop: 'socket', action: 'bounce', door: true, metas: [{ featured: true }, {}] },
+  { id: 'contact', era: 'beacon', prop: 'beacon', action: 'dance', door: false, metas: [{}] },
 ]
 
 const marksFor = (top: number, items: number): RoomMarks => ({
