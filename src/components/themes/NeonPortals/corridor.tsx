@@ -1,14 +1,12 @@
 'use client'
 
 import { memo, useCallback, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrollStage } from '@/hooks/useScrollStage'
 import { cssVars } from '@/lib/cssVars'
-import { fillLabel } from '@/lib/cv/labels'
 import { decorArt, doorArt, gateArt, ribArt, vistaArt, type PlaneArt } from './eras'
-import { doorStateAt, hubRunner, isFound, propStateAt, roomRunner, SETTLED_DOOR, SETTLED_PROP, settledRunner, type RunnerState } from './motion'
+import { doorStateAt, hubRunner, propStateAt, roomRunner, SETTLED_DOOR, SETTLED_PROP, settledRunner, type RunnerState } from './motion'
 import { ERAS, type Era } from './palette'
 import { HUB_ERA } from './plan'
 import { partsOf, propArt, updateDoor, updateProp, type Parts } from './props'
@@ -33,7 +31,6 @@ import {
   type Corridor,
   type Keyframe,
   type Plane,
-  type RoomGeometry,
   type RoomMarks,
   type RoomSpec,
   type View,
@@ -64,8 +61,6 @@ interface Measured {
 interface Drawn {
   era: Era | ''
   fog: number
-  room: string
-  tally: string
   planes: Map<string, string>
 }
 
@@ -115,16 +110,12 @@ interface Refs {
   railPath: SVGPathElement | null
   figure: HTMLDivElement | null
   runner: RunnerParts | null
-  hudRoom: HTMLSpanElement | null
-  hudTally: HTMLSpanElement | null
   planes: Map<string, { el: HTMLDivElement; parts: Parts }>
   sparks: HTMLElement[]
 }
 
 interface CorridorWorldProps {
   specs: RoomSpec[]
-  /** Each room's title, for the HUD. */
-  titles: string[]
   /** The text layer: the hero and the rooms, each room a [data-room] section. */
   children: ReactNode
   className: string
@@ -140,17 +131,15 @@ function placeRunner(refs: Refs, view: View, { pose, x }: RunnerState) {
   applyPose(refs.runner!, pose)
 }
 
-export function CorridorWorld({ specs, titles, children, className, style }: CorridorWorldProps) {
-  const labels = useLabels()
+export function CorridorWorld({ specs, children, className, style }: CorridorWorldProps) {
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const corridor: Corridor = useMemo(() => layoutCorridor(specs, phone), [specs, phone])
   const sparks = useMemo(() => sparksFor(corridor.tw), [corridor.tw])
-  const total = useMemo(() => corridor.rooms.reduce((sum, room) => sum + room.items.length, 0), [corridor])
 
-  const refs = useRef<Refs>({ root: null, heroInner: null, fog: null, dark: null, rails: null, railPath: null, figure: null, runner: null, hudRoom: null, hudTally: null, planes: new Map(), sparks: [] }).current
+  const refs = useRef<Refs>({ root: null, heroInner: null, fog: null, dark: null, rails: null, railPath: null, figure: null, runner: null, planes: new Map(), sparks: [] }).current
   const measured = useRef<Measured | null>(null)
-  const drawn = useRef<Drawn>({ era: '', fog: -1, room: '', tally: '', planes: new Map() }).current
+  const drawn = useRef<Drawn>({ era: '', fog: -1, planes: new Map() }).current
 
   const onPlane = useCallback(
     (key: string, el: HTMLDivElement | null) => {
@@ -201,23 +190,6 @@ export function CorridorWorld({ specs, titles, children, className, style }: Cor
     [refs, drawn],
   )
 
-  const setHud = useCallback(
-    (room: RoomGeometry | null, foundAt: number) => {
-      const index = room ? corridor.rooms.indexOf(room) : -1
-      const name = index < 0 ? labels.warp.hub : titles[index]
-      if (name !== drawn.room && refs.hudRoom) {
-        drawn.room = name
-        refs.hudRoom.textContent = name
-      }
-      const found = corridor.rooms.reduce((sum, r) => sum + r.items.filter((item) => isFound(item, foundAt)).length, 0)
-      const tally = fillLabel(labels.navigation.findTally, { found, total })
-      if (tally === drawn.tally || !refs.hudTally) return
-      drawn.tally = tally
-      refs.hudTally.textContent = tally
-    },
-    [corridor, labels, titles, total, refs, drawn],
-  )
-
   const draw = useCallback(
     (position: number) => {
       const m = measured.current
@@ -239,8 +211,6 @@ export function CorridorWorld({ specs, titles, children, className, style }: Cor
         refs.sparks[i].style.opacity = String(opacity)
       })
       placeRunner(refs, m.view, reduced ? settledRunner(room) : room ? roomRunner(room, camZ) : hubRunner(camZ))
-      // Under reduced motion the room on screen counts as found whole.
-      setHud(room, reduced && room ? room.vista : camZ)
       const lift = reduced ? 0 : Math.min(1, Math.max(0, position / m.view.vh))
       if (refs.heroInner) refs.heroInner.style.transform = `scale(${(1 - 0.1 * lift).toFixed(4)})`
 
@@ -270,7 +240,7 @@ export function CorridorWorld({ specs, titles, children, className, style }: Cor
         updateDoor(held.parts, state)
       }
     },
-    [corridor, sparks, reduced, refs, drawn, setEra, setHud],
+    [corridor, sparks, reduced, refs, drawn, setEra],
   )
 
   const mainRef = useScrollStage<HTMLDivElement>({ enabled: true, measure, draw, tauMs: reduced ? 0 : undefined })
@@ -327,14 +297,6 @@ export function CorridorWorld({ specs, titles, children, className, style }: Cor
         </div>
       </div>
       {children}
-      <p className={css.hud} aria-hidden="true">
-        <span ref={(el) => {
-          refs.hudRoom = el
-        }} className="font-bold" />
-        <span ref={(el) => {
-          refs.hudTally = el
-        }} />
-      </p>
     </div>
   )
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import type { Ref } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
@@ -10,9 +9,8 @@ import { ACTION_CLASS } from './hero'
 import { Stage } from './stage'
 import css from './page.module.css'
 
-// The pieces round the gates: the ledger at the top (the era the page is in and how many of its props are
-// reached, both written by the engine), the rail of gates on the right (the engine marks the current one)
-// and the beacon at the end, the contact.
+// The pieces round the gates: the ledger at the top (his initials, a link back to the top), the rail of
+// gates on the right (the engine marks the current one) and the beacon at the end, the contact.
 
 /** His initials, the ledger's mark: the first letter of each word of his name. */
 const initialsOf = (name: string): string =>
@@ -21,8 +19,7 @@ const initialsOf = (name: string): string =>
     .map((word) => word.charAt(0))
     .join('')
 
-export function Ledger({ placeRef, countRef }: { placeRef: Ref<HTMLSpanElement>; countRef: Ref<HTMLSpanElement> }) {
-  const { eras } = useLabels()
+export function Ledger() {
   const { fullName } = useCVData()
   return (
     <header className={css.ledger}>
@@ -30,10 +27,6 @@ export function Ledger({ placeRef, countRef }: { placeRef: Ref<HTMLSpanElement>;
         <span aria-hidden="true">{initialsOf(fullName)}</span>
         <span className="sr-only">{fullName}</span>
       </a>
-      <p className={css.ledgerText}>
-        <span ref={placeRef}>{eras[SCENE_DEFS.hero.place]}</span>
-        <span ref={countRef} className={css.ledgerCount} />
-      </p>
     </header>
   )
 }
@@ -61,7 +54,7 @@ export function Rail({ scenes }: { scenes: readonly Scene[] }) {
 }
 
 export function Beacon({ scene, still }: { scene: Scene; still: boolean }) {
-  const { eras, sections } = useLabels()
+  const { sections } = useLabels()
   const { cv } = useSiteLinks()
   return (
     <section id={scene.anchor} data-scene="contact" aria-labelledby="era-contact" className={css.beacon} style={cssVars(lookVars(scene.look))}>
@@ -69,7 +62,6 @@ export function Beacon({ scene, still }: { scene: Scene; still: boolean }) {
       <RecruiterHero
         render={({ name, line, actions }) => (
           <div className={css.beaconCopy}>
-            <p className={css.plate}>{eras[scene.place]}</p>
             <h2 id="era-contact" className={`${css.display} ${css.title}`}>
               {sections.contact}
             </h2>

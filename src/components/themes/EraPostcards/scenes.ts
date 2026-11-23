@@ -16,33 +16,28 @@ import { arena } from './eras/arena'
 import { jungle } from './eras/jungle'
 
 // The page as scenes: the hub (hero), one era per section of every profession in reading order, the
-// beacon (contact). Each scene names its picture, its card look, its words in labels.eras, its anchor and
-// what its section counts, read from the same slot the section's cards are drawn from.
+// beacon (contact). Each scene names its picture, its card look, its anchor and what its section counts,
+// read from the same slot the section's cards are drawn from.
 
 export type SceneId = 'hero' | SectionId | 'contact'
-
-type EraWords = Labels['eras']
 
 export interface SceneDef {
   era: Era
   look: EraLook
-  place: keyof EraWords
-  /** The ledger's line, "{count} of {total} rune stones lit"; a scene that counts nothing has none. */
-  count: keyof EraWords | null
   anchor: string
 }
 
 export const SCENE_DEFS: Record<SceneId, SceneDef> = {
-  hero: { era: hero, look: LOOK.hero, place: 'placeHero', count: null, anchor: 'top' },
-  about: { era: fern, look: LOOK.about, place: 'placeAbout', count: 'countAbout', anchor: 'about' },
-  work: { era: highway, look: LOOK.work, place: 'placeWork', count: 'countWork', anchor: 'work' },
-  tech: { era: tomb, look: LOOK.tech, place: 'placeTech', count: 'countTech', anchor: 'tech' },
-  services: { era: market, look: LOOK.services, place: 'placeServices', count: 'countServices', anchor: 'services' },
-  projects: { era: wall, look: LOOK.projects, place: 'placeProjects', count: 'countProjects', anchor: 'projects' },
-  ventures: { era: keystone, look: LOOK.ventures, place: 'placeVentures', count: 'countVentures', anchor: 'ventures' },
-  bands: { era: arena, look: LOOK.bands, place: 'placeBands', count: 'countBands', anchor: 'bands' },
-  muayThai: { era: jungle, look: LOOK.muayThai, place: 'placeMuayThai', count: 'countMuayThai', anchor: 'muay-thai' },
-  contact: { era: beacon, look: LOOK.contact, place: 'placeContact', count: null, anchor: 'contact' },
+  hero: { era: hero, look: LOOK.hero, anchor: 'top' },
+  about: { era: fern, look: LOOK.about, anchor: 'about' },
+  work: { era: highway, look: LOOK.work, anchor: 'work' },
+  tech: { era: tomb, look: LOOK.tech, anchor: 'tech' },
+  services: { era: market, look: LOOK.services, anchor: 'services' },
+  projects: { era: wall, look: LOOK.projects, anchor: 'projects' },
+  ventures: { era: keystone, look: LOOK.ventures, anchor: 'ventures' },
+  bands: { era: arena, look: LOOK.bands, anchor: 'bands' },
+  muayThai: { era: jungle, look: LOOK.muayThai, anchor: 'muay-thai' },
+  contact: { era: beacon, look: LOOK.contact, anchor: 'contact' },
 }
 
 const only = (count: number): EraInput => ({ count, years: [], featured: 0 })
