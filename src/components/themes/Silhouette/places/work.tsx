@@ -1,77 +1,72 @@
-import { litOf } from '@/lib/scroll/propRow'
+import { mix } from '@/lib/motion/rigPose'
+import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { FLOOR } from '../forest'
+import { FIGURE_H, FLOOR, H } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { hang } from '../pose'
+import { AT, type Frame, type Place } from '../place'
+import { HANG, rest } from '../pose'
 
-// Work at the chasm's edge: a rope hangs out of the dark for each job, a bell on the beam it hangs from; as
-// each job is read he takes its rope and hangs his weight off it, the rope swings and its bell rings out
-// in light.
+// Work at the chasm: for each job a rope hangs over a gap in the path from a beam with a bell. He leaps,
+// takes the rope and swings out over the gap; the frame holds him at the far top of the swing as the bell
+// rings out in light.
 
-const END = -330
-const BEAM = -760
-// A rope he hangs off swings this far.
-const SWING = 5
+const LENGTH = 560
+// The rope swings from this far back to this far forward, in degrees.
+const BACK = -14
+const OUT = 32
+const GAP = { from: -40, to: 260 }
+
+const angleAt = (t: number): number => BACK + (OUT - BACK) * ramp(t, 0.2, 1)
+const rad = (deg: number): number => (deg * Math.PI) / 180
+
+/** His frame hanging off the rope's end at `deg`: his hands at the end, his body under them. */
+function onRope(profession: Parameters<typeof rest>[0], t: number): Frame {
+  const deg = angleAt(t)
+  const grab = ramp(t, 0, 0.2)
+  const endX = AT + LENGTH * Math.sin(rad(deg))
+  const endY = FLOOR - 300 - LENGTH + LENGTH * Math.cos(rad(deg))
+  return { pose: mix(rest(profession), HANG, grab), ahead: endX * grab, lift: (FLOOR - endY - FIGURE_H * 0.95) * grab, over: 0 }
+}
+
+function Gap({ light }: { light: Light }) {
+  return <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={H - FLOOR + 2} fill={light.mid} />
+}
 
 function Rope() {
   return (
     <>
-      <line x1={0} y1={BEAM} x2={0} y2={END} stroke={SHADE.black} strokeWidth={7} />
-      <circle cx={0} cy={END + 6} r={10} fill={SHADE.black} />
-    </>
-  )
-}
-
-function Beam() {
-  return (
-    <>
-      <rect x={-70} y={BEAM - 20} width={140} height={20} fill={SHADE.black} />
-      <path d={`M-26 ${BEAM} Q-26 ${BEAM + 50} -34 ${BEAM + 60} H34 Q26 ${BEAM + 50} 26 ${BEAM} Z`} fill={SHADE.black} />
-    </>
-  )
-}
-
-function Ring({ light }: { light: Light }) {
-  return (
-    <>
-      <circle cx={0} cy={BEAM + 40} r={90} fill={light.rim} opacity={0.2} />
-      <path d={`M-20 ${BEAM + 10} Q-20 ${BEAM + 46} -26 ${BEAM + 54} H26 Q20 ${BEAM + 46} 20 ${BEAM + 10} Z`} fill={light.rim} />
+      <line x1={0} y1={0} x2={0} y2={LENGTH} stroke={SHADE.black} strokeWidth={7} />
+      <circle cx={0} cy={LENGTH + 6} r={10} fill={SHADE.black} />
     </>
   )
 }
 
 export const work: Place = {
-  floor: ({ xs, profession, light }) => (
+  obstacle: (i, { light }) => (
     <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <>
-            <Beam />
-            <g data-fx={`rope-${i}`}>
-              <Rope />
-            </g>
-          </>
-        )}
-        light={() => <Ring light={light} />}
-      />
-      <Walker xs={xs} profession={profession} />
+      <Gap light={light} />
+      <g transform={`translate(0 ${-300 - LENGTH})`}>
+        <rect x={-70} y={-20} width={140} height={20} fill={SHADE.black} />
+        <path d="M-26 0 Q-26 50 -34 60 H34 Q26 50 26 0 Z" fill={SHADE.black} />
+        <g data-fx={`bell-${i}`} opacity="0">
+          <circle cx={0} cy={40} r={90} fill={light.rim} opacity={0.2} />
+          <path d="M-20 10 Q-20 46 -26 54 H26 Q20 46 20 10 Z" fill={light.rim} />
+        </g>
+        <g data-fx={`rope-${i}`}>
+          <Rope />
+        </g>
+      </g>
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, hang)
-    const props = propNodes(stage, input.xs.length)
-    const ropes = input.xs.map((_, i) => fx(stage, `rope-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const rung = litOf(reached, i)
-        fadeTo(lit, rung)
-        transformTo(ropes[i], `rotate(${(-SWING * rung).toFixed(1)} 0 ${BEAM})`)
+  move: onRope,
+  reply: (stage, { count }) => {
+    const ropes = Array.from({ length: count }, (_, i) => fx(stage, `rope-${i}`))
+    const bells = Array.from({ length: count }, (_, i) => fx(stage, `bell-${i}`))
+    return (played) =>
+      ropes.forEach((rope, i) => {
+        const t = played(i)
+        transformTo(rope, `rotate(${(-(t > 0 ? angleAt(t) : 0)).toFixed(1)} 0 0)`)
+        fadeTo(bells[i], ramp(t, 0.8, 1))
       })
-    }
   },
 }
