@@ -1,0 +1,44 @@
+/* Medieval Fantasy's theatre: the realm's void behind every stage and the dark a stage fades into, the
+   vignette over each land, and where each realm's figure stands. The golem rises on the right of the chaos
+   field, clear of the text column on the left; the spires grow on the right of the frost king, who stands at
+   the left of the ice (hero.tsx), clear of the text column on the right. */
+
+.root {
+  --theatre-ground: var(--realm-bg-void);
+  --theatre-veil: var(--realm-bg-void);
+}
+
+.stage {
+  background: var(--realm-bg-void);
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 20%, rgb(0 0 0 / 0.7) 100%);
+}
+
+/* The golem's 160 by 200 box, his feet near its foot. */
+.golem {
+  position: absolute;
+  right: 10%;
+  bottom: 5%;
+  width: clamp(140px, 17vw, 250px);
+  aspect-ratio: 160 / 200;
+}
+
+/* The spires' 560 by 200 box, from just past the frost king's right side (left 11%, 120 px wide). */
+.spires {
+  position: absolute;
+  left: calc(11% + 128px);
+  bottom: 3%;
+  width: clamp(160px, 22vw, 320px);
+  aspect-ratio: 560 / 200;
+}
+
+/* The contact's call and the footer stand on the frost land, no frame of their own: a plate of the realm's
+   void under them keeps the lettering at AAA over the brightest ice behind. */
+.plate {
+  background: color-mix(in srgb, var(--realm-bg-void) 94%, transparent);
+  border-radius: 4px;
+}

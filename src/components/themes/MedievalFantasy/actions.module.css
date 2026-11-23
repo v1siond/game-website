@@ -1,12 +1,12 @@
-/* The language menu's items: iron at rest, lit fel on the current language, and the same lifted iron for a
+/* The language menu's items: iron at rest, lit blight on the current language, and the same lifted iron for a
    pointer over an item and for keyboard focus on it. */
 .item {
   background: transparent;
   color: var(--realm-text-mid);
 }
 .item[aria-current] {
-  background: color-mix(in srgb, var(--realm-chaos-fel-dark) 25.1%, transparent);
-  color: var(--realm-chaos-fel-bright);
+  background: color-mix(in srgb, var(--realm-chaos-blight-dark) 25.1%, transparent);
+  color: var(--realm-chaos-blight-bright);
 }
 .item:not([aria-current]):hover,
 .item:not([aria-current]):focus-visible {

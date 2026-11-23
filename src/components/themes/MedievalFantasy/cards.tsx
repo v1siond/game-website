@@ -33,17 +33,17 @@ export const MARKED_LIST: MarkedLinesLook = {
 }
 
 // The tags under a card, every one: a job's skills, a project's technologies, a venture's services, on the
-// fel green at alpha 0x40 (64 of 255).
+// blight green at alpha 0x40 (64 of 255).
 const CHIP_ROW: TagListLook = {
   list: 'mt-2 flex flex-wrap gap-1',
-  tag: 'bg-[color-mix(in_srgb,var(--realm-chaos-fel-dark)_25.098%,transparent)] px-1 py-0.5 text-[0.875rem] uppercase text-[color:var(--realm-chaos-fel-text)]',
+  tag: 'bg-[color-mix(in_srgb,var(--realm-chaos-blight-dark)_25.098%,transparent)] px-1 py-0.5 text-[0.875rem] uppercase text-[color:var(--realm-chaos-blight-text)]',
 }
 
 export function JobCard({ job }: { job: Job }) {
   const { years, cards } = useLabels()
   const card = jobCard(job, years)
   return (
-    <InnerCard highlight={job.endDate === null} zone="roc">
+    <InnerCard highlight={job.endDate === null} zone="chaos">
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem 0.75rem', marginBottom: '0.375rem' }}>
         <div style={{ minWidth: 0 }}>
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{card.title}</h3>
@@ -64,7 +64,7 @@ export function ProjectCard({ slot: { project, links } }: { slot: ProjectSlot })
   const labels = useLabels()
   const card = projectCard(project, labels)
   return (
-    <InnerCard zone="ft">
+    <InnerCard zone="frost">
       <h3 style={CARD_TITLE}><SlashBreaks text={card.name} /></h3>
       <p style={CARD_SUBTITLE}>
         {card.role}
@@ -89,7 +89,7 @@ export function ProjectCard({ slot: { project, links } }: { slot: ProjectSlot })
 
 export function BandCard({ band, years, linkProps, release }: BandSlot) {
   return (
-    <InnerCard zone="ft">
+    <InnerCard zone="frost">
       <h3 style={CARD_TITLE}>
         {linkProps ? (
           <a {...linkProps} style={{ color: REALM.textBright, textDecoration: 'underline', textUnderlineOffset: '3px' }}>{band.name}</a>
@@ -115,7 +115,7 @@ export function VentureCard({ slot: { venture, linkProps, nameFor } }: { slot: V
   const card = ventureCard(venture)
   const address = shownUrl(card.url)
   return (
-    <InnerCard zone="ft" highlight={card.featured}>
+    <InnerCard zone="frost" highlight={card.featured}>
       {card.featured && (
         <p className="mb-2 inline-block border border-[color:var(--realm-gold-dark)] px-2 py-0.5 text-sm font-semibold uppercase tracking-[0.08em] text-[color:var(--realm-gold-bright)]">
           {cards.ownProduct}

@@ -1,8 +1,6 @@
 import { memo, type ReactNode } from 'react'
 import { REALM } from './palette'
-import ornament from './ornaments.module.css'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
-import { cycles } from '@/components/themes/shared/loops'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
 
@@ -14,10 +12,10 @@ interface Ornament {
   art: ReactNode
 }
 
-type RoCOrnamentType = 'flag' | 'weapons' | 'shield'
-type FTOrnamentType = 'shard' | 'rune' | 'frost'
+type ChaosOrnamentType = 'flag' | 'weapons' | 'shield'
+type FrostOrnamentType = 'shard' | 'rune' | 'frost'
 
-const ROC_ORNAMENTS: Record<RoCOrnamentType, Ornament> = {
+const CHAOS_ORNAMENTS: Record<ChaosOrnamentType, Ornament> = {
   flag: {
     width: '60px',
     height: '120px',
@@ -69,7 +67,7 @@ const ROC_ORNAMENTS: Record<RoCOrnamentType, Ornament> = {
   },
 }
 
-const FT_ORNAMENTS: Record<FTOrnamentType, Ornament> = {
+const FROST_ORNAMENTS: Record<FrostOrnamentType, Ornament> = {
   shard: {
     width: '50px',
     height: '100px',
@@ -126,19 +124,19 @@ function OrnamentSvg({ ornament: { width, height, viewBox, art }, side, offset, 
   )
 }
 
-export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'left' | 'right'; type: RoCOrnamentType }) {
-  return <OrnamentSvg ornament={ROC_ORNAMENTS[type]} side={side} offset="-80px" opacity={0.25} />
+export const ChaosOrnament = memo(function ChaosOrnament({ side, type }: { side: 'left' | 'right'; type: ChaosOrnamentType }) {
+  return <OrnamentSvg ornament={CHAOS_ORNAMENTS[type]} side={side} offset="-80px" opacity={0.25} />
 })
 
-export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left' | 'right'; type: FTOrnamentType }) {
-  return <OrnamentSvg ornament={FT_ORNAMENTS[type]} side={side} offset="-70px" opacity={0.2} />
+export const FrostOrnament = memo(function FrostOrnament({ side, type }: { side: 'left' | 'right'; type: FrostOrnamentType }) {
+  return <OrnamentSvg ornament={FROST_ORNAMENTS[type]} side={side} offset="-70px" opacity={0.2} />
 })
 
 // =============================================================================
 // ART SECTION DIVIDERS - Decorative breaks between content
 // =============================================================================
 
-export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', scale = 1 }: { variant?: 'horde' | 'alliance' | 'weapons'; scale?: number }) {
+export const ChaosArtDivider = memo(function ChaosArtDivider({ variant = 'warband', scale = 1 }: { variant?: 'warband' | 'kingdom' | 'weapons'; scale?: number }) {
   return (
     <div style={{
       position: 'relative',
@@ -153,7 +151,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
         position: 'absolute',
         width: '200px',
         height: '60px',
-        background: `radial-gradient(ellipse, ${REALM.chaosFelDark}20 0%, transparent 70%)`,
+        background: `radial-gradient(ellipse, ${REALM.chaosBlightDark}20 0%, transparent 70%)`,
         filter: 'blur(20px)',
         pointerEvents: 'none',
       }} />
@@ -175,12 +173,12 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
 
       {/* Center shield ornament */}
       <svg aria-hidden="true" width="140" height="100" viewBox="0 0 140 100" style={{ position: 'relative', zIndex: 2 }}>
-        {variant === 'horde' && (
+        {variant === 'warband' && (
           <g transform="translate(70,50)">
-            {/* Horde shield shape - pointed bottom */}
+            {/* Warband shield shape - pointed bottom */}
             <path
               d="M0,-38 L32,-28 L35,5 L20,32 L0,42 L-20,32 L-35,5 L-32,-28 Z"
-              fill={REALM.hordeRed}
+              fill={REALM.warbandRed}
               stroke={REALM.metalDark}
               strokeWidth="3"
             />
@@ -192,7 +190,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
               strokeWidth="1.5"
               opacity="0.5"
             />
-            {/* Orc skull emblem */}
+            {/* Brute skull emblem */}
             <g transform="translate(0,-2)">
               {/* Skull base */}
               <ellipse cx="0" cy="0" rx="16" ry="14" fill={REALM.ember19a} />
@@ -203,7 +201,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
               <ellipse cx="6" cy="-2" rx="5" ry="4" fill={REALM.ember7} />
               {/* Nose hole */}
               <ellipse cx="0" cy="6" rx="3" ry="4" fill={REALM.ember7} />
-              {/* Tusks - horizontal orc style */}
+              {/* Tusks - horizontal brute style */}
               <path d="M-12,8 L-22,5 L-20,10 Z" fill={REALM.ember22} stroke={REALM.ember16a} strokeWidth="1" />
               <path d="M12,8 L22,5 L20,10 Z" fill={REALM.ember22} stroke={REALM.ember16a} strokeWidth="1" />
               {/* Brow ridge */}
@@ -214,12 +212,12 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
             <polygon points="32,-28 40,-25 35,-18" fill={REALM.metalDark} />
           </g>
         )}
-        {variant === 'alliance' && (
+        {variant === 'kingdom' && (
           <g transform="translate(70,50)">
-            {/* Alliance shield shape - rounded bottom */}
+            {/* Kingdom shield shape - rounded bottom */}
             <path
               d="M0,-38 L30,-30 L35,-5 L30,20 L0,38 L-30,20 L-35,-5 L-30,-30 Z"
-              fill={REALM.allianceBlue}
+              fill={REALM.kingdomBlue}
               stroke={REALM.goldDark}
               strokeWidth="3"
             />
@@ -249,7 +247,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
         )}
         {variant === 'weapons' && (
           <g transform="translate(70,50)">
-            {/* Crossed axes - more orc-like */}
+            {/* Crossed axes - more brute-like */}
             <g transform="rotate(-35)">
               <rect x="-3" y="-35" width="6" height="55" fill={REALM.metalMid} rx="2" />
               {/* Axe head */}
@@ -262,7 +260,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
             </g>
             {/* Center boss */}
             <circle cx="0" cy="0" r="10" fill={REALM.metalDark} stroke={REALM.metalMid} strokeWidth="2" />
-            <circle cx="0" cy="0" r="5" fill={REALM.chaosFelMid} style={{ filter: `drop-shadow(0 0 4px ${`${REALM.moss27}80`})` }} />
+            <circle cx="0" cy="0" r="5" fill={REALM.chaosBlightMid} style={{ filter: `drop-shadow(0 0 4px ${`${REALM.moss27}80`})` }} />
           </g>
         )}
       </svg>
@@ -288,7 +286,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
   )
 })
 
-export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', scale = 1 }: { variant?: 'crystals' | 'rune' | 'throne'; scale?: number }) {
+export const FrostArtDivider = memo(function FrostArtDivider({ variant = 'crystals', scale = 1 }: { variant?: 'crystals' | 'rune' | 'throne'; scale?: number }) {
   return (
     <div style={{
       position: 'relative',
@@ -414,8 +412,7 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
             opacity: 0.3 + (i % 4) * 0.1,
             borderRadius: '1px',
             transform: `rotate(${i * 15}deg)`,
-            animation: cycles(ornament.felPulse, 2.5 + i * 0.2, 'ease-in-out'),
-          }}
+            }}
         />
       ))}
     </div>
