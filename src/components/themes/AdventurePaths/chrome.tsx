@@ -10,7 +10,7 @@ import { LAYER_MOTION, type TrailScene } from './scenes'
 import page from './page.module.css'
 
 // The pieces round the levels: the HUD bar at the top of the screen (his initials, back to the top) and
-// the goal at the end, the contact, under the flagpole run.
+// the goal at the end, the contact, under the run through the finish gate.
 
 export function Hud({ anchor }: { anchor: string }) {
   const { fullName } = useCVData()

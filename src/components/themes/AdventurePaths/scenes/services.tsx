@@ -1,46 +1,73 @@
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, frames, fx, lerp, translateTo } from '../../shared/stageNodes'
+import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, Canvas, Cloud, DomeHills, FoeRig, GROUND, GrassGround, HeroRig, Placed, Sky, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
-import { beatOf, type Level } from './level'
-import { Pipe } from './pieces'
+import { BLOCK, Bush, CRITTER_FRAMES, Canvas, Cloud, DomeHills, FoeRig, GROUND, GrassGround, Placed, Sky, critterStep } from './kit'
+import type { Level } from './level'
+import { Coin, Tree } from './pieces'
+import { StopsFigure, keyed, stopsWriter, type Stops } from './stops'
 
-// The services: the stretch between levels, where a mushroom walks the path for each service (the source
-// game's first move). Each mushroom walks up while the card before it is read; as its own service is read
-// he runs at it, jumps and stomps it flat.
+// The services: the stretch between levels, trees off along the path. For each service a
+// critter walks up the path at him; he tucks into a roll and bowls into it, the critter tumbles away onto
+// its back, and a coin springs up where it stood with a ring round it.
 
-const START = 520
-const STEP_EVERY = 30
-const WALK = 120
+const CRITTER_FROM = 380
+const HIT_X = 230
+const ROLL_END = 170
+const ROLL = [0.12, 0.5] as const
+const COIN_TOP = -280
+const COIN_W = 10 * BLOCK
 
-/** Each service's mushroom along the course, where it stands once he reaches it. */
-const foesAt = (count: number): number[] => courseAt(count, 860, 280)
-
-const FOE_FRAMES = ['walkerA', 'walkerB', 'walkerFlat'] as const
-
-/** A walking mushroom's step frame at x. */
-const stepFrame = (x: number): string => (Math.floor(x / STEP_EVERY) % 2 === 0 ? 'walkerA' : 'walkerB')
-
-function heroOf(xs: readonly number[], p: number, f: number): { x: number; y: number; pose: string } {
-  const entry = ramp(p, 0.02, 0.2)
-  if (entry < 1) {
-    const x = lerp(START - 520, START, entry)
-    return { x, y: GROUND, pose: runFrame(x) }
-  }
-  const { k, t } = beatOf(f, xs.length)
-  const from = k === 0 ? START : xs[k - 1]
-  const takeOff = xs[k] - 180
-  if (t < 0.45) {
-    const x = lerp(from, takeOff, t / 0.45)
-    return { x, y: GROUND, pose: t === 0 ? 'stand' : runFrame(x) }
-  }
-  if (t >= 0.85) return { x: xs[k], y: GROUND, pose: 'stand' }
-  const u = (t - 0.45) / 0.4
-  return { x: lerp(takeOff, xs[k], u), y: GROUND - arc(u, 200), pose: u > 0.5 ? 'stomp' : 'jump' }
+const course: Stops = {
+  back: (i) => (
+    <>
+      <g data-fx={`coin-${i}`} transform={`translate(${HIT_X - COIN_W / 2} -60)`} opacity={0}>
+        <circle data-fx={`ring-${i}`} cx={COIN_W / 2} cy={28} r={10} fill="none" stroke={TRAIL.COIN} strokeWidth={6} />
+        <g transform={`scale(${BLOCK})`}>
+          <Coin />
+        </g>
+      </g>
+      <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_FROM} 0)`}>
+        <g transform="scale(-1 1)">
+          <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
+        </g>
+      </g>
+    </>
+  ),
+  move: keyed([
+    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
+    { at: ROLL[0], pose: 'stomp', ahead: 0, lift: 0 },
+    { at: ROLL[1], pose: 'stomp', ahead: ROLL_END, lift: 0, spin: 720 },
+    { at: ROLL[1] + 0.08, pose: 'stomp', ahead: ROLL_END, lift: 0, spin: 720 },
+    { at: ROLL[1] + 0.1, pose: 'stand', ahead: ROLL_END, lift: 0, spin: 720 },
+  ]),
+  reply: (stage, { count }) => {
+    const stops = Array.from({ length: count }, (_, i) => ({
+      critter: fx(stage, `critter-at-${i}`),
+      critterFace: frames(fx(stage, `critter-${i}`), 'critterA'),
+      coin: fx(stage, `coin-${i}`),
+      ring: fx(stage, `ring-${i}`),
+    }))
+    return (played) =>
+      stops.forEach(({ critter, critterFace, coin, ring }, i) => {
+        const t = played(i)
+        const walk = lerp(CRITTER_FROM, HIT_X, ramp(t, 0, ROLL[1]))
+        const tumble = ramp(t, ROLL[1], ROLL[1] + 0.25)
+        const x = walk + 170 * tumble
+        transformTo(critter, `translate(${r1(x)} ${r1(-hop(tumble, 160))}) rotate(${r1(-540 * tumble)} 0 -27)`)
+        critterFace(tumble >= 1 ? 'critterTipped' : critterStep(walk))
+        const rise = ramp(t, ROLL[1], ROLL[1] + 0.2)
+        translateTo(coin, HIT_X - COIN_W / 2, lerp(-60, COIN_TOP, rise))
+        fadeTo(coin, rise > 0 ? 1 : 0)
+        const rings = ramp(t, ROLL[1] + 0.15, ROLL[1] + 0.4)
+        ring?.setAttribute('r', r1(10 + 70 * rings).toString())
+        fadeTo(ring, 1 - rings)
+      })
+  },
 }
 
 export const services: Level = {
-  layers: ({ count, profession }) => [
+  layers: (input) => [
     {
       name: 'sky',
       node: (
@@ -56,8 +83,8 @@ export const services: Level = {
       node: (
         <Canvas>
           {[80, 420, 980, 1380].map((x, i) => (
-            <Placed key={x} x={x} y={GROUND - 120 - (i % 2) * 90}>
-              <Pipe height={70 + (i % 2) * 24} />
+            <Placed key={x} x={x} y={GROUND - 60 - (4 + (i % 2)) * 56} scale={4 + (i % 2)}>
+              <Tree />
             </Placed>
           ))}
         </Canvas>
@@ -67,7 +94,7 @@ export const services: Level = {
       name: 'mid',
       node: (
         <Canvas>
-          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} eye={TRAIL.HUD} />
+          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} />
         </Canvas>
       ),
     },
@@ -81,18 +108,7 @@ export const services: Level = {
     },
     {
       name: 'figure',
-      node: (
-        <Canvas>
-          <g data-fx="course">
-            {foesAt(count).map((x, i) => (
-              <g key={x} data-fx={`foe-at-${i}`} transform={`translate(${x + WALK} ${GROUND})`}>
-                <FoeRig name={`foe-${i}`} kinds={FOE_FRAMES} />
-              </g>
-            ))}
-            <HeroRig profession={profession} />
-          </g>
-        </Canvas>
-      ),
+      node: <StopsFigure stops={course} input={input} />,
     },
     {
       name: 'fg',
@@ -103,22 +119,5 @@ export const services: Level = {
       ),
     },
   ],
-  bind: (stage, { count }) => {
-    const xs = foesAt(count)
-    const hero = rigOf(stage, 'hero', 'stand')
-    const pan = panOf(stage)
-    const foes = xs.map((x, i) => ({ x, node: fx(stage, `foe-at-${i}`), face: frames(fx(stage, `foe-${i}`), 'walkerA') }))
-    return (p, f) => {
-      foes.forEach(({ x, node, face }, i) => {
-        const flat = f - i - 0.85 >= 0
-        // It walks up toward him while the card before it is read, and stops where he will stomp it.
-        const walk = WALK * clamp01(i - f)
-        translateTo(node, x + walk, GROUND)
-        face(flat ? 'walkerFlat' : stepFrame(x + walk + p * BLOCK * 60))
-      })
-      const { x, y, pose } = heroOf(xs, p, f)
-      pan(cameraFor(x))
-      hero(x, y, pose)
-    }
-  },
+  bind: (stage, input) => stopsWriter(stage, input, course),
 }

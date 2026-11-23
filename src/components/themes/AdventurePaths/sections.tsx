@@ -56,8 +56,8 @@ const COIN_TAGS: TagListLook = {
   marker: <span className="h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />,
 }
 
-// The four palace colours a project's tech blocks fill with, taken in turn: ink on gold, white on the rest.
-const PALACE = [
+// The four block colours a project's tech blocks fill with, taken in turn: ink on gold, white on the rest.
+const BLOCK_FILLS = [
   'bg-[color:var(--ap-gold)] text-[color:var(--ap-ink)]',
   'bg-[color:var(--ap-forest)] text-white',
   'bg-[color:var(--ap-route-plate)] text-white',
@@ -168,7 +168,7 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
               )}
               <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
                 {project.techStack.map((item) => (
-                  <li key={item} className={`rounded-sm border-2 border-[color:var(--ap-ink)] px-2 py-1 text-sm font-semibold ${PALACE[index % PALACE.length]}`}>
+                  <li key={item} className={`rounded-sm border-2 border-[color:var(--ap-ink)] px-2 py-1 text-sm font-semibold ${BLOCK_FILLS[index % BLOCK_FILLS.length]}`}>
                     {item}
                   </li>
                 ))}

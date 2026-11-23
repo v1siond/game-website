@@ -1,18 +1,18 @@
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
-import { FOE_INK, SIDE_INK, SPRITE_INK, TRAIL } from './palette'
+import { FOE_INK, HERO_INK, SPRITE_INK, TRAIL } from './palette'
 
 // The side view cast of the levels, drawn as pixel rows (one letter a pixel, '.' clear) like the top view
-// map walker in sprite.ts. Him: a parody of the plumber hero in the 16 bit side view, 16 by 26, facing
-// right: the red cap with its long brim, red shirt under blue overalls with a gold button, white gloves,
-// brown shoes, and his full dark beard where the moustache would be (skin, hair, beard and eyes from
-// HERO_IDENTITY). Frames from the game's own set: stand, the two run frames, the fist up jump, the stomp
-// (feet together, arms up), the kick, the grab on the flagpole, and the cheer. The foes: the round
-// walking mushroom (two step frames and squashed flat), the turtle (two step frames and its empty shell)
-// and the biting plant (mouth open and shut).
+// map walker in sprite.ts. Him in the 16 bit side view, 16 by 26, facing right: his short dark hair, his
+// full dark beard, his skin and eyes (HERO_IDENTITY) and his own clothes per profession, a shirt over
+// trousers and brown shoes; the Martial Artist bare chested in shorts and gold gloves with the mongkhon.
+// Frames from the genre's own set: stand, the two run frames, the knee up jump, the stomp (feet together,
+// arms up), the kick, the hang from a rope, the cheer, the crate held over his head and the throw. The
+// foe: his own critter, a round shelled beetle on six legs (two step frames, squashed flat, and tipped on
+// its back).
 //
-// Hero keys: K outline, C cap, c brim, M the mongkhon cord, Y button, S skin, s nose shade, H hair, B beard,
-// E eyes, T shirt, P overalls, G gloves, F shoes.
+// Hero keys: K outline, M the mongkhon cord, S skin, s nose shade, H hair, B beard, E eyes, T shirt,
+// A hands, P trousers, Q their lower legs, F shoes.
 
 export const HERO = { width: 16, height: 26 } as const
 
@@ -29,12 +29,12 @@ const FACE = [
   '....KBBBBBBBK...',
 ]
 
-const CAP_DOME = ['.....KKKKKK.....', '...KKCCCCCCKK...']
+const HAIR_TOP = ['.....KKKKKK.....', '...KKHHHHHHKK...']
 
 const HEADS = {
-  cap: [...CAP_DOME, '..KCCCCCCCCCCK..', '..KCCCCCCCYYCK..', '..KHcccccccccccK', ...FACE],
-  // the mongkhon tied round the cap, its tail flying behind
-  capRing: [...CAP_DOME, '.KKMMMMMMMMMMK..', 'KMKCCCCCCCYYCK..', '..KHcccccccccccK', ...FACE],
+  hair: [...HAIR_TOP, '..KHHHHHHHHHHK..', '..KHHHHHHHHHHHK.', '..KHHHHHHSSSSK..', ...FACE],
+  // the mongkhon tied round his head, its tail flying behind
+  hairRing: [...HAIR_TOP, '.KKMMMMMMMMMMK..', 'KMKHHHHHHHHHHHK.', '..KHHHHHHSSSSK..', ...FACE],
 } as const
 
 export type HeroHeadgear = keyof typeof HEADS
@@ -43,55 +43,55 @@ const TORSOS = {
   stand: [
     '....KTTTTTTK....',
     '...KTTTTTTTTK...',
-    '...KPPKTTKPPK...',
-    '...KPPKTTKYPK...',
-    '...KPPKGGKPPK...',
-    '....KPPKKPPPK...',
+    '...KTTKTTKTTK...',
+    '...KTTKTTKTTK...',
+    '...KTTKAAKTTK...',
+    '....KTTKKTTTK...',
   ],
-  // the near arm swung back, glove behind him
+  // the near arm swung back, hand behind him
   armBack: [
     '....KTTTTTTK....',
     '..KKTTTTTTTTK...',
-    '.KTTKPPPPPPPK...',
-    'KGGKPPPPYPPK....',
-    'KGGKPPPPPPPK....',
-    '.KK.KPPPPPPK....',
+    '.KTTKTTTTTTTK...',
+    'KAAKTTTTTTTK....',
+    'KAAKTTTTTTTK....',
+    '.KK.KTTTTTTK....',
   ],
-  // the near arm swung forward, glove in front
+  // the near arm swung forward, hand in front
   armFront: [
     '....KTTTTTTK....',
     '...KTTTTTTTTKK..',
-    '...KPPPPPPKTTK..',
-    '...KPPPPYPKKGGK.',
-    '...KPPPPPPPKGGK.',
-    '....KPPPPPPKKK..',
+    '...KTTTTTTKTTK..',
+    '...KTTTTTTKKAAK.',
+    '...KTTTTTTTKAAK.',
+    '....KTTTTTTKKK..',
   ],
-  // the near arm up past his cap (the fist is in the overlay), the far glove out behind
+  // the near arm up past his head (the fist is in the overlay), the far hand out behind
   fistUp: [
     '....KTTTTTTKTK..',
     '...KTTTTTTTTK...',
-    '...KPPPPPYPPK...',
-    '.KGKPPPPPPPPK...',
-    '..KKPPPPPPPK....',
-    '....KPPPPPPK....',
+    '...KTTTTTTTTK...',
+    '.KAKTTTTTTTTK...',
+    '..KKTTTTTTTK....',
+    '....KTTTTTTK....',
   ],
   // both arms flung up and out as he drops on a foe
   armsUp: [
-    'KGK.KTTTTTTK.KGK',
+    'KAK.KTTTTTTK.KAK',
     '.KTKTTTTTTTTKTK.',
-    '..KKPPPPPYPPKK..',
-    '....KPPPPPPPK...',
-    '....KPPPPPPPK...',
-    '....KPPPPPPPK...',
+    '..KKTTTTTTTTKK..',
+    '....KTTTTTTTK...',
+    '....KTTTTTTTK...',
+    '....KTTTTTTTK...',
   ],
-  // both hands up on the pole in front of him (the gloves are in the overlay)
+  // both hands up on the rope in front of him (the hands are in the overlay)
   hold: [
     '....KTTTTTTTKK..',
     '...KTTTTTTTTK...',
-    '...KPPPPPPYPK...',
-    '...KPPPPPPPPK...',
-    '....KPPPPPPPK...',
-    '....KPPPPPPK....',
+    '...KTTTTTTTTK...',
+    '...KTTTTTTTTK...',
+    '....KTTTTTTTK...',
+    '....KTTTTTTK....',
   ],
 } as const
 
@@ -102,7 +102,7 @@ const LEGS = {
     HIPS,
     '....KPPPKPPPK...',
     '....KPPK.KPPK...',
-    '....KPPK.KPPK...',
+    '....KQQK.KQQK...',
     '....KFFK.KFFFK..',
     '...KFFFK.KFFFFK.',
     '...KKKKK.KKKKKK.',
@@ -112,7 +112,7 @@ const LEGS = {
     HIPS,
     '...KPPPKKPPPPK..',
     '..KPPK....KPPPK.',
-    '.KPPK......KPPK.',
+    '.KQQK......KQQK.',
     'KFFK.......KFFFK',
     '.KK........KKKKK',
     '................',
@@ -122,8 +122,8 @@ const LEGS = {
     HIPS,
     '....KPPPPPPK....',
     '....KPPKKPPK....',
-    '...KFFK.KPPK....',
-    '...KKK..KPPK....',
+    '...KFFK.KQQK....',
+    '...KKK..KQQK....',
     '........KFFFK...',
     '........KKKKK...',
   ],
@@ -132,8 +132,8 @@ const LEGS = {
     HIPS,
     '....KPPPPPPPPKK.',
     '....KPPKKKPPFFK.',
-    '...KPPK..KKFFFK.',
-    '...KPPK...KKKK..',
+    '...KQQK..KKFFFK.',
+    '...KQQK...KKKK..',
     '..KFFFK.........',
     '..KKKKK.........',
   ],
@@ -142,7 +142,7 @@ const LEGS = {
     HIPS,
     '....KPPPKPPPK...',
     '.....KPPKPPK....',
-    '.....KPPKPPK....',
+    '.....KQQKQQK....',
     '.....KFFKFFFK...',
     '.....KFFKFFFK...',
     '.....KKKKKKKK...',
@@ -152,30 +152,30 @@ const LEGS = {
     '....KPPPPPPPKK..',
     '....KPPPPPPPPPK.',
     '....KPPKKKKPFFFK',
-    '....KPPK...KKKKK',
-    '....KPPK........',
+    '....KQQK...KKKKK',
+    '....KQQK........',
     '...KFFFK........',
     '...KKKKK........',
   ],
-  // knees drawn up and feet hooked on the pole
+  // knees drawn up and feet hooked round the rope
   hook: [
     HIPS,
     '....KPPPPPPK....',
     '.....KPPPPPK....',
-    '.....KPPKPPK....',
-    '.....KPPKFFFK...',
+    '.....KQQKQQK....',
+    '.....KQQKFFFK...',
     '.....KFFKKKKK...',
     '.....KKKK.......',
   ],
 } as const
 
-// Parts drawn over the head: the raised fist, and the two hands on the pole.
+// Parts drawn over the head: the raised fist, and the two hands on the rope.
 const OVERLAYS = {
-  fist: ['............KKK.', '...........KGGGK', '...........KGGGK', '............KTK.', '............KTK.', '............KTK.'],
-  grip: ['...........KGGK.', '...........KGGK.', '..........KTKK..', '..........KTK...', '...........KGGK.', '...........KGGK.', '..........KTK...'],
+  fist: ['............KKK.', '...........KAAAK', '...........KAAAK', '............KTK.', '............KTK.', '............KTK.'],
+  grip: ['...........KAAK.', '...........KAAK.', '..........KTKK..', '..........KTK...', '...........KAAK.', '...........KAAK.', '..........KTK...'],
 } as const
 
-export type HeroPose = 'stand' | 'runA' | 'runB' | 'jump' | 'stomp' | 'kick' | 'grab' | 'cheer'
+export type HeroPose = 'stand' | 'runA' | 'runB' | 'jump' | 'stomp' | 'kick' | 'grab' | 'cheer' | 'carry' | 'throw'
 
 interface PoseParts {
   torso: keyof typeof TORSOS
@@ -193,6 +193,9 @@ const POSES: Record<HeroPose, PoseParts> = {
   kick: { torso: 'armBack', legs: 'kick' },
   grab: { torso: 'hold', legs: 'hook', overlay: 'grip' },
   cheer: { torso: 'fistUp', legs: 'stand', overlay: 'fist' },
+  // the crate held up over his head in both hands, then flung forward off the stride
+  carry: { torso: 'hold', legs: 'stand', overlay: 'grip' },
+  throw: { torso: 'armFront', legs: 'stride' },
 }
 
 export const HERO_POSES = Object.keys(POSES) as HeroPose[]
@@ -219,20 +222,15 @@ export function heroParts(pose: HeroPose, headgear: HeroHeadgear): SpritePart[] 
 /** Where his eye is, for the blink. */
 export const HERO_EYE = { x: 9, y: HEAD_TOP + 5, height: 2 } as const
 
-const COSTUME = {
+const BODY = {
   K: SPRITE_INK.OUTLINE,
-  C: SIDE_INK.RED,
-  c: SIDE_INK.BRIM,
-  T: SIDE_INK.RED,
   M: TRAIL.PAGE,
-  Y: SIDE_INK.BUTTON,
   S: HERO_IDENTITY.skin,
   s: HERO_IDENTITY.skinShade,
   H: HERO_IDENTITY.hair,
   B: HERO_IDENTITY.beard,
   E: HERO_IDENTITY.eyes,
-  P: SIDE_INK.OVERALLS,
-  G: SPRITE_INK.GLOVE,
+  A: HERO_IDENTITY.skin,
   F: SPRITE_INK.SHOE,
 }
 
@@ -241,80 +239,34 @@ export interface HeroOutfit {
   colours: Record<string, string>
 }
 
-/** The same cap and overalls for every profession; the Martial Artist wears gold gloves and the mongkhon. */
+/** His own clothes per profession: the System Engineer's teal shirt and jeans, the Musician's black tee and
+ *  black jeans, the Martial Artist bare chested in red shorts (bare shins) with gold gloves and the mongkhon. */
 export const HERO_OUTFITS: Record<Profession, HeroOutfit> = {
-  engineer: { headgear: 'cap', colours: COSTUME },
-  drummer: { headgear: 'cap', colours: COSTUME },
-  fighter: { headgear: 'capRing', colours: { ...COSTUME, G: SIDE_INK.FIGHT_GLOVE } },
+  engineer: { headgear: 'hair', colours: { ...BODY, T: HERO_INK.ENGINEER_SHIRT, P: HERO_INK.JEANS, Q: HERO_INK.JEANS } },
+  drummer: { headgear: 'hair', colours: { ...BODY, T: HERO_INK.DRUMMER_SHIRT, P: HERO_INK.BLACK_JEANS, Q: HERO_INK.BLACK_JEANS } },
+  fighter: {
+    headgear: 'hairRing',
+    colours: { ...BODY, T: HERO_IDENTITY.skin, A: HERO_INK.FIGHT_GLOVE, P: HERO_INK.SHORTS, Q: HERO_IDENTITY.skin },
+  },
 }
 
-// The foes. Keys: K outline, N body, O underside, W white, E pupil, F feet, L shell, l shell shade,
-// Y skin, R shoes, D mouth, V stem and leaves, v leaf shade.
+// The foe, his own critter. Keys: K outline, N shell, n its shine, O underside, W eye white, E pupil, F legs.
 
 export const FOE = { width: 12, height: 16 } as const
 
-const MUSHROOM_HEAD = [
-  '....KKKK....',
-  '..KKNNNNKK..',
-  '.KNNNNNNNNK.',
-  'KNWWNNNNWWNK',
-  'KNWEKNNKEWNK',
-  'KNWEKNNKEWNK',
-  'KNNNNNNNNNNK',
-  '.KNNOOOONNK.',
-  '..KOOOOOOK..',
-]
+const SHELL = ['...KKKKK....', '..KNNKNNK...', '.KNnNKNnNKK.', 'KNNNNKNNNKWK', 'KNNNNKNNNKEK', 'KOOOOOOOOOKK', '.KKKKKKKKKK.']
 
-const TURTLE_TOP = [
-  '........KKK.',
-  '.......KYYYK',
-  '.......KYEYK',
-  '.......KYYYK',
-  '...KKKKKYYK.',
-  '..KLLLLlKYK.',
-  '.KLLlLLLlKYK',
-  '.KLlLLLlLKK.',
-  'KLLLLlLLLLK.',
-  'KWWWWWWWWWK.',
-]
-
-const PLANT_STEM = ['....KVVK....', '.KKKKVVKKKK.', 'KVVvVKVVvVVK', '.KKVVVVVVKK.', '....KVVK....', '....KVVK....']
+const STEP_A = ['.KFK.KFK.KFK', 'KFK.KFK.KFK.']
+const STEP_B = ['KFK.KFK.KFK.', '.KFK.KFK.KFK']
 
 const blank = (count: number) => Array.from({ length: count }, () => '............')
 
 const FOE_FRAMES = {
-  walkerA: [...blank(4), ...MUSHROOM_HEAD, '.KFFK..KFFK.', 'KFFFK..KFFFK', 'KKKK....KKKK'],
-  walkerB: [...blank(4), ...MUSHROOM_HEAD, '..KFFKKFFK..', '..KFFKKFFK..', '..KKKKKKKK..'],
-  walkerFlat: [...blank(12), '.KKKKKKKKKK.', 'KNNWEKKEWNNK', 'KOOOOOOOOOOK', '.KKKKKKKKKK.'],
-  turtleA: [...blank(2), ...TURTLE_TOP, '.KYYKKKYYK..', '.KYYK.KYYK..', 'KRRRK.KRRRK.', 'KKKKK.KKKKK.'],
-  turtleB: [...blank(2), ...TURTLE_TOP, '..KYYKYYK...', '..KYYKYYK...', '.KRRRKRRRK..', '.KKKKKKKKK..'],
-  shell: [...blank(10), '..KKKKKKK...', '.KLLlLLLlK..', 'KLlLLLlLLLK.', 'KLLLLlLLLLK.', 'KWWWWWWWWWK.', '.KKKKKKKKK..'],
-  plantOpen: [
-    '...KKKKKK...',
-    '..KNNWNNNK..',
-    '.KNWWNNNWNK.',
-    '.KNNNNNWWNK.',
-    'KWWKKKKKKWWK',
-    'KWDDDDDDDDWK',
-    'KWWKKKKKKWWK',
-    '.KNNNWNNNNK.',
-    '..KKNNNNKK..',
-    '....KVVK....',
-    ...PLANT_STEM,
-  ],
-  plantShut: [
-    ...blank(1),
-    '...KKKKKK...',
-    '..KNNWNNNK..',
-    '.KNWWNNNWNK.',
-    '.KNNNNNWWNK.',
-    'KNNNNNNNNNNK',
-    'KWWWWWWWWWWK',
-    '.KNNNWNNNNK.',
-    '..KKNNNNKK..',
-    '....KVVK....',
-    ...PLANT_STEM,
-  ],
+  critterA: [...blank(7), ...SHELL, ...STEP_A],
+  critterB: [...blank(7), ...SHELL, ...STEP_B],
+  critterFlat: [...blank(12), '.KKKKKKKKKK.', 'KNNNNKNNNKWK', 'KOOOOOOOOOEK', '.KKKKKKKKKK.'],
+  // knocked over: on its back, legs in the air
+  critterTipped: [...blank(7), ...STEP_B, ...[...SHELL].reverse()],
 } as const
 
 export type FoeFrame = keyof typeof FOE_FRAMES
@@ -323,24 +275,7 @@ export const FOE_FRAME_NAMES = Object.keys(FOE_FRAMES) as FoeFrame[]
 
 export const foeRows = (frame: FoeFrame): readonly string[] => FOE_FRAMES[frame]
 
-const FOE_BASE = { K: SPRITE_INK.OUTLINE, W: FOE_INK.WHITE, E: SPRITE_INK.OUTLINE, D: FOE_INK.MOUTH }
+const CRITTER = { K: SPRITE_INK.OUTLINE, N: FOE_INK.SHELL, n: FOE_INK.SHINE, O: FOE_INK.UNDERSIDE, W: FOE_INK.WHITE, E: SPRITE_INK.OUTLINE, F: FOE_INK.LEGS }
 
-/** Each foe's colours: the brown mushroom, the green turtle with its yellow skin, the red spotted plant. */
-export const FOE_COLOURS: Record<'walker' | 'turtle' | 'plant', Record<string, string>> = {
-  walker: { ...FOE_BASE, N: FOE_INK.MUSHROOM, O: FOE_INK.UNDERSIDE, F: FOE_INK.FEET },
-  turtle: { ...FOE_BASE, L: FOE_INK.GREEN, l: FOE_INK.GREEN_SHADE, Y: FOE_INK.SKIN, R: FOE_INK.SHOES },
-  plant: { ...FOE_BASE, N: FOE_INK.PLANT, V: FOE_INK.GREEN, v: FOE_INK.GREEN_SHADE },
-}
-
-const FOE_KIND: Record<FoeFrame, keyof typeof FOE_COLOURS> = {
-  walkerA: 'walker',
-  walkerB: 'walker',
-  walkerFlat: 'walker',
-  turtleA: 'turtle',
-  turtleB: 'turtle',
-  shell: 'turtle',
-  plantOpen: 'plant',
-  plantShut: 'plant',
-}
-
-export const foeColours = (frame: FoeFrame) => FOE_COLOURS[FOE_KIND[frame]]
+/** The critter's colours, the same in every frame. */
+export const FOE_COLOURS: Record<string, string> = CRITTER

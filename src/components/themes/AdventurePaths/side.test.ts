@@ -1,5 +1,5 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
-import { FOE, FOE_FRAME_NAMES, HERO, HERO_OUTFITS, HERO_POSES, foeColours, foeRows, heroParts } from './side'
+import { FOE, FOE_FRAME_NAMES, HERO, HERO_OUTFITS, HERO_POSES, FOE_COLOURS, foeRows, heroParts } from './side'
 
 const pixelKeys = (rows: readonly string[]) => rows.flatMap((row) => [...row]).filter((key) => key !== '.')
 
@@ -19,6 +19,6 @@ describe('the side view sprites', () => {
     const rows = foeRows(frame)
     expect(rows).toHaveLength(FOE.height)
     rows.forEach((row) => expect(row).toHaveLength(FOE.width))
-    pixelKeys(rows).forEach((key) => expect(foeColours(frame)[key]).toBeDefined())
+    pixelKeys(rows).forEach((key) => expect(FOE_COLOURS[key]).toBeDefined())
   })
 })

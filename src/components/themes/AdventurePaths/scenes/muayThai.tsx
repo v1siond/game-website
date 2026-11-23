@@ -1,43 +1,59 @@
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, frames, fx, lerp, translateTo } from '../../shared/stageNodes'
+import { frames, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { Canvas, FoeRig, GROUND, HeroRig, PX, TileGround, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
-import { beatOf, type Level } from './level'
+import { CRITTER_FRAMES, Canvas, FoeRig, TileGround } from './kit'
+import type { Level } from './level'
 import { GoldBlock } from './pieces'
+import { StopsFigure, keyed, stopsWriter, type Stops } from './stops'
 
-// The Muay Thai record: the fortress (research images 15, 26, 27), gold blocks on the dark, and one
-// mushroom foe in his way for each line of the record. He runs in and, as each line is read, bounces
-// from foe to foe in one chain without touching the ground, each one flattened under his feet with its
-// score popping up, doubling as the chain goes on (100, 200, 400).
+// The Muay Thai record: the fortress, gold blocks on the dark, and one critter in his way for each line of
+// the record. As each line is read he dashes at it, drives a flying knee into it that knocks it back, lands
+// and kicks it, and it flies off onto its back.
 
-const START = 540
-// He stands on a flattened foe: its squashed body is a few pixels tall.
-const FOE_TOP = GROUND - 5 * PX
-const FOE_FRAMES = ['walkerA', 'walkerB', 'walkerFlat'] as const
-const STEP_EVERY = 0.04
+const CRITTER_X = 250
+const KNOCKED_X = 290
+const DOWN_X = 380
+// The shares of his move: the dash, the knee's hit, the kick's hit.
+const DASH = 0.25
+const KNEE = 0.34
+const KICK = 0.62
 
-/** A walking foe's step frame as the scroll goes. */
-const stepFrame = (p: number): string => (Math.floor(p / STEP_EVERY) % 2 === 0 ? 'walkerA' : 'walkerB')
-
-/** Each foe along the course. */
-const foesAt = (count: number): number[] => courseAt(count, 820, 260)
-
-function heroOf(xs: readonly number[], p: number, f: number): { x: number; y: number; pose: string } {
-  const entry = ramp(p, 0.02, 0.2)
-  if (entry < 1) {
-    const x = lerp(START - 520, START, entry)
-    return { x, y: GROUND, pose: runFrame(x) }
-  }
-  const { k, t } = beatOf(f, xs.length)
-  const from = k === 0 ? { x: START, y: GROUND } : { x: xs[k - 1], y: FOE_TOP }
-  if (t === 0) return { ...from, pose: 'stand' }
-  if (t >= 0.85) return { x: xs[k], y: FOE_TOP, pose: 'stand' }
-  const u = t / 0.85
-  return { x: lerp(from.x, xs[k], u), y: lerp(from.y, FOE_TOP, u) - arc(u, 220), pose: u > 0.6 ? 'stomp' : 'jump' }
+const course: Stops = {
+  tiled: true,
+  back: (i) => (
+    <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_X} 0)`}>
+      <g transform="scale(-1 1)">
+        <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
+      </g>
+    </g>
+  ),
+  move: keyed([
+    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
+    { at: DASH / 2, pose: 'runA', ahead: 50, lift: 0 },
+    { at: DASH, pose: 'runB', ahead: 110, lift: 0 },
+    { at: 0.43, pose: 'jump', ahead: 170, lift: 0, arc: 120 },
+    { at: 0.5, pose: 'stand', ahead: 170, lift: 0 },
+    { at: 0.56, pose: 'runA', ahead: 175, lift: 0 },
+    { at: 0.75, pose: 'kick', ahead: 185, lift: 0 },
+    { at: 0.77, pose: 'stand', ahead: 185, lift: 0 },
+  ]),
+  reply: (stage, { count }) => {
+    const stops = Array.from({ length: count }, (_, i) => ({ critter: fx(stage, `critter-at-${i}`), face: frames(fx(stage, `critter-${i}`), 'critterA') }))
+    return (played) =>
+      stops.forEach(({ critter, face }, i) => {
+        const t = played(i)
+        const back = ramp(t, KNEE, KNEE + 0.08)
+        const fly = ramp(t, KICK, KICK + 0.2)
+        const x = lerp(lerp(CRITTER_X, KNOCKED_X, back), DOWN_X, fly)
+        transformTo(critter, `translate(${r1(x)} ${r1(-hop(back, 30) - hop(fly, 140))}) rotate(${r1(-360 * fly)} 0 -27)`)
+        face(fly >= 1 ? 'critterTipped' : 'critterA')
+      })
+  },
 }
 
 export const muayThai: Level = {
-  layers: ({ count, profession }) => [
+  layers: (input) => [
     {
       name: 'sky',
       node: (
@@ -85,26 +101,7 @@ export const muayThai: Level = {
     },
     {
       name: 'figure',
-      node: (
-        <Canvas>
-          <g data-fx="course">
-            {foesAt(count).map((x, i) => (
-              <g key={x}>
-                <g data-fx={`foe-at-${i}`} transform={`translate(${x} ${GROUND})`}>
-                  <FoeRig name={`foe-${i}`} kinds={FOE_FRAMES} />
-                </g>
-                <g data-fx={`score-${i}`} opacity={0} transform={`translate(${x} ${GROUND - 140})`}>
-                  <rect x={-58} y={-34} width={116} height={44} rx={6} fill={TRAIL.HUD} />
-                  <text x={0} y={0} textAnchor="middle" fontSize={34} fontWeight={700} fill={TRAIL.PAGE}>
-                    {100 * 2 ** i}
-                  </text>
-                </g>
-              </g>
-            ))}
-            <HeroRig profession={profession} />
-          </g>
-        </Canvas>
-      ),
+      node: <StopsFigure stops={course} input={input} />,
     },
     {
       name: 'fg',
@@ -115,22 +112,5 @@ export const muayThai: Level = {
       ),
     },
   ],
-  bind: (stage, { count }) => {
-    const xs = foesAt(count)
-    const hero = rigOf(stage, 'hero', 'stand')
-    const pan = panOf(stage, true)
-    const foes = xs.map((x, i) => ({ x, face: frames(fx(stage, `foe-${i}`), 'walkerA'), score: fx(stage, `score-${i}`) }))
-    return (p, f) => {
-      foes.forEach(({ x, face, score }, i) => {
-        const flat = f - i - 0.85
-        face(flat >= 0 ? 'walkerFlat' : stepFrame(p))
-        const pop = clamp01(flat / 0.15)
-        translateTo(score, x, GROUND - 140 - pop * 60)
-        fadeTo(score, pop)
-      })
-      const { x, y, pose } = heroOf(xs, p, f)
-      pan(cameraFor(x))
-      hero(x, y, pose)
-    }
-  },
+  bind: (stage, input) => stopsWriter(stage, input, course),
 }

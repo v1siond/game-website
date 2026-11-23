@@ -2,11 +2,11 @@ import { fx, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { BLOCK, Bush, Canvas, Cloud, DomeHills, GROUND, GrassGround, PillHills, Placed, Sky } from './kit'
 import type { Level } from './level'
-import { Castle, Pipe, QuestionBlock } from './pieces'
+import { ItemBox, Rock, Tree } from './pieces'
 
 // The hero's picture: the plains of the first world at the start of the course, behind the name plaque
-// and the overworld map he picks a profession on. A row of ? blocks and a pipe wait on the path, the
-// castle stands far off; the clouds drift as the page leaves the hero. He is on the map, not here.
+// and the overworld map he picks a profession on. A row of item boxes and a rock wait on the path, trees
+// stand far off; the clouds drift as the page leaves the hero. He is on the map, not here.
 
 export const hub: Level = {
   layers: () => [
@@ -28,9 +28,11 @@ export const hub: Level = {
       node: (
         <Canvas>
           <PillHills base={800} fill={TRAIL.HILL_FAR} edge={TRAIL.HILL_FAR_EDGE} />
-          <Placed x={1260} y={800 - 64 * 2} scale={2}>
-            <Castle />
-          </Placed>
+          {[1240, 1330].map((x, i) => (
+            <Placed key={x} x={x} y={800 - 56 * (2 + i)} scale={2 + i}>
+              <Tree />
+            </Placed>
+          ))}
         </Canvas>
       ),
     },
@@ -38,7 +40,7 @@ export const hub: Level = {
       name: 'mid',
       node: (
         <Canvas>
-          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} eye={TRAIL.HUD} />
+          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} />
         </Canvas>
       ),
     },
@@ -56,11 +58,11 @@ export const hub: Level = {
         <Canvas>
           {[560, 656, 752].map((x) => (
             <Placed key={x} x={x} y={560}>
-              <QuestionBlock />
+              <ItemBox />
             </Placed>
           ))}
-          <Placed x={1080} y={GROUND - 52 * BLOCK}>
-            <Pipe height={52} />
+          <Placed x={1080} y={GROUND - 18 * BLOCK}>
+            <Rock />
           </Placed>
         </Canvas>
       ),
