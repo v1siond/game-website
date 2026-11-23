@@ -1,51 +1,26 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { BandList } from '@/components/cv/BandList'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { ORANGE_POINTS, Stage } from './stage'
-import type { Zone } from './wasteland'
-import { BountyBoard } from './bountyBoard'
-import { SkillTree } from './skillTree'
-import { LootDrops } from './lootDrops'
-import { MakersPlates } from './badges'
-import { BossCards } from './bossCards'
-import { HeavyBag } from './heavyBag'
-import { LootChest, SlamLanding } from './melee'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { ProjectList } from '@/components/cv/ProjectList'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import { drumsSince } from '@/lib/cv/sectionText'
+import { Stage } from '../shared/theatre/Stage'
+import { BossCard, Branch, LootCard, MakersPlate, Notice, ORANGE_POINTS, ServicePaper } from './cards'
+import { LAYER_MOTION, type CelScene } from './scenes'
 import cel from './cel.module.css'
+import page from './page.module.css'
 
-// The picked profession's sections, each one a stage in the wasteland's day: About at noon, the bounty
-// board, the skill tree and the services (plain papers under a fade) in the town's afternoon, the loot field, the makers' plates, the boss cards
-// and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx). Two sections he
-// hits himself (./melee): he lands on the about paper from a leap, and kicks open the chest the services
-// come out of. The shared section plan picks which a profession shows and in which order.
+// One section per place of the desert's day: a tall head that first shows the place alone and then brings
+// up the section's title on its ink slab, then the cards, then a screen of the place alone before it goes
+// dark. The cards a place counts sit inside an element marked data-stage-items, which the theatre measures
+// for the reading line that sets his act. Every field comes from the shared lists and the card view models.
 
-/** The hour of the desert each section's stage hands the sky. */
-const ZONE: Record<SectionId, Zone> = {
-  about: 'noon',
-  work: 'town',
-  tech: 'town',
-  services: 'town',
-  projects: 'dusk',
-  ventures: 'dusk',
-  bands: 'dusk',
-  muayThai: 'dusk',
-}
-
-// A section as its stage, titled from the labels in its hour of the day.
-function Hour({ slot, children }: { slot: SectionSlot; children: ReactNode | ((on: boolean) => ReactNode) }) {
-  const { sections: titles } = useLabels()
-  return (
-    <Stage title={titles[slot.titleKey]} zone={ZONE[slot.id]}>
-      {children}
-    </Stage>
-  )
-}
+const STACK = 'flex flex-col gap-6'
 
 // His education and languages under the highlights, each label in the inked capitals.
 const INKED_FACTS: AboutFactsLook = {
@@ -56,82 +31,156 @@ const INKED_FACTS: AboutFactsLook = {
   termEnd: ': ',
 }
 
-// One frame per section of the shared plan, which picks the ones a profession shows and their order.
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { cards } = useLabels()
-    const { highlights } = useAboutBlock()
-    return (
-      <Hour slot={slot}>
-        <SlamLanding>
-          <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
-            <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
-            <div className="max-w-prose">
-              <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
-              <AboutFacts look={INKED_FACTS} />
-            </div>
-          </div>
-        </SlamLanding>
-      </Hour>
-    )
-  },
-  work: function WorkFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <BountyBoard jobs={slot.jobs} />
-      </Hour>
-    )
-  },
-  tech: function TechFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <SkillTree categories={slot.categories} />
-      </Hour>
-    )
-  },
-  services: function ServicesFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <LootChest>
-          <FadeInScene>
-            <ul className={MASONRY_LIST}>
-              {slot.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
-                  <h3 className="text-lg font-bold">{service.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed">{service.line}</p>
-                </li>
-              ))}
-            </ul>
-          </FadeInScene>
-        </LootChest>
-      </Hour>
-    )
-  },
-  projects: function ProjectsFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <LootDrops projects={slot.projects} />
-      </Hour>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <MakersPlates companies={slot.companies} />
-      </Hour>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    return (
-      <Hour slot={slot}>
-        <BossCards musician={slot.musician} bands={slot.bands} />
-      </Hour>
-    )
-  },
-  // The heavy bag throws its first hits off the stage's flag.
-  muayThai: function MuayThaiFrame({ slot }) {
-    return <Hour slot={slot}>{(on) => <HeavyBag martialArts={slot.martialArts} on={on} />}</Hour>
-  },
+function AboutCards() {
+  const { bio, highlights } = useAboutBlock()
+  const { cards } = useLabels()
+  return (
+    <div className={`p-5 sm:p-6 ${cel.paper}`}>
+      <p className="text-base leading-relaxed">{bio}</p>
+      <div data-stage-items="">
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
+      </div>
+      <AboutFacts look={INKED_FACTS} />
+    </div>
+  )
 }
 
-export const SECTION_VIEWS = sectionViews(FRAMES)
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  return (
+    <ul className={`${STACK} p-4 sm:p-6 ${cel.board}`} data-stage-items="">
+      {slot.jobs.map((job) => (
+        <li key={job.id} className="pt-3">
+          <Notice job={job} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  const { cards } = useLabels()
+  return (
+    <ul className={STACK} data-stage-items="" aria-label={cards.techByCategory}>
+      {slot.categories.map((category) => (
+        <li key={category.id}>
+          <Branch category={category} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <ul className={STACK} data-stage-items="">
+      {slot.services.map((service) => (
+        <li key={service.id}>
+          <ServicePaper service={service} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  return (
+    <div data-stage-items="">
+      <ProjectList projects={slot.projects} className={STACK} itemClassName="" renderProject={(project) => <LootCard slot={project} />} />
+    </div>
+  )
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return (
+    <ul className={STACK} data-stage-items="">
+      {slot.companies.map((company, index) => (
+        <li key={company.id}>
+          <MakersPlate company={company} index={index} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function BandCards({ slot }: { slot: SlotOf<'bands'> }) {
+  const { years } = useLabels()
+  return (
+    <>
+      <div className={`p-5 ${cel.darkPaper}`}>
+        <p className={`text-2xl text-[var(--cel-sun)] ${cel.display} [-webkit-text-stroke:0]`}>{drumsSince(slot.musician, years)}</p>
+        {slot.musician.line && <p className="mt-2 text-base font-bold">{slot.musician.line}</p>}
+      </div>
+      <div data-stage-items="">
+        <BandList bands={slot.bands} className={STACK} itemClassName="" renderBand={(band) => <BossCard slot={band} />} />
+      </div>
+    </>
+  )
+}
+
+function MuayThaiCards({ slot }: { slot: SlotOf<'muayThai'> }) {
+  const { martialArts } = slot
+  return (
+    <div className={`p-5 sm:p-6 ${cel.paper}`}>
+      <h3 className={`mb-4 text-2xl ${cel.display} [-webkit-text-stroke:0]`}>{martialArts.primary.title}</h3>
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'mb-5 grid gap-3',
+            fact: 'border-[3px] border-[var(--cel-ink)] bg-[var(--cel-white)] p-3',
+            term: 'text-sm font-black uppercase tracking-wider',
+            value: 'mt-1 text-base',
+            achievements: 'space-y-3',
+            achievement: 'text-base font-bold',
+          }}
+          renderAchievement={(achievement) => (
+            <span className="flex items-start gap-3">
+              <span className="mt-0.5 inline-block h-5 w-5 shrink-0 bg-[var(--cel-crit)] [clip-path:polygon(50%_0,62%_35%,100%_38%,70%_60%,80%_100%,50%_76%,20%_100%,30%_60%,0_38%,38%_35%)]" aria-hidden="true" />
+              <span>{achievement}</span>
+            </span>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: MuayThaiCards,
+}
+
+/** A section's title on its ink slab, cut on a slant. */
+export function SectionTitle({ id, title }: { id: string; title: string }) {
+  return (
+    <h2 id={id} className={`text-3xl sm:text-4xl ${cel.display}`}>
+      <span className={cel.titleSlab}>
+        <span>{title}</span>
+      </span>
+    </h2>
+  )
+}
+
+/** One place: under reduced motion its own stage sits still behind its head. */
+export function PlaceSection({ scene, still }: { scene: CelScene & { slot: SectionSlot }; still: boolean }) {
+  const { sections } = useLabels()
+  const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const headingId = `cel-${scene.id}`
+  return (
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+      <header className={page.head}>
+        <SectionTitle id={headingId} title={sections[scene.slot.titleKey]} />
+      </header>
+      <div className={page.body}>
+        <Cards slot={scene.slot} />
+      </div>
+    </section>
+  )
+}
