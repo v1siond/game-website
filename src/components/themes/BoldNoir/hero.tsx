@@ -59,7 +59,7 @@ export function RooftopHero({ scene, still }: { scene: NoirScene; still: boolean
             plate so a fan beside it opens from the plate's edge */}
         <Wardrobe
           look={OUTFIT_LOOK}
-          className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:-44px] c-wardrobe--fan-level-md-to-lg c-wardrobe--fan-left-md-to-lg c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:-bottom-[5px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+          className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:-60px] c-wardrobe--fan-level-md-to-lg c-wardrobe--fan-left-md-to-lg c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:-bottom-[5px] sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
         />
       </header>
 
