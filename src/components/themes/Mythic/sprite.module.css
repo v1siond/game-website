@@ -1,15 +1,25 @@
 /*
- * His sprite (sprite.tsx): the joints' rest pose is an SVG attribute; the moves are Web Animations
- * from rig.ts that set transform and transform-origin in the viewBox's units, so every joint group and
- * the body measure their origin in view-box space. The ring grows from its own centre.
+ * The bands his scenes play in (scenes.tsx), in the 1920 by 1080 field. From lg the sections read in a
+ * column on the left, so their scenes play on the right (about x 1150 to 1720) and the hero stands in the
+ * hall's left bay (x 600). Under 1024 px the screen shows only the field's middle (about x 710 to 1210 on a
+ * phone), so each band shrinks to two thirds about its own middle and moves there; from 768 the hero's bay
+ * sits a little further in, where the hero's left column is. Under 768 px the hero's copy fills the foot of the
+ * first screen, so he stands up in the bay under the outfit switcher, 540 field units off the floor.
  */
+@media (max-width: 1023.98px) {
+  .rightBand {
+    transform: translateX(-475px) scale(0.66);
+    transform-origin: 1435px 1000px;
+  }
 
-.sprite [data-joint],
-.sprite [data-body] {
-  transform-box: view-box;
+  .leftBand {
+    transform: translateX(135px);
+    transform-origin: 600px 1000px;
+  }
 }
 
-.ring {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
+@media (max-width: 767.98px) {
+  .leftBand {
+    transform: translate(360px, -540px) scale(0.72);
+  }
 }

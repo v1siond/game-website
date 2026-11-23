@@ -4,7 +4,7 @@ import u from './underworld.module.css'
 
 // The fixed painting behind the page, one era per stretch of the CV: the great hall of crimson marble
 // with its braziers (hero, about), the storm sea with the serpent (work history, tech stack), the basalt
-// and the magma river (projects, ventures), Rhodes at night under the bronze giant (bands, muay thai) and
+// and the magma river (projects, ventures), the harbour at night under the bronze giant (bands, muay thai) and
 // Olympus at dawn (contact). The root's data-zone fades the era in view up (stage.tsx) and only that era
 // runs its own clock (the .era parts sit paused otherwise), so each era plays its motion once the first time
 // it is in view and then rests; each era drifts against the pointer (--mx, --my).
@@ -96,7 +96,7 @@ function HallArt() {
   )
 }
 
-// The storm sea of the first game: rain driving at a slant, a lightning flash, the swell rolling under a
+// The storm sea: rain driving at a slant, a lightning flash, the swell rolling under a
 // broken mast with its torn sail, the serpent's near head rising out of the sea to lunge with its jaw open
 // and standing risen, a second head swaying far off.
 function StormArt() {
@@ -152,10 +152,10 @@ function MagmaArt() {
   )
 }
 
-// Rhodes at night under the bronze giant: the harbour city with its fires, the giant towering over it with
+// The harbour at night under the bronze giant: the harbour city with its fires, the giant towering over it with
 // the laurel crown, its blue eyes flaring, its fist rising and smashing the harbour wall once with a
 // burst of dust, smoke going up from the city.
-function RhodesArt() {
+function HarbourArt() {
   const e = u.era
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
@@ -272,8 +272,8 @@ export function Depths() {
       <div className={`${u.zone} ${u.zoneMagma}`}>
         <MagmaArt />
       </div>
-      <div className={`${u.zone} ${u.zoneRhodes}`}>
-        <RhodesArt />
+      <div className={`${u.zone} ${u.zoneHarbour}`}>
+        <HarbourArt />
       </div>
       <div className={`${u.zone} ${u.zoneOlympus}`}>
         <OlympusArt />

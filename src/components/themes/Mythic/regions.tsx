@@ -4,26 +4,21 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, Stage } from './stage'
 import { Trials } from './trials'
-import { ChainHaul } from './chains'
-import { ChestHeave } from './chest'
-import { BladeThrow } from './hurl'
-import { Climb } from './climb'
-import { Boons } from './boons'
-import { Volcano } from './volcano'
-import { Keepsakes } from './keepsakes'
+import { Codex } from './codex'
+import { Labours } from './labours'
+import { Votives } from './votives'
 import { Portraits } from './portraits'
 import { Prophecies } from './prophecies'
-import { CyclopsStomp, GorgonGaze } from './wrath'
 import u from './underworld.module.css'
 
-// The picked profession's sections, each a stage in the descent: About in the great hall, the chambers
-// and the codex in the teal brick vaults, the services on plain parchment after them, the volcano erupting over the boons and the keepsakes in the
-// magma, the portraits and the arena in the green fields. The last gate of the red temple closes the page (gate.tsx).
-// The shared section plan picks which a profession shows and in which order.
+// The picked profession's sections, each a stretch of the descent: About in the great hall, the jobs on the
+// storm deck and the codex over the storm sea, the services on plain parchment after them, his labours and
+// the votive tokens over the magma, the portraits and the record under the bronze giant. The last gate of the
+// red temple closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
+// order; each section's scene plays behind it (scenes.tsx).
 
 // His education and languages under the highlights, each label in the gold display face.
 const GOLD_FACTS: AboutFactsLook = {
@@ -40,21 +35,21 @@ const FRAMES: SectionFrames = {
     const { sections: titles, cards } = useLabels()
     const { highlights } = useAboutBlock()
     return (
-      <Stage title={titles.about} zone="hall">
-        <ChainHaul>
-          <p className="max-w-prose whitespace-pre-line text-lg leading-relaxed">{slot.bio}</p>
-          <div className="max-w-prose">
+      <Stage id={slot.id} title={titles.about} zone="hall">
+        <div className={`max-w-prose p-5 sm:p-6 ${u.panel}`}>
+          <p className="whitespace-pre-line text-lg leading-relaxed">{slot.bio}</p>
+          <div data-stage-items="">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
-            <AboutFacts look={GOLD_FACTS} />
           </div>
-        </ChainHaul>
+          <AboutFacts look={GOLD_FACTS} />
+        </div>
       </Stage>
     )
   },
   work: function WorkFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.workExperience} zone="storm">
+      <Stage id={slot.id} title={titles.workExperience} zone="storm">
         <Trials jobs={slot.jobs} />
       </Stage>
     )
@@ -62,63 +57,54 @@ const FRAMES: SectionFrames = {
   tech: function TechFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.techStack} zone="storm">
-        <Climb categories={slot.categories} />
+      <Stage id={slot.id} title={titles.techStack} zone="storm">
+        <Codex categories={slot.categories} />
       </Stage>
     )
   },
   services: function ServicesFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.services} zone="storm">
-        <FadeInScene>
-          <GorgonGaze>
-            <ul className={MASONRY_LIST}>
-              {slot.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
-                  <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
-                  <p className="mt-3 text-base leading-relaxed">{service.line}</p>
-                </li>
-              ))}
-            </ul>
-          </GorgonGaze>
-        </FadeInScene>
+      <Stage id={slot.id} title={titles.services} zone="storm">
+        <ul className={MASONRY_LIST} data-stage-items="">
+          {slot.services.map((service) => (
+            <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
+              <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
+              <p className="mt-3 text-base leading-relaxed">{service.line}</p>
+            </li>
+          ))}
+        </ul>
       </Stage>
     )
   },
   projects: function ProjectsFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.projects} zone="magma">
-        <Volcano />
-        <ChestHeave />
-        <Boons projects={slot.projects} />
+      <Stage id={slot.id} title={titles.projects} zone="magma">
+        <Labours projects={slot.projects} />
       </Stage>
     )
   },
   ventures: function VenturesFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.ventures} zone="magma">
-        <BladeThrow />
-        <Keepsakes companies={slot.companies} />
+      <Stage id={slot.id} title={titles.ventures} zone="magma">
+        <Votives companies={slot.companies} />
       </Stage>
     )
   },
   bands: function BandsFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.bands} zone="rhodes">
-        <CyclopsStomp>
-          <Portraits musician={slot.musician} bands={slot.bands} />
-        </CyclopsStomp>
+      <Stage id={slot.id} title={titles.bands} zone="harbour">
+        <Portraits musician={slot.musician} bands={slot.bands} />
       </Stage>
     )
   },
   muayThai: function MuayThaiFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage title={titles.muayThai} zone="rhodes">
+      <Stage id={slot.id} title={titles.muayThai} zone="harbour">
         <Prophecies martialArts={slot.martialArts} />
       </Stage>
     )

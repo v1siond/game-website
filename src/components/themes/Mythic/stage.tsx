@@ -7,25 +7,23 @@ import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
 import u from './underworld.module.css'
 
-// A section's stage in the descent: the gilded title plate and the section's own scene. useZoneStage
-// marks it data-on once, the first time it scrolls into view, and every entrance inside starts off that
-// flag. While the stage is in view it hands its region to the page, which fades the fixed depths
-// (depths.tsx) to that region.
+// A section in the descent: the gilded title plate over the section's cards, read in a column on the left
+// from lg so the section's scene (scenes.tsx, on the shared theatre) plays clear of it on the right.
+// useZoneStage marks it data-on once, the first time it scrolls into view, and every entrance inside starts
+// off that flag. While it is in view it hands its region to the page, which fades the fixed depths
+// (depths.tsx) to that region. Under reduced motion the section carries its own scene drawn settled
+// (StillStages).
 
 /** The regions the page goes down, top to bottom. */
-export type Zone = 'hall' | 'storm' | 'magma' | 'rhodes' | 'olympus'
+export type Zone = 'hall' | 'storm' | 'magma' | 'harbour' | 'olympus'
 
-interface House {
-  // Counts the visitor's returns to the house from the last gate; the hero replays the rise on each.
-  rebirths: number
-  returnToHouse: () => void
-}
+/** The column a section reads in: the whole width on a phone, the left of the screen from lg. */
+export const COLUMN = 'lg:mr-auto lg:w-[min(46rem,52vw)]'
 
-const HouseContext = createContext<House>({ rebirths: 0, returnToHouse: () => undefined })
+/** The scene a section draws settled under reduced motion, by its id; nothing while the theatre plays. */
+const StillStagesContext = createContext<(id: string) => ReactNode>(() => null)
 
-export const HouseProvider = HouseContext.Provider
-
-export const useHouse = () => useContext(HouseContext)
+export const StillStages = StillStagesContext.Provider
 
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
@@ -38,7 +36,7 @@ export const BLOOD_POINTS: MarkedLinesLook = {
   marker: <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />,
 }
 
-/** A card's tags on the ink, ruled in deep gold: a job's skills, a project's technologies, a keepsake's services. */
+/** A card's tags on the ink, ruled in deep gold: a job's skills, a project's technologies, a venture's services. */
 export const GOLD_TAGS: TagListLook = {
   list: 'mt-3 flex flex-wrap gap-1.5',
   tag: 'border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm',
@@ -67,13 +65,17 @@ export function SectionTitle({ title }: { title: string }) {
   )
 }
 
-export function Stage({ title, zone, children }: { title: string; zone: Zone; children: ReactNode }) {
+export function Stage({ id, title, zone, children }: { id: string; title: string; zone: Zone; children: ReactNode }) {
   const { ref, on } = useZoneStage<Zone>(zone)
+  const still = useContext(StillStagesContext)
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="mb-28 scroll-mt-8">
-      <SectionTitle title={title} />
-      {children}
+    <section ref={ref} data-scene={id} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative mb-28 scroll-mt-8">
+      {still(id)}
+      <div className={COLUMN}>
+        <SectionTitle title={title} />
+        {children}
+      </div>
     </section>
   )
 }

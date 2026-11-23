@@ -1,51 +1,58 @@
-import { JOINTS, MOVES, RANGE, REST, bodyTransform, plantedDrop, resolveKeys, type Move } from './rig'
-import type { Profession } from '@/lib/cv/professions'
+import { JOINTS, MOVES, RANGE, REST, bodyTransform, plantedDrop, poseAt, resolveKeys, type Move } from './rig'
 
-const PROFESSIONS: Profession[] = ['engineer', 'drummer', 'fighter']
 const MOVE_NAMES = Object.keys(MOVES) as Move[]
 
 describe('his rig', () => {
-  it.each(PROFESSIONS)('keeps every joint of the %s at rest inside its human range', (profession) => {
+  it('keeps every joint at rest inside its human range', () => {
     JOINTS.forEach((joint) => {
       const [low, high] = RANGE[joint]
-      expect(REST[profession][joint]).toBeGreaterThanOrEqual(low)
-      expect(REST[profession][joint]).toBeLessThanOrEqual(high)
+      expect(REST[joint]).toBeGreaterThanOrEqual(low)
+      expect(REST[joint]).toBeLessThanOrEqual(high)
     })
   })
 
-  it.each(MOVE_NAMES)('bends the elbows only forward and the knees only back in every key of %s, in every kit', (move) => {
-    PROFESSIONS.forEach((profession) => {
-      resolveKeys(move, profession).forEach(({ at, pose }) => {
-        JOINTS.forEach((joint) => {
-          const [low, high] = RANGE[joint]
-          const where = `${move} ${profession} at ${at} ${joint} ${pose[joint]}`
-          expect([where, pose[joint] >= low && pose[joint] <= high]).toEqual([where, true])
-        })
+  it.each(MOVE_NAMES)('bends the elbows only forward and the knees only back in every key of %s', (move) => {
+    resolveKeys(move).forEach(({ at, pose }) => {
+      JOINTS.forEach((joint) => {
+        const [low, high] = RANGE[joint]
+        const where = `${move} at ${at} ${joint} ${pose[joint]}`
+        expect([where, pose[joint] >= low && pose[joint] <= high]).toEqual([where, true])
       })
     })
   })
 
   it.each(MOVE_NAMES)('runs the keys of %s in order from 0 to 1', (move) => {
-    const times = resolveKeys(move, 'engineer').map(({ at }) => at)
+    const times = resolveKeys(move).map(({ at }) => at)
     expect(times[0]).toBe(0)
     expect(times[times.length - 1]).toBe(1)
     expect([...times].sort((a, b) => a - b)).toEqual(times)
   })
 
-  it('ends every loop where it starts, so the cycle has no jump', () => {
-    MOVE_NAMES.filter((move) => MOVES[move].loop).forEach((move) => {
-      const keys = resolveKeys(move, 'engineer')
-      expect(keys[keys.length - 1].pose).toEqual(keys[0].pose)
-    })
-  })
-
   it('stands on the floor at rest, and drops the hips when the knees bend', () => {
-    expect(Math.abs(plantedDrop({ ...REST.engineer, thighNear: 0, shinNear: 0, thighFar: 0, shinFar: 0 }))).toBeLessThan(0.001)
-    expect(plantedDrop({ ...REST.engineer, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 })).toBeGreaterThan(8)
+    expect(Math.abs(plantedDrop({ ...REST, thighNear: 0, shinNear: 0, thighFar: 0, shinFar: 0 }))).toBeLessThan(0.001)
+    expect(plantedDrop({ ...REST, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 })).toBeGreaterThan(8)
   })
 
   it('hangs from the hands on the climb, so the hips hold still while the knees come up', () => {
-    const hips = resolveKeys('climb', 'engineer').map(({ pose }) => bodyTransform(pose))
+    const hips = resolveKeys('climb').map(({ pose }) => bodyTransform(pose))
     expect(new Set(hips)).toEqual(new Set(['translate(0 0)']))
+  })
+
+  it.each(MOVE_NAMES)('poses %s at its first key at 0 and its last at 1, and past the end it holds the last', (move) => {
+    const keys = resolveKeys(move)
+    expect(poseAt(move, 0)).toEqual(keys[0].pose)
+    expect(poseAt(move, 1)).toEqual(keys[keys.length - 1].pose)
+    expect(poseAt(move, 1.5)).toEqual(keys[keys.length - 1].pose)
+  })
+
+  it('poses a move between two keys with every joint between their angles', () => {
+    const keys = resolveKeys('combo')
+    const [a, b] = [keys[1], keys[2]]
+    const pose = poseAt('combo', (a.at + b.at) / 2)
+    JOINTS.forEach((joint) => {
+      expect(pose[joint]).toBeGreaterThanOrEqual(Math.min(a.pose[joint], b.pose[joint]))
+      expect(pose[joint]).toBeLessThanOrEqual(Math.max(a.pose[joint], b.pose[joint]))
+    })
+    expect(pose.armNear).not.toBe(a.pose.armNear)
   })
 })

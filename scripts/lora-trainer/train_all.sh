@@ -18,7 +18,7 @@ if [ -z "$SPRITES_PATH" ]; then
     echo "Usage: $0 <sprites_path> [name] [steps]"
     echo ""
     echo "Examples:"
-    echo "  $0 ./kratos_sprites.png kratos 2000"
+    echo "  $0 ./hero_sprites.png hero 2000"
     echo "  $0 ./sprite_folder/ knight 3000"
     exit 1
 fi

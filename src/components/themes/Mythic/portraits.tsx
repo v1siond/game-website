@@ -1,29 +1,24 @@
 'use client'
 
-import { memo, useCallback, useState } from 'react'
+import { memo } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import type { Band, Musician } from '@/lib/cv/content'
-import { SpartanSprite, type SpriteMotion } from './sprite'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
 import u from './underworld.module.css'
 
-// The bands as the portraits and dialogue boxes of the house: each band a painted portrait plate with
-// its initial in the laurel and a framed dialogue box with its name, his role, the years and the release.
-// Beside them he stands at the great war drum; pointing at or focusing a band, he brings the hilts down
-// on the skin, fire bursts from it and the band's portrait flares on each hit.
+// The bands as painted portraits with their dialogue plates: each band a portrait plate with its initial in
+// the laurel and a framed plate with its name, his role, the years and the release. Beside them his years on
+// the drums and his line.
 
-// Memoised: a strike re-renders the portraits, and only the card it flares needs to draw again.
-const BandCard = memo(function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; onStrike: (id: string) => void }) {
+// Memoised: the list re-renders with the section, and a card only draws again when its band changes.
+const BandCard = memo(function BandCard({ slot }: { slot: BandSlot }) {
   const { band, years, linkProps, release } = slot
-  const strike = () => onStrike(band.id)
 
   return (
-    <article className={`flex gap-4 ${u.bandCard}`} onPointerEnter={strike} onFocus={strike}>
+    <article className={`flex gap-4 ${u.bandCard}`}>
       <div className={`relative flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden ${u.portrait}`} aria-hidden="true">
-        {flare > 0 && <span key={flare} className={`absolute inset-0 bg-[radial-gradient(circle,var(--myth-fire-core),transparent_70%)] ${u.flare}`} />}
         <span className={`text-3xl text-[var(--myth-ink)] ${u.display}`}>{band.name.charAt(0)}</span>
       </div>
       <div className={`min-w-0 flex-1 p-4 ${u.dialogue}`}>
@@ -51,37 +46,16 @@ const BandCard = memo(function BandCard({ slot, flare, onStrike }: { slot: BandS
 
 export function Portraits({ musician, bands }: { musician: Musician; bands: Band[] }) {
   const { years } = useLabels()
-  const [struck, setStruck] = useState<string | null>(null)
-  const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
-  const strike = useCallback(
-    (id: string) => {
-      setStruck(id)
-      play('drum')
-    },
-    [play],
-  )
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
-      <div className={`p-5 ${u.panel} ${u.reveal} lg:sticky lg:top-8 lg:self-start`}>
-        <div className="mx-auto h-64 w-52" aria-hidden="true">
-          <SpartanSprite profession="drummer" motion={pose} onDone={settle} className="h-full w-full" take={take} waiting={take === 0} />
-        </div>
-        <p className={`mt-4 text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
+    <div className="grid gap-8">
+      <div className={`p-5 ${u.panel} ${u.reveal}`}>
+        <p className={`text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
       </div>
-      <BandList
-        bands={bands}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => (
-          <BandCard
-            slot={slot}
-            flare={struck === slot.band.id ? take : 0}
-            onStrike={strike}
-          />
-        )}
-      />
+      <div data-stage-items="">
+        <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard slot={slot} />} />
+      </div>
     </div>
   )
 }
