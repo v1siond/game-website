@@ -5,28 +5,31 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
-import { walkAlong } from '@/lib/scroll/walkAlong'
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, frames, fx, spread, transformTo } from '@/components/themes/shared/stageNodes'
+import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
-import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
-import { ImpactBurst } from './badges'
-import { beatAt, beatsOf, marksUpTo, reached as markReached, type Beat, type Bout } from './bout'
-import { CrowdGroup, H, W, ZONE_ART, type Zone } from './backdrop'
-import { ScrubFighter, scrubWriter } from './fighter'
-import { CELL, type FighterPose } from './poses'
+import { SETTLED_PROGRESS, type LayerMotions, type StageWriter, type TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
+import { beatAt, planOf, type Beat, type Bout, type Place, type Plan } from './bout'
+import { H, W, ZONE_ART, type Zone } from './backdrop'
+import { KiBall, ScrubFighter, scrubWriter } from './fighter'
+import { CELL, type FighterPose, type Pt } from './poses'
 import { FS } from './palette'
 import look from './world.module.css'
 
-// The arcade tour as the page's scenes: the hero on the castle rooftop, each section a stage of the tour
-// with its own bout, and the contact on the temple ring. Every bout is the one his section played before,
-// now driven by the scroll (bout.ts beatAt): the lead while the scene rises, one beat per card as that
-// card scrolls up, the close after the last card. About is the bonus stage, a punch per highlight denting
-// the car and the uppercut wrecking it; Work walks him across the market a step per job; the Tech Stack
-// throws a ki blast per category, lighting its target; Services launches a crate per service with the
-// rising uppercut; Projects is the super move, its flash then a spin kick per project; Ventures is the
-// parry, his partner's punch per venture turned aside; Bands is the show on the yacht's deck, a flurry per
-// band; the Muay Thai record is the sparring round, ending with the partner down. Scroll up and it all plays back.
+// The arcade tour as the page's scenes: the hero on the castle rooftop, each section a round on its own
+// stage of the tour, and the contact on the temple ring. In every round he stands in the arena against his
+// sparring partner and each card is one exchange of a fight (bout.ts): the lead while the scene rises, one
+// exchange per card as that card scrolls up, the close after the last card. About chains a jab, a strong
+// punch and a roundhouse, a link per highlight, and cancels into the energy wave; Work blocks the partner's
+// attack and punishes it, per job, ending on the rising uppercut; the Tech Stack trades energy waves that
+// clash in the middle, per category, until his gets through; Services meets every jump in with the rising
+// uppercut; Projects is the super, the screen dimmed and the partner juggled a hit per project into a wall
+// splat; Ventures parries the partner's punch per venture and counters with the spinning kick; Bands spins
+// kicks into the partner's guard until it cracks and he is dizzy; the Muay Thai record is the clinch, a knee
+// per line, and the throw. The pair stays in the arena: hits push them a step along it and the camera pans
+// with them, pushing in on the super and the wall splat. Scroll up and the round plays back. A scene drawn
+// settled (reduced motion) holds its exchange at its peak.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -40,214 +43,271 @@ export const TOUR_MOTION: LayerMotions = {
 const FLOOR = 860
 const SIZE = 2
 const TOP = FLOOR - CELL.ground * SIZE
-// He stands at HERO_X, a little forward when the bout moves him; his partner faces him from PARTNER_X.
-const HERO_X = 980
-const HERO_STEP = 120
-const PARTNER_X = 1300
+// He stands at HERO_X; his partner faces him GAP further on, close for blows, in the clinch for knees, at
+// range for waves and jump ins.
+const HERO_X = 900
+const GAP = { clinch: 70, close: 110, mid: 220, range: 330 } as const
+// Hits push the pair along the arena a step per card, at most MAX_DRIFT in a round, the camera panning
+// PAN of the way with them; a hurt partner rocks back KNOCK at the height of the hit.
+const STEP = 40
+const MAX_DRIFT = 160
+const PAN = 0.6
+const KNOCK = 22
 
-const place = (x: number): string => `translate(${x.toFixed(1)} ${TOP}) scale(${SIZE})`
+// Points of a fighter's own 160 by 170 cell: the hands where a wave leaves, the chest where it lands, the
+// raised guard where a kick cracks it.
+const HAND: Pt = [116, 72]
+const CHEST: Pt = [70, 80]
+const GUARD_AT: Pt = [84, 52]
 
-// ---- About's bonus car, side on, in four states of damage (data-frame 0 to 3) ----
+/** Where on the canvas a point of his cell is, or of his partner's mirrored one. */
+const heroAt = (x: number, [cx, cy]: Pt): Pt => [x + cx * SIZE, TOP + cy * SIZE]
+const partnerAt = (x: number, [cx, cy]: Pt): Pt => [x + (CELL.width - cx) * SIZE, TOP + cy * SIZE]
 
-function Car({ damage }: { damage: number }) {
-  const roofDrop = Math.min(damage, 3) * 5
-  const wrecked = damage >= 3
-  const sill = wrecked ? 80 : 70
-  return (
-    <g data-frame={String(damage)} visibility={damage === 0 ? 'visible' : 'hidden'}>
-      <ellipse cx={100} cy={86} rx={90} ry={4} fill={FS.ink} opacity={0.4} />
-      <path d={`M14 ${sill} L22 44 H58 L76 ${18 + roofDrop} H136 L156 44 H186 L190 ${sill} Z`} fill={FS.p2} stroke={FS.ink} strokeWidth={3} strokeLinejoin="round" />
-      <path d="M22 56 H188" stroke={FS.p2Dark} strokeWidth={3} />
-      {damage < 2 && <path d={`M80 ${22 + roofDrop} H106 V42 H66 Z M110 ${22 + roofDrop} H132 L148 42 H110 Z`} fill={FS.parry} stroke={FS.ink} strokeWidth={2} />}
-      {damage === 1 && <path d="M92 26 L86 36 M92 26 L100 34 M92 26 L96 20 M124 28 L118 38 M124 28 L132 36" stroke={FS.flash} strokeWidth={2} />}
-      {damage >= 1 && <path d="M40 48 Q46 58 40 66 M150 50 Q158 56 152 66" stroke={FS.p2Dark} strokeWidth={3} fill="none" />}
-      {wrecked ? (
-        <path d="M70 30 H110 V52 H70 Z M112 30 H150 V52 H112 Z" fill={FS.p2Dark} stroke={FS.ink} strokeWidth={2} transform="translate(30 -60) rotate(24 110 40)" />
-      ) : (
-        <>
-          <circle cx={52} cy={72} r={13} fill={FS.ink} />
-          <circle cx={52} cy={72} r={5} fill={FS.chrome} />
-          <circle cx={156} cy={72} r={13} fill={FS.ink} />
-          <circle cx={156} cy={72} r={5} fill={FS.chrome} />
-        </>
-      )}
-      <rect x={180} y={50} width={10} height={6} fill={FS.gold} stroke={FS.ink} strokeWidth={1.5} />
-    </g>
-  )
+const standAt = (x: number, lift = 0): string => `translate(${r1(x)} ${r1(TOP - lift)}) scale(${SIZE})`
+
+/** What a scene's writers know of the moment: the beat, where in the bout it is, and where the two stand. */
+interface Moment {
+  beat: Beat
+  place: Place
+  count: number
+  reached: number
+  heroX: number
+  partnerX: number
 }
-
-const CAR_X = 1230
-const CAR_SCALE = 1.7
-const DAMAGES = [0, 1, 2, 3]
-
-// ---- the props a section counts, one per card ----
-
-function Target({ x, i }: { x: number; i: number }) {
-  return (
-    <g transform={`translate(${x.toFixed(1)} ${FLOOR})`}>
-      <rect x={-6} y={-150} width={12} height={150} fill="#6b5a4a" stroke={FS.ink} strokeWidth={3} />
-      <circle cy={-180} r={42} fill={FS.gi} stroke={FS.ink} strokeWidth={4} />
-      <circle cy={-180} r={26} fill={FS.p2} stroke={FS.ink} strokeWidth={3} />
-      <circle cy={-180} r={10} fill={FS.gi} />
-      <g data-fx={`lit-${i}`} opacity="0">
-        <svg x={-70} y={-250} width={140} height={140} overflow="visible">
-          <ImpactBurst className="" />
-        </svg>
-      </g>
-    </g>
-  )
-}
-
-function Crate({ x, i }: { x: number; i: number }) {
-  return (
-    <g data-fx={`crate-${i}`} transform={`translate(${x.toFixed(1)} ${FLOOR})`}>
-      <rect x={-45} y={-90} width={90} height={90} fill="#c98a3a" stroke={FS.ink} strokeWidth={4} />
-      <path d="M-45 -90 L45 0 M45 -90 L-45 0" stroke="#8a5a20" strokeWidth={6} />
-      <rect x={-45} y={-90} width={90} height={90} fill="none" stroke={FS.ink} strokeWidth={4} />
-    </g>
-  )
-}
-
-// ---- the scenes ----
 
 interface SceneSpec {
   zone: Zone
   bout: Bout
-  /** The poses each fighter plays in the bout, the first shown before the scene's writer runs. */
-  props?: (xs: readonly number[]) => ReactNode
-  /** The partner stands across from him in this bout. */
-  partner?: boolean
-  /** Where he stands at beat `index` of `beats`: forward of HERO_X as the bout moves him. */
-  /** Where he stands in the scene: from his bout's beat, or from the cards read along the scene's xs. */
-  heroX?: (at: { beats: readonly Beat[]; index: number; t: number; xs: readonly number[]; reached: number }) => number
-  write?: (stage: HTMLElement, xs: readonly number[]) => (beats: readonly Beat[], index: number, t: number, cardsReached: number) => void
+  gap: number
+  /** The beat a settled scene holds and how far through it: the exchange at its peak. In the lead (a scene
+   *  with no cards), in the last card's exchange, or in the close. */
+  peak: { in: 'lead' | 'card' | 'close'; beat: number; t: number }
+  /** The partner's step off his place and how high he flies this beat. */
+  partner?: (m: Moment) => { dx: number; lift: number }
+  /** How far the camera pushes in on the pair. */
+  zoom?: (m: Moment) => number
+  /** The scene throws energy waves. */
+  waves?: boolean
+  props?: () => ReactNode
+  write?: (stage: HTMLElement) => (m: Moment) => void
 }
 
 const posesOf = (beats: readonly Beat[], who: 'hero' | 'partner'): FighterPose[] =>
   Array.from(new Set(beats.map((beat) => (who === 'hero' ? beat.hero : (beat.partner ?? 'stance')))))
 
-/** About, the bonus stage: he walks up to the car, a punch per highlight dents it, the uppercut wrecks it. */
-const about: SceneSpec = {
-  zone: 'castle',
-  bout: { lead: [{ hero: 'walk' }], item: { hero: 'punch', mark: 'hit' }, close: [{ hero: 'uppercut', mark: 'wreck' }, { hero: 'win' }] },
-  heroX: ({ index, t }) => HERO_X + (index === 0 ? t : 1) * HERO_STEP,
-  props: () => (
+// ---- the energy waves: his from his hands, the partner's from his, meeting in the middle on a clash ----
+
+// A wave flies over this stretch of its beat, bursts where it lands over the next.
+const WAVE = { from: 0.35, to: 0.6, gone: 0.62, burst: 0.52, fade: [0.62, 0.8] as const }
+
+function Waves() {
+  return (
     <>
-      <g data-fx="car" transform={`translate(${CAR_X} ${FLOOR - 86 * CAR_SCALE}) scale(${CAR_SCALE})`}>
-        {DAMAGES.map((damage) => (
-          <Car key={damage} damage={damage} />
-        ))}
+      <g data-fx="wave-hero" opacity="0">
+        <g transform={`scale(${SIZE}) translate(${-HAND[0]} ${-HAND[1]})`}>
+          <KiBall kind="ki" className="" />
+        </g>
+      </g>
+      <g data-fx="wave-partner" opacity="0">
+        <g transform={`scale(${-SIZE} ${SIZE}) translate(${-HAND[0]} ${-HAND[1]})`}>
+          <KiBall kind="ki" className="" />
+        </g>
+      </g>
+      <g data-fx="burst" opacity="0">
+        <circle r={58} fill={FS.cyan} opacity={0.45} />
+        <circle r={34} fill={FS.flash} opacity={0.85} />
+        <path d="M0 -70 L8 -14 L64 -24 L16 4 L52 52 L0 18 L-46 56 L-16 4 L-66 -20 L-8 -14 Z" fill={FS.flash} opacity={0.7} />
       </g>
     </>
-  ),
-  write: (stage, xs) => {
-    const car = frames(fx(stage, 'car'), '0')
-    return (beats, index) => {
-      const wrecked = markReached(beats, index, 'wreck')
-      car(String(wrecked ? 3 : Math.min(2, Math.ceil((marksUpTo(beats, index, 'hit') * 2) / Math.max(1, xs.length)))))
-    }
-  },
+  )
 }
 
-// Work's stops, one per job, and how far short of the first he waits.
-const WORK_STOPS = [HERO_X - 260, HERO_X + 260] as const
-const WORK_ENTRY = 120
+function wavesWriter(stage: HTMLElement): (m: Moment) => void {
+  const hero = fx(stage, 'wave-hero')
+  const partner = fx(stage, 'wave-partner')
+  const burst = fx(stage, 'burst')
+  return ({ beat, place: { t }, heroX, partnerX }) => {
+    const [fromX, y] = heroAt(heroX, HAND)
+    const [partnerFrom] = partnerAt(partnerX, HAND)
+    const clash = beat.mark === 'clash'
+    const target = clash ? (fromX + partnerFrom) / 2 : partnerAt(partnerX, CHEST)[0]
+    const flight = ramp(t, WAVE.from, WAVE.to)
+    const flying = flight > 0 && t < WAVE.gone
+    transformTo(hero, `translate(${r1(lerp(fromX, target, flight))} ${r1(y)})`)
+    fadeTo(hero, beat.hero === 'fireball' && flying ? 1 : 0)
+    transformTo(partner, `translate(${r1(lerp(partnerFrom, target, flight))} ${r1(y)})`)
+    fadeTo(partner, beat.partner === 'fireball' && flying ? 1 : 0)
+    const landing = beat.hero === 'fireball' ? ramp(t, WAVE.burst, WAVE.to) * (1 - ramp(t, ...WAVE.fade)) : 0
+    transformTo(burst, `translate(${r1(target)} ${r1(y)}) scale(${(0.6 + 0.6 * ramp(t, WAVE.burst, WAVE.fade[1])).toFixed(3)})`)
+    fadeTo(burst, landing)
+  }
+}
 
-/** Work: he walks the market a step per job, on the shared walk. */
+// ---- the rounds ----
+
+/** About: a chain, a link per highlight (jab, strong, roundhouse in turn), cancelled into the energy wave. */
+const about: SceneSpec = {
+  zone: 'castle',
+  gap: GAP.close,
+  waves: true,
+  bout: {
+    lead: [{ hero: 'walk', partner: 'stance' }],
+    cards: [[{ hero: 'punch', partner: 'hurt', mark: 'hit' }], [{ hero: 'strong', partner: 'hurt', mark: 'hit' }], [{ hero: 'roundhouse', partner: 'hurt', mark: 'hit' }]],
+    close: [{ hero: 'fireball', partner: 'hurt', mark: 'hit' }, { hero: 'stance', partner: 'down' }],
+  },
+  peak: { in: 'close', beat: 0, t: 0.58 },
+}
+
+/** Work: per job the partner attacks and he blocks it, then punishes with the strong punch; the rising
+ *  uppercut ends it. */
 const work: SceneSpec = {
   zone: 'market',
-  bout: { lead: [{ hero: 'stance' }], item: { hero: 'walk' }, close: [{ hero: 'win' }] },
-  heroX: ({ xs, reached }) => (xs.length ? walkAlong(xs, reached, 0, WORK_ENTRY).x : HERO_X),
+  gap: GAP.close,
+  bout: {
+    lead: [{ hero: 'stance', partner: 'walk' }],
+    cards: [[{ hero: 'guard', partner: 'punch' }, { hero: 'strong', partner: 'hurt', mark: 'hit' }]],
+    close: [{ hero: 'uppercut', partner: 'down', mark: 'hit' }],
+  },
+  peak: { in: 'close', beat: 0, t: 0.4 },
 }
 
-const TARGETS = { from: 1260, to: 1480 }
-
-/** The Tech Stack: a ki blast per category, each lighting its target. */
+/** The Tech Stack: energy waves traded at range, a pair per category clashing in the middle, until his gets
+ *  through. */
 const tech: SceneSpec = {
   zone: 'market',
-  bout: { lead: [{ hero: 'stance' }], item: { hero: 'fireball', mark: 'light' }, close: [{ hero: 'win' }] },
-  props: (xs) => xs.map((x, i) => <Target key={i} x={x} i={i} />),
-  write: (stage, xs) => {
-    const lits = xs.map((_, i) => fx(stage, `lit-${i}`))
-    return (_beats, _index, _t, cardsReached) => lits.forEach((lit, i) => fadeTo(lit, ramp(cardsReached - i, 0.7, 0.85)))
+  gap: GAP.range,
+  waves: true,
+  bout: {
+    lead: [{ hero: 'walkBack', partner: 'stance' }],
+    cards: [[{ hero: 'fireball', partner: 'fireball', mark: 'clash' }]],
+    close: [{ hero: 'fireball', partner: 'down', mark: 'hit' }],
   },
+  peak: { in: 'card', beat: 0, t: 0.6 },
 }
 
-/** Services: the rising uppercut launches a crate per service. */
+// The jump in: the partner leaves from range, meets the uppercut at the top of his arc and falls back.
+const JUMP_HEIGHT = 150
+const JUMP_IN = GAP.range - GAP.close - 30
+
+/** Services: per service the partner jumps in and he answers with the rising uppercut. */
 const services: SceneSpec = {
   zone: 'market',
-  bout: { lead: [{ hero: 'walk' }], item: { hero: 'uppercut', mark: 'hit' }, close: [{ hero: 'win' }] },
-  props: (xs) => xs.map((x, i) => <Crate key={i} x={x} i={i} />),
-  write: (stage, xs) => {
-    const crates = xs.map((_, i) => fx(stage, `crate-${i}`))
-    return (_beats, _index, _t, cardsReached) =>
-      crates.forEach((crate, i) => {
-        const launched = ramp(cardsReached - i, 0.4, 0.8)
-        transformTo(crate, `translate(${xs[i].toFixed(1)} ${(FLOOR - launched * 520).toFixed(1)}) rotate(${(launched * 200).toFixed(1)} 0 -45)`)
-        fadeTo(crate, 1 - ramp(launched, 0.7, 1))
-      })
+  gap: GAP.range,
+  bout: {
+    lead: [{ hero: 'stance', partner: 'walkBack' }],
+    cards: [[{ hero: 'stance', partner: 'jump' }, { hero: 'uppercut', partner: 'juggle', mark: 'hit' }]],
+    close: [{ hero: 'stance', partner: 'down' }],
+  },
+  peak: { in: 'card', beat: 1, t: 0.4 },
+  partner: ({ beat, place: { t } }) => {
+    if (beat.partner === 'jump') return { dx: -JUMP_IN * t, lift: hop(t / 2, JUMP_HEIGHT) }
+    if (beat.partner === 'juggle') return { dx: -JUMP_IN + 140 * t, lift: hop(0.5 + t / 2, JUMP_HEIGHT) }
+    return { dx: 0, lift: 0 }
   },
 }
 
-/** Projects: the super move; the screen dims to the flash, then a spin kick per project. */
+// The super's juggle: each hit holds the partner higher, to this height, before the wall splat.
+const JUGGLE = { base: 90, per: 10, most: 8, bounce: 50 }
+const WALL = 120
+
+/** Projects: the super; the screen dims and flashes, then a hit per project juggles the partner, and the
+ *  rising uppercut splats him on the wall. */
 const projects: SceneSpec = {
   zone: 'harbour',
-  bout: { lead: [{ hero: 'stance' }, { hero: 'fireball', mark: 'flash' }], item: { hero: 'spinKick', mark: 'hit' }, close: [{ hero: 'win' }] },
-  props: () => <rect data-fx="flash" width={W} height={H} fill={FS.flash} opacity="0" />,
+  gap: GAP.close + 30,
+  bout: {
+    lead: [{ hero: 'stance', partner: 'stance', mark: 'flash' }],
+    cards: [[{ hero: 'punch', partner: 'juggle' }], [{ hero: 'strong', partner: 'juggle' }], [{ hero: 'roundhouse', partner: 'juggle' }], [{ hero: 'spinKick', partner: 'juggle' }]],
+    close: [{ hero: 'uppercut', partner: 'splat', mark: 'hit' }],
+  },
+  peak: { in: 'close', beat: 0, t: 0.3 },
+  partner: ({ beat, place: { t, card } }) => {
+    if (beat.partner === 'juggle') return { dx: 0, lift: JUGGLE.base + JUGGLE.per * Math.min(card, JUGGLE.most) + hop(t, JUGGLE.bounce) }
+    if (beat.partner === 'splat') return { dx: WALL, lift: 0 }
+    return { dx: 0, lift: 0 }
+  },
+  zoom: ({ beat, place: { t, card }, count }) => {
+    if (card === -1) return beat.mark === 'flash' ? lerp(1, 1.1, ramp(t, 0.3, 1)) : 1
+    if (card < count) return 1.1
+    return lerp(1.12, 1, ramp(t, 0.5, 1))
+  },
+  props: () => (
+    <>
+      <rect data-fx="dim" x={-W} y={-H} width={W * 3} height={H * 3} fill="#000" opacity="0" />
+      <rect data-fx="flash" x={-W} y={-H} width={W * 3} height={H * 3} fill={FS.flash} opacity="0" />
+    </>
+  ),
   write: (stage) => {
+    const dim = fx(stage, 'dim')
     const flash = fx(stage, 'flash')
-    return (beats, index, t) => {
-      const flashing = beats[index]?.mark === 'flash'
-      fadeTo(flash, flashing ? 0.8 * Math.max(0, 1 - Math.abs(t - 0.5) * 3) : 0)
+    return ({ beat, place: { t, card }, count }) => {
+      const flashing = beat.mark === 'flash'
+      fadeTo(dim, card >= 0 && card < count ? 0.3 : flashing ? 0.3 * ramp(t, 0, 0.3) : 0)
+      fadeTo(flash, flashing ? 0.7 * Math.max(0, 1 - Math.abs(t - 0.5) * 3) : 0)
     }
   },
 }
 
-/** Ventures: his partner throws a punch per venture and he parries each, then answers with the uppercut. */
+/** Ventures: per venture the partner punches and he parries it in a blue flash; the spinning kick counters. */
 const ventures: SceneSpec = {
   zone: 'harbour',
-  partner: true,
+  gap: GAP.close,
   bout: {
     lead: [{ hero: 'stance', partner: 'walk' }],
-    item: { hero: 'parry', partner: 'punch', mark: 'light' },
-    close: [{ hero: 'uppercut', partner: 'hurt', mark: 'hit' }, { hero: 'win', partner: 'stance' }],
+    cards: [[{ hero: 'parry', partner: 'punch' }]],
+    close: [{ hero: 'spinKick', partner: 'down', mark: 'hit' }],
   },
+  peak: { in: 'card', beat: 0, t: 0.3 },
 }
 
-/** Bands: the show on the yacht's deck, his flurry on the kit per band, his partner dancing, the crowd at the rail. */
+/** Bands: per band a spinning kick into the partner's guard, cracking it a little more each time, until it
+ *  breaks and he is dizzy. */
 const bands: SceneSpec = {
   zone: 'harbour',
-  partner: true,
-  bout: { lead: [{ hero: 'stance', partner: 'win' }], item: { hero: 'act', partner: 'win' }, close: [{ hero: 'win', partner: 'win' }] },
+  gap: GAP.close,
+  bout: {
+    lead: [{ hero: 'stance', partner: 'guard' }],
+    cards: [[{ hero: 'spinKick', partner: 'guard', mark: 'hit' }]],
+    close: [{ hero: 'stance', partner: 'dizzy' }],
+  },
+  peak: { in: 'close', beat: 0, t: 0.3 },
   props: () => (
-    <g transform={`translate(0 ${FLOOR + 30})`}>
-      <CrowdGroup x={120} base={0} count={6} gap={46} scale={1.9} i={0} />
-      <CrowdGroup x={640} base={0} count={5} gap={46} scale={1.9} i={1} />
-      <CrowdGroup x={1140} base={0} count={7} gap={46} scale={1.9} i={2} />
+    <g data-fx="crack" opacity="0">
+      <path d="M0 -34 L7 -14 L-3 0 L9 16 L0 34 M7 -14 L19 -20 M9 16 L21 22 M-3 0 L-15 -6" fill="none" stroke={FS.flash} strokeWidth={3} strokeLinejoin="round" />
     </g>
   ),
-}
-
-/** The Muay Thai record: the sparring round, a strike per line of his record, then the partner down. */
-const muayThai: SceneSpec = {
-  zone: 'temple',
-  partner: true,
-  bout: {
-    lead: [{ hero: 'stance', partner: 'walk' }],
-    item: { hero: 'act', partner: 'hurt', mark: 'hit' },
-    close: [{ hero: 'act', partner: 'down' }, { hero: 'win', partner: 'down' }],
+  write: (stage) => {
+    const crack = fx(stage, 'crack')
+    return ({ beat, count, reached, partnerX }) => {
+      const [x, y] = partnerAt(partnerX, GUARD_AT)
+      transformTo(crack, `translate(${r1(x)} ${r1(y)}) scale(${SIZE})`)
+      fadeTo(crack, beat.partner === 'guard' ? Math.min(1, reached / Math.max(1, count)) : 0)
+    }
   },
 }
 
-/** The hero: he waits on the castle rooftop in his stance, bouncing on his feet as the page starts to scroll. */
-const hero: SceneSpec = { zone: 'castle', bout: { lead: [{ hero: 'stance' }], item: { hero: 'stance' }, close: [] } }
+/** The Muay Thai record: the clinch, a knee per line of the record, then the throw and his win pose. */
+const muayThai: SceneSpec = {
+  zone: 'temple',
+  gap: GAP.clinch,
+  bout: {
+    lead: [{ hero: 'walk', partner: 'stance' }],
+    cards: [[{ hero: 'knee', partner: 'hurt', mark: 'hit' }]],
+    close: [{ hero: 'throw', partner: 'down' }, { hero: 'win', partner: 'down' }],
+  },
+  peak: { in: 'close', beat: 0, t: 0.55 },
+  partner: ({ beat, place: { t, card }, count }) => ({ dx: card === count && beat.partner === 'down' ? (beat.hero === 'throw' ? 140 * ramp(t, 0.3, 1) : 140) : 0, lift: 0 }),
+}
+
+/** The hero: the two of them squared up on the castle rooftop as the page starts. */
+const hero: SceneSpec = { zone: 'castle', gap: GAP.mid, bout: { lead: [{ hero: 'stance', partner: 'stance' }], cards: [], close: [] }, peak: { in: 'lead', beat: 0, t: 0 } }
 
 /** The contact: the win screen, him in his win pose over his partner on the temple floor. */
-const contact: SceneSpec = { zone: 'temple', partner: true, bout: { lead: [{ hero: 'win', partner: 'down' }], item: { hero: 'win', partner: 'down' }, close: [] } }
+const contact: SceneSpec = { zone: 'temple', gap: GAP.mid, bout: { lead: [{ hero: 'win', partner: 'down' }], cards: [], close: [] }, peak: { in: 'lead', beat: 0, t: 0.99 } }
 
 const SCENES: Record<SceneId, SceneSpec> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
 
-// How many cards each section counts, read off the slot its cards are drawn from: one beat per card.
 // The cards a section counts, the shared count (stageItems): the record's facts and its achievements both.
 const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[]): number => {
   const { lead, count } = stageItems(slot, labels, highlights.length)
@@ -257,49 +317,61 @@ const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[
 export interface TourScene extends TheatreScene {
   id: SceneId
   slot: SectionSlot | null
-  xs: readonly number[]
-  beats: readonly Beat[]
+  plan: Plan
 }
 
-/** The scene's writer: where it is in its bout, both fighters posed and stepped, then its own props. */
+/** The place a settled scene holds: its peak beat. */
+function peakOf({ peak, bout }: SceneSpec, { starts }: Plan, count: number): Place {
+  if (peak.in === 'lead' || count === 0) return { index: peak.beat, t: peak.t, card: -1 }
+  if (peak.in === 'card') return { index: starts[count - 1] + peak.beat, t: peak.t, card: count - 1 }
+  return { index: starts[count] + Math.min(peak.beat, bout.close.length - 1), t: peak.t, card: count }
+}
+
+/** The scene's writer: where it is in its round, both fighters posed and placed, the camera, then its props. */
 function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, 'bind'>, profession: Profession): StageWriter {
-  const { beats, xs, count } = scene
-  const heroPoses = posesOf(beats, 'hero')
-  const partnerPoses = posesOf(beats, 'partner')
+  const { plan, count } = scene
   const heroNode = fx(stage, 'hero')
-  const pose = scrubWriter(heroNode, profession, heroPoses)
-  const partner = spec.partner ? scrubWriter(fx(stage, 'partner'), profession, partnerPoses) : null
-  const props = spec.write?.(stage, xs)
+  const partnerNode = fx(stage, 'partner')
+  const camera = fx(stage, 'camera')
+  const shadow = partnerNode?.querySelector('[data-shadow]') ?? null
+  const pose = scrubWriter(heroNode, profession, posesOf(plan.beats, 'hero'))
+  const partner = scrubWriter(partnerNode, profession, posesOf(plan.beats, 'partner'))
+  const waves = spec.waves ? wavesWriter(stage) : null
+  const props = spec.write?.(stage)
+  const peak = peakOf(spec, plan, count)
   return (progress, cardsReached) => {
-    const { index, t } = beatAt(spec.bout, count, cardsReached, progress)
-    const beat = beats[index] ?? beats[beats.length - 1]
-    // A scene with no cards (the hero, the contact) plays its pose over the scene itself.
-    const at = count === 0 ? progress : t
-    pose(beat.hero, at)
-    transformTo(heroNode, place(spec.heroX?.({ beats, index, t: at, xs, reached: cardsReached }) ?? HERO_X))
-    partner?.(beat.partner ?? 'stance', at)
-    props?.(beats, index, at, cardsReached)
+    const settled = progress === SETTLED_PROGRESS && cardsReached >= count
+    const place = settled ? peak : beatAt(spec.bout, plan, cardsReached, progress)
+    const beat = plan.beats[place.index] ?? plan.beats[plan.beats.length - 1]
+    const reached = settled ? count : cardsReached
+    const drift = Math.min(MAX_DRIFT, reached * Math.min(STEP, MAX_DRIFT / Math.max(1, count)))
+    const base: Moment = { beat, place, count, reached, heroX: HERO_X + drift, partnerX: HERO_X + spec.gap + drift }
+    const { dx, lift } = spec.partner?.(base) ?? { dx: 0, lift: 0 }
+    const rock = beat.partner === 'hurt' ? Math.sin(Math.PI * place.t) * KNOCK : 0
+    const m: Moment = { ...base, partnerX: base.partnerX + dx + rock }
+    pose(beat.hero, place.t)
+    partner(beat.partner ?? 'stance', place.t)
+    transformTo(heroNode, standAt(m.heroX))
+    transformTo(partnerNode, standAt(m.partnerX, lift))
+    transformTo(shadow, `translate(0 ${r1(lift / SIZE)}) translate(${CELL.width} 0) scale(-1 1)`)
+    const focus = (m.heroX + m.partnerX) / 2 + CELL.width
+    transformTo(camera, `translate(${r1(-drift * PAN)} 0) ${focusOn(focus, FLOOR - 150, spec.zoom?.(m) ?? 1)}`)
+    waves?.(m)
+    props?.(m)
   }
-}
-
-const XS_FOR: Partial<Record<SceneId, readonly [number, number]>> = {
-  tech: [TARGETS.from, TARGETS.to],
-  services: [1240, 1480],
-  work: WORK_STOPS,
 }
 
 /** The page's scenes in order: the hero, the profession's sections, the contact. */
 export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[], profession: Profession): TourScene[] {
   const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number): TourScene => {
     const spec = SCENES[id]
-    const range = XS_FOR[id]
-    const base = { id, slot, count, xs: range ? spread(count, ...range) : [], beats: beatsOf(spec.bout, Math.max(count, 1)) }
+    const base = { id, slot, count, plan: planOf(spec.bout, count) }
     return { ...base, bind: (stage) => bindScene(stage, spec, base, profession) }
   }
   return [sceneOf('hero', null, 0), ...slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, labels, highlights))), sceneOf('contact', null, 0)]
 }
 
-/** A scene's picture: its stage of the tour, then the fighters and the section's props. */
+/** A scene's picture: its stage of the tour, then the two fighters in the arena and the round's props. */
 export function TourStage({ scene, profession, settled = false }: { scene: TourScene; profession: Profession; settled?: boolean }) {
   const spec = SCENES[scene.id]
   return (
@@ -322,14 +394,15 @@ export function TourStage({ scene, profession, settled = false }: { scene: TourS
           node: (
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
               <g className={look.troupe}>
-                {spec.props?.(scene.xs)}
-                {spec.partner && (
-                  <g data-fx="partner" transform={place(PARTNER_X)}>
-                    <ScrubFighter profession={profession} who="partner" mirror poses={posesOf(scene.beats, 'partner')} />
+                <g data-fx="camera">
+                  {spec.props?.()}
+                  <g data-fx="partner" transform={standAt(HERO_X + spec.gap)}>
+                    <ScrubFighter profession={profession} who="partner" mirror poses={posesOf(scene.plan.beats, 'partner')} />
                   </g>
-                )}
-                <g data-fx="hero" transform={place(HERO_X)}>
-                  <ScrubFighter profession={profession} poses={posesOf(scene.beats, 'hero')} />
+                  <g data-fx="hero" transform={standAt(HERO_X)}>
+                    <ScrubFighter profession={profession} poses={posesOf(scene.plan.beats, 'hero')} />
+                  </g>
+                  {spec.waves && <Waves />}
                 </g>
               </g>
             </svg>
