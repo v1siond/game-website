@@ -30,9 +30,10 @@ const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
 export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG)
 
-const plane = (children: ReactNode): ReactNode => (
+/** A layer's plane; its art sits in the camera's group (data-fx="cam-<layer>"), which a scene pushes in. */
+const plane = (name: string, children: ReactNode): ReactNode => (
   <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
-    {children}
+    <g data-fx={`cam-${name}`}>{children}</g>
   </svg>
 )
 
@@ -51,13 +52,14 @@ function Survivor({ scene }: { scene: Scene }) {
 const layersOf = (scene: Scene): StageLayer[] => {
   const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[scene.def.zone]
   return [
-    { name: 'sky', node: plane(<Sky uid={scene.id} />) },
-    { name: 'far', node: plane(<Far />) },
-    { name: 'mid', node: plane(<Mid />) },
-    { name: 'near', node: plane(<Near uid={scene.id} />) },
+    { name: 'sky', node: plane('sky', <Sky uid={scene.id} />) },
+    { name: 'far', node: plane('far', <Far />) },
+    { name: 'mid', node: plane('mid', <Mid />) },
+    { name: 'near', node: plane('near', <Near uid={scene.id} />) },
     {
       name: 'figure',
       node: plane(
+        'figure',
         <>
           <ellipse cx={scene.layout.cx} cy={GROUND[scene.def.zone] + 4} rx={340} ry={14} fill={POSTER_INK} opacity={0.12} />
           {scene.def.back(scene.layout)}
