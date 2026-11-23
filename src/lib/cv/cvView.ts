@@ -96,13 +96,14 @@ const projectsFor = (cv: WorldCV, keep: Keep): Project[] =>
   cv.projects.filter((project) => keep(project, project.endYear)).sort((a, b) => a.position - b.position)
 
 /**
- * The ventures in the order every world and /cv shows them: his own products (featured) first, then the
- * rest, each group in the order of companies.json.
+ * The ventures every world and /cv shows: the companies marked as ventures in companies.json, his own
+ * products (featured) first, then the rest, each group in the file's order. The other companies stay in
+ * the content for the current roles that link them.
  */
-export const venturesFor = (companies: CVData['companies']): CVData['companies'] => [
-  ...companies.filter((company) => company.featured),
-  ...companies.filter((company) => !company.featured),
-]
+export const venturesFor = (companies: CVData['companies']): CVData['companies'] => {
+  const ventures = companies.filter((company) => company.venture)
+  return [...ventures.filter((company) => company.featured), ...ventures.filter((company) => !company.featured)]
+}
 
 const bandsFor = (cv: WorldCV): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
 

@@ -2,21 +2,6 @@
   "en": {
     "companies": [
       {
-        "id": "nebulith",
-        "name": "Nebulith",
-        "tagline": "Custom game engine",
-        "description": "A game engine and map editor for generated worlds. Launching soon.",
-        "url": "https://nebulith-production.up.railway.app",
-        "services": [
-          "Generated worlds",
-          "Map editor",
-          "Iso and top views",
-          "Tiles, units, quests"
-        ],
-        "icon": "🎮",
-        "featured": true
-      },
-      {
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Language learning with an AI tutor",
@@ -29,7 +14,38 @@
           "Speech to text and text to speech"
         ],
         "icon": "📚",
-        "featured": true
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Custom game engine",
+        "description": "A game engine and map editor for generated worlds. Launching soon.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Generated worlds",
+          "Map editor",
+          "Iso and top views",
+          "Tiles, units, quests"
+        ],
+        "icon": "🎮",
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "insuradmin",
+        "name": "InsurAdmin",
+        "tagline": "Management software for insurance agencies and IMOs",
+        "description": "Carrier feeds, commission files and agency teams in one app.",
+        "url": "https://insuradmin.com",
+        "services": [
+          "Carrier feed parser that creates carriers, products, appointments and applications for each agent",
+          "Commission files and party commissions",
+          "Team and agency dashboards and user subscriptions per agency"
+        ],
+        "icon": "🛡️",
+        "venture": true
       },
       {
         "id": "dba",
@@ -78,21 +94,6 @@
   "es": {
     "companies": [
       {
-        "id": "nebulith",
-        "name": "Nebulith",
-        "tagline": "Motor de juegos propio",
-        "description": "Un motor de juegos y editor de mapas para mundos generados. Sale pronto.",
-        "url": "https://nebulith-production.up.railway.app",
-        "services": [
-          "Mundos generados",
-          "Editor de mapas",
-          "Vistas isométrica y cenital",
-          "Tiles, unidades, misiones"
-        ],
-        "icon": "🎮",
-        "featured": true
-      },
-      {
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Aprendizaje de idiomas con un tutor de IA",
@@ -105,7 +106,38 @@
           "Voz a texto y texto a voz"
         ],
         "icon": "📚",
-        "featured": true
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Motor de juegos propio",
+        "description": "Un motor de juegos y editor de mapas para mundos generados. Sale pronto.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Mundos generados",
+          "Editor de mapas",
+          "Vistas isométrica y cenital",
+          "Tiles, unidades, misiones"
+        ],
+        "icon": "🎮",
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "insuradmin",
+        "name": "InsurAdmin",
+        "tagline": "Software de gestión para agencias de seguros e IMOs",
+        "description": "Feeds de aseguradoras, archivos de comisiones y equipos de agencia en una sola app.",
+        "url": "https://insuradmin.com",
+        "services": [
+          "Parser de feeds de aseguradoras que crea aseguradoras, productos, nombramientos y solicitudes para cada agente",
+          "Archivos de comisiones y comisiones por parte",
+          "Dashboards de equipos y agencias y suscripciones de usuarios por agencia"
+        ],
+        "icon": "🛡️",
+        "venture": true
       },
       {
         "id": "dba",
@@ -154,21 +186,6 @@
   "it": {
     "companies": [
       {
-        "id": "nebulith",
-        "name": "Nebulith",
-        "tagline": "Motore di gioco proprietario",
-        "description": "Un motore di gioco ed editor di mappe per mondi generati. In uscita a breve.",
-        "url": "https://nebulith-production.up.railway.app",
-        "services": [
-          "Mondi generati",
-          "Editor di mappe",
-          "Viste isometrica e dall'alto",
-          "Tile, unità, missioni"
-        ],
-        "icon": "🎮",
-        "featured": true
-      },
-      {
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Apprendimento delle lingue con un tutor IA",
@@ -181,7 +198,38 @@
           "Voce in testo e testo in voce"
         ],
         "icon": "📚",
-        "featured": true
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Motore di gioco proprietario",
+        "description": "Un motore di gioco ed editor di mappe per mondi generati. In uscita a breve.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Mondi generati",
+          "Editor di mappe",
+          "Viste isometrica e dall'alto",
+          "Tile, unità, missioni"
+        ],
+        "icon": "🎮",
+        "featured": true,
+        "venture": true
+      },
+      {
+        "id": "insuradmin",
+        "name": "InsurAdmin",
+        "tagline": "Software gestionale per agenzie assicurative e IMO",
+        "description": "Feed delle compagnie, file delle commissioni e team di agenzia in un'unica app.",
+        "url": "https://insuradmin.com",
+        "services": [
+          "Parser dei feed delle compagnie che crea compagnie, prodotti, nomine e domande per ogni agente",
+          "File delle commissioni e commissioni per parte",
+          "Dashboard di team e agenzie e abbonamenti degli utenti per agenzia"
+        ],
+        "icon": "🛡️",
+        "venture": true
       },
       {
         "id": "dba",
