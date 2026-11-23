@@ -109,7 +109,7 @@ function Mongkhon() {
   )
 }
 
-const HAIR_CAP = 'M26.5 30 C25 12 38 5 50 5 C62 5 75 12 73.5 30 C68 21 60 17.5 50 17.5 C40 17.5 32 21 26.5 30 Z'
+const HAIR_CAP = 'M27 25 C27 11 38 6.5 50 6.5 C62 6.5 73 11 73 25 C67 18 59 14.5 50 14.5 C41 14.5 33 18 27 25 Z'
 const TUFTS = 'M36 9 L38 0 L42 6 L45 -2 L48 6 L52 -1 L55 6 L59 1 L61 9 Z'
 
 /** His head, `still` on a stage: no blink or lag of its own there. */
