@@ -18,8 +18,8 @@ import { DARK_FANTASY } from './palette'
  * ALEXANDER ADAPTATION:
  * - Beard extends from bottom of mask
  *
- * Drawn as an SVG element, so a scene places him inside its own picture. His nail ([data-nail]) turns on
- * the pommel and its soul light ([data-nail-glow]) brightens: the scene writes both from the scroll
+ * Drawn as an SVG element, so a scene places him inside its own picture. His blade ([data-blade]) turns on
+ * the pommel and its soul light ([data-blade-glow]) brightens: the scene writes both from the scroll
  * (slashAngle), so his slashes play forwards and back with it.
  */
 
@@ -31,24 +31,24 @@ export const KNIGHT_SOLE_Y = 79
 // The small ground shadow drawn over his legs sits this far above the sole line the contact shadows sit on.
 const KNIGHT_INNER_SHADOW_RISE = 3
 
-// The nail at rest, held to the side; it turns on the pommel.
-const NAIL_REST_DEG = 25
+// The blade at rest, held to the side; it turns on the pommel.
+const BLADE_REST_DEG = 25
 
-/** The nail's transform at `angle` degrees, turned on the pommel. */
-export const nailTurn = (angle: number): string => `rotate(${angle.toFixed(1)} 52 55)`
+/** The blade's transform at `angle` degrees, turned on the pommel. */
+export const bladeTurn = (angle: number): string => `rotate(${angle.toFixed(1)} 52 55)`
 
-// A slash: the nail swings up and over to NAIL_STRIKE_DEG by RAISE_END, holds to STRIKE_END and comes back
+// A slash: the blade swings up and over to BLADE_STRIKE_DEG by RAISE_END, holds to STRIKE_END and comes back
 // to rest by the slash's end.
-const NAIL_STRIKE_DEG = -60
+const BLADE_STRIKE_DEG = -60
 const RAISE_END = 0.3
 const STRIKE_END = 0.5
 
-/** The nail's angle at `phase` of a slash, 0 to 1: rest, the swing up, the hold, back to rest. */
+/** The blade's angle at `phase` of a slash, 0 to 1: rest, the swing up, the hold, back to rest. */
 export function slashAngle(phase: number): number {
-  if (phase <= 0 || phase >= 1) return NAIL_REST_DEG
-  if (phase < RAISE_END) return NAIL_REST_DEG + (NAIL_STRIKE_DEG - NAIL_REST_DEG) * (phase / RAISE_END)
-  if (phase < STRIKE_END) return NAIL_STRIKE_DEG
-  return NAIL_STRIKE_DEG + (NAIL_REST_DEG - NAIL_STRIKE_DEG) * ((phase - STRIKE_END) / (1 - STRIKE_END))
+  if (phase <= 0 || phase >= 1) return BLADE_REST_DEG
+  if (phase < RAISE_END) return BLADE_REST_DEG + (BLADE_STRIKE_DEG - BLADE_REST_DEG) * (phase / RAISE_END)
+  if (phase < STRIKE_END) return BLADE_STRIKE_DEG
+  return BLADE_STRIKE_DEG + (BLADE_REST_DEG - BLADE_STRIKE_DEG) * ((phase - STRIKE_END) / (1 - STRIKE_END))
 }
 
 /** How bright the blade's soul light is at `phase` of a slash: lit from the swing to the hold's end. */
@@ -198,21 +198,21 @@ export const KnightCharacter = memo(function KnightCharacter({ scale = 1, x = 0,
         opacity="0.4"
       />
 
-      {/* NAIL - held to the side */}
-      <g data-nail="" transform={nailTurn(NAIL_REST_DEG)}>
+      {/* BLADE - held to the side */}
+      <g data-blade="" transform={bladeTurn(BLADE_REST_DEG)}>
         {/* Handle */}
         <rect x="49" y="53" width="6" height="10" rx="1" fill={DARK_FANTASY.cloakDark} stroke={DARK_FANTASY.black} strokeWidth="0.5" />
         {/* Blade */}
         <path
           d="M52,53 L48,35 L52,15 L56,35 L52,53"
-          fill={DARK_FANTASY.nail}
+          fill={DARK_FANTASY.blade}
           stroke={DARK_FANTASY.silver}
           strokeWidth="0.5"
         />
         {/* Highlight */}
         <line x1="52" y1="50" x2="52" y2="18" stroke={DARK_FANTASY.white} strokeWidth="0.5" opacity="0.5" />
         {/* The soul light on the blade at the height of a slash; the scene writes its opacity */}
-        <path data-nail-glow="" d="M52,53 L48,35 L52,15 L56,35 L52,53" fill={DARK_FANTASY.soulBlue} opacity="0" />
+        <path data-blade-glow="" d="M52,53 L48,35 L52,15 L56,35 L52,53" fill={DARK_FANTASY.soulBlue} opacity="0" />
       </g>
 
       {/* Ground shadow */}
