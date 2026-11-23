@@ -38,8 +38,7 @@
         "skipToContent": "Skip to main content",
         "loading": "Loading...",
         "copyright": "Copyright",
-        "active": "Active",
-        "findTally": "{found} of {total}"
+        "active": "Active"
       },
       "actions": {
         "close": "Close {name}",
@@ -236,39 +235,6 @@
         "inkRibbons": "Ink ribbons: {count}",
         "saved": "Saved"
       },
-      "warp": {
-        "hub": "The Chronoport",
-        "observatory": "Observatory, 3000 BC",
-        "speedway": "Desert speedway, 1958",
-        "forge": "Iron forge, 1250",
-        "relay": "Sky relay, 2350",
-        "sands": "Vault of sands, 1320 BC",
-        "keystone": "The keystone",
-        "arena": "Neon arena, 1986",
-        "pavilion": "Ring pavilion, 1930",
-        "beacon": "The beacon, today"
-      },
-      "eras": {
-        "placeHero": "The Chronoport, the hub of every era",
-        "placeAbout": "The fern age, before history",
-        "placeWork": "The desert highway, 1957",
-        "placeTech": "The sun tomb",
-        "placeServices": "The lantern market by night",
-        "placeProjects": "The long wall at sunset",
-        "placeVentures": "The keystone, year 3000",
-        "placeBands": "The neon arena, 1985",
-        "placeMuayThai": "The jungle ring",
-        "placeContact": "The beacon",
-        "gate": "Gate {number} of {total}. {place}",
-        "countAbout": "{count} of {total} rune stones lit",
-        "countWork": "{count} of {total} mile signs passed",
-        "countTech": "{count} of {total} tablets lit",
-        "countServices": "{count} of {total} lanterns lit",
-        "countProjects": "{count} of {total} crates opened",
-        "countVentures": "{count} of {total} shards placed",
-        "countBands": "{count} of {total} screens on",
-        "countMuayThai": "{count} of {total} torches lit"
-      },
       "souls": {
         "kindled": "Fire kindled",
         "rest": "Rest at the fire",
@@ -302,12 +268,6 @@
         "healthFull": "Health is full",
         "souls": "Souls",
         "gained": "{count} souls"
-      },
-      "rpg": {
-        "check": "Check",
-        "checkAgain": "Check again",
-        "resetPuzzle": "Reset the puzzle",
-        "sparAgain": "Spar again"
       },
       "cvPage": {
         "backToSite": "Back to the site",
@@ -463,8 +423,7 @@
         "skipToContent": "Saltar al contenido principal",
         "loading": "Cargando...",
         "copyright": "Derechos de autor",
-        "active": "Activo",
-        "findTally": "{found} de {total}"
+        "active": "Activo"
       },
       "actions": {
         "close": "Cerrar {name}",
@@ -661,39 +620,6 @@
         "inkRibbons": "Cintas de tinta: {count}",
         "saved": "Guardado"
       },
-      "warp": {
-        "hub": "El Cronopuerto",
-        "observatory": "Observatorio, 3000 a. C.",
-        "speedway": "Autódromo del desierto, 1958",
-        "forge": "Forja de hierro, 1250",
-        "relay": "Relé del cielo, 2350",
-        "sands": "Cámara de las arenas, 1320 a. C.",
-        "keystone": "La clave del arco",
-        "arena": "Arena de neón, 1986",
-        "pavilion": "Pabellón del ring, 1930",
-        "beacon": "El faro, hoy"
-      },
-      "eras": {
-        "placeHero": "El Cronopuerto, el centro de todas las eras",
-        "placeAbout": "La era de los helechos, antes de la historia",
-        "placeWork": "La carretera del desierto, 1957",
-        "placeTech": "La tumba del sol",
-        "placeServices": "El mercado de faroles de noche",
-        "placeProjects": "La gran muralla al atardecer",
-        "placeVentures": "La piedra angular, año 3000",
-        "placeBands": "La arena de neón, 1985",
-        "placeMuayThai": "El ring de la selva",
-        "placeContact": "La baliza",
-        "gate": "Puerta {number} de {total}. {place}",
-        "countAbout": "{count} de {total} piedras rúnicas encendidas",
-        "countWork": "{count} de {total} señales de milla pasadas",
-        "countTech": "{count} de {total} tablillas encendidas",
-        "countServices": "{count} de {total} faroles encendidos",
-        "countProjects": "{count} de {total} cajas abiertas",
-        "countVentures": "{count} de {total} fragmentos colocados",
-        "countBands": "{count} de {total} pantallas encendidas",
-        "countMuayThai": "{count} de {total} antorchas encendidas"
-      },
       "souls": {
         "kindled": "Hoguera encendida",
         "rest": "Descansar junto al fuego",
@@ -727,12 +653,6 @@
         "healthFull": "La salud está completa",
         "souls": "Almas",
         "gained": "{count} almas"
-      },
-      "rpg": {
-        "check": "Examinar",
-        "checkAgain": "Examinar otra vez",
-        "resetPuzzle": "Reiniciar el acertijo",
-        "sparAgain": "Entrenar otra vez"
       },
       "cvPage": {
         "backToSite": "Volver al sitio",
@@ -888,8 +808,7 @@
         "skipToContent": "Vai al contenuto principale",
         "loading": "Caricamento...",
         "copyright": "Copyright",
-        "active": "Attivo",
-        "findTally": "{found} su {total}"
+        "active": "Attivo"
       },
       "actions": {
         "close": "Chiudi {name}",
@@ -1086,39 +1005,6 @@
         "inkRibbons": "Nastri inchiostrati: {count}",
         "saved": "Salvato"
       },
-      "warp": {
-        "hub": "Il Cronoporto",
-        "observatory": "Osservatorio, 3000 a.C.",
-        "speedway": "Autodromo nel deserto, 1958",
-        "forge": "Forgia del ferro, 1250",
-        "relay": "Ripetitore del cielo, 2350",
-        "sands": "Camera delle sabbie, 1320 a.C.",
-        "keystone": "La chiave di volta",
-        "arena": "Arena al neon, 1986",
-        "pavilion": "Padiglione del ring, 1930",
-        "beacon": "Il faro, oggi"
-      },
-      "eras": {
-        "placeHero": "Il Cronoporto, il centro di tutte le ere",
-        "placeAbout": "L'era delle felci, prima della storia",
-        "placeWork": "La strada del deserto, 1957",
-        "placeTech": "La tomba del sole",
-        "placeServices": "Il mercato delle lanterne di notte",
-        "placeProjects": "La lunga muraglia al tramonto",
-        "placeVentures": "La chiave di volta, anno 3000",
-        "placeBands": "L'arena al neon, 1985",
-        "placeMuayThai": "Il ring nella giungla",
-        "placeContact": "Il faro",
-        "gate": "Porta {number} di {total}. {place}",
-        "countAbout": "{count} pietre runiche accese su {total}",
-        "countWork": "{count} cartelli miliari superati su {total}",
-        "countTech": "{count} tavolette accese su {total}",
-        "countServices": "{count} lanterne accese su {total}",
-        "countProjects": "{count} casse aperte su {total}",
-        "countVentures": "{count} frammenti posati su {total}",
-        "countBands": "{count} schermi accesi su {total}",
-        "countMuayThai": "{count} torce accese su {total}"
-      },
       "souls": {
         "kindled": "Falò acceso",
         "rest": "Riposa accanto al fuoco",
@@ -1152,12 +1038,6 @@
         "healthFull": "La salute è piena",
         "souls": "Anime",
         "gained": "{count} anime"
-      },
-      "rpg": {
-        "check": "Esamina",
-        "checkAgain": "Esamina di nuovo",
-        "resetPuzzle": "Ripristina l'enigma",
-        "sparAgain": "Allenati di nuovo"
       },
       "cvPage": {
         "backToSite": "Torna al sito",

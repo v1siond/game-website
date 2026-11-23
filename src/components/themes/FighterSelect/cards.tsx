@@ -12,6 +12,7 @@ import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
+import { MASONRY_TILES } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
@@ -189,7 +190,7 @@ export function MoveCard({ category }: { category: CVData['techStack'][number] }
         {category.name}
       </h3>
       <ul
-        className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2"
+        className={`${MASONRY_TILES} gap-2`}
         aria-label={fillLabel(cards.categoryTechnologies, {
           name: category.name,
         })}

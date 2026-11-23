@@ -9,7 +9,7 @@ import { DF, smooth, STEP, type ItemSpot, type RoomGeometry } from './world'
 export const progressOf = (item: ItemSpot, camZ: number): number => (camZ - (item.z - DF)) / STEP
 
 /** An item counts as found once the runner has reached its prop. */
-export const isFound = (item: ItemSpot, camZ: number): boolean => progressOf(item, camZ) >= 0.02
+const isFound = (item: ItemSpot, camZ: number): boolean => progressOf(item, camZ) >= 0.02
 
 const nearestItem = (room: RoomGeometry, camZ: number): ItemSpot =>
   room.items.reduce((best, item) => (Math.abs(progressOf(item, camZ)) < Math.abs(progressOf(best, camZ)) ? item : best), room.items[0])

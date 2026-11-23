@@ -1,33 +1,27 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { cssVars } from '@/lib/cssVars'
-import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
-import { heldUntil } from '@/components/themes/shared/held'
 import { FS } from './palette'
-import living from './living.module.css'
 
-// The stage behind the page, the way the arcade tour moves from one country's stage to the next: the
-// castle rooftop under the moon behind his entrance, the select screen and the bonus stage; the street
-// market at noon, its crowd round the stalls and a rider crossing once, behind his jobs and his move list;
-// the harbour at sunset with the crowd dancing on the yacht's deck behind his projects, ventures and
-// bands; the temple ring with its crowd behind the Muay Thai record and the win quote. The page hands
-// the zone in view down (useZoneStage in each scene) and the stages cross fade. Each crowd bobs a two
-// frame step in groups, out of step, a few times the first time its stage is in view, then stands; a
-// stage out of view holds still.
+// The arcade tour's stages, one country's stage after the next, drawn on one 1600 by 900 canvas for the
+// theatre's scenes (theatre.tsx): the castle rooftop under the moon behind his entrance and the bonus
+// stage; the street market at noon, its crowd round the stalls and a rider, behind his jobs, his
+// move list and his services; the harbour at sunset with the crowd dancing on the yacht's deck behind his
+// projects, ventures and bands; the temple ring with its crowd behind the Muay Thai record and the win
+// quote. Every stage stands still: only the scroll moves the theatre.
 
 export type Zone = 'castle' | 'market' | 'harbour' | 'temple'
 
-const W = 1600
-const H = 900
+export const W = 1600
+export const H = 900
 
 const SHIRTS = [FS.p2Dark, FS.p1, FS.health, FS.orange, FS.chrome, FS.giDeep, FS.gold]
 const SKINS = ['#e9b08a', '#b9774c', FS.skinDeep, '#f2c49b']
 
-// A bobbing group of onlookers standing on the line `base`, `count` of them from `x`, `gap` apart.
+// A group of onlookers standing on the line `base`, `count` of them from `x`, `gap` apart.
 export function CrowdGroup({ x, base, count, gap, scale, i }: { x: number; base: number; count: number; gap: number; scale: number; i: number }) {
   return (
-    <g className={living.bob} style={cssVars({ '--i': i })}>
+    <g>
       {Array.from({ length: count }, (_, k) => (
         <g key={k} transform={`translate(${x + k * gap} ${base + (k % 2) * 6}) scale(${scale})`}>
           <path d="M-12 0 Q-12 -19 0 -20 Q12 -19 12 0 Z" fill={SHIRTS[(k + i) % SHIRTS.length]} stroke={FS.ink} strokeWidth={1.4} />
@@ -69,15 +63,15 @@ const CASTLE = (
     {Array.from({ length: 9 }, (_, k) => (
       <path key={k} d={`M${k * 200} 650 L${k * 200 - 120} 900`} stroke="#2a201c" strokeWidth={4} />
     ))}
-    <g className={living.sway} style={cssVars({ '--i': 0 })}>
+    <g>
       <rect x={300} y={470} width={70} height={150} fill="#c9b48a" stroke={FS.ink} strokeWidth={4} />
       <path d="M318 500 H352 M318 530 H352 M318 560 H352" stroke={FS.ink} strokeWidth={6} />
     </g>
   </>
 )
 
-// The street market at noon: shop fronts, lanterns swinging, stalls, the crowd along the street and a
-// rider crossing it once.
+// The street market at noon: shop fronts, lanterns hanging, stalls, the crowd along the street and a
+// rider in the street.
 const MARKET = (
   <>
     <rect width={W} height={H} fill="#f6c46a" />
@@ -88,8 +82,8 @@ const MARKET = (
         <rect x={x + 30} y={380} width={240} height={220} fill="#3a1a14" />
       </g>
     ))}
-    {[180, 520, 860, 1200, 1500].map((x, k) => (
-      <g key={x} className={living.sway} style={cssVars({ '--i': k })}>
+    {[180, 520, 860, 1200, 1500].map((x) => (
+      <g key={x}>
         <path d={`M${x} 60 V100`} stroke={FS.ink} strokeWidth={3} />
         <ellipse cx={x} cy={126} rx={26} ry={30} fill={FS.p2} stroke={FS.ink} strokeWidth={4} />
         <path d={`M${x - 26} 126 H${x + 26}`} stroke={FS.gold} strokeWidth={4} />
@@ -113,20 +107,18 @@ const MARKET = (
       ]}
       base={680}
     />
-    <g className={living.ride}>
-      <g transform="translate(0 820)">
-        <circle cx={-40} cy={0} r={34} fill="none" stroke={FS.ink} strokeWidth={6} />
-        <circle cx={60} cy={0} r={34} fill="none" stroke={FS.ink} strokeWidth={6} />
-        <path d="M-40 0 L0 -40 L60 0 M0 -40 L10 -70" stroke={FS.ink} strokeWidth={6} fill="none" />
-        <path d="M-10 -100 Q0 -120 14 -100 L20 -60 L-4 -60 Z" fill={FS.p1} stroke={FS.ink} strokeWidth={4} />
-        <circle cx={4} cy={-118} r={14} fill="#e9b08a" stroke={FS.ink} strokeWidth={4} />
-      </g>
+    <g transform="translate(220 820)">
+      <circle cx={-40} cy={0} r={34} fill="none" stroke={FS.ink} strokeWidth={6} />
+      <circle cx={60} cy={0} r={34} fill="none" stroke={FS.ink} strokeWidth={6} />
+      <path d="M-40 0 L0 -40 L60 0 M0 -40 L10 -70" stroke={FS.ink} strokeWidth={6} fill="none" />
+      <path d="M-10 -100 Q0 -120 14 -100 L20 -60 L-4 -60 Z" fill={FS.p1} stroke={FS.ink} strokeWidth={4} />
+      <circle cx={4} cy={-118} r={14} fill="#e9b08a" stroke={FS.ink} strokeWidth={4} />
     </g>
   </>
 )
 
-// The harbour at sunset: the sea, the far cranes, the yacht moored along the quay, rocking, its deck
-// packed with a crowd dancing.
+// The harbour at sunset: the sea, the far cranes, the yacht moored along the quay, its deck
+// packed with a crowd.
 const HARBOUR = (
   <>
     <rect width={W} height={H} fill="#ff9a4a" />
@@ -145,7 +137,7 @@ const HARBOUR = (
         fill="none"
       />
     ))}
-    <g className={living.rock}>
+    <g>
       <path d="M120 600 H1480 L1400 760 H220 Z" fill={FS.gi} stroke={FS.ink} strokeWidth={6} />
       <path d="M150 640 H1450" stroke={FS.p1} strokeWidth={12} />
       <rect x={520} y={420} width={420} height={180} fill={FS.gi} stroke={FS.ink} strokeWidth={6} />
@@ -200,31 +192,10 @@ const TEMPLE = (
   </>
 )
 
-const STAGES: Record<Zone, ReactNode> = {
+/** Each stage's art on the canvas. */
+export const ZONE_ART: Record<Zone, ReactNode> = {
   castle: CASTLE,
   market: MARKET,
   harbour: HARBOUR,
   temple: TEMPLE,
-}
-const ZONES = Object.keys(STAGES) as Zone[]
-
-export function TourBackdrop({ zones }: { zones: ValueStore<Zone> }) {
-  const zone = useStoreValue(zones)
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-      {ZONES.map((id) => (
-        <svg
-          key={id}
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="xMidYMax slice"
-          className={`absolute inset-0 h-full w-full ${living.zone} ${heldUntil(id === zone)}`}
-          data-on={id === zone || undefined}
-          focusable="false"
-        >
-          {STAGES[id]}
-        </svg>
-      ))}
-      <div className="absolute inset-0 bg-[color:var(--fs-select-deep)] opacity-40" />
-    </div>
-  )
 }

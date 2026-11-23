@@ -1,6 +1,6 @@
 'use client'
 
-import type { PointerEvent, ReactNode } from 'react'
+import type { PointerEvent } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -19,7 +19,6 @@ import fight from './fight.module.css'
 // - RoundEntry, a job as a round: the round number slams onto the card in a red KO style badge (0ms, 1100ms
 //   with a hold), the card steps in from player two's side (620ms), the two life bars fill from their
 //   outer edges with the start and end years under them (900ms, 1000ms). The oldest job is round one.
-// - LockIn, a project: the slot closes onto the card with one overshoot, like a pick locking in.
 // - ResultRecord, the Muay Thai record as the result screen: the title slams, the facts rise, each
 //   achievement is stamped down in turn (180ms apart) and a round win orb lights for each.
 // - BandStage, a band: the concert stage over the card, the card leaning with the pointer and the
@@ -46,14 +45,6 @@ export function RoundEntry({ entry, round }: { entry: Job; round: number }) {
           </span>
         </span>
       </div>
-    </Cue>
-  )
-}
-
-export function LockIn({ children }: { children: ReactNode }) {
-  return (
-    <Cue>
-      <div className={`${fight.enter} ${fight.lockIn}`}>{children}</div>
     </Cue>
   )
 }

@@ -41,7 +41,7 @@ export default function EraPostcardsTheme() {
   const year = useYearNow()
   const reduced = useReducedMotion()
   const scenes = useMemo(() => scenesOf(cv, labels, year), [cv, labels, year])
-  const { theatreRef, textRef, placeRef, countRef } = useEraEngine(scenes, labels.eras, reduced)
+  const { theatreRef, textRef } = useEraEngine(scenes, reduced)
   const gates = scenes.filter((scene): scene is Scene & { slot: NonNullable<Scene['slot']> } => scene.slot !== null)
   const contact = scenes[scenes.length - 1]
 
@@ -49,13 +49,13 @@ export default function EraPostcardsTheme() {
     <div style={PAGE_VARS} className={`${css.root} ${reduced ? css.still : ''} ${eraFace.variable} ${eraBody.variable} [--focus-ring:var(--ep-portal)] [--focus-halo:var(--ep-ink)]`}>
       <SkipLink className={css.skip} />
       {!reduced && <Theatre scenes={scenes} theatreRef={theatreRef} />}
-      <Ledger placeRef={placeRef} countRef={countRef} />
+      <Ledger />
       <Rail scenes={scenes} />
       <div ref={textRef} className={css.text}>
         <main id="main-content" className={css.main}>
           <HubHero still={reduced} scene={scenes[0]} />
-          {gates.map((scene, i) => (
-            <EraSection key={scene.id} scene={scene} gate={i + 1} gates={gates.length} still={reduced} />
+          {gates.map((scene) => (
+            <EraSection key={scene.id} scene={scene} still={reduced} />
           ))}
           <Beacon scene={contact} still={reduced} />
         </main>

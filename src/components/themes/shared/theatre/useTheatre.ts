@@ -1,9 +1,8 @@
 'use client'
 
 import { useCallback, useLayoutEffect, useRef } from 'react'
-import { useLatest } from '@/hooks/useLatest'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { heroState, itemsReached, layerTransform, leadOf, stageOpacity, stageState, veilOpacity, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
+import { heroState, itemsReached, layerTransform, stageOpacity, stageState, veilOpacity, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
 // stage per scene (the hero, each section, the contact), each in layers that push in across the scene and a
@@ -27,10 +26,6 @@ export interface TheatreScene {
   /** How many cards the scene counts: the settled frame shows them all reached. */
   count: number
 }
-
-/** Told which scene the page is in (the most visible stage) and how many of its cards are wholly reached,
- *  each time either changes: a world's ledger, rail or HUD. */
-export type LeadListener = (id: string, reached: number) => void
 
 /** Each layer's push in across its scene, by the layer's name. */
 export type LayerMotions = Readonly<Record<string, LayerMotion>>
@@ -92,9 +87,7 @@ const show = (bound: Bound, visible: boolean): void => {
 }
 
 /** The theatre's ref and the text layer's ref (it holds every section); the engine runs while motion is allowed. */
-export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions, reduced: boolean, onLead?: LeadListener) {
-  const lead = useLatest(onLead)
-  const told = useRef<{ id: string; reached: number }>({ id: '', reached: -1 })
+export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions, reduced: boolean) {
   const theatreRef = useRef<HTMLDivElement>(null)
   const bound = useRef<Bound[]>([])
   const text = useRef<HTMLElement | null>(null)
@@ -103,7 +96,6 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   useLayoutEffect(() => {
     const theatre = theatreRef.current
     bound.current = reduced || !theatre ? [] : scenes.flatMap((scene, i) => bind(theatre, scene, i, motion) ?? [])
-    told.current = { id: '', reached: -1 }
   }, [scenes, motion, reduced])
 
   // The boxes are read off the text layer as drawn, so its translate (the lag) is taken back out.
@@ -128,24 +120,17 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   const draw = useCallback((position: number, lag: number, { viewport, phone }: StageMetrics) => {
     settleText(lag)
     const all = bound.current
-    const visibilities = all.map((each, i) => {
+    all.forEach((each, i) => {
       const { vis, progress } = each.hero ? heroState(position, viewport) : stageState(each.span, position, viewport, { last: i === all.length - 1 })
       show(each, vis > 0)
-      if (vis <= 0) return 0
+      if (vis <= 0) return
       each.stage.style.opacity = stageOpacity(vis).toFixed(3)
       if (each.veil) each.veil.style.opacity = veilOpacity(vis).toFixed(3)
       if (each.hero) each.stage.style.transform = `scale(${(1 - (phone ? HERO_SHRINK_PHONE : HERO_SHRINK) * progress).toFixed(4)})`
       for (const layer of each.layers) layer.el.style.transform = layerTransform(layer.motion, progress, phone ? PHONE_MOTION : 1)
       each.write(progress, itemsReached(each.triggers, position, viewport))
-      return vis
     })
-    if (!lead.current || all.length === 0) return
-    const leader = all[leadOf(visibilities)]
-    const reached = Math.floor(itemsReached(leader.triggers, position, viewport) + 0.001)
-    if (leader.id === told.current.id && reached === told.current.reached) return
-    told.current = { id: leader.id, reached }
-    lead.current(leader.id, reached)
-  }, [settleText, lead])
+  }, [settleText])
 
   const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   const textRef = useCallback(

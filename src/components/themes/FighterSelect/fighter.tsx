@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useId, type ReactNode } from 'react'
+import { fadeTo, frames, transformTo } from '@/components/themes/shared/stageNodes'
 import { cssVars } from '@/lib/cssVars'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
@@ -585,9 +586,9 @@ function FrameArt({ frame, costume, index }: { frame: Frame; costume: Costume; i
 }
 
 // The thrown ball of light; the System Engineer's carries a terminal prompt.
-function KiBall({ kind }: { kind: BallKind }) {
+function KiBall({ kind, className = sprite.ball }: { kind: BallKind; className?: string }) {
   return (
-    <g className={sprite.ball} transform="translate(118 72)">
+    <g className={className} transform="translate(118 72)">
       <path d="M-4 -9 Q-26 -5 -36 0 Q-26 5 -4 9 Z" fill={FS.cyan} opacity={0.55} />
       <circle r={13} fill={FS.p1} opacity={0.4} />
       <circle r={9.5} fill={FS.cyan} />
@@ -650,3 +651,66 @@ export const Fighter = memo(function Fighter({ profession, pose, who = 'hero', t
     </svg>
   )
 })
+
+// ---- the fighter a scroll scene poses ----
+
+// The ki ball leaves his hands at this share of a throw and flies this far across the stage by its end.
+const BALL_FROM = 0.4
+const BALL_FLIGHT = 320
+
+/** Every pose a scene plays, as one strip each; the scene's writer (scrubWriter) shows one and steps it. */
+interface ScrubFighterProps {
+  profession: Profession
+  poses: readonly FighterPose[]
+  who?: Who
+  /** The partner stands facing him, the strip mirrored. */
+  mirror?: boolean
+}
+
+/** Him or his partner in a theatre scene: an SVG element one cell big (160 by 170), placed by its parent. */
+export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who = 'hero', mirror = false }: ScrubFighterProps) {
+  const clip = `fs-${useId().replace(/:/g, '')}`
+  const costume = COSTUME[who][profession]
+  const ball = poses.map((pose) => motionFor(pose, profession).ball).find(Boolean)
+  return (
+    <svg viewBox={`0 0 ${CELL.width} ${CELL.height}`} width={CELL.width} height={CELL.height} overflow="visible" aria-hidden="true" focusable="false">
+      <defs>
+        <clipPath id={clip}>
+          <rect x={0} y={-30} width={CELL.width} height={CELL.height + 30} />
+        </clipPath>
+      </defs>
+      <ellipse cx={62} cy={CELL.ground} rx={34} ry={3.8} fill={INK} opacity={0.4} transform={mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined} />
+      <g transform={mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined}>
+        {poses.map((pose, i) => (
+          <g key={pose} data-frame={pose} visibility={i === 0 ? 'visible' : 'hidden'} clipPath={`url(#${clip})`}>
+            <g data-strip={pose}>
+              {framesFor(pose, profession).map((frame, index) => (
+                <FrameArt key={index} frame={frame} costume={costume} index={index} />
+              ))}
+            </g>
+          </g>
+        ))}
+        {ball && (
+          <g data-ball="" opacity="0">
+            <KiBall kind={ball} className="" />
+          </g>
+        )}
+      </g>
+    </svg>
+  )
+})
+
+/** The writer of a ScrubFighter: shows `pose` at `t` of its strip (0 to 1) and flies its ki ball. */
+export function scrubWriter(root: Element | null, profession: Profession, poses: readonly FighterPose[]): (pose: FighterPose, t: number) => void {
+  const show = frames(root, poses[0])
+  const strips = new Map(poses.map((pose) => [pose, root?.querySelector(`[data-strip="${pose}"]`) ?? null]))
+  const ball = root?.querySelector('[data-ball]') ?? null
+  return (pose, t) => {
+    show(pose)
+    const count = framesFor(pose, profession).length
+    transformTo(strips.get(pose) ?? null, `translate(${-Math.min(count - 1, Math.floor(t * count)) * CELL.width} 0)`)
+    const thrown = motionFor(pose, profession).ball && t > BALL_FROM ? (t - BALL_FROM) / (1 - BALL_FROM) : 0
+    transformTo(ball, `translate(${(thrown * BALL_FLIGHT).toFixed(1)} 0)`)
+    fadeTo(ball, thrown > 0 && thrown < 1 ? 1 : 0)
+  }
+}

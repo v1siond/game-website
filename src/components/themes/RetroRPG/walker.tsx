@@ -4,7 +4,6 @@ import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { RPG } from './palette'
 import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, walkPose, type Facing, type Pose } from './sprite'
 import sprite from './sprite.module.css'
-import rooms from './rooms.module.css'
 import type { PixelSprite } from './npcs'
 import { PixelRuns } from '../shared/PixelRuns'
 
@@ -104,38 +103,38 @@ export const StageWalker = memo(function StageWalker({ profession, className = '
   )
 })
 
-interface RoomWalkerProps {
-  profession: Profession
-  /** The way he walks in; he stops facing down. */
-  facing: Facing
-  className?: string
-}
+/** His frames on a stage (stage.tsx): standing facing down, two steps facing right, his profession's two
+ *  action frames. */
+export type Frame = 'stand' | 'stepA' | 'stepB' | 'actA' | 'actB'
 
 /**
- * Him walking a few tiles in his four facing walk, two step frames, then standing facing down. The walk
- * plays while a parent says so (data-phase="walk" in the encounter room, data-walk="on" at the save point,
- * read by sprite.module.css); the rest of the time he stands.
+ * Him on a stage, on his 20 by 30 grid with his feet at its bottom middle (0, 0): every frame drawn once,
+ * all but the standing one hidden, and the scroll shows one at a time (the shared stage's frames, through
+ * the rig in stage.tsx).
  */
-export const RoomWalker = memo(function RoomWalker({ profession, facing, className = '' }: RoomWalkerProps) {
+export const StageFigure = memo(function StageFigure({ profession }: { profession: Profession }) {
   const colours = COLOURS[profession]
+  const poses: ReadonlyArray<readonly [Frame, Pose]> = [
+    ['stand', walkPose(profession, 'down', 'stand')],
+    ['stepA', walkPose(profession, 'right', 'stepA')],
+    ['stepB', walkPose(profession, 'right', 'stepB')],
+    ['actA', actionPose(profession, 'actA')],
+    ['actB', actionPose(profession, 'actB')],
+  ]
 
   return (
-    <Sheet className={className}>
-      <g className={sprite.stepA}>
-        <Pixels pose={walkPose(profession, facing, 'stepA')} colours={colours} />
-      </g>
-      <g className={sprite.stepB}>
-        <Pixels pose={walkPose(profession, facing, 'stepB')} colours={colours} />
-      </g>
-      <g className={sprite.arrived}>
-        <Pixels pose={walkPose(profession, facing === 'up' ? 'up' : 'down', 'stand')} colours={colours} />
-      </g>
-      <ChestSoul className={sprite.savedSoul} />
-    </Sheet>
+    <g transform={`translate(${-SPRITE.width / 2} ${-SPRITE.height})`}>
+      <rect x={4} y={SPRITE.height - 1} width={12} height={1} fill={RPG.void} opacity={0.45} />
+      {poses.map(([frame, pose]) => (
+        <g key={frame} data-frame={frame} visibility={frame === 'stand' ? 'visible' : 'hidden'}>
+          <Pixels pose={pose} colours={colours} />
+        </g>
+      ))}
+    </g>
   )
 })
 
-/** The determination sparkle: four point pixel stars that burst round him when he saves. */
+/** The save sparkle: four point pixel stars that burst round him when he saves. */
 export function Sparkles({ className = '' }: { className?: string }) {
   const spots: ReadonlyArray<readonly [number, number]> = [
     [1, 6],
@@ -159,47 +158,3 @@ export function PixelArt({ sprite: { rows, colours }, x = 0, y = 0, className }:
     </g>
   )
 }
-
-interface ActorProps {
-  profession: Profession
-  /** The way he walks in. */
-  walk: Facing
-  /** The way he faces once he has arrived. */
-  rest: Facing
-  /** Draw his profession's two action frames, played while the room says act. */
-  acts?: boolean
-}
-
-/**
- * Him inside a room's SVG (rooms.tsx), on the room's own 20 by 30 grid: two step frames while the room
- * walks (data-room="walk"), his rest facing once he has arrived, his action frames while it acts. The
- * room moves the whole actor by transform; rooms.module.css swaps the frames.
- */
-export const Actor = memo(function Actor({ profession, walk, rest, acts = false }: ActorProps) {
-  const colours = COLOURS[profession]
-
-  return (
-    <>
-      <rect x={4} y={SPRITE.height - 1} width={12} height={1} fill={RPG.void} opacity={0.35} />
-      <g className={rooms.stepA}>
-        <Pixels pose={walkPose(profession, walk, 'stepA')} colours={colours} />
-      </g>
-      <g className={rooms.stepB}>
-        <Pixels pose={walkPose(profession, walk, 'stepB')} colours={colours} />
-      </g>
-      <g className={acts ? rooms.restActs : rooms.rest}>
-        <Pixels pose={walkPose(profession, rest, 'stand')} colours={colours} />
-      </g>
-      {acts && (
-        <>
-          <g className={rooms.actA}>
-            <Pixels pose={actionPose(profession, 'actA')} colours={colours} />
-          </g>
-          <g className={rooms.actB}>
-            <Pixels pose={actionPose(profession, 'actB')} colours={colours} />
-          </g>
-        </>
-      )}
-    </>
-  )
-})
