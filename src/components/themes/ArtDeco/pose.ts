@@ -8,7 +8,7 @@ import s from './sprite.module.css'
 // numbers, plus his own kit on top, each 0 to 1: the bolt out of the charged hand, the wrench's arc, the
 // audio diary by his face, the sparks over the fingers, the spark off the snare, the revival chamber's light
 // and how far he is knit back together in it. His front side (the charged arm, the near leg) is the rig's
-// right, his back side its left; he faces right, so he walks with the rig's profile stride facing 1.
+// right, his back side its left; he faces right, so he runs with the rig's profile stride facing 1.
 
 export type DecoPose = RigPose & { head: number; bolt: number; arc: number; recorder: number; sparks: number; hit: number; chamber: number; knit: number }
 
@@ -26,7 +26,7 @@ const KIT: Record<Profession, DecoPose> = {
 /** He stands in his kit. */
 export const rest = (profession: Profession): DecoPose => KIT[profession]
 
-/** His stride at `phase` (rising as he goes on), the legs on the rig's profile walk; the engineer swings his
+/** His run between beats at `phase` (rising as he goes on), the legs on the rig's profile stride; the engineer swings his
  *  arms with it, the sticks and the guard stay up. */
 export function walk(profession: Profession, phase: number): DecoPose {
   const stride = rigWalk(phase, 1)
@@ -52,9 +52,36 @@ export const zap = (profession: Profession, t: number): DecoPose => ({ ...mix(KI
 const LIFT = pose({ armRight: -150, foreRight: -15, lean: -4 })
 export const lift = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], LIFT, t), sparks: t })
 
-/** The audio diary held up by his face, his head leaning into its speaker, `t` of the way. */
-const LISTEN = pose({ armRight: -45, foreRight: -140, head: 6 })
-export const listen = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], LISTEN, t), recorder: ramp(t, 0.5, 0.8) })
+/** The camera (his diary's recorder, held like one) brought up to his eye and aimed at the foe, `t` of the
+ *  way; it stays up while the flash goes. */
+const STUDY = pose({ armRight: -62, foreRight: -112, lean: -2 })
+export const study = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], STUDY, ramp(t, 0, 0.35)), recorder: ramp(t, 0.1, 0.3) })
+
+// Down low: the front knee up ahead of him, the back knee on the floor, the body dropped to match.
+const LOW = { thighRight: -80, shinRight: 85, thighLeft: 10, shinLeft: 85, rise: 16 }
+
+/** Down on one knee at a panel, the charged hand on its dial, working it, `t` of the way. */
+const KNEEL = pose({ ...LOW, armRight: -72, foreRight: -20, lean: 4 })
+export const hack = (profession: Profession, t: number): DecoPose => {
+  const held = mix(KIT[profession], KNEEL, ramp(t, 0, 0.3))
+  return { ...held, foreRight: held.foreRight + 10 * Math.sin(Math.PI * 4 * ramp(t, 0.3, 0.6)), sparks: ramp(t, 0.3, 0.5) }
+}
+
+/** The charged hand raised to lift (`t` to 0.55), then thrown forward to fling what it holds. */
+const THROW = pose({ armRight: -85, foreRight: -5, lean: 6 })
+export const fling = (profession: Profession, t: number): DecoPose =>
+  t < 0.55 ? lift(profession, ramp(t, 0, 0.3)) : { ...mix(lift(profession, 1), THROW, ramp(t, 0.55, 0.65)), sparks: 1 - ramp(t, 0.7, 1) }
+
+/** On the rail: both hands up on the hook over his head, the knees tucked, `t` of the way. */
+const HANG = pose({ armRight: -172, foreRight: 0, armLeft: -168, foreLeft: 0, thighRight: -45, shinRight: 70, thighLeft: -20, shinLeft: 60 })
+export const hang = (profession: Profession, t: number): DecoPose => mix(KIT[profession], HANG, t)
+
+/** Landed low off the rail with the wrench brought down: the swing's blow over the knees. */
+export const landed = (profession: Profession, t: number): DecoPose => ({ ...swing(profession, t), ...LOW, thighLeft: 30, rise: 12 * Math.min(1, t * 2) })
+
+/** Crouched with the charged hand flat on the floor ahead of him, laying the ring, `t` of the way. */
+const LAY = pose({ ...LOW, armRight: -30, foreRight: -10, lean: 22 })
+export const lay = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], LAY, ramp(t, 0, 0.3)), sparks: ramp(t, 0.2, 0.4) })
 
 /** The wrench wound up behind his head (`t` to 0.5), then brought down hard in front, the arc at the hit. */
 const WOUND = pose({ armLeft: 160, foreLeft: 30, lean: -6 })
@@ -62,21 +89,6 @@ const STRUCK = pose({ armLeft: -80, foreLeft: -10, lean: 7 })
 export function swing(profession: Profession, t: number): DecoPose {
   if (t < 0.5) return mix(KIT[profession], WOUND, t / 0.5)
   return { ...mix(WOUND, STRUCK, ramp(t, 0.5, 0.75)), arc: 1 - Math.abs(t - 0.75) / 0.25 }
-}
-
-/** Both hands on a valve wheel, turning it a quarter round with `turn`, `t` of the way in. */
-const GRIP = pose({ armRight: -70, foreRight: -35, armLeft: -55, foreLeft: -40, lean: 4 })
-export const grip = (profession: Profession, t: number, turn: number): DecoPose => {
-  const held = mix(KIT[profession], GRIP, t)
-  return { ...held, armRight: held.armRight + 20 * turn * t, armLeft: held.armLeft - 15 * turn * t, sparks: 0.35 * t }
-}
-
-/** The free hand up for a banner cord (`t` to 0.5), then the cord yanked down. */
-const REACH = pose({ armRight: -165, foreRight: -12, lean: -4 })
-const YANK = pose({ armRight: -40, foreRight: -105, lean: 5, rise: 3 })
-export function pull(profession: Profession, t: number): DecoPose {
-  if (t < 0.5) return mix(KIT[profession], REACH, t / 0.5)
-  return mix(REACH, YANK, (t - 0.5) / 0.5)
 }
 
 /** The sticks on the snare: each forearm strikes on its half of `phase`, `t` of the way into the roll. */

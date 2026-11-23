@@ -2,10 +2,9 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
-import { spread } from '../shared/stageNodes'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import { ROW_FROM, ROW_TO, type Chamber, type ChamberInput } from './chamber'
+import type { Chamber, ChamberInput } from './chamber'
 import { about } from './chambers/about'
 import { bands } from './chambers/bands'
 import { contact } from './chambers/contact'
@@ -20,7 +19,7 @@ import { Canvas, Floor, Front, Hall, Skyline, Water, bubblesWriter } from './cit
 
 // The page as scenes: the station lobby (hero), one chamber per section of the shown profession in reading
 // order, the revival chamber (contact). Each scene names its chamber, its anchor and how many cards its
-// section counts (stageItems), read from the same slot the section's cards are drawn from: one prop per
+// section counts (stageItems), read from the same slot the section's cards are drawn from: one beat per
 // card.
 
 export type SceneId = 'hero' | SectionId | 'contact'
@@ -62,7 +61,7 @@ const layersOf = (id: SceneId, { light, set, floor }: Chamber, input: ChamberInp
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): DecoScene => {
   const { chamber, ...def } = SCENE_DEFS[id]
-  const input = { xs: spread(count, ROW_FROM, ROW_TO), profession }
+  const input = { count, profession }
   return {
     ...def,
     id,

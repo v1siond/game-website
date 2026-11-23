@@ -1,15 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, fx, translateTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
-import { FLOOR } from '../city'
+import { still, stopsChamber } from '../chamber'
+import { Arc, Raider, foeOf } from '../foes'
 import { zap } from '../pose'
 
-// About: the power station, dark when he arrives. A fuse box stands on its pole for each highlight, its
-// lamp out; as each highlight is read he walks up to its box and throws the charged hand's bolt into it, and
-// the box's dials and the lamp over it come on and stay lit, so the room fills with light as the section
-// is read.
+// About: the power station, dark when he arrives. For each highlight a raider rushes him out of the dark
+// past a fuse box; he throws the charged hand's bolt into it, the raider shakes and goes rigid in the arc,
+// and the overcharge lights the box's dials and the lamp over it, so the room fills with light as the
+// section is read.
+
+const BOX = 150
+const FOE = 300
+// The raider rushes in from this far.
+const FROM = 520
 
 function FuseBox() {
   return (
@@ -42,20 +46,33 @@ function Power() {
   )
 }
 
-export const about: Chamber = {
+export const about = stopsChamber({
   light: C.goldBright,
-  floor: ({ xs, profession }) => (
+  back: (i) => (
     <>
-      <PropRow xs={xs} floor={FLOOR} art={() => <FuseBox />} light={() => <Power />} />
-      <Walker xs={xs} profession={profession} />
+      <g transform={`translate(${BOX} 0)`}>
+        <FuseBox />
+        <g data-fx={`power-${i}`} opacity="0">
+          <Power />
+        </g>
+      </g>
+      <g data-fx={`rush-${i}`} transform={`translate(${FROM} 0)`}>
+        <Raider name={`raider-${i}`} />
+      </g>
+      <Arc name={`raider-${i}`} x={FOE} />
     </>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, zap)
-    const props = propNodes(stage, input.xs.length)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => fadeTo(lit, litOf(reached, i)))
-    }
+  move: (profession, t) => still(zap(profession, ramp(t, 0.25, 0.45))),
+  reply: (stage, { count }) => {
+    const rushes = Array.from({ length: count }, (_, i) => fx(stage, `rush-${i}`))
+    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
+    const powers = Array.from({ length: count }, (_, i) => fx(stage, `power-${i}`))
+    return (played) =>
+      foes.forEach((foe, i) => {
+        const t = played(i)
+        translateTo(rushes[i], FROM + (FOE - FROM) * ramp(t, 0, 0.35), 0)
+        foe(t, [0.42, 0.7], null)
+        fadeTo(powers[i], ramp(t, 0.7, 0.85))
+      })
   },
-}
+})

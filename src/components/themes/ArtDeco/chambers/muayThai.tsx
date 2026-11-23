@@ -1,18 +1,19 @@
-import { litOf } from '@/lib/scroll/propRow'
-import { fadeTo, transformTo } from '../../shared/stageNodes'
+import { ramp } from '@/lib/scroll/stage'
+import { fadeTo, focusOn, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, propNodes } from '../../shared/propRow'
-import { Walker, walkerOf, type Chamber } from '../chamber'
+import { HOLD_X, still, stopsChamber } from '../chamber'
 import { Canvas, FLOOR } from '../city'
+import { BrassGuard } from '../foes'
 import { strike } from '../pose'
 
-// Muay Thai: the fight club on the old theatre's stage, its maroon curtains drawn back. A heavy bag hangs
-// on its chain for each line of the record; as each line is read he walks up to its bag, knees it and
-// throws the round kick, the bag swings on its chain and the bulb over it lights.
+// Muay Thai: the fight club on the old theatre's stage, its maroon curtains drawn back. For each line of the
+// record a brass guard in its diving suit stands in his way; he knees it and throws the round kick, it
+// staggers back, and on the blow it sinks to one knee, its porthole lamp going dark. On the last line the
+// frame pushes in on him over the kneeling guard.
 
-// The chain hangs from here; a kicked bag swings out this far and settles back.
-const HOOK = -760
-const SWING_DEG = 14
+const FOE = 260
+// The last guard's fall pushes the camera in this far.
+const PUSH = 0.2
 
 /** The stage's maroon curtains drawn back to both sides, and its gold valance. */
 function Curtains() {
@@ -26,57 +27,29 @@ function Curtains() {
   )
 }
 
-function Bag() {
-  return (
-    <>
-      <path d={`M0 ${HOOK} V-400`} stroke={C.steelShade} strokeWidth="4" strokeDasharray="10 4" />
-      <rect x={-38} y={-400} width={76} height={250} rx={30} fill={C.blood} stroke={C.bloodDark} strokeWidth="4" />
-      <path d="M-38 -350 H38 M-38 -200 H38" stroke={C.gold} strokeWidth="5" />
-    </>
-  )
-}
-
-function Bulb() {
-  return (
-    <>
-      <circle cx={0} cy={HOOK + 40} r={130} fill={C.goldBright} opacity="0.16" />
-      <circle cx={0} cy={HOOK + 40} r={16} fill={C.goldBright} />
-    </>
-  )
-}
-
-export const muayThai: Chamber = {
+export const muayThai = stopsChamber({
   light: C.blood,
   set: () => <Curtains />,
-  floor: ({ xs, profession }) => (
-    <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={() => (
-          <>
-            <circle cx={0} cy={HOOK + 40} r={14} fill={C.brassShadow} />
-            <g data-bag="">
-              <Bag />
-            </g>
-          </>
-        )}
-        light={() => <Bulb />}
-      />
-      <Walker xs={xs} profession={profession} />
-    </>
+  back: (i) => (
+    <g transform={`translate(${FOE} 0)`}>
+      <BrassGuard name={`guard-${i}`} />
+    </g>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, strike)
-    const props = propNodes(stage, input.xs.length)
-    const bags = props.map(({ move }) => move?.querySelector('[data-bag]') ?? null)
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        const hit = litOf(reached, i)
-        fadeTo(lit, hit)
-        transformTo(bags[i], `rotate(${(SWING_DEG * Math.sin(Math.PI * hit)).toFixed(1)} 0 ${HOOK})`)
+  move: (profession, t) => still(strike(profession, t)),
+  reply: (stage, { count }) => {
+    const guards = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}`))
+    const lamps = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}-lamp`))
+    const camera = fx(stage, 'camera')
+    return (played) => {
+      guards.forEach((guard, i) => {
+        const t = played(i)
+        const stagger = Math.sin(Math.PI * ramp(t, 0.55, 0.75))
+        const kneel = ramp(t, 0.72, 0.9)
+        transformTo(guard, `translate(${(40 * stagger + 20 * kneel).toFixed(1)} ${(70 * kneel).toFixed(1)}) rotate(${(10 * stagger - 8 * kneel).toFixed(1)})`)
+        fadeTo(lamps[i], 1 - 0.85 * kneel)
       })
+      const last = count > 0 ? ramp(played(count - 1), 0.72, 0.95) : 0
+      transformTo(camera, focusOn(HOLD_X + FOE / 2, FLOOR - 180, 1 + PUSH * last))
     }
   },
-}
+})
