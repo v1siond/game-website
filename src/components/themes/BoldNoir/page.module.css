@@ -84,7 +84,8 @@
   inset: 0;
   z-index: -1;
   background: var(--noir-paper);
-  clip-path: polygon(0 4%, 100% 0, 97% 92%, 18% 95%, 8% 100%, 10% 94%, 2% 96%);
+  /* the cut in px, so a long box keeps its words inside: the tail takes the last 40px */
+  clip-path: polygon(0 14px, 100% 0, calc(100% - 18px) calc(100% - 40px), 18% calc(100% - 32px), 8% 100%, 10% calc(100% - 34px), 10px calc(100% - 28px));
 }
 
 /* A title: paper words on a crooked red panel with a hard ink drop. */

@@ -26,7 +26,7 @@ export function RooftopHero({ scene, still }: { scene: NoirScene; still: boolean
   return (
     <section id={scene.anchor} data-scene={scene.id} data-worlds-hero="" aria-labelledby="noir-hero" className={page.hero}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
-      <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
+      <header className="relative z-30 px-4 pb-24 pt-16 sm:px-6 sm:py-16">
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

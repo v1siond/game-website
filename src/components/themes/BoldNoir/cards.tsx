@@ -65,7 +65,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
   return (
     <article className={`p-6 pt-14 sm:pt-9 ${page.slab} ${page.lift}`} style={crookOf(index)}>
       <p className="absolute -top-1 right-4">
-        <span className={`block bg-[color:var(--noir-red-plate)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${page.stamp}`}>{job.years}</span>
+        <span className={`block bg-[color:var(--noir-red-plate)] px-4 py-2 text-2xl text-[color:var(--noir-paper)] ${page.stamp}`}>{job.years}</span>
       </p>
       <h3 className="text-3xl leading-none tracking-wide">{job.title}</h3>
       <p className={`mt-1 text-sm font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${page.copy}`}>
