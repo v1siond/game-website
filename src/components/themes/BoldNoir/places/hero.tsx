@@ -11,7 +11,8 @@ import { noirJoints, setNoirPose, tip } from '../pose'
 
 const BURST = { x: 1000, y: 470, r: 620 }
 const RAYS = 18
-const HERO_X = 1000
+// He stands right of the menu on a desktop, clear of its slabs.
+const HERO_X = 1250
 // The burst turns this far over the hero's scroll and rests by this share of it.
 const TURN = 30
 const RESTED_BY = 0.6
@@ -32,10 +33,10 @@ function Roof() {
         ))}
       </g>
       <g>
-        <rect x={1260} y={430} width={170} height={190} fill={NOIR.ink} />
-        <polygon points="1250,430 1345,370 1440,430" fill={NOIR.ink} />
-        <path d="M1270 620 L1250 880 M1420 620 L1440 880 M1260 740 H1430" stroke={NOIR.ink} strokeWidth="10" />
-        <path d="M1260 470 H1430 M1260 520 H1430 M1260 570 H1430" stroke={NOIR.smoke} strokeWidth="3" />
+        <rect x={1400} y={430} width={170} height={190} fill={NOIR.ink} />
+        <polygon points="1390,430 1485,370 1580,430" fill={NOIR.ink} />
+        <path d="M1410 620 L1390 880 M1560 620 L1580 880 M1400 740 H1570" stroke={NOIR.ink} strokeWidth="10" />
+        <path d="M1400 470 H1570 M1400 520 H1570 M1400 570 H1570" stroke={NOIR.smoke} strokeWidth="3" />
       </g>
       <rect x={560} y={600} width={70} height={280} fill={NOIR.ink} />
       <rect x={548} y={590} width={94} height={22} fill={NOIR.smoke} />

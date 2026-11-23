@@ -31,14 +31,12 @@
   --theatre-veil: var(--noir-ink);
 }
 
-/* The shade under the text column, so the slabs sit on a calmer frame; flat, in two steps, and it fades
-   with its stage. */
+/* The shade under the text column, so the slabs sit on a calmer frame; it fades with its stage. */
 .scrim::after {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to right, color-mix(in srgb, var(--noir-ink) 55%, transparent) 0 46%, transparent 46%);
+  background: linear-gradient(to right, color-mix(in srgb, var(--noir-ink) 55%, transparent), transparent 55%);
 }
 
 /* ---- surfaces: crooked boxes built from flat layers ---- */
