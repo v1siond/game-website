@@ -70,7 +70,7 @@ export function HubHero({ scene, still }: { scene: Scene; still: boolean }) {
           </div>
         )}
       />
-      <Wardrobe look={OUTFIT} className={css.wardrobe} />
+      <Wardrobe look={OUTFIT} className={`c-wardrobe--fan-down-below-md ${css.wardrobe}`} />
     </section>
   )
 }
