@@ -163,10 +163,6 @@
   box-shadow: 4px 4px 0 var(--hose-shadow);
 }
 
-.posterWide {
-  box-shadow: 6px 6px 0 var(--hose-shadow);
-}
-
 /* A title card, the ornate frame a 1930s short puts its words in: paper with an inner rule. */
 .titleCard {
   background: var(--hose-paper);
@@ -307,71 +303,12 @@
   transform: scale(1);
 }
 
-/* The lane the sing along ball crosses, measured so the hop can cross its whole width. */
-.hopLane {
-  container-type: inline-size;
-}
-
-/* The sing along ball hopping from note to note across the line once, squashing on each of its five
-   landings, and resting on the last note. */
-.hop {
-  animation: hop 4s linear forwards;
-}
-
-.hop > * {
-  transform-origin: 50% 100%;
-  animation: hopBounce 0.8s ease-in-out 5;
-}
-
-@keyframes hop {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(calc(100cqw - 1rem), 0, 0);
-  }
-}
-
-@keyframes hopBounce {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1.2, 0.8);
-  }
-  50% {
-    transform: translate3d(0, -2.5rem, 0) scale(0.9, 1.1);
-  }
-}
-
-/* A pie eyed ball bouncing in place four times on its own --delay. */
-.ballBounce {
-  transform-origin: 50% 100%;
-  animation: hopBounce 1s ease-in-out 4;
-  animation-delay: var(--delay, 0s);
-}
-
-/* A drawing that turns to a stop at --turn (the sun's rays, the big wheel), each angle a whole turn of
-   its own repeat, so it stops on the drawing it started on. */
-@media (prefers-reduced-motion: no-preference) {
-  .turn {
-    animation: turn 4.8s cubic-bezier(0.2, 0.6, 0.35, 1);
-  }
-}
-
-@keyframes turn {
-  to {
-    transform: rotate(var(--turn));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sprockets,
   .grain,
   .flicker,
   .beatBounce,
-  .titleBounce,
-  .hop,
-  .hop > *,
-  .ballBounce {
+  .titleBounce {
     animation: none;
   }
 

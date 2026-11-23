@@ -21,7 +21,7 @@ import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 // ink blot in its corner when the pointer lands on it.
 
 const BODY = `text-sm ${world.ink}`
-const CHIP = `rounded-full px-2 py-0.5 text-sm ${world.chip}`
+const CHIP = `rounded-md px-2 py-0.5 text-sm ${world.chip}`
 
 // The four corner ticks of a poster's frame.
 const TICK_CORNERS = ['left-1 top-1 border-l-2 border-t-2', 'right-1 top-1 border-r-2 border-t-2', 'bottom-1 left-1 border-b-2 border-l-2', 'bottom-1 right-1 border-b-2 border-r-2']
@@ -139,7 +139,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
       <CornerTicks />
       <InkBlot />
       {company.featured && (
-        <p className="relative mb-3 inline-block -rotate-3 rounded-full bg-[color:var(--hose-ink)] px-3 py-0.5 text-sm font-bold uppercase tracking-wider text-[color:var(--hose-paper)]">
+        <p className="relative mb-3 inline-block -rotate-3 rounded-md bg-[color:var(--hose-ink)] px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-[color:var(--hose-paper)]">
           {cards.ownProduct}
         </p>
       )}

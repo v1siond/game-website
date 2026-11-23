@@ -1,14 +1,10 @@
 import type { ReactNode } from 'react'
 import { NameWords } from '@/components/cv/NameWords'
-import { InView } from '@/components/themes/shared/held'
 import { HOSE } from './palette'
 import world from './world.module.css'
-import styles from './scenes.module.css'
 
-// Rubber Hose's art pieces, drawn in SVG in the palette's ink and paper: the pie eyes its props wear
-// (never him), a music note, the ink blot a poster throws, the curled title banner, the bouncing title,
-// and the two art breaks between sections (a sing along line with its
-// bouncing ball, pie eyed balls bouncing in a row).
+// Rubber Hose's art pieces, drawn in SVG in the palette's ink and paper: the pie eyes its props wear, a
+// music note, the ink blot a poster throws, the curled title banner and the bouncing title.
 
 // Two pie eyes, the black ovals with the slice cut out of each, centred on (cx, cy) at width `size`.
 export function PieEyes({ cx, cy, size, paper = HOSE.paper }: { cx: number; cy: number; size: number; paper?: string }) {
@@ -87,82 +83,5 @@ export function CartoonTitle({ text }: { text: string }) {
         <NameWords name={text} wordClassName="inline-flex gap-x-1" letter={(char) => <span className="inline-block">{char}</span>} />
       </span>
     </h1>
-  )
-}
-
-// The iris of an old film: a ring of ink round a round hole, in a square as wide as the box it covers
-// (scenes.module.css .iris). The world's iris class scales it to open or close the hole; the ring is
-// a hundred units wide round a hole of radius ten, so it covers the box from a small hole to a frame.
-export function IrisRing({ className }: { className: string }) {
-  return (
-    <div className={`pointer-events-none ${styles.iris} ${className}`} aria-hidden="true">
-      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible" focusable="false">
-        <circle cx={50} cy={50} r={60} fill="none" stroke={HOSE.ink} strokeWidth={100} />
-      </svg>
-    </div>
-  )
-}
-
-// ---- the art breaks ----
-
-const SING_ALONG_NOTES = 6
-
-function SingAlong() {
-  return (
-    <div className="relative my-8 py-10" aria-hidden="true">
-      <svg className="absolute inset-x-0 top-1/2 h-8 w-full -translate-y-1/2" viewBox="0 0 800 40" preserveAspectRatio="none" focusable="false">
-        <path d="M0,20 Q100,0 200,20 T400,20 T600,20 T800,20" fill="none" stroke={HOSE.ink} strokeWidth={3} opacity={0.4} />
-      </svg>
-      <div className="flex items-center justify-around px-8">
-        {Array.from({ length: SING_ALONG_NOTES }, (_, i) => (
-          <MusicNote key={i} className="h-8 w-6 opacity-60" />
-        ))}
-      </div>
-      {/* the ball that follows the tune, hopping note to note */}
-      <div className={`relative mx-8 mt-4 h-4 ${world.hopLane}`}>
-        <div className={`absolute left-0 top-0 ${world.hop}`}>
-          <span className="block h-4 w-4 rounded-full bg-[var(--hose-ink)]" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const BALL_DELAYS = ['[--delay:0s]', '[--delay:-0.33s]', '[--delay:-0.66s]']
-
-function BouncingBalls() {
-  return (
-    <div className="relative my-8 py-10" aria-hidden="true">
-      <div className="absolute inset-x-8 top-1/2 h-1 -translate-y-1/2 border-t-[3px] border-dashed border-[var(--hose-ink)] opacity-30" />
-      <div className="flex h-24 items-end justify-around">
-        {BALL_DELAYS.map((delay) => (
-          <svg key={delay} viewBox="0 0 40 40" className={`h-10 w-10 ${world.ballBounce} ${delay}`} focusable="false">
-            <circle cx={20} cy={20} r={17} fill={HOSE.paper} stroke={HOSE.ink} strokeWidth={3} />
-            <PieEyes cx={20} cy={16} size={12} />
-            <path d="M13 26 Q20 31 27 26" fill="none" stroke={HOSE.ink} strokeWidth={2} strokeLinecap="round" />
-          </svg>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// A scene outside the section stages (the profession switch, an art break, his set, the map run) plays
-// once 0.3 of it is on screen.
-export const CUE_THRESHOLD = 0.3
-
-export type ArtBreakKind = 'singAlong' | 'bouncingBalls'
-
-const ART_BREAKS: Record<ArtBreakKind, () => ReactNode> = {
-  singAlong: SingAlong,
-  bouncingBalls: BouncingBalls,
-}
-
-export function ArtBreak({ kind }: { kind: ArtBreakKind }) {
-  const Break = ART_BREAKS[kind]
-  return (
-    <InView threshold={CUE_THRESHOLD}>
-      <Break />
-    </InView>
   )
 }
