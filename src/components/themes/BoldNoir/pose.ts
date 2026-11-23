@@ -5,13 +5,12 @@ import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
 import s from './detective.module.css'
 
 // The detective posed by the scroll, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
-// numbers, plus his own kit on top, each 0 to 1: the hat tipped, the notebook up, the red clue mark over
-// it, the badge held up and its paper flash. He faces the viewer, so his front side (the viewer's right,
-// the badge hand) is the rig's right, his back side its left, and he walks with the rig's front stride.
+// numbers, plus how far his hat is tipped, 0 to 1. He faces the viewer, so his front side (the viewer's right,
+// the badge hand) is the rig's right, his back side its left, and he dashes with the rig's front stride.
 
-export type NoirPose = RigPose & { hat: number; notebook: number; clue: number; badge: number; flash: number }
+export type NoirPose = RigPose & { hat: number }
 
-const STAND: NoirPose = { ...RIG_STAND, hat: 0, notebook: 0, clue: 0, badge: 0, flash: 0 }
+const STAND: NoirPose = { ...RIG_STAND, hat: 0 }
 
 const pose = (partial: Partial<NoirPose>): NoirPose => ({ ...STAND, ...partial })
 
@@ -25,82 +24,123 @@ const KIT: Record<Profession, NoirPose> = {
 /** He stands in his kit. */
 export const rest = (profession: Profession): NoirPose => KIT[profession]
 
-/** His two step at `phase` (rising as he goes on), on the rig's front stride; the suit swings its arms with
- *  it, the sticks and the guard stay up. */
-export function walk(profession: Profession, phase: number): NoirPose {
-  const stride = rigWalk(phase, 0)
-  const kit = KIT[profession]
-  const swing = profession === 'engineer' ? 1 : 0
-  return {
-    ...kit,
-    rise: stride.rise,
-    kneeRight: stride.kneeRight,
-    kneeLeft: stride.kneeLeft,
-    shinRight: stride.shinRight,
-    shinLeft: stride.shinLeft,
-    armRight: kit.armRight + swing * stride.armRight,
-    armLeft: kit.armLeft + swing * stride.armLeft,
-  }
-}
-
 /** The hat tipped to the street, `t` of the way and back. */
 export const tip = (profession: Profession, t: number): NoirPose => ({ ...KIT[profession], hat: Math.sin(Math.PI * t) })
 
-/** The front arm out flat at the prop on his right, `t` of the way. */
-const POINT = pose({ armRight: -85, foreRight: -5, lean: -2 })
-export const point = (profession: Profession, t: number): NoirPose => mix(KIT[profession], POINT, t)
+// Squatting `deg` at the hips: each thigh turns out at the hip and its shin folds back twice as far, so the
+// foot comes back under him, and the body drops by what the bent legs lose in height (thigh and shin,
+// 30.6 units long). A positive turn is clockwise on screen, which swings the viewer's right leg in.
+const LEG = 30.6
+const squat = (deg: number): Partial<NoirPose> => ({
+  thighRight: -deg,
+  shinRight: 2 * deg,
+  thighLeft: deg,
+  shinLeft: -2 * deg,
+  rise: LEG * (1 - Math.cos((deg * Math.PI) / 180)),
+})
 
-/** The notebook up in the back hand and the pencil working, the red clue mark popping at the end. */
-const NOTE = pose({ foreLeft: -100, foreRight: 110 })
-export function note(profession: Profession, t: number): NoirPose {
-  if (profession !== 'engineer') return point(profession, t)
-  const scribble = 6 * Math.sin(t * Math.PI * 8)
-  const held = mix(KIT.engineer, NOTE, ramp(t, 0, 0.3))
-  return { ...held, foreRight: held.foreRight + scribble * ramp(t, 0.3, 0.4), notebook: ramp(t, 0, 0.2), clue: ramp(t, 0.7, 0.85) }
+/** The dash from cover to cover at `phase` (rising as he goes on): low on bent knees, leaning into it, the
+ *  arms bent and pumping with the front stride. */
+export function dash(phase: number): NoirPose {
+  const stride = rigWalk(phase, 0)
+  const low = squat(28)
+  return pose({
+    ...low,
+    rise: (low.rise ?? 0) + stride.rise,
+    kneeRight: stride.kneeRight,
+    kneeLeft: stride.kneeLeft,
+    lean: 6,
+    armRight: -24 + 2 * stride.armRight,
+    foreRight: -70,
+    armLeft: 24 + 2 * stride.armLeft,
+    foreLeft: 70,
+  })
 }
 
-/** The badge held up high at the prop, its paper flash at the top of the lift. */
-const SHOW = pose({ armRight: -140, foreRight: 60 })
-export const badge = (profession: Profession, t: number): NoirPose => ({ ...mix(KIT[profession], SHOW, t), badge: ramp(t, 0.4, 0.7), flash: Math.max(0, 1 - Math.abs(t - 0.8) / 0.2) })
+/** Back flat to the doorway, palms on the frame either side, the hat brim down over his eyes. */
+const HUG = pose({ ...squat(14), armRight: -24, foreRight: -8, armLeft: 24, foreLeft: 8, hat: 0.4 })
+export const hug = (t: number): NoirPose => mix(STAND, HUG, ramp(t, 0, 0.35))
 
-/** A drawer handle taken (`t` to 0.5), then the drawer pulled toward him. */
-const TAKE = pose({ armRight: -75, foreRight: -10, lean: -3 })
-const DRAW = pose({ armRight: -45, foreRight: -55, lean: 4 })
-export function pull(profession: Profession, t: number): NoirPose {
-  if (t < 0.5) return mix(KIT[profession], TAKE, t / 0.5)
-  return mix(TAKE, DRAW, (t - 0.5) / 0.5)
+/** Down on his knees at a lock: the back hand on his knee, the front hand at the keyhole on his right. */
+const KNEEL = pose({ ...squat(52), kneeRight: 0.6, kneeLeft: 0.6, lean: 4, armRight: -62, foreRight: -42, armLeft: 28, foreLeft: -40 })
+
+/** He kneels at the lock and works it, the front hand turning `turns` times, then still as it gives. */
+const work = (t: number, turns: number, swing: number): NoirPose => {
+  const held = mix(STAND, KNEEL, ramp(t, 0, 0.3))
+  return { ...held, foreRight: held.foreRight + swing * Math.sin(ramp(t, 0.3, 0.85) * Math.PI * 2 * turns) }
 }
 
-/** The front hand on a safe's dial, working it back and forth with the turn. */
-const DIAL = pose({ armRight: -70, foreRight: -30, lean: -2 })
-export const crack = (profession: Profession, t: number): NoirPose => {
-  const held = mix(KIT[profession], DIAL, ramp(t, 0, 0.4))
-  return { ...held, foreRight: held.foreRight + 14 * Math.sin(t * Math.PI * 4) * ramp(t, 0.3, 0.4) }
+/** The lock picked: the pick worked in quick small turns. */
+export const pick = (t: number): NoirPose => work(t, 4, 8)
+
+/** The safe cracked: the dial turned back and forth in wide slow turns. */
+export const crack = (t: number): NoirPose => work(t, 2, 16)
+
+/** Low behind cover, a hand on it, the brim down, until the searchlight has passed. */
+const COVER = pose({ ...squat(58), kneeRight: 0.5, kneeLeft: 0.5, lean: 5, armRight: -55, foreRight: -60, armLeft: 22, foreLeft: 40, hat: 0.4 })
+export const cover = (t: number): NoirPose => mix(STAND, COVER, ramp(t, 0, 0.3))
+
+/** The ambush out of cover: crouched to spring, tucked in the air with both arms thrown up, and landed low
+ *  on the guard's back with the torn mask flung high in the front hand. */
+const SPRING = pose({ ...squat(50), lean: 8, armRight: 30, foreRight: 20, armLeft: -30, foreLeft: -20 })
+const TUCK = pose({ ...squat(64), rise: 0, armRight: -150, foreRight: 20, armLeft: 150, foreLeft: -20 })
+const POUNCE = pose({ ...squat(46), lean: -4, armRight: -160, foreRight: -10, armLeft: 40, foreLeft: -50 })
+export function ambush(t: number): NoirPose {
+  if (t < 0.2) return mix(STAND, SPRING, t / 0.2)
+  if (t < 0.55) return mix(SPRING, TUCK, ramp(t, 0.2, 0.35))
+  return mix(TUCK, POUNCE, ramp(t, 0.55, 0.8))
 }
 
-/** The stamp raised high (`t` to 0.5), then brought down hard on the folder. */
-const RAISE = pose({ armRight: -155, foreRight: -10, lean: -3 })
-const DOWN = pose({ armRight: -60, foreRight: 30, lean: 5, rise: 1.5 })
-export function stamp(profession: Profession, t: number): NoirPose {
-  if (t < 0.5) return mix(KIT[profession], RAISE, t / 0.5)
-  return mix(RAISE, DOWN, ramp(t, 0.5, 0.7))
+// ---- the battle ----
+
+/** His battle stance in every kit: the guard up and the feet set apart. */
+const READY = pose({ armRight: 15, foreRight: 150, armLeft: -15, foreLeft: -150, thighRight: -8, thighLeft: 8, rise: 0.4 })
+export const ready = (t: number): NoirPose => mix(STAND, READY, t)
+
+/** Each kit's blow at the weak point: the suit's straight right, the sticks brought down from overhead, the
+ *  Muay Thai knee driven up with the jab. */
+const BLOW: Record<Profession, NoirPose> = {
+  engineer: pose({ armRight: -90, foreRight: 0, armLeft: -15, foreLeft: -150, thighRight: -14, thighLeft: 12, lean: 8 }),
+  drummer: pose({ armRight: -120, foreRight: -40, armLeft: -15, foreLeft: -150, thighRight: -14, thighLeft: 12, lean: 8 }),
+  fighter: pose({ armRight: -85, foreRight: 0, armLeft: -15, foreLeft: -150, thighRight: -30, shinRight: 50, kneeRight: 1, lean: 6 }),
 }
 
-/** The sticks on the snare: each forearm strikes on its half of `phase`, `t` of the way into the roll. */
+/** The strike over `t`: a wind back, the blow at its peak by 0.35, held while the foe goes down, then back
+ *  into the stance for the extra turn. */
+export function strike(profession: Profession, t: number): NoirPose {
+  const wind = mix(READY, pose({ ...READY, lean: -4, armRight: 30 }), ramp(t, 0, 0.15))
+  if (t < 0.15) return wind
+  if (t < 0.6) return mix(wind, BLOW[profession], ramp(t, 0.15, 0.3))
+  return mix(BLOW[profession], READY, ramp(t, 0.6, 0.85))
+}
+
+/** The victory: his back to the fallen, the suit's hand straightening the tie and the other on the hip, the
+ *  brim pulled down; the drummer the same, the sticks in hand; the Muay Thai glove raised high. */
+const VICTORY: Record<Profession, NoirPose> = {
+  engineer: pose({ armRight: 30, foreRight: 120, armLeft: 22, foreLeft: -70, lean: -3, hat: 0.5 }),
+  drummer: pose({ armRight: 30, foreRight: 120, armLeft: 22, foreLeft: -70, lean: -3, hat: 0.5 }),
+  fighter: pose({ armRight: -165, foreRight: 0, armLeft: -15, foreLeft: -150, lean: -3 }),
+}
+export const victory = (profession: Profession, t: number): NoirPose => mix(READY, VICTORY[profession], t)
+
+// ---- the club and the office ----
+
+/** On the drummer's stool behind the kit: knees up toward the viewer, the sticks on the snare, each forearm
+ *  striking on its half of `phase`, `t` of the way into the roll. */
+const SEAT = pose({ ...squat(40), kneeRight: 1, kneeLeft: 1, foreRight: 20, foreLeft: -20 })
 export function drum(t: number, phase: number): NoirPose {
   const beat = Math.abs(Math.sin(phase * Math.PI))
   const right = phase % 2 < 1 ? beat : 0
   const left = beat - right
-  const kit = KIT.drummer
-  return { ...kit, foreRight: kit.foreRight + 16 * right * t, foreLeft: kit.foreLeft - 16 * left * t, hat: 0.2 * beat * t }
+  return { ...SEAT, foreRight: SEAT.foreRight + 16 * right * t, foreLeft: SEAT.foreLeft - 16 * left * t, hat: 0.2 * beat * t }
 }
 
-/** The guard held, the front glove jabbed out at the bag at the middle of `t` and back. */
-const JAB = pose({ armRight: -80, foreRight: 0, lean: -4 })
-export function jab(profession: Profession, t: number): NoirPose {
-  const out = Math.max(0, 1 - Math.abs(t - 0.6) / 0.25)
-  return mix(KIT[profession], JAB, out)
-}
+/** The calling card laid on the desk at his right, the front hand down flat on it. */
+const LAY = pose({ armRight: -40, foreRight: -20, lean: 7 })
+export const lay = (t: number): NoirPose => mix(STAND, LAY, Math.sin(Math.PI * Math.min(1, t)))
+
+/** The leap at the glass: tucked, the front arm over his face. */
+export const LEAP = pose({ ...squat(60), rise: 0, armRight: 40, foreRight: 140, armLeft: 150, foreLeft: -20, lean: 10 })
 
 // ---- the writer ----
 
@@ -118,34 +158,13 @@ const LIMB_CLASSES = {
 
 export interface NoirJoints extends RigJoints {
   hat: SVGElement | null
-  notebook: SVGElement[]
-  clue: SVGElement | null
-  badge: SVGElement | null
-  flash: SVGElement | null
 }
-
-const one = (root: Element, className: string): SVGElement | null => root.querySelector<SVGElement>(`.${className}`)
 
 /** His groups inside `root`, the group that holds one Detective. */
-export const noirJoints = (root: Element): NoirJoints => ({
-  ...rigJoints(root, LIMB_CLASSES),
-  hat: one(root, s.hat),
-  notebook: Array.from(root.querySelectorAll<SVGElement>(`.${s.notebook}`)),
-  clue: one(root, s.clue),
-  badge: one(root, s.badge),
-  flash: one(root, s.flash),
-})
+export const noirJoints = (root: Element): NoirJoints => ({ ...rigJoints(root, LIMB_CLASSES), hat: root.querySelector<SVGElement>(`.${s.hat}`) })
 
-const opacity = (el: SVGElement | null, value: number): void => {
-  if (el) el.style.opacity = value.toFixed(3)
-}
-
-/** Writes `p` on his groups: the rig's limbs, then his kit. Transforms and opacity only. */
+/** Writes `p` on his groups: the rig's limbs, then his hat. Transforms only. */
 export function setNoirPose(j: NoirJoints, p: NoirPose): void {
   setRigPose(j, p)
   if (j.hat) j.hat.style.transform = `translateY(${(-1.5 * p.hat).toFixed(2)}px) rotate(${(-12 * p.hat).toFixed(1)}deg)`
-  j.notebook.forEach((el) => opacity(el, p.notebook))
-  opacity(j.clue, p.clue)
-  opacity(j.badge, p.badge)
-  opacity(j.flash, p.flash)
 }

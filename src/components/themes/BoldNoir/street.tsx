@@ -173,7 +173,8 @@ export function rainWriter(stage: ParentNode): (progress: number) => void {
   return (progress) => transformTo(rain, `translate(${(-progress * RAIN_FALL * 0.33).toFixed(1)} ${(progress * RAIN_FALL).toFixed(1)})`)
 }
 
-const figureAt = (x: number): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - FIGURE_H * (DETECTIVE_VIEW.soles / DETECTIVE_VIEW.height)).toFixed(1)})`
+const figureAt = (x: number, lift = 0): string =>
+  `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (DETECTIVE_VIEW.soles / DETECTIVE_VIEW.height)).toFixed(1)})`
 
 /** Him on the pavement at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Sleuth({ x, profession }: { x: number; profession: Profession }) {
@@ -184,5 +185,5 @@ export function Sleuth({ x, profession }: { x: number; profession: Profession })
   )
 }
 
-/** Moves him to `x` on the pavement. */
-export const placeSleuth = (node: Element | null, x: number): void => transformTo(node, figureAt(x))
+/** Moves him to `x` on the pavement, `lift` above it. */
+export const placeSleuth = (node: Element | null, x: number, lift = 0): void => transformTo(node, figureAt(x, lift))

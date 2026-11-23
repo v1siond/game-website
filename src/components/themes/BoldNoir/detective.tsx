@@ -4,16 +4,15 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NOIR } from './palette'
 import s from './detective.module.css'
 
-// Him as this world's own figure, a 1940s city detective of the noir films (the pale
-// pinched fedora with its wide dark band, the grey three piece suit with the single breasted jacket worn
-// open over the waistcoat, the red tie, the pistol at his hip, the badge held up, the notebook that chimes
-// on a clue), cut the way the heist world cuts everything: flat ink, paper and one red, no gradient, depth
-// from hard shadow shapes and halftone dots, a sharp silhouette. The fedora's brim throws a hard shadow
-// over his brow; under it his own face: brown skin, short dark hair at the temples, the full dark beard,
-// dark oval eyes (HERO_IDENTITY).
+// Him as this world's own figure, a 1940s city detective of the noir films (the pale pinched fedora with its
+// wide dark band, the grey three piece suit with the single breasted jacket worn open over the waistcoat, the
+// red tie, the pistol at his hip, the badge held up), cut the way the heist world cuts everything: flat ink,
+// paper and one red, no gradient, depth from hard shadow shapes and halftone dots, a sharp silhouette. The
+// fedora's brim throws a hard shadow over his brow; under it his own face: brown skin, short dark hair at the
+// temples, the full dark beard, dark oval eyes (HERO_IDENTITY).
 //
 // Per profession, the way that detective would:
-// - System Engineer: the full suit, the notebook and pencil for a clue, the red clue mark over the page.
+// - System Engineer: the full suit.
 // - Musician: jacket off, waistcoat and rolled sleeves, the tie loosened, the hat kept, sticks on a snare.
 // - Martial Artist: hat and jacket off, a vest and braces, his own mongkhon on his head, red gloves and
 //   white prajioud on the arms, in his guard.
@@ -155,16 +154,6 @@ const VEST = (dots: string) => (
 
 // ---- props ----
 
-const NOTEBOOK = (
-  <g className={s.notebook} transform="rotate(100 16 60)">
-    <rect x={11} y={53} width={10} height={12} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth={0.8} />
-    <path d="M12.6 56 H19 M12.6 58.4 H18 M12.6 60.8 H19.2" stroke={NOIR.ash} strokeWidth={0.6} />
-    <path className={s.clue} d="M16 44 L17.2 47.4 L20.8 46.4 L18.4 49 L20.8 51.6 L17.2 50.6 L16 54 L14.8 50.6 L11.2 51.6 L13.6 49 L11.2 46.4 L14.8 47.4 Z" fill={NOIR.red} />
-  </g>
-)
-
-const PENCIL = <path className={s.notebook} d="M48.6 59.4 L52.6 51.4 L53.8 52 L49.8 60 Z" fill={NOIR.paper} stroke={NOIR.ink} strokeWidth={0.4} />
-
 const stick = (x: number, toX: number) => <path d={`M${x} 60 L${toX} 70`} stroke={NOIR.paper} strokeWidth={1.4} strokeLinecap="round" />
 
 const SNARE = (
@@ -176,7 +165,7 @@ const SNARE = (
 )
 
 const KITS: Record<Profession, Kit> = {
-  engineer: { torso: SUIT, sleeve: NOIR.ash, forearm: NOIR.ash, backProp: NOTEBOOK, frontProp: PENCIL, head: FEDORA, hatShade: true, snare: null, trousers: { fill: NOIR.ash, crease: NOIR.smoke }, hand: 'bare', band: false },
+  engineer: { torso: SUIT, sleeve: NOIR.ash, forearm: NOIR.ash, backProp: null, frontProp: null, head: FEDORA, hatShade: true, snare: null, trousers: { fill: NOIR.ash, crease: NOIR.smoke }, hand: 'bare', band: false },
   drummer: { torso: WAISTCOAT, sleeve: NOIR.paper, forearm: SKIN, backProp: stick(16, 22), frontProp: stick(48, 42), head: FEDORA, hatShade: true, snare: SNARE, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'bare', band: false },
   fighter: { torso: VEST, sleeve: SKIN, forearm: SKIN, backProp: null, frontProp: null, head: MONGKHON, hatShade: false, snare: null, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'glove', band: true },
 }

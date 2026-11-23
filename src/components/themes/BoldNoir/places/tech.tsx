@@ -1,17 +1,15 @@
-import { litOf } from '@/lib/scroll/propRow'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { PropRow, propNodes } from '../../shared/propRow'
 import { NOIR } from '../palette'
-import { Walker, walkerOf, type Place } from '../place'
-import { FLOOR } from '../street'
+import { roomPlace, still } from '../place'
 import { crack } from '../pose'
 
-// Tech: the vault. A safe stands for each group of tools; as each is read he works its dial, the dial
-// turns under his hand, and the safe's door swings open on its paper lit inside.
+// Tech: the vault. For each group of tools a safe comes to him on the dash; he kneels at it and works the
+// dial back and forth under his hand until it gives, and the door swings open on the paper lit inside.
 
+// The safe stands this far right of him; a cracked dial has turned this far.
+const AT = 150
 const DIAL = { y: -110, r: 26 }
-// A cracked safe's dial has turned this far.
 const TURNED = 270
 
 function Safe() {
@@ -41,41 +39,33 @@ function Open() {
       <rect x={-56} y={-176} width={112} height={152} fill={NOIR.paper} />
       <rect x={-40} y={-150} width={80} height={30} fill={NOIR.red} />
       <rect x={-40} y={-104} width={80} height={60} fill={NOIR.smoke} />
-      <polygon points="-56,-176 -110,-196 -110,-4 -56,-24" fill={NOIR.coal} stroke={NOIR.ash} strokeWidth="4" />
+      <polygon points="56,-176 110,-196 110,-4 56,-24" fill={NOIR.coal} stroke={NOIR.ash} strokeWidth="4" />
     </>
   )
 }
 
-export const tech: Place = {
+export const tech = roomPlace({
   light: NOIR.paper,
-  floor: ({ xs, profession }) => (
-    <>
-      <PropRow
-        xs={xs}
-        floor={FLOOR}
-        art={(i) => (
-          <>
-            <Safe />
-            <g data-fx={`dial-${i}`}>
-              <Dial />
-            </g>
-          </>
-        )}
-        light={() => <Open />}
-      />
-      <Walker xs={xs} profession={profession} />
-    </>
+  back: (i) => (
+    <g transform={`translate(${AT} 0)`}>
+      <Safe />
+      <g data-fx={`dial-${i}`}>
+        <Dial />
+      </g>
+      <g data-fx={`open-${i}`} opacity="0">
+        <Open />
+      </g>
+    </g>
   ),
-  bind: (stage, input) => {
-    const walker = walkerOf(stage, input, crack)
-    const props = propNodes(stage, input.xs.length)
-    const dials = input.xs.map((_, i) => fx(stage, `dial-${i}`))
-    return (_progress, reached) => {
-      walker(reached)
-      props.forEach(({ lit }, i) => {
-        fadeTo(lit, litOf(reached, i))
-        transformTo(dials[i], `rotate(${(TURNED * ramp(reached - i, 0, 0.5)).toFixed(1)} 0 ${DIAL.y})`)
+  move: (_profession, t) => still(crack(t)),
+  reply: (stage, { count }) => {
+    const dials = Array.from({ length: count }, (_, i) => fx(stage, `dial-${i}`))
+    const doors = Array.from({ length: count }, (_, i) => fx(stage, `open-${i}`))
+    return (played) =>
+      dials.forEach((dial, i) => {
+        const t = played(i)
+        transformTo(dial, `rotate(${(TURNED * Math.sin(Math.PI * ramp(t, 0.3, 0.85))).toFixed(1)} 0 ${DIAL.y})`)
+        fadeTo(doors[i], ramp(t, 0.85, 1))
       })
-    }
   },
-}
+})
