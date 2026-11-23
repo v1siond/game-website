@@ -17,10 +17,10 @@ import type { Scene } from './scenes'
 import { HoseStage } from './stage'
 import world from './world.module.css'
 
-// One section per scene: a tall head that first shows the painted place alone and then brings the title
+// One section per stage of the fight: a tall head that first shows the fight alone and then brings the title
 // up on its curled banner, then the cards (the title cards and posters under one ink line), then a screen
-// of the place alone before it sinks. The cards a scene counts sit in an element marked data-stage-items,
-// which the shared theatre measures for the reading line that plays each card's beat.
+// of the fight alone. From lg the head and the cards keep to the left 40%, so the fight plays clear of
+// them on the right.
 
 const LEAD = `text-center text-base ${world.ink}`
 
@@ -174,10 +174,10 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <HoseStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh]">
+      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh] lg:max-w-[40vw]">
         <CurlBanner id={id}>{title}</CurlBanner>
       </header>
-      <div className="relative max-w-[42rem]">
+      <div className="relative max-w-[42rem] lg:max-w-[40vw]">
         <Cards slot={slot} />
       </div>
     </section>

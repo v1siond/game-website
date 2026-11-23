@@ -17,7 +17,7 @@ import toon from './toon.module.css'
 // at him squashes him down and stretches him back up. Each loop plays a set number of beats and he rests
 // on the pose's held angle within 5 s. On a stage (StageToon) every limb turns at its joint on the shared
 // rig (../shared/rig), each hose in two lengths so it curves through the bend, the body squashing and
-// stretching, and the scroll writes the pose.
+// stretching, and the scene writes the pose, his face turned toward the boss.
 //
 // The Martial Artist is bare chested in red Muay Thai shorts with red gloves, the prajioud on his arms and
 // his own mongkhon round his head, barefoot.
@@ -71,7 +71,7 @@ const RIG_CLASSES: RigClasses = {
 
 // One arm: the upper hose from the shoulder in the shirt's colour, the lower hose in his skin, the hand.
 // The right arm is the one nearer the things he acts on.
-function Arm({ side, kit, mallet = false }: { side: 'left' | 'right'; kit: Kit; mallet?: boolean }) {
+function Arm({ side, kit }: { side: 'left' | 'right'; kit: Kit }) {
   const right = side === 'right'
   const s = right ? 1 : -1
   return (
@@ -83,7 +83,6 @@ function Arm({ side, kit, mallet = false }: { side: 'left' | 'right'; kit: Kit; 
           <g className={right ? toon.foreRight : toon.foreLeft}>
             <Hose d={`M0 0 Q${3 * s} 6 ${2 * s} 11`} fill={SKIN} />
             {kit.sticks && <path d={`M${2 * s} 13 L${16 * s} 28`} stroke={HOSE.gold} strokeWidth={2.4} strokeLinecap="round" />}
-            {mallet && <Mallet x={2 * s} />}
             <circle cx={2 * s} cy={13} r={kit.bands ? 6 : 4.8} fill={kit.hand} stroke={INK} strokeWidth={2.2} />
           </g>
         </g>
@@ -91,15 +90,6 @@ function Arm({ side, kit, mallet = false }: { side: 'left' | 'right'; kit: Kit; 
     </g>
   )
 }
-
-// The carnival mallet in his fist, its handle running on down the line of the arm, so a swing of the arm swings it.
-const Mallet = ({ x }: { x: number }) => (
-  <>
-    <path d={`M${x} 14 V44`} stroke={INK} strokeWidth={5} strokeLinecap="round" />
-    <path d={`M${x} 14 V44`} stroke={HOSE.paperDark} strokeWidth={2.4} strokeLinecap="round" />
-    <rect x={x - 11} y={42} width={22} height={13} rx={3} fill={HOSE.red} stroke={INK} strokeWidth={2.2} />
-  </>
-)
 
 // One leg: the thigh and the shin as two hoses in the trousers' colour, and the shoe (or his bare foot).
 function Leg({ side, kit }: { side: 'left' | 'right'; kit: Kit }) {
@@ -136,8 +126,10 @@ function Mongkhon() {
 const HAIR_CAP = 'M27 25 C27 11 38 6.5 50 6.5 C62 6.5 73 11 73 25 C67 18 59 14.5 50 14.5 C41 14.5 33 18 27 25 Z'
 const TUFTS = 'M36 9 L38 0 L42 6 L45 -2 L48 6 L52 -1 L55 6 L59 1 L61 9 Z'
 
-/** His head, `still` on a stage: no blink or lag of its own there. */
-function Head({ profession, still }: { profession: Profession; still: boolean }) {
+/** His head, `still` on a stage: no blink or lag of its own there; `turned` toward the right, three quarters
+ *  on, for a side action: his eyes, nose and smile move toward the way he faces. */
+function Head({ profession, still, turned = false }: { profession: Profession; still: boolean; turned?: boolean }) {
+  const face = turned ? 'translate(7 0)' : undefined
   return (
     <g className={still ? undefined : toon.head}>
       <circle cx={50} cy={32} r={24.5} fill={HOSE.highlight} stroke={INK} strokeWidth={LINE} />
@@ -145,9 +137,9 @@ function Head({ profession, still }: { profession: Profession; still: boolean })
       <path d={TUFTS} fill={HAIR} stroke={INK} strokeWidth={1.8} strokeLinejoin="round" />
       <path d={HAIR_CAP} fill={HAIR} stroke={INK} strokeWidth={2} strokeLinejoin="round" />
       <path d={BEARD} fill={HERO_IDENTITY.beard} stroke={INK} strokeWidth={2} strokeLinejoin="round" />
-      <path d="M43.5 49 Q50 56 56.5 49 Q50 51.5 43.5 49 Z" fill={HOSE.red} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
+      <path d="M43.5 49 Q50 56 56.5 49 Q50 51.5 43.5 49 Z" fill={HOSE.red} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" transform={face} />
       {profession === 'fighter' && <Mongkhon />}
-      <g className={still ? undefined : toon.eyes}>
+      <g className={still ? undefined : toon.eyes} transform={face}>
         {[43.5, 56.5].map((x) => (
           <g key={x}>
             <ellipse cx={x} cy={31} rx={4.2} ry={7.4} fill={INK} />
@@ -155,8 +147,10 @@ function Head({ profession, still }: { profession: Profession; still: boolean })
           </g>
         ))}
       </g>
-      <circle cx={50} cy={40.5} r={3.4} fill={HERO_IDENTITY.skin} stroke={INK} strokeWidth={1.8} />
-      <circle cx={49} cy={39.4} r={0.9} fill={HOSE.highlight} />
+      <g transform={turned ? 'translate(11 0)' : undefined}>
+        <circle cx={50} cy={40.5} r={3.4} fill={HERO_IDENTITY.skin} stroke={INK} strokeWidth={1.8} />
+        <circle cx={49} cy={39.4} r={0.9} fill={HOSE.highlight} />
+      </g>
     </g>
   )
 }
@@ -165,7 +159,7 @@ function Head({ profession, still }: { profession: Profession; still: boolean })
 const HERO_BOX = { top: -20, height: 170 } as const
 
 /** Everything but the shadow: the legs, the far arm, the body, the head and the near arm. */
-function Body({ profession, still, mallet = false }: { profession: Profession; still: boolean; mallet?: boolean }) {
+function Body({ profession, still, turned = false }: { profession: Profession; still: boolean; turned?: boolean }) {
   const kit = KIT[profession]
   return (
     <>
@@ -182,8 +176,8 @@ function Body({ profession, still, mallet = false }: { profession: Profession; s
       />
       {kit.bands && <path d="M37 86 Q50 81.5 63 86" fill="none" stroke={HOSE.gold} strokeWidth={2.6} />}
       {profession === 'engineer' && <path d="M44 64 L50 70 L56 64" fill="none" stroke={INK} strokeWidth={1.8} strokeLinejoin="round" />}
-      <Head profession={profession} still={still} />
-      <Arm side="right" kit={kit} mallet={mallet} />
+      <Head profession={profession} still={still} turned={turned} />
+      <Arm side="right" kit={kit} />
     </>
   )
 }
@@ -221,14 +215,14 @@ export function setToonPose(j: RigJoints, p: ToonPose): void {
   if (j.foreRight) j.foreRight.style.transform = `rotate(${p.foreRight.toFixed(1)}deg) scaleY(${(1 + p.reach).toFixed(3)})`
 }
 
-/** Him on a stage, his feet at 0 0 and his box 100 wide, standing until the scroll writes his pose; `mallet`
- *  puts the carnival mallet in his near hand. */
-export const StageToon = memo(function StageToon({ profession, mallet = false }: { profession: Profession; mallet?: boolean }) {
+/** Him on a stage, his feet at 0 0 and his box 100 wide, standing until the writer poses him; `turned` faces
+ *  him toward the right, the way he fights. */
+export const StageToon = memo(function StageToon({ profession, turned = false }: { profession: Profession; turned?: boolean }) {
   return (
     <g transform="translate(-50 -146)">
       <ellipse cx={50} cy={146} rx={26} ry={3.4} fill={INK} opacity={0.3} />
       <g className={toon.body}>
-        <Body profession={profession} still mallet={mallet} />
+        <Body profession={profession} still turned={turned} />
       </g>
     </g>
   )

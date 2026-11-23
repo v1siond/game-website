@@ -6,7 +6,6 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useSiteLinks } from '@/components/cv/SiteLinks'
@@ -47,14 +46,15 @@ const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOS
 // composition. Its palette, backdrop, art, cards, his drawing, the scenes and the per profession sections
 // live in ./RubberHose.
 //
-// The hero is the title card, him standing at its edge, over the meadow where the big flower sways once
-// beside him. Then every section of the active profession is one full screen scene of a walk from the
-// meadow through the carnival to the theatre (./RubberHose/scenes) that rises from dark, holds while its
-// banner and cards scroll over it, and sinks back into dark while the next one rises; he makes one of the
-// genre's moves per card and its stop answers it. Contact is his bow at the microphone in the closing
-// spotlight. Every motion is a function of the scroll position, on the shared theatre (./shared/theatre)
-// and its settle: scroll up and it plays back. Under
-// reduced motion there is no theatre: each section carries its own picture, still, at its settled frame.
+// The page is one boss fight in the big top (./RubberHose/scenes), the way the 1930s cartoon run and gun
+// plays: the hero is the title card over the isle map, his marker walking up to the big top before the
+// iris opens on the ring and the steam calliope rolls in; each section of the active profession is a stage
+// of the fight, the calliope changing form as it escalates, and he shoots, jumps, dashes, slaps the pink
+// things away and fires his charged shot and his super; Contact is the knockout and his bow. Each scene
+// plays its one to three actions on time when its section arrives and holds its end frame, on the shared
+// theatre (./shared/theatre). The cards read in a column on the left from lg, so the fight plays clear of
+// them on the right. Under reduced motion there is no theatre: each section carries its own picture,
+// still, at its end frame.
 //
 // The root carries the palette as --hose-* variables (the one inline style, variables only), the pointer
 // as --mx and --my (usePointerVars, read by his title card pose), and clips sideways overflow with
@@ -67,17 +67,15 @@ const CONTACT_HEADING = headingId('hose', 'Contact')
 export default function RubberHoseTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const labels = useLabels()
-  const { navigation, sections } = labels
+  const { navigation, sections } = useLabels()
   const { professionalSummary } = useCVData()
-  const { highlights } = useAboutBlock()
   const { cv, engine } = useSiteLinks('engine')
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const rootRef = usePointerVars(!reduced)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
-    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone),
+    [view.sections, professionalSummary.bio, active, phone],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)
@@ -145,11 +143,11 @@ export default function RubberHoseTheme() {
             ))}
           </ProfessionRegion>
 
-          <section data-scene={contact.id} className="relative mx-auto max-w-3xl px-2 pb-8 pt-[60svh] motion-reduce:pt-16" aria-labelledby={CONTACT_HEADING}>
+          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
             {reduced && <HoseStage scene={contact} settled />}
             <RecruiterHero
               render={({ line, actions }) => (
-                <div className={`relative p-6 text-center sm:text-left ${world.titleCard}`}>
+                <div className={`relative mx-auto max-w-3xl p-6 text-center sm:text-left lg:mx-0 lg:max-w-[40vw] ${world.titleCard}`}>
                   <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
                     {sections.contact}
                   </h2>
