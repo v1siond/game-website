@@ -4,7 +4,7 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NOIR } from './palette'
 import s from './detective.module.css'
 
-// Him as this world's own figure, a parody of the 1947 city detective of the noir crime game (the pale
+// Him as this world's own figure, a 1940s city detective of the noir films (the pale
 // pinched fedora with its wide dark band, the grey three piece suit with the single breasted jacket worn
 // open over the waistcoat, the red tie, the pistol at his hip, the badge held up, the notebook that chimes
 // on a clue), cut the way the heist world cuts everything: flat ink, paper and one red, no gradient, depth
@@ -13,22 +13,19 @@ import s from './detective.module.css'
 // dark oval eyes (HERO_IDENTITY).
 //
 // Per profession, the way that detective would:
-// - System Engineer: the full suit; his action is the notebook scribble, the pencil working and a red
-//   clue mark popping over the page.
+// - System Engineer: the full suit, the notebook and pencil for a clue, the red clue mark over the page.
 // - Musician: jacket off, waistcoat and rolled sleeves, the tie loosened, the hat kept, sticks on a snare.
 // - Martial Artist: hat and jacket off, a vest and braces, his own mongkhon on his head, red gloves and
-//   white prajioud on the arms; the guard, then the jab.
-// Every profession has the hat tip idle, a two step walk, the badge flash on a hover of the element
-// that carries `badgeHost` and the interrogation lean on a hover of the one that carries `leanHost`.
+//   white prajioud on the arms, in his guard.
+// The badge comes up with its paper flash on a hover of the element that carries `badgeHost`.
 //
-// Parts are groups moved with transform only, each turning round its own joint (shoulder, elbow, hip),
-// given in the 64 by 96 viewBox's units; detective.module.css picks the cycle from data-motion. The eyes
-// stay at y 17.5, where the cut-in's eye strip crops them.
+// Parts are groups moved with transform only, each turning round its own joint (shoulder, elbow, hip,
+// knee), given in the 64 by 96 viewBox's units in detective.module.css. Nothing moves on its own: a
+// theatre scene poses him from the scroll (pose.ts), the menu draws him at rest. The eyes stay at y 17.5,
+// where the cut-in's eye strip crops them.
 
-/** Class names a parent puts on itself so a hover over it plays the badge flash or the lean. */
-export const DETECTIVE_HOST = { badge: s.badgeHost, lean: s.leanHost } as const
-
-export type DetectiveMotion = 'still' | 'idle' | 'act' | 'walk'
+/** The class a parent puts on itself so a hover over it brings his badge up. */
+export const DETECTIVE_HOST = { badge: s.badgeHost } as const
 
 const SKIN = HERO_IDENTITY.skin
 const SHADE = HERO_IDENTITY.skinShade
@@ -99,7 +96,7 @@ function Head({ head, dots, hatShade }: { head: ReactNode; dots: string; hatShad
         </>
       )}
       <path d="M25.4 14.4 L30 15.3 M34 15.3 L38.6 14.4" stroke={NOIR.ink} strokeWidth={1.2} />
-      <g className={s.eyes}>
+      <g>
         <ellipse cx={28} cy={17.5} rx={1.5} ry={2.1} fill={HERO_IDENTITY.eyes} />
         <ellipse cx={36} cy={17.5} rx={1.5} ry={2.1} fill={HERO_IDENTITY.eyes} />
       </g>
@@ -228,38 +225,50 @@ const BADGE = (
   </g>
 )
 
+// Each leg in two groups, the shin inside the thigh, so the knee bends where the rig turns it.
 function Legs({ trousers }: { trousers: Trousers }) {
   return (
     <>
-      <g className={s.backLeg}>
-        <path d="M22 62 L31 62 L30 89 L23 89 Z" fill={trousers.fill} />
-        <path d="M23 86.6 L30.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
-        <path d="M21 88 L31 88 L32 92 L19.5 92 Q19.5 89 21 88 Z" fill={NOIR.ink} />
+      <g className={s.backThigh}>
+        <path d="M22 62 L31 62 L30.5 76.6 L22.5 76.6 Z" fill={trousers.fill} />
+        <g className={s.backShin}>
+          <path d="M22.5 75.8 L30.5 75.8 L30 89 L23 89 Z" fill={trousers.fill} />
+          <path d="M23 86.6 L30.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
+          <path d="M21 88 L31 88 L32 92 L19.5 92 Q19.5 89 21 88 Z" fill={NOIR.ink} />
+        </g>
       </g>
-      <g className={s.frontLeg}>
-        <path d="M33 62 L42 62 L41 89 L34 89 Z" fill={trousers.fill} />
-        <path d="M37.5 64 L37.5 88 M33.9 86.6 L41.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
-        <path d="M33 88 L43 88 Q45 89 45 92 L32.5 92 Z" fill={NOIR.ink} />
-        <path d="M38 89.4 L43 89.6" stroke={NOIR.fog} strokeWidth={0.5} />
+      <g className={s.frontThigh}>
+        <path d="M33 62 L42 62 L41.5 76.6 L33.5 76.6 Z" fill={trousers.fill} />
+        <path d="M37.5 64 L37.5 76.6" stroke={trousers.crease} strokeWidth={0.5} />
+        <g className={s.frontShin}>
+          <path d="M33.5 75.8 L41.5 75.8 L41 89 L34 89 Z" fill={trousers.fill} />
+          <path d="M37.5 75.8 L37.5 88 M33.9 86.6 L41.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
+          <path d="M33 88 L43 88 Q45 89 45 92 L32.5 92 Z" fill={NOIR.ink} />
+          <path d="M38 89.4 L43 89.6" stroke={NOIR.fog} strokeWidth={0.5} />
+        </g>
       </g>
     </>
   )
 }
 
+/** His box: the viewBox's size and the y his soles stand on. */
+export const DETECTIVE_VIEW = { width: 64, height: 96, soles: 92 } as const
+
 interface DetectiveProps {
   profession: Profession
-  motion?: DetectiveMotion
+  /** His drawn size, when he is drawn into a larger picture. */
+  box?: { width: number; height: number }
   className?: string
 }
 
 // Memoised: its props are primitives, so a parent render that leaves them as they are draws nothing again.
-export const Detective = memo(function Detective({ profession, motion = 'idle', className = '' }: DetectiveProps) {
+export const Detective = memo(function Detective({ profession, box, className = '' }: DetectiveProps) {
   const kit = KITS[profession]
   const dotsId = `noir-dots-${useId().replace(/:/g, '')}`
   const dots = `url(#${dotsId})`
 
   return (
-    <svg viewBox="0 0 64 96" className={`overflow-visible ${className}`} data-motion={motion} data-kit={profession} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${DETECTIVE_VIEW.width} ${DETECTIVE_VIEW.height}`} {...box} className={`overflow-visible ${s.figure} ${className}`} aria-hidden="true" focusable="false">
       <defs>
         <pattern id={dotsId} width={2} height={2} patternUnits="userSpaceOnUse">
           <circle cx={1} cy={1} r={0.45} fill={NOIR.ash} />
@@ -268,7 +277,7 @@ export const Detective = memo(function Detective({ profession, motion = 'idle', 
       <path d="M12 93 L52 93 L48 95 L16 95 Z" fill={NOIR.ink} />
       <g className={s.body}>
         <Legs trousers={kit.trousers} />
-        <g className={s.breath}>{kit.torso(dots)}</g>
+        {kit.torso(dots)}
         {kit.snare}
         <Arm side="back" kit={kit} dots={dots} />
         <Head head={kit.head} dots={dots} hatShade={kit.hatShade} />

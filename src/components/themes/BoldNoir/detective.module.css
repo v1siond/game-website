@@ -1,171 +1,43 @@
 /*
  * His detective figure (detective.tsx). Each part turns round its own joint in the 64 by 96 viewBox
- * (transform-box: view-box); the cycle comes from data-motion on the svg, the profession's action from
- * data-kit. Transform and opacity only; reduced motion holds every part at rest.
- *
- * Every cycle plays a set number of times and he rests at its first frame, so each scene he is in has
- * ended within 5 s of its start: the idle's breath, blink and hat tip once each in 3 s (after the 1.92 s
- * walk on in the menu, 4.92 s), the walk three steps (as long as the walk on; the cameo's walk beats are
- * shorter), each act about 4.2 s.
+ * (transform-box: view-box), so a forearm turns at the elbow and a shin at the knee wherever the shoulder
+ * or the hip took it. A theatre scene's writer (pose.ts) poses the parts with inline transforms from the
+ * scroll; the menu draws him at rest. The kit's notebook, clue mark and badge rest hidden until a pose or
+ * a hover shows them. Transform and opacity only.
  */
 
-.body,
-.breath,
-.hat,
-.eyes,
-.frontUpper,
-.frontFore,
-.backUpper,
-.backFore,
-.frontLeg,
-.backLeg,
-.badge,
-.flash,
-.clue {
+.figure * {
   transform-box: view-box;
 }
 
-.body { transform-origin: 32px 93px; transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-.breath { transform-origin: 32px 65px; }
+.body { transform-origin: 32px 93px; }
 .hat { transform-origin: 32px 11px; }
-.eyes { transform-origin: 32px 17.5px; }
-.frontUpper { transform-origin: 44px 36px; transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-.frontFore { transform-origin: 46.5px 48px; transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.frontUpper { transform-origin: 44px 36px; }
+.frontFore { transform-origin: 46.5px 48px; }
 .backUpper { transform-origin: 20px 36px; }
 .backFore { transform-origin: 17.5px 48px; }
-.frontLeg { transform-origin: 37.5px 62px; }
-.backLeg { transform-origin: 26.5px 62px; }
+.frontThigh { transform-origin: 37.5px 62px; }
+.frontShin { transform-origin: 37.5px 76px; }
+.backThigh { transform-origin: 26.5px 62px; }
+.backShin { transform-origin: 26.5px 76px; }
 .flash { transform-origin: 48px 60px; }
 .clue { transform-origin: 16px 49px; }
 
 .notebook,
 .badge,
-.clue {
+.clue,
+.flash {
   opacity: 0;
 }
 
-/* ---- idle: the breath, a blink, the hat tip, once each ---- */
-
-@keyframes breath {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.025); }
-}
-
-@keyframes blink {
-  0%, 94%, 100% { transform: scaleY(1); }
-  96% { transform: scaleY(0.1); }
-}
-
-@keyframes hatTip {
-  0%, 80%, 100% { transform: none; }
-  84%, 90% { transform: translateY(-1.5px) rotate(-12deg); }
-}
-
-[data-motion='idle'] .breath,
-[data-motion='act'] .breath {
-  animation: breath 3000ms ease-in-out;
-}
-
-[data-motion='idle'] .eyes,
-[data-motion='act'] .eyes {
-  animation: blink 3000ms steps(1, end);
-}
-
-[data-motion='idle'] .hat {
-  animation: hatTip 3000ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* ---- the walk: a front view two step, the body bobs ----
- * Two steps per 640ms cycle, snapped with steps(2) like a cut out. He faces the camera, so a limb that
- * swings forward comes toward the viewer: `toward` shortens it from its own joint (the knee or the hand
- * rises, the shoe leaves the floor) while the other limb of the pair stays down. The back leg and the
- * front arm play their keyframes half a cycle behind (-320ms), so the legs take turns and each arm comes
- * forward with the opposite leg. */
-
-@keyframes toward {
-  0%, 100% { transform: none; }
-  50% { transform: scaleY(0.88); }
-}
-
-@keyframes bob {
-  0%, 50%, 100% { transform: translateY(0); }
-  25%, 75% { transform: translateY(-1.5px); }
-}
-
-[data-motion='walk'] .frontLeg { animation: toward 640ms steps(2, jump-none) 3; }
-[data-motion='walk'] .backLeg { animation: toward 640ms steps(2, jump-none) -320ms 3; }
-[data-motion='walk'] .body { animation: bob 640ms steps(2, jump-none) 3; }
-[data-motion='walk'] .frontUpper { animation: toward 640ms steps(2, jump-none) -320ms 3; }
-[data-motion='walk'] .backUpper { animation: toward 640ms steps(2, jump-none) 3; }
-
-/* ---- the actions ---- */
-
-/* System Engineer: the notebook at his chest, the pencil working twelve strokes, the red clue mark pops
-   twice. */
-@keyframes scribble {
-  0%, 100% { transform: rotate(104deg); }
-  50% { transform: rotate(116deg); }
-}
-
-@keyframes clue {
-  0%, 70%, 100% { opacity: 0; transform: scale(0.4); }
-  76% { opacity: 1; transform: scale(1.3); }
-  90% { opacity: 1; transform: scale(1); }
-}
-
-[data-motion='act'][data-kit='engineer'] .notebook { opacity: 1; }
-[data-motion='act'][data-kit='engineer'] .backFore { transform: rotate(-100deg); }
-[data-motion='act'][data-kit='engineer'] .frontFore { animation: scribble 360ms steps(2, jump-none) 12; }
-[data-motion='act'][data-kit='engineer'] .clue { animation: clue 1800ms cubic-bezier(0.34, 1.56, 0.64, 1) 2; }
-
-/* Musician: the sticks come down on the snare in turn, ten hits each. */
-@keyframes hitFront {
-  0%, 100% { transform: rotate(10deg); }
-  50% { transform: rotate(34deg); }
-}
-
-@keyframes hitBack {
-  0%, 100% { transform: rotate(-34deg); }
-  50% { transform: rotate(-10deg); }
-}
-
-[data-motion='act'][data-kit='drummer'] .frontFore { animation: hitFront 420ms steps(2, jump-none) 10; }
-[data-motion='act'][data-kit='drummer'] .backFore { animation: hitBack 420ms steps(2, jump-none) 10; }
-
-/* Martial Artist: gloves up in guard, then the front hand jabs out and back three times. */
-@keyframes jabUpper {
-  0%, 40%, 70%, 100% { transform: rotate(15deg); }
-  50%, 60% { transform: rotate(-80deg); }
-}
-
-@keyframes jabFore {
-  0%, 40%, 70%, 100% { transform: rotate(150deg); }
-  50%, 60% { transform: rotate(0deg); }
-}
-
-[data-motion='act'][data-kit='fighter'] .backUpper { transform: rotate(-15deg); }
-[data-motion='act'][data-kit='fighter'] .backFore { transform: rotate(-150deg); }
-[data-motion='act'][data-kit='fighter'] .frontUpper { animation: jabUpper 1400ms cubic-bezier(0.34, 1.56, 0.64, 1) 3; }
-[data-motion='act'][data-kit='fighter'] .frontFore { animation: jabFore 1400ms cubic-bezier(0.34, 1.56, 0.64, 1) 3; }
-
-/* ---- reactions to the visitor ---- */
-
-/* The badge flash: the front arm comes up with the badge and a paper flash bursts behind it. */
-@keyframes badgeFlash {
-  0% { opacity: 1; transform: scale(0.3) rotate(0deg); }
-  40% { opacity: 1; transform: scale(1.25) rotate(20deg); }
-  100% { opacity: 0; transform: scale(1.4) rotate(30deg); }
-}
-
+/* The badge on a hover: the front arm comes up with it and its paper flash shows behind it. */
 .badgeHost:hover .frontUpper,
 .badgeHost:focus-visible .frontUpper {
-  animation: none;
   transform: rotate(-140deg);
 }
 
 .badgeHost:hover .frontFore,
 .badgeHost:focus-visible .frontFore {
-  animation: none;
   transform: rotate(60deg);
 }
 
@@ -176,42 +48,10 @@
 
 .badgeHost:hover .flash,
 .badgeHost:focus-visible .flash {
-  animation: badgeFlash 420ms ease-out both;
+  opacity: 0.85;
 }
 
 .badgeHost:hover .notebook,
 .badgeHost:focus-visible .notebook {
   opacity: 0;
-}
-
-/* The interrogation lean: he leans in over the table, hat low. */
-.leanHost:hover .body {
-  transform: rotate(-7deg) translateY(1px);
-}
-
-.leanHost:hover .hat {
-  animation: none;
-  transform: translateY(1.5px) rotate(4deg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .body,
-  .breath,
-  .hat,
-  .eyes,
-  .frontUpper,
-  .frontFore,
-  .backUpper,
-  .backFore,
-  .frontLeg,
-  .backLeg,
-  .flash,
-  .clue {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .leanHost:hover .body {
-    transform: none;
-  }
 }
