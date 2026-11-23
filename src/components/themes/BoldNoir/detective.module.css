@@ -2,8 +2,8 @@
  * His detective figure (detective.tsx). Each part turns round its own joint in the 64 by 96 viewBox
  * (transform-box: view-box), so a forearm turns at the elbow and a shin at the knee wherever the shoulder
  * or the hip took it. A theatre scene's writer (pose.ts) poses the parts with inline transforms from the
- * scroll; the menu draws him at rest. The kit's notebook, clue mark and badge rest hidden until a pose or
- * a hover shows them. Transform and opacity only.
+ * scroll; the menu draws him at rest. The badge rests hidden until a hover shows it. Transform and
+ * opacity only.
  */
 
 .figure * {
@@ -21,11 +21,8 @@
 .backThigh { transform-origin: 26.5px 62px; }
 .backShin { transform-origin: 26.5px 76px; }
 .flash { transform-origin: 48px 60px; }
-.clue { transform-origin: 16px 49px; }
 
-.notebook,
 .badge,
-.clue,
 .flash {
   opacity: 0;
 }
@@ -51,7 +48,3 @@
   opacity: 0.85;
 }
 
-.badgeHost:hover .notebook,
-.badgeHost:focus-visible .notebook {
-  opacity: 0;
-}

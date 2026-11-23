@@ -2,10 +2,9 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
-import { spread } from '../shared/stageNodes'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import { ROW_FROM, ROW_TO, type Place, type PlaceInput } from './place'
+import type { Place, PlaceInput } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -18,9 +17,9 @@ import { ventures } from './places/ventures'
 import { work } from './places/work'
 import { Canvas, Front, Night, Skyline, Street, Wall, rainWriter } from './street'
 
-// The page as scenes: the rooftop (hero), one place of the night per section of the shown profession in
+// The page as scenes: the rooftop (hero), one place of the heist per section of the shown profession in
 // reading order, the calling card (contact). Each scene names its place, its anchor and how many cards its
-// section counts (stageItems), read from the same slot the section's cards are drawn from: one prop per
+// section counts (stageItems), read from the same slot the section's cards are drawn from: one beat per
 // card.
 
 export type SceneId = 'hero' | SectionId | 'contact'
@@ -50,19 +49,19 @@ export interface NoirScene extends TheatreScene, Omit<SceneDef, 'place'> {
   slot: SectionSlot | null
 }
 
-const layersOf = (id: SceneId, { light, set, floor }: Place, input: PlaceInput): StageLayer[] => [
+const layersOf = (id: SceneId, { light, set, mid, near, floor }: Place, input: PlaceInput): StageLayer[] => [
   { name: 'sky', node: <Night id={`noir-${id}`} light={light} /> },
   { name: 'far', node: <Skyline /> },
   ...(set ? [{ name: 'set', node: set(input) }] : []),
-  { name: 'mid', node: <Wall /> },
-  { name: 'near', node: <Street /> },
+  { name: 'mid', node: mid ? mid(input) : <Wall /> },
+  { name: 'near', node: near ? near(input) : <Street /> },
   { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
   { name: 'fg', node: <Front /> },
 ]
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): NoirScene => {
   const { place, ...def } = SCENE_DEFS[id]
-  const input = { xs: spread(count, ROW_FROM, ROW_TO), profession }
+  const input = { count, profession }
   return {
     ...def,
     id,
