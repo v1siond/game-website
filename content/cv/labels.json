@@ -150,8 +150,7 @@
         "incomingCall": "Incoming call",
         "doubleJump": "Double jump",
         "tagHighlight": "Highlight",
-        "installed": "Installed",
-        "contract": "Contract {number}"
+        "installed": "Installed"
       },
       "trail": {
         "mapOf": "Expedition map of {name}",
@@ -626,8 +625,7 @@
         "incomingCall": "Llamada entrante",
         "doubleJump": "Doble salto",
         "tagHighlight": "Destacado",
-        "installed": "Instalado",
-        "contract": "Contrato {number}"
+        "installed": "Instalado"
       },
       "trail": {
         "mapOf": "Mapa de la expedición de {name}",
@@ -1102,8 +1100,7 @@
         "incomingCall": "Chiamata in arrivo",
         "doubleJump": "Doppio salto",
         "tagHighlight": "In evidenza",
-        "installed": "Installato",
-        "contract": "Contratto {number}"
+        "installed": "Installato"
       },
       "trail": {
         "mapOf": "Mappa della spedizione di {name}",
