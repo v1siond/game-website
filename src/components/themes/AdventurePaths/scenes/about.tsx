@@ -1,42 +1,94 @@
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { clamp01, fadeTo, frames, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, Canvas, Cloud, DomeHills, GROUND, GrassGround, HeroRig, PillHills, Placed, Sky, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
-import { beatOf, type Level } from './level'
-import { Coin, QuestionBlock, UsedBlock } from './pieces'
+import { BLOCK, Bush, CRITTER_FRAMES, Canvas, Cloud, DomeHills, FoeRig, GrassGround, HERO_TALL, PillHills, Sky, critterStep } from './kit'
+import type { Level } from './level'
+import { Coin, ItemBox, OpenBox } from './pieces'
+import { StopsFigure, stopsWriter, type Stops } from './stops'
 
-// About: the first stretch of the plains (research images 04, 09, 21). A row of ? blocks hangs over the
-// ground, one per highlight; he runs in, and as each highlight is read he runs under its block, jumps and
-// hits it from below: the block bumps, a coin spins up out of it and the block turns to a used block.
+// About: the first stretch of the plains. For each highlight a critter walks up under an item box; he
+// jumps and stomps it flat, bounces off it up into the box, and the box opens with a coin popping out
+// over it, the view pushing in on the stomp.
 
-const BLOCK_TOP = 560
 const SIZE = 24 * BLOCK
-const JUMP = 110
-const START = 560
+// Where the critter walks in from and where he lands on it, and where he lands after the bounce.
+const CRITTER_FROM = 330
+const LAND = 170
+const END = 230
+const JUMP = 200
+const BOUNCE = 210
+// The flattened critter he bounces off is this tall.
+const FLAT = 24
+// The box hangs where his head reaches at the top of the bounce, centred over it.
+const BOX_X = (LAND + END) / 2 - SIZE / 2
+const BOX_Y = -(HERO_TALL + FLAT / 2 + BOUNCE) - SIZE
+// The share of his move when his feet meet the critter, and when his head meets the box.
+const STOMP = 0.4
+const HIT = STOMP + 0.35 / 2
 
-/** The left edge of each ? block along the course. */
-const blocksAt = (count: number): number[] => courseAt(count, 760, 300)
-
-/** Where he is: running in over the head of the section, then under each block in turn, jumping at it. */
-function heroOf(xs: readonly number[], p: number, f: number): { x: number; y: number; pose: string } {
-  const entry = ramp(p, 0.02, 0.2)
-  if (entry < 1) {
-    const x = lerp(START - 520, START, entry)
-    return { x, y: GROUND, pose: runFrame(x) }
-  }
-  const { k, t } = beatOf(f, xs.length)
-  const from = k === 0 ? START : xs[k - 1] + SIZE / 2
-  const centre = xs[k] + SIZE / 2
-  if (t < 0.5) {
-    const x = lerp(from, centre, t / 0.5)
-    return { x, y: GROUND, pose: t === 0 ? 'stand' : runFrame(x) }
-  }
-  if (t >= 1) return { x: centre, y: GROUND, pose: 'stand' }
-  return { x: centre, y: GROUND - arc((t - 0.5) / 0.5, JUMP), pose: 'jump' }
+const course: Stops = {
+  back: (i) => (
+    <>
+      <g data-fx={`coin-${i}`} transform={`translate(${BOX_X + SIZE / 2 - 20} ${BOX_Y})`} opacity={0}>
+        <g transform={`scale(${BLOCK})`}>
+          <Coin />
+        </g>
+      </g>
+      <g data-fx={`box-${i}`} transform={`translate(${BOX_X} ${BOX_Y})`}>
+        <g transform={`scale(${BLOCK})`}>
+          <g data-frame="closed" visibility="visible">
+            <ItemBox />
+          </g>
+          <g data-frame="open" visibility="hidden">
+            <OpenBox />
+          </g>
+        </g>
+      </g>
+      <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_FROM} 0)`}>
+        <g transform="scale(-1 1)">
+          <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
+        </g>
+      </g>
+    </>
+  ),
+  move: (t) => {
+    if (t < STOMP) {
+      const u = t / STOMP
+      return { pose: u < 0.5 ? 'jump' : 'stomp', ahead: lerp(0, LAND, u), lift: FLAT * u + hop(u, JUMP) }
+    }
+    if (t < 0.75) {
+      const v = ramp(t, STOMP, 0.75)
+      return { pose: 'jump', ahead: lerp(LAND, END, v), lift: lerp(FLAT, 0, v) + hop(v, BOUNCE) }
+    }
+    return { pose: 'stand', ahead: END }
+  },
+  push: (t) => clamp01(1 - Math.abs(t - STOMP) / 0.12),
+  reply: (stage, { count }) => {
+    const stops = Array.from({ length: count }, (_, i) => ({
+      critter: fx(stage, `critter-at-${i}`),
+      critterFace: frames(fx(stage, `critter-${i}`), 'critterA'),
+      box: fx(stage, `box-${i}`),
+      boxFace: frames(fx(stage, `box-${i}`), 'closed'),
+      coin: fx(stage, `coin-${i}`),
+    }))
+    return (played) =>
+      stops.forEach(({ critter, critterFace, box, boxFace, coin }, i) => {
+        const t = played(i)
+        const x = lerp(CRITTER_FROM, LAND, ramp(t, 0, STOMP - 0.04))
+        translateTo(critter, x, 0)
+        critterFace(t >= STOMP - 0.03 ? 'critterFlat' : critterStep(x))
+        translateTo(box, BOX_X, BOX_Y - hop(ramp(t, HIT, HIT + 0.08), 22))
+        boxFace(t >= HIT ? 'open' : 'closed')
+        const rise = ramp(t, HIT, HIT + 0.2)
+        translateTo(coin, BOX_X + SIZE / 2 - 20, BOX_Y - rise * 150)
+        fadeTo(coin, rise > 0 ? 1 : 0)
+      })
+  },
 }
 
 export const about: Level = {
-  layers: ({ count, profession }) => [
+  layers: (input) => [
     {
       name: 'sky',
       node: (
@@ -62,7 +114,7 @@ export const about: Level = {
       name: 'mid',
       node: (
         <Canvas>
-          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} eye={TRAIL.HUD} />
+          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} />
         </Canvas>
       ),
     },
@@ -76,30 +128,7 @@ export const about: Level = {
     },
     {
       name: 'figure',
-      node: (
-        <Canvas>
-          <g data-fx="course">
-            {blocksAt(count).map((x, i) => (
-              <g key={x}>
-                <Placed x={x + SIZE / 2 - 20} y={BLOCK_TOP} name={`coin-${i}`}>
-                  <g opacity={0} data-fx={`coin-face-${i}`}>
-                    <Coin />
-                  </g>
-                </Placed>
-                <Placed x={x} y={BLOCK_TOP} name={`block-${i}`}>
-                  <g data-frame="q" visibility="visible">
-                    <QuestionBlock />
-                  </g>
-                  <g data-frame="used" visibility="hidden">
-                    <UsedBlock />
-                  </g>
-                </Placed>
-              </g>
-            ))}
-            <HeroRig profession={profession} />
-          </g>
-        </Canvas>
-      ),
+      node: <StopsFigure stops={course} input={input} />,
     },
     {
       name: 'fg',
@@ -111,26 +140,12 @@ export const about: Level = {
       ),
     },
   ],
-  bind: (stage, { count }) => {
-    const xs = blocksAt(count)
-    const hero = rigOf(stage, 'hero', 'stand')
-    const pan = panOf(stage)
+  bind: (stage, input) => {
+    const beats = stopsWriter(stage, input, course)
     const clouds = fx(stage, 'clouds')
-    const blocks = xs.map((x, i) => ({ x, node: fx(stage, `block-${i}`), face: frames(fx(stage, `block-${i}`), 'q'), coin: fx(stage, `coin-${i}`), coinFace: fx(stage, `coin-face-${i}`) }))
     return (p, f) => {
       translateTo(clouds, -p * 260, 0)
-      blocks.forEach(({ x, node, face, coin, coinFace }, i) => {
-        // He hits block i at the top of his jump under it, three quarters into its beat.
-        const hit = f - i - 0.75
-        translateTo(node, x, BLOCK_TOP - arc(clamp01(hit / 0.12), 22))
-        face(hit >= 0 ? 'used' : 'q')
-        const rise = clamp01(hit / 0.25)
-        translateTo(coin, x + SIZE / 2 - 20, BLOCK_TOP - rise * 170)
-        fadeTo(coinFace, rise > 0 && rise < 1 ? 1 : 0)
-      })
-      const { x, y, pose } = heroOf(xs, p, f)
-      pan(cameraFor(x))
-      hero(x, y, pose)
+      beats(p, f)
     }
   },
 }

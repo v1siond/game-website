@@ -27,7 +27,7 @@ describe('the map walker sprite', () => {
   })
 
   it('finds his eyes where the face draws them', () => {
-    const face = headRows('cap')
+    const face = headRows('hair')
     EYES.forEach(([x, y]) => expect(face[y][x - 2]).toBe('E'))
   })
 })

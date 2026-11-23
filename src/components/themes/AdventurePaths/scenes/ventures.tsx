@@ -1,34 +1,88 @@
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
+import { fadeTo, frames, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Canvas, GROUND, HeroRig, Placed, TileGround, arc, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
-import { beatOf, type Level } from './level'
-import { CaveBrick, Coin, Pipe } from './pieces'
+import { BLOCK, Canvas, GROUND, Placed, TileGround } from './kit'
+import type { Level } from './level'
+import { CaveBrick, Hatch, ItemBox, Ladder, OpenBox, PowerUp } from './pieces'
+import { SPACING, StopsFigure, keyed, stopsWriter, type Stops } from './stops'
 
-// The ventures: the underground room under the pipe (research images 10, 14, 24), black with teal
-// bricks. He drops out of the pipe in the ceiling and lands; as each venture is read he runs on and jumps
-// through its coin, which flicks up and is gone.
+// The ventures: the underground room, black with teal bricks, which he has come down into by the ladder
+// through the hatch in its ceiling. For each venture a wall of bricks hangs from the ceiling with a low gap
+// under it and an item box past it; he runs at it, drops into a slide under the gap, comes up at the box
+// and it opens on the power-up inside, which floats up out of it.
 
-const START = 560
-const PIPE_H = 60
-const COIN_Y = GROUND - 250
-const COIN_W = 10 * BLOCK
+const SIZE = 24 * BLOCK
+const CEILING = 40
+// The hanging wall, its foot this high over the floor, and the box past it.
+const WALL_X = 20
+const GAP = 110
+const BOX_X = 270
+const UP_X = BOX_X + SIZE / 2
+const UP_TOP = -SIZE - 200
+// The shares of his move: into the slide, out of it.
+const SLIDE = [0.2, 0.55] as const
+const OPEN = 0.62
 
-/** Each venture's coin along the course, its left edge. */
-const coinsAt = (count: number): number[] => courseAt(count, 860, 300)
-
-function heroOf(xs: readonly number[], p: number, f: number): { x: number; y: number; pose: string } {
-  const drop = ramp(p, 0.04, 0.2)
-  if (drop < 1) return { x: START, y: lerp(PIPE_H * BLOCK - 40, GROUND, drop * drop), pose: 'jump' }
-  const { k, t } = beatOf(f, xs.length)
-  const from = k === 0 ? START : xs[k - 1] + COIN_W / 2
-  const x = lerp(from, xs[k] + COIN_W / 2, t)
-  if (t > 0.5 && t < 0.9) return { x, y: GROUND - arc((t - 0.5) / 0.4, 160), pose: 'jump' }
-  return { x, y: GROUND, pose: t > 0 && t < 1 ? runFrame(x) : 'stand' }
+const course: Stops = {
+  tiled: true,
+  back: (i) => (
+    <>
+      {i === 0 && (
+        <g transform={`translate(${-SPACING - 28} ${CEILING - GROUND})`}>
+          <g transform={`scale(${BLOCK})`}>
+            <Hatch />
+            <Ladder rungs={26} />
+          </g>
+        </g>
+      )}
+      {Array.from({ length: Math.ceil((GROUND - CEILING - GAP) / SIZE) }, (_, j) =>
+        [0, 1].map((k) => (
+          <g key={`${j}-${k}`} transform={`translate(${WALL_X + k * SIZE} ${-GAP - (j + 1) * SIZE}) scale(${BLOCK})`}>
+            <CaveBrick />
+          </g>
+        )),
+      )}
+      <g data-fx={`up-${i}`} transform={`translate(${UP_X} ${-SIZE})`} opacity={0}>
+        <circle r={60} fill={TRAIL.RUNE} opacity={0.2} />
+        <g transform={`scale(${BLOCK})`}>
+          <PowerUp />
+        </g>
+      </g>
+      <g data-fx={`box-${i}`} transform={`translate(${BOX_X} ${-SIZE})`}>
+        <g transform={`scale(${BLOCK})`}>
+          <g data-frame="closed" visibility="visible">
+            <ItemBox />
+          </g>
+          <g data-frame="open" visibility="hidden">
+            <OpenBox />
+          </g>
+        </g>
+      </g>
+    </>
+  ),
+  move: keyed([
+    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
+    { at: 0.1, pose: 'runA', ahead: 0, lift: 0 },
+    { at: SLIDE[0] - 0.05, pose: 'runB', ahead: 30, lift: 0 },
+    { at: SLIDE[0], pose: 'kick', ahead: 50, lift: -28, spin: -80 },
+    { at: SLIDE[1], pose: 'kick', ahead: BOX_X - 90, lift: -28, spin: -80 },
+    { at: SLIDE[1] + 0.05, pose: 'stand', ahead: BOX_X - 70, lift: 0 },
+  ]),
+  reply: (stage, { count }) => {
+    const stops = Array.from({ length: count }, (_, i) => ({ up: fx(stage, `up-${i}`), box: frames(fx(stage, `box-${i}`), 'closed') }))
+    return (played) =>
+      stops.forEach(({ up, box }, i) => {
+        const t = played(i)
+        box(t >= OPEN ? 'open' : 'closed')
+        const rise = ramp(t, OPEN, OPEN + 0.25)
+        translateTo(up, UP_X, lerp(-SIZE, UP_TOP, rise))
+        fadeTo(up, rise > 0 ? 1 : 0)
+      })
+  },
 }
 
 export const ventures: Level = {
-  layers: ({ count, profession }) => [
+  layers: (input) => [
     {
       name: 'sky',
       node: (
@@ -77,21 +131,7 @@ export const ventures: Level = {
     },
     {
       name: 'figure',
-      node: (
-        <Canvas>
-          <g data-fx="course">
-            {coinsAt(count).map((x, i) => (
-              <Placed key={x} x={x} y={COIN_Y} name={`coin-${i}`}>
-                <Coin />
-              </Placed>
-            ))}
-            <HeroRig profession={profession} />
-            <g transform={`translate(${START} 0) scale(${BLOCK} ${-BLOCK}) translate(-20 ${-PIPE_H})`}>
-              <Pipe height={PIPE_H} />
-            </g>
-          </g>
-        </Canvas>
-      ),
+      node: <StopsFigure stops={course} input={input} />,
     },
     {
       name: 'fg',
@@ -102,20 +142,5 @@ export const ventures: Level = {
       ),
     },
   ],
-  bind: (stage, { count }) => {
-    const xs = coinsAt(count)
-    const hero = rigOf(stage, 'hero', 'stand')
-    const pan = panOf(stage, true)
-    const coins = xs.map((_, i) => fx(stage, `coin-${i}`))
-    return (p, f) => {
-      coins.forEach((coin, i) => {
-        const flick = clamp01((f - i - 0.7) / 0.25)
-        translateTo(coin, xs[i], COIN_Y - flick * 160)
-        fadeTo(coin, 1 - flick)
-      })
-      const { x, y, pose } = heroOf(xs, p, f)
-      pan(cameraFor(x))
-      hero(x, y, pose)
-    }
-  },
+  bind: (stage, input) => stopsWriter(stage, input, course),
 }

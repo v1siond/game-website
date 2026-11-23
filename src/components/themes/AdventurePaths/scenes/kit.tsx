@@ -3,15 +3,16 @@ import type { Profession } from '@/lib/cv/professions'
 import { pixelRuns } from '@/lib/pixelRuns'
 import { PixelRuns } from '../../shared/PixelRuns'
 import { frames, fx, r1, transformTo } from '../../shared/stageNodes'
-import { FOE, HERO, HERO_OUTFITS, HERO_POSES, foeColours, foeRows, heroParts, type FoeFrame, type HeroPose } from '../side'
+import { FOE, HERO, HERO_OUTFITS, HERO_POSES, FOE_COLOURS, foeRows, heroParts, type FoeFrame, type HeroPose } from '../side'
 import { TRAIL } from '../palette'
 
 // The drawing kit of the side view levels behind the page. Every level is a stack of SVG layers on one
 // 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x 570
 // to 1030, and a desktop crop the same art. The ground's top is at GROUND. He and the foes are the pixel
 // sprites of side.ts, every frame drawn once and one shown at a time by the scene's writer. A level's
-// things stand along a course that can run past the canvas: the camera follows him the way a side
-// scroller does (cameraFor, panOf), so every section has room for as many things as it has cards.
+// things stand along a course that runs past the canvas: he holds his place and the course slides under
+// him the way a side scroller's camera follows him (panOf, stops.tsx), so every section has room for as
+// many things as it has cards.
 
 export const W = 1600
 export const H = 1000
@@ -88,7 +89,7 @@ export function PillHills({ base, fill, edge }: { base: number; fill: string; ed
   )
 }
 
-// The near round hills with eyes: centre, width and height.
+// The near round hills: centre, width and height.
 const DOMES: ReadonlyArray<readonly [number, number, number]> = [
   [-40, 300, 150],
   [200, 300, 150],
@@ -99,29 +100,24 @@ const DOMES: ReadonlyArray<readonly [number, number, number]> = [
   [1700, 260, 140],
 ]
 
-/** The near range of round hills with eyes, their feet at `base`. */
-export function DomeHills({ base, fill, edge, eye }: { base: number; fill: string; edge: string; eye: string }) {
+/** The near range of round hills, their feet at `base`. */
+export function DomeHills({ base, fill, edge }: { base: number; fill: string; edge: string }) {
   return (
     <g>
       {DOMES.map(([cx, width, height]) => (
         <g key={cx}>
           <path d={`M${cx - width / 2} ${base + 20} V${base - height * 0.5} A${width / 2} ${height * 0.5} 0 0 1 ${cx + width / 2} ${base - height * 0.5} V${base + 20} Z`} fill={fill} stroke={edge} strokeWidth={5} />
-          {[-1, 1].map((side) => (
-            <rect key={side} x={cx + side * width * 0.08 - 6} y={base - height * 0.8} width={12} height={28} rx={6} fill={eye} />
-          ))}
         </g>
       ))}
     </g>
   )
 }
 
-/** A cloud with a face, 96 by 40 at `scale`, from its top left. */
-export function Cloud({ x, y, scale = 2, fill = TRAIL.CLOUD, eye = TRAIL.HUD }: { x: number; y: number; scale?: number; fill?: string; eye?: string }) {
+/** A cloud, 96 by 40 at `scale`, from its top left. */
+export function Cloud({ x, y, scale = 2, fill = TRAIL.CLOUD }: { x: number; y: number; scale?: number; fill?: string }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${scale})`}>
       <rect x={3} y={8} width={90} height={28} rx={14} fill={fill} stroke={TRAIL.CLOUD_SHADE} strokeWidth={3} />
-      <rect x={38} y={16} width={5} height={10} rx={2} fill={eye} />
-      <rect x={52} y={16} width={5} height={10} rx={2} fill={eye} />
     </g>
   )
 }
@@ -208,7 +204,7 @@ export function FoeRig({ name, kinds }: { name: string; kinds: readonly FoeFrame
       <g transform={`scale(${PX}) translate(${-FOE.width / 2} ${-FOE.height})`} shapeRendering="crispEdges">
         {kinds.map((frame, i) => (
           <g key={frame} data-frame={frame} visibility={i === 0 ? 'visible' : 'hidden'}>
-            <Pixels parts={[{ rows: foeRows(frame), top: 0 }]} colours={foeColours(frame)} />
+            <Pixels parts={[{ rows: foeRows(frame), top: 0 }]} colours={FOE_COLOURS} />
           </g>
         ))}
       </g>
@@ -216,16 +212,20 @@ export function FoeRig({ name, kinds }: { name: string; kinds: readonly FoeFrame
   )
 }
 
-/** A rig's writer: where its feet stand, which frame shows and whether it faces left. */
-export type RigWriter = (x: number, y: number, frame: string, left?: boolean) => void
+/** A rig's writer: where its feet stand, which frame shows, whether it faces left, and how far it is turned
+ *  round its middle (a roll, a slide, a swing on a rope). */
+export type RigWriter = (x: number, y: number, frame: string, left?: boolean, spin?: number) => void
+
+// The middle of his sprite above his feet, which a spin turns round.
+const MIDDLE = (HERO.height * PX) / 2
 
 export function rigOf(stage: ParentNode, name: string, first: string): RigWriter {
   const node = fx(stage, name)
   const face = fx(stage, `${name}-face`)
   const show = frames(node, first)
   let facing = false
-  return (x, y, frame, left = false) => {
-    transformTo(node, `translate(${r1(x)} ${r1(y)})`)
+  return (x, y, frame, left = false, spin = 0) => {
+    transformTo(node, `translate(${r1(x)} ${r1(y)})${spin ? ` rotate(${r1(spin)} 0 ${-MIDDLE})` : ''}`)
     show(frame)
     if (left === facing) return
     facing = left
@@ -239,25 +239,26 @@ const STRIDE = 34
 /** His run frame at x along the ground. */
 export const runFrame = (x: number): HeroPose => (Math.floor(x / STRIDE) % 2 === 0 ? 'runA' : 'runB')
 
-/** A jump arc: 0 at both ends, `height` at the middle. */
-export const arc = (t: number, height: number): number => 4 * height * t * (1 - t)
-
-// The camera holds him here, then slides the course left under him.
-const CAMERA_X = 820
-
-/** How far the course has slid left with him at x. */
-export const cameraFor = (x: number): number => Math.max(0, x - CAMERA_X)
-
-/** `count` places along the course from `first`, `gap` apart. */
-export const courseAt = (count: number, first: number, gap: number): number[] => Array.from({ length: count }, (_, i) => first + i * gap)
-
-/** Slides the course group (data-fx="course") and the ground's pattern with the camera. */
-export function panOf(stage: ParentNode, tiled = false): (camera: number) => void {
-  const course = fx(stage, 'course')
+/** Slides the course groups (data-fx="course", behind him, and "course-front", in front of him) and the
+ *  ground's pattern left under him by `offset`. */
+export function panOf(stage: ParentNode, tiled = false): (offset: number) => void {
+  const courses = [fx(stage, 'course'), fx(stage, 'course-front')]
   const ground = fx(stage, 'ground')
   const step = tiled ? TILE : GRASS_STEP
-  return (camera) => {
-    transformTo(course, `translate(${r1(-camera)} 0)`)
-    transformTo(ground, `translate(${r1(-(camera % step))} 0)`)
+  return (offset) => {
+    courses.forEach((course) => transformTo(course, `translate(${r1(-offset)} 0)`))
+    transformTo(ground, `translate(${r1(-(offset % step))} 0)`)
   }
 }
+
+/** How tall he stands on the canvas, feet to the top of his head. */
+export const HERO_TALL = HERO.height * PX
+
+/** The critter's walk frames and its squashed and tipped frames, for a FoeRig. */
+export const CRITTER_FRAMES = ['critterA', 'critterB', 'critterFlat', 'critterTipped'] as const
+
+// The critter changes step frames every this many canvas units it walks.
+const CRITTER_STEP = 30
+
+/** The critter's step frame at x along its walk. */
+export const critterStep = (x: number): FoeFrame => (Math.floor(x / CRITTER_STEP) % 2 === 0 ? 'critterA' : 'critterB')

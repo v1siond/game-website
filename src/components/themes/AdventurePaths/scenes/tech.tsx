@@ -1,22 +1,27 @@
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
+import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, Canvas, DomeHills, FoeRig, GROUND, GrassGround, HeroRig, PillHills, Placed, Sky, Stars, cameraFor, courseAt, panOf, rigOf, runFrame } from './kit'
+import { BLOCK, Bush, CRITTER_FRAMES, Canvas, DomeHills, FoeRig, GrassGround, PillHills, Sky, Stars } from './kit'
 import type { Level } from './level'
-import { Brick } from './pieces'
+import { Brick, Crate } from './pieces'
+import { StopsFigure, keyed, stopsWriter, type Stops } from './stops'
 
-// The tech stack: a night stretch with a turtle shell on the ground (research images 13, 22, 25). He runs
-// up and kicks the shell, and as each category is read the shell slides on along the ground and breaks
-// its brick, the pieces flying, the way a kicked shell clears a row of bricks; he runs on after it.
+// The tech stack: a night stretch. For each category a crate waits on the ground with a critter and a
+// stack of bricks past it; he lifts the crate over his head and throws it, and it knocks the critter over
+// on its back and bursts the bricks, the pieces flying.
 
 const SIZE = 24 * BLOCK
-const KICK_X = 600
-const SHELL_X = KICK_X + 90
-// The share of the first card's beat he spends running up and kicking before the shell slides.
-const KICK = 0.3
-
-/** The left edge of each category's brick along the course. */
-const bricksAt = (count: number): number[] => courseAt(count, 1000, 320)
+const CRITTER_X = 200
+const BRICKS_X = 300
+// The crate's top left: on the ground in front of him, held over his head, then flung.
+const CRATE = { ground: [50, -SIZE], held: [-21, -150 - SIZE], critter: [CRITTER_X - SIZE, -54 - SIZE], bricks: [BRICKS_X - SIZE + 20, -2 * SIZE + 20], rest: [BRICKS_X - SIZE - 30, -SIZE] } as const
+// The shares of his move: the lift, the throw, the critter hit, the bricks hit, the crate down.
+const LIFT = [0.12, 0.28] as const
+const THROW = 0.42
+const KNOCK = 0.6
+const BURST = 0.72
+const DOWN = 0.86
 
 // The four pieces a brick breaks into: how far each flies across and up, and how far it spins.
 const PIECES: ReadonlyArray<readonly [number, number, number]> = [
@@ -39,35 +44,87 @@ const STARS: ReadonlyArray<readonly [number, number]> = [
   [260, 340],
 ]
 
-/** How far the shell has slid: 0 at his kick, i + 1 once it has broken brick i. */
-const slideOf = (f: number, count: number): number => clamp01((f - KICK) / (count - KICK)) * count
-
-/** The shell's x for its slide: from his kick to each brick's left edge in turn. */
-function shellAt(xs: readonly number[], slide: number): number {
-  const k = Math.min(xs.length - 1, Math.floor(slide))
-  const from = k === 0 ? SHELL_X : xs[k - 1]
-  return lerp(from, xs[k] - 60, Math.min(1, slide - k))
+/** The crate's top left at t of his move. */
+function crateAt(t: number): readonly [number, number, number] {
+  const along = (from: readonly number[], to: readonly number[], u: number, arc = 0): readonly [number, number, number] => [lerp(from[0], to[0], u), lerp(from[1], to[1], u) - hop(u, arc), 0]
+  if (t < LIFT[0]) return [...CRATE.ground, 0]
+  if (t < THROW) return along(CRATE.ground, CRATE.held, ramp(t, LIFT[0], LIFT[1]))
+  if (t < KNOCK) return along(CRATE.held, CRATE.critter, ramp(t, THROW, KNOCK), 90)
+  if (t < BURST) return along(CRATE.critter, CRATE.bricks, ramp(t, KNOCK, BURST), 30)
+  const down = ramp(t, BURST, DOWN)
+  return [lerp(CRATE.bricks[0], CRATE.rest[0], down), lerp(CRATE.bricks[1], CRATE.rest[1], down * down), 14 * down]
 }
 
-/** Where he is: running in, kicking the shell, then running after it, a little behind. */
-function heroOf(p: number, f: number, shellX: number, sliding: boolean): { x: number; pose: string } {
-  const entry = ramp(p, 0.02, 0.2)
-  if (entry < 1) {
-    const x = lerp(KICK_X - 600, KICK_X - 120, entry)
-    return { x, pose: runFrame(x) }
-  }
-  const run = clamp01(f / (KICK * 0.6))
-  if (run < 1) {
-    const x = lerp(KICK_X - 120, KICK_X, run)
-    return { x, pose: f === 0 ? 'stand' : runFrame(x) }
-  }
-  if (f < KICK) return { x: KICK_X, pose: 'kick' }
-  const x = Math.max(KICK_X, shellX - 300)
-  return { x, pose: sliding && x > KICK_X ? runFrame(x) : 'stand' }
+const course: Stops = {
+  back: (i) => (
+    <>
+      {[0, 1].map((j) => (
+        <g key={j}>
+          <g data-fx={`brick-${i}-${j}`} transform={`translate(${BRICKS_X} ${-(j + 1) * SIZE}) scale(${BLOCK})`}>
+            <Brick />
+          </g>
+          {PIECES.map((_, k) => (
+            <g key={k} data-fx={`piece-${i}-${j}-${k}`} opacity={0}>
+              <g transform={`scale(${BLOCK / 2})`}>
+                <Brick />
+              </g>
+            </g>
+          ))}
+        </g>
+      ))}
+      <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_X} 0)`}>
+        <g transform="scale(-1 1)">
+          <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
+        </g>
+      </g>
+    </>
+  ),
+  front: (i) => (
+    <g data-fx={`crate-${i}`} transform={`translate(${CRATE.ground[0]} ${CRATE.ground[1]})`}>
+      <g transform={`scale(${BLOCK})`}>
+        <Crate />
+      </g>
+    </g>
+  ),
+  move: keyed([
+    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
+    { at: LIFT[0], pose: 'stand', ahead: 0, lift: 0 },
+    { at: THROW, pose: 'carry', ahead: 0, lift: 0 },
+    { at: BURST, pose: 'throw', ahead: 20, lift: 0 },
+    { at: BURST + 0.02, pose: 'stand', ahead: 20, lift: 0 },
+  ]),
+  reply: (stage, { count }) => {
+    const stops = Array.from({ length: count }, (_, i) => ({
+      crate: fx(stage, `crate-${i}`),
+      critter: fx(stage, `critter-at-${i}`),
+      critterFace: frames(fx(stage, `critter-${i}`), 'critterA'),
+      bricks: [0, 1].map((j) => ({ brick: fx(stage, `brick-${i}-${j}`), pieces: PIECES.map((_, k) => fx(stage, `piece-${i}-${j}-${k}`)) })),
+    }))
+    return (played) =>
+      stops.forEach(({ crate, critter, critterFace, bricks }, i) => {
+        const t = played(i)
+        const [cx, cy, tilt] = crateAt(t)
+        transformTo(crate, `translate(${r1(cx)} ${r1(cy)}) rotate(${r1(tilt)} ${SIZE / 2} ${SIZE / 2})`)
+        const knock = ramp(t, KNOCK, KNOCK + 0.14)
+        translateTo(critter, CRITTER_X + 60 * knock, -hop(knock, 70))
+        critterFace(knock > 0 ? 'critterTipped' : 'critterA')
+        const fly = ramp(t, BURST, BURST + 0.26)
+        bricks.forEach(({ brick, pieces }, j) => {
+          fadeTo(brick, t >= BURST ? 0 : 1)
+          pieces.forEach((piece, k) => {
+            const [dx, dy, spin] = PIECES[k]
+            const px = BRICKS_X + SIZE / 4 + dx * fly
+            const py = -(j + 1) * SIZE + dy * fly + 900 * fly * fly
+            transformTo(piece, `translate(${r1(px)} ${r1(py)}) rotate(${r1(spin * fly)})`)
+            fadeTo(piece, fly > 0 && fly < 1 ? 1 : 0)
+          })
+        })
+      })
+  },
 }
 
 export const tech: Level = {
-  layers: ({ count, profession }) => [
+  layers: (input) => [
     {
       name: 'sky',
       node: (
@@ -91,7 +148,7 @@ export const tech: Level = {
       name: 'mid',
       node: (
         <Canvas>
-          <DomeHills base={880} fill={TRAIL.NIGHT_HILL_NEAR} edge={TRAIL.NIGHT_SKY} eye={TRAIL.NIGHT_SKY} />
+          <DomeHills base={880} fill={TRAIL.NIGHT_HILL_NEAR} edge={TRAIL.NIGHT_SKY} />
         </Canvas>
       ),
     },
@@ -105,30 +162,7 @@ export const tech: Level = {
     },
     {
       name: 'figure',
-      node: (
-        <Canvas>
-          <g data-fx="course">
-            {bricksAt(count).map((x, i) => (
-              <g key={x}>
-                <Placed x={x} y={GROUND - SIZE} name={`brick-${i}`}>
-                  <Brick />
-                </Placed>
-                {PIECES.map((_, j) => (
-                  <g key={j} data-fx={`piece-${i}-${j}`} opacity={0}>
-                    <g transform={`scale(${BLOCK / 2})`}>
-                      <Brick />
-                    </g>
-                  </g>
-                ))}
-              </g>
-            ))}
-            <g data-fx="shell" transform={`translate(${SHELL_X} ${GROUND})`}>
-              <FoeRig name="shell-face" kinds={['shell']} />
-            </g>
-            <HeroRig profession={profession} />
-          </g>
-        </Canvas>
-      ),
+      node: <StopsFigure stops={course} input={input} />,
     },
     {
       name: 'fg',
@@ -140,30 +174,5 @@ export const tech: Level = {
       ),
     },
   ],
-  bind: (stage, { count }) => {
-    const xs = bricksAt(count)
-    const hero = rigOf(stage, 'hero', 'stand')
-    const pan = panOf(stage)
-    const shell = fx(stage, 'shell')
-    const bricks = xs.map((x, i) => ({ x, brick: fx(stage, `brick-${i}`), pieces: PIECES.map((_, j) => fx(stage, `piece-${i}-${j}`)) }))
-    return (p, f) => {
-      const slide = slideOf(f, count)
-      const shellX = shellAt(xs, slide)
-      translateTo(shell, shellX, GROUND)
-      bricks.forEach(({ x, brick, pieces }, i) => {
-        fadeTo(brick, slide - i - 1 >= -0.02 ? 0 : 1)
-        const fly = clamp01((slide - i - 0.98) / 0.6)
-        pieces.forEach((piece, j) => {
-          const [dx, dy, spin] = PIECES[j]
-          const px = x + SIZE / 4 + dx * fly
-          const py = GROUND - SIZE + dy * fly + 900 * fly * fly
-          transformTo(piece, `translate(${r1(px)} ${r1(py)}) rotate(${r1(spin * fly)})`)
-          fadeTo(piece, fly > 0 && fly < 1 ? 1 : 0)
-        })
-      })
-      const { x, pose } = heroOf(p, f, shellX, slide % 1 > 0)
-      pan(cameraFor(x + 150))
-      hero(x, GROUND, pose)
-    }
-  },
+  bind: (stage, input) => stopsWriter(stage, input, course),
 }

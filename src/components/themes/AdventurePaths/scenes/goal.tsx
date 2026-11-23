@@ -1,43 +1,39 @@
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { Bush, Canvas, Cloud, GROUND, GrassGround, HeroRig, PillHills, Placed, Sky, arc, rigOf, runFrame } from './kit'
+import { BLOCK, Bush, Canvas, Cloud, GROUND, GrassGround, HeroRig, PillHills, Placed, Sky, rigOf, runFrame } from './kit'
 import type { Level } from './level'
-import { Castle, Firework } from './pieces'
+import { FinishGate, Firework, Ribbon } from './pieces'
 
-// Contact: the end of the course at sunset (research images 05, 08, 31). As the page reaches its end he
-// runs at the goal pole, leaps and grabs it high up, slides down it with the flag coming down beside him,
-// hops off and walks into the castle, and fireworks go off over it. The last scene never sinks, so the
-// whole run plays over the last screens of the page.
+// Contact: the end of the course at sunset. As the contact rises he runs at the finish gate and through
+// it, the ribbon across it breaking and its two halves dropping to the posts, and he stops past it with a
+// fist up as the fireworks go off over the gate. The whole run is done by the time the contact has risen
+// and holds there.
 
-const POLE_X = 820
-const POLE_TOP = 330
-const GRAB_Y = 470
-const CASTLE_X = 1000
-const CASTLE_SCALE = 4
-const DOOR_X = CASTLE_X + 32 * CASTLE_SCALE
-const FLAG_TOP = POLE_TOP + 20
+const GATE_X = 700
+const GATE_SCALE = BLOCK
+const GATE_W = 64 * GATE_SCALE
+const POST = 6 * GATE_SCALE
+const RIBBON_Y = GROUND - 100
+const RIBBON_HALF = (GATE_W - POST) / 2
+// He breaks the ribbon at its middle.
+const BREAK_X = GATE_X + POST + RIBBON_HALF
+const STOP_X = 980
 const BURSTS: ReadonlyArray<readonly [number, number, number]> = [
-  [CASTLE_X + 40, 420, 0.82],
-  [CASTLE_X + 230, 360, 0.88],
-  [CASTLE_X + 130, 300, 0.94],
+  [GATE_X + 20, 420, 0.4],
+  [GATE_X + 230, 360, 0.44],
+  [GATE_X + 120, 290, 0.48],
 ]
 
-type Beat = { x: number; y: number; pose: string; left?: boolean; seen?: number }
+// His run through the gate on the scene's progress: in from the left, through the ribbon, slowing to a stop.
+const RUN = { from: 200, to: STOP_X, by: 0.44 }
 
-// His run through the goal, beat by beat on the scene's progress: each entry starts at its progress.
-const BEATS: ReadonlyArray<{ from: number; to: number; at: (u: number) => Beat }> = [
-  { from: 0, to: 0.3, at: (u) => ({ x: lerp(200, POLE_X - 260, u), y: GROUND, pose: runFrame(lerp(200, POLE_X - 260, u)) }) },
-  { from: 0.3, to: 0.38, at: (u) => ({ x: lerp(POLE_X - 260, POLE_X - 30, u), y: lerp(GROUND, GRAB_Y, u) - arc(u, 120), pose: 'jump' }) },
-  { from: 0.38, to: 0.6, at: (u) => ({ x: POLE_X - 30, y: lerp(GRAB_Y, GROUND, u), pose: 'grab' }) },
-  { from: 0.6, to: 0.66, at: (u) => ({ x: lerp(POLE_X - 30, POLE_X + 60, u), y: GROUND - arc(u, 60), pose: 'jump' }) },
-  { from: 0.66, to: 0.8, at: (u) => ({ x: lerp(POLE_X + 60, DOOR_X, u), y: GROUND, pose: runFrame(lerp(POLE_X + 60, DOOR_X, u)), seen: 1 - ramp(u, 0.8, 1) }) },
-  { from: 0.8, to: 1, at: () => ({ x: DOOR_X, y: GROUND, pose: 'stand', seen: 0 }) },
-]
-
-const beatAt = (p: number): Beat => {
-  const beat = BEATS.find(({ to }) => p < to) ?? BEATS[BEATS.length - 1]
-  return beat.at(ramp(p, beat.from, beat.to))
+function runnerAt(p: number): { x: number; pose: string } {
+  const u = ramp(p, 0, RUN.by)
+  // Full speed to the gate, easing to a stop past it.
+  const x = lerp(RUN.from, RUN.to, 1 - (1 - u) ** 2)
+  if (u >= 1) return { x, pose: 'cheer' }
+  return { x, pose: runFrame(x) }
 }
 
 export const goal: Level = {
@@ -47,7 +43,7 @@ export const goal: Level = {
       node: (
         <Canvas>
           <Sky id="ap-goal-sky" top={TRAIL.SUNSET_HIGH} low={TRAIL.SUNSET_LOW} />
-          <Cloud x={180} y={140} scale={2} fill={TRAIL.SUNSET_LOW} eye={TRAIL.ROCK_DARK} />
+          <Cloud x={180} y={140} scale={2} fill={TRAIL.SUNSET_LOW} />
         </Canvas>
       ),
     },
@@ -85,18 +81,20 @@ export const goal: Level = {
       name: 'figure',
       node: (
         <Canvas>
-          <rect x={POLE_X - 6} y={POLE_TOP} width={12} height={GROUND - POLE_TOP} fill={TRAIL.PIPE} stroke={TRAIL.PIPE_DARK} strokeWidth={3} />
-          <circle cx={POLE_X} cy={POLE_TOP} r={18} fill={TRAIL.PIPE_LIGHT} stroke={TRAIL.PIPE_DARK} strokeWidth={4} />
-          <g data-fx="flag" transform={`translate(${POLE_X} ${FLAG_TOP})`}>
-            <path d="M-6 0 L-120 40 L-6 80 Z" fill={TRAIL.PAGE} stroke={TRAIL.HUD} strokeWidth={4} />
-            <circle cx={-46} cy={40} r={14} fill={TRAIL.ROUTE} />
-          </g>
-          <Placed x={CASTLE_X} y={GROUND - 64 * CASTLE_SCALE} scale={CASTLE_SCALE}>
-            <Castle />
+          <Placed x={GATE_X} y={GROUND - 64 * GATE_SCALE} scale={GATE_SCALE}>
+            <FinishGate />
           </Placed>
-          <g data-fx="seen">
-            <HeroRig profession={profession} />
+          <g data-fx="ribbon-left" transform={`translate(${GATE_X + POST} ${RIBBON_Y})`}>
+            <g transform={`scale(${GATE_SCALE})`}>
+              <Ribbon length={RIBBON_HALF / GATE_SCALE} />
+            </g>
           </g>
+          <g data-fx="ribbon-right" transform={`translate(${GATE_X + GATE_W} ${RIBBON_Y})`}>
+            <g transform={`scale(${-GATE_SCALE} ${GATE_SCALE})`}>
+              <Ribbon length={RIBBON_HALF / GATE_SCALE} />
+            </g>
+          </g>
+          <HeroRig profession={profession} />
         </Canvas>
       ),
     },
@@ -111,14 +109,16 @@ export const goal: Level = {
   ],
   bind: (stage) => {
     const hero = rigOf(stage, 'hero', 'stand')
-    const flag = fx(stage, 'flag')
-    const seen = fx(stage, 'seen')
+    const ribbons = [fx(stage, 'ribbon-left'), fx(stage, 'ribbon-right')]
     const bursts = BURSTS.map(([x, y, at], i) => ({ x, y, at, node: fx(stage, `burst-${i}`) }))
+    const broken = RUN.by * (1 - Math.sqrt(1 - (BREAK_X - RUN.from) / (RUN.to - RUN.from)))
     return (p) => {
-      const { x, y, pose, seen: shown = 1 } = beatAt(p)
-      hero(x, y, pose)
-      fadeTo(seen, shown)
-      translateTo(flag, POLE_X, lerp(FLAG_TOP, GROUND - 100, ramp(p, 0.38, 0.6)))
+      const { x, pose } = runnerAt(p)
+      hero(x, GROUND, pose)
+      // Each half of the ribbon swings down to hang from its post once he runs through.
+      const drop = ramp(p, broken, broken + 0.06)
+      transformTo(ribbons[0], `translate(${GATE_X + POST} ${RIBBON_Y}) rotate(${r1(80 * drop)})`)
+      transformTo(ribbons[1], `translate(${GATE_X + GATE_W} ${RIBBON_Y}) rotate(${r1(-80 * drop)})`)
       bursts.forEach(({ x: bx, y: by, at, node }) => {
         const bloom = ramp(p, at, at + 0.06)
         transformTo(node, `translate(${bx} ${by}) scale(${r1(0.3 + bloom * 0.7)})`)

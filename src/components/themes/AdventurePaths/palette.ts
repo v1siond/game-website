@@ -9,7 +9,7 @@ import { paletteVars } from '../shared/paletteVars'
 // forest on parchment 6.4:1, parchment on night 13.4:1, on canopy 10:1 and on the forest plate 7.7:1,
 // gold on canopy 5.6:1 and on night 7.6:1, edge on night 7.4:1, ink on gold 7.5:1, white on the route
 // plate 7.7:1 and on the blue plate 7.7:1, white on the black HUD bar 21:1, the coin gold on the HUD 14:1.
-// ROUTE, FOREST and BLUE keep drawing the map line, the art and the overalls; their TEXT and PLATE twins
+// ROUTE, FOREST and BLUE keep drawing the map line, the art and his clothes; their TEXT and PLATE twins
 // are the same hues deepened for the words and for the buttons that carry words.
 export const TRAIL = {
   NIGHT: '#14211a',
@@ -36,7 +36,7 @@ export const TRAIL = {
   WOOD: '#7a4e2a',
   BARK: '#3e2a1a',
   // The light and dark ends of the map's stone, wood, gold and route red gradients (art.tsx), the darker
-  // ends the switch palaces shade their switches with, and the blue's shade on his overalls and its switch.
+  // ends the switch plate's blocks shade with, and the blue's shade.
   STONE_LIGHT: '#c9c1aa',
   WOOD_LIGHT: '#a06a3a',
   GOLD_DARK: '#9a6a14',
@@ -58,11 +58,11 @@ export const TRAIL = {
   FALL: '#d0913f',
   FALL_DARK: '#8a4e22',
   TEAL: '#3f9a92',
-  // The blue of the overalls and the blue switch; white words sit on BLUE_PLATE.
+  // The blue of the map and the blue block; white words sit on BLUE_PLATE.
   BLUE: '#2f5fae',
   BLUE_PLATE: '#275198',
   // The levels behind the page, sampled from the research images (notes.md): the day sky, pill hills far
-  // off and round hills with eyes near, the grass and soil of the ground, the clouds with faces.
+  // off and round hills near, the grass and soil of the ground, the clouds.
   SKY_HIGH: '#2c78e8',
   SKY_LOW: '#a0dcff',
   HILL_FAR: '#88d0c0',
@@ -75,7 +75,7 @@ export const TRAIL = {
   CLOUD: '#ffffff',
   CLOUD_SHADE: '#b8d8f8',
   // The other zones: the sky level's mint, the underground's black and teal bricks, the night's navy
-  // and teal hills, the fortress's gold blocks on the dark, the sunset's amber over the pipe rocks.
+  // and teal hills, the fortress's gold blocks on the dark, the sunset's amber over the rocks.
   MINT: '#a8f0e8',
   CAVE: '#000000',
   CAVE_BRICK: '#008890',
@@ -92,44 +92,49 @@ export const TRAIL = {
   SUNSET_LOW: '#f8e0a0',
   ROCK: '#c87858',
   ROCK_DARK: '#8c4c38',
-  // The things he hits: the ? block and its used shell, bricks, coins, pipes, the note block, the HUD.
+  // The things he hits: the item box and its dark inside once open, bricks, coins, the crate's planks, the
+  // trees and rocks along the path, the HUD.
   BLOCK: '#f8c030',
   BLOCK_DARK: '#b86c08',
-  USED: '#a8683c',
+  BOX_INSIDE: '#5a3010',
   BRICK: '#c8501c',
   BRICK_DARK: '#6c2008',
   COIN: '#f8d038',
-  PIPE: '#40b040',
-  PIPE_LIGHT: '#a8f088',
-  PIPE_DARK: '#1c6020',
+  CRATE: '#c88a48',
+  CRATE_DARK: '#7a4a1c',
+  LEAF: '#40b040',
+  LEAF_LIGHT: '#a8f088',
+  LEAF_DARK: '#1c6020',
   HUD: '#000000',
 } as const
 
 // The inks both of his pixel figures share, the map walker (sprite.ts) and the side view hero (side.ts):
-// the outline, the white gloves and the brown shoes. Drawn into SVG only, so they stay out of TRAIL_VARS.
-export const SPRITE_INK = { OUTLINE: '#160e08', GLOVE: '#fbf8ee', SHOE: '#6b3a1c' } as const
+// the outline and the brown shoes. Drawn into SVG only, so they stay out of TRAIL_VARS.
+export const SPRITE_INK = { OUTLINE: '#160e08', SHOE: '#6b3a1c' } as const
 
-// The map walker's own reds (sprite.ts): the cap and shirt, and the brim. SVG only.
-export const WALKER_INK = { CAP: '#c8301f', BRIM: '#86200f' } as const
+// His own clothes in the side view and on the map (side.ts, sprite.ts): the System Engineer's teal shirt
+// and jeans, the Musician's black tee and black jeans, the Martial Artist's red shorts and gold gloves.
+// SVG only.
+export const HERO_INK = {
+  ENGINEER_SHIRT: '#2f8a8c',
+  JEANS: '#2c4f8a',
+  JEANS_DARK: '#1c355e',
+  DRUMMER_SHIRT: '#2c2a34',
+  BLACK_JEANS: '#3a3842',
+  BLACK_JEANS_DARK: '#24222a',
+  SHORTS: '#c8301f',
+  SHORTS_DARK: '#86200f',
+  FIGHT_GLOVE: '#f0b030',
+} as const
 
-// The side view hero's own inks (side.ts): the cap and shirt red and the brim, the overall button, the
-// overalls, and the Martial Artist's gold gloves. SVG only.
-export const SIDE_INK = { RED: '#d8281c', BRIM: '#8e1a10', BUTTON: '#f8d038', OVERALLS: '#2a58c8', FIGHT_GLOVE: '#f0b030' } as const
-
-// The side view foes' inks (side.ts): the eye white and the mouth they share, the brown mushroom with its
-// orange underside and yellow feet, the green turtle and plant leaves with their shade, the turtle's skin
-// and shoes, and the plant's red head. SVG only.
+// The side view critter's inks (side.ts): its dark violet shell with a light shine, its amber underside,
+// its legs, and its eye. SVG only.
 export const FOE_INK = {
   WHITE: '#ffffff',
-  MOUTH: '#3a0c0c',
-  MUSHROOM: '#b0401c',
+  SHELL: '#5a2c78',
+  SHINE: '#a070c8',
   UNDERSIDE: '#f09028',
-  FEET: '#f8c820',
-  GREEN: '#38a838',
-  GREEN_SHADE: '#1c6c1c',
-  SKIN: '#f8c860',
-  SHOES: '#e04020',
-  PLANT: '#d82818',
+  LEGS: '#2a1a30',
 } as const
 
 /** The palette as CSS variables, set once on the world's root. */
