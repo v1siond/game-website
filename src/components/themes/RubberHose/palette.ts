@@ -1,7 +1,7 @@
 import { paletteVars } from '../shared/paletteVars'
 
 // Rubber Hose's palette, every colour of the world once: the sepia paper of a 1930s cartoon, its ink
-// line, the parry pink, the watercolour washes of the profession sets, the faded red and gold of a
+// line, the watercolour washes of the profession sets, the faded red and gold of a
 // theatre poster, the film stock round the frame. The SVG art reads HOSE; HOSE_VARS puts the same
 // values on the world's root as --hose-* variables, which the CSS modules and the few Tailwind
 // arbitrary values read, so no colour is written twice.
@@ -27,19 +27,23 @@ export const HOSE = {
   gold: '#c9a227',
   orange: '#d4652f',
 
-  // The parry pink: the one colour a visitor may slap
-  parry: '#ff4fa3',
-
   // The watercolour washes behind the sets: a pale sky, the meadow and its shade, the carnival's pale wash,
-  // the casino's felt
+  // the bottles' green, the theatre's boards and the footlights' glow
   skyWash: '#d9e2d0',
   meadow: '#9aa86f',
   meadowDark: '#6f7d4a',
   carnivalWash: '#e7d9c4',
-  feltGreen: '#2f5a3a',
+  bottleGreen: '#2f5a3a',
+  boards: '#7a5532',
+  footlight: '#f3d98a',
 
-  // His big cartoon shoes
-  shoe: '#6b3d1f',
+  // His own clothes in the sepia washes: the System Engineer's teal shirt and slate trousers, the Musician's
+  // black tee and black trousers, his shoes
+  engineerShirt: '#5f8f8a',
+  trousers: '#4a5670',
+  drummerShirt: '#2e2a26',
+  blackTrousers: '#3c3631',
+  shoe: '#4a2e1a',
 
   // The film stock round the frame and its sprocket holes
   film: '#1a1510',

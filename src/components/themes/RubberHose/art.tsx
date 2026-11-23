@@ -3,26 +3,8 @@ import { NameWords } from '@/components/cv/NameWords'
 import { HOSE } from './palette'
 import world from './world.module.css'
 
-// Rubber Hose's art pieces, drawn in SVG in the palette's ink and paper: the pie eyes its props wear, a
-// music note, the ink blot a poster throws, the curled title banner and the bouncing title.
-
-// Two pie eyes, the black ovals with the slice cut out of each, centred on (cx, cy) at width `size`.
-export function PieEyes({ cx, cy, size, paper = HOSE.paper }: { cx: number; cy: number; size: number; paper?: string }) {
-  const rx = size * 0.22
-  const ry = size * 0.3
-  const gap = size * 0.28
-
-  return (
-    <g>
-      {[cx - gap, cx + gap].map((x) => (
-        <g key={x}>
-          <ellipse cx={x} cy={cy} rx={rx} ry={ry} fill={HOSE.ink} />
-          <path d={`M${x} ${cy - ry * 0.9} L${x} ${cy} L${x - rx * 0.9} ${cy} Z`} fill={paper} />
-        </g>
-      ))}
-    </g>
-  )
-}
+// Rubber Hose's art pieces, drawn in SVG in the palette's ink and paper: a music note, the ink blot a
+// poster throws, the curled title banner and the bouncing title.
 
 // An eighth note: the head, the stem and the flag.
 export function MusicNote({ className = '' }: { className?: string }) {

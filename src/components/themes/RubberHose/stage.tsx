@@ -5,16 +5,16 @@ import type { LayerMotion } from '@/lib/scroll/stage'
 import { Stage, type StageLayer } from '../shared/theatre/Stage'
 import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform, type FigureRig } from '../shared/figureScene'
-import { frames } from '../shared/stageNodes'
-import { StageToon, type Frame } from './toon'
+import type { RigJoints } from '../shared/rig'
+import { StageToon, setToonPose, toonJoints, type ToonPose } from './toon'
 import type { Scene } from './scenes'
 import { VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the painted place's layers from its sky
-// to the ground he walks on, then the scene's props and him in the figure layer. The shared engine fades
-// each stage and pushes its layers in; the scene's writer sets its props off and hands back his place and
-// frame.
+// to the ground he walks on, then the scene's stops and him in the figure layer, in one camera group the
+// view pushes in on at a big hit. The shared engine fades each stage and pushes its layers in; the scene's
+// writer plays its stops' answers and hands back his place and pose.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -25,11 +25,8 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
   figure: { zoom: [1.06, 1.16], lift: [0, -3] },
 }
 
-/** His frames swap the way a cartoon's drawings do: one shown at a time. */
-const TOON_RIG: FigureRig<(frame: string) => void, Frame> = {
-  joints: (group) => frames(group, 'stand'),
-  pose: (show, frame) => show(frame),
-}
+/** His limbs turn on the shared rig, the hoses curving through each bend, his body squashing and stretching. */
+const TOON_RIG: FigureRig<RigJoints, ToonPose> = { joints: toonJoints, pose: setToonPose }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and framed from what it returns. */
 export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, TOON_RIG)
@@ -40,12 +37,12 @@ const plane = (children: ReactNode): ReactNode => (
   </svg>
 )
 
-/** Him at his first frame's place. */
+/** Him at his first frame's place, standing until the scroll writes his pose. */
 function Toon({ scene }: { scene: Scene }) {
   const first = scene.def.bind(NO_NODES, scene.layout)(0, 0)
   return (
     <g data-fx="figure" transform={figureTransform(first)}>
-      <StageToon profession={scene.kit} />
+      <StageToon profession={scene.kit} mallet={scene.def.mallet === true} />
     </g>
   )
 }
@@ -60,10 +57,10 @@ const layersOf = (scene: Scene): StageLayer[] => {
     {
       name: 'figure',
       node: plane(
-        <>
+        <g data-fx="camera">
           {scene.def.back(scene.layout)}
           <Toon scene={scene} />
-        </>,
+        </g>,
       ),
     },
   ]

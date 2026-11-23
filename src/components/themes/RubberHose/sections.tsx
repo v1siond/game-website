@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { BandList } from '@/components/cv/BandList'
+import { ProjectList } from '@/components/cv/ProjectList'
 import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { MarkedLines } from '@/components/cv/MarkedLines'
@@ -11,8 +12,7 @@ import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { CurlBanner } from './art'
-import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud } from './cards'
-import { ParryBoard } from './parry'
+import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud, VintagePoster } from './cards'
 import type { Scene } from './scenes'
 import { HoseStage } from './stage'
 import world from './world.module.css'
@@ -20,8 +20,7 @@ import world from './world.module.css'
 // One section per scene: a tall head that first shows the painted place alone and then brings the title
 // up on its curled banner, then the cards (the title cards and posters under one ink line), then a screen
 // of the place alone before it sinks. The cards a scene counts sit in an element marked data-stage-items,
-// which the shared theatre measures for the reading line that sets each prop off. Featured Work keeps its
-// parry board (./parry), a game the visitor plays.
+// which the shared theatre measures for the reading line that plays each card's beat.
 
 const LEAD = `text-center text-base ${world.ink}`
 
@@ -88,7 +87,7 @@ function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
 function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
   return (
     <div data-stage-items="">
-      <ParryBoard projects={slot.projects} />
+      <ProjectList projects={slot.projects} className={MASONRY_COLUMN_LIST} itemClassName={`${MASONRY_ITEM} pl-4 pt-4`} renderProject={(project) => <VintagePoster {...project} />} />
     </div>
   )
 }
