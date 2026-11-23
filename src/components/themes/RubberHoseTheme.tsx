@@ -43,16 +43,17 @@ const hoseLettering = Abril_Fatface({
 // His outfit plate: an inked title card, ink lettering on paper with an ink outline.
 const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOSE.ink }
 
-// Rubber Hose, a 1930s rubber hose cartoon in sepia (one ink line, pie eyed props, film grain): the page
+// Rubber Hose, a 1930s rubber hose cartoon in sepia (one ink line, bendy hose limbs, film grain): the page
 // composition. Its palette, backdrop, art, cards, his drawing, the scenes and the per profession sections
 // live in ./RubberHose.
 //
-// The hero is the title card, him standing at its edge, over the meadow where the big faced flower sways to
-// him. Then every section of the active profession is one full screen scene of a walk from the meadow
-// through the carnival to the casino (./RubberHose/scenes) that rises from dark, holds while its banner and
-// cards scroll over it, and sinks back into dark while the next one rises; he acts once per card on the prop
-// it sets off. Contact is the spotlight at the microphone. Every motion is a function of the scroll
-// position, on the shared theatre (./shared/theatre) and its settle: scroll up and it plays back. Under
+// The hero is the title card, him standing at its edge, over the meadow where the big flower sways once
+// beside him. Then every section of the active profession is one full screen scene of a walk from the
+// meadow through the carnival to the theatre (./RubberHose/scenes) that rises from dark, holds while its
+// banner and cards scroll over it, and sinks back into dark while the next one rises; he makes one of the
+// genre's moves per card and its stop answers it. Contact is his bow at the microphone in the closing
+// spotlight. Every motion is a function of the scroll position, on the shared theatre (./shared/theatre)
+// and its settle: scroll up and it plays back. Under
 // reduced motion there is no theatre: each section carries its own picture, still, at its settled frame.
 //
 // The root carries the palette as --hose-* variables (the one inline style, variables only), the pointer

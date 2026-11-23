@@ -167,7 +167,7 @@ export const themes: Theme[] = [
     font: 'sans-serif',
   },
 
-  // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia with the iris, him as the cup headed toon
+  // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia with the iris, him as a 1930s rubber hose toon
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
