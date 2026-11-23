@@ -1,0 +1,53 @@
+/*
+ * His joints (figure.tsx): every part turns round its own joint in the viewBox's units, so a forearm turns
+ * at the elbow wherever the shoulder took it. The scenes write every joint per frame (pose.ts) over these
+ * origins; nothing here animates. The beam, the revolver and the paper in his hand rest hidden by
+ * their opacity attribute (figure.tsx), which the scenes write.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body {
+  transform-origin: 50px 144px;
+}
+
+.armRight {
+  transform-origin: 32px 48px;
+}
+
+.foreRight {
+  transform-origin: 30.5px 66px;
+}
+
+.armLeft {
+  transform-origin: 68px 48px;
+}
+
+.foreLeft {
+  transform-origin: 69.5px 66px;
+}
+
+.thighRight {
+  transform-origin: 41px 93px;
+}
+
+.shinRight {
+  transform-origin: 42px 117px;
+}
+
+.thighLeft {
+  transform-origin: 59px 93px;
+}
+
+.shinLeft {
+  transform-origin: 58px 117px;
+}
+
+.holster,
+.beam,
+.gun,
+.paper {
+  transform-box: view-box;
+}

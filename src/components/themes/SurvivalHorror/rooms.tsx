@@ -1,18 +1,20 @@
 import type { ReactNode } from 'react'
-import type { Flags, Zone } from './scripts'
 import { SH } from './palette'
-import stage from './stage.module.css'
 
-// The rooms of the house behind the page, one fixed camera frame each (600 by 300, the floor from y 220),
-// the way the genre's pre-rendered rooms hold still while the figures move through them. The stage
-// (./stage) shows the room of the part of the page in view and cuts to the next with a black frame. A
-// phone sees only the middle of a room, so what matters stands near x 300. What a figure handles (the
-// chest, the lamp, the doors, the trader, the desk) is not here but in ./props, placed by his body width.
-//
-// Each room keeps still; the lamps glow without flicker. The few that move do it once: the hall's
-// chandelier settles when he walks in, the armoury lamp swings at the blow.
+// The rooms of the house, one fixed camera frame each (600 by 300, the floor from y 220), the way the
+// genre's pre-rendered rooms hold still while he moves through them: the back layer of each scene's stage
+// (./stage). The wall runs up into the dark above the frame, so a phone's tall screen shows a ceiling. What
+// he handles in a scene (the cabinet, the crate, the lamps, the door) is not here but in ./scenes. Every
+// room holds still; the lamps glow without flicker.
 
-type Room = Zone | 'safe'
+export type Room = 'hall' | 'store' | 'about' | 'corridor' | 'tech' | 'projects' | 'ventures' | 'bands' | 'gym' | 'contact'
+
+/** The room's gradients, their ids made unique per stage (several stages share the page). */
+interface Fills {
+  dark: string
+  glow: string
+  blue: string
+}
 
 const FLOOR_ROWS = 7
 const FLOOR_COLS = 12
@@ -41,11 +43,12 @@ function spineOf(book: number): string {
   return SH.rust
 }
 
-function Wall({ tone = SH.paper, children }: { tone?: string; children?: ReactNode }) {
+function Wall({ fills, tone = SH.paper, children }: { fills: Fills; tone?: string; children?: ReactNode }) {
   return (
     <>
+      <rect y={-300} width={600} height={300} fill={SH.void} />
       <rect width={600} height={220} fill={tone} />
-      <rect width={600} height={220} fill="url(#sh-room-dark)" />
+      <rect width={600} height={220} fill={fills.dark} />
       {children}
     </>
   )
@@ -87,8 +90,8 @@ function Checker() {
 }
 
 /** A pool of lamp light on wall and floor. */
-function Glow({ x, y, r }: { x: number; y: number; r: number }) {
-  return <ellipse cx={x} cy={y} rx={r} ry={r * 0.7} fill="url(#sh-room-glow)" />
+function Glow({ fills, x, y, r }: { fills: Fills; x: number; y: number; r: number }) {
+  return <ellipse cx={x} cy={y} rx={r} ry={r * 0.7} fill={fills.glow} />
 }
 
 function TallWindow({ x }: { x: number }) {
@@ -111,9 +114,9 @@ function Bulb({ x }: { x: number }) {
   )
 }
 
-const HALL = (
+const HALL = (fills: Fills): ReactNode => (
   <>
-    <Wall>
+    <Wall fills={fills}>
       <TallWindow x={40} />
       <TallWindow x={516} />
       <rect x={262} y={150} width={76} height={70} fill={SH.void} />
@@ -135,8 +138,8 @@ const HALL = (
     </Wall>
     <Checker />
     <path d="M262 220 L338 220 L392 300 L208 300 Z" fill={SH.leather} opacity={0.7} />
-    <Glow x={300} y={262} r={170} />
-    <g className={stage.settle}>
+    <Glow fills={fills} x={300} y={262} r={170} />
+    <g>
       <line x1={300} y1={0} x2={300} y2={50} stroke={SH.ash} strokeWidth={1.4} />
       <path d="M270 58 Q300 76 330 58 L326 54 Q300 66 274 54 Z" fill={SH.brass} />
       {[274, 286, 300, 314, 326].map((x) => (
@@ -159,9 +162,9 @@ const SHELF_BOXES = [
   [400, 140, 26, 28],
 ] as const
 
-const STORE = (
+const STORE = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.panel}>
+    <Wall fills={fills} tone={SH.panel}>
       {[114, 164].map((y) => (
         <rect key={y} x={160} y={y} width={280} height={6} fill={SH.wood} />
       ))}
@@ -171,24 +174,24 @@ const STORE = (
       <path d="M160 70 V220 M440 70 V220" stroke={SH.wood} strokeWidth={5} />
     </Wall>
     <Boards />
-    <Glow x={300} y={150} r={150} />
+    <Glow fills={fills} x={300} y={150} r={150} />
     <Bulb x={300} />
   </>
 )
 
-const ABOUT = (
+const ABOUT = (fills: Fills): ReactNode => (
   <>
-    <Wall>
-      <rect x={340} y={40} width={150} height={180} fill={SH.wood} />
+    <Wall fills={fills}>
+      <rect x={90} y={40} width={150} height={180} fill={SH.wood} />
       {[64, 112, 160].map((y) => (
         <g key={y}>
-          <rect x={346} y={y} width={138} height={4} fill={SH.sepia} />
+          <rect x={96} y={y} width={138} height={4} fill={SH.sepia} />
           {BOOKS.map((book) => (
-            <rect key={book} x={350 + book * 9.4} y={y - 22 + (book % 3) * 2} width={7} height={22 - (book % 3) * 2} fill={spineOf(book)} />
+            <rect key={book} x={100 + book * 9.4} y={y - 22 + (book % 3) * 2} width={7} height={22 - (book % 3) * 2} fill={spineOf(book)} />
           ))}
         </g>
       ))}
-      <TallWindow x={150} />
+      <TallWindow x={500} />
       <Wainscot />
     </Wall>
     <Boards />
@@ -196,10 +199,10 @@ const ABOUT = (
   </>
 )
 
-// The long corridor of the ground floor: its window is the stage's glass band, the night beyond it.
-const CORRIDOR = (
+// The long corridor of the ground floor.
+const CORRIDOR = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.panel}>
+    <Wall fills={fills} tone={SH.panel}>
       <rect x={0} y={60} width={600} height={6} fill={SH.wood} />
       <Wainscot />
     </Wall>
@@ -210,9 +213,9 @@ const CORRIDOR = (
 
 const PEGS = Array.from({ length: 6 }, (_, index) => 190 + index * 44)
 
-const TECH = (
+const TECH = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.panel}>
+    <Wall fills={fills} tone={SH.panel}>
       <rect x={170} y={60} width={260} height={110} fill={SH.olive} opacity={0.6} />
       {PEGS.map((x) => (
         <g key={x}>
@@ -224,37 +227,38 @@ const TECH = (
       <path d="M120 192 V220 M480 192 V220" stroke={SH.wood} strokeWidth={6} />
     </Wall>
     <rect y={220} width={600} height={80} fill={SH.shadow} />
-    <Glow x={300} y={160} r={160} />
+    <Glow fills={fills} x={300} y={160} r={160} />
+    <Bulb x={300} />
   </>
 )
 
-const PROJECTS = (
+const PROJECTS = (fills: Fills): ReactNode => (
   <>
-    <Wall>
+    <Wall fills={fills}>
       <TallWindow x={110} />
       <Wainscot />
     </Wall>
     <Checker />
-    <Glow x={240} y={240} r={130} />
+    <Glow fills={fills} x={240} y={240} r={130} />
   </>
 )
 
-const VENTURES = (
+const VENTURES = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.shadow}>
+    <Wall fills={fills} tone={SH.shadow}>
       <path d="M140 220 V90 Q300 20 460 90 V220" fill={SH.void} opacity={0.7} />
       <path d="M140 220 V90 Q300 20 460 90 V220" fill="none" stroke={SH.sepia} strokeWidth={6} />
     </Wall>
     <rect y={220} width={600} height={80} fill={SH.shadow} />
-    <ellipse cx={380} cy={250} rx={160} ry={50} fill="url(#sh-room-blue)" />
+    <ellipse cx={380} cy={250} rx={160} ry={50} fill={fills.blue} />
   </>
 )
 
 const SUIT_STRIP = [200, 260, 340, 400]
 
-const BANDS = (
+const BANDS = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.panel}>
+    <Wall fills={fills} tone={SH.panel}>
       <rect x={0} y={60} width={600} height={6} fill={SH.wood} />
       {SUIT_STRIP.map((x) => (
         <rect key={x} x={x} y={30} width={16} height={16} transform={`rotate(45 ${x + 8} 38)`} fill={SH.brass} opacity={0.3} />
@@ -265,96 +269,69 @@ const BANDS = (
   </>
 )
 
-const GYM = (
+const GYM = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.void}>
+    <Wall fills={fills} tone={SH.void}>
       <path d="M0 34 H600 M0 48 H600" stroke={SH.rust} strokeWidth={6} opacity={0.5} />
       <rect x={430} y={60} width={90} height={160} fill={SH.olive} opacity={0.25} />
     </Wall>
     <rect y={220} width={600} height={80} fill={SH.olive} opacity={0.6} />
-    <rect y={220} width={600} height={80} fill="url(#sh-room-dark)" opacity={0.5} />
-    <Glow x={300} y={200} r={150} />
+    <rect y={220} width={600} height={80} fill={fills.dark} opacity={0.5} />
+    <Glow fills={fills} x={300} y={200} r={150} />
     <Bulb x={300} />
   </>
 )
 
-// Outside the safe room: the last corridor, the safe door at his end of it.
-const CONTACT = (
+// The last corridor to the front door.
+const CONTACT = (fills: Fills): ReactNode => (
   <>
-    <Wall tone={SH.panel}>
+    <Wall fills={fills} tone={SH.panel}>
       {[60, 180, 420, 520].map((x) => (
         <rect key={x} x={x} y={70} width={50} height={70} fill="none" stroke={SH.sepia} strokeWidth={2} />
       ))}
       <Wainscot />
     </Wall>
     <Boards />
-    <Glow x={260} y={220} r={110} />
+    <Glow fills={fills} x={260} y={220} r={110} />
     <Bulb x={260} />
   </>
 )
 
-// Inside: the safe room's warm lamp, the item box against the wall.
-const SAFE = (
-  <>
-    <Wall tone={SH.paper}>
-      <rect x={380} y={150} width={120} height={70} fill={SH.wood} />
-      <path d="M380 150 Q440 124 500 150 Z" fill={SH.rust} />
-      <rect x={434} y={160} width={12} height={14} fill={SH.brass} />
-      <Wainscot />
-    </Wall>
-    <Boards />
-    <Glow x={300} y={200} r={200} />
-  </>
-)
-
-const ROOMS: Record<Room, ReactNode> = {
+const ROOMS: Record<Room, (fills: Fills) => ReactNode> = {
   hall: HALL,
   store: STORE,
   about: ABOUT,
-  experience: CORRIDOR,
+  corridor: CORRIDOR,
   tech: TECH,
   projects: PROJECTS,
   ventures: VENTURES,
   bands: BANDS,
   gym: GYM,
   contact: CONTACT,
-  safe: SAFE,
 }
 
-/** The room in view: the safe room once he is inside it. */
-export function RoomArt({ zone, flags, replayed }: { zone: Zone; flags: Flags; replayed: boolean }) {
-  const room: Room = zone === 'contact' && flags.inside ? 'safe' : zone
-
+/** The room as the stage's back layer, its gradients' ids ending in `uid`. */
+export function RoomArt({ room, uid }: { room: Room; uid: string }) {
+  const id = (name: string) => `sh-room-${name}-${uid}`
+  const fills: Fills = { dark: `url(#${id('dark')})`, glow: `url(#${id('glow')})`, blue: `url(#${id('blue')})` }
   return (
-    <svg
-      viewBox="0 0 600 300"
-      preserveAspectRatio="xMidYMax slice"
-      className="absolute inset-0 h-full w-full"
-      data-replayed={replayed || undefined}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <>
       <defs>
-        <linearGradient id="sh-room-dark" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={id('dark')} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={SH.void} stopOpacity={0.9} />
           <stop offset="70%" stopColor={SH.void} stopOpacity={0.2} />
           <stop offset="100%" stopColor={SH.void} stopOpacity={0.4} />
         </linearGradient>
-        <radialGradient id="sh-room-glow" cx="0.5" cy="0.5" r="0.5">
+        <radialGradient id={id('glow')} cx="0.5" cy="0.5" r="0.5">
           <stop offset="0%" stopColor={SH.flame} stopOpacity={0.3} />
           <stop offset="100%" stopColor={SH.flame} stopOpacity={0} />
         </radialGradient>
-        <radialGradient id="sh-room-blue" cx="0.5" cy="0.5" r="0.5">
+        <radialGradient id={id('blue')} cx="0.5" cy="0.5" r="0.5">
           <stop offset="0%" stopColor={SH.moon} stopOpacity={0.3} />
           <stop offset="100%" stopColor={SH.moon} stopOpacity={0} />
         </radialGradient>
       </defs>
-      {ROOMS[room]}
-      {room === 'tech' && (
-        <g className={flags.swing ? stage.swing : ''}>
-          <Bulb x={300} />
-        </g>
-      )}
-    </svg>
+      {ROOMS[room](fills)}
+    </>
   )
 }

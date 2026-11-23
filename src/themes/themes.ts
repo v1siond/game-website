@@ -83,11 +83,11 @@ export const themes: Theme[] = [
     font: 'serif',
   },
 
-  // 2. Survival Horror - an old house at night with fixed camera rooms, the item box and the last corridor
+  // 2. Survival Horror - an old house at night with fixed camera rooms, one move of the genre per card
   {
     id: 'survival-horror',
     name: 'Survival Horror',
-    description: 'Search an old house at night and reach the safe room',
+    description: 'Search an old house at night and walk out at dawn',
     colors: {
       background: SH.void,
       backgroundGradient: `linear-gradient(to bottom, ${SH.shadow}, ${SH.void})`,
