@@ -135,7 +135,9 @@ export default function MedievalFantasyTheme() {
 
       <div ref={textRef} className="relative z-10">
         {reduced && <RealmStage scene={scenes[0]} settled />}
-        <div style={{ position: 'relative', padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
+        {/* The hero: under reduced motion it holds at least one screen, so the hero's still stage (one screen
+            tall, his units on its floor) ends before the About section's still stage begins over it. */}
+        <div className={reduced ? 'min-h-[100svh]' : undefined} style={{ position: 'relative', padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
 
           {/* Header - wrapped in high z-index container so it sits above the scene */}
           <div style={{ position: 'relative', zIndex: 100 }}>
@@ -177,9 +179,10 @@ export default function MedievalFantasyTheme() {
           </div>
 
           {/* Profession Selector - REALM Style Command Card */}
-          {/* From lg to xl the outfit fan opens down over the right of the header: the row is drawn 2rem lower so
-              its right node stays clear of the fan (C38 at 1024 by 768). */}
-          <section aria-label={navigation.professionSelection} className="lg:max-xl:top-8" style={{
+          {/* The outfit fan opens down past the plate on a short phone and over the right of the header from lg to
+              xl: there the row is drawn 2rem lower so its nodes stay clear of the fan (C38 at 360 by 780 and 1024
+              by 768). */}
+          <section aria-label={navigation.professionSelection} className="max-sm:[@media(max-height:800px)]:top-8 lg:max-xl:top-8" style={{
             marginBottom: sectionSpacing,
             position: 'relative',
             height: isLargeScreen ? '12rem' : '9rem',
