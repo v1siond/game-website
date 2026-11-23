@@ -51,7 +51,7 @@ export interface Frame {
 }
 
 export const FIGHTER_POSES = [
-  'stance', 'walk', 'walkBack', 'hadouken', 'shoryuken', 'tatsumaki', 'win', 'punch', 'hurt', 'parry', 'down', 'act',
+  'stance', 'walk', 'walkBack', 'fireball', 'uppercut', 'spinKick', 'win', 'punch', 'hurt', 'parry', 'down', 'act',
 ] as const
 
 export type FighterPose = (typeof FIGHTER_POSES)[number]
@@ -121,7 +121,7 @@ const WALK_FRAMES: Frame[] = [
 ]
 
 // The ki blast: both palms cupped at the back hip gathering light, then thrust out at chest height.
-const HADOUKEN_CHARGE: Frame = {
+const FIREBALL_CHARGE: Frame = {
   head: [58, 52],
   tilt: 4,
   neck: [57, 62],
@@ -134,7 +134,7 @@ const HADOUKEN_CHARGE: Frame = {
   fx: [{ kind: 'charge', at: [47, 100], r: 4 }],
 }
 
-const HADOUKEN_THRUST: Frame = {
+const FIREBALL_THRUST: Frame = {
   head: [76, 52],
   tilt: -2,
   neck: [72, 61],
@@ -147,19 +147,19 @@ const HADOUKEN_THRUST: Frame = {
   fx: [{ kind: 'spark', at: [116, 72], r: 9 }],
 }
 
-const HADOUKEN_FRAMES: Frame[] = [
-  HADOUKEN_CHARGE,
+const FIREBALL_FRAMES: Frame[] = [
+  FIREBALL_CHARGE,
   {
-    ...shift(HADOUKEN_CHARGE, -1, 1),
+    ...shift(FIREBALL_CHARGE, -1, 1),
     wind: 1,
     fx: [{ kind: 'charge', at: [46, 101], r: 7 }],
   },
-  HADOUKEN_THRUST,
-  { ...shift(HADOUKEN_THRUST, -2, 1), wind: 3, fx: [] },
+  FIREBALL_THRUST,
+  { ...shift(FIREBALL_THRUST, -2, 1), wind: 3, fx: [] },
 ]
 
 // The rising uppercut: a low crouch, then the lead fist drives up past the face and he leaves the ground.
-const SHORYUKEN_FRAMES: Frame[] = [
+const UPPERCUT_FRAMES: Frame[] = [
   {
     head: [70, 62],
     tilt: 8,
@@ -216,7 +216,7 @@ const TATSU_BODY = {
 
 const TUCKED: LegPose = { k: [56, 110], a: [49, 126], toe: [57, 130] }
 
-const TATSUMAKI_FRAMES: Frame[] = [
+const SPIN_KICK_FRAMES: Frame[] = [
   {
     ...TATSU_BODY,
     backLeg: TUCKED,
@@ -511,9 +511,9 @@ const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
   stance: STANCE_FRAMES,
   walk: WALK_FRAMES,
   walkBack: WALK_FRAMES,
-  hadouken: HADOUKEN_FRAMES,
-  shoryuken: SHORYUKEN_FRAMES,
-  tatsumaki: TATSUMAKI_FRAMES,
+  fireball: FIREBALL_FRAMES,
+  uppercut: UPPERCUT_FRAMES,
+  spinKick: SPIN_KICK_FRAMES,
   win: WIN_FRAMES,
   punch: PUNCH_FRAMES,
   hurt: HURT_FRAMES,
@@ -524,7 +524,7 @@ const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
 // Each profession's action, done the way this hero would: the System Engineer throws the ki blast
 // (its ball carries a terminal prompt), the Musician's flurry on the kit, the Martial Artist's roundhouse.
 const ACT_FRAMES: Record<Profession, Frame[]> = {
-  engineer: HADOUKEN_FRAMES,
+  engineer: FIREBALL_FRAMES,
   drummer: DRUM_FRAMES,
   fighter: KICK_FRAMES,
 }

@@ -16,10 +16,10 @@ describe('fighter moves', () => {
 
   it('throws the specials in turn and ignores a throw while one plays', () => {
     const first = startSpecial(REST)
-    expect(first.playing).toBe('hadouken')
+    expect(first.playing).toBe('fireball')
     expect(startSpecial(first)).toBe(first)
-    expect(startSpecial(endMove(first)).playing).toBe('shoryuken')
-    expect(startSpecial({ ...REST, last: 'tatsumaki' }).playing).toBe('hadouken')
+    expect(startSpecial(endMove(first)).playing).toBe('uppercut')
+    expect(startSpecial({ ...REST, last: 'spinKick' }).playing).toBe('fireball')
   })
 
   it('walks a step at a time and stops at the edge of his ground', () => {

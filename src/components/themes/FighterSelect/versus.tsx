@@ -70,7 +70,8 @@ export function HeroSplash({ profession }: { profession: Profession }) {
               </div>
             </div>
 
-            <div className={`relative border-4 border-[color:var(--fs-p2)] bg-black px-5 pb-6 pt-14 sm:px-8 sm:pt-16 lg:pt-8 ${look.splashRight} ${fight.panelInRight}`}>
+            {/* From lg the VS burst sits on the seam, about 40 px into this panel, so the lines start clear of it. */}
+            <div className={`relative border-4 border-[color:var(--fs-p2)] bg-black px-5 pb-6 pt-14 sm:px-8 sm:pt-16 lg:pl-14 lg:pt-8 ${look.splashRight} ${fight.panelInRight}`}>
               <h1 className={`text-[clamp(1.75rem,8vw,3rem)] uppercase leading-tight ${fight.nameSlam}`}>
                 <NameWords name={name} wordClassName={`inline-block ${look.call}`} />
               </h1>

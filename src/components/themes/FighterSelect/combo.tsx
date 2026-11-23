@@ -1,63 +1,13 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
-import { CallText, ImpactBurst } from './badges'
-import look from './world.module.css'
+import { useRef, useState, type PointerEvent, type ReactNode } from 'react'
+import { ImpactBurst } from './badges'
 import fight from './fight.module.css'
 
-// The combo counter over the projects, the hit count in the round call lettering with the word beside it
-// the way the arcade counted a combo on player one's side. Every card the pointer lands on is a hit: the card freezes and
-// vibrates for the hitstop, a burst flashes where the pointer entered, and the counter on player one's
-// side climbs. A pause longer than COMBO_WINDOW_MS drops the combo, like the defender recovering; the
-// counter stops at MAX_HITS, as the arcade counters did. React renders only on a hit: the burst's
-// position goes to CSS variables on the card, the burst itself is a keyed one shot animation, and the
-// shake restarts its class on the card's own element, so the card (and a focused link in it) stays mounted.
-
-const COMBO_WINDOW_MS = 1400
-const MAX_HITS = 99
-
-const ComboContext = createContext<() => void>(() => {})
-
-/** Lands one hit on the combo counter of the zone around it (the super move's hits). */
-export const useComboLand = () => useContext(ComboContext)
-
-function ComboCounter({ hits }: { hits: number }) {
-  const { hud } = useLabels()
-
-  return (
-    <span key={hits} className={`ml-2 mt-2 inline-flex items-baseline gap-2 border-2 border-black bg-black/80 px-3 py-1 ${fight.comboPop}`}>
-      <span className="text-4xl leading-none">
-        <CallText>{hits}</CallText>
-      </span>
-      <span className={`text-base uppercase text-[color:var(--fs-call-top)] [text-shadow:2px_2px_0_var(--fs-navy)] ${look.display}`}>{hud.hits}</span>
-    </span>
-  )
-}
-
-export function ComboZone({ children }: { children: ReactNode }) {
-  const [hits, setHits] = useState(0)
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-
-  useEffect(() => () => clearTimeout(timer.current), [])
-
-  const land = useCallback(() => {
-    setHits((count) => Math.min(count + 1, MAX_HITS))
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => setHits(0), COMBO_WINDOW_MS)
-  }, [])
-
-  return (
-    <ComboContext.Provider value={land}>
-      <div className="relative">
-        <div className="pointer-events-none sticky top-4 z-30 flex h-0 justify-start" aria-hidden="true">
-          {hits > 1 && <ComboCounter hits={hits} />}
-        </div>
-        {children}
-      </div>
-    </ComboContext.Provider>
-  )
-}
+// The projects take hits under the pointer: every card the pointer lands on freezes and vibrates for the
+// hitstop and a burst flashes where the pointer entered. React renders only on a hit: the burst's position
+// goes to CSS variables on the card, the burst itself is a keyed one shot animation, and the shake restarts
+// its class on the card's own element, so the card (and a focused link in it) stays mounted.
 
 // Plays the shake again from its first frame: the class comes off, a layout read ends the running
 // animation, and the class goes back on.
@@ -68,7 +18,6 @@ function replayShake(element: HTMLElement) {
 }
 
 export function HitCard({ children }: { children: ReactNode }) {
-  const land = useComboLand()
   const [hit, setHit] = useState(0)
   const shaken = useRef<HTMLDivElement>(null)
 
@@ -78,7 +27,6 @@ export function HitCard({ children }: { children: ReactNode }) {
     event.currentTarget.style.setProperty('--hy', `${event.clientY - box.top}px`)
     if (shaken.current) replayShake(shaken.current)
     setHit((count) => count + 1)
-    land()
   }
 
   return (
