@@ -377,11 +377,11 @@ export const themes: Theme[] = [
     font: 'serif',
   },
 
-  // 16. Tropical Platformer - a jungle barrel platformer from sunset to night, shot out of his tree house
+  // 16. Tropical Platformer - a jungle platformer from sunset to night, climbing, swinging and swimming through it
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
-    description: 'A jungle run from sunset to night, barrel to barrel',
+    description: 'A jungle run from sunset to night',
     colors: {
       background: COLORS.canopy,
       backgroundGradient: `linear-gradient(to bottom, ${COLORS.leafDark}, ${COLORS.canopy})`,

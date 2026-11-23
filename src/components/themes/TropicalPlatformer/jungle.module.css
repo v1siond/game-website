@@ -1,18 +1,17 @@
 /*
- * The jungle world's own look outside its machines: the light down the page, the two type families, the
- * wooden plank and the dark board every panel sits on, the platform card, the tags and the buttons.
- * Colours are the --tp-* variables the root sets from palette.ts.
+ * The jungle world's own look over its stages: the light down the page, the two type families, the wooden
+ * plank and the dark board every panel sits on, the sign's post, the tags and the buttons. Colours are the
+ * --tp-* variables the root sets from palette.ts.
  *
- * The light follows the level from the source's first stage: sunset at the top, dusk at the profession
- * switch, the deep green of the jungle through the sections, night at the contact (the level ends at
- * night).
+ * The light follows the run: sunset at the top, dusk at the profession switch, the deep green of the
+ * jungle through the sections, night at the contact.
  */
 
 .root {
-  /* The speckle the source's rendered textures carry, a tile of dark noise laid over wood and boards. */
+  /* The speckle of painted wood, a tile of dark noise laid over wood and boards. */
   --tp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 -0.12'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
-  /* The keyboard focus ring (globals.css) in the gold of the letters, 7.11:1 on the dusk at the top. */
-  --focus-ring: var(--tp-letter);
+  /* The keyboard focus ring (globals.css) in sun gold. */
+  --focus-ring: var(--tp-sun-gold);
   /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
   --focus-halo: var(--tp-bark-dark);
   --tp-display: var(--tp-face), 'Arial Rounded MT Bold', 'Trebuchet MS', 'Arial Black', system-ui, sans-serif;
@@ -30,7 +29,7 @@
   );
 }
 
-/* The chunky rounded lettering of the level cards, with the dark outline the game draws round it. */
+/* The chunky rounded lettering of the level cards, with a dark outline round it. */
 .display {
   font-family: var(--tp-display);
   font-weight: 900;
@@ -60,14 +59,10 @@
     0 6px 0 -2px rgb(10 6 3 / 0.55);
 }
 
-/* A plank that carries dark body text: the grain stays light down to the bottom edge (the bark shade
-   alone is 1.9:1 under bark-dark text) and the wood is the lighter plank-text, so every line reads at 7:1
-   or more. */
+/* A plank that carries dark text: flat light plank-text wood, no speckle, grain lines or bark shade (each
+   pulls dark lettering under 7:1), so every line reads at 7:1 or more. */
 .plankText {
-  background:
-    var(--tp-grain),
-    repeating-linear-gradient(178deg, transparent 0 7px, rgb(46 26 11 / 0.2) 7px 8px, transparent 8px 13px, rgb(255 236 190 / 0.12) 13px 14px),
-    linear-gradient(180deg, var(--tp-plank-light), var(--tp-plank-text) 30%, var(--tp-plank-text) 100%);
+  background: var(--tp-plank-text);
 }
 
 .plank::before,
@@ -78,8 +73,8 @@
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 9999px;
-  background: var(--tp-hoop-light);
-  box-shadow: inset -1px -1px 0 var(--tp-hoop);
+  background: var(--tp-nail);
+  box-shadow: inset -1px -1px 0 var(--tp-nail-shade);
 }
 
 .plank::before {
@@ -92,7 +87,7 @@
 
 /* The dark board text is read on: shaded jungle wood in vertical planks with the speckle, light falling
    from the upper left, parchment text over 10:1. Moss hangs over its top edge, as it grows over every
-   wooden thing in the source's jungle. */
+   wooden thing in the jungle. */
 .board {
   position: relative;
   background:
@@ -138,7 +133,7 @@
   color: var(--tp-plank-light);
 }
 
-/* Buttons: the primary is a sun gold barrel band with dark lettering (11:1), the rest wooden. */
+/* Buttons: the primary is sun gold with dark lettering (11:1), the rest wooden. */
 .button {
   font-family: var(--tp-display);
   font-weight: 900;
@@ -178,4 +173,9 @@
     transition: none;
     transform: none;
   }
+}
+
+/* The post a level's sign is nailed to. */
+.post {
+  background: linear-gradient(90deg, var(--tp-bark-dark), var(--tp-bark) 50%, var(--tp-bark-dark));
 }

@@ -5,48 +5,30 @@ import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { usePosts } from '@/components/blog/BlogProvider'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import type { SectionSlot } from '@/lib/cv/sectionPlan'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { BLOG_PATH, postLinks } from '@/lib/blog/links'
+import { BandList } from '@/components/cv/BandList'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { SUN_POINTS, ServiceBoard, TechBoard, VentureBoard } from './boards'
-import { WOOD_BUTTON } from './buttons'
-import { BrawlRecord } from './brawl'
-import { CannonRun } from './cannons'
-import { VineCrossing } from './crossing'
-import { ElderYard } from './elder'
-import { Board, Level } from './levelSign'
-import type { SceneKind } from './scenery'
-import { CartProjects } from './projects'
-import { RAMMED, RhinoCharge } from './rhino'
-import { GroundSlap, JOLTED } from './slap'
-import { VineBands } from './vines'
-import { BarrelSmash, VultureDrop } from './deliveries'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { ProjectList } from '@/components/cv/ProjectList'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { TagList } from '@/components/cv/TagList'
+import { BLOG_PATH, postLinks } from '@/lib/blog/links'
+import { jobCard, projectCard } from '@/lib/cv/cvView'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { drumsSince, headingId } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import { SUN_POINTS, ServiceBoard, TechBoard, VentureBoard, WOOD_TAGS } from './boards'
+import { WOOD_BUTTON, jungleButton } from './buttons'
+import { Board, LevelSign } from './levelSign'
+import type { Scene } from './scenes'
+import { JungleStage } from './stage'
 import look from './jungle.module.css'
 
-// The picked profession's sections, each a level opened by its plank sign and standing in its own scene,
-// and each one a different thing he does with its content: about in the old timer's yard (a barrel
-// cannon fires him in, the board unfolds, the old timer grumbles), the jobs as barrel cannons he blasts
-// between collecting the letters of his name, the tech stack shaken by his ground slap, the services on
-// boards his thrown barrel smashes open (./deliveries), a vine crossing
-// into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
-// bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
-// crocodiles, dropped onto the page by the vulture (./deliveries). The shared plan picks which levels a
-// profession runs and in which order. The posts level closes every profession on a plain board with the
-// latest posts.
+// One level per scene: a tall head that first shows the place alone and then brings the level's sign up,
+// then the cards on their dark boards, then a screen of the place alone before it sinks. The cards a scene
+// counts sit in an element marked data-stage-items, which the shared theatre measures for the reading line
+// that plays each card's beat.
 
-/** A section's level, titled with the section's own label. */
-function SectionLevel({ slot, scene, children }: { slot: SectionSlot; scene: SceneKind; children: ReactNode }) {
-  const { sections: titles } = useLabels()
-  return (
-    <Level title={titles[slot.titleKey]} scene={scene}>
-      {children}
-    </Level>
-  )
-}
-
-// His education and languages on the elder's board, each label in sun gold.
+// His education and languages on the About board, each label in sun gold.
 const SUN_FACTS: AboutFactsLook = {
   list: 'mt-4 space-y-1',
   fact: 'text-sm leading-relaxed text-[color:var(--tp-parchment)]',
@@ -55,124 +37,244 @@ const SUN_FACTS: AboutFactsLook = {
   termEnd: ': ',
 }
 
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { cards } = useLabels()
-    const { highlights } = useAboutBlock()
-    return (
-      <SectionLevel slot={slot} scene="jungle">
-        <ElderYard>
-          <Board>
-            <p className="mx-auto max-w-prose whitespace-pre-line text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
-            <div className="mx-auto max-w-prose">
-              <MarkedLines items={highlights} label={cards.keyAchievements} look={SUN_POINTS} />
-              <AboutFacts look={SUN_FACTS} />
-            </div>
-          </Board>
-        </ElderYard>
-      </SectionLevel>
-    )
-  },
-  work: function WorkFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="treetop">
-        <CannonRun jobs={slot.jobs} />
-      </SectionLevel>
-    )
-  },
-  tech: function TechFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="jungle">
-        <GroundSlap>
-          <TechBoard categories={slot.categories} itemClassName={JOLTED} />
-        </GroundSlap>
-      </SectionLevel>
-    )
-  },
-  services: function ServicesFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="jungle">
-        <FadeInScene>
-          <BarrelSmash>
-            <ServiceBoard services={slot.services} />
-          </BarrelSmash>
-        </FadeInScene>
-      </SectionLevel>
-    )
-  },
-  // He swings across the gap into the cave before the projects.
-  projects: function ProjectsFrame({ slot }) {
-    return (
-      <>
-        <VineCrossing />
-        <SectionLevel slot={slot} scene="cave">
-          <CartProjects projects={slot.projects} />
-        </SectionLevel>
-      </>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="jungle">
-        <RhinoCharge>
-          <VentureBoard companies={slot.companies} itemClassName={RAMMED} />
-        </RhinoCharge>
-      </SectionLevel>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="vines">
-        <VineBands bands={slot.bands} musician={slot.musician} />
-      </SectionLevel>
-    )
-  },
-  muayThai: function MuayThaiFrame({ slot }) {
-    return (
-      <SectionLevel slot={slot} scene="jungle">
-        <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{slot.martialArts.primary.title}</h3>
-        <VultureDrop>{(landed) => <BrawlRecord martialArts={slot.martialArts} landed={landed} />}</VultureDrop>
-      </SectionLevel>
-    )
-  },
+const CARD_TITLE = `text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`
+const QUIET = 'mt-1 text-sm text-[color:var(--tp-plank-light)]'
+const LINK_BUTTON = jungleButton({ tone: 'wood', size: 'small', extra: 'inline-flex items-center' })
+
+function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
+  return (
+    <Board>
+      <p className="whitespace-pre-line text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
+      <div data-stage-items="">
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={SUN_POINTS} />
+      </div>
+      <AboutFacts look={SUN_FACTS} />
+    </Board>
+  )
 }
 
-// A profession's levels sit 6rem apart in one wrapper.
-export const SECTION_VIEWS = sectionViews(FRAMES, 'space-y-24')
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  const { years, cards } = useLabels()
+  return (
+    <ul className={MASONRY_LIST} data-stage-items="">
+      {slot.jobs.map((entry) => {
+        const job = jobCard(entry, years)
+        return (
+          <li key={entry.id} className={MASONRY_ITEM}>
+            <article className={`rounded-3xl p-5 ${look.board}`}>
+              <h3 className={CARD_TITLE}>{job.title}</h3>
+              <p className="mt-1 text-base text-[color:var(--tp-parchment)]">
+                <SlashBreaks text={job.company} />
+              </p>
+              <p className={QUIET}>{job.years}</p>
+              {job.location && <p className={QUIET}>{job.location}</p>}
+              {job.description && <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{job.description}</p>}
+              <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SUN_POINTS} />
+              <TagList items={job.skills} label={cards.skillsUsed} look={WOOD_TAGS} />
+            </article>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
-/** The closing posts level, the same after every profession: the latest posts on a plain board, each
- *  title a sun gold link with its date, and the wooden button to the whole list. */
-export function PostsLevel() {
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  return (
+    <div data-stage-items="">
+      <TechBoard categories={slot.categories} />
+    </div>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <div data-stage-items="">
+      <ServiceBoard services={slot.services} />
+    </div>
+  )
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  const labels = useLabels()
+  return (
+    <div data-stage-items="">
+      <ProjectList
+        projects={slot.projects}
+        className={MASONRY_LIST}
+        itemClassName={MASONRY_ITEM}
+        renderProject={({ project: entry, links, noLink }) => {
+          const project = projectCard(entry, labels)
+          return (
+            <article className={`rounded-3xl p-5 ${look.board}`}>
+              <h3 className={CARD_TITLE}>
+                <SlashBreaks text={project.name} />
+              </h3>
+              {project.role && <p className={`${QUIET} font-bold`}>{project.role}</p>}
+              {project.years && <p className={QUIET}>{project.years}</p>}
+              {project.tagline && <p className="mt-3 text-base leading-relaxed text-[color:var(--tp-parchment)]">{project.tagline}</p>}
+              {project.description && <p className="mt-3 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{project.description}</p>}
+              {project.impact && (
+                <p className="mt-3 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
+                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{labels.cards.impact}: </span>
+                  {project.impact}
+                </p>
+              )}
+              <MarkedLines items={project.details} label={labels.cards.details} look={SUN_POINTS} />
+              <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={WOOD_TAGS} />
+              <div className="mt-4 flex flex-wrap gap-3">
+                {links.map(({ kind, label, linkProps }) => (
+                  <a key={kind} {...linkProps} className={LINK_BUTTON}>
+                    {label}
+                  </a>
+                ))}
+                {noLink && <p className="text-sm italic text-[color:var(--tp-plank-light)]">{noLink}</p>}
+              </div>
+            </article>
+          )
+        }}
+      />
+    </div>
+  )
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return (
+    <div data-stage-items="">
+      <VentureBoard companies={slot.companies} />
+    </div>
+  )
+}
+
+function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
+  const { years: yearWords } = useLabels()
+  return (
+    <>
+      <p className={`mx-auto mb-8 w-fit rounded-xl px-5 py-2 text-center text-base text-[color:var(--tp-parchment)] ${look.board}`}>{drumsSince(musician, yearWords)}</p>
+      <div data-stage-items="">
+        <BandList
+          bands={bands}
+          className={MASONRY_LIST}
+          itemClassName={MASONRY_ITEM}
+          renderBand={({ band, years, linkProps, release }) => (
+            <article className={`rounded-3xl p-5 ${look.board}`}>
+              <h3 className={CARD_TITLE}>
+                {linkProps ? (
+                  <a {...linkProps} className={`underline decoration-2 underline-offset-4 ${look.focus}`}>
+                    {band.name}
+                  </a>
+                ) : (
+                  band.name
+                )}
+              </h3>
+              {band.role && <p className="mt-1 text-base text-[color:var(--tp-parchment)]">{band.role}</p>}
+              {years && <p className={QUIET}>{years}</p>}
+              {release && (
+                <p className="mt-2 text-sm text-[color:var(--tp-parchment)]">
+                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{release.label}: </span>
+                  {release.title}
+                </p>
+              )}
+            </article>
+          )}
+        />
+      </div>
+    </>
+  )
+}
+
+function RecordCards({ slot: { martialArts } }: { slot: SlotOf<'muayThai'> }) {
+  return (
+    <>
+      <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{martialArts.primary.title}</h3>
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid gap-4 sm:grid-cols-2 mb-6',
+            fact: `rounded-2xl p-4 ${look.board}`,
+            term: `text-sm uppercase text-[color:var(--tp-sun-gold)] ${look.display}`,
+            value: 'mt-1 text-base text-[color:var(--tp-parchment)]',
+            achievements: `space-y-3 rounded-3xl p-6 ${look.board}`,
+            achievement: 'flex items-start gap-3 text-base text-[color:var(--tp-parchment)]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              {SUN_POINTS.marker}
+              <span className="min-w-0 flex-1">{achievement}</span>
+            </>
+          )}
+        />
+      </div>
+    </>
+  )
+}
+
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: RecordCards,
+}
+
+interface SceneSectionProps {
+  scene: Scene
+  slot: SectionSlot
+  still: boolean
+}
+
+/** One level of the page; under reduced motion its own stage sits still behind its head. */
+export function SceneSection({ scene, slot, still }: SceneSectionProps) {
+  const { sections } = useLabels()
+  const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const title = sections[slot.titleKey]
+  const id = headingId('jungle', title)
+  return (
+    <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
+      {still && <JungleStage scene={scene} settled />}
+      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-6 motion-reduce:min-h-[70svh]">
+        <LevelSign id={id} title={title} />
+      </header>
+      <div className="relative max-w-[42rem]">
+        <Cards slot={slot} />
+      </div>
+    </section>
+  )
+}
+
+/** The latest posts on a plain board, each title a sun gold link with its date, and the button to the
+ *  whole list; nothing when there are none. */
+export function PostsBoard() {
   const { blog } = useLabels()
   const links = postLinks(usePosts())
   if (!links) return null
 
   return (
-    <Level title={blog.latestPosts} scene="dusk">
-      <FadeInScene>
-        <Board>
-          <ul className="space-y-1">
-            {links.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className={`flex min-h-[44px] flex-col justify-center gap-1 rounded-lg py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 ${look.focus}`}
-                >
-                  <span className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] underline decoration-2 underline-offset-4 ${look.display}`}>{link.title}</span>
-                  <time dateTime={link.date} className="shrink-0 text-sm text-[color:var(--tp-plank-light)]">
-                    {link.shownDate}
-                  </time>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-6 flex justify-center">
-            <Link href={BLOG_PATH} className={WOOD_BUTTON}>
-              {blog.allPosts}
+    <Board className="mb-10">
+      <h2 className={`mb-4 text-xl uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>{blog.latestPosts}</h2>
+      <ul className="space-y-1">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link href={link.href} className={`flex min-h-[44px] flex-col justify-center gap-1 rounded-lg py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 ${look.focus}`}>
+              <span className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] underline decoration-2 underline-offset-4 ${look.display}`}>{link.title}</span>
+              <time dateTime={link.date} className="shrink-0 text-sm text-[color:var(--tp-plank-light)]">
+                {link.shownDate}
+              </time>
             </Link>
-          </div>
-        </Board>
-      </FadeInScene>
-    </Level>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 flex justify-center">
+        <Link href={BLOG_PATH} className={WOOD_BUTTON}>
+          {blog.allPosts}
+        </Link>
+      </div>
+    </Board>
   )
 }
