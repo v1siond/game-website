@@ -4,8 +4,9 @@
    The launcher (top right, every world), its turned face, the lens under it, the hint card and the worlds picker paint from custom
    properties the React components set from the current world's palette (launcherColors in
    src/lib/worlds/nudge.ts): --wl-text the label colour, --wl-body running text, --wl-fill the world's
-   background, --wl-edge the black or white hairline (the launcher's has a band of the fill outside it). Both
-   text pairs read at 7 to 1 or more; the rings keep 3 to 1 from the fill and any page behind. The defaults (Retro Atomic's colours) only cover a paint before the component
+   background, --wl-edge the black or white hairline (on the launcher and its wide face drawn inside the label border,
+   with a band of the fill outside). Both text pairs read at 7 to 1 or more; the rings keep 3 to 1 from the
+   fill and any page behind. The defaults (Retro Atomic's colours) only cover a paint before the component
    sets its own.
    =================================================================== */
 
@@ -52,11 +53,12 @@
   }
 }
 
-/* Outside the black or white edge, a solid band of the fill: text scrolling under the fixed launcher meets
-   the fill, never the edge, so a white edge never touches white letters (Bold Noir's "Since 2026" and a
-   Fighter Select About line at 390). */
+/* The black or white edge is drawn inside the button's box (inset, inside the label border) and only a solid
+   band of the fill lies outside it: text scrolling under the fixed launcher is covered by the button itself
+   and meets only the fill at its edge, never a white line (Bold Noir's "Since 2026" and Fighter Select's
+   About lines at 390). The wide face below does the same. */
 .c-worlds-launcher {
-  box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 0 0 7px var(--wl-fill), 0 6px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 0 1px var(--wl-edge), 0 0 0 5px var(--wl-fill), 0 6px 24px rgba(0, 0, 0, 0.45);
   transition: transform 0.15s ease;
 }
 .c-worlds-launcher:hover { transform: scale(1.05); }
@@ -127,7 +129,7 @@
   color: var(--wl-text);
   background-color: var(--wl-fill);
   border: 2px solid var(--wl-text);
-  box-shadow: 0 0 0 1.5px var(--wl-edge), 0 0 0 5.5px var(--wl-fill);
+  box-shadow: inset 0 0 0 1.5px var(--wl-edge), 0 0 0 5px var(--wl-fill);
   transform-origin: 100% 50%;
   animation: worlds-face-grow 2.6s ease-out both;
 }

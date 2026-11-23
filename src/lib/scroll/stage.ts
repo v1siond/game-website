@@ -1,6 +1,6 @@
 // Pure math behind the scroll stages (useScrollStage): a full screen picture per section that rises from
 // dark, holds while the section's text scrolls over it and sinks back into dark as the next one rises, the
-// Rockstar VI hand over (score C47 research vi.md). Every value is a function of a scroll position, so the
+// open world trailer hand over (score C47 research vi.md). Every value is a function of a scroll position, so the
 // stages play forwards on the way down and backwards on the way up, and nothing moves while the scroll
 // rests. The settle is the eased follow that draws the stages a little behind the scroll and brings them to
 // rest about a second after it stops. No DOM here.
