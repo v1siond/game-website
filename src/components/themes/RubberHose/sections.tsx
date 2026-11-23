@@ -1,78 +1,29 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
-import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { BandList } from '@/components/cv/BandList'
 import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
-import { useZoneStageContext } from '@/hooks/useZoneStage'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { ArtBreak, CurlBanner, PieEyes } from './art'
-import { HOSE } from './palette'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud } from './cards'
-import { Reveal, RunBar } from './scenes'
-import { staggerAt } from '../shared/stagger'
-import { ParryBoard } from './parry'
-import { FingerGunPop, ParrySlap } from './gags'
-import { IsleStage } from './isles'
-import { BagFoe, Bandstand, FlowerKnockout, MapRun, ShopCounter, StageCurtains } from './stages'
-import world from './world.module.css'
-import styles from './scenes.module.css'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { drumsSince, headingId } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import { CurlBanner } from './art'
+import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud } from './cards'
+import { ParryBoard } from './parry'
+import type { Scene } from './scenes'
+import { HoseStage } from './stage'
+import world from './world.module.css'
 
-// The picked profession's sections, each on its isle (./isles, the backdrop follows) and each with its own
-// act of his (./stages). About: he knocks out the flower boss and the text unfolds. Work Experience: the
-// lost round's run bar, his figure running past a flag per job as they scroll by, the jobs dropping in as
-// phase cards. Tech Stack: he pays at the shop counter and the items lift off the shelf. Services: poster
-// cards he pops into place with the finger gun (./gags). Featured Work: the parry board (./parry), bounced
-// by his parry slap (./gags). Ventures: the curtains part and he
-// bows. Bands: he drums on the bandstand, each record spinning up under the pointer. Muay Thai: he drops the heavy bag, the knockout slams the
-// title, the achievements land as hit stars. Between About, Work and Tech he runs the isle map. The shared
-// section plan picks which a profession shows and in which order; each is one frame here, with the map run
-// or the art break that goes with it.
+// One section per scene: a tall head that first shows the painted place alone and then brings the title
+// up on its curled banner, then the cards (the title cards and posters under one ink line), then a screen
+// of the place alone before it sinks. The cards a scene counts sit in an element marked data-stage-items,
+// which the shared theatre measures for the reading line that sets each prop off. Featured Work keeps its
+// parry board (./parry), a game the visitor plays.
 
 const LEAD = `text-center text-base ${world.ink}`
-
-// The run bar's scroll lines: it starts as the section's top passes the middle of the screen and he
-// reaches the last flag as the section's top is most of a screen above it (the jobs scrolled by).
-const RUN_START = 0.5
-const RUN_END = -0.9
-
-// The map run between sections: he sets off as the strip comes up from the bottom and reaches the far
-// island as it nears the top third.
-const MAP_START = 0.95
-const MAP_END = 0.25
-
-function MapBreak() {
-  return (
-    <ScrollScene reveal={false} start={MAP_START} end={MAP_END}>
-      <MapRun profession="engineer" />
-    </ScrollScene>
-  )
-}
-
-// The knockout starburst's points, long and short rays in turn round an oval 200 by 60.
-const KO_RAYS = 18
-const KO_BURST = Array.from({ length: KO_RAYS * 2 }, (_, i) => {
-  const angle = (Math.PI * i) / KO_RAYS
-  const reach = i % 2 === 0 ? 1 : 0.62
-  return `${(100 + Math.cos(angle) * 98 * reach).toFixed(1)},${(30 + Math.sin(angle) * 29 * reach).toFixed(1)}`
-}).join(' ')
-
-// The heading each section is named by (aria-labelledby).
-const HEADING = {
-  about: headingId('hose', 'About'),
-  workExperience: headingId('hose', 'Work Experience'),
-  techStack: headingId('hose', 'Tech Stack'),
-  services: headingId('hose', 'Services'),
-  featuredWork: headingId('hose', 'Featured Work'),
-  ventures: headingId('hose', 'Ventures'),
-  bands: headingId('hose', 'Bands'),
-  muayThai: headingId('hose', 'Muay Thai'),
-} as const
 
 // The About title card's billing, each label in the red lettering.
 const BILL_LINES: AboutFactsLook = {
@@ -82,234 +33,152 @@ const BILL_LINES: AboutFactsLook = {
   value: world.ink,
 }
 
-// One frame per section of the shared plan, each on its isle.
-const FRAMES: SectionFrames = {
-  about: function AboutFrame({ slot }) {
-    const { sections: titles, cards } = useLabels()
-    const { highlights } = useAboutBlock()
-    const { reduced } = useZoneStageContext()
-
-    return (
-      <>
-        <IsleStage isle="meadow">
-          {(on) => (
-            <section aria-labelledby={HEADING.about} className="mb-8">
-              <CurlBanner id={HEADING.about}>{titles.about}</CurlBanner>
-              <FlowerKnockout on={on} reduced={reduced} profession="engineer">
-                <div className={`mx-auto max-w-prose p-5 ${world.titleCard}`}>
-                  <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
-                  <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
-                  <AboutFacts look={BILL_LINES} />
-                </div>
-              </FlowerKnockout>
-            </section>
-          )}
-        </IsleStage>
-
-        <MapBreak />
-      </>
-    )
-  },
-  work: function WorkFrame({ slot }) {
-    const titles = useLabels().sections
-    const { jobs } = slot
-
-    return (
-      <>
-        <IsleStage isle="meadow">
-          <ScrollScene reveal={false} start={RUN_START} end={RUN_END}>
-            <section aria-labelledby={HEADING.workExperience} className="mb-8">
-              <CurlBanner id={HEADING.workExperience}>{titles.workExperience}</CurlBanner>
-              <div className="sticky top-3 z-30 mb-2">
-                <RunBar profession="engineer" stops={jobs.length} />
-              </div>
-              <Reveal>
-                {({ played }) => (
-                  <ul className={`pt-4 ${MASONRY_LIST}`}>
-                    {jobs.map((entry, index) => (
-                      <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
-                        <div className={styles.breathe}>
-                          <ExperienceCard entry={entry} />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Reveal>
-            </section>
-          </ScrollScene>
-        </IsleStage>
-
-        <MapBreak />
-      </>
-    )
-  },
-  tech: function TechFrame({ slot }) {
-    const titles = useLabels().sections
-    const { reduced } = useZoneStageContext()
-
-    return (
-      <IsleStage isle="carnival">
-        {(on) => (
-          <section aria-labelledby={HEADING.techStack} className="mx-auto mb-8 max-w-3xl">
-            <CurlBanner id={HEADING.techStack}>{titles.techStack}</CurlBanner>
-            <ShopCounter on={on} reduced={reduced} profession="engineer">
-              <TechBubbleCloud categories={slot.categories} />
-            </ShopCounter>
-          </section>
-        )}
-      </IsleStage>
-    )
-  },
-  services: function ServicesFrame({ slot }) {
-    const titles = useLabels().sections
-
-    return (
-      <IsleStage isle="carnival">
-        <section aria-labelledby={HEADING.services} className="mb-8">
-          <CurlBanner id={HEADING.services}>{titles.services}</CurlBanner>
-          <FadeInScene>
-            <FingerGunPop>
-              <ul className={MASONRY_LIST}>
-                {slot.services.map((service) => (
-                  <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
-                    <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
-                    <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
-                  </li>
-                ))}
-              </ul>
-            </FingerGunPop>
-          </FadeInScene>
-        </section>
-      </IsleStage>
-    )
-  },
-  projects: function ProjectsFrame({ slot }) {
-    const titles = useLabels().sections
-
-    return (
-      <>
-        <IsleStage isle="carnival">
-          <section aria-labelledby={HEADING.featuredWork} className="mb-8">
-            <CurlBanner id={HEADING.featuredWork}>{titles.featuredWork}</CurlBanner>
-            <ParrySlap>
-              <ParryBoard projects={slot.projects} />
-            </ParrySlap>
-          </section>
-        </IsleStage>
-
-        <ArtBreak kind="bouncingBalls" />
-      </>
-    )
-  },
-  ventures: function VenturesFrame({ slot }) {
-    const titles = useLabels().sections
-
-    return (
-      <IsleStage isle="carnival">
-        {(on) => (
-          <section aria-labelledby={HEADING.ventures}>
-            <CurlBanner id={HEADING.ventures}>{titles.ventures}</CurlBanner>
-            <StageCurtains on={on} profession="engineer">
-              <VentureList
-                companies={slot.companies}
-                className="grid gap-4 md:grid-cols-6"
-                itemClassName="md:col-span-2"
-                featuredItemClassName="md:col-span-3"
-                renderVenture={(venture) => <CompanyPoster {...venture} />}
-              />
-            </StageCurtains>
-          </section>
-        )}
-      </IsleStage>
-    )
-  },
-  bands: function BandsFrame({ slot }) {
-    const labels = useLabels()
-    const { musician, bands } = slot
-
-    return (
-      <>
-        <ArtBreak kind="singAlong" />
-        <IsleStage isle="casino">
-          <section aria-labelledby={HEADING.bands} className="mb-8">
-            <CurlBanner id={HEADING.bands}>{labels.sections.bands}</CurlBanner>
-            <Bandstand profession="drummer" />
-            <p className={`mb-6 p-3 ${world.titleCard} ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
-            <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(band) => <BandRecord {...band} />} />
-            <p className={`mt-6 p-3 italic ${world.titleCard} ${LEAD} ${world.red}`}>{musician.line}</p>
-          </section>
-        </IsleStage>
-      </>
-    )
-  },
-  muayThai: function MuayThaiFrame({ slot }) {
-    const { martialArts } = slot
-    const titles = useLabels().sections
-
-    return (
-      <>
-        <ArtBreak kind="bouncingBalls" />
-        <IsleStage isle="casino">
-          <section aria-labelledby={HEADING.muayThai} className="mb-8">
-            <CurlBanner id={HEADING.muayThai}>{titles.muayThai}</CurlBanner>
-            <Reveal className={`relative mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
-              {({ played }) => (
-                <>
-                  <RingBell />
-                  <BagFoe on={played} profession="fighter" />
-                  <div className="relative mb-6 flex min-h-24 items-center justify-center px-6">
-                    <svg viewBox="0 0 200 60" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${world.inked} ${played ? styles.koBurst : styles.koBurstWait}`} aria-hidden="true" focusable="false">
-                      <polygon points={KO_BURST} fill={HOSE.highlight} />
-                    </svg>
-                    <h3 className={`relative text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
-                      {martialArts.primary.title}
-                    </h3>
-                  </div>
-                  <MuayThaiRecord
-                    martialArts={martialArts}
-                    classNames={{
-                      facts: 'grid sm:grid-cols-2 gap-4 mb-6',
-                      fact: `p-3 ${world.fact}`,
-                      term: `text-sm tracking-widest uppercase ${world.red}`,
-                      value: `text-sm mt-1 ${world.ink}`,
-                      achievements: 'space-y-4',
-                      achievement: `text-sm ${world.ink}`,
-                    }}
-                    renderAchievement={(achievement, index) => (
-                      <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
-                        <span className={`inline-block ${world.red} ${staggerAt(index)} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
-                          ★
-                        </span>
-                        <span>{achievement}</span>
-                      </p>
-                    )}
-                  />
-                </>
-              )}
-            </Reveal>
-          </section>
-        </IsleStage>
-      </>
-    )
-  },
-}
-
-// The ring bell in the poster's corner, swinging when the pointer lands on it.
-function RingBell() {
+function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
   return (
-    <div className={`absolute right-3 top-3 h-12 w-10 ${styles.bellBox}`} aria-hidden="true">
-      <svg viewBox="0 0 24 30" className={`h-full w-full ${world.inked}`} focusable="false">
-        <rect x={10} y={0} width={4} height={6} fill={HOSE.ink} />
-        <g className={styles.bell}>
-          <path d="M3 24 Q3 6 12 6 Q21 6 21 24 Z" fill={HOSE.gold} />
-          <ellipse cx={9} cy={13} rx={2} ry={4} fill={HOSE.highlight} opacity={0.6} />
-          <PieEyes cx={12} cy={15} size={9} paper={HOSE.gold} />
-          <rect x={1} y={23} width={22} height={3} rx={1.5} fill={HOSE.shadowDark} />
-        </g>
-      </svg>
+    <div className={`p-5 ${world.titleCard}`}>
+      <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
+      <div data-stage-items="">
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
+      </div>
+      <AboutFacts look={BILL_LINES} />
     </div>
   )
 }
 
-export const SECTION_VIEWS = sectionViews(FRAMES)
+function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
+  return (
+    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+      {slot.jobs.map((entry) => (
+        <li key={entry.id} className={MASONRY_ITEM}>
+          <ExperienceCard entry={entry} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
+  // the shared tech list's masonry, held to two columns in the screen column
+  return (
+    <div className={`p-5 ${world.titleCard}`}>
+      <div data-stage-items="" className="xl:[&>ul]:columns-2">
+        <TechBubbleCloud categories={slot.categories} />
+      </div>
+    </div>
+  )
+}
+
+function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
+  return (
+    <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
+      {slot.services.map((service) => (
+        <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
+          <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
+          <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
+  return (
+    <div data-stage-items="">
+      <ParryBoard projects={slot.projects} />
+    </div>
+  )
+}
+
+function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
+  return (
+    <div data-stage-items="">
+      <VentureList
+        companies={slot.companies}
+        className="grid gap-4 md:grid-cols-6"
+        itemClassName="md:col-span-3"
+        featuredItemClassName="md:col-span-6"
+        renderVenture={(venture) => <CompanyPoster {...venture} />}
+      />
+    </div>
+  )
+}
+
+function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
+  const { years } = useLabels()
+  return (
+    <>
+      <p className={`mb-6 p-3 ${world.titleCard} ${LEAD}`}>{drumsSince(musician, years)}</p>
+      <div data-stage-items="">
+        <BandList bands={bands} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderBand={(band) => <BandRecord {...band} />} />
+      </div>
+      <p className={`mt-6 p-3 italic ${world.titleCard} ${LEAD} ${world.red}`}>{musician.line}</p>
+    </>
+  )
+}
+
+function RecordCards({ slot: { martialArts } }: { slot: SlotOf<'muayThai'> }) {
+  return (
+    <div className={`relative p-6 ${world.poster}`}>
+      <h3 className={`mb-6 text-center text-2xl ${world.red} ${world.lettering} ${world.dropText}`}>{martialArts.primary.title}</h3>
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+            fact: `p-3 ${world.fact}`,
+            term: `text-sm tracking-widest uppercase ${world.red}`,
+            value: `text-sm mt-1 ${world.ink}`,
+            achievements: 'space-y-4',
+            achievement: `text-sm ${world.ink}`,
+          }}
+          renderAchievement={(achievement) => (
+            <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
+              <span className={world.red} aria-hidden="true">
+                ★
+              </span>
+              <span>{achievement}</span>
+            </p>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
+const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {
+  about: AboutCards,
+  work: WorkCards,
+  tech: TechCards,
+  services: ServiceCards,
+  projects: ProjectCards,
+  ventures: VentureCards,
+  bands: BandCards,
+  muayThai: RecordCards,
+}
+
+interface SceneSectionProps {
+  scene: Scene
+  slot: SectionSlot
+  still: boolean
+}
+
+/** One scene of the page; under reduced motion its own stage sits still behind its head. */
+export function SceneSection({ scene, slot, still }: SceneSectionProps) {
+  const { sections } = useLabels()
+  const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
+  const title = slot.id === 'projects' ? sections.featuredWork : sections[slot.titleKey]
+  const id = headingId('hose', title)
+  return (
+    <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
+      {still && <HoseStage scene={scene} settled />}
+      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh]">
+        <CurlBanner id={id}>{title}</CurlBanner>
+      </header>
+      <div className="relative max-w-[42rem]">
+        <Cards slot={slot} />
+      </div>
+    </section>
+  )
+}

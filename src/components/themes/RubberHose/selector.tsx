@@ -1,5 +1,5 @@
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { HeroCharacter } from './cup'
+import { HeroCharacter } from './toon'
 import world from './world.module.css'
 
 // One option of the shared profession switch, a round vintage badge like a cartoon's cast card: him in

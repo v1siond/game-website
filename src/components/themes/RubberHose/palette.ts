@@ -31,13 +31,12 @@ export const HOSE = {
   parry: '#ff4fa3',
 
   // The watercolour washes behind the sets: a pale sky, the meadow and its shade, the carnival's pale wash,
-  // the casino's felt and the sea on the isle map
+  // the casino's felt
   skyWash: '#d9e2d0',
   meadow: '#9aa86f',
   meadowDark: '#6f7d4a',
   carnivalWash: '#e7d9c4',
   feltGreen: '#2f5a3a',
-  mapSea: '#7fa6bf',
 
   // His big cartoon shoes
   shoe: '#6b3d1f',
