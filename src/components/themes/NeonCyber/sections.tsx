@@ -10,16 +10,15 @@ import { TagList } from '@/components/cv/TagList'
 import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { Braindance } from './braindance'
-import { Gigs } from './gigs'
-import { Radio } from './radio'
+import { BandDeck } from './bands'
+import { ProjectFiles } from './projects'
+import { JobTimeline } from './timeline'
 import { DATA_CHIPS, panelHeadingId } from './hud'
-import { Scannable } from './scanner'
 import type { Scene } from './scenes'
 import { NeonStage } from './stage'
 import world from './world.module.css'
 
-// One section per scene: a tall head that first shows the night city alone and then brings the HUD title
+// One section per scene: a tall head that first shows the city alone and then brings the HUD title
 // up from the bottom, then the cards on the HUD's glass, then a screen of the city alone before it sinks.
 // The cards a scene counts sit in an element marked data-stage-items, which the shared theatre measures
 // for the reading line that drives each prop. Every field comes from the shared lists and the card view
@@ -50,7 +49,7 @@ function AboutCards({ slot }: { slot: SlotOf<'about'> }) {
 }
 
 function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
-  return <Braindance jobs={slot.jobs} />
+  return <JobTimeline jobs={slot.jobs} />
 }
 
 function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
@@ -89,7 +88,7 @@ function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
 }
 
 function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
-  return <Gigs projects={slot.projects} />
+  return <ProjectFiles projects={slot.projects} />
 }
 
 // His own products (featured) are ruled in full gold with a gold tag over the name.
@@ -101,23 +100,21 @@ function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
       <ul className="grid gap-4">
         {companies.map((company) => (
           <li key={company.id}>
-            <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
-              <a
-                href={company.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${world.cut} block border bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)] ${company.featured ? 'border-[color:var(--neon-gold)]' : 'border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)]'}`}
-              >
-                {company.featured && <span className="mb-1 inline-block bg-[color:var(--neon-gold)] px-2 py-0.5 text-sm uppercase tracking-wider text-[color:var(--neon-ink)]">{cards.ownProduct}</span>}
-                <span className={`mt-1 block text-[color:var(--neon-ice)] ${company.featured ? 'text-lg' : 'text-base'}`}>
-                  <SlashBreaks text={company.name} />
-                </span>
-                <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
-                <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
-                <span className="sr-only"> {newTabHint(links)}</span>
-              </a>
-              <TagList items={company.services} label={sections.services} look={{ ...DATA_CHIPS, list: 'mt-2 flex flex-wrap gap-1' }} />
-            </Scannable>
+            <a
+              href={company.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${world.cut} block border bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)] ${company.featured ? 'border-[color:var(--neon-gold)]' : 'border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)]'}`}
+            >
+              {company.featured && <span className="mb-1 inline-block bg-[color:var(--neon-gold)] px-2 py-0.5 text-sm uppercase tracking-wider text-[color:var(--neon-ink)]">{cards.ownProduct}</span>}
+              <span className={`mt-1 block text-[color:var(--neon-ice)] ${company.featured ? 'text-lg' : 'text-base'}`}>
+                <SlashBreaks text={company.name} />
+              </span>
+              <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
+              <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
+              <span className="sr-only"> {newTabHint(links)}</span>
+            </a>
+            <TagList items={company.services} label={sections.services} look={{ ...DATA_CHIPS, list: 'mt-2 flex flex-wrap gap-1' }} />
           </li>
         ))}
       </ul>
@@ -125,36 +122,30 @@ function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
   )
 }
 
-// The record as the ripperdoc's install log: each achievement a row with its bar full and its Installed word.
+// The record on the HUD: the facts, then each achievement a row with its gold bar full.
 function RecordCards({ slot }: { slot: SlotOf<'muayThai'> }) {
-  const { cyber, sections } = useLabels()
   const { martialArts } = slot
   return (
     <div className={CARD}>
       <p className="mb-4 text-base text-[color:var(--neon-hud)]">{martialArts.primary.title}</p>
-      <Scannable kind="record" title={sections.muayThai} fact={martialArts.primary.rank}>
-        <div data-stage-items="">
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'mb-5 grid gap-3 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] p-4 sm:grid-cols-2',
-              fact: 'border-l-2 border-[color:var(--neon-data)] pl-3',
-              term: 'text-sm uppercase tracking-wider text-[color:var(--neon-data)]',
-              value: 'mt-1 text-sm text-[color:var(--neon-ice)]',
-              achievements: 'space-y-3',
-            }}
-            renderAchievement={(achievement) => (
-              <span className="block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3">
-                <span className="flex items-start justify-between gap-3">
-                  <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
-                  <span className="shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]">{cyber.installed}</span>
-                </span>
-                <span className="mt-2 block h-1.5 bg-[color:var(--neon-gold)]" aria-hidden="true" />
-              </span>
-            )}
-          />
-        </div>
-      </Scannable>
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'mb-5 grid gap-3 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] p-4 sm:grid-cols-2',
+            fact: 'border-l-2 border-[color:var(--neon-data)] pl-3',
+            term: 'text-sm uppercase tracking-wider text-[color:var(--neon-data)]',
+            value: 'mt-1 text-sm text-[color:var(--neon-ice)]',
+            achievements: 'space-y-3',
+          }}
+          renderAchievement={(achievement) => (
+            <span className="block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3">
+              <span className="block text-sm text-[color:var(--neon-ice)]">{achievement}</span>
+              <span className="mt-2 block h-1.5 bg-[color:var(--neon-gold)]" aria-hidden="true" />
+            </span>
+          )}
+        />
+      </div>
     </div>
   )
 }
@@ -171,7 +162,7 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
 }
 
 function BandCards({ slot }: { slot: SlotOf<'bands'> }) {
-  return <Radio musician={slot.musician} bands={slot.bands} />
+  return <BandDeck musician={slot.musician} bands={slot.bands} />
 }
 
 /** The HUD title over the city: its place in the page, two slashes, the title in the loud yellow, the red

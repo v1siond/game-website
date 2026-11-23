@@ -2,34 +2,32 @@ import { memo } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NEON } from './palette'
-import s from './merc.module.css'
+import s from './figure.module.css'
 
-// Him as this world's own figure, a parody of the night city merc of Cyberpunk 2077 (V): the yellow
-// samurai style jacket of the key art with its tall upturned collar lit cyan inside, the silver reflective
-// bands round the sleeves and the red sigil on the chest, a chrome
-// cyberarm with its segment seams, the optics glowing cyan at the eyes with the implant lines on the
-// temple, dark cargo trousers and heavy boots. Drawn the way the game's key art reads at sprite size:
-// hard dark outline, flat fills with one cut of neon rim light on the lit side, chrome in two tones.
+// Him as this world's own figure, an augmented operative of the neon city: a dark long coat with a cyan
+// piped hem and a low collar, a thin visor lit cyan across the eyes, gloves with a wrist deck on the left
+// forearm, a short blade sheathed across his back (its hilt over the right shoulder), dark trousers and
+// heavy boots. Drawn at sprite size with a hard dark outline, flat fills and one cut of neon rim light on
+// the lit side.
 //
 // His traits come from HERO_IDENTITY: his brown skin, short dark hair cut close, his full dark beard.
 //
-// Per profession: the System Engineer jacks a cable from the temple into a deck and runs a quickhack
-// (data glyphs climb off the hand); the Musician drops behind a neon snare with two sticks; the Martial
-// Artist sheds the jacket, wraps his hands and wears his own mongkhon, then throws the knee and the
-// roundhouse; that action plays on his rig in the quickhack menu, and he glitches when hovered. In the
-// scroll scenes the scene poses him instead (pose.ts): the walk, the Sandevistan dash, the scan with the
-// optic reticle, the hop on the cyberlegs, the chair, the mantis blades.
+// Per profession: the System Engineer raises the wrist deck and data climbs off it; the Musician drops
+// behind a neon snare with two sticks; the Martial Artist sheds the coat, wraps his hands and wears his own
+// mongkhon, then throws the knee and the roundhouse. That action plays on his rig in the profession menu,
+// and he glitches when hovered. In the scroll scenes the scene poses him instead (pose.ts): the walk, the
+// hack, the takedown, the run and the leap, the swing, the drawn blade's deflect and cut, the drums, the kick.
 
-export type MercMotion = 'still' | 'hack' | 'drum' | 'kick'
+export type HeroMotion = 'still' | 'hack' | 'drum' | 'kick'
 
-/** Each profession's action, the way the merc would do that job. */
-export const MERC_ACTION: Record<Profession, MercMotion> = {
+/** Each profession's action, the way he would do that job. */
+export const HERO_ACTION: Record<Profession, HeroMotion> = {
   engineer: 'hack',
   drummer: 'drum',
   fighter: 'kick',
 }
 
-const MOTION_CLASS: Record<MercMotion, string> = {
+const MOTION_CLASS: Record<HeroMotion, string> = {
   still: '',
   hack: s.hack,
   drum: s.drum,
@@ -47,21 +45,23 @@ const LW = 1.6
 const SKIN = HERO_IDENTITY.skin
 const SKIN_SHADE = HERO_IDENTITY.skinShade
 const HAIR = HERO_IDENTITY.hair
-const JACKET = NEON.jacket
-const COLLAR = NEON.jacketLit
-const LINING = NEON.data
-const BAND = NEON.ash
-const OPTIC = NEON.data
-const CHROME = NEON.chrome
-const CHROME_LIT = NEON.ash
+const COAT = NEON.coat
+const COAT_LIT = NEON.coatLit
+const PIPING = NEON.data
+const GLOVE = NEON.panel
+const VISOR = NEON.data
+const STEEL = NEON.chrome
+const STEEL_LIT = NEON.ash
 
-// ---- shapes (viewBox 100 by 150, three quarter to the viewer, feet on y 144) ----
+// ---- shapes (viewBox 100 by 150, three quarter to the viewer facing right, feet on y 144) ----
 
 const HEAD = 'M38 26 Q38 12 50 12 Q62 12 62 26 Q62 40 50 43 Q38 40 38 26 Z'
 const HAIR_CUT = 'M37.5 25 Q37 10 50 9.5 Q63 10 62.5 25 Q60 17 54 16.5 Q48 14.5 43 17 Q39 19 37.5 25 Z'
 const BEARD = 'M38.5 28 Q39 42 50 45.5 Q61 42 61.5 28 Q58.5 34.5 54 34.5 Q50 32.5 46 34.5 Q41.5 34.5 38.5 28 Z'
-const COLLAR_BACK = 'M33 34 L36 22 L44 38 L50 44 L56 38 L64 22 L67 34 L62 50 L38 50 Z'
-const JACKET_BODY = 'M31 46 Q50 40 69 46 L71 94 L29 94 Z'
+const COLLAR = 'M37 38 L42 34 L50 42 L58 34 L63 38 L60 48 L40 48 Z'
+const COAT_BODY = 'M31 46 Q50 40 69 46 L71 96 L29 96 Z'
+// The coat's skirt hangs behind his legs from the waist, split at the back, its hem piped in cyan.
+const COAT_SKIRT = 'M30 90 L70 90 L74 124 L56 126 L50 108 L44 126 L26 124 Z'
 const BARE_CHEST = 'M33 47 Q50 42 67 47 L66 86 L34 86 Z'
 
 const UPPER = {
@@ -89,8 +89,8 @@ const BOOT = {
 
 type Side = 'right' | 'left'
 
-// The left hand is the chrome cyberarm's, the right is his own; wraps cover both for the fight.
-const HAND_FILL: Record<Side, string> = { right: SKIN, left: CHROME }
+// The left hand wears the deck's glove, the right is his own; wraps cover both for the fight.
+const HAND_FILL: Record<Side, string> = { right: SKIN, left: GLOVE }
 
 function Shape({ d, fill }: { d: string; fill: string }) {
   return <path d={d} fill={fill} stroke={LINE} strokeWidth={LW} strokeLinejoin="round" />
@@ -108,24 +108,40 @@ function Mongkhon() {
   )
 }
 
+// The visor: a thin dark band across the eyes, its lit strip brightening when he hacks or fights.
+function Visor() {
+  return (
+    <g>
+      <path d="M39.5 22.5 H60.5 L60 27 H40 Z" fill={NEON.ink} stroke={LINE} strokeWidth={1} />
+      <rect x={41} y={23.6} width={18} height={1.6} fill={VISOR} opacity={0.45} />
+      <rect className={s.visor} x={41} y={23.6} width={18} height={1.6} fill={NEON.ice} />
+    </g>
+  )
+}
+
 function Head({ profession }: { profession: Profession }) {
   return (
     <g className={s.head}>
       <circle cx={38.5} cy={28} r={3} fill={SKIN_SHADE} stroke={LINE} strokeWidth={LW} />
       <circle cx={61.5} cy={28} r={3} fill={SKIN_SHADE} stroke={LINE} strokeWidth={LW} />
       <Shape d={HEAD} fill={SKIN} />
-      <path d="M58 16 Q61.5 24 59 36" fill="none" stroke={NEON.magenta} strokeWidth={1} opacity={0.6} />
       <Shape d={HAIR_CUT} fill={HAIR} />
       <Shape d={BEARD} fill={HAIR} />
       <path d="M46.5 36.5 Q50 38.5 53.5 36.5" fill="none" stroke={SKIN_SHADE} strokeWidth={1.2} strokeLinecap="round" />
-      <path d="M42 21.5 L47.5 21 M52.5 21 L58 21.5" stroke={HAIR} strokeWidth={1.8} strokeLinecap="round" />
-      {/* the optics: two lit cyan slits and the implant seams down the left temple */}
-      <g className={s.optics}>
-        <rect x={42.6} y={24} width={4} height={2.2} rx={0.6} fill={OPTIC} />
-        <rect x={53.4} y={24} width={4} height={2.2} rx={0.6} fill={OPTIC} />
+      {profession === 'fighter' ? <Mongkhon /> : <Visor />}
+    </g>
+  )
+}
+
+// The blade's sheath across his back: its hilt shows over the right shoulder while the blade is home.
+function Sheath() {
+  return (
+    <g>
+      <path d="M62 40 L38 92" stroke={NEON.ink} strokeWidth={4.5} strokeLinecap="round" />
+      <g className={s.hilt}>
+        <path d="M62 40 L67 29" stroke={STEEL} strokeWidth={2.6} strokeLinecap="round" />
+        <path d="M59.5 39 L65 42" stroke={PIPING} strokeWidth={1.6} strokeLinecap="round" />
       </g>
-      <path d="M59.5 23 L61 27 L59.5 31" fill="none" stroke={OPTIC} strokeWidth={0.8} />
-      {profession === 'fighter' && <Mongkhon />}
     </g>
   )
 }
@@ -136,7 +152,6 @@ function Torso({ profession }: { profession: Profession }) {
       <g>
         <Shape d={BARE_CHEST} fill={SKIN} />
         <path d="M41 58 Q45.5 61 50 58 Q54.5 61 59 58 M50 63 V82" fill="none" stroke={SKIN_SHADE} strokeWidth={1.1} />
-        <path d="M35 52 L40 60 L37 70" fill="none" stroke={OPTIC} strokeWidth={0.9} opacity={0.8} />
         <Shape d="M32 84 L68 84 L69 96 L31 96 Z" fill={NEON.hotPink} />
         <path d="M32 87 H68" stroke={NEON.ice} strokeWidth={1.4} />
       </g>
@@ -145,23 +160,29 @@ function Torso({ profession }: { profession: Profession }) {
 
   return (
     <g>
-      <Shape d={COLLAR_BACK} fill={COLLAR} />
-      <path d="M38 36 L44 39 L50 45 L56 39 L62 36 L60 46 L40 46 Z" fill={LINING} opacity={0.75} />
-      <Shape d={JACKET_BODY} fill={JACKET} />
-      <path d="M31.5 70 H40 M60 70 H68.8" stroke={BAND} strokeWidth={2.4} />
-      <path d="M44 42 L50 60 L56 42" fill={NEON.ink} stroke={LINE} strokeWidth={LW} />
-      <path d="M50 60 V94" stroke={NEON.steel} strokeWidth={1.2} />
-      {/* the sigil on the chest and the rim light down the lit side */}
-      <path d="M36 56 L41 54 L40 60 L36 61 Z" fill={NEON.chromeRed} />
+      <Shape d={COAT_BODY} fill={COAT} />
+      <path d="M50 48 V96" stroke={NEON.ink} strokeWidth={1.2} />
+      <Shape d={COLLAR} fill={COAT_LIT} />
+      <path d="M42 35 L50 43 L58 35" fill="none" stroke={PIPING} strokeWidth={1} />
+      {/* the rim light down the lit side and the belt */}
       <path d="M68.5 48 L70 92" stroke={NEON.magenta} strokeWidth={1.4} opacity={0.7} />
-      <Shape d="M30 88 L70 88 L70.5 94 L29.5 94 Z" fill={NEON.ink} />
-      <rect x={46} y={88.5} width={8} height={5} fill={COLLAR} stroke={LINE} strokeWidth={1} />
+      <Shape d="M30 86 L70 86 L70.4 91 L29.6 91 Z" fill={NEON.ink} />
+      <rect x={46} y={86.5} width={8} height={4} fill={STEEL} stroke={LINE} strokeWidth={0.8} />
+    </g>
+  )
+}
+
+function Skirt() {
+  return (
+    <g>
+      <Shape d={COAT_SKIRT} fill={COAT} />
+      <path d="M26 124 L44 126 M56 126 L74 124" stroke={PIPING} strokeWidth={1.4} />
     </g>
   )
 }
 
 function Leg({ side, profession }: { side: Side; profession: Profession }) {
-  const trouser = profession === 'fighter' ? SKIN : NEON.jeans
+  const trouser = profession === 'fighter' ? SKIN : NEON.trousers
 
   return (
     <g className={side === 'right' ? s.thighRight : s.thighLeft}>
@@ -169,18 +190,42 @@ function Leg({ side, profession }: { side: Side; profession: Profession }) {
       <g className={side === 'right' ? s.shinRight : s.shinLeft}>
         <Shape d={SHIN[side]} fill={trouser} />
         <Shape d={BOOT[side]} fill={profession === 'fighter' ? SKIN : NEON.shoe} />
-        {profession !== 'fighter' && <path d={side === 'right' ? 'M33 140 H48' : 'M52 140 H67'} stroke={NEON.chromeRed} strokeWidth={1.2} />}
-        {/* the cyberleg's thrusters, lit only on the double jump */}
-        <path className={s.thrust} d={side === 'right' ? 'M36 145 L39.5 152 L43 145 Z' : 'M57 145 L60.5 152 L64 145 Z'} fill={OPTIC} />
+        {profession !== 'fighter' && <path d={side === 'right' ? 'M33 140 H48' : 'M52 140 H67'} stroke={PIPING} strokeWidth={1} opacity={0.7} />}
       </g>
     </g>
   )
 }
 
-// The mantis blade folds out of the forearm: a long magenta edged chrome scythe, resting folded away.
-function Blade({ side }: { side: Side }) {
-  const d = side === 'right' ? 'M30 70 Q14 74 6 96 Q18 84 31 80 Z' : 'M70 70 Q86 74 94 96 Q82 84 69 80 Z'
-  return <path className={side === 'right' ? s.bladeRight : s.bladeLeft} d={d} fill={CHROME_LIT} stroke={NEON.magenta} strokeWidth={1.2} strokeLinejoin="round" />
+// The drawn blade in the right fist, along the forearm's line, a straight single edge lit cyan.
+function Blade() {
+  return (
+    <g className={s.blade}>
+      <path d="M26.5 89.5 H34.5" stroke={STEEL} strokeWidth={2} strokeLinecap="round" />
+      <path d="M29.2 91 L31.8 91 L31.4 128 L30.5 133 L29.6 128 Z" fill={STEEL_LIT} stroke={LINE} strokeWidth={0.9} strokeLinejoin="round" />
+      <path d="M31.4 93 L31 127" stroke={PIPING} strokeWidth={0.8} />
+    </g>
+  )
+}
+
+// The wrist deck on the left glove: a dark slab whose screen lights when he hacks.
+function Deck() {
+  return (
+    <g>
+      <rect x={65.5} y={74} width={8.6} height={6} fill={NEON.ink} stroke={LINE} strokeWidth={0.9} />
+      <rect className={s.deck} x={66.6} y={75.1} width={6.4} height={3.8} fill={VISOR} />
+    </g>
+  )
+}
+
+// The data climbing off the deck in the hack (the hack pose puts the left hand at about 100, 65).
+function Glyphs() {
+  return (
+    <g className={s.glyphs} fill={NEON.hack}>
+      <rect x={95} y={58} width={3} height={3} />
+      <rect x={101} y={53} width={3} height={3} />
+      <rect x={96} y={47} width={3} height={3} />
+    </g>
+  )
 }
 
 function Hand({ side, profession }: { side: Side; profession: Profession }) {
@@ -196,19 +241,16 @@ function Hand({ side, profession }: { side: Side; profession: Profession }) {
 }
 
 function Arm({ side, profession }: { side: Side; profession: Profession }) {
-  const chrome = side === 'left'
-  const sleeve = profession === 'fighter' ? SKIN : JACKET
-  const fore = chrome ? CHROME : sleeve
+  const sleeve = profession === 'fighter' ? SKIN : COAT
+  const fore = side === 'left' && profession !== 'fighter' ? GLOVE : sleeve
 
   return (
     <g className={side === 'right' ? s.armRight : s.armLeft}>
-      <Shape d={UPPER[side]} fill={chrome && profession === 'fighter' ? CHROME : sleeve} />
-      {profession !== 'fighter' && <path d={side === 'right' ? 'M27.4 58 L36 59.4' : 'M64 59.4 L73.4 58'} stroke={BAND} strokeWidth={2.6} />}
+      <Shape d={UPPER[side]} fill={sleeve} />
       <g className={side === 'right' ? s.foreRight : s.foreLeft}>
-        <Blade side={side} />
+        {side === 'right' && <Blade />}
         <Shape d={FORE[side]} fill={fore} />
-        {chrome && <path d="M66 71 H73.6 M66 76 H73.6 M69.8 66 V84" stroke={NEON.steel} strokeWidth={0.9} />}
-        {chrome && <path d="M73.5 67 L73 83" stroke={CHROME_LIT} strokeWidth={1.2} />}
+        {side === 'left' && profession !== 'fighter' && <Deck />}
         <Hand side={side} profession={profession} />
       </g>
     </g>
@@ -227,73 +269,49 @@ function Snare() {
   )
 }
 
-// The quickhack: the cable from the temple to the deck resting on the raised chrome palm (the hack pose
-// puts the hand at about 100, 65), glyphs climbing off it.
-function Jack() {
-  return (
-    <g className={s.jack}>
-      <path d="M60 30 Q86 34 96 68" fill="none" stroke={OPTIC} strokeWidth={1.2} strokeDasharray="2 1.5" />
-      <rect x={92} y={68} width={15} height={8} fill={NEON.ink} stroke={OPTIC} strokeWidth={1.2} />
-      <g className={s.glyphs} fill={NEON.hack}>
-        <rect x={95} y={58} width={3} height={3} />
-        <rect x={101} y={53} width={3} height={3} />
-        <rect x={96} y={47} width={3} height={3} />
-      </g>
-    </g>
-  )
-}
-
-// The scan pose's optic reticle, resting hidden.
-function Reticle() {
-  return (
-    <g className={s.reticle} fill="none" stroke={COLLAR} strokeWidth={1.6}>
-      <path d="M80 14 H76 V20 M94 14 H98 V20 M80 34 H76 V28 M94 34 H98 V28" />
-      <circle cx={87} cy={24} r={1.6} fill={COLLAR} />
-    </g>
-  )
-}
-
-interface MercProps {
+interface HeroProps {
   profession: Profession
-  motion: MercMotion
+  motion: HeroMotion
   className?: string
 }
 
 /** His figure's groups in the 100 by 150 viewBox, playing `motion`; a stage places it in a nested svg of
  *  that viewBox and poses its joints itself (pose.ts), with the motion left 'still'. */
-export function MercFigure({ profession, motion }: Omit<MercProps, 'className'>) {
+export function HeroFigure({ profession, motion }: Omit<HeroProps, 'className'>) {
+  const coated = profession !== 'fighter'
   return (
     <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
       <ellipse className={s.shadow} cx={50} cy={145} rx={20} ry={2.6} fill={NEON.magenta} opacity={0.35} />
       <g className={s.glitch}>
         <g className={s.ghost} aria-hidden="true">
-          <path d={JACKET_BODY} fill={NEON.cyan} opacity={0.5} />
+          <path d={COAT_BODY} fill={NEON.cyan} opacity={0.5} />
           <path d={HEAD} fill={NEON.hotPink} opacity={0.5} />
         </g>
         <g className={s.body}>
+          {coated && <Skirt />}
           <Leg side="right" profession={profession} />
           <Leg side="left" profession={profession} />
           <g className={s.chest}>
+            {coated && <Sheath />}
             <Torso profession={profession} />
             <Head profession={profession} />
           </g>
           {profession === 'drummer' && <Snare />}
           <Arm side="right" profession={profession} />
           <Arm side="left" profession={profession} />
-          {profession === 'engineer' && <Jack />}
+          {profession === 'engineer' && <Glyphs />}
         </g>
       </g>
-      <Reticle />
     </g>
   )
 }
 
-/** Him as the night city merc, in a profession's kit, playing one motion; he glitches when hovered.
+/** Him in a profession's kit, playing one motion; he glitches when hovered.
  *  Memoised on its three primitive props, so a parent render that keeps them redraws none of his svg. */
-export const MercSprite = memo(function MercSprite({ profession, motion, className = '' }: MercProps) {
+export const HeroSprite = memo(function HeroSprite({ profession, motion, className = '' }: HeroProps) {
   return (
     <svg viewBox="0 0 100 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <MercFigure profession={profession} motion={motion} />
+      <HeroFigure profession={profession} motion={motion} />
     </svg>
   )
 })

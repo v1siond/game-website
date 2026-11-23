@@ -2,7 +2,7 @@ import { headingId } from '@/lib/cv/sectionText'
 import type { TagListLook } from '@/components/cv/TagList'
 import world from './world.module.css'
 
-// The optics HUD's controls and chips, and the id of a section's HUD title (sections.tsx). Red stays in
+// The HUD's controls and chips, and the id of a section's HUD title (sections.tsx). Red stays in
 // the line work; the words are yellow or ice white on near black.
 
 export const panelHeadingId = (title: string): string => headingId('nc', title)

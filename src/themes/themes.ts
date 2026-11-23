@@ -293,7 +293,7 @@ export const themes: Theme[] = [
     font: 'monospace',
   },
 
-  // 12. Neon Cyber - a netrunner's night city through the optics HUD, with quickhacks and scan mode
+  // 12. Neon Cyber - an augmented operative's neon city through his visor's HUD
   {
     id: 'neon-cyber',
     name: 'Neon Cyber',

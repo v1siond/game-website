@@ -1,14 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { MERC_ACTION, MercSprite } from './merc'
+import { HERO_ACTION, HeroSprite } from './figure'
 import { NEON } from './palette'
 import world from './world.module.css'
 
-// His rig per profession, the place the quickhack menu swaps in: three layers (far, mid with him, near)
+// His rig per profession, the place the profession menu swaps in: three layers (far, mid with him, near)
 // that lean apart under the pointer, each place with its own motions, played once inside 5 s when the
 // menu scrolls in and again on a profession pick.
 // - System Engineer, the den: the city through the window, cables from the ceiling, three screens with
-//   scrolling code, the deck on the desk and the netrunner chair; he types (5 motions).
+//   scrolling code, the deck on the desk and the reclined chair; he types (5 motions).
 // - Musician, the club: a holo sign over the stage, two beams sweeping, his kit with the crash shaking
 //   on the hit; he plays behind it (6 motions).
 // - Martial Artist, the overpass gym: the highway deck overhead with traffic crossing, the ring ropes
@@ -30,7 +30,7 @@ function Layer({ depth, children }: { depth: 'far' | 'mid' | 'near'; children: R
   )
 }
 
-// Where he stands in the rig, in percent of the rig box; his motion there is the merc's profession action.
+// Where he stands in the rig, in percent of the rig box; his motion there is his profession's action.
 const PLACE: Record<Profession, string> = {
   engineer: 'left-[13%] bottom-[3%] w-[18%]',
   drummer: 'left-[41%] bottom-[10%] w-[18%]',
@@ -90,7 +90,7 @@ function Den({ figure }: { figure: ReactNode }) {
       </Layer>
       {figure}
       <Layer depth="near">
-        {/* the netrunner chair, reclined, its cable to the deck */}
+        {/* the reclined chair, its cable to the deck */}
         <path d="M400 236 L418 168 Q426 150 446 156 L470 236 Z" fill={NEON.ink} stroke={NEON.chromeRed} strokeWidth={2} />
         <path d="M420 176 Q300 230 206 160" stroke={NEON.data} strokeOpacity={0.6} strokeWidth={2} fill="none" />
         <rect x={-40} y={232} width={560} height={20} fill={NEON.ink} />
@@ -182,7 +182,7 @@ const RIG: Record<Profession, (props: { figure: ReactNode }) => ReactNode> = {
   fighter: Gym,
 }
 
-// `on` is the quickhack menu's trigger: he holds his kit pose until it.
+// `on` is the profession menu's trigger: he holds his kit pose until it.
 export function Rig({ profession, on }: { profession: Profession; on: boolean }) {
   const Place = RIG[profession]
   const place = PLACE[profession]
@@ -192,7 +192,7 @@ export function Rig({ profession, on }: { profession: Profession; on: boolean })
       <Place
         figure={
           <div className={`absolute ${place} ${world.depth} ${world.mid}`}>
-            <MercSprite profession={profession} motion={on ? MERC_ACTION[profession] : 'still'} className="h-auto w-full" />
+            <HeroSprite profession={profession} motion={on ? HERO_ACTION[profession] : 'still'} className="h-auto w-full" />
           </div>
         }
       />

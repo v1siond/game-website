@@ -5,19 +5,19 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { NameWords } from '@/components/cv/NameWords'
 import { ContactActions } from './actions'
-import { MercSprite } from './merc'
+import { HeroSprite } from './figure'
 import { panelHeadingId } from './hud'
 import type { Scene } from './scenes'
 import { HudTitle } from './sections'
 import { NeonStage } from './stage'
 import world from './world.module.css'
 
-// Contact as an incoming call on the optics: his portrait on the call feed, his name and the two ways to
-// answer, email and LinkedIn; pointing at one kicks it out a step. Behind it he sits on his car's rear deck
-// at the kerb, and as the page ends he gets in and drives off into the Badlands (scenes.tsx), so the
-// section runs a screen past the call.
+// Contact as an incoming call on his visor: his portrait on the call feed, his name and the two ways to
+// answer, email and LinkedIn; pointing at one kicks it out a step. Behind it a flying cab comes down to the
+// street, and as the page ends he steps in and it lifts away (scenes.tsx), so the section runs a screen past
+// the call.
 
-export function HoloCall({ scene, profession, number, still }: { scene: Scene; profession: Profession; number: number; still: boolean }) {
+export function IncomingCall({ scene, profession, number, still }: { scene: Scene; profession: Profession; number: number; still: boolean }) {
   const { cyber, sections } = useLabels()
 
   return (
@@ -38,7 +38,7 @@ export function HoloCall({ scene, profession, number, still }: { scene: Scene; p
               <div className="relative shrink-0" aria-hidden="true">
                 <span className="absolute -inset-3 rounded-full border-2 border-[color:var(--neon-hack)] opacity-60" />
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-[color:var(--neon-data)] bg-[color:var(--neon-ink)]">
-                  <MercSprite profession={profession} motion="still" className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
+                  <HeroSprite profession={profession} motion="still" className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,color-mix(in_srgb,var(--neon-data)_14%,transparent)_2px_3px)]" />
                 </div>
               </div>

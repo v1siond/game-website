@@ -6,18 +6,17 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { NameWords } from '@/components/cv/NameWords'
 import { ContactActions } from './actions'
-import { ScanToggle } from './scanner'
-import { QuickhackMenu } from './quickhack'
+import { ProfessionMenu } from './menu'
 import type { Scene } from './scenes'
 import { NeonStage } from './stage'
 import world from './world.module.css'
 import { NEON } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 
-// His outfit plate: an optics readout in HUD yellow on ink, ringed in the scanner's data cyan.
+// His outfit plate: a visor readout in HUD yellow on ink, ringed in data cyan.
 const OUTFIT_LOOK: WardrobeLook = { plate: NEON.ink, text: NEON.hud, ring: NEON.data }
 
-// The recruiter first screen as the optics booting, once, about 2.4 s: a scanline sweeps the panel,
+// The recruiter first screen as his visor booting, once, about 2.4 s: a scanline sweeps the panel,
 // the four brackets snap in, his name lands with its red and cyan ghosts splitting off and settling,
 // the headline and the tagline type in and the HUD rail slides in under them. He stands in the city
 // behind the panel, the hero's stage. After the boot the panel leans toward the pointer (--mx, --my), the
@@ -54,11 +53,9 @@ const GHOSTS = [
 
 interface BootHeroProps {
   profession: Profession
-  scanning: boolean
-  onScan: () => void
 }
 
-function BootHero({ profession, scanning, onScan }: BootHeroProps) {
+function BootHero({ profession }: BootHeroProps) {
   const { navigation, professions } = useLabels()
 
   return (
@@ -108,9 +105,6 @@ function BootHero({ profession, scanning, onScan }: BootHeroProps) {
             <nav className={`mt-5 flex flex-wrap gap-3 ${world.fadeLate}`} aria-label={navigation.contactAndCv}>
               <ContactActions actions={actions} />
             </nav>
-            <div className={`mt-4 ${world.fadeLate}`}>
-              <ScanToggle scanning={scanning} onToggle={onScan} />
-            </div>
           </div>
         </div>
       )}
@@ -124,13 +118,13 @@ interface HeroSectionProps extends BootHeroProps {
 }
 
 /**
- * The first screen: the booting optics panel and the quickhack menu over Watson, him under the overpass to
+ * The first screen: the booting visor panel and the profession menu over the street, him under the overpass to
  * the right. His outfit plate sits beside him from lg, its fan opening down over the street; below lg it
  * sits under the menu, clear of every control: on a phone its fan opens down into the hero's own bottom
  * space, which the visitor scrolls to; from md to lg the plate is on the first screen, so the fan opens up.
  * Under reduced motion the hero's picture sits still behind it.
  */
-export function HeroSection({ scene, still, profession, scanning, onScan }: HeroSectionProps) {
+export function HeroSection({ scene, still, profession }: HeroSectionProps) {
   const { navigation } = useLabels()
   return (
     <section data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-[14rem] pt-8 sm:px-6 sm:pt-16 lg:px-[6vw] lg:pb-16">
@@ -138,9 +132,9 @@ export function HeroSection({ scene, still, profession, scanning, onScan }: Hero
       {/* on a phone the first half screen is his: up on the fire escape landing over the street (scenes.tsx) */}
       <div className="h-[44svh] md:hidden" aria-hidden="true" />
       <div className="max-w-[44rem] lg:max-w-[min(40rem,56vw)]">
-        <BootHero profession={profession} scanning={scanning} onScan={onScan} />
+        <BootHero profession={profession} />
         <section className="mt-6" aria-label={navigation.professionSelection}>
-          <QuickhackMenu active={profession} />
+          <ProfessionMenu active={profession} />
         </section>
       </div>
       <Wardrobe

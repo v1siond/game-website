@@ -1,14 +1,13 @@
 import type { ComponentType } from 'react'
 import { NEON } from './palette'
 
-// The city in the art direction's three eras, as the layers of a scene's stage (stage.tsx): far, the
-// neomilitary megatowers with their lit window grids in the dusk haze; mid, the kitsch towers hung with
-// sign boxes in yellow, cyan and magenta and a flying car the scroll carries across; near, the entropism
-// walls, a fire escape, sagging cables, an LED strip bolted on and the street. Between far and mid sits
-// the scene's district (research 2026-10-21-w4-neon-cyber): Watson's concrete overpass in a brown dusk,
-// Japantown's towers hung with tall cyan and yellow ad screens and red lanterns, a megabuilding's slab in
-// a pink fog canyon, and the Badlands' amber sunset with palms and the highway out. Every layer is drawn
-// on the stage's 1600 by 900 canvas; `uid` keeps each stage's gradient and pattern ids its own.
+// The city in three depths, as the layers of a scene's stage (stage.tsx): far, the dark towers with their lit
+// window grids in the dusk haze; mid, the towers hung with sign boxes in yellow, cyan and magenta and a flying
+// car the scroll carries across; near, the alley walls, a fire escape, sagging cables, an LED strip bolted on
+// and the street. Between far and mid sits the scene's district: the concrete overpass in a brown dusk, the
+// lantern street's towers hung with tall cyan and yellow ad screens and red lanterns, a housing slab in a pink
+// fog canyon, and the outskirts' amber sky with palms and the highway out. Every layer is drawn on the
+// stage's 1600 by 900 canvas; `uid` keeps each stage's gradient and pattern ids its own.
 
 export const VIEW = '0 0 1600 900'
 
@@ -22,7 +21,7 @@ const FAR_TOWERS = [
   { x: 1430, w: 150, h: 600 },
 ]
 
-// The kitsch towers and the sign boxes on them: colour, place, size.
+// The sign towers and the sign boxes on them: colour, place, size.
 const MID_TOWERS = [
   { x: 120, w: 170, h: 380 },
   { x: 520, w: 140, h: 470 },
@@ -51,7 +50,7 @@ export function Far({ uid }: { uid: string }) {
         </pattern>
       </defs>
       <rect width={1600} height={900} fill={`url(#nc-dusk-${uid})`} />
-      {/* the megatower, its spire and the red aircraft light */}
+      {/* the tallest tower, its spire and the red aircraft light */}
       <polygon points="610,900 640,140 700,80 760,140 790,900" fill={NEON.alley} />
       <rect x={694} y={20} width={12} height={70} fill={NEON.alley} />
       <circle cx={700} cy={22} r={4} fill={NEON.chromeRed} />
@@ -104,11 +103,11 @@ export function Near() {
   )
 }
 
-// Watson: the brown dusk over the street, the concrete overpass on its pillars, a kiosk sign under it.
-function Watson() {
+// The overpass: the brown dusk over the street, the concrete overpass on its pillars, a kiosk sign under it.
+function Overpass() {
   return (
     <>
-      <rect width={1600} height={900} fill={NEON.watsonDusk} fillOpacity={0.35} />
+      <rect width={1600} height={900} fill={NEON.overpassDusk} fillOpacity={0.35} />
       <path d="M0 610 L1600 560 L1600 600 L0 650 Z" fill={NEON.concrete} />
       <path d="M0 650 L1600 600" stroke={NEON.data} strokeOpacity={0.5} strokeWidth={3} />
       {[180, 620, 1060, 1460].map((x) => (
@@ -120,19 +119,19 @@ function Watson() {
   )
 }
 
-const JAPANTOWN_ADS = [
+const LANTERN_ADS = [
   { x: 90, y: 180, w: 60, h: 300, color: NEON.data },
   { x: 430, y: 120, w: 70, h: 360, color: NEON.hud },
   { x: 1000, y: 160, w: 60, h: 320, color: NEON.data },
   { x: 1340, y: 220, w: 80, h: 260, color: NEON.hud },
 ]
 
-// Japantown: the night towers with tall ad screens and a row of red lanterns strung across the street.
-function Japantown() {
+// The lantern street: the night towers with tall ad screens and a row of red lanterns strung across the street.
+function Lanterns() {
   return (
     <>
       <rect width={1600} height={900} fill={NEON.ink} fillOpacity={0.3} />
-      {JAPANTOWN_ADS.map(({ x, y, w, h, color }) => (
+      {LANTERN_ADS.map(({ x, y, w, h, color }) => (
         <g key={x}>
           <rect x={x} y={y} width={w} height={h} fill={NEON.ink} stroke={color} strokeWidth={3} />
           <rect x={x + 8} y={y + 10} width={w - 16} height={h - 20} fill={color} fillOpacity={0.22} />
@@ -147,9 +146,9 @@ function Japantown() {
   )
 }
 
-// The megabuilding: the stacked slab of a block of thousands, its lit window bands, the pink fog in the
-// canyon and one pink tube sign hanging down its face.
-function Megablock() {
+// The slab: the stacked housing block of thousands, its lit window bands, the pink fog in the canyon and one
+// pink tube sign hanging down its face.
+function Slab() {
   return (
     <>
       <rect x={560} y={60} width={480} height={840} fill={NEON.alley} />
@@ -167,8 +166,8 @@ function Megablock() {
 
 const PALMS = [140, 380, 1240, 1480]
 
-// The Badlands: the amber sunset low on the horizon, the sun disc, palms in silhouette, the highway out.
-function Badlands({ uid }: { uid: string }) {
+// The outskirts: the amber sky low on the horizon, the sun disc, palms in silhouette, the highway out.
+function Outskirts({ uid }: { uid: string }) {
   return (
     <>
       <defs>
@@ -192,10 +191,10 @@ function Badlands({ uid }: { uid: string }) {
   )
 }
 
-export type District = 'watson' | 'japantown' | 'megablock' | 'badlands'
+export type District = 'overpass' | 'lanterns' | 'slab' | 'outskirts'
 
-/** Each district's picture, drawn between the far towers and the kitsch towers. */
-export const DISTRICT_ART: Record<District, ComponentType<{ uid: string }>> = { watson: Watson, japantown: Japantown, megablock: Megablock, badlands: Badlands }
+/** Each district's picture, drawn between the far towers and the sign towers. */
+export const DISTRICT_ART: Record<District, ComponentType<{ uid: string }>> = { overpass: Overpass, lanterns: Lanterns, slab: Slab, outskirts: Outskirts }
 
 // The rain as slanted streaks in the foreground layer, still; the scroll's push in moves them.
 const RAIN = Array.from({ length: 46 }, (_, i) => ({ x: (i * 137) % 1640, y: (i * 211) % 860, long: 40 + ((i * 53) % 50) }))

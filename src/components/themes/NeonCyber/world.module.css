@@ -1,4 +1,4 @@
-/* Neon Cyber's own motion and chrome: the optics HUD of a netrunner city. Every animation moves transform or
+/* Neon Cyber's own motion and chrome: the HUD of a neon city at night. Every animation moves transform or
  * opacity only. The base style of each element is its final frame and the keyframes start from the first
  * frame (fill: both), so under reduced motion, where every animation is dropped, the page rests whole.
  * Nothing loops (BD29): each motion plays a bounded number of runs inside 5 s and rests on a still frame.
@@ -116,7 +116,7 @@
   }
 }
 
-/* ---- Hero: the optics boot, once, then the panel leans toward the pointer ---- */
+/* ---- Hero: the visor boot, once, then the panel leans toward the pointer ---- */
 
 .tilt {
   transform: perspective(1100px) rotateY(calc(var(--mx) * 3deg)) rotateX(calc(var(--my) * -2deg));
@@ -236,135 +236,7 @@
   }
 }
 
-/* ---- Scanner: the optics mode. The root carries data-scan; a scannable card shows its reticle and tag ---- */
-
-.scanVeil {
-  position: fixed;
-  inset: 0;
-  z-index: 15;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.25s;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--neon-hud) 7%, transparent) 3px 4px),
-    radial-gradient(circle at 50% 45%, transparent 35%, color-mix(in srgb, var(--neon-ink) 70%, transparent) 100%);
-}
-
-.root[data-scan='on'] .scanVeil {
-  opacity: 1;
-}
-
-.scannable {
-  --tag: var(--neon-gold);
-  position: relative;
-}
-
-.scannable[data-tag='project'] {
-  --tag: var(--neon-hack);
-}
-
-.scannable[data-tag='use'] {
-  --tag: var(--neon-use);
-}
-
-.scannable[data-tag='record'] {
-  --tag: var(--neon-chrome-red);
-}
-
-.root[data-scan='on'] .scannable {
-  outline: 1px dashed color-mix(in srgb, var(--tag) 55%, transparent);
-  outline-offset: 5px;
-}
-
-.reticle {
-  position: absolute;
-  inset: -9px;
-  pointer-events: none;
-}
-
-.reticle > span {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 0 solid var(--tag);
-  opacity: 0;
-  transform: scale(1.6);
-  transition:
-    opacity 0.18s,
-    transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-}
-
-.reticle > span:nth-child(1) {
-  top: 0;
-  left: 0;
-  border-top-width: 2px;
-  border-left-width: 2px;
-}
-
-.reticle > span:nth-child(2) {
-  top: 0;
-  right: 0;
-  border-top-width: 2px;
-  border-right-width: 2px;
-}
-
-.reticle > span:nth-child(3) {
-  bottom: 0;
-  left: 0;
-  border-bottom-width: 2px;
-  border-left-width: 2px;
-}
-
-.reticle > span:nth-child(4) {
-  bottom: 0;
-  right: 0;
-  border-bottom-width: 2px;
-  border-right-width: 2px;
-}
-
-.tag {
-  position: absolute;
-  left: -9px;
-  bottom: calc(100% + 10px);
-  z-index: 30;
-  display: flex;
-  gap: 0.5rem;
-  max-width: calc(100% + 18px);
-  padding: 2px 8px;
-  border-left: 3px solid var(--tag);
-  background: var(--neon-ink);
-  color: var(--tag);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity 0.18s,
-    transform 0.18s;
-}
-
-.tag > span + span {
-  color: var(--neon-ice);
-}
-
-.root[data-scan='on'] .scannable:is(:hover, :focus-within) {
-  z-index: 25;
-}
-
-.root[data-scan='on'] .scannable:is(:hover, :focus-within) .reticle > span,
-.root[data-scan='on'] .scannable:is(:hover, :focus-within) .tag {
-  opacity: 1;
-  transform: none;
-}
-
-.scanOn {
-  background: var(--neon-hud);
-  color: var(--neon-ink);
-}
-
-/* ---- Quickhack: the profession programs, the upload bar, the glitch over his rig ---- */
+/* ---- The profession menu: the programs, the load bar, the glitch over his rig ---- */
 
 .program[aria-checked='true'] {
   background: color-mix(in srgb, var(--neon-hud) 12%, var(--neon-ink));
@@ -541,7 +413,7 @@
   }
 }
 
-/* ---- Braindance: the timeline, its striped clips and the playhead ---- */
+/* ---- Work: the timeline, its striped clips and the playhead ---- */
 
 .track {
   height: calc(var(--lanes) * 20px + 16px);
@@ -561,16 +433,6 @@
   background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--clip) 55%, transparent) 0 4px, transparent 4px 9px);
 }
 
-.bd[data-layer='audio'] .clip,
-.bd[data-layer='audio'] .lens {
-  --clip: var(--neon-hack);
-}
-
-.bd[data-layer='thermal'] .clip,
-.bd[data-layer='thermal'] .lens {
-  --clip: color-mix(in srgb, var(--neon-heat) calc(var(--heat) * 100%), var(--neon-cold));
-}
-
 .clip[data-lit='true'] {
   background: color-mix(in srgb, var(--clip) 70%, transparent);
 }
@@ -587,7 +449,7 @@
 
 /* A job off the playhead dims as a whole, card and words together, so the city behind never shows through it
    and its words keep 7:1 on the card. */
-.bd[data-scrubbed='true'] .lens[data-lit='false'] {
+.jobs[data-scrubbed='true'] .lens[data-lit='false'] {
   filter: brightness(0.75);
 }
 
@@ -596,40 +458,25 @@
   border-left-color: var(--clip);
 }
 
-.bd[data-layer='audio'] .mark {
-  color: var(--neon-hack);
-}
-
-/* ---- Breach: the code matrix, its lit band, the buffer ---- */
+/* ---- Projects: the decrypt dialog, its bar and the scramble over the file ---- */
 
 .dialog::backdrop {
   background: color-mix(in srgb, var(--neon-ink) 85%, transparent);
 }
 
-.band {
-  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+/* The decryption runs once in steps; the file opens when it ends (projects.tsx), or at once under reduced motion. */
+.decrypting {
+  transform-origin: 0 50%;
+  animation: decrypt 1.4s steps(8) both;
 }
 
-.band[data-axis='row'] {
-  inset: 0 0 auto 0;
-  height: 20%;
-  transform: translateY(calc(var(--line) * 100%));
+.decrypting[data-open='true'] {
+  transform: none;
 }
 
-.band[data-axis='column'] {
-  inset: 0 auto 0 0;
-  width: 20%;
-  transform: translateX(calc(var(--line) * 100%));
-}
-
-.picked {
-  animation: picked 0.24s steps(3) both;
-}
-
-@keyframes picked {
+@keyframes decrypt {
   from {
-    opacity: 0;
-    transform: scale(1.5);
+    transform: scaleX(0);
   }
 }
 
@@ -642,16 +489,7 @@
   opacity: 0;
 }
 
-/* ---- Radio: the dial needle and the equaliser of the tuned band ---- */
-
-.stations {
-  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
-}
-
-.needle {
-  transform: translateX(calc((var(--tuned) + 0.5) / var(--count) * 100%));
-  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
+/* ---- Bands: the equaliser of the band in focus ---- */
 
 .eq > span {
   transform-origin: 50% 100%;

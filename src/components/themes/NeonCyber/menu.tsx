@@ -9,10 +9,10 @@ import { heldUntil } from '@/components/themes/shared/held'
 import { Rig } from './rigs'
 import world from './world.module.css'
 
-// The profession switch as the netrunner's quickhack menu: the three professions are programs in a
-// list, each with its icon and its field; picking one uploads it (the bar fills in steps), then a
-// glitch tears across his rig while the new place swaps in. The upload bar and the rig are keyed by
-// the picked profession, so each pick plays the upload and the tear once.
+// The profession switch as a program list on the HUD: the three professions are programs, each with its
+// icon and its field; picking one loads it (the bar fills in steps), then a glitch tears across his rig
+// while the new place swaps in. The load bar and the rig are keyed by the picked profession, so each pick
+// plays the load and the tear once.
 
 const PROGRAM_ICON: Record<Profession, ReactNode> = {
   // a chip with its pins
@@ -45,7 +45,7 @@ const TEARS = [
   { y: '71%', h: '12%', x: '-8%', color: 'bg-[color:var(--neon-hud)]' },
 ]
 
-export function QuickhackMenu({ active }: { active: Profession }) {
+export function ProfessionMenu({ active }: { active: Profession }) {
   const { navigation, professionFields, cyber } = useLabels()
   // The rig sits under the boot hero, so its entrance and its motions wait on their first
   // frame (heldUntil) until it scrolls in.
