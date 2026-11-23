@@ -2,19 +2,17 @@ import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { TagList } from '@/components/cv/TagList'
 import { ATOMIC_CHIPS, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
-import { cssVars } from '@/lib/cssVars'
 
 // Experience as the terminal's quest log: each job an entry with its state box (the current one a
 // blinking diamond and "Active", an ended one a ticked box and "Completed"), the title, the company and
-// the years, its achievements as the objective rows. The cards sit in masonry; when the section's
-// trigger fires (data-on on the section, sections.tsx) each card powers on like the tube, a bright line
-// opening to the full card, staggered by --i. Under the pointer an objective row inverts the way the
-// wrist terminal marks its pick, the phosphor bar filling in from the left.
+// the years, its achievements as the objective rows. The cards sit in masonry; on the stage he runs a
+// quest flag up per card as the page reaches it (scenes.tsx). Under the pointer an objective row inverts
+// the way the wrist terminal marks its pick, the phosphor bar filling in from the left.
 
 function QuestState({ current }: { current: boolean }) {
   const { navigation, hud } = useLabels()
@@ -27,12 +25,12 @@ function QuestState({ current }: { current: boolean }) {
   )
 }
 
-function QuestCard({ job: entry, index }: { job: Job; index: number }) {
+function QuestCard({ job: entry }: { job: Job }) {
   const { years, cards } = useLabels()
   const job = jobCard(entry, years)
 
   return (
-    <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={cssVars({ '--i': index })}>
+    <article className={`relative p-5 ${atomic.panel}`}>
       <QuestState current={entry.current} />
       <h3 className="mt-3 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{job.title}</h3>
       <p className="mt-1 text-base text-atomic-yellow">
@@ -52,10 +50,10 @@ function QuestCard({ job: entry, index }: { job: Job; index: number }) {
 
 export function QuestLog({ jobs }: { jobs: Job[] }) {
   return (
-    <ul className={MASONRY_LIST}>
-      {jobs.map((job, index) => (
+    <ul className={MASONRY_COLUMN_LIST}>
+      {jobs.map((job) => (
         <li key={job.id} className={MASONRY_ITEM}>
-          <QuestCard job={job} index={index} />
+          <QuestCard job={job} />
         </li>
       ))}
     </ul>

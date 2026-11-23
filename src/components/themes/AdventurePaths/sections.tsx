@@ -307,14 +307,13 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
 
 /** One level: under reduced motion its own stage sits still behind its head. */
 export function LevelSection({ scene, still }: { scene: TrailScene & { slot: SectionSlot }; still: boolean }) {
-  const { sections, trail } = useLabels()
+  const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `trail-${scene.id}`
   return (
     <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
       <header className={page.head}>
-        <p className={page.place}>{trail[scene.place]}</p>
         <h2 id={headingId} className={`${page.title} ${JOURNAL_SERIF}`}>
           {sections[scene.slot.titleKey]}
         </h2>

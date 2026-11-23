@@ -4,15 +4,15 @@ import { useState } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
-import { RadioDancer } from './dance'
 import { PHOSPHOR, PHOSPHOR_DEEP } from './palette'
 import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
 
-// Bands as the terminal's radio: each band a station. Above the stations the receiver: him dancing with
-// the bakelite radio (dance.tsx), the tuning scale with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
+// Bands as the terminal's radio: each band a station, the stations the cards the bands scene counts (he
+// sways with the bakelite radio on the stage, scenes.tsx). Above the stations the receiver: the tuning
+// scale with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
 // slides to that station's place on the scale (transform, an eased glide), the wave's height and speed
 // change to that station's (the --amp and --wave variables the CSS reads), a short burst of static
 // flickers over the panel (keyed per station, so it plays on each retune), the station's lamp lights
@@ -40,7 +40,7 @@ const WAVES = [
   { cycle: '3s', loops: 1 },
 ]
 
-function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: boolean }) {
+function Receiver({ bands, tuned }: { bands: Band[]; tuned: number }) {
   const { hud } = useLabels()
   const band = bands[tuned]
   const place = bands.length > 1 ? tuned / (bands.length - 1) : 0.5
@@ -53,8 +53,7 @@ function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: bool
   })
 
   return (
-    <div className={`mb-8 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 p-4 sm:p-6 md:grid-cols-[7rem_minmax(0,3fr)_minmax(0,2fr)] ${atomic.panel}`} style={look}>
-      <RadioDancer tuned={tuned} on={on} />
+    <div className={`mb-8 grid gap-4 p-4 sm:p-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] ${atomic.panel}`} style={look}>
       <div className="self-center">
         <div className={`relative h-16 ${atomic.dialScale}`} aria-hidden="true">
           <span className={`absolute bottom-0 top-0 w-1 bg-atomic-red ${atomic.needle}`} />
@@ -64,13 +63,13 @@ function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: bool
         </p>
       </div>
       <div className={`relative h-24 self-center overflow-hidden border border-atomic-phosphor/50 ${atomic.wavePanel}`} aria-hidden="true">
-        <div key={tuned} className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
+        <div key={`wave-${tuned}`} className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
           <svg viewBox="0 0 400 60" preserveAspectRatio="none" className={`h-full w-full ${atomic.waveHeight}`} focusable="false">
             <path d={SINE} fill="none" stroke={PHOSPHOR} strokeWidth="2" vectorEffect="non-scaling-stroke" />
             <path d="M0 30 H400" stroke={PHOSPHOR_DEEP} strokeWidth="1" vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
-        <span key={tuned} className={`absolute inset-0 ${atomic.static}`} />
+        <span key={`static-${tuned}`} className={`absolute inset-0 ${atomic.static}`} />
       </div>
     </div>
   )
@@ -110,18 +109,20 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
   )
 }
 
-export function Radio({ bands, on }: { bands: Band[]; on: boolean }) {
+export function Radio({ bands }: { bands: Band[] }) {
   const [tuned, setTuned] = useState(0)
 
   return (
     <>
-      <Receiver bands={bands} tuned={tuned} on={on} />
-      <BandList
-        bands={bands}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderBand={(slot, index) => <Station slot={slot} tuned={index === tuned} onTune={() => setTuned(index)} />}
-      />
+      <Receiver bands={bands} tuned={tuned} />
+      <div data-stage-items="">
+        <BandList
+          bands={bands}
+          className={MASONRY_COLUMN_LIST}
+          itemClassName={MASONRY_ITEM}
+          renderBand={(slot, index) => <Station slot={slot} tuned={index === tuned} onTune={() => setTuned(index)} />}
+        />
+      </div>
     </>
   )
 }

@@ -14,7 +14,8 @@ import css from './page.module.css'
 // The hub: his name, the headline, the tagline, the contact line and his two actions over the Chronoport's
 // picture, then the three professions as portal pads. Every profession is on this one page, so a pad is a
 // link down to the first gate of its wing. He stands in the picture under the ring; his outfit plate sits
-// beside him. Under reduced motion the hub's picture sits still behind the hero.
+// beside him. The copy stands on two plates, his name and headline, then the rest, so on a phone the
+// picture shows him between them. Under reduced motion the hub's picture sits still behind the hero.
 
 const OUTFIT: WardrobeLook = { plate: PAGE.night, text: PAGE.chalk, ring: PAGE.portal }
 
@@ -36,32 +37,36 @@ export function HubHero({ scene, still }: { scene: Scene; still: boolean }) {
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
           <div className={css.heroCopy}>
-            <h1 id="era-hero" className={`${css.display} ${css.name}`}>
-              {name}
-            </h1>
-            <p className={css.headline}>{headline}</p>
-            <p className={css.tagline}>{tagline}</p>
-            <p className={css.line}>{line}</p>
-            <p className={css.actions}>
-              {actions.map((slot) => (
-                <ContactLink key={slot.id} slot={slot} className={ACTION_CLASS[slot.id]} />
-              ))}
-            </p>
-            <nav className={css.pads} aria-labelledby="era-pads">
-              <p id="era-pads" className={css.padsTitle}>
-                {navigation.selectYourProfession}
-              </p>
-              <ul>
-                {PADS.map(({ id, anchor, className }) => (
-                  <li key={id}>
-                    <a className={`${css.pad} ${className}`} href={`#${anchor}`}>
-                      <strong>{professions[id]}</strong>
-                      <span>{professionFields[id]}</span>
-                    </a>
-                  </li>
+            <div className={css.heroPlate}>
+              <h1 id="era-hero" className={`${css.display} ${css.name}`}>
+                {name}
+              </h1>
+              <p className={css.headline}>{headline}</p>
+            </div>
+            <div className={css.heroPlate}>
+              <p className={css.tagline}>{tagline}</p>
+              <p className={css.line}>{line}</p>
+              <p className={css.actions}>
+                {actions.map((slot) => (
+                  <ContactLink key={slot.id} slot={slot} className={ACTION_CLASS[slot.id]} />
                 ))}
-              </ul>
-            </nav>
+              </p>
+              <nav className={css.pads} aria-labelledby="era-pads">
+                <p id="era-pads" className={css.padsTitle}>
+                  {navigation.selectYourProfession}
+                </p>
+                <ul>
+                  {PADS.map(({ id, anchor, className }) => (
+                    <li key={id}>
+                      <a className={`${css.pad} ${className}`} href={`#${anchor}`}>
+                        <strong>{professions[id]}</strong>
+                        <span>{professionFields[id]}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
           </div>
         )}
       />

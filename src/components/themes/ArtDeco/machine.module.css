@@ -3,7 +3,8 @@
  * key, so these keyframes play once per pick: the blind drops over the glass (0 to 280 ms), holds while
  * the costume changes, lifts (to 900 ms); the prop and his figure rise into the case under it; the
  * bottle drops into the tray and settles; the two bulb layers alternate in a chase for 1.6 s. Nothing
- * plays before the machine is in view (data-on). Transform and opacity only.
+ * plays until a profession is picked (data-on): the page opens on him standing in the glass. Transform and
+ * opacity only.
  */
 
 .machine {
@@ -84,11 +85,6 @@
   100% {
     transform: translate3d(0, -101%, 0);
   }
-}
-
-.figure,
-.prop {
-  opacity: 0;
 }
 
 .machine[data-on] .figure {
@@ -188,8 +184,6 @@
     animation: none;
   }
 
-  .figure,
-  .prop,
   .bottle {
     opacity: 1;
   }

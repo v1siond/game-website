@@ -5,27 +5,24 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { projectCard } from '@/lib/cv/cvView'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { useModalDialog } from '@/hooks/useModalDialog'
 import type { Project } from '@/lib/cv/content'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
-import { DwellerSprite, type DwellerMotion } from './dweller'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { TagList } from '@/components/cv/TagList'
 import { ATOMIC_CHIPS, PHOSPHOR_BUTTON, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
-import j from './journey.module.css'
 import { cssVars } from '@/lib/cssVars'
 
 // Projects through the targeting system. The pointer or focus on a project locks the targeting on it:
-// the section goes into its paused state (data-vats on the section: every other card drains to a dim
+// the section goes into its paused state (data-aiming on the section: every other card drains to a dim
 // tint, the page's ambient loops freeze through the root's :has rule in atomic.module.css), the corner
 // brackets close in on the target and each of its parts (role, impact, tech, links) gets its tag, the
-// way the game names each body part it can hit.
+// way a targeting sight tags each part it can hit.
 // A click (or the card's button) spends action points and plays the shot, in setTimeout phases:
 //   aim    0 ms    the letterbox bars slide in and the target pushes toward the camera
 //   hit    420 ms  the white flash and the target's hard shake
@@ -33,9 +30,8 @@ import { cssVars } from '@/lib/cssVars'
 // With fewer points than a shot costs, the file opens at once without the slow motion; the points come
 // back on a timer, shown as the bar and its number. Esc, the close button or the backdrop close the
 // file and focus returns to the card's button.
-// He is the shooter, on the rail at the cards' left edge (sticky beside the list from md up, above it on a
-// phone): idle while nothing is targeted, the pistol up at arm's length while a card is locked, and on the
-// hit phase the shot itself, recoil and muzzle flash, while the card he hit takes the comic burst.
+// The card shot takes the comic burst. The cards are the ones the projects scene counts: on the stage he
+// locks and shoots a target board per card as the page reaches it (scenes.tsx).
 
 const AP_TOTAL = 100
 const AP_SHOT = 25
@@ -131,7 +127,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
       onClick={(event) => (event.target as HTMLElement).closest('a, button') === null && fire()}
     >
       <span className={atomic.brackets} aria-hidden="true" />
-      <svg viewBox="-50 -50 100 100" className={`pointer-events-none absolute left-1/2 top-1/3 h-28 w-28 ${j.hitBurst}`} aria-hidden="true" focusable="false">
+      <svg viewBox="-50 -50 100 100" className={`pointer-events-none absolute left-1/2 top-1/3 h-28 w-28 ${atomic.hitBurst}`} aria-hidden="true" focusable="false">
         <path d={BURST} fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={4} strokeLinejoin="round" />
         <path d={BURST} fill={CREAM} transform="scale(0.5)" />
       </svg>
@@ -250,23 +246,6 @@ const ProjectFile = memo(function ProjectFile({ slot, open, opener, onClose }: P
   )
 })
 
-function shooterMotion(locked: boolean, phase: ShotPhase | undefined): DwellerMotion {
-  if (phase === 'hit') return 'fire'
-  return locked ? 'aim' : 'idle'
-}
-
-function Shooter({ motion }: { motion: DwellerMotion }) {
-  const { active } = useProfession()
-
-  return (
-    <div className="relative mb-4 shrink-0 self-start md:sticky md:top-[38vh] md:mb-0 md:w-24" aria-hidden="true">
-      <DwellerSprite profession={active} motion={motion} className="h-32 w-[5.4rem] md:block" />
-      {/* his ground on the desktop, where the div sticks: his box is a block there, so the div's bottom is his box's bottom, and the plate's top sits on it and moves with him */}
-      <span className="absolute inset-x-0 top-full hidden h-2 border-t-2 border-atomic-steel-edge bg-atomic-steel md:block" />
-    </div>
-  )
-}
-
 type Shot = { id: string; phase: ShotPhase }
 
 export function TargetingSystem({ projects }: { projects: Project[] }) {
@@ -320,15 +299,14 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
   const locked = shot?.id ?? target
 
   return (
-    <div className="relative" data-vats={locked ? 'on' : undefined}>
+    <div className="relative" data-aiming={locked ? 'on' : undefined}>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <ActionPoints points={points} />
       </div>
-      <div className="md:flex md:gap-4">
-        <Shooter motion={shooterMotion(locked !== null, shot?.phase)} />
+      <div data-stage-items="">
         <ProjectList
           projects={projects}
-          className={`min-w-0 flex-1 ${MASONRY_LIST}`}
+          className={MASONRY_COLUMN_LIST}
           itemClassName={MASONRY_ITEM}
           renderProject={(slot, index) => (
             <>

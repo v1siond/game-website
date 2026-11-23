@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { CREAM_SHADE, DUST_DARK, MUTANT, MUTANT_LIGHT, MUTANT_SHADE, POSTER_INK, RUST, WARNING_RED } from './palette'
 import m from './mutant.module.css'
 
@@ -7,12 +6,8 @@ import m from './mutant.module.css'
 // highlights, bald, no neck, the small head thrust forward under a heavy brow with the jaw open, the
 // shoulders twice the head's width, long thick arms with wrapped wrists, a rag loincloth over short bowed
 // legs, and from the armoured brute one rust shoulder plate and the knee pads. Every part turns round its
-// own joint (mutant.module.css) so the same drawing keeps a brawler's guard, doubles over a knee to the
-// gut, rocks back from a kick to the head, and drops to one knee when the spar is over.
-
-export type MutantMotion = 'guard' | 'kneed' | 'kicked' | 'down'
-
-const MOTION_CLASS: Record<MutantMotion, string> = { guard: m.guard, kneed: m.kneed, kicked: m.kicked, down: m.down }
+// own joint (mutant.module.css) so the scroll (pose.ts) keeps a brawler's guard, doubles him over a knee to
+// the gut, rocks him back from a kick to the head, and drops him to one knee when the spar is over.
 
 const LINE = { stroke: POSTER_INK, strokeWidth: 2.2, strokeLinejoin: 'round' as const }
 
@@ -62,34 +57,32 @@ function Arm({ near }: { near: boolean }) {
   )
 }
 
-// Memoised: its props are primitives, so a parent render that leaves them as they are draws nothing again.
-export const MutantSprite = memo(function MutantSprite({ motion, className = '' }: { motion: MutantMotion; className?: string }) {
+/** His groups in the 120 by 150 viewBox, feet on y 146; a stage places them in a nested svg of that viewBox. */
+export function MutantFigure() {
   return (
-    <svg viewBox="0 0 120 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <g className={`${m.sprite} ${MOTION_CLASS[motion]}`}>
-        <ellipse cx={66} cy={146} rx={34} ry={3.5} fill={POSTER_INK} opacity={0.35} />
-        <g className={m.body}>
-          <Leg near={false} />
-          <Arm near={false} />
-          <g className={m.torso}>
-            <path d="M46 98 Q40 72 40 54 Q50 36 78 37 Q98 42 95 66 Q92 88 86 98 Z" fill={MUTANT} {...LINE} />
-            <path d="M50 58 Q60 50 74 54 M54 72 Q62 76 72 72 M58 84 Q64 86 70 84" fill="none" stroke={MUTANT_SHADE} strokeWidth={1.8} strokeLinecap="round" />
-            <path d="M80 44 Q92 48 90 64" fill="none" stroke={MUTANT_LIGHT} strokeWidth={2.4} strokeLinecap="round" />
-            <path d="M44 90 L88 90 L86 98 L82 116 L70 104 L60 118 L50 102 Z" fill={DUST_DARK} {...LINE} />
-            <path d="M44 89 L88 89 L88 94 L44 94 Z" fill={RUST} {...LINE} />
-            <g className={m.head}>
-              <path d="M22 46 Q20 30 33 27 Q47 25 49 40 Q50 53 39 58 Q25 59 22 46 Z" fill={MUTANT} {...LINE} />
-              <path d="M22 37 Q32 31 44 35" fill="none" stroke={POSTER_INK} strokeWidth={3.2} strokeLinecap="round" />
-              <circle cx={29} cy={39.5} r={1.8} fill={WARNING_RED} />
-              <path d="M21 47 L34 47 L32 55 L23 54 Z" fill={POSTER_INK} />
-              <path d="M23 47 L25 50 L27 47 M29 47 L31 50 L33 47" fill={CREAM_SHADE} />
-              <path d="M37 32 Q43 31 46 36" fill="none" stroke={MUTANT_LIGHT} strokeWidth={2} strokeLinecap="round" />
-            </g>
+    <g className={m.sprite}>
+      <ellipse cx={66} cy={146} rx={34} ry={3.5} fill={POSTER_INK} opacity={0.35} />
+      <g className={m.body}>
+        <Leg near={false} />
+        <Arm near={false} />
+        <g className={m.torso}>
+          <path d="M46 98 Q40 72 40 54 Q50 36 78 37 Q98 42 95 66 Q92 88 86 98 Z" fill={MUTANT} {...LINE} />
+          <path d="M50 58 Q60 50 74 54 M54 72 Q62 76 72 72 M58 84 Q64 86 70 84" fill="none" stroke={MUTANT_SHADE} strokeWidth={1.8} strokeLinecap="round" />
+          <path d="M80 44 Q92 48 90 64" fill="none" stroke={MUTANT_LIGHT} strokeWidth={2.4} strokeLinecap="round" />
+          <path d="M44 90 L88 90 L86 98 L82 116 L70 104 L60 118 L50 102 Z" fill={DUST_DARK} {...LINE} />
+          <path d="M44 89 L88 89 L88 94 L44 94 Z" fill={RUST} {...LINE} />
+          <g className={m.head}>
+            <path d="M22 46 Q20 30 33 27 Q47 25 49 40 Q50 53 39 58 Q25 59 22 46 Z" fill={MUTANT} {...LINE} />
+            <path d="M22 37 Q32 31 44 35" fill="none" stroke={POSTER_INK} strokeWidth={3.2} strokeLinecap="round" />
+            <circle cx={29} cy={39.5} r={1.8} fill={WARNING_RED} />
+            <path d="M21 47 L34 47 L32 55 L23 54 Z" fill={POSTER_INK} />
+            <path d="M23 47 L25 50 L27 47 M29 47 L31 50 L33 47" fill={CREAM_SHADE} />
+            <path d="M37 32 Q43 31 46 36" fill="none" stroke={MUTANT_LIGHT} strokeWidth={2} strokeLinecap="round" />
           </g>
-          <Leg near />
-          <Arm near />
         </g>
+        <Leg near />
+        <Arm near />
       </g>
-    </svg>
+    </g>
   )
-})
+}

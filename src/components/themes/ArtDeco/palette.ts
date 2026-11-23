@@ -6,9 +6,7 @@ import { paletteVars } from '../shared/paletteVars'
 // those. Gold and cream on abyss measure over 9:1; mist on deep sea 9:1.
 
 export const DECO_COLORS = {
-  // The water, from the surface to the floor
-  surface: '#1c5a6e',
-  tealDark: '#006666',
+  // The water, from the lit shallows to the floor
   tealLight: '#00AAAA',
   waterGlow: '#41c8e8',
   seaMid: '#0d3050',
@@ -16,29 +14,13 @@ export const DECO_COLORS = {
   deepSeaDark: '#102030',
   abyss: '#05101a',
 
-  // The drowned city through the glass: the far towers in the fog, a lobby window and its towers
+  // The drowned city beyond the great window: the far towers in the fog and their spires
   farCity: '#0a2a33',
-  lobbyGlass: '#2a7a6c',
-  lobbyTowers: '#0b2a2a',
-
-  // The ride down in the hero's porthole: the storm sky over the lighthouse, its rock and its footing in
-  // the water, the whale far off in the green, the far and the near towers (the near ones also stand on
-  // the research board's skyline plate)
-  stormSky: '#0b1626',
-  lighthouseRock: '#0d1a24',
-  footing: '#0b2a36',
-  whale: '#0e3a44',
-  whaleLine: '#1d5560',
   skylineFar: '#0a2236',
-  tower: '#0e2c44',
 
-  // The glass tunnel's sea: the water outside, the seabed, the kelp and its own whale
+  // The glass tunnel's sea on its pane, and the kelp in front of every chamber
   tunnelSea: '#1d5a52',
-  tunnelSeaDeep: '#0e3a3a',
-  seabed: '#08201f',
   kelp: '#0f3a2e',
-  tunnelWhale: '#0b2e33',
-  tunnelWhaleLine: '#1b4a50',
 
   // Brass and gold
   brassDark: '#8B7320',
@@ -46,7 +28,7 @@ export const DECO_COLORS = {
   gold: '#D4AF37',
   goldBright: '#F0C850',
   // The same golds a step lighter, for lettering only: the shapes, borders and glows keep gold and
-  // goldBright, the words on teal cards and red boards reach 7:1.
+  // goldBright, the words on the panels and red boards reach 7:1.
   goldText: '#E3CB7C',
   goldBrightText: '#F4D882',
   // The ventures banner titles: the thin display letters only reach about three quarters of their colour
@@ -54,29 +36,26 @@ export const DECO_COLORS = {
   goldPaleText: '#FBEEC8',
   // The picked machine row, a paler gold under the abyss letters for the same reason (7:1 as rendered).
   goldPick: '#EFD892',
-  shutter: '#2a2008',
-  // The brass in shadow: the lower shutter leaf and the machine's blind slats, the gaps between them and
-  // the porthole rim's dark lines, the rim's far edge and its bolt heads
+  // The brass in shadow: the lab shutter's and the machine's blind slats and the gaps between them, the
+  // bathysphere's rim and its bolt heads
   brassShadow: '#6b5818',
   brassLine: '#3a2c08',
   brassRimDark: '#4a3a0c',
   boltHead: '#5a4610',
 
   // Bronze
-  bronzeDark: '#8B4513',
   bronze: '#CD7F32',
 
-  // The dark wood and lacquer of the city's furniture: the vending cabinet from its top to its tray, the
-  // bronze panels of the hack, the programme and the plaques, the theatre box, the recorder's case
+  // The dark wood and lacquer of the city's furniture: the vending cabinet and the hall's frame from top to
+  // floor, the bronze panels of the plaques, the crates and the programme, the marquee box, the recorders
   cabinetTop: '#2a1a10',
   cabinetMid: '#170d08',
   cabinetFoot: '#0f0905',
   bronzePanel: '#1a140a',
-  bronzePanelDeep: '#0d0a05',
   theatreBox: '#1a0606',
   recorderCase: '#2a1d0c',
 
-  // Sea glass: the vending machine's case and its engineer prop, the diary cards
+  // Sea glass: the vending machine's case and its engineer prop, the lab window, the diary cards
   machineGlass: '#0f3550',
   machineGlassDeep: '#07182a',
   machineProp: '#14324a',
@@ -90,12 +69,12 @@ export const DECO_COLORS = {
   // Maroon theatre boards
   bloodDark: '#660000',
   blood: '#8B0000',
-  // The edge of a ventures banner, so the cloth deepens from bloodDark behind the title outward, and the
-  // board under the vending machine's thin marquee letters
+  // The edge of a ventures banner, so the cloth deepens from bloodDark behind the title outward, the stage's
+  // valance and the board under the vending machine's thin marquee letters
   bloodDeep: '#3F0000',
 
   // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue
-  // crackle of the electric plasmid in his veins
+  // crackle of the electric charge in his veins
   knit: '#7c7a74',
   knitShade: '#4a4843',
   knitLight: '#a3a19a',
@@ -108,18 +87,9 @@ export const DECO_COLORS = {
   boltCore: '#effcff',
 
   // The revival chamber's life light
-  vita: '#3fe0b0',
+  revival: '#3fe0b0',
 
-  // The guardian's helmet ports: amber while he minds his own walk, red once provoked
-  portCalm: '#ffc94a',
-  portAngry: '#ff3b2a',
-  diver: '#6b4a2a',
-  diverDark: '#3a2814',
-  diverBoot: '#2a2a2a',
-  sisterDress: '#e8b4bc',
-  sisterSkin: '#e9c4a4',
-
-  // The research board's photo paper, top to foot
+  // The project photographs' paper, top to foot
   photoPaper: '#f6ecd6',
   photoPaperShade: '#e6d6b4',
 

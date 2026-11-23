@@ -1,77 +1,95 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useMemo } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
-import { CopyrightLine } from './shared/CopyrightLine'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useProfession } from '@/contexts/ProfessionContext'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
-import { JourneyBackdrop, Wanderer, type Zone } from './RetroAtomic/journey'
-import { VaultEntrance } from './RetroAtomic/vaultDoor'
+import { sectionPlan } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
+import { Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
 import { WristComputer } from './RetroAtomic/wristComputer'
-import { SECTION_VIEWS } from './RetroAtomic/sections'
+import { scenesOf, type Scene } from './RetroAtomic/scenes'
+import { SceneSection } from './RetroAtomic/sections'
+import { AtomicStage, LAYER_MOTION, theatreScene } from './RetroAtomic/stage'
 import { ContactTerminal } from './RetroAtomic/terminal'
 import atomic from './RetroAtomic/atomic.module.css'
 
 // The world's own lettering: the root carries its --atomic-face variable and the world's css reads it.
 const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--atomic-face' })
 
-// Retro Atomic, a fallout shelter of the atomic age seen through his wrist terminal: the page
-// composition. The visit opens on the shelter's cog door rolling aside (./RetroAtomic/vaultDoor); behind
-// it the wrist terminal boots and types his name, its screen tabs and selector dial switch the
-// profession (./RetroAtomic/wristComputer); the picked profession's sections follow on the terminal's
-// glass, the radio and the printed perk chart (./RetroAtomic/sections); contact steps outside into the
-// wasteland, to a public terminal with its password game (./RetroAtomic/terminal). Each section hands
-// its zone (shelter, wasteland, town) up through the shared ZoneStageProvider; the backdrop crossfades to
-// it and he walks there with the dog along the foot of the screen (./RetroAtomic/journey).
+const PHONE_QUERY = '(max-width: 767.98px)'
+
+// Retro Atomic: a bomb shelter of the atomic age seen through his wrist terminal, as a walk out of the
+// shelter, through the wasteland and into the town at dusk. The hero is the wrist terminal over the
+// shelter, its cog door rolled aside, him and the dog by the opening (./RetroAtomic/wristComputer); the
+// terminal's tabs and dial switch the profession. Then every section of the active profession is one full
+// screen scene of the walk (./RetroAtomic/scenes) that rises from dark, holds while its title and cards
+// scroll over it, and sinks back into dark while the next one rises; he does one thing per card: lights a
+// poster with his thumbs up, runs a quest flag up, throws a footlocker open, boots a dead tube, shoots a
+// target, cheers the dog digging a tape, sways under the radio mast, puts the mutant down. Contact is
+// the public terminal and its password game (./RetroAtomic/terminal), which he and the dog walk out to.
+// Every motion is a function of the scroll position, on the shared theatre (./shared/theatre) and its
+// settle: stop and art and text come to rest together, scroll up and it plays back. Under reduced motion
+// there is no theatre and no scrub: each section carries its own picture, still, at its settled frame.
 //
-// The root carries the pointer as --mx and --my (-1 to 1) for the shelter's and the wasteland's
-// parallax. It clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
-// scroll container. Under reduced motion the door is skipped and the terminal is on from the start.
-//
-// The world mounts on the client after the theme provider, so its first render already knows the reduced
-// motion answer; the door's timeline, the pointer parallax and the password game's random seed start in
-// effects.
+// The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a scroll
+// container.
 
 export default function RetroAtomicTheme() {
+  const { active } = useProfession()
   const view = useWorldView()
-  const reducedMotion = useReducedMotion()
-  const [booted, setBooted] = useState(false)
-  const rootRef = usePointerVars(!reducedMotion)
-  const onOpened = useCallback(() => setBooted(true), [])
-  const { zones, stage } = useZoneStore<Zone>('shelter', reducedMotion)
+  const { professionalSummary } = useCVData()
+  const labels = useLabels()
+  const { highlights } = useAboutBlock()
+  const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
+    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+  )
+  const staged = useMemo(() => scenes.map(theatreScene), [scenes])
+  const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)
+  const sections = scenes.filter((scene): scene is Scene & { slot: NonNullable<Scene['slot']> } => scene.slot !== null)
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}>
+    <div
+      className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] [--theatre-ground:theme(colors.atomic.bunker)] [--theatre-veil:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}
+    >
       <SkipLink />
-      <JourneyBackdrop zones={zones} />
-      {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
+      {!reduced && (
+        <Theatre theatreRef={theatreRef}>
+          {scenes.map((scene) => (
+            <AtomicStage key={scene.id} scene={scene} />
+          ))}
+        </Theatre>
+      )}
+      <div ref={textRef} className="relative z-20">
+        <header data-scene="hero" className="relative min-h-[100svh] px-3 pb-16 pt-14 sm:px-6 sm:pt-10 lg:px-[4vw]">
+          {reduced && <AtomicStage scene={scenes[0]} settled />}
+          <WristComputer instant={reduced} />
+        </header>
 
-      <header className="relative z-30 px-3 pb-8 pt-14 sm:px-6 sm:pt-10">
-        <WristComputer booted={booted} instant={reducedMotion} />
-      </header>
-
-      <ZoneStageProvider value={stage}>
-        <main id="main-content" className="relative z-20 px-4 py-10 sm:px-6">
-          <ProfessionRegion className="mx-auto max-w-6xl">
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+        <main id="main-content">
+          <ProfessionRegion>
+            {sections.map((scene) => (
+              <SceneSection key={scene.id} scene={scene} slot={scene.slot} still={reduced} />
+            ))}
           </ProfessionRegion>
+          <ContactTerminal scene={scenes[scenes.length - 1]} still={reduced} />
         </main>
 
-        <ContactTerminal />
-      </ZoneStageProvider>
-
-      <Wanderer zones={zones} />
-
-      <footer className="relative z-20 bg-atomic-ink py-8 text-center">
-        <p className="text-sm text-atomic-ash">
-          <CopyrightLine />
-        </p>
-      </footer>
+        <footer className="bg-atomic-ink py-8 text-center">
+          <p className="text-sm text-atomic-ash">
+            <CopyrightLine />
+          </p>
+        </footer>
+      </div>
     </div>
   )
 }
