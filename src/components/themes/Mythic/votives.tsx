@@ -8,27 +8,28 @@ import { MYTH } from './palette'
 import { GOLD_TAGS } from './stage'
 import u from './underworld.module.css'
 
-// The ventures as keepsakes in the cabinet: each company a gold token resting on its velvet slot, its
-// name and motto on the plaque under it. Pointing at or focusing a keepsake lifts it out of its slot; a
-// keepsake with a site is the link to it. His own products (featured) rest in the two wide slots of the
-// top shelf, a larger token and a gold plate over the name; the other ventures fill the shelf below.
+// The ventures as votive tokens on the shelf of offerings: each company a gold token resting on its velvet
+// slot, its name and motto on the plaque under it. Pointing at or focusing a token lifts it out of its slot;
+// a token with a site is the link to it. His own products (featured) rest in the two wide slots of the top
+// shelf, a larger token and a gold plate over the name; the other ventures fill the shelf below. The token's
+// shape changes along the shelf, the way each offering is a different object.
 
 type Company = CVData['companies'][number]
 
-// The token's shape changes along the shelf, the way each keepsake is a different object.
+// The token's shape changes along the shelf, so each offering is a different object.
 const TOKENS = [
   'M32 6 L54 18 L54 46 L32 58 L10 46 L10 18 Z',
   'M32 4 A28 28 0 1 1 31.9 4 Z',
   'M32 4 L58 32 L32 60 L6 32 Z',
 ]
 
-function Keepsake({ company, index }: { company: Company; index: number }) {
+function Votive({ company, index }: { company: Company; index: number }) {
   const { cards, sections } = useLabels()
 
   return (
     <div className="flex h-full flex-col">
       <div className={`relative flex h-36 items-center justify-center ${u.slot}`} aria-hidden="true">
-        <div className={`relative ${company.featured ? 'h-24 w-24' : 'h-20 w-20'} ${u.keepsake}`}>
+        <div className={`relative ${company.featured ? 'h-24 w-24' : 'h-20 w-20'} ${u.votive}`}>
           <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full">
             <path d={TOKENS[index % TOKENS.length]} fill={MYTH.gold} stroke={MYTH.inkLine} strokeWidth={3} />
             <path d={TOKENS[index % TOKENS.length]} fill="none" stroke={MYTH.goldPale} strokeWidth={1.5} transform="translate(32 32) scale(0.78) translate(-32 -32)" />
@@ -53,14 +54,14 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
   )
 }
 
-export function Keepsakes({ companies }: { companies: Company[] }) {
+export function Votives({ companies }: { companies: Company[] }) {
   const { links } = useLabels()
 
   return (
     <>
-      <ul className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
+      <ul data-stage-items="" className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
         {companies.map((company, index) => (
-          <li key={company.id} className={`${u.cabinetItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--i': index })}>
+          <li key={company.id} className={`${u.shelfItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--i': index })}>
             {company.url ? (
               <a
                 href={company.url}
@@ -68,11 +69,11 @@ export function Keepsakes({ companies }: { companies: Company[] }) {
                 rel="noopener noreferrer"
                 className="block h-full"
               >
-                <Keepsake company={company} index={index} />
+                <Votive company={company} index={index} />
                 <span className="sr-only"> {newTabHint(links)}</span>
               </a>
             ) : (
-              <Keepsake company={company} index={index} />
+              <Votive company={company} index={index} />
             )}
           </li>
         ))}

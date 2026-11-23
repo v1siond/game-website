@@ -179,25 +179,10 @@
         "allBeaten": "Every challenger knocked out"
       },
       "myth": {
-        "combo": "Strike the chain combo",
-        "rolesCleared": "{count} of {total} roles cleared",
-        "roleCleared": "Cleared",
-        "throwAgain": "Throw again",
-        "rarityHeroic": "Heroic",
-        "choose": "Choose",
-        "chosen": "Chosen",
-        "chooseBoon": "Choose the boon of {name}",
-        "boonTray": "Chosen boons",
-        "boonCount": "{count} of {total} boons chosen",
         "fulfilled": "Fulfilled",
-        "strike": "Strike",
-        "strikeKnee": "Knee",
-        "strikeElbow": "Elbow",
-        "strikeKick": "Kick",
-        "strikeRoar": "Roar",
         "openGate": "Open the gate",
         "gateOpen": "The gate is open",
-        "returnHouse": "Return to the house"
+        "returnHall": "Back to the great hall"
       },
       "horror": {
         "aimHint": "Point anywhere in the hall and he takes aim",
@@ -558,25 +543,10 @@
         "allBeaten": "Todos los rivales noqueados"
       },
       "myth": {
-        "combo": "Lanzar el combo de cadenas",
-        "rolesCleared": "{count} de {total} puestos superados",
-        "roleCleared": "Superado",
-        "throwAgain": "Lanzar de nuevo",
-        "rarityHeroic": "Heroico",
-        "choose": "Elegir",
-        "chosen": "Elegido",
-        "chooseBoon": "Elegir la bendición de {name}",
-        "boonTray": "Bendiciones elegidas",
-        "boonCount": "{count} de {total} bendiciones elegidas",
         "fulfilled": "Cumplida",
-        "strike": "Golpear",
-        "strikeKnee": "Rodilla",
-        "strikeElbow": "Codo",
-        "strikeKick": "Patada",
-        "strikeRoar": "Rugido",
         "openGate": "Abrir la puerta",
         "gateOpen": "La puerta está abierta",
-        "returnHouse": "Volver a la casa"
+        "returnHall": "Volver al gran salón"
       },
       "horror": {
         "aimHint": "Apunta a cualquier parte del vestíbulo y él apunta",
@@ -937,25 +907,10 @@
         "allBeaten": "Tutti gli sfidanti al tappeto"
       },
       "myth": {
-        "combo": "Sferra la combo di catene",
-        "rolesCleared": "{count} di {total} ruoli superati",
-        "roleCleared": "Superato",
-        "throwAgain": "Lancia di nuovo",
-        "rarityHeroic": "Eroico",
-        "choose": "Scegli",
-        "chosen": "Scelto",
-        "chooseBoon": "Scegli il dono di {name}",
-        "boonTray": "Doni scelti",
-        "boonCount": "{count} di {total} doni scelti",
         "fulfilled": "Compiuta",
-        "strike": "Colpisci",
-        "strikeKnee": "Ginocchio",
-        "strikeElbow": "Gomito",
-        "strikeKick": "Calcio",
-        "strikeRoar": "Ruggito",
         "openGate": "Apri il cancello",
         "gateOpen": "Il cancello è aperto",
-        "returnHouse": "Torna alla casa"
+        "returnHall": "Torna alla grande sala"
       },
       "horror": {
         "aimHint": "Punta un punto qualsiasi dell’atrio e lui prende la mira",

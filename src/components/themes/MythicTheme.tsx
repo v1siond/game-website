@@ -1,23 +1,28 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Cinzel } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { sectionPlan } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
+import { Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { MYTH_VARS } from './Mythic/palette'
 import { Depths } from './Mythic/depths'
-import { PoolRise } from './Mythic/poolRise'
-import { Mirror } from './Mythic/mirror'
+import { HallHero } from './Mythic/hero'
+import { Altar } from './Mythic/altar'
 import { SECTION_VIEWS } from './Mythic/regions'
 import { LastGate } from './Mythic/gate'
-import { HouseProvider, type Zone } from './Mythic/stage'
+import { FIELD_MOTION, MythStage, scenesOf } from './Mythic/scenes'
+import { StillStages, type Zone } from './Mythic/stage'
 import u from './Mythic/underworld.module.css'
 
 // The carved inscriptional capitals, Cinzel: the root carries its --myth-display variable and the world's css
@@ -28,13 +33,15 @@ const mythDisplay = Cinzel({
   variable: '--myth-display',
 })
 
-// Mythic, the chained blade Spartan's ascent painted in ink over colour: the page climbs from the great
-// hall to Olympus. He rises out of the blood pool in the hall, the mirror changes his talent, his work is
-// the foes he fights on the storm deck and his tech stack the carved chain he climbs over the storm sea,
-// his projects the boons over the magma with his ventures as keepsakes, his bands and his Muay Thai under
-// the bronze giant of Rhodes, and the last gate opens on Olympus at dawn. The fixed eras fade to the one
-// in view (data-zone); Return to the house at the gate scrolls back up and he rises again. Every part is
-// drawn in ./Mythic.
+// Mythic, a hero of the old myths climbing out of the deep, painted in ink over colour: the page climbs from
+// the great hall to the gods' mountain. The fixed depths behind the page fade to the region in view
+// (data-zone): the great hall, the storm sea, the magma, the bronze giant's harbour and the summit at dawn.
+// Over them, on the shared theatre (./shared/theatre), every part of the page has his scene
+// (./Mythic/scenes): he stands in his guard in the hall, takes the gods' gift, fights the storm deck, climbs
+// the chain, launches and slams, parries the fire spirits, hurls the brutes, dodges the giant, duels the
+// champion and walks up into the dawn, one beat per card, scrubbed by the scroll and played back on the way
+// up. The sections read in a column on the left from lg, so the scenes play clear of them on the right.
+// Under reduced motion there is no theatre: each part carries its own scene, still, at its peak.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
 // container chain.
@@ -42,34 +49,52 @@ const mythDisplay = Cinzel({
 export default function MythicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { professionalSummary } = useCVData()
+  const labels = useLabels()
+  const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
-  const [rebirths, setRebirths] = useState(0)
   const pointerRef = usePointerVars(!reduced)
   const { zones, stage } = useZoneStore<Zone>('hall', reduced)
   useZoneAttribute(zones, pointerRef)
-
-  const returnToHouse = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
-    setRebirths((count) => count + 1)
-  }, [reduced])
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
+    [view.sections, professionalSummary.bio, labels, highlights, active],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, FIELD_MOTION, reduced)
+  const still = useCallback(
+    (id: string) => {
+      const scene = reduced ? scenes.find((each) => each.id === id) : undefined
+      return scene ? <MythStage scene={scene} settled /> : null
+    },
+    [reduced, scenes],
+  )
 
   return (
-    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${u.root} ${mythDisplay.variable}`}>
+    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip [--theatre-ground:transparent] [--theatre-veil:transparent] ${u.root} ${mythDisplay.variable}`}>
       <SkipLink />
       <Depths />
+      {!reduced && (
+        <Theatre theatreRef={theatreRef}>
+          {scenes.map((scene) => (
+            <MythStage key={scene.id} scene={scene} />
+          ))}
+        </Theatre>
+      )}
       <ZoneStageProvider value={stage}>
-        <HouseProvider value={{ rebirths, returnToHouse }}>
-          <PoolRise profession={active} reduced={reduced} />
-          <Mirror profession={active} />
+        <StillStages value={still}>
+          <div ref={textRef} className="relative z-20">
+            <HallHero still={still('hero')} />
+            <Altar />
 
-          <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
-            <ProfessionRegion className="mx-auto max-w-6xl">
-              <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-            </ProfessionRegion>
-          </main>
+            <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
+              <ProfessionRegion className="mx-auto max-w-6xl">
+                <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+              </ProfessionRegion>
+            </main>
 
-          <LastGate profession={active} />
-        </HouseProvider>
+            <LastGate still={still('contact')} />
+          </div>
+        </StillStages>
       </ZoneStageProvider>
 
       <footer className="relative z-20 py-8 text-center">

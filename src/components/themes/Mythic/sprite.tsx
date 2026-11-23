@@ -1,39 +1,26 @@
 'use client'
 
-import { useEffect, useId, useState, type ReactNode, type Ref } from 'react'
+import { useId, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { useLatest } from '@/hooks/useLatest'
 import { MYTH } from './palette'
-import { MOVES, NEAR_FIST, REST, bodyCss, bodyTransform, firstPose, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'
-import s from './sprite.module.css'
+import { REST, bodyTransform, jointTransform, type Joint, type Pose } from './rig'
 
-// Him as this world's own sprite, a parody of the ash pale Spartan with the chained blades (reference
-// sheet src/assets/sprites/kratos_spritesheet.png), in the sheet's three quarter profile facing right:
-// the near arm in front of the chest, the far arm and leg behind it in a darker shade. One dark ink line
-// round every shape over painted gradient fills, the warm rim of the fire on the lit edge. Heavy
-// proportions: a small shaved head, broad shoulders, thick arms, a low stance.
+// Him as a hero of the old myths, in three quarter profile facing right: the near arm with the short sword
+// in front of the chest, the far arm with the round shield and the far leg behind it in a darker shade, the
+// red cloak hanging from his shoulders behind him. One dark ink line round every shape over painted
+// gradient fills, the warm rim of the fire on the lit edge. A bronze cuirass, a leather kilt of strips with
+// the key band, bronze greaves, and the crested helm pushed back off his brow so his face shows.
 //
-// His traits come from HERO_IDENTITY: his skin with the ash dusted over it, his dark hair as the stubble
-// shadow on the shaved scalp, his full dark beard and dark oval eyes. The Spartan's marks: the red stripe
-// from the crown over the near eye, down the near side of the chest and the near arm; the scar over the
-// far eye.
+// His traits come from HERO_IDENTITY: his skin, his dark hair under the helm, his full dark beard and dark
+// oval eyes. The Martial Artist wears his mongkhon in place of the helm.
 //
-// Per profession: the System Engineer in the full kit (kilt with the key band and the ragged hem, the
-// harness, the pauldron, bracers with the chains wound round them, the twin blades); the Musician in the
-// same kit with the blades crossed on his back and their hilts in his fists over a bronze war drum; the
-// Martial Artist bare chested in red Muay Thai shorts, hand wraps, prajioud on the arms and his mongkhon.
-//
-// Every limb is drawn hanging straight down and rig.ts turns it: SpartanFigure draws one pose as SVG
-// attributes (the server render, reduced motion and the pose renders), SpartanSprite plays a move over it
-// with the Web Animations API from the same keys.
-
-export type SpriteMotion = 'still' | Move
+// Every limb is drawn hanging straight down and rig.ts turns it: HeroFigure draws one pose as SVG
+// attributes, and a scene's writer turns its joints ([data-joint]) and moves its body ([data-body]) as the
+// page scrolls (scenes.tsx).
 
 const INK = MYTH.inkLine
 
-/** One painted shape with the ink line round it. */
 function Inked({ d, fill }: { d: string; fill: string }) {
   return <path d={d} fill={fill} stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
 }
@@ -43,30 +30,24 @@ type Side = 'far' | 'near'
 // ---- the shapes (viewBox 160 by 210, facing right, limbs hanging straight down, feet on y 198) ----
 
 const HEAD = 'M80 38 Q78 20 94 19 Q106 19 107 33 L109 42 Q108 50 102 53 L85 54 Q80 48 80 38 Z'
-const STUBBLE = 'M79 36 Q78 20 94 19 Q106 19 107 31 Q94 25 79 36 Z'
-const HEAD_STRIPE = 'M89 19 Q93 18 97 20 L98 34 L98 46 L94 46 L93 34 Z'
+const HAIR = 'M79 40 Q76 22 92 18 Q106 17 108 30 Q100 26 92 28 Q86 30 84 42 Z'
+const HELM = 'M77 30 Q78 12 95 10 Q110 11 111 24 L104 26 Q96 18 86 22 Q80 26 79 33 Z'
+const CREST = 'M80 14 Q88 -4 104 2 Q114 6 112 16 Q102 8 92 12 Q86 14 82 20 Z'
 const BROW = 'M92 32 L108 30 L108 34 L93 35 Z'
 const NOSE = 'M107 37 L111 44 L107 45'
 const BEARD = 'M84 44 Q86 50 89 52 L107 46 Q111 51 108 58 Q103 69 95 71 Q85 69 83 58 Z'
 const NECK = 'M85 50 L101 50 L103 64 L83 64 Z'
 
+const CLOAK = 'M74 62 Q66 64 62 80 L52 168 Q70 176 82 168 L86 110 Q88 80 92 62 Z'
 const TORSO = 'M76 62 Q86 54 100 58 Q111 62 113 74 Q115 90 107 104 L103 118 L76 118 Q69 100 71 84 Q71 70 76 62 Z'
-const TORSO_SHADE = 'M76 62 Q71 72 71 84 Q69 100 76 118 L83 118 Q78 96 83 64 Z'
-const CHEST_LINES = 'M95 80 Q104 90 112 82 M99 94 L101 112 M92 99 Q98 101 105 99 M92 107 Q98 109 103 107'
-const TORSO_STRIPE = 'M95 58 Q105 60 109 70 Q113 82 107 96 L103 94 Q107 82 104 72 Q100 64 93 62 Z'
-const ASH = 'M78 76 L84 72 M88 102 L94 100 M104 70 L108 72'
-const HARNESS = 'M77 64 L86 61 L108 104 L99 111 Z'
+const CUIRASS = 'M75 66 Q86 58 100 61 Q110 65 112 76 Q113 90 106 104 L103 116 L77 116 Q71 100 72 84 Q72 72 75 66 Z'
+const CUIRASS_LINES = 'M95 80 Q104 90 111 82 M99 94 L101 112 M92 99 Q98 101 105 99'
 
 const UPPER_ARM: Record<Side, string> = {
   far: 'M76 66 Q84 58 92 66 L91 98 Q84 103 77 98 Z',
   near: 'M89 68 Q98 60 108 70 L106 102 Q98 107 90 102 Z',
 }
-const ARM_STRIPE = 'M99 66 L105 68 L104 98 L99 98 Z'
-const PRAJIOUD: Record<Side, string> = {
-  far: 'M77 80 L91 80 L91 86 L77 86 Z',
-  near: 'M90 82 L107 82 L106 88 L90 88 Z',
-}
-const PAULDRON = 'M87 64 Q98 53 111 64 L109 80 Q98 85 88 78 Z'
+const SHOULDER_GUARD = 'M87 64 Q98 53 111 64 L109 80 Q98 85 88 78 Z'
 const FOREARM: Record<Side, string> = {
   far: 'M78 96 L90 96 Q91 108 88 122 L80 122 Q77 108 78 96 Z',
   near: 'M91 100 L105 100 Q106 112 103 126 L93 126 Q90 112 91 100 Z',
@@ -75,38 +56,16 @@ const BRACER: Record<Side, string> = {
   far: 'M77 104 L91 104 L89 120 L79 120 Z',
   near: 'M90 108 L106 108 L104 124 L92 124 Z',
 }
-const CHAIN_WRAP: Record<Side, string> = {
-  far: 'M78 108 L90 111 M78 113 L90 116 M79 118 L89 119',
-  near: 'M91 112 L105 115 M91 117 L105 120 M92 122 L104 123',
-}
-// The near fist is drawn around NEAR_FIST, the point the rig hangs him from, so the drawing and the hold agree.
-const [FIST_X, FIST_Y] = NEAR_FIST
 const FIST: Record<Side, string> = {
   far: 'M78 119 Q84 115 90 119 L90 130 Q84 134 78 130 Z',
-  near: `M${FIST_X - 7} ${FIST_Y - 6} Q${FIST_X} ${FIST_Y - 10} ${FIST_X + 7} ${FIST_Y - 6} L${FIST_X + 7} ${FIST_Y + 6} Q${FIST_X} ${FIST_Y + 10} ${FIST_X - 7} ${FIST_Y + 6} Z`,
+  near: 'M91 123 Q98 119 105 123 L105 135 Q98 139 91 135 Z',
 }
-const WRAP_LINES: Record<Side, string> = {
-  far: 'M78 123 L90 125 M78 127 L90 129',
-  near: 'M91 127 L105 129 M91 131 L105 133',
-}
-// The blades leave the fist edge first and curve forward, the chain looping from the pommel to the bracer.
-const BLADE: Record<Side, string> = {
-  far: 'M81 130 L87 130 L89 142 Q94 160 108 170 Q96 169 89 159 Q83 149 81 138 Z',
-  near: 'M95 134 L101 134 L103 146 Q108 164 123 175 Q110 173 103 163 Q97 153 95 142 Z',
-}
-const BLADE_EDGE: Record<Side, string> = {
-  far: 'M89 142 Q94 160 108 170',
-  near: 'M103 146 Q108 164 123 175',
-}
-const CHAIN: Record<Side, string> = {
-  far: 'M80 120 Q70 136 83 146',
-  near: 'M93 124 Q82 140 96 150',
-}
-// A hilt held as a beater leaves the fist forward and down, so the forearm swinging forward brings its tip down on the skin.
-const HILT: Record<Side, string> = {
-  far: 'M83 129 L89 126 L102 148 L96 151 Z',
-  near: 'M97 133 L103 130 L116 152 L110 155 Z',
-}
+// The short sword leaves the near fist forward and down, its guard across the fist.
+const SWORD_BLADE = 'M101 134 L106 132 L128 176 L126 182 L121 179 Z'
+const SWORD_EDGE = 'M104 134 L125 177'
+const SWORD_GUARD = 'M94 132 L110 126 L111 130 L96 136 Z'
+// The round shield rides on the far forearm, its face to the front.
+const SHIELD_AT = { x: 86, y: 116, r: 30 }
 
 const THIGH: Record<Side, string> = {
   far: 'M72 120 L88 120 L87 158 L74 158 Z',
@@ -116,24 +75,18 @@ const SHIN: Record<Side, string> = {
   far: 'M74 156 L87 156 L85 190 L76 190 Z',
   near: 'M86 156 L99 156 L97 190 L88 190 Z',
 }
-const BOOT: Record<Side, string> = {
+const GREAVE: Record<Side, string> = {
+  far: 'M73 158 L88 158 L86 184 L75 184 Z',
+  near: 'M85 158 L100 158 L98 184 L87 184 Z',
+}
+const SANDAL: Record<Side, string> = {
   far: 'M74 183 L87 183 L94 191 L97 198 L71 198 Z',
   near: 'M86 183 L99 183 L106 191 L109 198 L83 198 Z',
-}
-const BARE_FOOT: Record<Side, string> = {
-  far: 'M75 187 L86 187 L94 193 L96 198 L72 198 Z',
-  near: 'M87 187 L98 187 L106 193 L108 198 L84 198 Z',
-}
-const FOOT_WRAPS: Record<Side, string> = {
-  far: 'M74 186 L87 187 M73 191 L89 192',
-  near: 'M86 186 L99 187 M85 191 L101 192',
 }
 
 const KILT = 'M72 112 L104 112 L113 146 L105 150 L99 142 L93 152 L87 142 L81 152 L75 142 L66 148 Z'
 const KILT_SHADE = 'M72 112 L80 112 L77 128 L81 152 L75 142 L66 148 Z'
 const BELT = 'M72 105 L104 105 L105 116 L71 116 Z'
-const SHORTS = 'M72 110 L104 110 L109 140 L91 142 L88 131 L85 142 L67 140 Z'
-const SHORTS_TRIM = 'M68 135 L86 137 M91 137 L108 135'
 
 // The key pattern band along the kilt's top: one square hook per step.
 const keyBand = (x0: number, x1: number, y: number) => {
@@ -145,15 +98,22 @@ const KILT_KEY = keyBand(73, 105, 117)
 
 // ---- the parts ----
 
+interface GradientIds {
+  skin: string
+  skinFar: string
+  leather: string
+  bronze: string
+  blade: string
+  cloak: string
+}
+
 interface PartProps {
   profession: Profession
   ids: GradientIds
   pose: Pose
-  // the blades on his back and his fists bare, for the climb
-  sheathed: boolean
 }
 
-/** A joint's group: rotated by the pose as an attribute, and found by the animation through data-joint. */
+/** A joint's group: rotated by the pose as an attribute, and found by a scene's writer through data-joint. */
 function JointGroup({ joint, pose, children }: { joint: Joint; pose: Pose; children: ReactNode }) {
   return (
     <g data-joint={joint} transform={jointTransform(joint, pose[joint])}>
@@ -162,33 +122,26 @@ function JointGroup({ joint, pose, children }: { joint: Joint; pose: Pose; child
   )
 }
 
-/** The rage light laid over a mark: hidden, lit by the roar. */
-function Rage({ d }: { d: string }) {
-  return <path d={d} fill={MYTH.rage} opacity={0} data-fx="rage" />
-}
-
 function Head({ profession, ids, pose }: PartProps) {
   return (
     <JointGroup joint="head" pose={pose}>
       <Inked d={HEAD} fill={`url(#${ids.skin})`} />
       <ellipse cx={85} cy={40} rx={3} ry={5} fill={HERO_IDENTITY.skinShade} stroke={INK} strokeWidth={1.6} />
-      <path d={STUBBLE} fill={HERO_IDENTITY.hair} opacity={0.35} />
-      <path d={HEAD_STRIPE} fill={MYTH.tattoo} />
-      <Rage d={HEAD_STRIPE} />
+      <Inked d={HAIR} fill={HERO_IDENTITY.hair} />
       <path d={BROW} fill={HERO_IDENTITY.skinShade} />
-      {/* his eyes: the near one under the stripe, the far one smaller towards the nose, the scar over it */}
       <ellipse cx={96} cy={37} rx={2.4} ry={1.7} fill={HERO_IDENTITY.eyes} />
       <ellipse cx={104} cy={37} rx={1.6} ry={1.5} fill={HERO_IDENTITY.eyes} />
-      <g opacity={0} data-fx="rage">
-        <ellipse cx={96} cy={37} rx={2.4} ry={1.7} fill={MYTH.rageCore} />
-        <ellipse cx={104} cy={37} rx={1.6} ry={1.5} fill={MYTH.rageCore} />
-      </g>
-      <path d="M102 30 L106 41" stroke={MYTH.ash} strokeWidth={1.2} />
       <path d={NOSE} fill={HERO_IDENTITY.skinShade} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
       <Inked d={BEARD} fill={HERO_IDENTITY.beard} />
       <path d="M89 58 Q95 64 104 58" stroke={MYTH.inkSoft} strokeWidth={1.2} fill="none" />
-      <ellipse cx={101} cy={54} rx={4} ry={3.4} fill={MYTH.bloodDeep} stroke={INK} strokeWidth={1.2} opacity={0} data-fx="mouth" />
-      {profession === 'fighter' && <Mongkhon />}
+      {profession === 'fighter' ? (
+        <Mongkhon />
+      ) : (
+        <>
+          <Inked d={CREST} fill={MYTH.crest} />
+          <Inked d={HELM} fill={`url(#${ids.bronze})`} />
+        </>
+      )}
     </JointGroup>
   )
 }
@@ -198,51 +151,32 @@ function Mongkhon() {
   return (
     <g>
       <path d="M80 33 L73 50 M82 32 L79 52" stroke={INK} strokeWidth={4.4} strokeLinecap="round" />
-      <path d="M80 33 L73 50 M82 32 L79 52" stroke={MYTH.tattoo} strokeWidth={2.4} strokeLinecap="round" />
+      <path d="M80 33 L73 50 M82 32 L79 52" stroke={MYTH.crest} strokeWidth={2.4} strokeLinecap="round" />
       <path d="M81 32 Q94 22 108 30" fill="none" stroke={INK} strokeWidth={7} strokeLinecap="round" />
-      <path d="M81 32 Q94 22 108 30" fill="none" stroke={MYTH.tattoo} strokeWidth={4.6} strokeLinecap="round" />
+      <path d="M81 32 Q94 22 108 30" fill="none" stroke={MYTH.crest} strokeWidth={4.6} strokeLinecap="round" />
       <path d="M81 32 Q94 22 108 30" fill="none" stroke={MYTH.bone} strokeWidth={4.6} strokeDasharray="2 4" />
-      <circle cx={80} cy={33} r={3} fill={MYTH.tattoo} stroke={INK} strokeWidth={1.4} />
+      <circle cx={80} cy={33} r={3} fill={MYTH.crest} stroke={INK} strokeWidth={1.4} />
     </g>
   )
 }
 
-function Torso({ profession, ids }: Pick<PartProps, 'profession' | 'ids'>) {
+function Torso({ ids }: Pick<PartProps, 'ids'>) {
   return (
     <g>
       <Inked d={NECK} fill={`url(#${ids.skin})`} />
       <Inked d={TORSO} fill={`url(#${ids.skin})`} />
-      <path d={TORSO_SHADE} fill={HERO_IDENTITY.skinShade} opacity={0.6} />
-      <path d={CHEST_LINES} fill="none" stroke={HERO_IDENTITY.skinShade} strokeWidth={1.6} strokeLinecap="round" />
-      <path d={ASH} stroke={MYTH.ash} strokeWidth={2.4} strokeLinecap="round" opacity={0.45} />
-      <path d={TORSO_STRIPE} fill={MYTH.tattoo} />
-      <Rage d={TORSO_STRIPE} />
-      {profession !== 'fighter' && (
-        <>
-          <Inked d={HARNESS} fill={`url(#${ids.leather})`} />
-          <circle cx={93} cy={86} r={4.6} fill={MYTH.bronze} stroke={INK} strokeWidth={1.6} />
-        </>
-      )}
+      <Inked d={CUIRASS} fill={`url(#${ids.bronze})`} />
+      <path d={CUIRASS_LINES} fill="none" stroke={MYTH.leatherShade} strokeWidth={1.6} strokeLinecap="round" />
     </g>
   )
 }
 
-function Waist({ profession, ids }: Pick<PartProps, 'profession' | 'ids'>) {
-  if (profession === 'fighter') {
-    return (
-      <g>
-        <Inked d={SHORTS} fill={`url(#${ids.kilt})`} />
-        <path d={SHORTS_TRIM} stroke={MYTH.gold} strokeWidth={2.4} />
-        <path d="M72 112 L104 112" stroke={MYTH.gold} strokeWidth={3} />
-      </g>
-    )
-  }
+function Waist({ ids }: Pick<PartProps, 'ids'>) {
   return (
     <g>
-      <Inked d={KILT} fill={`url(#${ids.kilt})`} />
-      <path d={KILT_SHADE} fill={MYTH.kiltShade} opacity={0.7} />
+      <Inked d={KILT} fill={`url(#${ids.leather})`} />
+      <path d={KILT_SHADE} fill={MYTH.leatherShade} opacity={0.7} />
       <path d={KILT_KEY} fill="none" stroke={MYTH.gold} strokeWidth={1.4} />
-      <Inked d="M90 116 L96 116 L96 146 L93 149 L90 146 Z" fill={`url(#${ids.leather})`} />
       <Inked d={BELT} fill={`url(#${ids.leather})`} />
       <circle cx={92} cy={110} r={3.4} fill={MYTH.bronze} stroke={INK} strokeWidth={1.4} />
     </g>
@@ -251,129 +185,58 @@ function Waist({ profession, ids }: Pick<PartProps, 'profession' | 'ids'>) {
 
 const skinOf = (ids: GradientIds, side: Side) => `url(#${side === 'far' ? ids.skinFar : ids.skin})`
 
-function Leg({ side, profession, ids, pose }: PartProps & { side: Side }) {
+function Leg({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }) {
   const skin = skinOf(ids, side)
   return (
     <JointGroup joint={side === 'far' ? 'thighFar' : 'thighNear'} pose={pose}>
       <Inked d={THIGH[side]} fill={skin} />
       <JointGroup joint={side === 'far' ? 'shinFar' : 'shinNear'} pose={pose}>
         <Inked d={SHIN[side]} fill={skin} />
-        {profession === 'fighter' ? (
-          <>
-            <Inked d={BARE_FOOT[side]} fill={skin} />
-            <path d={FOOT_WRAPS[side]} stroke={MYTH.wrap} strokeWidth={2.4} />
-          </>
-        ) : (
-          <>
-            <Inked d={BOOT[side]} fill={`url(#${ids.leather})`} />
-            <path d={FOOT_WRAPS[side]} stroke={MYTH.leatherShade} strokeWidth={1.6} />
-          </>
-        )}
+        <Inked d={GREAVE[side]} fill={`url(#${ids.bronze})`} />
+        <Inked d={SANDAL[side]} fill={`url(#${ids.leather})`} />
       </JointGroup>
     </JointGroup>
   )
 }
 
-// What a fist holds: a blade on its chain, a blade's hilt as a drum beater, the Muay Thai wraps, or
-// nothing while the blades ride on his back.
-function Grip({ side, profession, ids, sheathed }: Omit<PartProps, 'pose'> & { side: Side }) {
-  if (sheathed) return <Inked d={FIST[side]} fill={skinOf(ids, side)} />
-  if (profession === 'fighter') {
-    return (
-      <>
-        <Inked d={FIST[side]} fill={MYTH.wrap} />
-        <path d={WRAP_LINES[side]} stroke={MYTH.boneShade} strokeWidth={1.2} />
-      </>
-    )
-  }
-  if (profession === 'drummer') {
-    return (
-      <>
-        <Inked d={HILT[side]} fill={MYTH.bronze} />
-        <Inked d={FIST[side]} fill={skinOf(ids, side)} />
-      </>
-    )
-  }
+function Sword({ ids }: { ids: GradientIds }) {
   return (
-    <>
-      <path d={CHAIN[side]} fill="none" stroke={INK} strokeWidth={4} />
-      <path d={CHAIN[side]} fill="none" stroke={MYTH.steel} strokeWidth={2.4} strokeDasharray="3 2" />
-      <Inked d={BLADE[side]} fill={`url(#${ids.blade})`} />
-      <path d={BLADE_EDGE[side]} fill="none" stroke={MYTH.bladeFire} strokeWidth={1.8} />
-      <Inked d={FIST[side]} fill={skinOf(ids, side)} />
-    </>
+    <g>
+      <Inked d={SWORD_BLADE} fill={`url(#${ids.blade})`} />
+      <path d={SWORD_EDGE} fill="none" stroke={MYTH.bone} strokeWidth={1.2} />
+      {/* the god's light the sword keeps once it is given (scenes.tsx lights it) */}
+      <path d={SWORD_EDGE} fill="none" stroke={MYTH.bladeFire} strokeWidth={5} strokeLinecap="round" opacity={0} data-fx="sword-light" />
+      <Inked d={SWORD_GUARD} fill={MYTH.bronze} />
+    </g>
   )
 }
 
-function Arm({ side, profession, ids, pose, sheathed }: PartProps & { side: Side }) {
-  const fighter = profession === 'fighter'
+function Shield({ ids }: { ids: GradientIds }) {
+  const { x, y, r } = SHIELD_AT
+  return (
+    <g>
+      <circle cx={x} cy={y} r={r} fill={`url(#${ids.bronze})`} stroke={INK} strokeWidth={2.6} />
+      <circle cx={x} cy={y} r={r - 6} fill="none" stroke={MYTH.leatherShade} strokeWidth={1.6} />
+      <path d={`M${x - 10} ${y - 8} Q${x} ${y - 16} ${x + 10} ${y - 8} M${x - 12} ${y + 6} Q${x} ${y + 14} ${x + 12} ${y + 6}`} fill="none" stroke={MYTH.crest} strokeWidth={3} />
+      <circle cx={x} cy={y} r={4} fill={MYTH.gold} stroke={INK} strokeWidth={1.4} />
+    </g>
+  )
+}
+
+function Arm({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }) {
   return (
     <JointGroup joint={side === 'far' ? 'armFar' : 'armNear'} pose={pose}>
       <Inked d={UPPER_ARM[side]} fill={skinOf(ids, side)} />
-      {side === 'near' && (
-        <>
-          <path d={ARM_STRIPE} fill={MYTH.tattoo} />
-          <Rage d={ARM_STRIPE} />
-        </>
-      )}
-      {fighter && <Inked d={PRAJIOUD[side]} fill={MYTH.tattoo} />}
-      {side === 'near' && !fighter && <Inked d={PAULDRON} fill={`url(#${ids.leather})`} />}
+      {side === 'near' && <Inked d={SHOULDER_GUARD} fill={`url(#${ids.bronze})`} />}
       <JointGroup joint={side === 'far' ? 'foreFar' : 'foreNear'} pose={pose}>
         <Inked d={FOREARM[side]} fill={skinOf(ids, side)} />
-        {!fighter && (
-          <>
-            <Inked d={BRACER[side]} fill={`url(#${ids.leather})`} />
-            <path d={CHAIN_WRAP[side]} stroke={MYTH.steel} strokeWidth={1.8} />
-          </>
-        )}
-        <g data-fx={side === 'near' ? 'grip' : undefined}>
-          <Grip side={side} profession={profession} ids={ids} sheathed={sheathed} />
-        </g>
+        <Inked d={BRACER[side]} fill={`url(#${ids.leather})`} />
+        {side === 'near' && <Sword ids={ids} />}
+        <Inked d={FIST[side]} fill={skinOf(ids, side)} />
+        {side === 'far' && <Shield ids={ids} />}
       </JointGroup>
     </JointGroup>
   )
-}
-
-// The slam's mark: his code burnt into the floor as a glowing bracket rune.
-function Rune() {
-  return (
-    <g opacity={0} data-fx="rune">
-      <ellipse cx={132} cy={198} rx={26} ry={5} fill={MYTH.bladeFire} opacity={0.5} />
-      <path d="M122 189 L114 195 L122 201 M142 189 L150 195 L142 201 M135 187 L129 203" fill="none" stroke={MYTH.rageCore} strokeWidth={3} strokeLinecap="round" />
-    </g>
-  )
-}
-
-// The bronze war drum in front of him, its skin where the hilts land.
-function WarDrum({ ids }: { ids: GradientIds }) {
-  return (
-    <g>
-      <path d="M123 190 L118 202 M151 190 L156 202" stroke={INK} strokeWidth={3} />
-      <Inked d="M117 132 L157 132 L153 190 L121 190 Z" fill={`url(#${ids.leather})`} />
-      <path d="M119 138 L137 184 L155 138 M121 184 L137 138 L153 184" fill="none" stroke={MYTH.bone} strokeWidth={1.4} opacity={0.8} />
-      <Inked d="M115 126 L159 126 L159 134 L115 134 Z" fill={MYTH.bronze} />
-      <ellipse cx={137} cy={127} rx={22} ry={6} fill={MYTH.bone} stroke={INK} strokeWidth={2.2} />
-      <path d="M142 122 Q136 108 144 96 Q146 108 152 102 Q154 114 148 122 Z" fill={MYTH.bladeFire} stroke={INK} strokeWidth={1.4} opacity={0} data-fx="flame" />
-    </g>
-  )
-}
-
-// The blades crossed on his back while his fists hold their hilts at the drum, or while he climbs.
-function BladesOnBack({ ids }: { ids: GradientIds }) {
-  return (
-    <g>
-      <Inked d="M70 62 L77 58 L96 22 L92 20 Z" fill={`url(#${ids.blade})`} />
-      <Inked d="M104 62 L97 58 L80 20 L84 18 Z" fill={`url(#${ids.blade})`} />
-    </g>
-  )
-}
-
-interface GradientIds {
-  skin: string
-  skinFar: string
-  leather: string
-  kilt: string
-  blade: string
 }
 
 function Gradients({ ids }: { ids: GradientIds }) {
@@ -395,14 +258,19 @@ function Gradients({ ids }: { ids: GradientIds }) {
         <stop offset="0" stopColor={MYTH.leather} />
         <stop offset="1" stopColor={MYTH.leatherShade} />
       </linearGradient>
-      <linearGradient id={ids.kilt} x1="0" y1="0" x2="0.6" y2="1">
-        <stop offset="0" stopColor={MYTH.kilt} />
-        <stop offset="1" stopColor={MYTH.kiltShade} />
+      <linearGradient id={ids.bronze} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor={MYTH.goldPale} />
+        <stop offset="0.45" stopColor={MYTH.bronze} />
+        <stop offset="1" stopColor={MYTH.leatherShade} />
       </linearGradient>
       <linearGradient id={ids.blade} x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stopColor={MYTH.bone} />
         <stop offset="0.6" stopColor={MYTH.steel} />
         <stop offset="1" stopColor={MYTH.steelShade} />
+      </linearGradient>
+      <linearGradient id={ids.cloak} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor={MYTH.crest} />
+        <stop offset="1" stopColor={MYTH.bloodDeep} />
       </linearGradient>
     </defs>
   )
@@ -410,162 +278,34 @@ function Gradients({ ids }: { ids: GradientIds }) {
 
 function useGradientIds(): GradientIds {
   const base = useId().replace(/:/g, '')
-  return { skin: `${base}skin`, skinFar: `${base}skinfar`, leather: `${base}leather`, kilt: `${base}kilt`, blade: `${base}blade` }
+  return { skin: `${base}skin`, skinFar: `${base}skinfar`, leather: `${base}leather`, bronze: `${base}bronze`, blade: `${base}blade`, cloak: `${base}cloak` }
 }
 
-interface FigureProps {
-  profession: Profession
-  pose?: Pose
-  className?: string
-  svgRef?: Ref<SVGSVGElement>
-  /** Where he stands inside a scene's own SVG, in that scene's units (a nested viewport). */
-  place?: Place
-  /** The blades on his back and his fists bare (the climb). */
-  sheathed?: boolean
-}
+/** His drawing's own box: a scene scales it to the height it stands him at. */
+export const FIGURE_BOX = { width: 160, height: 210, feetX: 90, feetY: 198 } as const
 
-export interface Place {
-  x: number
-  y: number
-  height: number
-}
-
-/** His drawing's own box, the viewBox every placed figure scales to its height. */
-const FIGURE_BOX = { width: 160, height: 210 } as const
-const FIGURE_VIEW_BOX = `0 0 ${FIGURE_BOX.width} ${FIGURE_BOX.height}`
-
-/** A placed figure's viewport: his box scaled to the height. */
-const placeAttributes = (place?: Place) => (place ? { x: place.x, y: place.y, height: place.height, width: (place.height * FIGURE_BOX.width) / FIGURE_BOX.height } : {})
-
-/** The place of a figure of this height whose point (in his box) lands on a scene point, so a prop and his hand read one spot. */
-export function placeOn(height: number, [x, y]: readonly [number, number], [sceneX, sceneY]: readonly [number, number]): Place {
-  const scale = height / FIGURE_BOX.height
-  return { x: sceneX - x * scale, y: sceneY - y * scale, height }
-}
-
-/** A viewport over a placed figure's own box, so a scene draws the props he handles in his units (the hand positions of rig.ts). */
-export function FigureSpace({ place, children }: { place: Place; children: ReactNode }) {
-  return (
-    <svg {...placeAttributes(place)} viewBox={FIGURE_VIEW_BOX} className="overflow-visible">
-      {children}
-    </svg>
-  )
-}
-
-/** Him in one pose, drawn with SVG attributes only. */
-export function SpartanFigure({ profession, pose = REST[profession], className = '', svgRef, place, sheathed = false }: FigureProps) {
+/** Him in one pose, his drawing's 160 by 210 box at the origin; a scene places and poses him. */
+export function HeroFigure({ profession, pose = REST }: { profession: Profession; pose?: Pose }) {
   const ids = useGradientIds()
-  const parts = { profession, ids, pose, sheathed }
-
+  const parts = { ids, pose }
   return (
-    <svg ref={svgRef} {...placeAttributes(place)} viewBox={FIGURE_VIEW_BOX} className={`overflow-visible ${className}`} aria-hidden="true">
+    <g>
       <Gradients ids={ids} />
-      <g className={s.sprite}>
-        <ellipse cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
-        <ellipse cx={92} cy={140} rx={70} ry={66} fill="none" stroke={MYTH.rage} strokeWidth={3} opacity={0} data-fx="ring" className={s.ring} />
-        {profession === 'engineer' && <Rune />}
-        {profession === 'drummer' && <WarDrum ids={ids} />}
-        <g data-body="" transform={bodyTransform(pose)}>
-          {/* the far arm turns with the chest but sits behind the legs and the kilt, so it has its own chest group */}
-          <JointGroup joint="chest" pose={pose}>
-            <Arm side="far" {...parts} />
-          </JointGroup>
-          <Leg side="far" {...parts} />
-          <Leg side="near" {...parts} />
-          <Waist profession={profession} ids={ids} />
-          <JointGroup joint="chest" pose={pose}>
-            {(profession === 'drummer' || sheathed) && <BladesOnBack ids={ids} />}
-            <Torso profession={profession} ids={ids} />
-            <Head {...parts} />
-            <Arm side="near" {...parts} />
-          </JointGroup>
-        </g>
+      <ellipse cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
+      <g data-body="" transform={bodyTransform(pose)}>
+        <JointGroup joint="chest" pose={pose}>
+          <Inked d={CLOAK} fill={`url(#${ids.cloak})`} />
+          <Arm side="far" {...parts} />
+        </JointGroup>
+        <Leg side="far" {...parts} />
+        <Leg side="near" {...parts} />
+        <Waist ids={ids} />
+        <JointGroup joint="chest" pose={pose}>
+          <Torso ids={ids} />
+          <Head profession={profession} {...parts} />
+          <Arm side="near" {...parts} />
+        </JointGroup>
       </g>
-    </svg>
+    </g>
   )
-}
-
-// The lights each move turns on, as opacity keys over the move's own length (offsets 0 to 1).
-type Fx = 'rage' | 'mouth' | 'ring' | 'rune' | 'flame' | 'grip'
-const FX: Partial<Record<Move, Partial<Record<Fx, Keyframe[]>>>> = {
-  roar: {
-    rage: [{ offset: 0, opacity: 0 }, { offset: 0.3, opacity: 0 }, { offset: 0.4, opacity: 0.95 }, { offset: 0.8, opacity: 0.95 }, { offset: 1, opacity: 0 }],
-    mouth: [{ offset: 0, opacity: 0 }, { offset: 0.34, opacity: 1 }, { offset: 0.82, opacity: 1 }, { offset: 0.9, opacity: 0 }],
-    ring: [
-      { offset: 0, opacity: 0, transform: 'scale(0.4)' },
-      { offset: 0.36, opacity: 0.9, transform: 'scale(0.6)' },
-      { offset: 0.8, opacity: 0, transform: 'scale(1.4)' },
-      { offset: 1, opacity: 0, transform: 'scale(1.4)' },
-    ],
-  },
-  combo: {
-    rune: [{ offset: 0, opacity: 0 }, { offset: 0.71, opacity: 0 }, { offset: 0.74, opacity: 1 }, { offset: 0.92, opacity: 1 }, { offset: 1, opacity: 0 }],
-  },
-  finish: {
-    rage: [{ offset: 0, opacity: 0 }, { offset: 0.55, opacity: 0 }, { offset: 0.6, opacity: 0.8 }, { offset: 1, opacity: 0 }],
-  },
-  // the near blade leaves the hand on the throw and is back in it on the catch (the scene flies it)
-  hurl: {
-    grip: [{ offset: 0, opacity: 1 }, { offset: 0.23, opacity: 1 }, { offset: 0.24, opacity: 0 }, { offset: 0.75, opacity: 0 }, { offset: 0.76, opacity: 1 }, { offset: 1, opacity: 1 }],
-  },
-  drum: {
-    flame: [{ offset: 0, opacity: 0 }, { offset: 0.3, opacity: 1 }, { offset: 0.45, opacity: 0.2 }, { offset: 0.7, opacity: 1 }, { offset: 1, opacity: 0 }],
-  },
-}
-
-interface SpriteProps {
-  profession: Profession
-  motion: SpriteMotion
-  className?: string
-  place?: Place
-  /** A one shot move has played out (never called for a cycle, or under reduced motion). */
-  onDone?: () => void
-  sheathed?: boolean
-  /** Bumped to play the motion again from its start (the same move twice in a row) on the same figure. */
-  take?: number
-  /** True until his scene's trigger: he stands in his rest pose and no motion plays, so a figure drawn below
-   *  the first screen does not breathe unseen at mount. */
-  waiting?: boolean
-}
-
-/** Plays a move's keys on the figure's joints, its body and its lights, and cancels them when the move or the take changes. */
-function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion: SpriteMotion, take: number, waiting: boolean, onDone?: () => void) {
-  const reduced = useReducedMotion()
-  // The latest onDone, so a new one each render never restarts the move.
-  const doneRef = useLatest(onDone)
-
-  useEffect(() => {
-    if (!svg || reduced || waiting || motion === 'still' || typeof svg.animate !== 'function') return
-    const { ms, loop } = MOVES[motion]
-    const keys = resolveKeys(motion, profession)
-    const timing: KeyframeAnimationOptions = { duration: ms, iterations: loop || 1 }
-    const frames = (style: (pose: Pose) => Keyframe) => keys.map(({ at, pose }) => ({ offset: at, easing: 'ease-in-out', ...style(pose) }))
-
-    const joints = [...svg.querySelectorAll<SVGGElement>('[data-joint]')].map((element) => {
-      const joint = element.dataset.joint as Joint
-      return element.animate(frames((pose) => jointCss(joint, pose[joint])), timing)
-    })
-    const body = [...svg.querySelectorAll<SVGGElement>('[data-body]')].map((element) => element.animate(frames(bodyCss), timing))
-    const lights = Object.entries(FX[motion] ?? {}).flatMap(([fx, track]) =>
-      [...svg.querySelectorAll<SVGElement>(`[data-fx="${fx}"]`)].map((element) => element.animate(track, timing)),
-    )
-    const all = [...joints, ...body, ...lights]
-    if (!loop) all[0]?.finished.then(() => doneRef.current?.(), () => undefined)
-    return () => all.forEach((animation) => animation.cancel())
-  }, [svg, reduced, waiting, motion, profession, take, doneRef])
-}
-
-// The pose drawn when no move plays (reduced motion): the move's first key, so a figure resting in a hang
-// hangs from his holds instead of standing in the air; 'still' keeps his profession's rest pose.
-const stillPose = (motion: SpriteMotion, profession: Profession): Pose | undefined => {
-  if (motion === 'still') return undefined
-  return firstPose(motion, profession)
-}
-
-/** Him as the chained blade Spartan, in a profession's kit, playing one motion. */
-export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false, take = 0, waiting = false }: SpriteProps) {
-  const [svg, setSvg] = useState<SVGSVGElement | null>(null)
-  const reduced = useReducedMotion()
-  useRigMotion(svg, profession, motion, take, waiting, onDone)
-  return <SpartanFigure profession={profession} pose={reduced ? stillPose(motion, profession) : undefined} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
 }

@@ -1,9 +1,9 @@
 import { MYTH } from './palette'
 
-// The foes he fights, drawn in his sprite's language (one ink line round painted shapes), each facing
-// left towards him, in a 60 by 80 box with the feet on y 78: the undead legionnaire with the round
-// shield and spear, the harpy on her wings, the gorgon with the serpent hair and tail, and the one eyed
-// giant with the bronze shield who takes the Muay Thai strikes.
+// The foes he fights, drawn in his figure's language (one ink line round painted shapes), each facing left
+// towards him, in a 60 by 80 box with the feet on y 78: the undead legionnaire with the round shield and
+// spear, the harpy on her wings, the gorgon with the serpent hair and tail, the one eyed giant with the
+// bronze shield, and the fire spirit of the magma that throws its bolts.
 
 const INK = MYTH.inkLine
 
@@ -85,15 +85,17 @@ function Cyclops() {
   )
 }
 
-export const FOE = { legionnaire: Legionnaire, harpy: Harpy, gorgon: Gorgon, cyclops: Cyclops } as const
-
-export type FoeName = keyof typeof FOE
-
-export function FoeFigure({ name, className = '' }: { name: FoeName; className?: string }) {
-  const Drawing = FOE[name]
+function FireSpirit() {
   return (
-    <svg viewBox="-4 -6 66 86" className={`overflow-visible ${className}`} aria-hidden="true">
-      <Drawing />
-    </svg>
+    <>
+      <Inked d="M30 78 Q12 70 14 50 Q16 34 26 24 Q24 36 32 40 Q30 22 40 8 Q42 26 50 34 Q56 46 50 62 Q44 76 30 78 Z" fill={MYTH.fire} />
+      <path d="M30 72 Q20 64 22 52 Q26 42 32 48 Q36 38 42 30 Q46 46 44 58 Q40 70 30 72 Z" fill={MYTH.fireCore} />
+      <circle cx={28} cy={50} r={3} fill={MYTH.inkLine} />
+      <circle cx={38} cy={48} r={2.4} fill={MYTH.inkLine} />
+    </>
   )
 }
+
+export const FOE = { legionnaire: Legionnaire, harpy: Harpy, gorgon: Gorgon, cyclops: Cyclops, spirit: FireSpirit } as const
+
+export type FoeName = keyof typeof FOE
