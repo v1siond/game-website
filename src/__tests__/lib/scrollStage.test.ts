@@ -43,18 +43,21 @@ describe('settleStep', () => {
     expect(settleStep(500 - SETTLE_EPSILON_PX / 2, 500, 16)).toEqual({ drawn: 500, settled: true })
   })
 
-  it('is within 7 px half a second after a full screen stop at 60 Hz and rests before a second', () => {
+  it('settles in about a second after a full screen stop at 60 Hz: still on its way at half a second, within 7 px at one, at rest before 1.6 s', () => {
     let state = { drawn: 0, settled: false }
     let frames = 0
     let atHalf = 0
+    let atOne = 0
     // Bounded, so a settle that never rests fails the test instead of hanging it.
     while (!state.settled && frames < 600) {
       state = settleStep(state.drawn, 900, 1000 / 60)
       frames += 1
       if (frames === 30) atHalf = state.drawn
+      if (frames === 60) atOne = state.drawn
     }
-    expect(900 - atHalf).toBeLessThan(7)
-    expect(frames * (1000 / 60)).toBeLessThanOrEqual(1000)
+    expect(900 - atHalf).toBeGreaterThan(50)
+    expect(900 - atOne).toBeLessThan(7)
+    expect(frames * (1000 / 60)).toBeLessThanOrEqual(1600)
     expect(state.drawn).toBe(900)
   })
 
