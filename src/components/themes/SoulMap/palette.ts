@@ -1,17 +1,15 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Soul Map's palette, every colour of the world once: the ash and stone of a ruined kingdom at dusk (the
-// hard knight action game of bonfires and fog walls, named here in code only), one warm fire in it, the
-// gold of its banners, the blood red of a health bar and the green of the healing flask. His armour reads
-// the steel, mail, leather and the blue surcoat; his face reads HERO_IDENTITY (character.tsx).
+// Soul Map's palette, every colour of the world once: the ash and stone of a ruined kingdom at dusk, one
+// warm fire in it, the gold of its banners and the foes in it. His armour reads the steel, mail, leather
+// and the blue surcoat; his face reads HERO_IDENTITY.
 //
 // The SVG art reads SOUL; SOUL_VARS sets the same values as --soul-* variables on the world's root, so the
 // class strings (bg-[color:var(--soul-deep)]) and the CSS modules paint them too. The keys abyss, deep,
 // cavern, rock, glow, moss, lantern, text and textSoft are also read by the theme registry.
 //
-// Text pairs (WCAG): text on deep 14.1:1, textSoft on cavern 12.0:1, glow on deep 9.6:1, ember on deep 6.1:1,
-// message on slab 11.0:1, lantern on panel 10.2:1, ink on glow 11.4:1. Blood is never small text; the knock
-// down banner is large text in bloodBright (4.0:1 on ink).
+// Text pairs (WCAG): text on deep 14.1:1, textSoft on cavern 12.0:1, glow on deep 9.6:1, lantern on panel
+// 10.2:1, ink on glow 11.4:1.
 
 export const SOUL = {
   // The page: ash black to the nearest stone
@@ -23,9 +21,8 @@ export const SOUL = {
   rock: '#2a2621',
   slab: '#332e27',
   ridge: '#4a433a',
-  stoneLight: '#6c6357',
 
-  // The dusk sky over the ruins, high to the horizon haze, and the fog of a fog wall
+  // The dusk sky over the ruins, high to the horizon haze, and the fog low over the floor
   skyTop: '#1d1f22',
   skyMid: '#3b3b38',
   skyLow: '#7a6e5a',
@@ -40,30 +37,13 @@ export const SOUL = {
   ash: '#5b5550',
   bone: '#c9bfa8',
 
-  // Banner gold, the lit menu highlight, and the soapstone message's orange
+  // Banner gold, the lit menu highlight, and the moss on the old stone
   glow: '#e3c27a',
   glowDeep: '#8f7337',
   lantern: '#f0cf86',
-  message: '#fce4d0',
-  phantom: '#f3dd9a',
-
-  // The red phantom of an invader: the sparring partner in the Muay Thai ring
-  invaderLight: '#ff9a7a',
-  invader: '#c8452f',
-  invaderDeep: '#5e1810',
-
-  // The white blue of a spirit that left a message on the floor
-  spirit: '#d6e4f2',
-  spiritDeep: '#6f88a6',
-
-  // HUD colours: health, its bright banner red, stamina, the flask
-  blood: '#9e2a22',
-  bloodBright: '#d8432f',
-  stamina: '#5f8f4a',
   moss: '#7fb36a',
-  estus: '#d8a03a',
 
-  // His armour: steel, mail, leather, the blue surcoat and its fire warding emblem, the wraps of his gloves
+  // His armour: steel, mail, leather, the plain blue surcoat, the gold cord of his mongkhon, the wraps of his gloves
   steelLight: '#c9ccce',
   steel: '#8b9095',
   steelDark: '#474b50',
@@ -72,8 +52,23 @@ export const SOUL = {
   leatherDark: '#3b2818',
   surcoat: '#30508a',
   surcoatDark: '#1b2f57',
-  emblem: '#d9a441',
+  cord: '#d9a441',
   wraps: '#a3322a',
+
+  // The foes: a hollow's dried skin and its rags, the demon's hide, belly and horn, a shield knight's iron
+  hollow: '#7d6c5a',
+  hollowDark: '#463a30',
+  rag: '#57493b',
+  hide: '#5d5247',
+  hideDark: '#352d27',
+  belly: '#7f6d59',
+  iron: '#3d3f42',
+  ironLight: '#6c7075',
+
+  // The old wood of a great door, and the pale fog wall
+  wood: '#4b3624',
+  woodDark: '#2c1f14',
+  mist: '#e8e4da',
 
   // Lettering
   text: '#ebe0c8',
