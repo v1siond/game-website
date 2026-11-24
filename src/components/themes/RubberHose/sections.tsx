@@ -20,7 +20,8 @@ import world from './world.module.css'
 // One section per stage of the fight: a tall head that first shows the fight alone and then brings the title
 // up on its curled banner, then the cards (the title cards and posters under one ink line), then a screen
 // of the fight alone. From lg the head and the cards keep to the left 40%, so the fight plays clear of
-// them on the right.
+// them on the right. On a phone the fight fills the lower screen, so the banner rides at the top of the
+// head, over the tent, and the cards come up only after a full screen of the fight alone.
 
 const LEAD = `text-center text-base ${world.ink}`
 
@@ -174,7 +175,7 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <HoseStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh] lg:max-w-[40vw]">
+      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[110svh] max-md:items-start max-md:pt-16 lg:max-w-[40vw]">
         <CurlBanner id={id}>{title}</CurlBanner>
       </header>
       <div className="relative max-w-[42rem] lg:max-w-[40vw]">

@@ -8,7 +8,7 @@ import { NO_NODES, figureTransform } from '../shared/figureScene'
 import { fadeTo, fx, transformTo } from '../shared/stageNodes'
 import { ARENA_LAYERS, GROUND, arenaPlane } from './arena'
 import { Calliope } from './boss'
-import { sceneEnd, stubPlay, type Playhead, type SceneScript } from './playStub'
+import { sceneEnd, type Playhead } from '@/lib/scroll/player'
 import { Effects, type Scene } from './scenes'
 import { StageToon, setToonPose, toonJoints } from './toon'
 import css from './stage.module.css'
@@ -27,11 +27,8 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
   figure: { zoom: [1.0, 1.04], lift: [0, -1] },
 }
 
-/** A theatre scene that plays a script on time from its arrival. */
-export type PlayedScene = TheatreScene & { script: SceneScript }
-
 /** The scene as the shared theatre runs it: the writer on the playhead, then him placed and posed. */
-export const theatreScene = (scene: Scene): PlayedScene => ({
+export const theatreScene = (scene: Scene): TheatreScene => ({
   id: scene.id,
   count: 0,
   script: scene.def.script,
@@ -39,8 +36,8 @@ export const theatreScene = (scene: Scene): PlayedScene => ({
     const group = fx(stage, 'figure')
     const joints = group && toonJoints(group)
     const write = scene.def.bind(stage, scene.layout)
-    return (progress: number, _reached: number, play?: Playhead) => {
-      const state = write(play ?? stubPlay(scene.def.script, progress))
+    return (_progress: number, _reached: number, play?: Playhead) => {
+      const state = write(play ?? sceneEnd(scene.def.script))
       if (!group || !joints) return
       transformTo(group, figureTransform(state))
       fadeTo(group, state.opacity)

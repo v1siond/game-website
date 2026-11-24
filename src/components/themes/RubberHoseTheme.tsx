@@ -143,7 +143,7 @@ export default function RubberHoseTheme() {
             ))}
           </ProfessionRegion>
 
-          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
+          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] max-md:pt-[100svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
             {reduced && <HoseStage scene={contact} settled />}
             <RecruiterHero
               render={({ line, actions }) => (

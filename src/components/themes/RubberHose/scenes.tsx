@@ -9,14 +9,14 @@ import type { FigureState, StageNodes } from '../shared/figureScene'
 import { GROUND } from './arena'
 import { PARRY_PINK, PIPES, SHOULDER, STILTS, STILTS_FOOT, WAGON_TOP, scaleYFrom, turnAbout, type BossKit } from './boss'
 import { HOSE } from './palette'
-import type { Playhead, SceneScript } from './playStub'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { TOON_STAND, type ToonPose } from './toon'
 
 // The page as one boss fight in the big top (arena.tsx), the structure of the 1930s cartoon run and gun:
 // the hero is the map and the boss rolling in, each section is a stage of the fight against the steam
 // calliope (boss.tsx), and the contact is the knockout. Each scene plays one to three different actions
-// on time once its section arrives, then holds its end frame (the shared section scene player; until it
-// lands, playStub.ts). He stands on the left facing the boss on the right, side on, and fights with the
+// on time once its section arrives, then holds its end frame (the shared scene player,
+// src/lib/scroll/player.ts). He stands on the left facing the boss on the right, side on, and fights with the
 // genre's verbs: shoot, jump, dash, the parry slap on anything pink, a charged shot and a super.
 //
 // The phases escalate: About and Work fight the calliope on its wheels; Tech raises it on its stilts into
