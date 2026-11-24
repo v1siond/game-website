@@ -894,7 +894,7 @@ function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
 }
 
 // What each section shows inside its frame, every field from the shared lists and the card view models. The
-// cards a scene counts (one relic each) sit inside [data-stage-items].
+// cards a section counts sit inside [data-stage-items].
 const CARDS: SectionFrames = {
   about: function AboutCards({ slot }) {
     const { cards } = useLabels()
@@ -992,7 +992,7 @@ const CARDS: SectionFrames = {
   },
 }
 
-// The column a frame reads in: beside the scene from lg, the knight and his relics on its right; below lg the
+// The column a frame reads in: beside the scene from lg, the wanderer and what he meets on its right; below lg the
 // whole width, the scene showing in the screens of picture alone above and below it.
 const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(42rem,46vw)]'
 const SIDE = 'px-4 md:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
@@ -1005,7 +1005,7 @@ function SceneSection({ scene, profession, still }: { scene: DarkScene & { slot:
   return (
     <div data-scene={scene.id} className={`relative z-20 pb-[70svh] ${SIDE}`}>
       {still && <DarkStage scene={scene} profession={profession} settled />}
-      <div className="min-h-[100svh]" />
+      <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
       <div className={COLUMN}>
         <VoidFrame title={sections[scene.slot.titleKey]}>
           <Cards slot={scene.slot} />
@@ -1015,11 +1015,13 @@ function SceneSection({ scene, profession, still }: { scene: DarkScene & { slot:
   )
 }
 
-// Dark Fantasy: his CV as a knight's descent through a gothic cavern arena. The hero shows the arena and the
-// profession's boss stage; then every section is a full screen scene that rises from the dark, holds while
-// its frame scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine). In
-// each scene the knight frees one relic per card as that card scrolls up; in projects he fights the bug and
-// at the contact he ends it. Under reduced motion every section carries its own scene, still.
+// Dark Fantasy: his CV as a masked wanderer's descent through the caverns of a fallen bug kingdom, drawn
+// from the hand drawn adventure it evokes. The hero shows the arena and the profession's boss stage; then
+// every section is a full screen scene that rises from the dark, holds while its frame scrolls over it and
+// sinks as the next rises (the shared theatre on the scroll stage engine), each playing a few of the game's
+// moves (scenes.tsx); below lg the scene's own screen is 130svh, so its floor plays clear of the cards. At
+// the contact he rests at the bench. Under reduced motion every section carries its own scene, still, at
+// its end frame.
 export default function DarkFantasyTheme() {
   const view = useWorldView()
   const labels = useLabels()
@@ -1167,7 +1169,7 @@ export default function DarkFantasyTheme() {
           ))}
         </ProfessionRegion>
 
-        {/* Contact: the knight ends the bug on the scene behind it */}
+        {/* Contact: the wanderer rests at the bench on the scene behind it */}
         <div data-scene="contact" className={`relative z-20 pt-[60svh] pb-[40svh] ${SIDE}`}>
           {reduced && <DarkStage scene={contact} profession={active} settled />}
           <section className="df-panel relative mx-auto max-w-2xl bg-[color:var(--df-panel)] px-6 py-10" aria-label={sections.contact}>

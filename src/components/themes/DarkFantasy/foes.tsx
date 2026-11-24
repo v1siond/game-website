@@ -3,10 +3,10 @@
 import { memo } from 'react'
 import { DARK_FANTASY } from './palette'
 
-// What the knight meets in the hall besides the bug (bug.tsx), drawn in the bug's shell and mask colours
+// What the wanderer meets in the hall besides the bug (bug.tsx), drawn in the bug's shell and mask colours
 // with its orange infection light: the crawler that charges along the floor, the flier that dives from the
-// vaults, and the armoured knight who duels him; and the hall's own pieces his scenes use: the bench, a pit
-// in the floor, the bells under the vault, the soul bolt he casts and the pale wings of his leap. Each is
+// vaults, and the armoured knight who duels him; and the bench he rests at and the soul bolt he casts (the
+// caverns' other pieces are cavern.tsx). Each is
 // drawn round its own origin, the foot of the thing at y 0, so a scene places it with one translate.
 
 /** The crawler, about 150 wide, facing left toward him: a low domed shell, a pale mask, two orange eyes. */
@@ -79,36 +79,6 @@ export const Bench = memo(function Bench() {
   )
 })
 
-/** A pit in the hall's floor, PIT_WIDTH wide: the dark drop between two broken ledges. */
-export const PIT_WIDTH = 220
-
-export function Pit() {
-  const w = PIT_WIDTH
-  return (
-    <g>
-      <rect x={-w / 2} y="-6" width={w} height="200" fill={DARK_FANTASY.void} />
-      <path d={`M${-w / 2 - 20},-6 L${-w / 2},-6 L${-w / 2 + 10},20 L${-w / 2 - 4},44 L${-w / 2 - 20},60 Z`} fill={DARK_FANTASY.stoneDark} stroke={DARK_FANTASY.black} strokeWidth="2" />
-      <path d={`M${w / 2 + 20},-6 L${w / 2},-6 L${w / 2 - 12},24 L${w / 2 + 2},50 L${w / 2 + 20},64 Z`} fill={DARK_FANTASY.stoneDark} stroke={DARK_FANTASY.black} strokeWidth="2" />
-    </g>
-  )
-}
-
-/** A bell under the vault, hung from its chain; its light ([data-fx="bell-lit-i"]) is written by the scene. */
-export function Bell({ i }: { i: number }) {
-  return (
-    <g>
-      <line x1="0" y1="-400" x2="0" y2="-60" stroke={DARK_FANTASY.copper} strokeWidth="3" opacity="0.7" />
-      <g data-fx={`bell-lit-${i}`} opacity="0">
-        <circle cx="0" cy="0" r="90" fill={DARK_FANTASY.lavender} opacity="0.25" />
-        <circle cx="0" cy="0" r="46" fill={DARK_FANTASY.lavender} opacity="0.35" />
-      </g>
-      <path d="M-34,10 C-34,-30 -24,-60 0,-60 C24,-60 34,-30 34,10 L42,22 L-42,22 Z" fill={DARK_FANTASY.brass} stroke={DARK_FANTASY.black} strokeWidth="3" />
-      <path d="M-20,-30 C-20,-44 -12,-50 0,-50" fill="none" stroke={DARK_FANTASY.brassPlate} strokeWidth="3" opacity="0.7" />
-      <circle cx="0" cy="28" r="7" fill={DARK_FANTASY.copper} stroke={DARK_FANTASY.black} strokeWidth="2" />
-    </g>
-  )
-}
-
 /** The soul bolt he casts, flying right, about 120 long: a bright head trailing pale fire. */
 export const SoulBolt = memo(function SoulBolt() {
   return (
@@ -116,16 +86,6 @@ export const SoulBolt = memo(function SoulBolt() {
       <path d="M-110,0 C-70,-22 -30,-26 0,-14 C14,-8 14,8 0,14 C-30,26 -70,22 -110,0 Z" fill={DARK_FANTASY.soulBlue} opacity="0.35" />
       <path d="M-70,0 C-40,-14 -16,-16 0,-8 C8,-4 8,4 0,8 C-16,16 -40,14 -70,0 Z" fill={DARK_FANTASY.ethereal} opacity="0.7" />
       <circle cx="-4" cy="0" r="10" fill={DARK_FANTASY.white} />
-    </g>
-  )
-})
-
-/** The pale wings of his leap, spread from his back, about 200 wide. */
-export const Wings = memo(function Wings() {
-  return (
-    <g>
-      <path d="M0,0 C-40,-60 -110,-70 -120,-30 C-90,-34 -60,-20 0,0 Z" fill={DARK_FANTASY.white} opacity="0.55" />
-      <path d="M0,0 C30,-60 100,-80 116,-44 C86,-44 56,-26 0,0 Z" fill={DARK_FANTASY.white} opacity="0.4" />
     </g>
   )
 })

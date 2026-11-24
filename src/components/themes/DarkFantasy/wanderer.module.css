@@ -1,0 +1,24 @@
+/*
+ * His side on figure (wanderer.tsx): every part turns round its own joint in the viewBox's units (transform-box:
+ * view-box), so a forearm turns at the elbow wherever the shoulder took it. The rest below is his stance before
+ * a scene writes him: the nail arm bent forward, the nail held low ahead. A scene's writer (pose.ts) overrides
+ * it with inline transforms. The head turns by its SVG transform attribute; the slashes, the soul and the dash's
+ * shadow rest at opacity 0 (their own attribute) until a pose shows them.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 54px 96px; }
+.armBack { transform-origin: 46px 60px; }
+.foreBack { transform-origin: 46px 72px; }
+.armFront { transform-origin: 62px 60px; }
+.foreFront { transform-origin: 63px 72px; }
+.thighBack { transform-origin: 50px 95px; }
+.shinBack { transform-origin: 50px 104px; }
+.thighFront { transform-origin: 58px 95px; }
+.shinFront { transform-origin: 58px 104px; }
+
+.armFront { transform: rotate(-10deg); }
+.foreFront { transform: rotate(-50deg); }
