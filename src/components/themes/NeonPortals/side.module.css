@@ -1,0 +1,20 @@
+/*
+ * His side on figure (side.tsx): every part turns round its own joint in the viewBox's units (transform-box:
+ * view-box), so a forearm turns at the elbow wherever the shoulder took it. The writer (setSidePose) sets each
+ * part's turn with inline transforms; the squash, the head and what shows round him move by their SVG transform
+ * and opacity attributes.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 66px 128px; }
+.armBack { transform-origin: 54px 88px; }
+.foreBack { transform-origin: 54px 112px; }
+.armFront { transform-origin: 78px 88px; }
+.foreFront { transform-origin: 78px 112px; }
+.thighBack { transform-origin: 58px 128px; }
+.shinBack { transform-origin: 58px 160px; }
+.thighFront { transform-origin: 72px 128px; }
+.shinFront { transform-origin: 72px 160px; }
