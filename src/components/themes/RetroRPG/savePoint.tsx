@@ -43,7 +43,7 @@ export function SavePoint({ profession, scene, still }: { profession: Profession
   const saved = saves > 0
 
   return (
-    <section data-scene={scene.id} data-saved={saved} className="relative z-20 px-4 pb-8 pt-[60svh] motion-reduce:pt-16 sm:px-6" aria-labelledby={CONTACT_HEADING}>
+    <section data-scene={scene.id} data-saved={saved} className="relative z-20 px-4 pb-8 pt-[60svh] motion-reduce:pt-16 max-md:pt-[130svh] sm:px-6" aria-labelledby={CONTACT_HEADING}>
       {still && <RpgStage scene={scene} settled />}
       <div className="relative mx-auto max-w-3xl">
         <div className="relative mb-4 flex justify-center">

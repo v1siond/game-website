@@ -181,7 +181,7 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-label={label} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <RpgStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] items-end pb-4 motion-reduce:min-h-[70svh]">
+      <header className="relative flex min-h-[90svh] items-end pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
         <SectionHeader title={title} />
       </header>
       <div className="relative max-w-[42rem]">
