@@ -29,27 +29,26 @@ export const StillStages = StillStagesContext.Provider
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
 /** Lines marked with the blood red diamond the trials give a job's highlights: a job's highlights, a
- *  project's details, the About highlights, under their gold heading. */
+ *  project's details, the About highlights, under their frost heading. */
 export const BLOOD_POINTS: MarkedLinesLook = {
-  heading: `mt-4 text-sm text-[var(--myth-gold)] ${u.display}`,
+  heading: `mt-4 text-sm text-[var(--myth-frost)] ${u.display}`,
   list: 'mt-2 space-y-1.5',
   line: 'flex gap-2 text-base',
   marker: <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />,
 }
 
-/** A card's tags on the ink, ruled in deep gold: a job's skills, a project's technologies, a venture's services. */
-export const GOLD_TAGS: TagListLook = {
+/** A card's tags on the ink, ruled in iron: a job's skills, a project's technologies, a venture's services. */
+export const IRON_TAGS: TagListLook = {
   list: 'mt-3 flex flex-wrap gap-1.5',
-  tag: 'border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm',
+  tag: 'border border-[var(--myth-iron)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm',
 }
 
-export function Laurel({ flip = false }: { flip?: boolean }) {
+/** A knot cut either side of a title stone: one stave with its branches, wound through a ring of knotwork. */
+export function RuneKnot({ flip = false }: { flip?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 shrink-0 ${flip ? '-scale-x-100' : ''}`} aria-hidden="true">
-      <path d="M20 21 Q8 18 5 4" fill="none" stroke="currentColor" strokeWidth={1.6} />
-      {[6, 10, 14, 18].map((y, index) => (
-        <path key={y} d={`M${7 + index * 2.6} ${y} q-5 -1 -5 -5 q5 0 5 5 Z`} fill="currentColor" />
-      ))}
+      <path d="M12 3 V21 M12 9 L6 4 M12 9 L18 4 M12 15 L7 19" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+      <path d="M4 12 Q4 5 12 5 Q20 5 20 12 Q20 19 12 19 Q4 19 4 12 Z" fill="none" stroke="currentColor" strokeWidth={1.2} strokeDasharray="3 2" />
     </svg>
   )
 }
@@ -58,9 +57,9 @@ export function SectionTitle({ title }: { title: string }) {
   return (
     <h2 id={mythHeadingId(title)} className="mb-8 text-[clamp(1.25rem,0.85rem+1.8vw,1.875rem)]">
       <span className={`${u.plate} ${u.display}`}>
-        <Laurel />
+        <RuneKnot />
         <span className="min-w-0">{title}</span>
-        <Laurel flip />
+        <RuneKnot flip />
       </span>
     </h2>
   )

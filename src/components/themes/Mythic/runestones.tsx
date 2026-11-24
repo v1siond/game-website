@@ -6,17 +6,17 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { MartialArts } from '@/lib/cv/content'
 import u from './underworld.module.css'
 
-// Muay Thai in the green fields: the record as the stone tablet of facts and his achievements as the
-// prophecies on the list, each stamped fulfilled in turn when the stage first shows. His duel plays on the
-// section's stage behind them (scenes.tsx).
+// Muay Thai under the bronze giant: the record carved on a runestone of facts, his achievements as the
+// deeds cut on the stone beside it, each marked with its frost rune in turn when the stage first shows. His
+// duel plays on the section's stage behind them (scenes.tsx).
 
-export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
+export function Runestones({ martialArts }: { martialArts: MartialArts }) {
   const { myth } = useLabels()
 
   return (
     <div className="grid gap-8">
       <div className="min-w-0">
-        <h3 className={`mb-4 text-xl text-[var(--myth-gold)] ${u.display}`}>{martialArts.primary.title}</h3>
+        <h3 className={`mb-4 text-xl text-[var(--myth-frost)] ${u.display}`}>{martialArts.primary.title}</h3>
         <div className="grid gap-6" data-stage-items="">
           <MuayThaiRecord
             martialArts={martialArts}
@@ -26,7 +26,7 @@ export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
               term: `text-sm text-[var(--myth-ink-soft)] ${u.display}`,
               value: 'text-base',
               achievements: `space-y-3 p-5 ${u.panel}`,
-              achievement: 'flex items-start justify-between gap-4 border-b border-[var(--myth-gold-deep)] pb-3 last:border-b-0 last:pb-0',
+              achievement: 'flex items-start justify-between gap-4 border-b border-[var(--myth-iron)] pb-3 last:border-b-0 last:pb-0',
             }}
             renderAchievement={(achievement, index) => (
               <>

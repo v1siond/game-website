@@ -113,6 +113,13 @@ export const MYTH = {
   bladeFire: '#ff8a2a',
   // ---- the frost of his axe and the fur of his mantle
   frost: '#8fd4ff',
+  // ---- the carved stone, iron and wood of the realms: the title stones, the rims, the realm doors
+  stone: '#d6dde0',
+  stoneShade: '#a3afb5',
+  iron: '#5d6870',
+  ironDeep: '#2c3338',
+  wood: '#6a4428',
+  woodShade: '#3a2516',
   frostCore: '#e8f7ff',
   fur: '#4e4034',
   furLight: '#8a7460',

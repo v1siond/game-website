@@ -8,23 +8,23 @@ import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, Stage } from './stage'
 import { Trials } from './trials'
 import { Codex } from './codex'
-import { Labours } from './labours'
+import { Sagas } from './sagas'
 import { Votives } from './votives'
 import { Portraits } from './portraits'
-import { Prophecies } from './prophecies'
+import { Runestones } from './runestones'
 import u from './underworld.module.css'
 
 // The picked profession's sections, each a stretch of the descent: About in the great hall, the jobs on the
-// storm deck and the codex over the storm sea, the services on plain parchment after them, his labours and
-// the votive tokens over the magma, the portraits and the record under the bronze giant. The last gate of the
-// red temple closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
+// storm deck and the codex over the storm sea, the services on the journal's pages after them, the sagas of
+// his deeds and the votive tokens over the magma, the portraits and the runestone of his record under the
+// bronze giant. The realm door on the summit closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
 // order; each section's scene plays behind it (scenes.tsx).
 
-// His education and languages under the highlights, each label in the gold display face.
-const GOLD_FACTS: AboutFactsLook = {
+// His education and languages under the highlights, each label in the frost display face.
+const FROST_FACTS: AboutFactsLook = {
   list: 'mt-4 space-y-1',
   fact: 'text-base',
-  term: `inline text-sm text-[var(--myth-gold)] ${u.display}`,
+  term: `inline text-sm text-[var(--myth-frost)] ${u.display}`,
   value: 'inline',
   termEnd: ': ',
 }
@@ -41,7 +41,7 @@ const FRAMES: SectionFrames = {
           <div data-stage-items="">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
           </div>
-          <AboutFacts look={GOLD_FACTS} />
+          <AboutFacts look={FROST_FACTS} />
         </div>
       </Stage>
     )
@@ -69,7 +69,7 @@ const FRAMES: SectionFrames = {
         <ul className={MASONRY_LIST} data-stage-items="">
           {slot.services.map((service) => (
             <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
-              <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
+              <h3 className={`border-b-2 border-[var(--myth-iron)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
               <p className="mt-3 text-base leading-relaxed">{service.line}</p>
             </li>
           ))}
@@ -81,7 +81,7 @@ const FRAMES: SectionFrames = {
     const titles = useLabels().sections
     return (
       <Stage id={slot.id} title={titles.projects} zone="magma">
-        <Labours projects={slot.projects} />
+        <Sagas projects={slot.projects} />
       </Stage>
     )
   },
@@ -105,7 +105,7 @@ const FRAMES: SectionFrames = {
     const titles = useLabels().sections
     return (
       <Stage id={slot.id} title={titles.muayThai} zone="harbour">
-        <Prophecies martialArts={slot.martialArts} />
+        <Runestones martialArts={slot.martialArts} />
       </Stage>
     )
   },

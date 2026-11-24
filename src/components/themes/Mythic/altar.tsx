@@ -9,19 +9,22 @@ import type { Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
-// The profession switch as the altar of his callings in the great hall: three bronze plates, each carved
-// with that calling's kit (the sword and shield, the war drum, the wrapped fists under the mongkhon). Picking
-// one (click, or the arrow keys the shared switch handles) turns the plate over to its lit gold face.
+// The profession switch as the altar of his callings in the great hall: three iron rimmed stones, each
+// carved with that calling's kit (the axe and the round shield, the war drum, the wrapped fists under the
+// mongkhon). Picking one (click, or the arrow keys the shared switch handles) turns the stone over to its
+// frost lit face.
 
 const INK = MYTH.inkLine
 
-function SwordAndShield() {
+function AxeAndShield() {
   return (
     <>
-      <circle cx={18} cy={28} r={14} fill={MYTH.bronze} stroke={INK} strokeWidth={2} />
-      <circle cx={18} cy={28} r={3} fill={MYTH.gold} stroke={INK} strokeWidth={1.2} />
-      <path d="M26 40 L29 42 L44 8 L41 6 Z" fill={MYTH.steel} stroke={INK} strokeWidth={2} strokeLinejoin="round" />
-      <path d="M22 36 L33 41" stroke={MYTH.bronze} strokeWidth={4} strokeLinecap="round" />
+      <circle cx={18} cy={28} r={14} fill={MYTH.wood} stroke={INK} strokeWidth={2} />
+      <path d="M18 14 V42 M4 28 H32" stroke={MYTH.iron} strokeWidth={2.4} />
+      <circle cx={18} cy={28} r={3} fill={MYTH.iron} stroke={INK} strokeWidth={1.2} />
+      <path d="M30 44 L33 45 L42 6 L39 5 Z" fill={MYTH.leather} stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
+      <path d="M38 10 Q47 8 47 16 Q46 24 38 22 L39 18 Q43 18 43 15 Q43 12 39 13 Z" fill={MYTH.steel} stroke={INK} strokeWidth={1.6} />
+      <path d="M43 9 Q47 12 46 20" fill="none" stroke={MYTH.frost} strokeWidth={1.4} />
     </>
   )
 }
@@ -50,7 +53,7 @@ function WrappedFists() {
 
 // The mark carved on each talent plate: the kit of that profession.
 const KIT_MARK: Record<Profession, () => ReactElement> = {
-  engineer: SwordAndShield,
+  engineer: AxeAndShield,
   drummer: WarDrumMark,
   fighter: WrappedFists,
 }

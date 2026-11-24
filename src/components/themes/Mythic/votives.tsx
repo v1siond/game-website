@@ -5,13 +5,13 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { newTabHint } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { MYTH } from './palette'
-import { GOLD_TAGS } from './stage'
+import { IRON_TAGS } from './stage'
 import u from './underworld.module.css'
 
-// The ventures as votive tokens on the shelf of offerings: each company a gold token resting on its velvet
+// The ventures as runestones on the shelf of offerings: each company a carved stone resting in its iron
 // slot, its name and motto on the plaque under it. Pointing at or focusing a token lifts it out of its slot;
 // a token with a site is the link to it. His own products (featured) rest in the two wide slots of the top
-// shelf, a larger token and a gold plate over the name; the other ventures fill the shelf below. The token's
+// shelf, a larger stone and a frost plate over the name; the other ventures fill the shelf below. The token's
 // shape changes along the shelf, the way each offering is a different object.
 
 type Company = CVData['companies'][number]
@@ -31,24 +31,24 @@ function Votive({ company, index }: { company: Company; index: number }) {
       <div className={`relative flex h-36 items-center justify-center ${u.slot}`} aria-hidden="true">
         <div className={`relative ${company.featured ? 'h-24 w-24' : 'h-20 w-20'} ${u.votive}`}>
           <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full">
-            <path d={TOKENS[index % TOKENS.length]} fill={MYTH.gold} stroke={MYTH.inkLine} strokeWidth={3} />
-            <path d={TOKENS[index % TOKENS.length]} fill="none" stroke={MYTH.goldPale} strokeWidth={1.5} transform="translate(32 32) scale(0.78) translate(-32 -32)" />
+            <path d={TOKENS[index % TOKENS.length]} fill={MYTH.stone} stroke={MYTH.inkLine} strokeWidth={3} />
+            <path d={TOKENS[index % TOKENS.length]} fill="none" stroke={MYTH.iron} strokeWidth={1.5} transform="translate(32 32) scale(0.78) translate(-32 -32)" />
           </svg>
           <span className={`absolute inset-0 flex items-center justify-center text-2xl text-[var(--myth-ink)] ${u.display}`}>{company.name.charAt(0)}</span>
         </div>
       </div>
-      <div className="flex-1 border-x-2 border-b-2 border-[var(--myth-gold-deep)] bg-[var(--myth-panel)] p-5">
+      <div className="flex-1 border-x-2 border-b-2 border-[var(--myth-iron)] bg-[var(--myth-panel)] p-5">
         {company.featured && (
-          <p className={`mb-2 inline-block bg-[var(--myth-gold)] px-2 py-0.5 text-sm uppercase tracking-widest text-[var(--myth-ink)] ${u.display}`}>
+          <p className={`mb-2 inline-block bg-[var(--myth-frost)] px-2 py-0.5 text-sm uppercase tracking-widest text-[var(--myth-ink)] ${u.display}`}>
             {cards.ownProduct}
           </p>
         )}
-        <h3 className={`${company.featured ? 'text-xl' : 'text-lg'} text-[var(--myth-gold)] ${u.display}`}>
+        <h3 className={`${company.featured ? 'text-xl' : 'text-lg'} text-[var(--myth-frost)] ${u.display}`}>
           <SlashBreaks text={company.name} />
         </h3>
-        {company.tagline && <p className="mt-1 text-base italic text-[var(--myth-gold-pale)]">{company.tagline}</p>}
+        {company.tagline && <p className="mt-1 text-base italic text-[var(--myth-frost-core)]">{company.tagline}</p>}
         <p className="mt-2 text-base leading-relaxed">{company.description}</p>
-        <TagList items={company.services} label={sections.services} look={{ ...GOLD_TAGS, tag: 'border border-[var(--myth-gold-deep)] px-2 py-0.5 text-sm' }} />
+        <TagList items={company.services} label={sections.services} look={{ ...IRON_TAGS, tag: 'border border-[var(--myth-iron)] px-2 py-0.5 text-sm' }} />
       </div>
     </div>
   )
@@ -59,7 +59,7 @@ export function Votives({ companies }: { companies: Company[] }) {
 
   return (
     <>
-      <ul data-stage-items="" className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
+      <ul data-stage-items="" className={`grid gap-6 border-4 border-[var(--myth-iron)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
         {companies.map((company, index) => (
           <li key={company.id} className={`${u.shelfItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--i': index })}>
             {company.url ? (
