@@ -2,19 +2,21 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_FOLLOWER, crossOf, follow, sceneEnd, type Follower, type Playhead, type SceneScript } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, crossOf, follow, headingOf, restAt, sceneEnd, type Follower, type Heading, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
-// stage per scene (the hero, each section, the contact), each in layers that push in across the scene. Each
-// stage dissolves in over the one before it as its section arrives and the one under it is hidden once it is
-// whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). It binds every stage once,
+// stage per scene (the hero, each section, the contact), each in layers that push in across the scene. On the
+// way down each stage dissolves in over the one before it as its section arrives and the one under it is
+// hidden once it is whole, so the screen never dips to dark; on the way back the page cuts to the stage it
+// returns to, so two scenes and their casts are never left one over the other (crossOf, src/lib/scroll/player.ts). It binds every stage once,
 // measures each section ([data-scene]) and the reading line of each counted card ([data-stage-items]) on load
 // and resize, and per frame writes only each visible stage's opacity, its layers' transforms and the scene's
 // own writer, which poses the world's figure and props from the scene's progress, the cards reached and, for
-// a scene with a script, its playhead: the scroll plays the script, forward on the way down and back on the
-// way up, at no more than its own speed (src/lib/scroll/player.ts); while a scene has not caught up with the
-// scroll the engine draws every frame.
+// a scene with a script, its playhead: the scroll plays the script of the stage the page is in, forward on the
+// way down and back on the way up, at no more than its own speed (src/lib/scroll/player.ts), and every other
+// stage rests where the scroll puts it; while that scene has not caught up with the scroll the engine draws
+// every frame.
 // The first scene is the hero. The text layer settles with the art: it is drawn at the settled position, the
 // lag written as a translate and cleared at rest, so pictures and cards come to rest together (as Era
 // Postcards' settleText).
@@ -91,14 +93,16 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
   }
 }
 
-/** A scene's playhead at `now`, following the scroll's `played` share of it at no more than its own speed;
- *  true in `playing` while it has not caught up. */
-const playOf = (bound: Bound, played: number, now: number): { play: Playhead; playing: boolean } => {
+/** A scene's playhead at `now`. The stage the page is in (`lead`) follows the scroll's `played` share of it at
+ *  no more than its own speed, true in `playing` while it has not caught up; every other stage rests where the
+ *  scroll puts it, so a stage the page leaves or flies past never plays catching up under or over another. */
+const playOf = (bound: Bound, played: number, now: number, lead: boolean): { play: Playhead; playing: boolean } => {
   if (!bound.script) return { play: restingPlay(undefined), playing: false }
-  const { follower, play, playing } = follow(bound.follower, bound.script, played, now)
+  const { follower, play, playing } = follow(lead ? bound.follower : restAt(bound.script, played, now), bound.script, played, now)
   bound.follower = follower
   return { play, playing }
 }
+
 
 const show = (bound: Bound, visible: boolean): void => {
   if (bound.shown === visible) return
@@ -112,6 +116,7 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   const bound = useRef<Bound[]>([])
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
+  const heading = useRef<Heading>('down')
   const frame = useRef(0)
 
   useLayoutEffect(() => {
@@ -145,12 +150,16 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
       const all = bound.current
       const now = performance.now()
       const states = all.map((each, i) => (each.hero ? heroState(position, viewport, { phone }) : stageState(each.span, position, viewport, { last: i === all.length - 1, phone })))
-      const { layers } = crossOf(states.map((state) => state.vis))
+      heading.current = headingOf(lag, heading.current)
+      const { layers, lead } = crossOf(
+        states.map((state) => state.vis),
+        heading.current,
+      )
       let playing = false
       all.forEach((each, i) => {
         const { shown, opacity } = layers[i]
         show(each, shown)
-        const { play, playing: runs } = playOf(each, states[i].play, now)
+        const { play, playing: runs } = playOf(each, states[i].play, now, i === lead)
         playing ||= runs
         if (!shown) return
         each.stage.style.opacity = opacity.toFixed(3)

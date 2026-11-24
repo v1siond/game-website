@@ -78,20 +78,37 @@ export interface Cross {
   lead: number
 }
 
+/** Which way the page is going: down the page plays the scenes on, up plays them back. */
+export type Heading = 'down' | 'up'
+
+// Under this many px of lag the page keeps the way it was going.
+const HEADING_PX = 1
+
+/** The way the page is going from the drawn position's lag behind the scroll (positive on the way down), or
+ *  `was` while it rests. */
+export function headingOf(lag: number, was: Heading): Heading {
+  if (lag > HEADING_PX) return 'down'
+  if (lag < -HEADING_PX) return 'up'
+  return was
+}
+
 /**
  * The stages in page order, each by how far it has risen (0 to 1): the last fully risen one is drawn whole
- * (the first stage counts as risen), the ones after it dissolve in over it, eased, and the ones under it are
- * hidden. The page is in the last stage at least half risen.
+ * (the first stage counts as risen). On the way down the ones after it dissolve in over it, eased, so the
+ * screen never dips to dark; on the way back the page cuts to it and the stage it leaves is gone at once, so
+ * two scenes and their casts are never left one over the other (his 11-24 words). The ones under it are
+ * hidden. The page is in the last stage at least half risen, or on the way back in the one it returns to.
  */
-export function crossOf(rises: readonly number[]): Cross {
+export function crossOf(rises: readonly number[], heading: Heading = 'down'): Cross {
   const base = rises.reduce((top, rise, i) => (rise >= 1 ? i : top), 0)
-  const lead = rises.reduce((top, rise, i) => (rise >= 0.5 ? i : top), 0)
   const layers = rises.map((rise, i) => {
     if (i < base) return { shown: false, opacity: 0 }
     if (i === base) return { shown: true, opacity: 1 }
+    if (heading === 'up') return { shown: false, opacity: 0 }
     return { shown: rise > 0, opacity: easeInOut(clamp01(rise)) }
   })
-  return { layers, lead }
+  if (heading === 'up') return { layers, lead: base }
+  return { layers, lead: rises.reduce((top, rise, i) => (rise >= 0.5 ? i : top), 0) }
 }
 
 /** Where the drawn scene is (ms into it), how fast it moves (ms of scene per ms), and the time of its last frame. */
@@ -102,6 +119,11 @@ export interface Follower {
 }
 
 export const IDLE_FOLLOWER: Follower = { drawn: 0, speed: 0, at: null }
+
+/** A scene at rest where the scroll puts it (`progress` 0 to 1 of the scroll that plays it): a stage out of
+ *  view, or one the scroll flew past, is drawn at that frame with no catch up; only the stage the page is in
+ *  plays at its own pace. */
+export const restAt = (script: SceneScript, progress: number, now: number): Follower => ({ drawn: clamp01(progress) * sceneLength(script), speed: 0, at: now })
 
 /** The drawn scene never runs faster than the scene itself: one ms of it per ms. */
 const MAX_SPEED = 1

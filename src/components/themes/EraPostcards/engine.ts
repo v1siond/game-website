@@ -2,17 +2,19 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_FOLLOWER, crossOf, follow, type Follower } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, crossOf, follow, headingOf, restAt, type Follower, type Heading } from '@/lib/scroll/player'
 import { heroState, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
 
 // The world's side of the scroll stage engine (src/hooks/useScrollStage.ts): it binds every stage of the
 // theatre once (its layers, the era's writer), measures each section on load and resize, and per frame
-// writes only each visible stage's opacity, its layers' transforms and its era's props and pose. Each era's
-// script is played by the scroll, forward and back, at no more than its own speed (src/lib/scroll/player.ts);
-// while one has not caught up with the scroll the engine draws every frame, scrolled or not. Each stage dissolves in over the one before it and the one under it is
-// hidden once it is whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). The rail's
+// writes only each visible stage's opacity, its layers' transforms and its era's props and pose. The era of
+// the stage the page is in plays its script by the scroll, forward and back, at no more than its own speed
+// (src/lib/scroll/player.ts), every other stage resting where the scroll puts it; while that one has not caught
+// up with the scroll the engine draws every frame, scrolled or not. On the way down each stage dissolves in
+// over the one before it and the one under it is hidden once it is whole, so the screen never dips to dark; on
+// the way back the page cuts to the stage it returns to (crossOf, src/lib/scroll/player.ts). The rail's
 // current mark changes only when the leading scene does.
 //
 // The text settles with the art: the page scroll stays native (scrollbar, keyboard, find in page, screen
@@ -72,6 +74,7 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   const lead = useRef('')
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
+  const heading = useRef<Heading>('down')
   const frame = useRef(0)
 
   useLayoutEffect(() => {
@@ -111,12 +114,18 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
       const all = bound.current
       const now = performance.now()
       const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1, phone))
-      const cross = crossOf(states.map((state) => state.vis))
+      heading.current = headingOf(lag, heading.current)
+      const cross = crossOf(
+        states.map((state) => state.vis),
+        heading.current,
+      )
       let playing = false
       all.forEach((each, i) => {
         const { shown, opacity } = cross.layers[i]
         show(each, shown)
-        const run = follow(each.follower, each.scene.era.script, states[i].play, now)
+        // Only the stage the page is in plays at its own pace; the others rest where the scroll puts them.
+        const { script } = each.scene.era
+        const run = follow(i === cross.lead ? each.follower : restAt(script, states[i].play, now), script, states[i].play, now)
         each.follower = run.follower
         playing ||= run.playing
         if (!shown) return

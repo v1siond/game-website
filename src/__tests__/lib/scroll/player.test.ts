@@ -1,4 +1,4 @@
-import { IDLE_FOLLOWER, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, crossOf, elapsedOf, follow, playheadAt, sceneEnd, sceneLength, type Follower } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, crossOf, elapsedOf, follow, playheadAt, headingOf, restAt, sceneEnd, sceneLength, type Follower } from '@/lib/scroll/player'
 
 describe('actionLengths', () => {
   it('gives every action at least the time to read it', () => {
@@ -79,6 +79,17 @@ describe('crossOf', () => {
     expect(crossOf([1, 1, 0.6, 0.1]).lead).toBe(2)
     expect(crossOf([1, 0.4]).lead).toBe(0)
   })
+
+  it('on the way back cuts to the stage the page returns to: the one it leaves is gone at once, never left over it', () => {
+    const cross = crossOf([1, 1, 0.6, 0.1], 'up')
+    expect(cross.layers.map((layer) => layer.shown)).toEqual([false, true, false, false])
+    expect(cross.layers[1]).toEqual({ shown: true, opacity: 1 })
+    expect(cross.lead).toBe(1)
+  })
+
+  it('dissolves on the way down as before', () => {
+    expect(crossOf([1, 1, 0.6, 0.1], 'down')).toEqual(crossOf([1, 1, 0.6, 0.1]))
+  })
 })
 
 describe('follow', () => {
@@ -135,5 +146,30 @@ describe('follow', () => {
 
   it('gives the end frame for the settled scene reduced motion shows', () => {
     expect(playheadAt(script, sceneLength(script))).toEqual(sceneEnd(script))
+  })
+})
+
+describe('restAt', () => {
+  const script = [1500, 1500]
+
+  it('rests a scene out of view where the scroll puts it, so it never plays catching up', () => {
+    const rested = restAt(script, 0.25, 1000)
+    expect(rested).toEqual({ drawn: 750, speed: 0, at: 1000 })
+    const next = follow(rested, script, 0.25, 1016)
+    expect(next.playing).toBe(false)
+    expect(next.play).toEqual(playheadAt(script, 750))
+  })
+
+  it('drops a scene the scroll flew past straight to its end or its start', () => {
+    expect(restAt(script, 1.4, 0).drawn).toBe(sceneLength(script))
+    expect(restAt(script, -2, 0).drawn).toBe(0)
+  })
+})
+
+describe('headingOf', () => {
+  it('reads the way the page goes from the lag behind the scroll, and keeps it while the page rests', () => {
+    expect(headingOf(40, 'up')).toBe('down')
+    expect(headingOf(-40, 'down')).toBe('up')
+    expect(headingOf(0.3, 'up')).toBe('up')
   })
 })
