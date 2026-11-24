@@ -108,8 +108,9 @@ export interface SceneDef {
   script: SceneScript
   /** Where each action ends on the move's t, one per action, the last 1. */
   ends: readonly number[]
-  /** How far right of his usual spot he stands on a wide screen, clear of a wide hero card. */
-  wideShift?: number
+  /** How far right of his usual spot he stands, on a wide screen and on a phone (the hero: clear of the wide
+   *  wrist computer, and his dogs in a phone's view). */
+  shift?: { wide: number; phone: number }
   /** The place's art round his spot (x 0 his spot, y 0 the ground), behind him and in front of him. */
   back: (input: SceneInput) => ReactNode
   front?: (input: SceneInput) => ReactNode
@@ -286,7 +287,7 @@ const HERO_DOGS = [-60, -115, -170]
 const hero: SceneDef = {
   zone: 'shelter',
   kit: null,
-  wideShift: 150,
+  shift: { wide: 150, phone: 70 },
   script: [1600, 1800],
   ends: [0.45, 1],
   back: () => (
@@ -877,8 +878,8 @@ export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<D
   }
 }
 
-/** Where he stands in a scene: his usual spot, shifted right on a wide screen where the scene asks. */
-export const sceneSpot = ({ def, layout }: Scene): number => spotOf(layout.phone) + (layout.phone ? 0 : (def.wideShift ?? 0))
+/** Where he stands in a scene: his usual spot, shifted right where the scene asks. */
+export const sceneSpot = ({ def, layout }: Scene): number => spotOf(layout.phone) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
 
 /** The input the scene's art reads. */
 export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, kit: scene.kit })

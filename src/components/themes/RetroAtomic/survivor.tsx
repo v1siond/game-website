@@ -20,9 +20,9 @@ import {
 import s from './survivor.module.css'
 import { cssVars } from '@/lib/cssVars'
 
-// Him as this world's own figure, the shelter survivor drawn as an atomic age poster mascot, the one on the
-// posters and the badge cards: a big round head on a small body,
-// the wide toothy grin and the wink, the blue jumpsuit with the yellow collar, placket, cuffs and belt
+// Him as this world's own figure facing the viewer, the shelter survivor drawn in the atomic age poster
+// style of the wrist terminal's status screen: a big round head on a small body,
+// the wide toothy grin, the blue jumpsuit with the yellow collar, placket, cuffs and belt
 // buckle, black boots, the wrist terminal strapped on the left forearm with its green screen. Drawn the
 // poster way: flat fills, one thick ink outline round every shape, a cream highlight, no gradients. The
 // same drawing has a phosphor tone for the wrist terminal's status screen: every fill a shade of the
@@ -35,12 +35,11 @@ import { cssVars } from '@/lib/cssVars'
 // tapping its keys while the screen flickers; the Musician in the jumpsuit at a snare with two sticks,
 // whose action is the drum roll; the Martial Artist with the jumpsuit rolled down to the waist and the
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
-// side kick. Every one can take the targeting stance with the bracket reticle and give the level up thumbs
-// up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage he
-// stands side on instead (dweller.tsx).
+// side kick; these motions play on the wrist terminal. On a stage and on the badge cards he stands side on
+// instead (dweller.tsx).
 
 export type SurvivorTone = 'poster' | 'phosphor'
-export type SurvivorMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
+export type SurvivorMotion = 'still' | 'type' | 'drum' | 'strike'
 
 /** Each profession's action, the way the survivor would do that job. */
 export const SURVIVOR_ACTION: Record<Profession, SurvivorMotion> = {
@@ -51,8 +50,6 @@ export const SURVIVOR_ACTION: Record<Profession, SurvivorMotion> = {
 
 const MOTION_CLASS: Record<SurvivorMotion, string> = {
   still: '',
-  thumbsUp: s.thumbsUp,
-  target: s.target,
   type: s.type,
   drum: s.drum,
   strike: s.strike,
@@ -185,11 +182,8 @@ function Head({ profession, inks }: { profession: Profession; inks: Inks }) {
       <Shape d={GRIN} fill={inks.teeth} inks={inks} />
       <path d="M50 33 Q54 39.5 49 40.5" fill="none" stroke={inks.line} strokeWidth={1.3} strokeLinecap="round" />
       <path d="M38 24.5 L46 23.5 M54 23.5 L62 24.5" stroke={inks.hair} strokeWidth={2.2} strokeLinecap="round" />
-      <ellipse cx={58} cy={30.5} rx={1.9} ry={3} fill={inks.eye} className={s.eyeOpen} />
-      <g className={s.eyeWink}>
-        <ellipse cx={42} cy={30.5} rx={1.9} ry={3} fill={inks.eye} className={s.eyeShut} />
-        <path d="M39 31 Q42 33 45 31" fill="none" stroke={inks.eye} strokeWidth={1.4} strokeLinecap="round" className={s.winkLine} />
-      </g>
+      <ellipse cx={58} cy={30.5} rx={1.9} ry={3} fill={inks.eye} />
+      <ellipse cx={42} cy={30.5} rx={1.9} ry={3} fill={inks.eye} />
       {profession === 'fighter' && <Mongkhon inks={inks} />}
     </g>
   )
@@ -255,21 +249,6 @@ function WristTerminal({ inks }: { inks: Inks }) {
   )
 }
 
-// The atomic age pistol in his left fist, drawn along the hanging forearm so the aim swings it level: a
-// chunky barrel with two cooling rings and a red emitter tip, the grip out of the fist, the muzzle flash
-// at the tip. Both rest hidden; the aim and fire motions show them.
-function Pistol({ inks }: { inks: Inks }) {
-  return (
-    <g className={s.pistol}>
-      <Shape d="M59 95 L66 95 L66 100.5 L59 100.5 Z" fill={inks.boot} inks={inks} />
-      <Shape d="M64.5 99 L72 99 L71.5 114 L65 114 Z" fill={inks.device} inks={inks} />
-      <path d="M64.8 104 H71.8 M64.9 108 H71.7" stroke={inks.trim} strokeWidth={1.6} />
-      <Shape d="M65.5 114 L71 114 L70 118 L66.5 118 Z" fill={inks.band} inks={inks} />
-      <path className={s.flash} d="M68.2 118 L71 124 L76 122 L72.5 127 L77 131 L70.5 129.5 L68.2 136 L66 129.5 L59.5 131 L64 127 L60.5 122 L65.5 124 Z" fill={inks.trim} stroke={inks.line} strokeWidth={inks.lineWidth} strokeLinejoin="round" />
-    </g>
-  )
-}
-
 function Hand({ side, profession, inks }: { side: Side; profession: Profession; inks: Inks }) {
   const { x, y } = HAND[side]
   const wrapped = profession === 'fighter'
@@ -295,7 +274,6 @@ function Arm({ side, profession, inks }: { side: Side; profession: Profession; i
         {!bare && <path d={side === 'right' ? 'M28 90 L35.8 90' : 'M64.3 90 L72.2 90'} stroke={inks.trim} strokeWidth={3} />}
         {side === 'left' && <WristTerminal inks={inks} />}
         <Hand side={side} profession={profession} inks={inks} />
-        {side === 'left' && <Pistol inks={inks} />}
       </g>
     </g>
   )
@@ -308,19 +286,6 @@ function Snare({ inks }: { inks: Inks }) {
       <Shape d="M34 112 L66 112 L64 128 L36 128 Z" fill={inks.suitShade} inks={inks} />
       <path d="M40 112 L40 128 M50 112 L50 128 M60 112 L60 128" stroke={inks.trim} strokeWidth={1.6} />
       <ellipse cx={50} cy={112} rx={16} ry={3.6} fill={inks.teeth} stroke={inks.line} strokeWidth={inks.lineWidth} className={s.drumHead} />
-    </g>
-  )
-}
-
-// The targeting stance's bracket reticle and the level up star, both resting hidden.
-function Overlays({ inks }: { inks: Inks }) {
-  return (
-    <g>
-      <g className={s.reticle} fill="none" stroke={PHOSPHOR} strokeWidth={2}>
-        <path d="M80 34 H76 V42 M96 34 H100 V42 M80 62 H76 V54 M96 62 H100 V54" />
-        <circle cx={88} cy={48} r={2} fill={PHOSPHOR} />
-      </g>
-      <path className={s.star} d="M14 20 L17 28 L25 28 L19 33 L21 41 L14 36 L7 41 L9 33 L3 28 L11 28 Z" fill={inks.trim} stroke={inks.line} strokeWidth={inks.lineWidth} />
     </g>
   )
 }
@@ -349,7 +314,6 @@ function SurvivorFigure({ profession, motion, tone = 'poster' }: Omit<SurvivorPr
         <Arm side="right" profession={profession} inks={inks} />
         <Arm side="left" profession={profession} inks={inks} />
       </g>
-      <Overlays inks={inks} />
     </g>
   )
 }
