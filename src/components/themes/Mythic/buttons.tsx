@@ -3,13 +3,13 @@ import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
 import u from './underworld.module.css'
 
-// The world's buttons: carved capitals on a gold, blood or stone slab with a dark drop under it; they
+// The world's buttons: carved capitals on a frost, blood or stone slab with a dark drop under it; they
 // lift on hover and press into the drop on a click (underworld.module.css, "buttons").
 
-export type SlabTone = 'gold' | 'blood' | 'stone'
+export type SlabTone = 'frost' | 'blood' | 'stone'
 
 const TONE: Record<SlabTone, string> = {
-  gold: u.btnGold,
+  frost: u.btnFrost,
   blood: u.btnBlood,
   stone: u.btnStone,
 }
@@ -18,14 +18,14 @@ export const slabClass = (tone: SlabTone) => `${u.btn} ${TONE[tone]}`
 
 type SlabButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { tone?: SlabTone; children: ReactNode }
 
-export function SlabButton({ tone = 'gold', className = '', type = 'button', ...props }: SlabButtonProps) {
+export function SlabButton({ tone = 'frost', className = '', type = 'button', ...props }: SlabButtonProps) {
   return <button type={type} className={`${slabClass(tone)} ${className}`} {...props} />
 }
 
-// Email is the blood red action, LinkedIn the gold one, the CV and the engine stone.
+// Email is the blood red action, LinkedIn the frost one, the CV and the engine stone.
 const HERO_TONE: Record<ContactLinkId, SlabTone> = {
   email: 'blood',
-  linkedin: 'gold',
+  linkedin: 'frost',
   cv: 'stone',
   engine: 'stone',
 }

@@ -11,8 +11,8 @@
 /* ---------------------------------------------------------------- page */
 
 .root {
-  /* The keyboard focus ring (globals.css) in the pale gold of its own ring, 14.86:1 on the hall. */
-  --focus-ring: var(--myth-gold-pale);
+  /* The keyboard focus ring (globals.css) in the pale frost of its own ring, 18.1:1 on the hall. */
+  --focus-ring: var(--myth-frost-core);
   /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
   --focus-halo: var(--myth-hall-high);
   background: var(--myth-hall-high);
@@ -28,25 +28,25 @@
   text-transform: uppercase;
 }
 
-/* The page the skip link lands on shows where the keyboard landed with the gold ring; every control
+/* The page the skip link lands on shows where the keyboard landed with the frost ring; every control
    keeps the global ring (globals.css) in the --focus-ring set above. */
 .root main:focus-visible {
-  outline: 3px solid var(--myth-gold-pale);
+  outline: 3px solid var(--myth-frost-core);
   outline-offset: 3px;
 }
 
-/* A painted panel: near black lacquer, a gold edge and a thin inner gilt line. */
+/* A board of dark wood: near black, an iron rim and a thin inner line of frost. */
 .panel {
   background: linear-gradient(180deg, var(--myth-panel) 0%, var(--myth-ink) 100%);
-  border: 2px solid var(--myth-gold-deep);
-  box-shadow: inset 0 0 0 4px var(--myth-panel), inset 0 0 0 5px var(--myth-gold-deep), 0 10px 30px rgb(0 0 0 / 45%);
+  border: 2px solid var(--myth-iron);
+  box-shadow: inset 0 0 0 4px var(--myth-panel), inset 0 0 0 5px color-mix(in srgb, var(--myth-frost) 45%, transparent), 0 10px 30px rgb(0 0 0 / 45%);
 }
 
-/* Parchment: the codex and the prophecy tablet, dark ink on it. */
+/* The pages of his journal of the realms: the codex and the runestone's facts, dark ink on them. */
 .parchment {
   background: linear-gradient(170deg, var(--myth-marble) 0%, var(--myth-marble-shade) 100%);
   color: var(--myth-ink);
-  border: 2px solid var(--myth-gold-deep);
+  border: 2px solid var(--myth-iron);
   box-shadow: 0 10px 26px rgb(0 0 0 / 40%);
 }
 
@@ -147,16 +147,16 @@
 
 /* ---------------------------------------------------------------- stage and section title (stage.tsx) */
 
-/* The title is carved into a gilded plate with a laurel each side. */
+/* The title is cut into a stone with a rune knot each side, the stone bound by an iron band. */
 .plate {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 1.4rem 0.45rem;
-  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 45%, var(--myth-gold-plate) 100%);
+  background: linear-gradient(180deg, var(--myth-stone) 0%, var(--myth-stone-shade) 100%);
   color: var(--myth-ink);
   border: 2px solid var(--myth-ink);
-  box-shadow: inset 0 0 0 2px var(--myth-gold-pale), 0 6px 0 var(--myth-ink);
+  box-shadow: inset 0 0 0 3px var(--myth-iron), 0 6px 0 var(--myth-ink);
   clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
 }
 
@@ -198,21 +198,21 @@
 .btn:focus-visible { transform: translate3d(0, -2px, 0); }
 .btn:active { transform: translate3d(0, 3px, 0); }
 
-.btnGold {
-  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 60%, var(--myth-gold-plate) 100%);
+.btnFrost {
+  background: linear-gradient(180deg, var(--myth-frost-core) 0%, var(--myth-frost) 100%);
   color: var(--myth-ink);
 }
 
 .btnBlood {
   background: linear-gradient(180deg, var(--myth-blood-plate) 0%, var(--myth-terracotta-deep) 100%);
   color: var(--myth-bone);
-  border-color: var(--myth-gold-deep);
+  border-color: var(--myth-iron);
 }
 
 .btnStone {
   background: var(--myth-panel);
   color: var(--myth-bone);
-  border-color: var(--myth-gold-deep);
+  border-color: var(--myth-iron);
 }
 
 /* ---------------------------------------------------------------- the great hall (hero.tsx) */
@@ -223,12 +223,12 @@
 
 /* ---------------------------------------------------------------- the altar's plates (altar.tsx) */
 
-/* A plate: stone when idle, its lit face (gold) when picked; a new pick turns it over. */
+/* A stone: dark when idle, its frost lit face when picked; a new pick turns it over. */
 .talent {
   min-height: 44px;
   cursor: pointer;
   background: var(--myth-panel);
-  border: 2px solid var(--myth-gold-deep);
+  border: 2px solid var(--myth-iron);
   color: var(--myth-bone);
   transition: transform 0.2s ease;
 }
@@ -237,7 +237,7 @@
 .talent:focus-visible { transform: translate3d(0, -3px, 0); }
 
 .talent[aria-checked='true'] {
-  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 55%, var(--myth-gold-plate) 100%);
+  background: linear-gradient(180deg, var(--myth-frost-core) 0%, var(--myth-frost) 100%);
   color: var(--myth-ink);
   border-color: var(--myth-ink);
 }
@@ -255,8 +255,8 @@
 /* ---------------------------------------------------------------- votives (votives.tsx) */
 
 .slot {
-  background: radial-gradient(ellipse at 50% 40%, var(--myth-crimson) 0%, var(--myth-blood-deep) 80%);
-  border: 2px solid var(--myth-gold-deep);
+  background: radial-gradient(ellipse at 50% 40%, var(--myth-iron) 0%, var(--myth-iron-deep) 80%);
+  border: 2px solid var(--myth-iron);
   box-shadow: inset 0 6px 16px rgb(0 0 0 / 60%);
 }
 
@@ -264,14 +264,14 @@
 
 .portrait {
   background: radial-gradient(ellipse at 50% 35%, var(--myth-ely-light) 0%, var(--myth-ely-low) 70%);
-  border: 3px solid var(--myth-gold);
+  border: 3px solid var(--myth-frost);
   box-shadow: inset 0 0 0 2px var(--myth-ink);
 }
 
 .dialogue {
   background: rgb(10 5 8 / 88%);
-  border: 2px solid var(--myth-gold-deep);
-  border-top: 4px solid var(--myth-gold);
+  border: 2px solid var(--myth-iron);
+  border-top: 4px solid var(--myth-frost);
 }
 
 .bandCard {
@@ -283,7 +283,7 @@
   transform: translate3d(0, -4px, 0);
 }
 
-/* ---------------------------------------------------------------- the prophecies (prophecies.tsx) */
+/* ---------------------------------------------------------------- the runestone (runestones.tsx) */
 
 .fulfilled {
   opacity: 0;
@@ -297,11 +297,11 @@
   transform: scale(1) rotate(-10deg);
 }
 
-/* ---------------------------------------------------------------- the last gate (gate.tsx) */
+/* ---------------------------------------------------------------- the realm door (gate.tsx) */
 
 .gateScene {
-  background: linear-gradient(180deg, var(--myth-styx-high) 0%, var(--myth-styx-low) 100%);
-  border: 2px solid var(--myth-gold-deep);
+  background: linear-gradient(180deg, var(--myth-iron-deep) 0%, var(--myth-ink) 100%);
+  border: 2px solid var(--myth-iron);
 }
 
 .dawn {

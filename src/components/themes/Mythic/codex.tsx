@@ -17,7 +17,7 @@ const Page = memo(function Page({ category }: { category: Category }) {
 
   return (
     <li className={`p-5 ${u.parchment}`}>
-      <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{category.name}</h3>
+      <h3 className={`border-b-2 border-[var(--myth-iron)] pb-2 text-lg ${u.display}`}>{category.name}</h3>
       <ul className="mt-3 flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
         {category.items.map((item) => (
           <li key={item} className="border border-[var(--myth-ink-soft)] px-2 py-0.5 text-base">
