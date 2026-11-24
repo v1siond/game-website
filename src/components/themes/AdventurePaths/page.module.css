@@ -12,6 +12,12 @@
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
+/* The HUD bar is fixed over the top of the page (51 px on a phone, 55 px wide), so the page scrolls a
+   link, a card or a section jumped to into view below it, never under it (WCAG 2.4.11, focus not obscured). */
+:global(html):has(.root) {
+  scroll-padding-top: 64px;
+}
+
 .theatre {
   --theatre-ground: var(--ap-night);
 }
