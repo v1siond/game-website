@@ -5,9 +5,15 @@
 /** One decimal, so the server and the browser print the same numbers. */
 export const r1 = (n: number): number => Math.round(n * 10) / 10
 
-export const clamp01 = (t: number): number => Math.min(1, Math.max(0, t))
+import { clamp01 } from '@/lib/scroll/progress'
+import { ramp } from '@/lib/scroll/stage'
+
+export { clamp01 }
 
 export const lerp = (from: number, to: number, t: number): number => from + (to - from) * t
+
+/** A bump from 0 up to 1 and back over [from, to] of t, 0 outside it. */
+export const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** The share of item i reached, 0 to 1, from the fractional count of reached items. */
 export const reached = (count: number, i: number): number => clamp01(count - i)

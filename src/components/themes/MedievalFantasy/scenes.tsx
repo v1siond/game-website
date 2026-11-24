@@ -7,7 +7,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { drop } from '@/lib/motion/arc'
 import { sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, focusOn, fx, lerp, r1, spread, transformTo } from '@/components/themes/shared/stageNodes'
+import { bell, clamp01, fadeTo, focusOn, fx, lerp, r1, spread, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { ChaosLand } from './chaosZone'
@@ -63,9 +63,6 @@ const FLOOR = 1000
 
 /** How far action `i` has played at `play`: all of it once a later one plays, `t` while it plays, none before. */
 const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** His gesture over an action: up over its first fifth, held while his units answer, down over its last fifth. */
 const gesture = (f: number): number => ramp(f, 0, 0.2) * (1 - ramp(f, 0.8, 1))

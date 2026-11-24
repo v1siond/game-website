@@ -5,9 +5,10 @@ import u from './underworld.module.css'
 // The fixed painting behind the page, one era per stretch of the CV: the great hall of crimson marble
 // with its braziers (hero, about), the storm sea with the serpent (work history, tech stack), the basalt
 // and the magma river (projects, ventures), the harbour at night under the bronze giant (bands, muay thai) and
-// Olympus at dawn (contact). The root's data-zone fades the era in view up (stage.tsx) and only that era
-// runs its own clock (the .era parts sit paused otherwise), so each era plays its motion once the first time
-// it is in view and then rests; each era drifts against the pointer (--mx, --my).
+// Olympus at dawn (contact). The root's data-zone fades the era in view up (stage.tsx). Each era's motion is
+// played by the first scene in its region on the shared scene player (scenes.tsx writes --era-t on its
+// data-era layer), so it follows the scroll with that scene, back on the way up and again every pass; each
+// era drifts against the pointer (--mx, --my).
 
 const INK = MYTH.inkLine
 
@@ -263,24 +264,24 @@ const EMBERS = [
 export function Depths() {
   return (
     <div className={u.depths} aria-hidden="true">
-      <div className={`${u.zone} ${u.zoneHall}`}>
+      <div className={`${u.zone} ${u.zoneHall}`} data-era="hall">
         <HallArt />
+        {EMBERS.map(({ left, drift }, index) => (
+          <span key={left} className={`${u.era} ${u.ember}`} style={cssVars({ '--left': left, '--i': index, '--drift': drift })} />
+        ))}
       </div>
-      <div className={`${u.zone} ${u.zoneStorm}`}>
+      <div className={`${u.zone} ${u.zoneStorm}`} data-era="storm">
         <StormArt />
       </div>
-      <div className={`${u.zone} ${u.zoneMagma}`}>
+      <div className={`${u.zone} ${u.zoneMagma}`} data-era="magma">
         <MagmaArt />
       </div>
-      <div className={`${u.zone} ${u.zoneHarbour}`}>
+      <div className={`${u.zone} ${u.zoneHarbour}`} data-era="harbour">
         <HarbourArt />
       </div>
-      <div className={`${u.zone} ${u.zoneOlympus}`}>
+      <div className={`${u.zone} ${u.zoneOlympus}`} data-era="olympus">
         <OlympusArt />
       </div>
-      {EMBERS.map(({ left, drift }, index) => (
-        <span key={left} className={u.ember} style={cssVars({ '--left': left, '--i': index, '--drift': drift })} />
-      ))}
       {/* a dark veil over the painting so the page's text keeps its contrast in every region */}
       <div className="absolute inset-0 bg-[var(--myth-ink)] opacity-40" />
     </div>

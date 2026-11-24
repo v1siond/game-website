@@ -1,7 +1,7 @@
 import { STAND as RIG_STAND, mix, walk, type RigPose } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
-import { fadeTo, transformTo } from '../shared/stageNodes'
+import { bell, fadeTo, transformTo } from '../shared/stageNodes'
 import { PARTS, type Part } from './wanderer'
 import s from './wanderer.module.css'
 
@@ -15,9 +15,6 @@ export type WandererPose = RigPose & { head: number } & Record<Part, number>
 const STAND: WandererPose = { ...RIG_STAND, head: 0, arc: 0, downArc: 0, upArc: 0, focus: 0, shade: 0 }
 
 const pose = (partial: Partial<WandererPose>): WandererPose => ({ ...STAND, ...partial })
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-export const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** At rest: the nail arm bent forward, the nail held low ahead (wanderer.module.css draws the same). */
 export const REST = pose({ armRight: -10, foreRight: -50 })

@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { headingId } from '@/lib/cv/sectionText'
+import type { SectionId } from '@/lib/cv/sectionPlan'
 import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
 import u from './underworld.module.css'
@@ -17,6 +18,20 @@ import u from './underworld.module.css'
 
 /** The regions the page goes down, top to bottom. */
 export type Zone = 'hall' | 'storm' | 'magma' | 'harbour' | 'olympus'
+
+/** The region each part of the page stands in: the hero and About in the hall down to the contact on Olympus. */
+export const ZONE_OF: Record<SectionId | 'hero' | 'contact', Zone> = {
+  hero: 'hall',
+  about: 'hall',
+  work: 'storm',
+  tech: 'storm',
+  services: 'storm',
+  projects: 'magma',
+  ventures: 'magma',
+  bands: 'harbour',
+  muayThai: 'harbour',
+  contact: 'olympus',
+}
 
 /** The column a section reads in: the whole width on a phone, the left of the screen from lg. */
 export const COLUMN = 'lg:mr-auto lg:w-[min(46rem,52vw)]'
@@ -65,8 +80,8 @@ export function SectionTitle({ title }: { title: string }) {
   )
 }
 
-export function Stage({ id, title, zone, children }: { id: string; title: string; zone: Zone; children: ReactNode }) {
-  const { ref, on } = useZoneStage<Zone>(zone)
+export function Stage({ id, title, children }: { id: SectionId; title: string; children: ReactNode }) {
+  const { ref, on } = useZoneStage<Zone>(ZONE_OF[id])
   const still = useContext(StillStagesContext)
 
   return (

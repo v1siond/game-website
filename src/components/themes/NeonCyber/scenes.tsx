@@ -7,7 +7,7 @@ import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { drop, hop } from '@/lib/motion/arc'
 import { handAt, type ArmPivots } from '@/lib/motion/rigPose'
-import { clamp01, fadeTo, fx, lerp, r1, transformTo, translateTo } from '../shared/stageNodes'
+import { bell, clamp01, fadeTo, fx, lerp, r1, transformTo, translateTo } from '../shared/stageNodes'
 import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import type { District } from './city'
 import { HeroFigure } from './figure'
@@ -68,9 +68,6 @@ const START: Playhead = { action: 0, t: 0, done: false }
 
 /** How far action `i` has played at `play`: all of it once a later one plays, `t` while it plays, none before. */
 const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** A place on the stage: `wide` right of the text column, `phone` inside the middle a phone shows (about x 530 to 1070). */
 const place = ({ phone }: Layout, wide: number, onPhone: number): number => (phone ? onPhone : wide)

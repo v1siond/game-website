@@ -1,5 +1,5 @@
 import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
-import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
+import { opacityTo, rigJoints, type RigJoints, rotateTo, setRigPose } from '../shared/rig'
 import s from './figure.module.css'
 
 // His poses for the scroll scenes, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's numbers
@@ -123,17 +123,12 @@ export const heroJoints = (root: Element): HeroJoints => ({
   ...(Object.fromEntries(Object.entries(KIT_CLASSES).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className}`)])) as Record<keyof typeof KIT_CLASSES, SVGElement | null>),
 })
 
-const show = (el: SVGElement | null, opacity: number): void => {
-  if (!el) return
-  el.style.opacity = opacity.toFixed(3)
-}
-
 /** Writes `p` on his groups: the rig's limbs, then his kit: the blade turning open at the wrist as it shows,
  *  the optics, the calves' charge (a variable his charge lines read). Transforms and opacity only. */
 export function setHeroPose(j: HeroJoints, p: HeroPose): void {
   setRigPose(j, p)
-  show(j.blade, Math.min(1, p.blade * 3))
-  if (j.blade) j.blade.style.transform = `rotate(${(160 * (1 - p.blade)).toFixed(1)}deg)`
-  show(j.optics, p.optics)
+  opacityTo(j.blade, Math.min(1, p.blade * 3))
+  rotateTo(j.blade, 160 * (1 - p.blade))
+  opacityTo(j.optics, p.optics)
   j.body?.style.setProperty('--charge', p.charge.toFixed(3))
 }

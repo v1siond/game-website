@@ -1,5 +1,6 @@
 import { STAND as RIG_STAND, mix, walk, type RigPose } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
+import { bell } from '../shared/stageNodes'
 
 // The runner side on (side.tsx), posed for the moves that show him whole, on the shared rig (rigPose): his limbs as the rig's
 // numbers, plus his own on top: the head's nod in degrees (positive looks down), the cartoon squash and stretch
@@ -16,9 +17,6 @@ export type SidePose = RigPose & { head: number; stretch: number } & Record<Part
 const STAND: SidePose = { ...RIG_STAND, head: 0, stretch: 0, whirl: 0, dust: 0 }
 
 const pose = (partial: Partial<SidePose>): SidePose => ({ ...STAND, ...partial })
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-export const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** At rest: the gloves loose at his sides, a little forward. */
 export const REST = pose({ armRight: -14, foreRight: -24, armLeft: 10, foreLeft: -20 })

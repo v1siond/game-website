@@ -5,10 +5,11 @@
  *
  * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites, and
  * the only smooth motions are the camera (the zoom into a landmark) and his walk when a profession is
- * picked. The map's life plays once on load and has ended within 5 s: each two frame loop a set number of
- * beats, ending on its first frame, the clouds the first 5 s of their drift; his act frames a set number of
- * beats, his step frames as many as his walk takes (walk.ts). Reduced motion (the block at the end) shows
- * the map with nothing playing.
+ * picked. The map's life at rest is played by the scroll, not a clock: --map-t (0 at the page top, 1 a
+ * screen down, written by hero.tsx through useScrollFollow) carries the clouds across, his breaths and his
+ * blink, so scrolling up plays them back and every pass plays them again. What a visitor sets going stays
+ * on its own count: his act frames a set number of beats, his step frames as many as his walk takes
+ * (walk.ts). Reduced motion (the block at the end) shows the map with nothing playing.
  */
 
 .root {
@@ -35,20 +36,9 @@
   transition: transform 400ms ease-out;
 }
 
-/* Each cloud starts 9 s further into its drift and plays on to 5 s after the map shows: the count is that
-   much of one drift counted from its start. */
+/* The scroll carries each cloud 48px across the map, the even ones left to right, the odd ones back. */
 .cloudDrift {
-  animation: cloud-drift 26s ease-in-out calc((5 + var(--i, 0) * 9) / 26) alternate forwards;
-  animation-delay: calc(var(--i, 0) * -9s);
-}
-
-@keyframes cloud-drift {
-  from {
-    transform: translate3d(-24px, 0, 0);
-  }
-  to {
-    transform: translate3d(24px, 0, 0);
-  }
+  transform: translate3d(calc((var(--map-t, 0) * 2 - 1) * 24px * (1 - 2 * var(--i, 0))), 0, 0);
 }
 
 /* ---- entering a landmark: the map breaks into coarse blocks and fades out, then back (about 30 frames
@@ -191,11 +181,12 @@
 .breath {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: sprite-breath 1.8s steps(2, jump-none) 2.25 forwards;
+  animation: sprite-breath 1s linear both paused;
+  animation-delay: calc(var(--map-t, 0) * -1s);
 }
 
 /* While he walks he bobs a pixel on every step frame, the walk's own count (walk.ts sets --walk-frame and
-   --walk-beats); once he has walked he stands unbreathed, the breath at rest played only before the walk. */
+   --walk-beats); once he has walked he stands unbreathed, the breaths at rest played only before the walk. */
 [data-walking='true'] .breath {
   animation: sprite-bob var(--walk-frame) steps(2, jump-none) var(--walk-beats) forwards;
 }
@@ -204,12 +195,20 @@
   animation: none;
 }
 
+/* Three breaths over the first screen of scroll, each a two frame step like a map sprite's, ending out. */
 @keyframes sprite-breath {
-  from {
+  0%,
+  33%,
+  67%,
+  100% {
     transform: scale(1, 1);
+    animation-timing-function: steps(1, end);
   }
-  to {
+  17%,
+  50%,
+  83% {
     transform: scale(1.02, 0.97);
+    animation-timing-function: steps(1, end);
   }
 }
 
@@ -224,19 +223,21 @@
 
 .blink {
   opacity: 0;
-  animation: sprite-blink 4.2s steps(1, end) 1 forwards;
+  animation: sprite-blink 1s steps(1, end) both paused;
+  animation-delay: calc(var(--map-t, 0) * -1s);
 }
 
+/* One blink while the map is still on screen, two fifths of the way down the first screen. */
 @keyframes sprite-blink {
   0%,
-  94% {
+  39% {
     opacity: 0;
   }
-  95%,
-  97% {
+  40%,
+  43% {
     opacity: 1;
   }
-  98%,
+  44%,
   100% {
     opacity: 0;
   }

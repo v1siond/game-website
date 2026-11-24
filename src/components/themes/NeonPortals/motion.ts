@@ -3,8 +3,9 @@ import { mix as mixRig } from '@/lib/motion/rigPose'
 import { clamp01 } from '@/lib/scroll/progress'
 import { ramp } from '@/lib/scroll/stage'
 import type { Action } from './plan'
-import { AIR, BOUNCE, bell, dance, KICK, READY, REST, run as sideRun, SLAM, spin, spinTurns, type SidePose } from './sidePose'
+import { AIR, BOUNCE, dance, KICK, READY, REST, run as sideRun, SLAM, spin, spinTurns, type SidePose } from './sidePose'
 import { DF, smooth, STEP, type ItemSpot, type RoomGeometry } from './world'
+import { bell, lerp } from '../shared/stageNodes'
 
 // What the scroll makes the props and the runner do. Every value is a pure function of the camera's depth
 // and, for the move at a prop, of that move's phase: the scroll sets where the move should be (actionTarget)
@@ -90,8 +91,6 @@ export const POSE_KEYS = ['jump', 'lean', 'spin', 'liftL', 'bendL', 'rotL', 'lif
 export type Pose = Record<(typeof POSE_KEYS)[number], number>
 
 const IDLE: Pose = { jump: 0, lean: 0, spin: 1, liftL: 0, bendL: 1, rotL: 3, liftR: 0, bendR: 1, rotR: -3, aL: 10, sL: 1, fL: 0, aR: -10, sR: 1, fR: 0, sticks: 0, wave: 0, look: 1, board: 0, boulder: 0 }
-
-const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
 
 const mix = (a: Pose, b: Pose, t: number): Pose => Object.fromEntries(POSE_KEYS.map((key) => [key, lerp(a[key], b[key], t)])) as Pose
 

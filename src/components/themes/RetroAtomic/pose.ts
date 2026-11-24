@@ -1,6 +1,6 @@
 import type { Profession } from '@/lib/cv/professions'
 import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
-import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
+import { opacityTo, rigJoints, type RigJoints, rotateTo, setRigPose, transformStyleTo } from '../shared/rig'
 import s from './dweller.module.css'
 import d from './dog.module.css'
 import m from './mutant.module.css'
@@ -115,29 +115,21 @@ export type DwellerJoints = RigJoints & Record<keyof typeof GEAR_CLASSES, SVGEle
 /** His groups inside `root`, the group that holds one DwellerFigure. */
 export const dwellerJoints = (root: Element): DwellerJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, GEAR_CLASSES) })
 
-const show = (el: SVGElement | null, opacity: number, transform?: string): void => {
-  if (!el) return
-  el.style.opacity = opacity.toFixed(3)
-  if (transform) el.style.transform = transform
-}
-
-const spin = (el: SVGElement | null, deg: number): void => {
-  if (el) el.style.transform = `rotate(${deg.toFixed(1)}deg)`
-}
 
 /** Writes `p` on his groups: the rig's limbs, then what he holds. The bobblehead turns against his arm so it
  *  stands upright in his hand. Transforms and opacity only. */
 export function setDwellerPose(j: DwellerJoints, p: DwellerPose): void {
   setRigPose(j, p)
-  show(j.pistol, p.pistol)
-  show(j.flash, p.flash)
-  show(j.held, p.held, `rotate(${(-(p.armRight + p.foreRight)).toFixed(1)}deg)`)
-  spin(j.heldHead, 14 * p.bob)
-  show(j.syringe, p.syringe)
-  show(j.radio, p.radio)
-  spin(j.dial, -120 + 240 * p.dial)
-  spin(j.needle, -60 + 120 * p.gauge)
-  show(j.alarm, p.alarm)
+  opacityTo(j.pistol, p.pistol)
+  opacityTo(j.flash, p.flash)
+  opacityTo(j.held, p.held)
+  rotateTo(j.held, -(p.armRight + p.foreRight))
+  rotateTo(j.heldHead, 14 * p.bob)
+  opacityTo(j.syringe, p.syringe)
+  opacityTo(j.radio, p.radio)
+  rotateTo(j.dial, -120 + 240 * p.dial)
+  rotateTo(j.needle, -60 + 120 * p.gauge)
+  opacityTo(j.alarm, p.alarm)
 }
 
 // ---- the dog ----
@@ -172,25 +164,22 @@ export type DogJoints = Record<keyof typeof DOG_CLASSES, SVGElement | null>
 
 export const dogJoints = (root: Element): DogJoints => find(root, DOG_CLASSES)
 
-const set = (el: SVGElement | null, transform: string): void => {
-  if (el) el.style.transform = transform
-}
 
 /** Writes the dog's pose: the paws' swing, the sit folding the hind legs under, the dig pitching him nose down. */
 export function setDogPose(j: DogJoints, { stride, sit, dig, look }: DogPose): void {
   const paw = 24 * stride * (1 - sit) * (1 - dig)
-  set(j.frontNear, `rotate(${paw.toFixed(1)}deg)`)
-  set(j.hindFar, `rotate(${paw.toFixed(1)}deg)`)
-  set(j.frontFar, `rotate(${(-paw).toFixed(1)}deg)`)
-  set(j.hindNear, `rotate(${(-paw).toFixed(1)}deg)`)
+  rotateTo(j.frontNear, paw)
+  rotateTo(j.hindFar, paw)
+  rotateTo(j.frontFar, -paw)
+  rotateTo(j.hindNear, -paw)
   const fold = `translate(${(6 * sit).toFixed(2)}px, ${(17 * sit).toFixed(2)}px) rotate(${(-85 * sit - 8 * dig).toFixed(1)}deg)`
   if (sit > 0 || dig > 0) {
-    set(j.hindNear, fold)
-    set(j.hindFar, fold)
+    transformStyleTo(j.hindNear, fold)
+    transformStyleTo(j.hindFar, fold)
   }
-  set(j.body, `rotate(${(-14 * sit + 12 * dig).toFixed(1)}deg) translateY(${(4 * sit + 2 * dig + Math.abs(stride) * -1.5).toFixed(2)}px)`)
-  set(j.head, `rotate(${(-12 * sit + 18 * dig - 14 * look).toFixed(1)}deg)`)
-  set(j.tail, `rotate(${(-62 * sit + 14 * stride).toFixed(1)}deg)`)
+  transformStyleTo(j.body, `rotate(${(-14 * sit + 12 * dig).toFixed(1)}deg) translateY(${(4 * sit + 2 * dig + Math.abs(stride) * -1.5).toFixed(2)}px)`)
+  rotateTo(j.head, -12 * sit + 18 * dig - 14 * look)
+  rotateTo(j.tail, -62 * sit + 14 * stride)
 }
 
 // ---- the mutant ----
@@ -248,19 +237,17 @@ export type FoeJoints = Record<keyof typeof FOE_CLASSES, SVGElement | null>
 
 export const foeJoints = (root: Element): FoeJoints => find(root, FOE_CLASSES)
 
-const turnTo = (el: SVGElement | null, deg: number): void => set(el, `rotate(${deg.toFixed(1)}deg)`)
-
 /** Writes the mutant's pose: transforms only. */
 export function setFoePose(j: FoeJoints, p: FoePose): void {
-  set(j.body, `translate(${p.shift.toFixed(2)}px, ${p.drop.toFixed(2)}px) rotate(${p.lean.toFixed(1)}deg)`)
-  turnTo(j.torso, p.torso)
-  turnTo(j.head, p.head)
-  turnTo(j.armNear, p.armNear)
-  turnTo(j.foreNear, p.foreNear)
-  turnTo(j.armFar, p.armFar)
-  turnTo(j.foreFar, p.foreFar)
-  turnTo(j.thighNear, p.thighNear)
-  turnTo(j.shinNear, p.shinNear)
-  turnTo(j.thighFar, p.thighFar)
-  turnTo(j.shinFar, p.shinFar)
+  transformStyleTo(j.body, `translate(${p.shift.toFixed(2)}px, ${p.drop.toFixed(2)}px) rotate(${p.lean.toFixed(1)}deg)`)
+  rotateTo(j.torso, p.torso)
+  rotateTo(j.head, p.head)
+  rotateTo(j.armNear, p.armNear)
+  rotateTo(j.foreNear, p.foreNear)
+  rotateTo(j.armFar, p.armFar)
+  rotateTo(j.foreFar, p.foreFar)
+  rotateTo(j.thighNear, p.thighNear)
+  rotateTo(j.shinNear, p.shinNear)
+  rotateTo(j.thighFar, p.thighFar)
+  rotateTo(j.shinFar, p.shinFar)
 }
