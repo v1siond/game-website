@@ -3,7 +3,6 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import {
   BAKELITE,
-  BRASS,
   CREAM,
   CREAM_SHADE,
   GLASS,
@@ -37,10 +36,8 @@ import { cssVars } from '@/lib/cssVars'
 // whose action is the drum roll; the Martial Artist with the jumpsuit rolled down to the waist and the
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
 // side kick. Every one can take the targeting stance with the bracket reticle and give the level up thumbs
-// up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage the
-// scroll poses him instead (pose.ts): the crouched sneak, the lockpick, keying a terminal, the aim and the
-// shot, pointing a dog out, the guard and the block, the knee and the kick, and turning the dial of the
-// bakelite radio he holds to his chest on the bands stage.
+// up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage he
+// stands side on instead (dweller.tsx).
 
 export type SurvivorTone = 'poster' | 'phosphor'
 export type SurvivorMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
@@ -315,27 +312,6 @@ function Snare({ inks }: { inks: Inks }) {
   )
 }
 
-// The bakelite table radio he holds level against his chest for the dance: the arched red case, the cream
-// grille, the round dial window with its needle, and at the lower left the long pointer knob on its brass
-// boss, which his right hand pinches and turns; the pointer reaches past his fingers so the turn shows. The
-// knob and the dial needle turn with the receiver's --needle (0 to 1), which the radio panel sets on its
-// grid, so the knob in his hand follows the tuning scale's needle.
-function HeldRadio({ inks }: { inks: Inks }) {
-  return (
-    <g>
-      <Shape d="M34 84 L34 71 Q34 61.5 49 61.5 Q64 61.5 64 71 L64 84 Z" fill={inks.band} inks={inks} />
-      <rect x={41} y={67} width={11} height={13} rx={1.5} fill={inks.wrap} stroke={inks.line} strokeWidth={inks.lineWidth * 0.6} />
-      <path d="M41.5 70 H51.5 M41.5 73 H51.5 M41.5 76 H51.5" stroke={inks.boot} strokeWidth={1} />
-      <circle cx={57} cy={71} r={3.8} fill={inks.teeth} stroke={inks.line} strokeWidth={inks.lineWidth * 0.6} />
-      <path className={s.dialNeedle} d="M57 71 L57 67.8" stroke={inks.line} strokeWidth={1.2} strokeLinecap="round" />
-      <g className={s.knob}>
-        <circle cx={38.5} cy={78.5} r={3.4} fill={BRASS} stroke={inks.line} strokeWidth={inks.lineWidth} />
-        <Shape d="M38.5 70.5 L40.6 78.5 L38.5 86.5 L36.4 78.5 Z" fill={inks.teeth} inks={inks} />
-      </g>
-    </g>
-  )
-}
-
 // The targeting stance's bracket reticle and the level up star, both resting hidden.
 function Overlays({ inks }: { inks: Inks }) {
   return (
@@ -356,10 +332,8 @@ interface SurvivorProps {
   className?: string
 }
 
-/** His figure's groups in the 100 by 150 viewBox, playing `motion`; a stage places it in a nested svg of
- *  that viewBox and poses its joints itself (pose.ts), with the motion left 'still' and `radio` set where
- *  he holds the bakelite radio. */
-export function SurvivorFigure({ profession, motion, tone = 'poster', radio = false }: Omit<SurvivorProps, 'className'> & { radio?: boolean }) {
+/** His figure's groups in the 100 by 150 viewBox, playing `motion`. */
+function SurvivorFigure({ profession, motion, tone = 'poster' }: Omit<SurvivorProps, 'className'>) {
   const inks = INKS[tone]
   return (
     <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} style={POSE_VARS}>
@@ -372,7 +346,6 @@ export function SurvivorFigure({ profession, motion, tone = 'poster', radio = fa
           <Head profession={profession} inks={inks} />
         </g>
         {profession === 'drummer' && <Snare inks={inks} />}
-        {radio && <HeldRadio inks={inks} />}
         <Arm side="right" profession={profession} inks={inks} />
         <Arm side="left" profession={profession} inks={inks} />
       </g>

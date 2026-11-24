@@ -114,12 +114,6 @@
   60%, 74% { transform: rotate(0deg); }
 }
 
-/* ---------------------------------------------------------------- the bakelite radio he holds on the bands stage:
- * its knob and the dial's needle rest at the receiver's --needle. */
-
-.knob { transform-origin: 38.5px 78.5px; transform: rotate(calc(var(--needle, 0) * 300deg)); }
-.dialNeedle { transform-origin: 57px 71px; transform: rotate(calc(var(--needle, 0) * 160deg - 80deg)); }
-
 @media (prefers-reduced-motion: reduce) {
   .sprite, .sprite * { animation: none !important; }
 }

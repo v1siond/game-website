@@ -27,15 +27,16 @@ const PHONE_QUERY = '(max-width: 767.98px)'
 
 // Retro Atomic: a bomb shelter of the atomic age seen through his wrist terminal, as a walk out of the
 // shelter, through the wasteland and into the town at dusk. The hero is the wrist terminal over the
-// shelter, its cog door rolled aside, him and the dog by the opening (./RetroAtomic/wristComputer); the
+// shelter, its cog door rolling aside and him walking out into the glare (./RetroAtomic/wristComputer); the
 // terminal's tabs and dial switch the profession. Then every section of the active profession is one full
-// screen scene of the walk (./RetroAtomic/scenes) that rises from dark, holds while its title and cards
-// scroll over it, and sinks back into dark while the next one rises; he does one thing per card: lights a
-// poster with his thumbs up, runs a quest flag up, throws a footlocker open, boots a dead tube, shoots a
-// target, cheers the dog digging a tape, sways under the radio mast, puts the mutant down. Contact is
-// the public terminal and its password game (./RetroAtomic/terminal), which he and the dog walk out to.
-// Every motion is a function of the scroll position, on the shared theatre (./shared/theatre) and its
-// settle: stop and art and text come to rest together, scroll up and it plays back. Under reduced motion
+// screen place of the walk (./RetroAtomic/scenes) that rises from dark, holds while its title and cards
+// scroll over it, and sinks back into dark while the next one rises; at each he plays one to three of the
+// game's own moves at their own speed: the bobblehead off its stand, the targeting freeze and its slowed
+// shot, the footlocker's lock, the power armour's stomp, the glowing crater and the syringe, the dog's
+// fetch, the radio mast, the turn fight with the mutant. Contact is the public terminal and its password
+// game (./RetroAtomic/terminal), which he and the dogs walk out to.
+// The scroll plays each place's script at no more than its own speed, on the shared theatre
+// (./shared/theatre): scroll up and it plays back. Under reduced motion
 // there is no theatre and no scrub: each section carries its own picture, still, at its settled frame.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a scroll
