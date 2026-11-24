@@ -4,7 +4,8 @@ import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
-import { SurvivorSprite } from './survivor'
+import { DwellerSprite } from './dweller'
+import { KEYS, pose } from './pose'
 import type { Scene } from './scenes'
 import { AtomicStage } from './stage'
 import { atomicId } from './anchors'
@@ -80,6 +81,9 @@ function LogLine({ entry }: { entry: HackLogEntry }) {
   )
 }
 
+// Him at the keys on the access screen once the password matches.
+const AT_KEYS = pose(KEYS)
+
 function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => void }) {
   const { hud } = useLabels()
   const reducer = useMemo(() => hackReducer(board), [board])
@@ -135,7 +139,7 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
       {state.status === 'granted' && (
         <div className={`mt-4 flex items-center gap-4 border-2 border-atomic-phosphor p-3 ${atomic.powerOn}`}>
           <div className="h-24 w-16 shrink-0">
-            <SurvivorSprite profession="engineer" tone="phosphor" motion="thumbsUp" className="h-full w-full" />
+            <DwellerSprite profession="engineer" pose={AT_KEYS} className="h-full w-full" />
           </div>
           <p className={`text-xl font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.glow}`}>{hud.accessGranted}</p>
         </div>

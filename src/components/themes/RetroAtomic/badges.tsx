@@ -1,19 +1,20 @@
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { SurvivorSprite, type SurvivorMotion } from './survivor'
+import { DwellerSprite } from './dweller'
+import { KICK, KIT, KNEE, pose, type DwellerPose } from './pose'
 import { CREAM, POSTER_BLUE, POSTER_INK, SHELTER_YELLOW } from './palette'
 import atomic from './atomic.module.css'
 
 // The Muay Thai record as the badge chart: the page leaves the green tube for the printed poster (cream
 // paper, flat poster blue, ink outlines, the sunburst behind). The facts are the chart's columns, each
-// headed by its term on a blue band; each achievement is a badge card with him on it in the mascot style
-// (the poster tone, outlined in ink), each card in its own pose: the thumbs up, the knee and kick,
-// the targeting stance. The chart's title and each badge's words are cut out and pasted on tilted pastel
+// headed by its term on a blue band; each achievement is a badge card with him on it
+// side on in the poster style (the poster tone, outlined in ink), each card in its own fight pose: the kick, the knee, the
+// guard. The chart's title and each badge's words are cut out and pasted on tilted pastel
 // blocks, the way atomic age posters print them; the blocks are drawn for the eye and the plain text sits beside them for screen readers. The facts and the
-// badges are the cards the Muay Thai scene counts: on the stage the mutant takes a strike per badge
-// (scenes.tsx). Under the pointer a card lifts, he hops and the star turns.
+// badges are the cards the Muay Thai record counts. Under the pointer a card lifts, he hops and the star turns.
 
-const POSES: SurvivorMotion[] = ['thumbsUp', 'strike', 'target']
+// His side on fight poses, one per badge in turn: the side kick, the clinch knee, the guard.
+const POSES: readonly DwellerPose[] = [pose(KICK), pose(KNEE), KIT.fighter]
 
 function Sunburst() {
   return (
@@ -70,7 +71,7 @@ function BadgeCard({ achievement, index }: { achievement: string; index: number 
       <div className="relative h-44 overflow-hidden border-b-4 border-atomic-poster-ink">
         <Sunburst />
         <div className={`absolute inset-x-0 bottom-0 mx-auto h-40 w-28 ${atomic.badgeHop}`}>
-          <SurvivorSprite profession="fighter" motion={POSES[index % POSES.length]} className="h-full w-full" />
+          <DwellerSprite profession="fighter" pose={POSES[index % POSES.length]} className="h-full w-full" />
         </div>
         <span className="absolute right-3 top-3">
           <Star />

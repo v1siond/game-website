@@ -27,7 +27,9 @@ const PHONE_QUERY = '(max-width: 767.98px)'
 
 // Retro Atomic: a bomb shelter of the atomic age seen through his wrist terminal, as a walk out of the
 // shelter, through the wasteland and into the town at dusk. The hero is the wrist terminal over the
-// shelter, its cog door rolling aside and him walking out into the glare (./RetroAtomic/wristComputer); the
+// shelter, its cog door rolling aside and him walking out into the glare (./RetroAtomic/wristComputer); on a
+// phone the terminal starts most of a screen down, so the door and his walk play in view above it first (and
+// under reduced motion its still shows there); the
 // terminal's tabs and dial switch the profession. Then every section of the active profession is one full
 // screen place of the walk (./RetroAtomic/scenes) that rises from dark, holds while its title and cards
 // scroll over it, and sinks back into dark while the next one rises; at each he plays one to three of the
@@ -71,7 +73,7 @@ export default function RetroAtomicTheme() {
         </Theatre>
       )}
       <div ref={textRef} className="relative z-20">
-        <header data-scene="hero" className="relative min-h-[100svh] px-3 pb-16 pt-14 sm:px-6 sm:pt-10 lg:px-[4vw]">
+        <header data-scene="hero" className="relative min-h-[100svh] px-3 pb-16 pt-14 max-md:!pt-[70svh] sm:px-6 sm:pt-10 lg:px-[4vw]">
           {reduced && <AtomicStage scene={scenes[0]} settled />}
           <WristComputer instant={reduced} />
         </header>
