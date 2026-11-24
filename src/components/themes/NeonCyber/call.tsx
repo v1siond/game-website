@@ -38,7 +38,7 @@ export function IncomingCall({ scene, profession, number, still }: { scene: Scen
               <div className="relative shrink-0" aria-hidden="true">
                 <span className="absolute -inset-3 rounded-full border-2 border-[color:var(--neon-hack)] opacity-60" />
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-[color:var(--neon-data)] bg-[color:var(--neon-ink)]">
-                  <HeroSprite profession={profession} motion="still" className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
+                  <HeroSprite profession={profession} motion="still" snare={false} className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,color-mix(in_srgb,var(--neon-data)_14%,transparent)_2px_3px)]" />
                 </div>
               </div>

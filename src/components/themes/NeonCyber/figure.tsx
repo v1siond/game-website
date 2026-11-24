@@ -277,12 +277,13 @@ export function HeroFigure({ profession, motion, snare = true }: Omit<HeroProps,
   )
 }
 
-/** Him in a profession's kit, playing one motion; he glitches when hovered.
- *  Memoised on its three primitive props, so a parent render that keeps them redraws none of his svg. */
-export const HeroSprite = memo(function HeroSprite({ profession, motion, className = '' }: HeroProps) {
+/** Him in a profession's kit, playing one motion; he glitches when hovered. `snare` false leaves the
+ *  Musician's snare out, for a picture of him alone (the call's portrait).
+ *  Memoised on its primitive props, so a parent render that keeps them redraws none of his svg. */
+export const HeroSprite = memo(function HeroSprite({ profession, motion, className = '', snare = true }: HeroProps & { snare?: boolean }) {
   return (
     <svg viewBox="0 0 100 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <HeroFigure profession={profession} motion={motion} />
+      <HeroFigure profession={profession} motion={motion} snare={snare} />
     </svg>
   )
 })
