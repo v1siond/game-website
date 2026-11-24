@@ -171,4 +171,11 @@ describe('the scroll that plays a scene', () => {
     expect(heroState(0, VIEWPORT).play).toBe(0)
     expect(heroState(0.6 * VIEWPORT, VIEWPORT).play).toBe(1)
   })
+
+  it('plays a phone hero over a short scroll, done before the hero text reaches him', () => {
+    expect(heroState(0, VIEWPORT, { phone: true }).play).toBe(0)
+    expect(heroState(0.05 * VIEWPORT, VIEWPORT, { phone: true }).play).toBeGreaterThan(0)
+    expect(heroState(0.1 * VIEWPORT, VIEWPORT, { phone: true }).play).toBe(1)
+    expect(heroState(0.1 * VIEWPORT, VIEWPORT).play).toBeLessThan(1)
+  })
 })

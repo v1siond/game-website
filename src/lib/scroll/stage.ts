@@ -83,8 +83,11 @@ const PLAY_FROM = -0.25
 const PLAY_SCREENS = 1.2
 const PHONE_PLAY_SCREENS = 0.55
 const PLAY_LEFT_SCREENS = 0.5
-// The hero plays its actions over this much of the first screen.
+// The hero plays its actions over this much of the first screen. A phone's hero text sits right under or
+// over him, and its card or the next block reaches him within about a tenth of a screen, so there the
+// script is all asked for by then and plays on at its own speed while he is still alone in view.
 const HERO_PLAY_SCREENS = 0.6
+const HERO_PHONE_PLAY_SCREENS = 0.1
 
 function playSpan(span: StageSpan, viewport: number, last: boolean, phone: boolean): readonly [number, number] {
   const start = span.top + PLAY_FROM * viewport
@@ -110,11 +113,11 @@ export function stageState(span: StageSpan, position: number, viewport: number, 
 }
 
 /** The hero's stage: whole from the top of the page, under the stages that rise over it, its progress run
- *  over the first screen and its actions over the first part of it. */
-export const heroState = (position: number, viewport: number): StageState => ({
+ *  over the first screen and its actions over the first part of it, a shorter one on a phone. */
+export const heroState = (position: number, viewport: number, { phone = false }: Pick<StageOptions, 'phone'> = {}): StageState => ({
   vis: 1,
   progress: ramp(position, 0, viewport),
-  play: ramp(position, 0, HERO_PLAY_SCREENS * viewport),
+  play: ramp(position, 0, (phone ? HERO_PHONE_PLAY_SCREENS : HERO_PLAY_SCREENS) * viewport),
 })
 
 // An item counts as reached over this many screens of scroll after its trigger.

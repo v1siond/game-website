@@ -144,7 +144,7 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
       settleText(lag)
       const all = bound.current
       const now = performance.now()
-      const states = all.map((each, i) => (each.hero ? heroState(position, viewport) : stageState(each.span, position, viewport, { last: i === all.length - 1, phone })))
+      const states = all.map((each, i) => (each.hero ? heroState(position, viewport, { phone }) : stageState(each.span, position, viewport, { last: i === all.length - 1, phone })))
       const { layers } = crossOf(states.map((state) => state.vis))
       let playing = false
       all.forEach((each, i) => {

@@ -57,7 +57,7 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
 }
 
 const stateOf = (bound: Bound, position: number, viewport: number, last: boolean, phone: boolean): StageState =>
-  bound.scene.id === 'hero' ? heroState(position, viewport) : stageState(bound.span, position, viewport, { last, phone })
+  bound.scene.id === 'hero' ? heroState(position, viewport, { phone }) : stageState(bound.span, position, viewport, { last, phone })
 
 const show = (bound: Bound, visible: boolean): void => {
   if (bound.shown === visible) return
