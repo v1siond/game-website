@@ -19,11 +19,11 @@ import { ventures } from './places/ventures'
 import { work } from './places/work'
 
 // The page as scenes, one walk through the black forest: its edge at dawn (hero), one place per section of
-// the shown profession in reading order, from the spider's thicket to the edge of the machine city, and
+// the shown profession in reading order, from the black lake to the edge of the machine city, and
 // the clearing at the end (contact). Every place past the hero stands in the profession's own light: cold
 // dawn for the System Engineer, an ember sunset for the Musician, a crimson dusk for the Martial Artist.
-// Each scene names its place, its anchor and how many cards its section counts (stageItems), read from
-// the same slot the section's cards are drawn from: one prop per card.
+// Each scene names its place, its anchor, its script of one to three actions the scroll plays, and how many
+// cards its section counts (stageItems) for the theatre's reading line.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -76,12 +76,13 @@ const layersOf = ({ far, mid, floor }: Scene, input: PlaceInput, light: LightNam
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): ShadeScene => {
   const place = PLACES[id]
   const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
-  const input = { count, profession, light: LIGHTS[light] }
+  const input = { profession, light: LIGHTS[light] }
   return {
     id,
     anchor: ANCHORS[id],
     slot,
     count,
+    script: place.script,
     layers: layersOf(place, input, light),
     bind: (stage) => place.bind(stage, input),
   }

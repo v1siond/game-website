@@ -4,12 +4,14 @@ import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { AT, type Place } from '../place'
-import { TUCK, rest } from '../pose'
+import { CROUCH, TUCK, rest } from '../pose'
 
-// Services on the trap line: a bear trap lies open in the path for each service. He leaps it, and as he
-// clears it the jaws snap shut under him; the frame holds him at the top of the leap over the shut trap.
+// Services on the trap line: a bear trap lies open in the path. He leaps it and the jaws snap shut under
+// him; then he lands past it, crouched, and rises.
 
-const HEIGHT = 150
+const HEIGHT = 170
+// Where he lands past the trap, from his place.
+const LANDED = 2 * AT + 110
 
 function Open() {
   return (
@@ -32,26 +34,31 @@ function Shut({ light }: { light: Light }) {
 }
 
 export const services: Place = {
-  obstacle: (i, { light }) => (
+  script: [1600, 1400],
+  ends: [0.55, 1],
+  obstacle: ({ light }) => (
     <>
-      <g data-fx={`open-${i}`}>
+      <g data-fx="open">
         <Open />
       </g>
-      <g data-fx={`shut-${i}`} opacity="0">
+      <g data-fx="shut" opacity="0">
         <Shut light={light} />
       </g>
     </>
   ),
-  // the leap's first half, from take off to the top over the trap, held there
-  move: (profession, t) => ({ pose: mix(rest(profession), TUCK, ramp(t, 0.1, 0.6)), ahead: AT * t, lift: hop(t / 2, HEIGHT), over: 0 }),
-  reply: (stage, { count }) => {
-    const open = Array.from({ length: count }, (_, i) => fx(stage, `open-${i}`))
-    const shut = Array.from({ length: count }, (_, i) => fx(stage, `shut-${i}`))
-    return (played) =>
-      open.forEach((trap, i) => {
-        const snapped = ramp(played(i), 0.6, 0.75)
-        fadeTo(trap, 1 - snapped)
-        fadeTo(shut[i], snapped)
-      })
+  // the leap over the trap and down past it, then the landing crouch and up again
+  move: (profession, t) => {
+    const leap = ramp(t, 0.05, 0.62)
+    const pose = t < 0.55 ? mix(rest(profession), TUCK, ramp(t, 0.05, 0.25)) : mix(mix(TUCK, CROUCH, ramp(t, 0.55, 0.66)), rest(profession), ramp(t, 0.75, 1))
+    return { pose, ahead: LANDED * leap, lift: hop(leap, HEIGHT), over: 0 }
+  },
+  reply: (stage) => {
+    const open = fx(stage, 'open')
+    const shut = fx(stage, 'shut')
+    return (t) => {
+      const snapped = ramp(t, 0.3, 0.4)
+      fadeTo(open, 1 - snapped)
+      fadeTo(shut, snapped)
+    }
   },
 }

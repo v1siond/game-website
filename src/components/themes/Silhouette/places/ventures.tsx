@@ -2,14 +2,14 @@ import { hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx } from '../../shared/stageNodes'
-import { Canvas, FLOOR, H } from '../forest'
+import { Canvas } from '../forest'
 import { SHADE, type Light } from '../palette'
 import { AT, type Place } from '../place'
 import { CLIMB, CROUCH, TUCK, rest } from '../pose'
 
-// Ventures over the roofs at the edge of the machine city: for each venture a gap opens in the roof and a
-// higher roof stands past it with a dark sign. He leaps the gap, catches the higher roof's edge and climbs
-// up; the frame holds him crouched on the ledge as the sign's tubes light.
+// Ventures over the roofs at the edge of the machine city: a gap opens in the roof and a higher roof stands
+// past it with a dark sign. He leaps the gap and catches the higher roof's edge; then he climbs up and
+// crouches on the ledge as the sign's tubes light.
 
 const GAP = { from: -20, to: 90 }
 const ROOF = { h: 130, w: 240 }
@@ -32,15 +32,17 @@ function Tubes({ color }: { color: string }) {
 }
 
 export const ventures: Place = {
+  script: [1800, 1600],
+  ends: [0.5, 1],
   far: ({ light }) => <City light={light} />,
-  obstacle: (i, { light }) => (
+  obstacle: ({ light }) => (
     <>
-      <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={H - FLOOR + 2} fill={light.mid} />
+      <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={700} fill={light.mid} />
       <rect x={GAP.to} y={-ROOF.h} width={ROOF.w} height={ROOF.h} fill={SHADE.black} />
       <rect x={GAP.to + 110} y={-SIGN + 120} width={14} height={SIGN - ROOF.h - 120} fill={SHADE.black} />
       <rect x={GAP.to + 20} y={-SIGN} width={200} height={120} fill={SHADE.black} />
       <Tubes color={SHADE.fog} />
-      <g data-fx={`sign-${i}`} opacity="0">
+      <g data-fx="sign" opacity="0">
         <rect x={GAP.to} y={-SIGN - 20} width={240} height={160} fill={light.rim} opacity={0.18} />
         <Tubes color={light.rim} />
       </g>
@@ -52,8 +54,8 @@ export const ventures: Place = {
     const pose = t < 0.5 ? mix(rest(profession), TUCK, ramp(t, 0, 0.2)) : mix(mix(TUCK, CLIMB, ramp(t, 0.5, 0.6)), CROUCH, ramp(t, 0.85, 1))
     return { pose, ahead: (AT + GAP.to - 20) * leap + 50 * up, lift: hop(leap, 90) * (1 - up) + ROOF.h * ramp(up, 0, 0.7), over: 0 }
   },
-  reply: (stage, { count }) => {
-    const signs = Array.from({ length: count }, (_, i) => fx(stage, `sign-${i}`))
-    return (played) => signs.forEach((sign, i) => fadeTo(sign, ramp(played(i), 0.85, 1)))
+  reply: (stage) => {
+    const sign = fx(stage, 'sign')
+    return (t) => fadeTo(sign, ramp(t, 0.85, 1))
   },
 }
