@@ -1,11 +1,11 @@
 'use client'
 
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
+import { memo, useCallback, useMemo, useRef, type CSSProperties, type ReactNode } from 'react'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrollStage } from '@/hooks/useScrollStage'
 import { cssVars } from '@/lib/cssVars'
-import { follow, IDLE_FOLLOWER, sceneLength, type Follower } from '@/lib/scroll/player'
+import { pacedMoves, type Follower } from '@/lib/scroll/player'
 import { decorArt, doorArt, gateArt, ribArt, vistaArt, type PlaneArt } from './eras'
 import { actionTarget, doorStateAt, hubRunner, inReach, propStateAt, roomRunner, SETTLED_DOOR, SETTLED_PROP, settledRunner, type RunnerState } from './motion'
 import { ERAS, type Era } from './palette'
@@ -51,7 +51,7 @@ import css from './corridor.module.css'
 // The move at each prop plays at the shared scene player's pace (src/lib/scroll/player.ts, his C55 words on
 // sped up animations): the scroll sets where the move should be, and the drawn move follows it no faster than
 // the move itself, easing out of rest and into its stop, forward or back. While a move is still catching up
-// after the scroll has settled, the corridor asks for its own frames until it rests.
+// after the scroll has settled, draw tells the shared loop to keep drawing until it rests.
 
 /** Where on the screen a card's centre meets its prop. */
 const READING_LINE = 0.55
@@ -60,45 +60,17 @@ const DARKEST = 0.88
 const PHONE_QUERY = '(max-width: 767.98px)'
 /** One move at a prop, as the player plays it: the spin, the slam, the kick. */
 const MOVE_SCRIPT = [1600] as const
-const MOVE_MS = sceneLength(MOVE_SCRIPT)
 
-/** Each item's move as drawn (by room and item), whether one is still catching up with the scroll, and the
- *  frame the corridor asked for to draw it at the last scroll position it drew. */
-interface Pace {
-  followers: Map<string, Follower>
-  playing: boolean
-  frame: number
-  position: number
-  redraw: (position: number) => void
+/** Each of the room's moves as drawn at `now` (src/lib/scroll/player.ts pacedMoves): following where the
+ *  scroll puts it while its prop is within reach, resting where the scroll puts it further off or when first
+ *  seen; the moves of any other room are forgotten, so a room left in mid move rests when he comes back. */
+function roomMoves(held: ReadonlyMap<string, Follower>, r: number, room: RoomGeometry, camZ: number, now: number) {
+  const moves = room.items.map((item, i) => ({ key: `${r}:${i}`, target: actionTarget(item, camZ), near: inReach(item, camZ) }))
+  return pacedMoves(held, moves, MOVE_SCRIPT, now)
 }
 
-/** Each of the room's moves as drawn at `now`: following where the scroll puts it while its prop is within
- *  reach, and where the scroll puts it further off (or when first seen), so a far move never replays. */
-function pacedPhases(pace: Pace, r: number, room: RoomGeometry, camZ: number, now: number): number[] {
-  pace.playing = false
-  return room.items.map((item, i) => {
-    const key = `${r}:${i}`
-    const target = actionTarget(item, camZ)
-    const held = pace.followers.get(key)
-    if (!held || !inReach(item, camZ)) {
-      pace.followers.set(key, { ...IDLE_FOLLOWER, drawn: target * MOVE_MS })
-      return target
-    }
-    const step = follow(held, MOVE_SCRIPT, target, now)
-    pace.followers.set(key, step.follower)
-    pace.playing ||= step.playing
-    return step.follower.drawn / MOVE_MS
-  })
-}
-
-/** While a move still catches up with the scroll, one more frame at the last scroll position drawn. */
-function askFrame(pace: Pace) {
-  if (!pace.playing || pace.frame) return
-  pace.frame = requestAnimationFrame(() => {
-    pace.frame = 0
-    pace.redraw(pace.position)
-  })
-}
+/** No move in view (the hub, a gap, reduced motion): none kept, none playing. */
+const NO_MOVES = { followers: new Map<string, Follower>(), phases: [], playing: false }
 
 /** The runner: held at the room's move under reduced motion, else at his room's paced moves or the hub. */
 function runnerAt(reduced: boolean, room: RoomGeometry | null, camZ: number, phases: readonly number[]): RunnerState {
@@ -195,7 +167,8 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
   const refs = useRef<Refs>({ root: null, heroInner: null, fog: null, dark: null, rails: null, railPath: null, figure: null, runner: null, planes: new Map(), sparks: [] }).current
   const measured = useRef<Measured | null>(null)
   const drawn = useRef<Drawn>({ era: '', fog: -1, planes: new Map() }).current
-  const pace = useRef<Pace>({ followers: new Map(), playing: false, frame: 0, position: 0, redraw: () => undefined }).current
+  // each move as drawn, by room and item: only the moves of the room he is in
+  const followers = useRef<ReadonlyMap<string, Follower>>(new Map())
 
   const onPlane = useCallback(
     (key: string, el: HTMLDivElement | null) => {
@@ -247,9 +220,9 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
   )
 
   const draw = useCallback(
-    (position: number) => {
+    (position: number): boolean => {
       const m = measured.current
-      if (!m || !refs.root || !refs.runner) return
+      if (!m || !refs.root || !refs.runner) return false
       const camZ = reduced ? settledCam(corridor, m.roomTops, position) : camAt(m.keyframes, position)
       const room = roomAt(corridor.rooms, camZ)
       setEra(room ? room.era : HUB_ERA)
@@ -261,7 +234,9 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
         refs.dark!.style.opacity = String(round2(trough * DARKEST))
       }
       const roomIndex = room ? corridor.rooms.indexOf(room) : -1
-      const phases = room && !reduced ? pacedPhases(pace, roomIndex, room, camZ, performance.now()) : []
+      const paced = room && !reduced ? roomMoves(followers.current, roomIndex, room, camZ, performance.now()) : NO_MOVES
+      followers.current = paced.followers
+      const { phases } = paced
       for (const plane of corridor.planes) drawPlane(plane, camZ)
       sparks.forEach((spark, i) => {
         const { transform, opacity } = sparkView(spark, m.view, camZ, trough)
@@ -269,10 +244,10 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
         refs.sparks[i].style.opacity = String(opacity)
       })
       placeRunner(refs, m.view, runnerAt(reduced, room, camZ, phases))
-      pace.position = position
-      askFrame(pace)
       const lift = reduced ? 0 : Math.min(1, Math.max(0, position / m.view.vh))
       if (refs.heroInner) refs.heroInner.style.transform = `scale(${(1 - 0.1 * lift).toFixed(4)})`
+      // a move still catching up: the shared loop draws again next frame
+      return paced.playing
 
       function drawPlane(plane: Plane, z: number) {
         const held = refs.planes.get(plane.key)
@@ -301,14 +276,8 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
         updateDoor(held.parts, state)
       }
     },
-    [corridor, sparks, reduced, refs, drawn, pace, setEra],
+    [corridor, sparks, reduced, refs, drawn, setEra],
   )
-
-  // The frames a catching up move asks for draw with the latest draw; none is left asked for once he is gone.
-  useLayoutEffect(() => {
-    pace.redraw = draw
-  }, [pace, draw])
-  useEffect(() => () => cancelAnimationFrame(pace.frame), [pace])
 
   const mainRef = useScrollStage<HTMLDivElement>({ enabled: true, measure, draw, tauMs: reduced ? 0 : undefined })
 
