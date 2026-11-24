@@ -3,9 +3,10 @@ import { SH } from './palette'
 
 // The rooms of the house, one fixed camera frame each (600 by 300, the floor from y 220), the way the
 // genre's pre-rendered rooms hold still while he moves through them: the back layer of each scene's stage
-// (./stage). The wall runs up into the dark above the frame, so a phone's tall screen shows a ceiling. What
-// he handles in a scene (the cabinet, the crate, the lamps, the door) is not here but in ./scenes. Every
-// room holds still; the lamps glow without flicker.
+// (./stage). The wall runs up into the dark above the frame and the floor down into the dark before it,
+// so a phone's tall screen shows a ceiling and a foreground. What he handles in a scene (the cabinet, the
+// crate, the lamps, the door) is not here but in ./scenes. Every room holds still; the lamps glow without
+// flicker.
 
 export type Room = 'hall' | 'store' | 'about' | 'corridor' | 'tech' | 'projects' | 'ventures' | 'bands' | 'gym' | 'contact'
 
@@ -282,7 +283,7 @@ const GYM = (fills: Fills): ReactNode => (
   </>
 )
 
-// The last corridor to the front door.
+// The last corridor to the door of the lit room.
 const CONTACT = (fills: Fills): ReactNode => (
   <>
     <Wall fills={fills} tone={SH.panel}>
@@ -331,6 +332,7 @@ export function RoomArt({ room, uid }: { room: Room; uid: string }) {
           <stop offset="100%" stopColor={SH.moon} stopOpacity={0} />
         </radialGradient>
       </defs>
+      <rect y={300} width={600} height={300} fill={SH.void} />
       {ROOMS[room](fills)}
     </>
   )

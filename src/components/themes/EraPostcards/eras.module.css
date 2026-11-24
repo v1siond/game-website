@@ -1,5 +1,5 @@
 /* The era pictures. In the theatre every stage is fixed behind the text; the engine sets each stage's
-   opacity, visibility and veil and each layer's transform. Before the engine's first frame (and with no
+   opacity and visibility and each layer's transform. Before the engine's first frame (and with no
    JavaScript) only the hero's stage shows, at its first frame. */
 
 .theatre {
@@ -62,14 +62,6 @@
   background:
     linear-gradient(to top, color-mix(in srgb, var(--ep-scrim) 82%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 46%),
     linear-gradient(to right, color-mix(in srgb, var(--ep-scrim) 55%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 50%);
-}
-
-.veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: var(--ep-veil);
-  opacity: 0;
 }
 
 @media (max-width: 767.98px) {

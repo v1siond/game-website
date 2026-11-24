@@ -14,7 +14,6 @@ export const PAGE = {
   portal: '#55f2ff',
   theatre: '#020109',
   scrim: '#03020e',
-  veil: '#000000',
   padEngineer: '#55f2ff',
   padDrummer: '#ff5fd2',
   padFighter: '#ffb02e',

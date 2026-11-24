@@ -26,7 +26,7 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
 const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG)
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG, scene.def.script)
 
 const plane = (scene: Scene, children: ReactNode): ReactNode => (
   <svg viewBox={VIEW[scene.layout.phone ? 'phone' : 'wide']} preserveAspectRatio="xMidYMax slice" focusable="false">

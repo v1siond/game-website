@@ -18,7 +18,6 @@
 
 .theatre {
   --theatre-ground: var(--cel-night-high);
-  --theatre-veil: var(--cel-ink);
 }
 
 /* The shade under the text column, so the cards sit on a calmer frame; it fades with its stage. */

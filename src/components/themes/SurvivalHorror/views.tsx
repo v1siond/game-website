@@ -18,8 +18,8 @@ import look from './world.module.css'
 
 // One section per scene: a screen of the room alone first, then its paper panel in the text column (on
 // the left from lg, the room playing on the right), then a stretch of the room alone before the next. The
-// cards a scene counts sit in an element marked data-stage-items, which the shared theatre measures for the
-// reading line that drives each beat (./scenes). Every field comes from the shared lists and the card view
+// scene plays once the section arrives, while its room is still alone on the screen (./scenes). The cards
+// sit in an element marked data-stage-items, which the shared theatre counts for its settled frame. Every field comes from the shared lists and the card view
 // models.
 
 // His education and languages typed under the bio on the same paper, each label in brass.

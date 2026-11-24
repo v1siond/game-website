@@ -1,21 +1,27 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { heroState, itemsReached, layerTransform, stageOpacity, stageState, veilOpacity, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
+import { IDLE_CLOCK, arrive, crossOf, playheadAt, sceneEnd, type Playhead, type SceneClock, type SceneScript } from '@/lib/scroll/player'
+import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
-// stage per scene (the hero, each section, the contact), each in layers that push in across the scene and a
-// black veil it fades into. It binds every stage once, measures each section ([data-scene]) and the reading
-// line of each counted card ([data-stage-items]) on load and resize, and per frame writes only each visible
-// stage's opacity, its veil, its layers' transforms and the scene's own writer, which poses the world's
-// figure and props from the scene's progress and the cards reached. The first scene is the hero. The text
-// layer settles with the art: it is drawn at the settled position, the lag written as a translate and cleared
-// at rest, so pictures and cards come to rest together (as Era Postcards' settleText).
+// stage per scene (the hero, each section, the contact), each in layers that push in across the scene. Each
+// stage dissolves in over the one before it as its section arrives and the one under it is hidden once it is
+// whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). It binds every stage once,
+// measures each section ([data-scene]) and the reading line of each counted card ([data-stage-items]) on load
+// and resize, and per frame writes only each visible stage's opacity, its layers' transforms and the scene's
+// own writer, which poses the world's figure and props from the scene's progress, the cards reached and, for
+// a scene with a script, its playhead: the script plays on time from the section's arrival, one action after
+// another, and holds its end frame (src/lib/scroll/player.ts); while one plays the engine draws every frame.
+// The first scene is the hero. The text layer settles with the art: it is drawn at the settled position, the
+// lag written as a translate and cleared at rest, so pictures and cards come to rest together (as Era
+// Postcards' settleText).
 
-/** A scene's per frame writer: `progress` 0 when its stage starts to rise, 1 when it has sunk; `reached`
- *  how many of its counted cards have crossed the reading line, fractional. It only writes. */
-export type StageWriter = (progress: number, reached: number) => void
+/** A scene's per frame writer: `progress` 0 when its stage starts to rise, 1 when its section has gone by;
+ *  `reached` how many of its counted cards have crossed the reading line, fractional; `play` where its
+ *  script is (none: its first frame). It only writes. */
+export type StageWriter = (progress: number, reached: number, play?: Playhead) => void
 
 /** Finds the nodes a scene moves inside its stage, once, and returns its writer. */
 export type StageBinder = (stage: HTMLElement) => StageWriter
@@ -25,7 +31,12 @@ export interface TheatreScene {
   bind: StageBinder
   /** How many cards the scene counts: the settled frame shows them all reached. */
   count: number
+  /** The scene's actions, played on time from its arrival; none for a scene the scroll drives. */
+  script?: SceneScript
 }
+
+/** Where a scene with `script` rests: its end frame, the one reduced motion and a scroll back show. */
+export const restingPlay = (script: SceneScript | undefined): Playhead => sceneEnd(script ?? [])
 
 /** Each layer's push in across its scene, by the layer's name. */
 export type LayerMotions = Readonly<Record<string, LayerMotion>>
@@ -37,9 +48,6 @@ const ITEMS = '[data-stage-items] li:not(li li), [data-stage-items] dl > div'
 const READ_LINE = 0.62
 // On a phone the layers zoom and lift this share of the desktop motion.
 const PHONE_MOTION = 0.6
-// The hero's whole stage shrinks by this much over the first screen, more on a phone.
-const HERO_SHRINK = 0.1
-const HERO_SHRINK_PHONE = 0.15
 // Under this lag in px the text is drawn at the scroll.
 const TEXT_REST_PX = 0.5
 
@@ -50,13 +58,14 @@ interface Bound {
   id: string
   hero: boolean
   stage: HTMLElement
-  veil: HTMLElement | null
   layers: Array<{ el: HTMLElement; motion: LayerMotion }>
   write: StageWriter
   section: HTMLElement | null
   span: StageSpan
   triggers: number[]
   shown: boolean
+  script: SceneScript | undefined
+  clock: SceneClock
 }
 
 /** Every layer of a stage with its motion; a layer with no motion stays still. */
@@ -70,14 +79,23 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
     id: scene.id,
     hero: index === 0,
     stage,
-    veil: stage.querySelector<HTMLElement>('[data-veil]'),
     layers: movingLayers(stage, motion),
     write: scene.bind(stage),
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
     triggers: [],
     shown: false,
+    script: scene.script,
+    clock: IDLE_CLOCK,
   }
+}
+
+/** A scene's playhead at `now`, its clock started once it has risen to `rise`; true in `playing` while it runs. */
+const playOf = (bound: Bound, rise: number, now: number): { play: Playhead; playing: boolean } => {
+  if (!bound.script) return { play: restingPlay(undefined), playing: false }
+  bound.clock = arrive(bound.clock, rise, now)
+  const play = playheadAt(bound.script, bound.clock.startedAt === null ? 0 : now - bound.clock.startedAt)
+  return { play, playing: bound.clock.startedAt !== null && !play.done }
 }
 
 const show = (bound: Bound, visible: boolean): void => {
@@ -92,6 +110,7 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   const bound = useRef<Bound[]>([])
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
+  const frame = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -117,20 +136,33 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
     node.style.transform = shown ? `translate3d(0,${shown.toFixed(1)}px,0)` : ''
   }, [])
 
-  const draw = useCallback((position: number, lag: number, { viewport, phone }: StageMetrics) => {
-    settleText(lag)
-    const all = bound.current
-    all.forEach((each, i) => {
-      const { vis, progress } = each.hero ? heroState(position, viewport) : stageState(each.span, position, viewport, { last: i === all.length - 1 })
-      show(each, vis > 0)
-      if (vis <= 0) return
-      each.stage.style.opacity = stageOpacity(vis).toFixed(3)
-      if (each.veil) each.veil.style.opacity = veilOpacity(vis).toFixed(3)
-      if (each.hero) each.stage.style.transform = `scale(${(1 - (phone ? HERO_SHRINK_PHONE : HERO_SHRINK) * progress).toFixed(4)})`
-      for (const layer of each.layers) layer.el.style.transform = layerTransform(layer.motion, progress, phone ? PHONE_MOTION : 1)
-      each.write(progress, itemsReached(each.triggers, position, viewport))
-    })
-  }, [settleText])
+  const draw = useCallback(
+    function drawFrame(position: number, lag: number, metrics: StageMetrics) {
+      const { viewport, phone } = metrics
+      settleText(lag)
+      const all = bound.current
+      const now = performance.now()
+      const states = all.map((each, i) => (each.hero ? heroState(position, viewport) : stageState(each.span, position, viewport, { last: i === all.length - 1 })))
+      const { layers } = crossOf(states.map((state) => state.vis))
+      let playing = false
+      all.forEach((each, i) => {
+        const { shown, opacity } = layers[i]
+        show(each, shown)
+        const { play, playing: runs } = playOf(each, states[i].vis, now)
+        playing ||= runs
+        if (!shown) return
+        each.stage.style.opacity = opacity.toFixed(3)
+        for (const layer of each.layers) layer.el.style.transform = layerTransform(layer.motion, states[i].progress, phone ? PHONE_MOTION : 1)
+        each.write(states[i].progress, itemsReached(each.triggers, position, viewport), play)
+      })
+      // A script is playing: draw again next frame, on time, whether or not the page scrolls.
+      cancelAnimationFrame(frame.current)
+      frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
+    },
+    [settleText],
+  )
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
   const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   const textRef = useCallback(

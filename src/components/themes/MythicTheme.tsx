@@ -70,7 +70,7 @@ export default function MythicTheme() {
   )
 
   return (
-    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip [--theatre-ground:transparent] [--theatre-veil:transparent] ${u.root} ${mythDisplay.variable}`}>
+    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip [--theatre-ground:transparent] ${u.root} ${mythDisplay.variable}`}>
       <SkipLink />
       <Depths />
       {!reduced && (
