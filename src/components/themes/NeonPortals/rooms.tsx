@@ -402,7 +402,7 @@ export function HubHero() {
               </h1>
             </div>
             <div className="hidden h-[calc(var(--np-foot-y,80svh)-14rem)] max-md:block" aria-hidden="true" />
-            <div className={`${PLATE} mt-4 px-6 pb-6 pt-5 max-md:mt-20`}>
+            <div className={`${PLATE} mt-4 px-6 pb-6 pt-5 max-md:mt-28`}>
               <p className="text-[1.3rem] font-bold leading-snug max-md:text-[1.15rem]">{headline}</p>
               <p className={`mt-3 ${MUTED}`}>{tagline}</p>
               <p className="mt-3">{line}</p>
