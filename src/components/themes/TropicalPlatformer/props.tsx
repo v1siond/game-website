@@ -8,29 +8,36 @@ import { COLORS as C } from './palette'
 
 const EDGE = C.shadow
 
-const GRADIENTS: ReadonlyArray<readonly [id: string, light: string, mid: string, dark: string]> = [
-  ['tp-wood', '#e8a35c', '#a8642a', '#4a2208'],
-  ['tp-hoop', '#e6ebf0', '#8d96a0', '#3b4148'],
-  ['tp-gold', '#fff6b0', '#ffc93c', '#b4700c'],
-  ['tp-banana', '#fff6a0', '#f4d23a', '#a87a10'],
-  ['tp-beetle', '#9fd0ff', '#2f6fbf', '#0d2450'],
-  ['tp-shell', '#e7c9a0', '#a07650', '#4a301a'],
-  ['tp-boar', '#a7826a', '#6b4a36', '#2a1a10'],
-  ['tp-iron', '#a9b0b8', '#5b636c', '#20252b'],
-  ['tp-rope', '#e8cf9a', '#b8955a', '#6b5028'],
+// Each material's rendered shading: the specular glint at its lit top, its lit side, its own colour, its shade.
+const GRADIENTS: ReadonlyArray<readonly [id: string, glint: string, light: string, mid: string, dark: string]> = [
+  ['tp-wood', '#ffd59a', '#e8a35c', '#a8642a', '#3a1a06'],
+  ['tp-hoop', '#ffffff', '#d6dde4', '#7d8690', '#262b30'],
+  ['tp-gold', '#ffffff', '#fff3a0', '#ffc93c', '#9a5c08'],
+  ['tp-banana', '#fffbe0', '#fff08a', '#f0c82e', '#946a0c'],
+  ['tp-beetle', '#e6f4ff', '#7fbfff', '#2f6fbf', '#0a1c40'],
+  ['tp-shell', '#fff0d8', '#e0bf92', '#9a704a', '#3a2412'],
+  ['tp-boar', '#d6b8a0', '#a7826a', '#6b4a36', '#1e120a'],
+  ['tp-iron', '#ffffff', '#b9c0c8', '#5b636c', '#181c20'],
+  ['tp-rope', '#fff4d6', '#e8cf9a', '#b8955a', '#5a4220'],
 ]
 
-/** Every prop's gradient, top lit to shaded underside, once for the page. */
+/** Every prop's gradient, lit from the top and front down to its shaded underside, and the soft contact
+ *  shadow, once for the page. */
 export function PropShading() {
   return (
     <>
-      {GRADIENTS.map(([id, light, mid, dark]) => (
-        <linearGradient key={id} id={id} x1="0.2" y1="0" x2="0.5" y2="1">
-          <stop offset="0" stopColor={light} />
-          <stop offset="0.45" stopColor={mid} />
+      {GRADIENTS.map(([id, glint, light, mid, dark]) => (
+        <linearGradient key={id} id={id} x1="0.3" y1="0" x2="0.45" y2="1">
+          <stop offset="0" stopColor={glint} />
+          <stop offset="0.18" stopColor={light} />
+          <stop offset="0.55" stopColor={mid} />
           <stop offset="1" stopColor={dark} />
         </linearGradient>
       ))}
+      <radialGradient id="tp-shadow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor={EDGE} stopOpacity="0.55" />
+        <stop offset="1" stopColor={EDGE} stopOpacity="0" />
+      </radialGradient>
       <radialGradient id="tp-burst" cx="0.5" cy="0.5" r="0.5">
         <stop offset="0" stopColor={C.sunCore} stopOpacity="1" />
         <stop offset="0.6" stopColor={C.sunGold} stopOpacity="0.6" />
@@ -41,6 +48,9 @@ export function PropShading() {
 }
 
 const LINE = { stroke: EDGE, strokeWidth: 3, strokeLinejoin: 'round' as const }
+
+/** The soft shadow where a thing meets the ground at 0 0, `width` across. */
+export const Shadow = ({ width, x = 0 }: { width: number; x?: number }) => <ellipse cx={x} cy={2} rx={width / 2} ry={width / 14} fill="url(#tp-shadow)" />
 
 /** A barrel lying on its side, its mouth to the right, round its middle: the staves, two iron hoops, the
  *  dark mouth; a blast barrel carries the burst on its side. Its length is 120, its height 96. */
@@ -63,6 +73,7 @@ export function Barrel({ blast = false, mouth = true }: { blast?: boolean; mouth
 export function StandingBarrel({ bonus = false }: { bonus?: boolean }) {
   return (
     <g>
+      <Shadow width={110} />
       <path d="M-34 0 Q-42 -48 -34 -96 L34 -96 Q42 -48 34 0 Z" fill="url(#tp-wood)" {...LINE} />
       <path d="M-38 -24 Q0 -18 38 -24 M-38 -72 Q0 -66 38 -72" fill="none" stroke="url(#tp-hoop)" strokeWidth={8} />
       <ellipse cx={0} cy={-96} rx={34} ry={9} fill="#d9a35f" {...LINE} />
@@ -108,6 +119,7 @@ export function GoldLetter({ letter }: { letter: (typeof NAME_LETTERS)[number] }
 export function Beetle() {
   return (
     <g>
+      <Shadow width={90} />
       {[-18, 0, 18].map((x) => (
         <path key={x} d={`M${x} -10 L${x - 8} 0`} stroke={EDGE} strokeWidth={4} strokeLinecap="round" />
       ))}
@@ -126,6 +138,9 @@ export function Beetle() {
 export function Armadillo() {
   return (
     <g>
+      <g transform="translate(0 38)">
+        <Shadow width={96} />
+      </g>
       <g data-fx="armadillo-walk" opacity={0} transform="translate(0 22)">
         <path d="M-44 4 Q-40 -40 4 -42 Q44 -38 46 4 Z" fill="url(#tp-shell)" {...LINE} />
         {[-24, -8, 8, 24].map((x) => (
@@ -148,6 +163,7 @@ export function Armadillo() {
 export function Boar() {
   return (
     <g>
+      <Shadow width={190} x={14} />
       {[-44, -24, 32, 50].map((x) => (
         <path key={x} d={`M${x} -30 L${x} 0`} stroke={EDGE} strokeWidth={13} strokeLinecap="round" />
       ))}
@@ -186,6 +202,7 @@ export const boardAt = (i: number, burst: number): string => {
 export function Crate() {
   return (
     <g>
+      <Shadow width={130} />
       {BOARDS.map(([x, y], i) => (
         <g key={i} data-fx={`crate-board-${i}`} transform={boardAt(i, 0)}>
           <rect x={x} y={y} width={50} height={50} fill="url(#tp-wood)" {...LINE} />
@@ -223,6 +240,7 @@ export function PlankWall() {
 export function Cart() {
   return (
     <g>
+      <Shadow width={140} />
       {[-36, 36].map((x) => (
         <g key={x} transform={`translate(${x} -10)`}>
           <circle r={12} fill="url(#tp-iron)" {...LINE} />

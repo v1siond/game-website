@@ -100,28 +100,29 @@ const still = (pose: FigurePose, ahead = 0, lift = 0): Frame => ({ pose, ahead, 
 
 const posed = (turns: Partial<FigurePose>): FigurePose => ({ ...FIGURE_STAND, ...turns })
 
-const STAND = posed({ armLeft: 12 })
-const CROUCH = posed({ rise: 14, thighRight: -50, shinRight: 70, thighLeft: -30, shinLeft: 60, armRight: -30, foreRight: -40, armLeft: -10, foreLeft: -40 })
+/** His stance: low, the knees bent, the head forward, the long arms hanging a little ahead, ready. */
+const STAND = posed({ rise: 4, lean: 4, thighRight: -14, shinRight: 18, thighLeft: 10, shinLeft: 12, armRight: -10, foreRight: -12, armLeft: 6, foreLeft: -10 })
+const CROUCH = posed({ rise: 8, thighRight: -50, shinRight: 70, thighLeft: -30, shinLeft: 60, armRight: -30, foreRight: -40, armLeft: -10, foreLeft: -40 })
 /** Tucked into a ball for the roll and the blast: knees to the chest, arms round them. */
-const TUCK = posed({ rise: 44, thighRight: -120, shinRight: 140, thighLeft: -110, shinLeft: 140, armRight: -70, foreRight: -100, armLeft: -60, foreLeft: -100 })
+const TUCK = posed({ rise: 28, thighRight: -120, shinRight: 140, thighLeft: -110, shinLeft: 140, armRight: -70, foreRight: -100, armLeft: -60, foreLeft: -100 })
 /** In the air reaching up: both arms high, the legs drawn up under him. */
 const REACH = posed({ armRight: -168, foreRight: -6, armLeft: -150, foreLeft: -10, thighRight: -40, shinRight: 60, thighLeft: -10, shinLeft: 40 })
 /** Hanging from both hands, the legs a little forward. */
 const HANG = posed({ armRight: -178, foreRight: 0, armLeft: -172, foreLeft: 0, thighRight: -20, shinRight: 10, thighLeft: -8, shinLeft: 14 })
-/** Holding a pickup up and out before him in the near hand, clear of his big head. */
-const HOLD_UP = posed({ armRight: -100, foreRight: -10, armLeft: 20 })
-/** Down on one knee for the hand slap. */
-const KNEEL = posed({ rise: 30, thighRight: -80, shinRight: 90, thighLeft: 10, shinLeft: 80, lean: 14 })
+/** Holding a pickup out before him in the near hand, the arm forward under his beard, clear of his face. */
+const HOLD_UP = posed({ armRight: -80, foreRight: -20, armLeft: 20 })
+/** Squatting wide and low for the hand slap, leaning over the ground he pounds. */
+const KNEEL = posed({ rise: 9, thighRight: -60, shinRight: 70, thighLeft: -50, shinLeft: 62, lean: 16 })
 /** Riding: seated with the knees forward, the hands on the rim or the boar's neck. */
-const RIDE = posed({ rise: 26, thighRight: -80, shinRight: 75, thighLeft: -70, shinLeft: 75, armRight: -60, foreRight: -30, armLeft: -50, foreLeft: -30 })
+const RIDE = posed({ rise: 12, thighRight: -80, shinRight: 75, thighLeft: -70, shinLeft: 75, armRight: -60, foreRight: -30, armLeft: -50, foreLeft: -30 })
 const GUARD = posed({ armRight: -40, foreRight: -110, armLeft: -50, foreLeft: -105, thighRight: -12, thighLeft: 14 })
 const KICK = posed({ armRight: -30, foreRight: -110, armLeft: 20, foreLeft: -60, thighRight: -100, shinRight: 0, lean: -16, rise: 2 })
 
-/** The hand slap at `phase`: on one knee, the near hand and the far hand coming down in turn. */
+/** The hand slap at `phase`: squatting low, each heavy hand swung high overhead and slammed flat on the ground
+ *  in turn, the near and the far. */
 const slap = (phase: number): FigurePose => {
-  const near = Math.max(0, Math.sin(Math.PI * phase))
-  const far = Math.max(0, -Math.sin(Math.PI * phase))
-  return { ...KNEEL, armRight: -70 + 40 * near, foreRight: -40 + 20 * near, armLeft: -70 + 40 * far, foreLeft: -40 + 20 * far }
+  const swing = Math.sin(Math.PI * phase)
+  return { ...KNEEL, armRight: -80 - 70 * swing, foreRight: -15, armLeft: -80 + 70 * swing, foreLeft: -15 }
 }
 
 /** The drum roll at `phase`: the sticks over the barrel head, near and far coming down in turn. */
@@ -135,14 +136,14 @@ const roll = (phase: number): FigurePose => {
 const stride = (phase: number): FigurePose => ({ ...FIGURE_STAND, ...walk(phase, 1) })
 
 // His size in place units: soles to his raised hands, and the middle of his tucked body above the ground.
-const HANDS_UP = 188
+const HANDS_UP = 192
 const TUCK_MIDDLE = 75
 
 /** The middle of his tucked body in his drawing, from his soles: what a tumble turns him round. */
-const BALL = { x: 6, y: -50 }
+const BALL = { x: 8, y: -50 }
 
 // His near arm's joints in his drawing (character.tsx): the shoulder, the elbow, the middle of the hand.
-const ARM = { shoulder: [50, 62], elbow: [50, 81], hand: [50.8, 101] } as const
+const ARM = { shoulder: [52, 66], elbow: [52, 90], hand: [53, 114] } as const
 
 /** Where his near hand is in a pose, from his soles, in place units (y up negative). */
 const handOf = (pose: FigurePose): [number, number] => {
@@ -532,7 +533,7 @@ const CRATE_X = 190
 const ROLLED = 110
 const SADDLE = 100
 // Seated, his hips are this far above his soles: the lift that puts his seat on the saddle, his legs astride.
-const SEAT = 34
+const SEAT = 33
 const CHARGE_TO = 430
 const WALL_X = 400
 
