@@ -18,7 +18,12 @@ import { mapWriter } from './worldMap'
 // The water's surface, the shore ledge's top (dry, just above it) and where the ledge starts past him.
 const SURFACE = 300
 const SHORE_Y = SURFACE - 10
-const SHORE = 330
+const SHORE = 315
+
+// Where the exit door stands along the ledge, nearer its edge on a phone so the door is in its view (x 570 to
+// 1030 at 390 wide, a little less at 360), and how far left of the door he lands, clear of it.
+const DOOR = 150
+const BESIDE_DOOR = 90
 
 // Where his feet go under water: the depth he dives to, the deepest point of his swim (over the sleeper) and
 // where he ends it; how far a stroke lifts him and how many he takes.
@@ -171,13 +176,14 @@ function Surface({ to }: { to: number }) {
   )
 }
 
-function Shore({ x }: { x: number }) {
+/** The shore ledge from x, with the exit door `door` along it. */
+function Shore({ x, door }: { x: number; door: number }) {
   return (
     <g transform={`translate(${x} ${SHORE_Y})`}>
       <rect x={0} y={0} width={900} height={GROUND} fill={TRAIL.SAND} stroke={TRAIL.HUD} strokeWidth={6} />
       <rect x={0} y={0} width={900} height={18} fill={TRAIL.GRASS} />
       {/* the exit door */}
-      <g transform="translate(150 0)">
+      <g transform={`translate(${door} 0)`}>
         <rect x={-40} y={-150} width={80} height={150} rx={30} fill={TRAIL.WOOD} stroke={TRAIL.HUD} strokeWidth={5} />
         <rect x={-30} y={-138} width={60} height={124} rx={24} fill={TRAIL.BARK} />
         <rect x={14} y={-80} width={10} height={10} fill={TRAIL.GOLD} />
@@ -254,7 +260,7 @@ export const projects: Level = {
             <g data-fx="bubble" opacity={0}>
               <Bubble r={10} />
             </g>
-            <Shore x={shore} />
+            <Shore x={shore} door={reach(input, DOOR)} />
           </>
         ),
         front: (
@@ -347,7 +353,7 @@ export const projects: Level = {
           hero(lerp(end.x, exitX, climb), lerp(end.y, OUT_Y, climb) - strokeLift(stroke) * (1 - climb), stroke < 0.25 ? 'strokeA' : 'strokeB', false, stroke < 0.25 ? -10 : 0)
           return
         }
-        hero(lerp(exitX, shore + 60, out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 220), out < 1 ? 'jump' : 'stand')
+        hero(lerp(exitX, shore + reach(input, DOOR) - BESIDE_DOOR, out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 220), out < 1 ? 'jump' : 'stand')
         return
       }
 
