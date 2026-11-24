@@ -4,19 +4,17 @@ import { setRigPose } from '../../shared/rig'
 import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { Canvas, FLOOR, Figure, figureAt } from '../forest'
 import { SHADE, type Light } from '../palette'
-import type { Scene } from '../place'
+import { START, moveAt, type Scene } from '../place'
 import { pull, run, shadeJoints } from '../pose'
 
-// Contact in the clearing at the forest's end: an old lamp post with its lever at the edge of the path. As
-// the contact rises he runs out of the trees to it and throws the lever, and the lamp lights the clearing,
-// the last light of the walk; the frame holds him with the lever thrown under the lit lamp.
+// Contact in the clearing at the forest's end: an old lamp post with its lever at the edge of the path. He
+// runs out of the trees to it; then he throws the lever and the lamp lights the clearing, the last light of
+// the walk, and he holds with the lever thrown under the lit lamp.
 
 const LAMP_X = 1240
 const FROM_X = 700
 const TO_X = LAMP_X - 110
 const LAMP_Y = FLOOR - 420
-const RUN = [0.05, 0.3] as const
-const THROW = [0.3, 0.42] as const
 const STEP = 70
 
 function Lamp({ light }: { light: Light }) {
@@ -33,19 +31,24 @@ function Lamp({ light }: { light: Light }) {
   )
 }
 
+// He runs out over the first action and throws the lever over the second.
+const ENDS = [0.55, 1]
+
 export const contact: Scene = {
+  script: [1600, 1400],
   mid: ({ light }) => <Lamp light={light} />,
   floor: ({ profession }) => <Figure x={FROM_X} profession={profession} />,
   bind: (stage, { profession }) => {
     const lamp = fx(stage, 'lamp')
     const root = fx(stage, 'figure')
     const joints = root ? shadeJoints(root) : null
-    return (progress) => {
-      const along = ramp(progress, ...RUN)
+    return (_progress, _reached, play = START) => {
+      const t = moveAt(ENDS, play)
+      const along = ramp(t, 0, 0.55)
       const x = lerp(FROM_X, TO_X, along)
-      const thrown = ramp(progress, ...THROW)
+      const thrown = ramp(t, 0.58, 0.85)
       transformTo(root, figureAt(x))
-      fadeTo(lamp, ramp(progress, 0.4, 0.5))
+      fadeTo(lamp, ramp(t, 0.8, 0.92))
       if (joints) setRigPose(joints, thrown > 0 ? pull(profession, thrown) : mix(pull(profession, 0), run(profession, (x - FROM_X) / STEP), along > 0 && along < 1 ? 1 : 0))
     }
   },

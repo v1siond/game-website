@@ -178,8 +178,9 @@
     padding-bottom: 60svh;
   }
 
+  /* a phone holds the place alone a little longer, so its last action plays before the cards come up */
   .head {
-    min-height: 115svh;
+    min-height: 130svh;
     padding-bottom: 10svh;
   }
 
