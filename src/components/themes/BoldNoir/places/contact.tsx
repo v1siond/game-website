@@ -1,102 +1,77 @@
-import { hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { fadeTo, fxAll, fx } from '../../shared/stageNodes'
 import { NOIR } from '../palette'
-import type { Place } from '../place'
-import { Canvas, FLOOR, Sleuth, placeSleuth } from '../street'
-import { LEAP, dash, lay, noirJoints, setNoirPose } from '../pose'
+import { share, still, stepPlace } from '../case'
+import { RoomFloor, RoomWall } from '../room'
+import { lay, rest, tip } from '../pose'
 
-// Contact: the office at dawn, the job done. As the contact rises he lays the calling card on the desk, its
-// red star flaring behind it, dashes for the tall window and leaps through it, the glass bursting round
-// him; he is held in the air outside the frame of the glass, the card left lit on the desk.
+// Contact: the case closed, at the captain's desk in the precinct, the window's blinds throwing their bars
+// across the wall. He lays the case file down on the desk; then the five stars of the case's rating light
+// over it one after another, the way the game scores every case it closes; then he tips his hat.
 
-const START_X = 760
-const DESK_X = 960
-const WINDOW_X = 1250
-const DASH_TO = 1120
-const HEIGHT = 200
-const DONE_BY = 0.55
-// One step of his dash carries him this far.
-const STEP = 80
+const DESK = { from: 120, to: 470, top: -112 }
+const STARS = 5
+const STAR = { y: -480, gap: 76, r: 26 }
+
+const starPoints = (cx: number, cy: number, r: number): string =>
+  Array.from({ length: 10 }, (_, i) => {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5
+    const d = i % 2 === 0 ? r : r * 0.42
+    return `${(cx + Math.cos(angle) * d).toFixed(1)},${(cy + Math.sin(angle) * d).toFixed(1)}`
+  }).join(' ')
 
 function Office() {
-  return (
-    <Canvas>
-      <rect x={WINDOW_X - 120} y={300} width={240} height={480} fill={NOIR.redDeep} stroke={NOIR.paper} strokeWidth="10" />
-      <path d={`M${WINDOW_X} 300 V780 M${WINDOW_X - 120} 540 H${WINDOW_X + 120}`} stroke={NOIR.paper} strokeWidth="6" />
-      <g data-fx="pane">
-        <rect x={WINDOW_X - 114} y={306} width={228} height={468} fill={NOIR.paper} opacity="0.18" />
-      </g>
-    </Canvas>
-  )
-}
-
-// The card on the desk with its red star behind it, and the bursting glass.
-function Desk() {
+  const left = (DESK.from + DESK.to) / 2 - ((STARS - 1) * STAR.gap) / 2
   return (
     <>
-      <rect x={DESK_X - 110} y={FLOOR - 120} width={220} height={16} fill={NOIR.ink} stroke={NOIR.smoke} strokeWidth="3" />
-      <path d={`M${DESK_X - 96} ${FLOOR - 104} V${FLOOR} M${DESK_X + 96} ${FLOOR - 104} V${FLOOR}`} stroke={NOIR.ink} strokeWidth="12" />
-      <g data-fx="card" opacity="0">
-        <path d={`M${DESK_X} ${FLOOR - 300} L${DESK_X + 30} ${FLOOR - 190} L${DESK_X + 130} ${FLOOR - 200} L${DESK_X + 50} ${FLOOR - 140} L${DESK_X + 100} ${FLOOR - 60} L${DESK_X} ${FLOOR - 120} L${DESK_X - 100} ${FLOOR - 60} L${DESK_X - 50} ${FLOOR - 140} L${DESK_X - 130} ${FLOOR - 200} L${DESK_X - 30} ${FLOOR - 190} Z`} fill={NOIR.red} opacity="0.8" />
-        <polygon points={`${DESK_X - 50},${FLOOR - 122} ${DESK_X + 40},${FLOOR - 130} ${DESK_X + 50},${FLOOR - 118} ${DESK_X - 40},${FLOOR - 112}`} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="3" />
-      </g>
-    </>
-  )
-}
-
-const SHARDS = [
-  [-60, -40, 26],
-  [40, -90, 34],
-  [90, 30, 22],
-  [-20, 70, 30],
-  [120, -150, 20],
-  [-110, 120, 24],
-] as const
-
-function Glass() {
-  return (
-    <g data-fx="glass" opacity="0" transform={`translate(${WINDOW_X} 540)`}>
-      {SHARDS.map(([x, y, size]) => (
-        <polygon key={`${x}-${y}`} data-shard="" points={`${x - size},${y} ${x + size * 0.4},${y - size} ${x + size},${y + size * 0.6}`} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="3" />
+      {/* the bars of the blinds' shadow across the wall */}
+      {Array.from({ length: 7 }, (_, i) => -700 + i * 36).map((y) => (
+        <polygon key={y} points={`-360,${y} 40,${y - 60} 40,${y - 44} -360,${y + 16}`} fill={NOIR.paper} opacity="0.07" />
       ))}
-    </g>
+      {/* the desk, its lamp and its phone */}
+      <rect x={DESK.from} y={DESK.top} width={DESK.to - DESK.from} height={20} fill={NOIR.ash} stroke={NOIR.ink} strokeWidth="4" />
+      <rect x={DESK.to - 120} y={DESK.top + 20} width={110} height={-DESK.top - 20} fill={NOIR.smoke} stroke={NOIR.ink} strokeWidth="4" />
+      <path d={`M${DESK.from + 20} ${DESK.top + 20} V0`} stroke={NOIR.ink} strokeWidth="12" />
+      <path d={`M${DESK.to - 60} ${DESK.top} V${DESK.top - 70} L${DESK.to - 90} ${DESK.top - 110}`} stroke={NOIR.ink} strokeWidth="6" fill="none" />
+      <polygon points={`${DESK.to - 120},${DESK.top - 96} ${DESK.to - 70},${DESK.top - 126} ${DESK.to - 60},${DESK.top - 104} ${DESK.to - 106},${DESK.top - 80}`} fill={NOIR.fog} stroke={NOIR.ink} strokeWidth="3" />
+      <rect x={DESK.from + 30} y={DESK.top - 22} width={60} height={22} rx={6} fill={NOIR.ink} />
+      <g data-fx="case-file" opacity="0">
+        <rect x={DESK.from + 120} y={DESK.top - 8} width={110} height={8} fill={NOIR.paperDim} stroke={NOIR.ink} strokeWidth="2" />
+      </g>
+      {Array.from({ length: STARS }, (_, i) => {
+        const cx = left + i * STAR.gap
+        return (
+          <g key={i}>
+            <polygon points={starPoints(cx, STAR.y, STAR.r)} fill="none" stroke={NOIR.paperDim} strokeWidth="4" />
+            <g data-fx={`star-${i}`} opacity="0">
+              <circle cx={cx} cy={STAR.y} r={STAR.r * 1.8} fill={NOIR.red} opacity="0.2" />
+              <polygon points={starPoints(cx, STAR.y, STAR.r)} fill={NOIR.red} stroke={NOIR.paper} strokeWidth="4" />
+            </g>
+          </g>
+        )
+      })}
+    </>
   )
 }
 
-export const contact: Place = {
-  light: NOIR.red,
-  set: () => <Office />,
-  floor: ({ profession }) => (
-    <>
-      <Desk />
-      <Sleuth x={START_X} profession={profession} />
-      <Glass />
-    </>
-  ),
-  bind: (stage) => {
-    const card = fx(stage, 'card')
-    const glass = fx(stage, 'glass')
-    const pane = fx(stage, 'pane')
-    const root = fx(stage, 'detective')
-    const joints = root ? noirJoints(root) : null
-    placeSleuth(root, START_X)
-    return (progress) => {
-      const t = ramp(progress, 0.05, DONE_BY)
-      const laid = ramp(t, 0, 0.3)
-      const run = ramp(t, 0.3, 0.6)
-      const leap = ramp(t, 0.6, 1)
-      const x = START_X + (DASH_TO - START_X) * run + (WINDOW_X + 40 - DASH_TO) * leap
-      fadeTo(card, ramp(laid, 0.5, 0.9))
-      const burst = ramp(leap, 0.4, 1)
-      fadeTo(glass, burst > 0 ? 1 : 0)
-      transformTo(glass, `translate(${WINDOW_X} 540) scale(${(1 + 1.6 * burst).toFixed(3)})`)
-      fadeTo(pane, 1 - ramp(leap, 0.4, 0.5))
-      placeSleuth(root, x, hop(leap / 2, HEIGHT))
-      if (!joints) return
-      const pose = leap > 0 ? mix(dash(x / STEP), LEAP, ramp(leap, 0, 0.3)) : run > 0 ? dash(x / STEP) : lay(laid)
-      setNoirPose(joints, pose)
+export const contact = stepPlace({
+  light: NOIR.paper,
+  script: [1500, 1700, 1300],
+  mid: () => <RoomWall />,
+  near: () => <RoomFloor />,
+  back: () => <Office />,
+  bind: (stage, { profession }) => {
+    const file = fx(stage, 'case-file')
+    const stars = fxAll(stage, 'star-')
+    return (play) => {
+      const laid = share(play, 0)
+      const rated = share(play, 1)
+      const tipped = share(play, 2)
+      fadeTo(file, ramp(laid, 0.7, 0.85))
+      stars.forEach((star, i) => fadeTo(star, ramp(rated, i / STARS, (i + 0.6) / STARS)))
+      if (tipped > 0) return still(tip(profession, tipped))
+      return still(mix(lay(profession, laid), rest(profession), ramp(rated, 0, 0.3)))
     }
   },
-}
+})

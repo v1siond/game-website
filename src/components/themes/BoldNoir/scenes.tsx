@@ -2,9 +2,10 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
+import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import type { Place, PlaceInput } from './place'
+import type { CaseInput, Place } from './case'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -17,10 +18,11 @@ import { ventures } from './places/ventures'
 import { work } from './places/work'
 import { Canvas, Front, Night, Skyline, Street, Wall, rainWriter } from './street'
 
-// The page as scenes: the rooftop (hero), one place of the heist per section of the shown profession in
-// reading order, the calling card (contact). Each scene names its place, its anchor and how many cards its
-// section counts (stageItems), read from the same slot the section's cards are drawn from: one beat per
-// card.
+// The page as scenes, one case of the 1947 detective game from the call to the close: the street where the
+// call comes in (hero), one step of the case per section of the shown profession in reading order, the
+// captain's desk where it is closed (contact). Each scene names its place, its anchor and its place's
+// script, which the scroll plays at the scene's own pace whatever the number of its cards (stageItems still
+// counts them for the theatre's settled frame).
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -49,8 +51,8 @@ export interface NoirScene extends TheatreScene, Omit<SceneDef, 'place'> {
   slot: SectionSlot | null
 }
 
-const layersOf = (id: SceneId, { light, set, mid, near, floor }: Place, input: PlaceInput): StageLayer[] => [
-  { name: 'sky', node: <Night id={`noir-${id}`} light={light} /> },
+const layersOf = ({ light, set, mid, near, floor }: Place, input: CaseInput): StageLayer[] => [
+  { name: 'sky', node: <Night light={light} /> },
   { name: 'far', node: <Skyline /> },
   ...(set ? [{ name: 'set', node: set(input) }] : []),
   { name: 'mid', node: mid ? mid(input) : <Wall /> },
@@ -59,36 +61,37 @@ const layersOf = (id: SceneId, { light, set, mid, near, floor }: Place, input: P
   { name: 'fg', node: <Front /> },
 ]
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): NoirScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): NoirScene => {
   const { place, ...def } = SCENE_DEFS[id]
-  const input = { count, profession }
+  const input = { profession, phone }
   return {
     ...def,
     id,
     slot,
     count,
-    layers: layersOf(id, place, input),
+    script: place.script,
+    layers: layersOf(place, input),
     bind: (stage) => {
       const rain = rainWriter(stage)
       const write = place.bind(stage, input)
-      return (progress, reached) => {
+      return (progress, _reached, play) => {
         rain(progress)
-        write(progress, reached)
+        write(play ?? sceneEnd(place.script))
       }
     },
   }
 }
 
 /** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): NoirScene[] {
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): NoirScene[] {
   const sections = slots.map((slot) => {
     const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession)
+    return sceneOf(slot.id, slot, lead + count, profession, phone)
   })
-  return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
+  return [sceneOf('hero', null, 0, profession, phone), ...sections, sceneOf('contact', null, 0, profession, phone)]
 }
 
-/** Each layer's push in across its scene: the far towers move least, the glass in front most, which gives
+/** Each layer's push in across its scene: the far skyline moves least, the rain in front most, which gives
  *  the depth. The pavement and what stands on it move together, so he always stands on it. */
 export const LAYER_MOTION: LayerMotions = {
   sky: { zoom: [1.0, 1.04], lift: [0, 0] },

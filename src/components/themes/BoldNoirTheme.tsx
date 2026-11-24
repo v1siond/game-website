@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -17,20 +18,25 @@ import { LAYER_MOTION, scenesOf, type NoirScene } from './BoldNoir/scenes'
 import { PlaceSection } from './BoldNoir/sections'
 import page from './BoldNoir/page.module.css'
 
-// Bold Noir: his CV as one heist night in the city, cut in flat ink, paper and one loud red. The page keeps
-// the rhythm of the Rockstar VI site: a big hero (the rooftop, his calling card with his name in ransom
-// note cut-outs, the game's menu where he picks a profession), then every section of the shown profession
-// is one full screen place of the night that rises from dark, holds while its cards scroll over it, and
-// goes dark while the next one rises: the evidence board, the records room, the vault, the case room, the
-// gallery, main street, the jazz club, the back alley gym, and the calling card pinned to the wall at the
-// end. He is the detective in each place and does one thing per card of the section: marks a clue, pulls a
-// file, cracks a safe, stamps a case closed. Every motion is a function of the scroll position (the shared
-// theatre on useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays
-// back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first
-// frame.
+// Bold Noir: his CV as one case of the 1947 detective game the world is drawn from, in its black and white
+// mode: ink, smoke, fog and paper, with one red for what is lit. The page keeps the rhythm of the Rockstar VI
+// site: a big hero (a street under the City Hall tower, his calling card with his name in cut-outs, the menu
+// where he picks a profession), then every section of the shown profession is one full screen place of the
+// case that rises from dark, holds while its cards scroll over it, and gives way to the next: the crime
+// scene, the call box, the interrogation room, the drive, the foot chase, the newsstand, the jazz club, the
+// alley brawl, and the captain's desk where the case is closed. He is the detective, side on, and each place
+// plays one to three different steps of that game's case, followed by the scroll at the scene's own pace
+// and played back on the way up: the clue's cue, the kneel and the notebook; the call box; the face read
+// across the table and the evidence laid down; the siren and the stop; the chase and the tackle; the
+// spinning front page; the last hit of the jazz; the slip and the kick; the five stars. The layers' push in
+// follows the scroll (the shared theatre on useScrollStage). The text is plain HTML in the page flow over
+// the fixed theatre of pictures, opaque from its first frame.
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
+
+// A phone sees the middle of the canvas only, so the places stage their steps nearer its middle.
+const PHONE_QUERY = '(max-width: 767.98px)'
 
 const hasSlot = (scene: NoirScene): scene is NoirScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -40,9 +46,10 @@ export default function BoldNoirTheme() {
   const cv = useCVData()
   const labels = useLabels()
   const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
+    [view, cv, labels, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]

@@ -6,7 +6,7 @@ import s from './detective.module.css'
 
 // Him as this world's own figure, a 1940s city detective of the noir films (the pale pinched fedora with its
 // wide dark band, the grey three piece suit with the single breasted jacket worn open over the waistcoat, the
-// red tie, the pistol at his hip, the badge held up), cut the way the heist world cuts everything: flat ink,
+// red tie, the pistol at his hip, the badge held up), cut the way the world cuts everything: flat ink,
 // paper and one red, no gradient, depth from hard shadow shapes and halftone dots, a sharp silhouette. The
 // fedora's brim throws a hard shadow over his brow; under it his own face: brown skin, short dark hair at the
 // temples, the full dark beard, dark oval eyes (HERO_IDENTITY).

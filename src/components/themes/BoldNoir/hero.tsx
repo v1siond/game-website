@@ -12,9 +12,9 @@ import { NOIR } from './palette'
 import { LAYER_MOTION, type NoirScene } from './scenes'
 import page from './page.module.css'
 
-// The first screen, over the rooftop: his calling card lying crooked with his name in ransom note cut-outs
+// The first screen, over the street where the call comes in: his calling card lying crooked with his name in ransom note cut-outs
 // and his headline, his lines and actions beside it, the wardrobe on the header's foot, then the game's
-// menu where he picks a profession. Under reduced motion the rooftop's picture sits still behind the hero.
+// menu where he picks a profession. Under reduced motion the street's picture sits still behind the hero.
 
 // The wardrobe's crooked cut-out slab over the menu: paper on ink, ringed in the red.
 const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOIR.red }

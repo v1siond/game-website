@@ -1,0 +1,36 @@
+/*
+ * His side on figure (gumshoe.tsx): every part turns round its own joint in the viewBox's units (transform-box:
+ * view-box), so a forearm turns at the elbow wherever the shoulder took it. The kit classes set a profession's
+ * resting pose; a scene's writer (pose.ts) overrides it with inline transforms. The head and the hat turn by
+ * their SVG transform attribute, round the pivots pose.ts gives them. What he holds rests at
+ * opacity 0 (its own attribute) until a pose shows it.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 62px 172px; }
+.armBack { transform-origin: 49px 53px; }
+.foreBack { transform-origin: 49.5px 76px; }
+.armFront { transform-origin: 73px 53px; }
+.foreFront { transform-origin: 73.5px 76px; }
+.thighBack { transform-origin: 54px 96px; }
+.shinBack { transform-origin: 55px 132px; }
+.thighFront { transform-origin: 70px 96px; }
+.shinFront { transform-origin: 69px 132px; }
+
+/* ---------------------------------------------------------------- resting poses per kit */
+
+/* both sticks raised */
+.kitSticks .armFront { transform: rotate(-20deg); }
+.kitSticks .foreFront { transform: rotate(-70deg); }
+.kitSticks .armBack { transform: rotate(-25deg); }
+.kitSticks .foreBack { transform: rotate(-75deg); }
+
+/* the Muay Thai guard: wrapped fists by the chin */
+.kitGuard .armFront { transform: rotate(-35deg); }
+.kitGuard .foreFront { transform: rotate(-135deg); }
+.kitGuard .armBack { transform: rotate(-25deg); }
+.kitGuard .foreBack { transform: rotate(-145deg); }
+.kitGuard .thighFront { transform: rotate(-6deg); }

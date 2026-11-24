@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { fx, transformTo } from '../shared/stageNodes'
-import { Detective, DETECTIVE_VIEW } from './detective'
+import { GumshoeSprite, SOLE_DROP } from './gumshoe'
 import { NOIR } from './palette'
 
-// The drawing kit of the heist night behind the page, cut the way the world cuts everything: flat ink,
-// paper and one red, no gradient, depth from stacked flat layers. Every scene is a stack of SVG layers on
-// one 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x
-// 570 to 1030, and a desktop crop the same art: the night with the red slab cut across it and the scene's
-// own light, the jagged towers beyond, the brick wall of the street with its lamps, the pavement he walks,
-// and the glass shards and rain in front. He is the detective (detective.tsx) drawn into the canvas and
-// posed by the scene's writer (pose.ts).
+// The drawing kit of the 1947 city behind the page, in the black and white mode of the detective game the
+// world is drawn from: flat ink, smoke, fog and paper, one red kept for what is lit, no gradient, depth from
+// stacked flat layers. Every scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its bottom
+// centre (xMidYMax slice), so a phone, which sees about x 570 to 1030, and a desktop crop the same art: the
+// night with its haze and searchlights, the skyline of deco blocks and palms under the City Hall tower, the
+// brick wall of the street with its lamps, the pavement, and the rain in front. He is the detective side on
+// (gumshoe.tsx) drawn into the canvas and posed by the scene's writer (pose.ts).
 
 export const W = 1600
 export const H = 1000
@@ -19,7 +19,7 @@ export const FLOOR = 880
 
 /** His drawn height on the canvas, about a third of the street. */
 export const FIGURE_H = 300
-const FIGURE_W = (FIGURE_H * DETECTIVE_VIEW.width) / DETECTIVE_VIEW.height
+const FIGURE_W = (FIGURE_H * 120) / 180
 
 export function Canvas({ children }: { children: ReactNode }) {
   return (
@@ -29,59 +29,88 @@ export function Canvas({ children }: { children: ReactNode }) {
   )
 }
 
-/** The night: the ink sky, the red slab cut across it from the top, a flat pool of the scene's light and
- *  the halftone dots over the slab's corner. */
-export function Night({ id, light }: { id: string; light: string }) {
+/** The night in the game's black and white mode: the ink sky, a pale haze of the scene's light low over the
+ *  roofs and the searchlight beams of the city crossing it. */
+export function Night({ light }: { light: string }) {
   return (
     <Canvas>
-      <defs>
-        <pattern id={`${id}-dots`} width="18" height="18" patternUnits="userSpaceOnUse">
-          <circle cx="9" cy="9" r="2.4" fill={NOIR.paper} opacity="0.08" />
-        </pattern>
-      </defs>
       <rect x={-200} width={W + 400} height={H} fill={NOIR.ink} />
-      <polygon points="-200,0 900,0 380,1000 -200,1000" fill={NOIR.redDeep} opacity="0.55" />
-      <polygon points="900,0 960,0 440,1000 380,1000" fill={NOIR.red} opacity="0.6" />
-      <circle cx={1150} cy={300} r={360} fill={light} opacity="0.12" />
-      <circle cx={1150} cy={300} r={200} fill={light} opacity="0.1" />
-      <rect x={-200} width={W + 400} height={H} fill={`url(#${id}-dots)`} />
+      <ellipse cx={800} cy={700} rx={1100} ry={260} fill={NOIR.smoke} opacity="0.7" />
+      <circle cx={1150} cy={320} r={360} fill={light} opacity="0.1" />
+      <circle cx={1150} cy={320} r={190} fill={light} opacity="0.08" />
+      <polygon points="300,800 330,800 -100,0 -10,0" fill={NOIR.paper} opacity="0.05" />
+      <polygon points="1350,800 1380,800 1700,0 1560,0" fill={NOIR.paper} opacity="0.05" />
     </Canvas>
   )
 }
 
-// The jagged towers, each top cut on a slant, a lit red window in some.
-const TOWERS = [
-  { x: -120, w: 150, h: 360, cut: 30 },
-  { x: 50, w: 110, h: 520, cut: -40 },
-  { x: 180, w: 190, h: 300, cut: 24 },
-  { x: 390, w: 120, h: 580, cut: 50 },
-  { x: 530, w: 170, h: 420, cut: -30 },
-  { x: 720, w: 100, h: 540, cut: 36 },
-  { x: 840, w: 190, h: 360, cut: -24 },
-  { x: 1050, w: 120, h: 600, cut: -46 },
-  { x: 1190, w: 180, h: 400, cut: 30 },
-  { x: 1390, w: 130, h: 520, cut: -36 },
-  { x: 1540, w: 180, h: 340, cut: 26 },
+// The low deco blocks of the 1947 city, each with its lit windows, at x and up to its height.
+const BLOCKS = [
+  { x: -160, w: 210, h: 230 },
+  { x: 60, w: 150, h: 330 },
+  { x: 220, w: 240, h: 260 },
+  { x: 470, w: 130, h: 380 },
+  { x: 610, w: 220, h: 290 },
+  { x: 1310, w: 180, h: 340 },
+  { x: 1500, w: 220, h: 250 },
+]
+
+// The palms over the roofs: the trunk's foot, its height and its lean.
+const PALMS = [
+  { x: 170, h: 420, lean: -30 },
+  { x: 900, h: 470, lean: 24 },
+  { x: 1440, h: 400, lean: -18 },
 ]
 
 const BASE = 800
 
-/** The jagged towers of the city beyond the street, in coal on the night. */
+// The stepped tower of City Hall, the tallest thing on the 1947 skyline: its tiers narrowing up to the
+// stepped pyramid and the beacon at its tip.
+const TOWER = { x: 1110, w: 150 }
+const TIERS = [
+  { w: 1, top: 470 },
+  { w: 0.74, top: 300 },
+  { w: 0.56, top: 230 },
+  { w: 0.42, top: 190 },
+]
+
+function Palm({ x, h, lean }: { x: number; h: number; lean: number }) {
+  const top = { x: x + lean, y: BASE - h }
+  return (
+    <g fill={NOIR.ink}>
+      <path d={`M${x - 6} ${BASE} Q${x + lean * 0.3} ${BASE - h * 0.5} ${top.x - 3} ${top.y} L${top.x + 3} ${top.y} Q${x + lean * 0.3 + 8} ${BASE - h * 0.5} ${x + 6} ${BASE} Z`} />
+      {[-150, -110, -60, -20, 20, 60].map((angle) => (
+        <path key={angle} d={`M${top.x} ${top.y} q${(Math.cos((angle * Math.PI) / 180) * 50).toFixed(0)} ${(Math.sin((angle * Math.PI) / 180) * 50 - 10).toFixed(0)} ${(Math.cos((angle * Math.PI) / 180) * 90).toFixed(0)} ${(Math.sin((angle * Math.PI) / 180) * 70 + 30).toFixed(0)}`} stroke={NOIR.ink} strokeWidth="9" fill="none" strokeLinecap="round" />
+      ))}
+    </g>
+  )
+}
+
+/** The 1947 skyline beyond the street: the City Hall tower, the deco blocks, the palms, in coal and ink. */
 export function Skyline() {
   return (
     <Canvas>
-      {TOWERS.map(({ x, w, h, cut }) => {
-        const top = BASE - h
-        const left = cut > 0 ? top : top - cut
-        const right = cut > 0 ? top + cut : top
-        return (
-          <g key={x}>
-            <polygon points={`${x},${BASE} ${x},${left} ${x + w},${right} ${x + w},${BASE}`} fill={NOIR.coal} />
-            <rect x={x + w * 0.3} y={Math.max(left, right) + 40} width={14} height={20} fill={NOIR.red} opacity="0.8" />
-            <rect x={x + w * 0.62} y={Math.max(left, right) + 120} width={14} height={20} fill={NOIR.paperDim} opacity="0.35" />
-          </g>
-        )
-      })}
+      {BLOCKS.map(({ x, w, h }) => (
+        <g key={x}>
+          <rect x={x} y={BASE - h} width={w} height={h} fill={NOIR.coal} />
+          <rect x={x + 10} y={BASE - h - 14} width={w - 20} height={14} fill={NOIR.coal} />
+          {[0.25, 0.55].map((across) =>
+            [60, 140].map((dy) => <rect key={`${across}-${dy}`} x={x + w * across} y={BASE - h + dy} width={14} height={20} fill={NOIR.paperDim} opacity="0.3" />),
+          )}
+        </g>
+      ))}
+      {TIERS.map(({ w, top }) => (
+        <rect key={top} x={TOWER.x + (TOWER.w * (1 - w)) / 2} y={top} width={TOWER.w * w} height={BASE - top} fill={NOIR.coal} />
+      ))}
+      <polygon points={`${TOWER.x + 44},190 ${TOWER.x + 75},120 ${TOWER.x + 106},190`} fill={NOIR.coal} />
+      <circle cx={TOWER.x + 75} cy={112} r={7} fill={NOIR.red} />
+      {[520, 580, 640, 700].map((y) => (
+        <path key={y} d={`M${TOWER.x + 30} ${y} V${y + 30} M${TOWER.x + 75} ${y} V${y + 30} M${TOWER.x + 120} ${y} V${y + 30}`} stroke={NOIR.paperDim} strokeWidth="5" opacity="0.3" />
+      ))}
+      {PALMS.map((palm) => (
+        <Palm key={palm.x} {...palm} />
+      ))}
+      <path d="M-200 560 Q400 590 800 560 T1800 560" stroke={NOIR.smoke} strokeWidth="2" fill="none" />
     </Canvas>
   )
 }
@@ -132,29 +161,10 @@ export function Street() {
   )
 }
 
-const SHARDS = [
-  [60, 180, 40, -20],
-  [1500, 260, 54, 24],
-  [1380, 120, 26, 60],
-  [120, 620, 34, 40],
-  [1540, 700, 30, -30],
-] as const
-
-/** In front: glass shards at the edges and the slant of the rain; the scene's writer drops the rain. */
+/** In front: the slant of the rain; the scene's writer drops it. */
 export function Front() {
   return (
     <Canvas>
-      {SHARDS.map(([x, y, size, turn]) => (
-        <polygon
-          key={`${x}-${y}`}
-          points={`${-size},${-size * 0.4} ${size * 0.6},${-size} ${size},${size * 0.7} ${-size * 0.2},${size * 0.4}`}
-          transform={`translate(${x} ${y}) rotate(${turn})`}
-          fill="none"
-          stroke={NOIR.paper}
-          strokeWidth="3"
-          opacity="0.3"
-        />
-      ))}
       <g data-fx="rain" opacity="0.18">
         {Array.from({ length: 16 }, (_, i) => ({ x: -100 + i * 115, y: (i * 233) % 700 })).map(({ x, y }) => (
           <path key={x} d={`M${x} ${y} l-30 90`} stroke={NOIR.paper} strokeWidth="3" />
@@ -174,13 +184,13 @@ export function rainWriter(stage: ParentNode): (progress: number) => void {
 }
 
 const figureAt = (x: number, lift = 0): string =>
-  `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (DETECTIVE_VIEW.soles / DETECTIVE_VIEW.height)).toFixed(1)})`
+  `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (1 - SOLE_DROP)).toFixed(1)})`
 
 /** Him on the pavement at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Sleuth({ x, profession }: { x: number; profession: Profession }) {
   return (
     <g data-fx="detective" transform={figureAt(x)}>
-      <Detective profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
+      <GumshoeSprite profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
     </g>
   )
 }
