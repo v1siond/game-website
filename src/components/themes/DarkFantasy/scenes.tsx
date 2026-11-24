@@ -454,14 +454,18 @@ const ventures: SceneSpec = {
 
 // ---- Bands: the station bell, the great beetle ----
 
-const STATION = { him: 1130, bell: 1220, beetleFrom: 2200, beetleAt: 1560, stepMs: 140 }
+// The beetle is drawn at BEETLE_SCALE and stops at beetleAt, so all of it, horns to tail, stays in the part of
+// the hall the narrowest wide screen shows (about x 320 to 1590 at 1024 by 768, with the figure layer's push in).
+const STATION = { him: 1050, bell: 1140, beetleFrom: 2200, beetleAt: 1410, stepMs: 140 }
+const BEETLE_SCALE = 0.7
+const beetleAt = (x: number): string => `translate(${r1(x)} ${FLOOR_Y}) scale(${BEETLE_SCALE})`
 
 const bands: SceneSpec = {
   light: DARK_FANTASY.lavender,
   script: [1400, 2200],
   figure: () => (
     <>
-      <g data-fx="beetle" transform={`translate(${STATION.beetleFrom} ${FLOOR_Y})`}>
+      <g data-fx="beetle" transform={beetleAt(STATION.beetleFrom)}>
         <Beetle />
       </g>
       <g transform={`translate(${STATION.bell} ${FLOOR_Y})`}>
@@ -491,7 +495,7 @@ const bands: SceneSpec = {
       fadeTo(ring, bell(rung, 0.45, 1) * (1 - came))
       const runIn = ramp(came, 0, 0.85)
       const easedIn = 1 - (1 - runIn) ** 2
-      transformTo(beetle, `translate(${r1(lerp(STATION.beetleFrom, STATION.beetleAt, easedIn))} ${FLOOR_Y})`)
+      transformTo(beetle, beetleAt(lerp(STATION.beetleFrom, STATION.beetleAt, easedIn)))
       const stepping = runIn > 0 && runIn < 1
       const step = Math.floor(elapsedOf(script, play) / STATION.stepMs) % 2
       fadeTo(legsA, stepping && step === 1 ? 0 : 1)
