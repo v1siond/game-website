@@ -2,15 +2,15 @@ import { ramp } from '@/lib/scroll/stage'
 import { drop, hop } from '@/lib/motion/arc'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { stopsChamber } from '../chamber'
+import { fightChamber, share } from '../chamber'
 import { Canvas, FLOOR } from '../city'
 import { Raider, foeOf } from '../foes'
 import { hang, landed } from '../pose'
 
-// Projects: the pipe works under the research lab, a freight rail running overhead. For each project a
-// raider guards a valve; he leaps up onto the rail, rides it in on the hook and drops on the raider with the
-// wrench, and the pipe glows teal past the valve. When the last project is read the flow reaches the lab's
-// shutter and it rolls up on the lit lab.
+// Projects: the pipe works under the research lab, a freight rail running overhead, the way the game's
+// sky rails carry its hero over a fight. A raider guards a valve; he leaps up onto the rail's hook, rides it
+// in, and drops on the raider with the wrench; the pipe glows teal past the valve, the flow reaches the
+// lab's shutter and it rolls up on the lit lab.
 
 const FOE = 330
 // The rail runs this high: his hands on the hook put his soles this far up.
@@ -65,43 +65,40 @@ function Flowing() {
   )
 }
 
-export const projects = stopsChamber({
+export const projects = fightChamber({
   light: C.tealLight,
+  script: [1200, 1300, 1500],
   set: () => <Lab />,
-  back: (i) => (
+  back: () => (
     <>
       <path d={`M-260 ${RAIL} H${FOE + 260}`} stroke={C.brassDark} strokeWidth="12" />
       <Valve />
-      <g data-fx={`flowing-${i}`} opacity="0">
+      <g data-fx="flowing" opacity="0">
         <Flowing />
       </g>
       <g transform={`translate(${FOE} 0)`}>
-        <Raider name={`raider-${i}`} />
+        <Raider name="raider" />
       </g>
     </>
   ),
-  move: (profession, t) => {
-    const up = ramp(t, 0, 0.25)
-    const ride = ramp(t, 0.25, 0.55)
-    const fall = ramp(t, 0.55, 0.7)
-    const lift = t < 0.25 ? ON_RAIL * up + hop(up, 60) : ON_RAIL - drop(fall, ON_RAIL)
-    const pose = t < 0.55 ? hang(profession, ramp(t, 0, 0.15)) : landed(profession, ramp(t, 0.5, 0.85))
-    return { pose, ahead: RIDE * ride, lift }
-  },
-  reply: (stage, { count }) => {
-    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
-    const flows = Array.from({ length: count }, (_, i) => fx(stage, `flowing-${i}`))
+  bind: (stage, { profession }) => {
+    const foe = foeOf(stage, 'raider')
+    const flowing = fx(stage, 'flowing')
     const shutter = fx(stage, 'shutter')
     const flow = fx(stage, 'flow')
-    return (played) => {
-      foes.forEach((foe, i) => {
-        const t = played(i)
-        foe(t, null, [0.68, 0.82])
-        fadeTo(flows[i], ramp(t, 0.8, 0.95))
-      })
-      const open = count > 0 ? ramp(played(count - 1), 0.85, 1) : 0
+    return (play) => {
+      const up = share(play, 0)
+      const ride = share(play, 1)
+      const fall = share(play, 2)
+      foe(fall, null, [0.3, 0.6])
+      fadeTo(flowing, ramp(fall, 0.55, 0.8))
+      const open = ramp(fall, 0.7, 1)
       fadeTo(flow, open)
       transformTo(shutter, `translate(0 ${(-open * SHUTTER.height).toFixed(1)})`)
+      const dropped = ramp(fall, 0, 0.35)
+      const lift = fall > 0 ? ON_RAIL - drop(dropped, ON_RAIL) : ON_RAIL * up + hop(up, 60)
+      const pose = fall > 0 ? landed(profession, ramp(fall, 0, 0.6)) : hang(profession, ramp(up, 0, 0.6))
+      return { pose, ahead: RIDE * ride, lift }
     }
   },
 })

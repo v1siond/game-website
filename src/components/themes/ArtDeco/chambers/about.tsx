@@ -1,19 +1,21 @@
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, translateTo } from '../../shared/stageNodes'
+import { mix } from '@/lib/motion/rigPose'
+import { fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { still, stopsChamber } from '../chamber'
+import { fightChamber, share } from '../chamber'
 import { Arc, Raider, foeOf } from '../foes'
-import { zap } from '../pose'
+import { swing, zap } from '../pose'
 
-// About: the power station, dark when he arrives. For each highlight a raider rushes him out of the dark
-// past a fuse box; he throws the charged hand's bolt into it, the raider shakes and goes rigid in the arc,
-// and the overcharge lights the box's dials and the lamp over it, so the room fills with light as the
-// section is read.
+// About: the power station, dark when he arrives. A raider rushes him out of the dark past a fuse box; he
+// throws the charged hand's bolt into it, the raider shakes and goes rigid in the arc and the overcharge
+// lights the box's dials and the lamp over it; then he steps in and brings the wrench down, and the raider
+// drops. The game's one-two: the power in one hand, the wrench in the other.
 
 const BOX = 150
 const FOE = 300
-// The raider rushes in from this far.
+// The raider rushes in from this far; he steps this far in to bring the wrench down on it.
 const FROM = 520
+const REACH = FOE - 150
 
 function FuseBox() {
   return (
@@ -46,33 +48,38 @@ function Power() {
   )
 }
 
-export const about = stopsChamber({
+export const about = fightChamber({
   light: C.goldBright,
-  back: (i) => (
+  script: [1400, 1600, 1600],
+  back: () => (
     <>
       <g transform={`translate(${BOX} 0)`}>
         <FuseBox />
-        <g data-fx={`power-${i}`} opacity="0">
+        <g data-fx="power" opacity="0">
           <Power />
         </g>
       </g>
-      <g data-fx={`rush-${i}`} transform={`translate(${FROM} 0)`}>
-        <Raider name={`raider-${i}`} />
+      <g data-fx="rush" transform={`translate(${FROM} 0)`}>
+        <Raider name="raider" />
       </g>
-      <Arc name={`raider-${i}`} x={FOE} />
+      <Arc name="raider" x={FOE} />
     </>
   ),
-  move: (profession, t) => still(zap(profession, ramp(t, 0.25, 0.45))),
-  reply: (stage, { count }) => {
-    const rushes = Array.from({ length: count }, (_, i) => fx(stage, `rush-${i}`))
-    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
-    const powers = Array.from({ length: count }, (_, i) => fx(stage, `power-${i}`))
-    return (played) =>
-      foes.forEach((foe, i) => {
-        const t = played(i)
-        translateTo(rushes[i], FROM + (FOE - FROM) * ramp(t, 0, 0.35), 0)
-        foe(t, [0.42, 0.7], null)
-        fadeTo(powers[i], ramp(t, 0.7, 0.85))
-      })
+  bind: (stage, { profession }) => {
+    const rush = fx(stage, 'rush')
+    const foe = foeOf(stage, 'raider')
+    const power = fx(stage, 'power')
+    return (play) => {
+      const rushed = share(play, 0)
+      const shocked = share(play, 1)
+      const struck = share(play, 2)
+      translateTo(rush, lerp(FROM, FOE, rushed), 0)
+      // the bolt holds it stiff over the first half, the wrench knocks it down at the end of the second
+      foe((shocked + struck) / 2, [0.08, 0.45], [0.86, 1])
+      fadeTo(power, ramp(shocked, 0.6, 0.9))
+      const bolt = zap(profession, ramp(shocked, 0, 0.5))
+      const pose = struck > 0 ? mix(bolt, swing(profession, struck), ramp(struck, 0, 0.2)) : bolt
+      return { pose, ahead: REACH * ramp(struck, 0, 0.35), lift: 0 }
+    }
   },
 })

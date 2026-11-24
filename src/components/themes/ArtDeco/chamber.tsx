@@ -1,36 +1,33 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { mix } from '@/lib/motion/rigPose'
-import { ramp } from '@/lib/scroll/stage'
-import { trackAt } from '@/lib/scroll/track'
-import { fx, transformTo } from '../shared/stageNodes'
-import type { StageWriter } from '../shared/theatre/useTheatre'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
+import { fx } from '../shared/stageNodes'
 import { FLOOR, Survivor, placeSurvivor } from './city'
-import { decoJoints, rest, setDecoPose, walk, type DecoPose } from './pose'
+import { decoJoints, setDecoPose, type DecoPose } from './pose'
 
-// What every chamber of the city is, and the fight through it that the sections play: he holds his place
-// near the middle of the frame and the city slides past him, one foe or machine per card of the section.
-// Each card is a beat: a short run in which the floor brings the card's stop to him, then his move at it (a
-// bolt, a hack, a ride on the rail), whose last frame is the move's own pose, held.
+// What every chamber of the city is, and the fight a section plays in it: one room, its foe and its machines
+// at fixed places round the spot he holds, and a short script of one to three different actions that plays
+// on time once the section arrives (src/lib/scroll/player.ts), at the same speed however the page is
+// scrolled, then holds its end frame. Nothing steps per card and the floor never slides under him.
 
 export interface ChamberInput {
-  /** The beats, one per card. */
-  count: number
   profession: Profession
+  /** A phone sees the canvas's middle only (x 570 to 1030). */
+  phone: boolean
 }
 
-/** A scene's picture as the theatre runs it: its light, an optional set of its own between the hall and
- *  the floor, what stands on its floor (him among it) and the binder that finds the nodes the scroll moves
- *  once and returns the per frame writer. The writer takes the scene's progress (0 when its stage starts to
- *  rise, 1 when it has sunk) and how many of the section's cards have crossed the reading line, fractional. */
+/** A scene's picture as the theatre runs it: its light, its script, an optional set of its own between the
+ *  hall and the floor, what stands on its floor (him among it), and the binder that finds the nodes it moves
+ *  once and returns the writer for a playhead. */
 export interface Chamber {
   light: string
+  script: SceneScript
   set?: (input: ChamberInput) => ReactNode
   floor: (input: ChamberInput) => ReactNode
-  bind: (stage: ParentNode, input: ChamberInput) => StageWriter
+  bind: (stage: ParentNode, input: ChamberInput) => (play: Playhead) => void
 }
 
-/** His frame in a move: his pose, how far he has moved ahead of his place and how high above the floor. */
+/** His frame: his pose, how far he has moved ahead of his place and how high above the floor. */
 export interface Frame {
   pose: DecoPose
   ahead: number
@@ -39,83 +36,56 @@ export interface Frame {
 
 export const still = (pose: DecoPose): Frame => ({ pose, ahead: 0, lift: 0 })
 
-const blend = (a: Frame, b: Frame, t: number): Frame => ({
-  pose: mix(a.pose, b.pose, t),
-  ahead: a.ahead + (b.ahead - a.ahead) * t,
-  lift: a.lift + (b.lift - a.lift) * t,
-})
+/** How far action `i` has played: all of it before, its eased share while it plays, none after. */
+export const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
 
-/** A section's fight: each card's stop, drawn round the spot where he makes his move (x 0 his place, y 0
- *  the floor), behind him and in front of him; his move there; the city's reply to it. */
-export interface Stops {
+/** Where he holds on the floor: right of the text column on a wider screen, at the left of a phone's view
+ *  so his foe and its machines fit right of him. */
+export const holdX = ({ phone }: Pick<ChamberInput, 'phone'>): number => (phone ? 620 : 760)
+
+// A phone's view is too narrow for a fight at full size, so there the whole fight, him with it, is drawn
+// smaller round his feet, his foe and its machines nearer him in the same proportion.
+const PHONE_SCALE = 0.72
+const fightScale = (input: ChamberInput): string | undefined => {
+  if (!input.phone) return undefined
+  const x = holdX(input)
+  return `translate(${x} ${FLOOR}) scale(${PHONE_SCALE}) translate(${-x} ${-FLOOR})`
+}
+
+/** A section's fight: its room drawn round the spot he holds (x 0 his place, y 0 the floor), behind him and
+ *  in front of him, and the binder whose writer moves the room and returns his frame at a playhead. */
+export interface Fight {
   light: string
+  script: SceneScript
   set?: (input: ChamberInput) => ReactNode
-  back: (i: number, input: ChamberInput) => ReactNode
-  front?: (i: number, input: ChamberInput) => ReactNode
-  /** His move at stop `at`, `t` of the way; t 1 is the move's held pose. */
-  move: (profession: Profession, t: number, at: number) => Frame
-  /** Binds the replies and returns their writer: how far each card's reply has played, 0 to 1. */
-  reply: (stage: ParentNode, input: ChamberInput) => (played: (i: number) => number) => void
+  back: (input: ChamberInput) => ReactNode
+  front?: (input: ChamberInput) => ReactNode
+  bind: (stage: ParentNode, input: ChamberInput) => (play: Playhead) => Frame
 }
 
-/** Where he holds on the floor, right of the text column and in a phone's view. */
-export const HOLD_X = 760
-/** The stops stand this far apart; the next one waits one spacing ahead of him. */
-const SPACING = 520
-// One step of his stride carries him this far over the floor.
-const STEP = 70
-
-const stopX = (i: number): number => HOLD_X + SPACING * (i + 1)
-
-function Track({ input, art, name }: { input: ChamberInput; art: (i: number, input: ChamberInput) => ReactNode; name: string }) {
-  return (
-    <g data-fx={name}>
-      {Array.from({ length: input.count }, (_, i) => (
-        <g key={i} transform={`translate(${stopX(i)} ${FLOOR})`}>
-          {art(i, input)}
-        </g>
-      ))}
-    </g>
-  )
-}
-
-/**
- * The beat writer: the floor slid under him, the run between beats, his move at the beat's stop and the
- * city's replies. The run blends out of the last move's held pose while the floor brings the next stop,
- * then the move takes over from the run.
- */
-function beatsOf(stage: ParentNode, input: ChamberInput, stops: Stops): (reached: number) => void {
-  const tracks = [fx(stage, 'stops-back'), fx(stage, 'stops-front')]
-  const root = fx(stage, 'survivor')
-  const joints = root ? decoJoints(root) : null
-  const replies = stops.reply(stage, input)
-  const waiting = still(rest(input.profession))
-  return (reached) => {
-    const beat = trackAt(reached, input.count, SPACING)
-    tracks.forEach((track) => transformTo(track, `translate(${(-beat.offset).toFixed(1)} 0)`))
-    replies((i) => (i < beat.at ? 1 : i === beat.at ? beat.act : 0))
-    const stride = still(walk(input.profession, beat.offset / STEP))
-    const before = beat.at > 0 ? stops.move(input.profession, 1, beat.at - 1) : waiting
-    const frame = beat.act > 0 ? blend(stride, stops.move(input.profession, beat.act, beat.at), ramp(beat.act, 0, 0.15)) : blend(before, stride, ramp(beat.run, 0, 0.4))
-    placeSurvivor(root, HOLD_X + frame.ahead, frame.lift)
-    if (joints) setDecoPose(joints, frame.pose)
-  }
-}
-
-/** A section's fight as a chamber: its stops behind him, him, its stops in front, run by the beat writer,
- *  all in one camera group a reply can push in on. */
-export const stopsChamber = (stops: Stops): Chamber => ({
-  light: stops.light,
-  set: stops.set,
+/** A section's fight as a chamber: its room behind him, him, its room in front, all in one camera group an
+ *  action can push in on. */
+export const fightChamber = (fight: Fight): Chamber => ({
+  light: fight.light,
+  script: fight.script,
+  set: fight.set,
   floor: (input) => (
-    <g data-fx="camera">
-      <Track input={input} art={stops.back} name="stops-back" />
-      <Survivor x={HOLD_X} profession={input.profession} />
-      {stops.front && <Track input={input} art={stops.front} name="stops-front" />}
+    <g transform={fightScale(input)}>
+      <g data-fx="camera">
+        <g transform={`translate(${holdX(input)} ${FLOOR})`}>{fight.back(input)}</g>
+        <Survivor x={holdX(input)} profession={input.profession} />
+        {fight.front && <g transform={`translate(${holdX(input)} ${FLOOR})`}>{fight.front(input)}</g>}
+      </g>
     </g>
   ),
   bind: (stage, input) => {
-    const beats = beatsOf(stage, input, stops)
-    return (_progress, reached) => beats(reached)
+    const root = fx(stage, 'survivor')
+    const joints = root ? decoJoints(root) : null
+    const write = fight.bind(stage, input)
+    return (play) => {
+      const frame = write(play)
+      placeSurvivor(root, holdX(input) + frame.ahead, frame.lift)
+      if (joints) setDecoPose(joints, frame.pose)
+    }
   },
 })

@@ -1,15 +1,16 @@
 import { ramp } from '@/lib/scroll/stage'
+import { mix } from '@/lib/motion/rigPose'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { still, stopsChamber } from '../chamber'
+import { fightChamber, share, still } from '../chamber'
 import { Canvas, FLOOR } from '../city'
 import { Raider, foeOf } from '../foes'
-import { hack } from '../pose'
+import { hack, rest } from '../pose'
 
-// Tech stack: the glass tunnel, the sea pressing on its brass ribs. For each category a security turret
-// stands by its panel with a raider coming down the tunnel beyond it; he drops to one knee at the panel and
-// works its dial, the panel's gauge swings to gold, the turret turns on its post to face the raider and
-// fires, and the raider goes down.
+// Tech stack: the glass tunnel, the sea pressing on its brass ribs. A security turret stands by its panel
+// with a raider coming down the tunnel beyond it; he drops to one knee at the panel and works its dial until
+// the gauge swings to gold; then he rises as the turret turns on its post to face the raider and fires, and
+// the raider goes down.
 
 const PANEL = 120
 const TURRET = 230
@@ -51,39 +52,40 @@ function Turret() {
   )
 }
 
-export const tech = stopsChamber({
+export const tech = fightChamber({
   light: C.waterGlow,
+  script: [1700, 1500],
   set: () => <Tunnel />,
-  back: (i) => (
+  back: () => (
     <>
       <Panel />
-      <g data-fx={`gauge-${i}`} transform={`translate(${PANEL} 0)`} opacity="0">
+      <g data-fx="gauge" transform={`translate(${PANEL} 0)`} opacity="0">
         <circle cx={0} cy={-148} r={14} fill={C.goldBright} />
       </g>
       <g transform={`translate(${TURRET} 0)`}>
-        <g data-fx={`turret-${i}`} transform="rotate(180 0 -170)">
+        <g data-fx="turret" transform="rotate(180 0 -170)">
           <Turret />
         </g>
       </g>
-      <path data-fx={`shot-${i}`} d={`M${TURRET + 80} -170 L${FOE} -170`} stroke={C.goldBright} strokeWidth="6" opacity="0" />
+      <path data-fx="shot" d={`M${TURRET + 80} -170 L${FOE} -170`} stroke={C.goldBright} strokeWidth="6" opacity="0" />
       <g transform={`translate(${FOE} 0)`}>
-        <Raider name={`raider-${i}`} />
+        <Raider name="raider" />
       </g>
     </>
   ),
-  move: (profession, t) => still(hack(profession, t)),
-  reply: (stage, { count }) => {
-    const gauges = Array.from({ length: count }, (_, i) => fx(stage, `gauge-${i}`))
-    const turrets = Array.from({ length: count }, (_, i) => fx(stage, `turret-${i}`))
-    const shots = Array.from({ length: count }, (_, i) => fx(stage, `shot-${i}`))
-    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
-    return (played) =>
-      foes.forEach((foe, i) => {
-        const t = played(i)
-        fadeTo(gauges[i], ramp(t, 0.45, 0.55))
-        transformTo(turrets[i], `rotate(${(180 * (1 - ramp(t, 0.5, 0.65))).toFixed(1)} 0 -170)`)
-        fadeTo(shots[i], t > 0.68 && t < 0.82 ? 1 : 0)
-        foe(t, null, [0.75, 0.9])
-      })
+  bind: (stage, { profession }) => {
+    const gauge = fx(stage, 'gauge')
+    const turret = fx(stage, 'turret')
+    const shot = fx(stage, 'shot')
+    const foe = foeOf(stage, 'raider')
+    return (play) => {
+      const worked = share(play, 0)
+      const fired = share(play, 1)
+      fadeTo(gauge, ramp(worked, 0.75, 0.95))
+      transformTo(turret, `rotate(${(180 * (1 - ramp(fired, 0.05, 0.4))).toFixed(1)} 0 -170)`)
+      fadeTo(shot, fired > 0.45 && fired < 0.62 ? 1 : 0)
+      foe(fired, null, [0.55, 0.8])
+      return still(mix(hack(profession, worked), rest(profession), ramp(fired, 0, 0.4)))
+    }
   },
 })

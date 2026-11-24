@@ -1,13 +1,18 @@
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { still, stopsChamber } from '../chamber'
+import { elapsedOf, type SceneScript } from '@/lib/scroll/player'
+import { fightChamber, share, still } from '../chamber'
 import { Arc, Raider, foeOf } from '../foes'
 import { drum } from '../pose'
 
-// Bands: theatre row. For each band he plays a roll on the snare at his waist under a dark marquee while a
-// raider comes at him; the roll charges the stick, the spark leaps off it into the raider, who goes down,
-// and the marquee's bulbs and its neon frame come on.
+// Bands: theatre row. He plays a roll on the snare at his waist under a dark marquee, a raider before him,
+// and the roll charges the sticks; then the spark leaps off them into the raider, who goes down, and the
+// marquee's bulbs and its neon frame come on.
+
+const BANDS_SCRIPT: SceneScript = [1800, 1400]
+// One stroke of the roll, in ms.
+const BEAT_MS = 110
 
 const MARQUEE = 160
 const FOE = 320
@@ -40,32 +45,34 @@ function Lit() {
   )
 }
 
-export const bands = stopsChamber({
+export const bands = fightChamber({
   light: C.neonPink,
-  back: (i) => (
+  script: BANDS_SCRIPT,
+  back: () => (
     <>
       <g transform={`translate(${MARQUEE} 0)`}>
         <Marquee />
-        <g data-fx={`lit-${i}`} opacity="0">
+        <g data-fx="lit" opacity="0">
           <Lit />
         </g>
       </g>
       <g transform={`translate(${FOE} 0)`}>
-        <Raider name={`raider-${i}`} />
+        <Raider name="raider" />
       </g>
-      <Arc name={`raider-${i}`} x={FOE} />
+      <Arc name="raider" x={FOE} />
     </>
   ),
-  // The sticks keep time with the scroll: four beats a card.
-  move: (_profession, t) => still(drum(Math.min(1, t * 3), t * 4)),
-  reply: (stage, { count }) => {
-    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
-    const lits = Array.from({ length: count }, (_, i) => fx(stage, `lit-${i}`))
-    return (played) =>
-      foes.forEach((foe, i) => {
-        const t = played(i)
-        foe(t, [0.5, 0.65], [0.62, 0.8])
-        fadeTo(lits[i], ramp(t, 0.8, 0.9))
-      })
+  bind: (stage) => {
+    const foe = foeOf(stage, 'raider')
+    const lit = fx(stage, 'lit')
+    return (play) => {
+      const rolled = share(play, 0)
+      const sparked = share(play, 1)
+      foe(sparked, [0.1, 0.4], [0.35, 0.7])
+      fadeTo(lit, ramp(sparked, 0.7, 0.9))
+      // the sticks keep one tempo on the clock, whatever the easing; the roll swells, then dies away
+      const beats = elapsedOf(BANDS_SCRIPT, play) / BEAT_MS
+      return still(drum(ramp(rolled, 0, 0.3) * (1 - ramp(sparked, 0.4, 1)), beats))
+    }
   },
 })

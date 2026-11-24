@@ -1,30 +1,33 @@
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import type { Chamber } from '../chamber'
+import { share, type Chamber } from '../chamber'
 import { Canvas, FLOOR, Survivor, placeSurvivor } from '../city'
-import { decoJoints, revive, setDecoPose } from '../pose'
+import { decoJoints, lift, revive, setDecoPose } from '../pose'
 
-// Contact: the revival chamber at the bottom of the city, where the survivor always comes back. As the
-// contact rises its glass lights teal and he is put back together inside it from the feet up, standing
-// ready when the scroll reaches the end.
+// Contact: the revival chamber at the bottom of the city, where the survivor always comes back. Its glass
+// lights teal and he is put back together inside it from the feet up; then its light fades and he stands
+// ready, the charged hand raised and crackling.
 
-const TUBE = { x: 1200, width: 260, top: 330 }
-const REVIVED_BY = 0.55
+const TUBE = { width: 260, top: 330 }
+// The tube stands right of the text column, in the middle of a phone's view.
+const tubeX = (phone: boolean): number => (phone ? 800 : 1200)
+// How far up he raises the charged hand once he is whole.
+const READY = 0.4
 
 /** The chamber's glass tube with its gold crown and base, its light off until he is revived. */
-function Tube() {
-  const left = TUBE.x - TUBE.width / 2
+function Tube({ x }: { x: number }) {
+  const left = x - TUBE.width / 2
   return (
     <Canvas>
       <g data-fx="revival" opacity="0">
         <rect x={left} y={TUBE.top} width={TUBE.width} height={FLOOR - TUBE.top} fill={C.revival} opacity="0.22" />
-        <circle cx={TUBE.x} cy={FLOOR - 200} r={260} fill={C.revival} opacity="0.12" />
+        <circle cx={x} cy={FLOOR - 200} r={260} fill={C.revival} opacity="0.12" />
       </g>
       <rect x={left} y={TUBE.top} width={TUBE.width} height={FLOOR - TUBE.top} rx={40} fill="none" stroke={C.brassMid} strokeWidth="8" />
       <path d={`M${left + 40} ${TUBE.top + 30} V${FLOOR - 40}`} stroke={C.cream} strokeWidth="6" opacity="0.25" />
-      <path d={`M${left - 30} ${TUBE.top} L${TUBE.x} ${TUBE.top - 110} L${left + TUBE.width + 30} ${TUBE.top} Z`} fill={C.brassMid} stroke={C.gold} strokeWidth="4" />
-      <circle cx={TUBE.x} cy={TUBE.top - 34} r={18} fill={C.revival} />
+      <path d={`M${left - 30} ${TUBE.top} L${x} ${TUBE.top - 110} L${left + TUBE.width + 30} ${TUBE.top} Z`} fill={C.brassMid} stroke={C.gold} strokeWidth="4" />
+      <circle cx={x} cy={TUBE.top - 34} r={18} fill={C.revival} />
       <rect x={left - 30} y={FLOOR - 24} width={TUBE.width + 60} height={24} fill={C.brassDark} stroke={C.gold} strokeWidth="3" />
     </Canvas>
   )
@@ -32,17 +35,21 @@ function Tube() {
 
 export const contact: Chamber = {
   light: C.revival,
-  set: () => <Tube />,
-  floor: ({ profession }) => <Survivor x={TUBE.x} profession={profession} />,
-  bind: (stage, { profession }) => {
+  script: [2200, 1400],
+  set: ({ phone }) => <Tube x={tubeX(phone)} />,
+  floor: ({ profession, phone }) => <Survivor x={tubeX(phone)} profession={profession} />,
+  bind: (stage, { profession, phone }) => {
     const glow = fx(stage, 'revival')
     const root = fx(stage, 'survivor')
     const joints = root ? decoJoints(root) : null
-    placeSurvivor(root, TUBE.x)
-    return (progress) => {
-      const t = ramp(progress, 0.05, REVIVED_BY)
-      fadeTo(glow, t)
-      if (joints) setDecoPose(joints, revive(profession, t))
+    placeSurvivor(root, tubeX(phone))
+    return (play) => {
+      // the knitting is the first three quarters of the revival, the light's fade its last quarter
+      const knit = 0.75 * share(play, 0)
+      const ready = share(play, 1)
+      fadeTo(glow, ramp(knit, 0, 0.25) * (1 - ready))
+      const revived = revive(profession, knit + 0.25 * ready)
+      if (joints) setDecoPose(joints, ready > 0 ? { ...lift(profession, READY * ready), chamber: revived.chamber } : revived)
     }
   },
 }

@@ -1,14 +1,14 @@
 import type { Profession } from '@/lib/cv/professions'
-import { STAND as RIG_STAND, mix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
+import { STAND as RIG_STAND, mix, type RigPose } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
 import s from './sprite.module.css'
 
-// The survivor posed by the scroll, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
+// The survivor posed by his scene's actions, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
 // numbers, plus his own kit on top, each 0 to 1: the bolt out of the charged hand, the wrench's arc, the
 // audio diary by his face, the sparks over the fingers, the spark off the snare, the revival chamber's light
 // and how far he is knit back together in it. His front side (the charged arm, the near leg) is the rig's
-// right, his back side its left; he faces right, so he runs with the rig's profile stride facing 1.
+// right, his back side its left; he faces right.
 
 export type DecoPose = RigPose & { head: number; bolt: number; arc: number; recorder: number; sparks: number; hit: number; chamber: number; knit: number }
 
@@ -25,24 +25,6 @@ const KIT: Record<Profession, DecoPose> = {
 
 /** He stands in his kit. */
 export const rest = (profession: Profession): DecoPose => KIT[profession]
-
-/** His run between beats at `phase` (rising as he goes on), the legs on the rig's profile stride; the engineer swings his
- *  arms with it, the sticks and the guard stay up. */
-export function walk(profession: Profession, phase: number): DecoPose {
-  const stride = rigWalk(phase, 1)
-  const kit = KIT[profession]
-  const swing = profession === 'engineer' ? 1 : 0
-  return {
-    ...kit,
-    rise: stride.rise,
-    thighRight: kit.thighRight + stride.thighRight,
-    thighLeft: stride.thighLeft,
-    shinRight: stride.shinRight,
-    shinLeft: stride.shinLeft,
-    armRight: kit.armRight + swing * stride.armRight,
-    armLeft: kit.armLeft + swing * stride.armLeft,
-  }
-}
 
 /** The charged hand thrown forward and the bolt forked out of it, `t` of the way. */
 const ZAP = pose({ armRight: -75, foreRight: -12, lean: -3 })
