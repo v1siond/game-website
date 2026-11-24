@@ -1,0 +1,35 @@
+/*
+ * His stage figure (dweller.tsx), side on. Every part turns round its own joint in the 100 by 150 viewBox
+ * (transform-box: view-box): the whole of him round his feet, both arms at one shoulder and their elbows,
+ * the legs at the hips side by side and the knees, so a forearm turns at the elbow wherever the shoulder
+ * took it. A scene's writer (pose.ts) poses the parts with inline transforms from its playhead. The held
+ * props (the pistol and its flash, the bobblehead, the syringe, the radio) and the wrist alarm rest hidden.
+ * Transform and opacity only.
+ */
+
+.dweller * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 52px 144px; }
+.armBack,
+.armFront { transform-origin: 52px 58px; }
+.foreBack,
+.foreFront { transform-origin: 52px 74px; }
+.thighBack { transform-origin: 49px 96px; }
+.thighFront { transform-origin: 55px 96px; }
+.shinBack { transform-origin: 49px 120px; }
+.shinFront { transform-origin: 55px 120px; }
+.held { transform-origin: 52px 89px; }
+.heldHead { transform-origin: 0 -9px; }
+.dial { transform-origin: 70.5px 70px; }
+.needle { transform-origin: 52px 83px; transform: rotate(-60deg); }
+
+.pistol,
+.flash,
+.held,
+.syringe,
+.radio,
+.alarm {
+  opacity: 0;
+}

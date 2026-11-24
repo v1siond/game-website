@@ -2,20 +2,24 @@ import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import type { Labels } from '@/lib/cv/labels'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, fx, lerp, r1, transformTo } from '../shared/stageNodes'
-import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
+import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '../shared/stageNodes'
+import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { DoorArt } from './shelterDoor'
 import { DogFigure, PACK } from './dog'
 import { MutantFigure } from './mutant'
+import { Bobblehead } from './dweller'
 import { GROUND, type Zone } from './zones'
 import {
   BAKELITE,
   BRASS,
   CHROME,
   CREAM,
+  DUST_DARK,
   GLASS,
+  HAZE_SUN,
   INK,
   OLIVE,
   OLIVE_DARK,
@@ -23,7 +27,6 @@ import {
   PHOSPHOR,
   PHOSPHOR_DEEP,
   POLE,
-  POSTER_BLUE,
   POSTER_INK,
   RUST,
   SHELTER_YELLOW,
@@ -32,167 +35,159 @@ import {
   WARNING_RED,
 } from './palette'
 import {
+  AIM,
+  BLOCK,
   FOE_DOWN,
   FOE_GUARD,
-  FOE_KICKED,
   FOE_KNEED,
   FOE_SWING,
-  BLOCK,
-  GUARD,
+  HOLD_UP,
+  JAB,
+  KEYS,
+  KICK,
+  KIT,
+  KNEE,
+  KNEEL,
+  PICK,
+  POINT,
+  RADIO,
+  REACH,
+  SHADE,
   SITTING,
-  STAND,
   STANDING,
-  aim,
+  WRIST,
   dogJoints,
   foeJoints,
-  kick,
-  knee,
   mix,
-  mixFoe,
-  lockpick,
   mixDog,
-  point,
+  mixFoe,
+  pose,
   setDogPose,
   setFoePose,
-  sneak,
-  tune,
-  thumbsUp,
   trot,
-  typing,
   walk,
   type DogPose,
-  type SurvivorPose,
+  type DwellerPose,
+  type FoePose,
 } from './pose'
 
-// Each part of the page as a scene of the walk out of the shelter, played the way a wasteland RPG's hero
-// plays: its place (the shelter, the wasteland, the town at dusk), his kit, the props it holds (one per card
-// the section counts) and, per frame, what the props and he do at the scene's progress p (0 when its stage
-// starts to rise, 1 when it has sunk) with f of its cards reached (0 to count, fractional). Each card is one
-// beat that ends back at rest, so the scroll plays it forward and back with no jump between cards. About:
-// he levels up at the wrist terminal under the shelter's posters, one poster and its pip lit per card.
-// Work: he sneaks crouched from quest flag to quest flag and runs each one up. Tech: he picks the lock of a
-// footlocker per category, on one knee. Services: he keys a locked set per service, two rows miss, the
-// third matches and the tube boots. Projects: per project the targeting freeze, the lock and its hit ring
-// on a board, the camera pushed in for the slow shot. Ventures: he points, and one of his three dogs in turn
-// runs out, digs a tape out of its mound and trots back to heel. Bands: he turns the radio's dial and a mast
-// lamp lights per station. Muay Thai: a turn fight on a row of hexes, his step and strike, then the mutant's
-// swing and his block; the last turn freezes, pushes in and drops the mutant. Contact: he and the three
-// dogs walk out to the public terminal. The hero: him and the three dogs in the shelter, the cog door
-// rolled aside.
+// Each part of the page as one place of the walk out of the shelter, played the way the atomic age RPG it
+// comes from plays: he stands at one spot under a fixed camera and the shared scene player moves his move
+// through the scene's script of one to three actions (src/lib/scroll/player.ts), each action its own stretch
+// of the move, so every frame is a function of the playhead alone, plays the same backward, and the last
+// action's end is the frame reduced motion shows. Hero: the cog door rolls aside and he walks out into the
+// glare, shading his eyes, the dogs up. About: he raises the wrist computer, then takes the bobblehead off its
+// stand and a pip lights. Work: the targeting freeze on a mutant behind a wreck, the hit percents, the slowed
+// shot under the pushed in camera. Tech: on one knee he picks the footlocker's lock. Services: he steps into the
+// power armour from behind, it closes, and he lands the stomp. Projects: the wrist needle climbs over the
+// glowing crater, he backs off and jabs the syringe. Ventures: he points and the husky digs up the tape and
+// brings it back. Bands: he tunes the radio and the mast lights. Muay Thai: a turn fight with the mutant, his
+// knee, its swing and his block, the freeze and the slowed kick. Contact: he walks out to the public terminal
+// and keys it, the dogs at heel.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-type Layout = PropLayout
+/** What a scene's art and writer read: the phone's narrower view, the kit he wears. */
+export interface SceneInput {
+  phone: boolean
+  kit: Profession
+}
 
-/** Him in a frame: where his boots are, his size, his pose and how visible he is. */
-export type SurvivorState = FigureState<SurvivorPose>
+/** His frame in a move: his pose, how far ahead of his spot he is, and how much of him shows. */
+interface Frame {
+  pose: DwellerPose
+  ahead: number
+  opacity?: number
+}
 
 export interface SceneDef {
   zone: Zone
   /** His kit in the scene; null takes the profession the page shows. */
   kit: Profession | null
-  /** Whether he holds the bakelite radio. */
-  radio?: boolean
-  /** The props behind him and in front of him, drawn in the figure layer. */
-  back: (layout: Layout) => ReactNode
-  front: (layout: Layout) => ReactNode
-  bind: (stage: StageNodes, layout: Layout) => FigureWriter<SurvivorPose>
+  /** The scene's actions, each its length in ms. */
+  script: SceneScript
+  /** Where each action ends on the move's t, one per action, the last 1. */
+  ends: readonly number[]
+  /** How far right of his usual spot he stands on a wide screen, clear of a wide hero card. */
+  wideShift?: number
+  /** The place's art round his spot (x 0 his spot, y 0 the ground), behind him and in front of him. */
+  back: (input: SceneInput) => ReactNode
+  front?: (input: SceneInput) => ReactNode
+  /** His move `t` of the way. */
+  move: (kit: Profession, t: number) => Frame
+  /** Binds the place's reply to his move and returns its writer over the move's t. */
+  reply: (stage: StageNodes, input: SceneInput) => (t: number) => void
 }
 
-// The band the props stand in: right of the text column on a wide screen, the middle a phone shows.
-const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [940, 1340], phone: [580, 860] }
+/** Him in a frame, as the shared figure scene places him. */
+export type DwellerState = FigureState<DwellerPose>
 
-/** A prop's size where many share the band: its own size while the gap between props fits its `width`,
- *  smaller as they crowd, never under half. */
-const fitOf = (xs: readonly number[], width: number): number => (xs.length < 2 ? 1 : Math.max(0.45, Math.min(1, (xs[1] - xs[0]) / width)))
+// His size on the stage, and where he stands: right of the text column on a wide screen, the left of a
+// phone's view (about x 490 to 950) so the place before him shows whole.
+const K = 1.6
+const spotOf = (phone: boolean): number => (phone ? 560 : 860)
 
-const propAt = (x: number, y: number, fit: number): string => `translate(${r1(x)} ${r1(y)}) scale(${fit.toFixed(3)})`
+/** On a phone's narrow view the place round his spot, and he, are drawn at this share of their size. */
+export const placeScale = (phone: boolean): number => (phone ? 0.8 : 1)
 
-const K = 1.5
-const NONE = (): ReactNode => null
+/** Before the section arrives a scene shows its first frame. */
+const START: Playhead = { action: 0, t: 0, done: false }
 
-// He comes in from this far left of the first prop as its card nears the reading line.
-const ENTRY = 80
+/** How far the move has played at `play`: each action plays its stretch, from the end of the one before to its
+ *  own end on the move's t. */
+const moveAt = (ends: readonly number[], { action, t }: Playhead): number => lerp(action > 0 ? ends[action - 1] : 0, ends[action] ?? 1, t)
 
-const survivor = (zone: Zone, x: number, pose: SurvivorPose, k = K, opacity = 1): SurvivorState => ({ x, y: GROUND[zone], k, pose, opacity })
-
-// ---------------------------------------------------------------- the beat of a card
-
-/** The card whose beat plays with f cards reached, and how far into its beat, 0 to 1; f = count is the
- *  last card's beat ended, the settled frame. */
-const beatOf = (f: number, count: number): { at: number; t: number } => {
-  const at = Math.min(count - 1, Math.max(0, Math.floor(f)))
-  return { at, t: clamp01(f - at) }
-}
-
-/** 0 outside from..to, rising to 1 and falling back inside it: a move that starts and ends at rest. */
+/** 0 outside from..to, rising to 1 and back inside it. */
 const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
-
-/** Up over in..held, held at 1, down over out..to. */
-const hold = (t: number, from: number, held: number, out: number, to: number): number => ramp(t, from, held) * (1 - ramp(t, out, to))
 
 const ease = (t: number): number => t * t * (3 - 2 * t)
 
-interface Station {
-  x: number
-  at: number
-  /** How far he has moved on to this card's spot, 0 to 1. */
-  go: number
-  /** The beat after he got there, 0 to 1. */
-  act: number
-  /** The step cycle of his move between spots: whole numbers at every spot. */
-  phase: number
-}
+const still = (p: DwellerPose, ahead = 0): Frame => ({ pose: p, ahead })
 
-/** He moves to the spot `offset` from card at's prop over the first `run` of its beat and acts over the rest;
- *  the first card's move starts ENTRY short of it. */
-function station(xs: readonly number[], f: number, offset: number, run: number): Station {
-  const { at, t } = beatOf(f, xs.length)
-  const go = ramp(t, 0, run)
-  const from = at === 0 ? xs[0] + offset - ENTRY : xs[at - 1] + offset
-  return { x: lerp(from, xs[at] + offset, ease(go)), at, go, act: ramp(t, run, 1), phase: (at + go) * 2 }
-}
+/** His pose over a stretch of the move: from `a` to `b` while t runs from..to. */
+const blend = (a: DwellerPose, b: DwellerPose, t: number, from: number, to: number): DwellerPose => mix(a, b, ease(ramp(t, from, to)))
 
-// ---------------------------------------------------------------- the camera and the freeze
+// ---------------------------------------------------------------- the camera and the targeting freeze
 
-// One canvas unit on screen: the planes cover the screen sliced from the 1440 by 900 canvas (stage.tsx).
-const UNIT = 'max(100vw / 1440, 100vh / 900)'
-
-/** The canvas point (x, y) on its plane as a CSS transform origin: the canvas sits centred across and on the
- *  bottom edge. */
-const originOf = (x: number, y: number): string => `calc(50% + ${r1(x - 720)} * ${UNIT}) calc(100% - ${r1(900 - y)} * ${UNIT})`
-
-/** The camera of the scene: every plane (stage.tsx marks each data-fx="cam-<layer>") pushed in on one point. A
- *  CSS scale on the plane, so the push is composited rather than the planes redrawn each frame. */
+/** The camera of the scene: every plane's group (stage.tsx marks each data-fx="cam-<layer>") pushed in on one
+ *  canvas point, as an SVG transform, so it holds on a phone's view as on the wide one. */
 function cameraWriter(stage: StageNodes): (x: number, y: number, zoom: number) => void {
-  const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`) as SVGElement | null)
-  return (x, y, zoom) => {
-    const pushed = zoom > 1
-    planes.forEach((plane) => {
-      if (!plane) return
-      plane.style.transformOrigin = originOf(x, y)
-      plane.style.transform = pushed ? `scale(${zoom.toFixed(3)})` : ''
-      plane.style.willChange = pushed ? 'transform' : ''
-    })
-  }
+  const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`))
+  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, zoom > 1 ? focusOn(x, y, zoom) : ''))
 }
 
-// How far the camera pushes in on the target for the slow shot.
+// How far the camera pushes in on the target for the slowed shot.
 const PUSH = 0.35
 
-/** The targeting freeze: the place washed in the terminal's green while the shot is lined up. */
-const Freeze = () => <rect data-fx="freeze" width={1440} height={900} fill={PHOSPHOR} opacity={0} />
+/** The targeting freeze: the place washed in the wrist screen's green while the shot is lined up. */
+const Freeze = () => <rect data-fx="freeze" x={-1600} y={-1200} width={4000} height={2600} fill={PHOSPHOR} opacity={0} />
 
-// ---------------------------------------------------------------- his three dogs, the second figures some scenes hold
+/** A targeting box round a part with its hit percent on a dark tab. */
+function Target({ name, x, y, size, odds }: { name: string; x: number; y: number; size: number; odds: number }) {
+  const h = size / 2
+  return (
+    <g data-fx={name} opacity={0} transform={`translate(${x} ${y})`}>
+      <path d={`M${-h} ${-h + 10} V${-h} H${-h + 10} M${h - 10} ${-h} H${h} V${-h + 10} M${h} ${h - 10} V${h} H${h - 10} M${-h + 10} ${h} H${-h} V${h - 10}`} fill="none" stroke={PHOSPHOR} strokeWidth={4} />
+      <rect x={h + 6} y={-14} width={58} height={28} rx={3} fill={INK} />
+      <text x={h + 35} y={7} textAnchor="middle" fontFamily="monospace" fontSize={20} fontWeight={700} fill={PHOSPHOR}>
+        {odds}%
+      </text>
+    </g>
+  )
+}
+
+// ---------------------------------------------------------------- his three dogs
 
 const DOG_K = 1.25
 
-/** Dog `i` of the pack, its 120 by 80 viewBox feet on y 69, placed on the ground by the writer. */
-function Dog({ zone, x, i }: { zone: Zone; x: number; i: number }) {
+const dogAt = (x: number, facing: 1 | -1): string => `translate(${r1(x)} 0) scale(${facing} 1)`
+
+/** Dog `i` of the pack at x, its 120 by 80 viewBox's feet on y 69. */
+function Dog({ x, i }: { x: number; i: number }) {
   const breed = PACK[i]
   const k = DOG_K * breed.size
   return (
-    <g data-fx={`dog-${i}`} transform={dogAt(zone, x, 1)}>
+    <g data-fx={`dog-${i}`} transform={dogAt(x, 1)}>
       <svg x={-60 * k} y={-69 * k} width={120 * k} height={80 * k} viewBox="0 0 120 80" overflow="visible">
         <DogFigure breed={breed} />
       </svg>
@@ -200,524 +195,704 @@ function Dog({ zone, x, i }: { zone: Zone; x: number; i: number }) {
   )
 }
 
-const dogAt = (zone: Zone, x: number, facing: 1 | -1): string => `translate(${r1(x)} ${GROUND[zone]}) scale(${facing} 1)`
-
 /** All three dogs at `xs`, the first drawn last so it stands in front. */
-const Pack = ({ zone, xs }: { zone: Zone; xs: readonly number[] }) => (
+const Pack = ({ xs }: { xs: readonly number[] }) => (
   <>
     {[2, 1, 0].map((i) => (
-      <Dog key={i} zone={zone} x={xs[i]} i={i} />
+      <Dog key={i} x={xs[i]} i={i} />
     ))}
   </>
 )
 
 type DogWriter = (i: number, x: number, pose: DogPose, facing?: 1 | -1) => void
 
-/** The pack's writer: where dog i stands, which way it faces and its pose. */
-function packWriter(stage: StageNodes, zone: Zone): DogWriter {
+function packWriter(stage: StageNodes): DogWriter {
   const dogs = PACK.map((_, i) => {
     const group = fx(stage, `dog-${i}`)
     return { group, joints: group && dogJoints(group) }
   })
-  return (i, x, pose, facing = 1) => {
+  return (i, x, dogPose, facing = 1) => {
     const { group, joints } = dogs[i]
-    transformTo(group, dogAt(zone, x, facing))
-    if (joints) setDogPose(joints, pose)
+    transformTo(group, dogAt(x, facing))
+    if (joints) setDogPose(joints, dogPose)
   }
 }
 
-// ---------------------------------------------------------------- the hero
+// ---------------------------------------------------------------- the mutant
 
-const DOOR = 320
+const FOE_K = 1.6
 
-// Where the door, he and the dogs stand: right of the wrist terminal on a wide screen, in the middle a phone shows.
-const HERO_AT = {
-  wide: { door: 760, him: 1180, dogs: [1300, 1065, 960] },
-  phone: { door: 470, him: 760, dogs: [870, 660, 570] },
+/** The mutant, its 120 by 150 viewBox's feet at (66, 146), facing left toward him. */
+function Mutant({ x }: { x: number }) {
+  return (
+    <g data-fx="foe" transform={`translate(${x} 0)`}>
+      <svg x={-66 * FOE_K} y={-146 * FOE_K} width={120 * FOE_K} height={150 * FOE_K} viewBox="0 0 120 150" overflow="visible">
+        <MutantFigure />
+      </svg>
+    </g>
+  )
 }
 
-const doorAt = (x: number, p: number): string => `translate(${r1(x + 60 * p)} ${GROUND.shelter - DOOR}) rotate(${r1(40 * p)} ${DOOR * 1.05} ${DOOR / 2})`
+/** The mutant's head from its feet, where the targeting box and the shot land. */
+const FOE_HEAD = { x: (40 - 66) * FOE_K, y: (40 - 146) * FOE_K }
+
+function foeWriter(stage: StageNodes): (foePose: FoePose, lift?: number) => void {
+  const foe = fx(stage, 'foe')
+  const joints = foe && foeJoints(foe)
+  return (foePose) => {
+    if (joints) setFoePose(joints, foePose)
+  }
+}
+
+// The pistol's muzzle with the pistol up (AIM), from his spot: the 100 by 150 box's (106, 58) at his size.
+const MUZZLE = { x: (106 - 52) * K, y: -(144 - 58) * K }
+
+/** The round of the slowed shot and the hit's burst, both resting hidden. */
+function Round({ to }: { to: { x: number; y: number } }) {
+  return (
+    <>
+      <g data-fx="round" opacity={0}>
+        <path d="M-18 0 H0" stroke={SHELTER_YELLOW} strokeWidth={5} strokeLinecap="round" />
+        <circle r={4} fill={CREAM} />
+      </g>
+      <path
+        data-fx="burst"
+        transform={`translate(${to.x} ${to.y})`}
+        d="M0 -30 L8 -10 L28 -14 L12 2 L24 20 L4 10 L-6 30 L-8 8 L-28 12 L-14 -4 L-26 -20 L-6 -12 Z"
+        fill={SHELTER_YELLOW}
+        stroke={POSTER_INK}
+        strokeWidth={3}
+        opacity={0}
+      />
+    </>
+  )
+}
+
+function roundWriter(stage: StageNodes, from: { x: number; y: number }, to: { x: number; y: number }): (flight: number, hit: number) => void {
+  const round = fx(stage, 'round')
+  const burst = fx(stage, 'burst')
+  return (flight, hit) => {
+    fadeTo(round, flight > 0 && flight < 1 ? 1 : 0)
+    transformTo(round, `translate(${r1(lerp(from.x, to.x, flight))} ${r1(lerp(from.y, to.y, flight))})`)
+    fadeTo(burst, hit)
+  }
+}
+
+// ---------------------------------------------------------------- Hero: the cog door
+
+const DOOR = { x: 210, size: 300, rolled: 340 }
+const HERO_DOGS = [-60, -115, -170]
 
 const hero: SceneDef = {
   zone: 'shelter',
   kit: null,
-  back: ({ phone }) => (
+  wideShift: 150,
+  script: [1600, 1800],
+  ends: [0.45, 1],
+  back: () => (
     <>
-      <ellipse cx={HERO_AT[phone ? 'phone' : 'wide'].door + DOOR / 2 - 20} cy={GROUND.shelter - DOOR / 2} rx={DOOR / 2 + 6} ry={DOOR / 2 + 6} fill={INK} opacity={0.8} />
-      <g data-fx="door" transform={doorAt(HERO_AT[phone ? 'phone' : 'wide'].door, 0)}>
-        <DoorArt x={DOOR * 0.55} width={DOOR} height={DOOR} />
+      {/* the opening in the wall and the glare of the outside through it */}
+      <circle cx={DOOR.x} cy={-DOOR.size / 2 - 4} r={DOOR.size / 2 + 4} fill={INK} />
+      <circle data-fx="glare" cx={DOOR.x} cy={-DOOR.size / 2 - 4} r={DOOR.size / 2 - 10} fill={HAZE_SUN} opacity={0} />
+      <path data-fx="beam" d={`M${DOOR.x - 130} -20 L${DOOR.x + 130} -20 L${DOOR.x + 260} 14 L${DOOR.x - 300} 14 Z`} fill={HAZE_SUN} opacity={0} />
+      <path d={`M${DOOR.x - 160} 0 H${DOOR.x + 380}`} stroke={STEEL} strokeWidth={8} />
+      <path d={`M${DOOR.x - 150} 0 H${DOOR.x + 370}`} stroke={BRASS} strokeWidth={3} strokeDasharray="6 10" />
+      {/* the warning light over the opening */}
+      <g transform={`translate(${DOOR.x - 170} -320)`}>
+        <rect x={-14} y={-6} width={28} height={30} rx={6} fill={STEEL_LIGHT} stroke={POSTER_INK} strokeWidth={3} />
+        <circle data-fx="alarm" cy={4} r={10} fill={WARNING_RED} opacity={0.2} />
       </g>
+      <Pack xs={HERO_DOGS} />
     </>
   ),
-  front: ({ phone }) => <Pack zone="shelter" xs={HERO_AT[phone ? 'phone' : 'wide'].dogs} />,
-  bind: (stage, { phone }) => {
+  front: () => (
+    <g data-fx="door">
+      <DoorArt x={DOOR.x - DOOR.size / 2} y={-DOOR.size - 4} width={DOOR.size} height={DOOR.size} />
+    </g>
+  ),
+  // he waits at his spot, then walks out to the edge of the opening and shades his eyes against the glare
+  move: (kit, t) => {
+    const out = ramp(t, 0.45, 0.8)
+    const walking = out > 0 && out < 1
+    const shade = ramp(t, 0.78, 0.95)
+    return still(walking ? walk(out * 4) : blend(KIT[kit], pose({ ...KIT[kit], ...SHADE }), shade, 0, 1), 70 * ease(out))
+  },
+  reply: (stage) => {
     const door = fx(stage, 'door')
-    const dogs = packWriter(stage, 'shelter')
-    const at = HERO_AT[phone ? 'phone' : 'wide']
-    return (p) => {
-      // the door has rolled aside from the opening: as the page moves on it rolls a little further on its track
-      transformTo(door, doorAt(at.door, p))
-      // the shepherds prick their ears at the open door; the husky gets up, ready to go
-      const looked = ramp(p, 0.2, 0.5)
-      dogs(0, at.dogs[0], { ...SITTING, look: looked })
-      dogs(1, at.dogs[1], { ...SITTING, look: looked })
-      dogs(2, at.dogs[2], mixDog(SITTING, { ...STANDING, look: 1 }, ramp(p, 0.15, 0.45)))
-      return survivor('shelter', at.him, { ...STAND, rise: -1.5 * Math.sin(p * 12) }, phone ? 1.9 : 2.1)
+    const glare = fx(stage, 'glare')
+    const beam = fx(stage, 'beam')
+    const alarm = fx(stage, 'alarm')
+    const dogs = packWriter(stage)
+    return (t) => {
+      // the purge light, the door pulled out of its seat, then rolled aside along its rack
+      fadeTo(alarm, 0.2 + 0.8 * Math.abs(Math.sin(ramp(t, 0, 0.4) * Math.PI * 3)))
+      const pulled = ease(ramp(t, 0.08, 0.2))
+      const rolled = ease(ramp(t, 0.2, 0.45))
+      const cx = DOOR.x + DOOR.rolled * rolled
+      const cy = -DOOR.size / 2 - 4
+      const size = 1 + 0.05 * pulled
+      transformTo(door, `translate(${r1(cx)} ${r1(cy)}) rotate(${r1(150 * rolled)}) scale(${size.toFixed(3)}) translate(${-DOOR.x} ${-cy})`)
+      fadeTo(glare, ramp(t, 0.2, 0.45))
+      fadeTo(beam, 0.5 * ramp(t, 0.3, 0.5))
+      // the dogs get up and look out
+      const up = ramp(t, 0.5, 0.75)
+      HERO_DOGS.forEach((x, i) => dogs(i, x, mixDog(SITTING, { ...STANDING, look: 1 }, up)))
     }
   },
 }
 
-// ---------------------------------------------------------------- About: the posters on the shelter wall
+// ---------------------------------------------------------------- About: the bobblehead stand
 
-const POSTER_Y = 380
+const SHELF = { x: 66, y: -126 }
+const PIPS = 5
 
 const about: SceneDef = {
   zone: 'shelter',
   kit: null,
-  back: ({ xs }) => (
+  script: [1400, 1800],
+  ends: [0.4, 1],
+  back: () => (
     <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(x, POSTER_Y, fitOf(xs, 96))}>
-          <rect x={-44} y={-62} width={88} height={124} fill={CREAM} stroke={POSTER_INK} strokeWidth={4} />
-          <g data-fx={`poster-${i}`} opacity={0.2}>
-            <rect x={-36} y={-54} width={72} height={70} fill={SHELTER_YELLOW} />
-            <path d="M-12 -2 V-34 Q-12 -42 -4 -42 Q2 -42 2 -34 V-18 H14 Q20 -18 20 -10 V8 Q20 14 12 14 H-12 Z" fill={POSTER_BLUE} stroke={POSTER_INK} strokeWidth={3} />
-            <rect x={-30} y={26} width={60} height={8} fill={POSTER_BLUE} />
-            <rect x={-22} y={40} width={44} height={6} fill={WARNING_RED} />
-          </g>
-          <rect x={-16} y={74} width={32} height={10} fill={INK} stroke={STEEL_LIGHT} strokeWidth={2} />
-          <rect data-fx={`pip-${i}`} x={-13} y={77} width={26} height={4} fill={PHOSPHOR} opacity={0.1} />
-        </g>
-      ))}
+      {/* the stat panel on the wall: five pips, the fourth fills when he takes the figure */}
+      <g transform="translate(150 -300)">
+        <rect x={-10} y={-10} width={PIPS * 26 + 10} height={36} rx={4} fill={GLASS} stroke={POSTER_INK} strokeWidth={3} />
+        {Array.from({ length: PIPS }, (_, i) => (
+          <rect key={i} x={i * 26} y={0} width={18} height={16} fill={i < 3 ? PHOSPHOR : PHOSPHOR_DEEP} />
+        ))}
+        <rect data-fx="pip" x={3 * 26} y={0} width={18} height={16} fill={PHOSPHOR} opacity={0} />
+      </g>
+      {/* the shelf on its brackets and the stand on it */}
+      <rect x={SHELF.x - 40} y={SHELF.y} width={130} height={10} fill={OLIVE_LIGHT} stroke={POSTER_INK} strokeWidth={3} />
+      <path d={`M${SHELF.x - 30} ${SHELF.y + 10} l10 24 M${SHELF.x + 80} ${SHELF.y + 10} l-10 24`} stroke={STEEL} strokeWidth={5} />
+      <rect x={SHELF.x - 10} y={SHELF.y - 10} width={90} height={10} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={2} />
+      <g data-fx="stand-figure" transform={`translate(${SHELF.x} ${SHELF.y - 10}) scale(${K})`}>
+        <Bobblehead />
+      </g>
+      <g transform={`translate(${SHELF.x + 50} ${SHELF.y - 10}) scale(${K})`}>
+        <Bobblehead />
+      </g>
     </>
   ),
-  front: NONE,
-  bind: (stage, { count, cx }) => {
-    const posters = fxs(stage, 'poster', count)
-    const pips = fxs(stage, 'pip', count)
-    return (p, f) => {
-      posters.forEach((poster, i) => fadeTo(poster, 0.2 + 0.8 * ramp(f, i + 0.3, i + 0.45)))
-      pips.forEach((pip, i) => fadeTo(pip, 0.1 + 0.9 * ramp(f, i + 0.35, i + 0.5)))
-      // per card: he keys the wrist terminal, then the thumb up with the wink and the star
-      const { t } = beatOf(f, Math.max(1, count))
-      const keyed = bell(t, 0.05, 0.5)
-      const cheered = bell(t, 0.5, 0.95)
-      return survivor('shelter', cx, keyed > 0 ? mix(STAND, typing(1, t * 8), keyed) : mix(STAND, thumbsUp(1), cheered))
+  // the wrist computer up before his face, then the reach to the stand and the figure held up, its head bobbing
+  move: (kit, t) => {
+    const base = KIT[kit]
+    const looked = blend(base, pose({ ...WRIST, gauge: 1 }), t, 0, 0.25)
+    if (t < 0.45) return still(looked)
+    const reached = blend(looked, pose(REACH), t, 0.45, 0.65)
+    if (t < 0.68) return still(reached)
+    const held = blend(pose(REACH), pose({ ...HOLD_UP }), t, 0.68, 0.85)
+    const bob = Math.sin(ramp(t, 0.72, 1) * Math.PI * 4) * (1 - ramp(t, 0.72, 1))
+    return still({ ...held, held: 1, bob })
+  },
+  reply: (stage) => {
+    const standFigure = fx(stage, 'stand-figure')
+    const pip = fx(stage, 'pip')
+    return (t) => {
+      fadeTo(standFigure, t < 0.68 ? 1 : 0)
+      fadeTo(pip, ramp(t, 0.85, 0.95))
     }
   },
 }
 
-// ---------------------------------------------------------------- Work: the quest flags
+// ---------------------------------------------------------------- Work: the targeting freeze on the wreck
 
-const FLAG_POLE = 260
+const WRECK = 250
+const WORK_FOE = 330
+
+function Wreck() {
+  return (
+    <g transform={`translate(${WRECK} 0)`}>
+      <path d="M-110 -10 L-104 -58 L-60 -66 L-36 -104 L44 -104 L74 -66 L112 -58 L116 -10 Z" fill={RUST} stroke={POSTER_INK} strokeWidth={4} />
+      <path d="M-30 -96 L40 -96 L62 -66 L-52 -66 Z" fill={INK} opacity={0.7} />
+      <circle cx={-66} cy={-10} r={22} fill={INK} />
+      <circle cx={74} cy={-10} r={22} fill={INK} />
+      <path d="M-104 -40 H116" stroke={DUST_DARK} strokeWidth={4} />
+    </g>
+  )
+}
+
+const workTarget = { x: WORK_FOE + FOE_HEAD.x, y: FOE_HEAD.y }
 
 const work: SceneDef = {
   zone: 'wasteland',
-  kit: 'engineer',
-  back: ({ xs }) => (
+  kit: null,
+  script: [2000, 2400],
+  ends: [0.45, 1],
+  back: () => (
     <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 76))}>
-          <rect x={-3} y={-FLAG_POLE} width={6} height={FLAG_POLE} fill={STEEL} />
-          <circle cx={0} cy={-FLAG_POLE} r={7} fill={BRASS} />
-          <path data-fx={`flag-${i}`} d="M3 -60 H66 L54 -42 L66 -24 H3 Z" fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={3} />
-        </g>
-      ))}
+      {/* the ground hides the mutant while he crouches behind the wreck */}
+      <clipPath id="ra-work-ground">
+        <rect x={WORK_FOE - 200} y={-400} width={400} height={404} />
+      </clipPath>
+      <g clipPath="url(#ra-work-ground)">
+        <Mutant x={WORK_FOE} />
+      </g>
     </>
   ),
-  front: NONE,
-  bind: (stage, { xs, count }) => {
-    const flags = fxs(stage, 'flag', count)
-    return (p, f) => {
-      flags.forEach((flag, i) => transformTo(flag, `translate(0 ${r1(-(FLAG_POLE - 66) * ease(ramp(f, i + 0.6, i + 0.85)))})`))
-      // crouched from flag to flag; at each he stands up while it runs up, then crouches again for the next
-      const { x, act, phase } = station(xs, f, -90, 0.5)
-      return survivor('wasteland', x, sneak(phase, 1 - hold(act, 0, 0.2, 0.75, 1)))
+  front: () => (
+    <>
+      <Wreck />
+      <Freeze />
+      <Target name="aim-head" x={workTarget.x} y={workTarget.y} size={70} odds={62} />
+      <Target name="aim-body" x={WORK_FOE - 30} y={-200} size={90} odds={88} />
+      <Round to={workTarget} />
+    </>
+  ),
+  // the pistol drawn and up on the head, held through the slowed shot, its kick at the release
+  move: (kit, t) => {
+    const aimed = blend(KIT[kit], pose(AIM), t, 0.1, 0.32)
+    const kick = bell(t, 0.56, 0.66)
+    return still({ ...aimed, armRight: aimed.armRight - 10 * kick, flash: kick })
+  },
+  reply: (stage, { phone }) => {
+    const spot = spotOf(phone)
+    const size = placeScale(phone)
+    const foe = foeWriter(stage)
+    const foeNode = fx(stage, 'foe')
+    const freeze = fx(stage, 'freeze')
+    const head = fx(stage, 'aim-head')
+    const body = fx(stage, 'aim-body')
+    const camera = cameraWriter(stage)
+    const shot = roundWriter(stage, MUZZLE, workTarget)
+    return (t) => {
+      // the mutant rises from behind the wreck; the place goes green and stops on the targeting boxes
+      transformTo(foeNode, `translate(${WORK_FOE} ${r1(110 * (1 - ease(ramp(t, 0, 0.28))))})`)
+      const frozen = ramp(t, 0.3, 0.42) * (1 - ramp(t, 0.88, 1))
+      fadeTo(freeze, 0.22 * frozen)
+      fadeTo(head, ramp(t, 0.34, 0.42) * (1 - ramp(t, 0.6, 0.66)))
+      fadeTo(body, ramp(t, 0.38, 0.45) * (1 - ramp(t, 0.5, 0.56)))
+      // the slowed shot: the camera pushes in on the head, the round crosses slowly, the hit throws him over
+      camera(spot + workTarget.x * size, GROUND.wasteland + workTarget.y * size, 1 + PUSH * ease(ramp(t, 0.46, 0.6) * (1 - ramp(t, 0.86, 1))))
+      shot(ramp(t, 0.6, 0.8), ramp(t, 0.79, 0.82) * (1 - ramp(t, 0.92, 1)))
+      foe(mixFoe(FOE_GUARD, FOE_DOWN, ease(ramp(t, 0.8, 0.95))))
     }
   },
 }
 
-// ---------------------------------------------------------------- Tech stack: the footlockers
+// ---------------------------------------------------------------- Tech stack: the footlocker
+
+const LOCKER = 74
 
 const tech: SceneDef = {
   zone: 'wasteland',
   kit: 'engineer',
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 92))}>
-          <rect data-fx={`glow-${i}`} x={-36} y={-58} width={72} height={10} fill={PHOSPHOR} opacity={0} />
-          <rect x={-40} y={-50} width={80} height={50} rx={3} fill={OLIVE} stroke={POSTER_INK} strokeWidth={3} />
-          <path d="M-40 -34 H40 M-40 -16 H40" stroke={OLIVE_DARK} strokeWidth={3} />
-          <rect x={-9} y={-47} width={18} height={14} fill={BRASS} stroke={POSTER_INK} strokeWidth={2} />
-          <g data-fx={`cylinder-${i}`} transform="translate(0 -40)">
-            <circle r={4.5} fill={POSTER_INK} />
-            <path d="M0 -3 V3" stroke={BRASS} strokeWidth={2} />
-          </g>
-          <path data-fx={`pin-${i}`} d="M0 -40 L-22 -40" stroke={CHROME} strokeWidth={2.5} strokeLinecap="round" transform="rotate(-50 0 -40)" />
-          <g data-fx={`lid-${i}`}>
-            <rect x={-42} y={-62} width={84} height={14} rx={2} fill={OLIVE_LIGHT} stroke={POSTER_INK} strokeWidth={3} />
-          </g>
-        </g>
-      ))}
-    </>
+  script: [1600, 1400],
+  ends: [0.55, 1],
+  back: () => (
+    <g transform={`translate(${LOCKER} 0) scale(1.3)`}>
+      <rect data-fx="glow" x={-36} y={-58} width={72} height={10} fill={PHOSPHOR} opacity={0} />
+      <rect x={-40} y={-50} width={80} height={50} rx={3} fill={OLIVE} stroke={POSTER_INK} strokeWidth={3} />
+      <path d="M-40 -34 H40 M-40 -16 H40" stroke={OLIVE_DARK} strokeWidth={3} />
+      <rect x={-9} y={-47} width={18} height={14} fill={BRASS} stroke={POSTER_INK} strokeWidth={2} />
+      <g data-fx="cylinder" transform="translate(0 -40)">
+        <circle r={4.5} fill={POSTER_INK} />
+        <path d="M0 -3 V3" stroke={BRASS} strokeWidth={2} />
+      </g>
+      <path data-fx="pin" d="M0 -40 L-22 -40" stroke={CHROME} strokeWidth={2.5} strokeLinecap="round" transform="rotate(-50 0 -40)" />
+      <g data-fx="lid">
+        <rect x={-42} y={-62} width={84} height={14} rx={2} fill={OLIVE_LIGHT} stroke={POSTER_INK} strokeWidth={3} />
+      </g>
+    </g>
   ),
-  front: NONE,
-  bind: (stage, { xs, count }) => {
-    const lids = fxs(stage, 'lid', count)
-    const glows = fxs(stage, 'glow', count)
-    const pins = fxs(stage, 'pin', count)
-    const cylinders = fxs(stage, 'cylinder', count)
-    return (p, f) => {
-      // the pick feels round to its angle, the cylinder turns, the lid flies open on what is inside
-      pins.forEach((pin, i) => transformTo(pin, `rotate(${r1(-50 + 62 * ramp(f, i + 0.35, i + 0.55))} 0 -40)`))
-      cylinders.forEach((cylinder, i) => transformTo(cylinder, `translate(0 -40) rotate(${r1(90 * ramp(f, i + 0.55, i + 0.65))})`))
-      lids.forEach((lid, i) => transformTo(lid, `rotate(${r1(-118 * ease(ramp(f, i + 0.65, i + 0.8)))} -42 -48)`))
-      glows.forEach((glow, i) => fadeTo(glow, ramp(f, i + 0.65, i + 0.8)))
-      const { x, act, phase } = station(xs, f, -70, 0.3)
-      const kneel = hold(act, 0, 0.12, 0.85, 1)
-      return survivor('wasteland', x, mix(sneak(phase, 0.5), lockpick(1, Math.sin(act * Math.PI * 5)), kneel))
+  // down on one knee at the lock, the pick worked round, then sitting back as the lid flies
+  move: (kit, t) => {
+    const knelt = blend(KIT[kit], pose({ ...KNEEL, ...PICK }), t, 0, 0.25)
+    const work = t > 0.25 && t < 0.55 ? Math.sin(ramp(t, 0.25, 0.55) * Math.PI * 6) : 0
+    const back = 6 * ease(ramp(t, 0.7, 0.85))
+    return still({ ...knelt, foreRight: knelt.foreRight + 8 * work, lean: knelt.lean - back })
+  },
+  reply: (stage) => {
+    const pin = fx(stage, 'pin')
+    const cylinder = fx(stage, 'cylinder')
+    const lid = fx(stage, 'lid')
+    const glow = fx(stage, 'glow')
+    return (t) => {
+      transformTo(pin, `rotate(${r1(-50 + 62 * ramp(t, 0.28, 0.55))} 0 -40)`)
+      transformTo(cylinder, `translate(0 -40) rotate(${r1(90 * ramp(t, 0.55, 0.7))})`)
+      transformTo(lid, `rotate(${r1(-118 * ease(ramp(t, 0.7, 0.85)))} -42 -48)`)
+      fadeTo(glow, ramp(t, 0.72, 0.9))
     }
   },
 }
 
-// ---------------------------------------------------------------- Services: the locked sets
+// ---------------------------------------------------------------- Services: the power armour
 
-// The rows of unreadable glyph blocks on a locked set's screen, each row's block widths.
-const GLYPH_ROWS: readonly (readonly number[])[] = [
-  [10, 6, 14, 8, 12],
-  [14, 8, 6, 12, 10],
-  [6, 12, 10, 14, 8],
-]
+const ARMOUR = 170
+const ARMOUR_LINE = { stroke: POSTER_INK, strokeWidth: 4, strokeLinejoin: 'round' as const }
 
-const ROW_Y = [-152, -136, -120]
-
-// The rows tried per set: the first two miss, the last matches.
-const TRIES: readonly (readonly [number, number])[] = [
-  [0.32, 0.48],
-  [0.48, 0.64],
-]
+/** The power armour frame side on, facing right, feet on y 0: the legs, the hull, the shoulder plate, the
+ *  helmet and its visor slit, the hatch on its back that swings open. */
+function Armour() {
+  return (
+    <g data-fx="armour">
+      <path d="M-40 0 L-38 -96 L-6 -96 L-4 0 Z" fill={STEEL} {...ARMOUR_LINE} />
+      <path d="M-14 0 L-12 -100 L22 -100 L26 0 Z" fill={STEEL_LIGHT} {...ARMOUR_LINE} />
+      <path d="M-20 4 L-20 -10 L40 -10 L46 4 Z" fill={OLIVE_DARK} {...ARMOUR_LINE} />
+      <path d="M-50 -92 L-46 -220 Q-10 -236 36 -220 L44 -92 Z" fill={STEEL_LIGHT} {...ARMOUR_LINE} />
+      <path d="M-10 -200 L34 -196 L38 -120 L-6 -118 Z" fill={STEEL} {...ARMOUR_LINE} />
+      <path d="M-34 -232 Q4 -252 40 -228 L44 -196 L-38 -196 Z" fill={SHELTER_YELLOW} {...ARMOUR_LINE} />
+      {/* the helmet and its visor slit */}
+      <path d="M-28 -236 Q-26 -292 8 -294 Q42 -292 44 -248 L40 -230 L-24 -228 Z" fill={STEEL_LIGHT} {...ARMOUR_LINE} />
+      <rect x={14} y={-262} width={30} height={10} rx={3} fill={INK} />
+      <rect data-fx="visor" x={16} y={-260} width={26} height={6} rx={2} fill={SHELTER_YELLOW} opacity={0} />
+      {/* the back hatch: open, the dark of the frame shows; it swings shut on its hinge at the back edge */}
+      <path data-fx="inside" d="M-48 -100 L-44 -218 L-8 -218 L-10 -100 Z" fill={INK} />
+      <g data-fx="hatch" transform="rotate(55 -46 -218)">
+        <path d="M-48 -100 L-44 -218 L-14 -216 L-16 -102 Z" fill={STEEL} {...ARMOUR_LINE} />
+        <circle cx={-30} cy={-160} r={8} fill={BRASS} stroke={POSTER_INK} strokeWidth={3} />
+      </g>
+    </g>
+  )
+}
 
 const services: SceneDef = {
   zone: 'wasteland',
   kit: 'engineer',
-  back: ({ xs }) => (
+  script: [1800, 1800],
+  ends: [0.5, 1],
+  back: () => (
     <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(x, GROUND.wasteland, fitOf(xs, 100))}>
-          <rect x={-6} y={-90} width={12} height={90} fill={STEEL} />
-          <rect x={-46} y={-170} width={92} height={84} rx={10} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
-          <rect x={-36} y={-160} width={72} height={60} rx={8} fill={GLASS} />
-          {GLYPH_ROWS.map((widths, row) => (
-            <g key={row}>
-              <rect data-fx={`row-${i}-${row}`} x={-33} y={ROW_Y[row] - 6} width={66} height={12} fill={PHOSPHOR} opacity={0} />
-              {widths.map((w, k) => (
-                <rect key={k} x={-30 + widths.slice(0, k).reduce((a, b) => a + b + 2, 0)} y={ROW_Y[row] - 3} width={w} height={6} fill={PHOSPHOR_DEEP} />
-              ))}
-            </g>
-          ))}
-          <g data-fx={`tube-${i}`} opacity={0}>
-            <rect x={-36} y={-160} width={72} height={60} rx={8} fill={PHOSPHOR} fillOpacity={0.35} />
-            <path d="M-26 -146 H20 M-26 -132 H26 M-26 -118 H6" stroke={PHOSPHOR} strokeWidth={4} />
-          </g>
-        </g>
-      ))}
+      <ellipse data-fx="ring" cx={ARMOUR} cy={4} rx={60} ry={10} fill="none" stroke={CREAM} strokeWidth={8} opacity={0} />
+      <g data-fx="cracks" opacity={0} stroke={POSTER_INK} strokeWidth={5} fill="none">
+        <path d={`M${ARMOUR - 30} 4 l-40 10 l-30 -2 M${ARMOUR + 40} 4 l50 8 l20 10 M${ARMOUR} 6 l6 14`} />
+      </g>
     </>
   ),
-  front: NONE,
-  bind: (stage, { xs, count }) => {
-    const rows = Array.from({ length: count }, (_, i) => GLYPH_ROWS.map((_, row) => fx(stage, `row-${i}-${row}`)))
-    const tubes = fxs(stage, 'tube', count)
-    return (p, f) => {
-      rows.forEach((set, i) => {
-        const t = f - i
-        TRIES.forEach(([from, to], row) => fadeTo(set[row], 0.6 * bell(t, from, to)))
-        fadeTo(set[2], 0.6 * ramp(t, 0.64, 0.72))
-      })
-      tubes.forEach((tube, i) => fadeTo(tube, ramp(f, i + 0.75, i + 0.9)))
-      const { x, act, phase } = station(xs, f, -110, 0.3)
-      const keyed = hold(act, 0, 0.1, 0.85, 1)
-      return survivor('wasteland', x, mix(walk(phase), typing(1, act * 10), keyed))
+  front: () => (
+    <g data-fx="suit" transform={`translate(${ARMOUR} 0)`}>
+      <Armour />
+    </g>
+  ),
+  // he walks up behind the frame and steps into it; inside it he is the armour
+  move: (_kit, t) => {
+    const into = ease(ramp(t, 0, 0.3))
+    const walking = into > 0 && into < 1
+    return { pose: walking ? walk(into * 4) : pose({}), ahead: (ARMOUR - 12) * into, opacity: 1 - ramp(t, 0.3, 0.34) }
+  },
+  reply: (stage) => {
+    const suit = fx(stage, 'suit')
+    const hatch = fx(stage, 'hatch')
+    const inside = fx(stage, 'inside')
+    const visor = fx(stage, 'visor')
+    const ring = fx(stage, 'ring')
+    const cracks = fx(stage, 'cracks')
+    return (t) => {
+      // the hatch swings shut behind him, the visor lights
+      const shut = ease(ramp(t, 0.34, 0.48))
+      transformTo(hatch, `rotate(${r1(55 * (1 - shut))} -46 -218)`)
+      fadeTo(inside, 1 - shut)
+      fadeTo(visor, ramp(t, 0.5, 0.58))
+      // the crouch, the jump and the landing stomp, the dust ring and the cracks going out
+      const dip = 10 * bell(t, 0.58, 0.68) + 14 * bell(t, 0.8, 0.9)
+      const flight = ramp(t, 0.66, 0.82)
+      const lift = -130 * Math.sin(Math.PI * flight)
+      transformTo(suit, `translate(${ARMOUR} ${r1(lift + dip)})`)
+      const out = ease(ramp(t, 0.8, 1))
+      transformTo(ring, `translate(${r1(ARMOUR * (1 - (1 + 2 * out)))} 0) scale(${(1 + 2 * out).toFixed(3)} 1)`)
+      fadeTo(ring, ramp(t, 0.8, 0.84) * (1 - 0.6 * out))
+      fadeTo(cracks, ramp(t, 0.82, 0.88))
     }
   },
 }
 
-// ---------------------------------------------------------------- Projects: the target boards
+// ---------------------------------------------------------------- Projects: the glowing crater
 
-// The boards' centre over the ground.
-const TARGET_UP = -230
-
-// The share of the hit ring the lock fills, the board's odds, by board.
-const ODDS = [0.95, 0.8, 0.9, 0.75]
-
-const boardX = (xs: readonly number[], i: number): number => xs[i] + 60 * fitOf(xs, 96)
+const CRATER = 210
 
 const projects: SceneDef = {
   zone: 'wasteland',
   kit: null,
-  back: ({ xs }) => (
-    <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(boardX(xs, i), GROUND.wasteland, fitOf(xs, 96))}>
-          <path d={`M-4 ${TARGET_UP + 40} V0`} stroke={POLE} strokeWidth={6} />
-          <g transform={`translate(0 ${TARGET_UP})`}>
-            <circle r={42} fill={CREAM} stroke={POSTER_INK} strokeWidth={3} />
-            <circle r={28} fill={WARNING_RED} />
-            <circle r={14} fill={CREAM} />
-            <circle data-fx={`hit-${i}`} r={6} fill={POSTER_INK} opacity={0} />
-            <g data-fx={`lock-${i}`} opacity={0} stroke={PHOSPHOR} strokeWidth={4} fill="none">
-              <path d="M-54 -38 V-54 H-38 M38 -54 H54 V-38 M54 38 V54 H38 M-38 54 H-54 V38" />
-              <circle data-fx={`odds-${i}`} r={62} pathLength={100} strokeDasharray="0 100" transform="rotate(-90)" />
-            </g>
-          </g>
-        </g>
-      ))}
-    </>
+  script: [1800, 1600],
+  ends: [0.5, 1],
+  back: () => (
+    <g transform={`translate(${CRATER} 0)`}>
+      <ellipse cx={0} cy={6} rx={130} ry={24} fill={DUST_DARK} stroke={POSTER_INK} strokeWidth={4} />
+      <ellipse data-fx="glow" cx={0} cy={6} rx={104} ry={16} fill={PHOSPHOR} opacity={0.5} />
+      <path d="M-40 4 Q-30 -40 -20 4 M10 4 Q22 -56 34 4" fill="none" stroke={PHOSPHOR_DEEP} strokeWidth={6} opacity={0.6} />
+      <g transform="translate(150 0)">
+        <rect x={-5} y={-130} width={10} height={130} fill={POLE} />
+        <path d="M0 -130 L-30 -100 H30 Z" fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={4} />
+        <circle cx={0} cy={-112} r={6} fill={POSTER_INK} />
+      </g>
+    </g>
   ),
-  front: () => <Freeze />,
-  bind: (stage, { xs, count, phone }) => {
-    const hits = fxs(stage, 'hit', count)
-    const locks = fxs(stage, 'lock', count)
-    const odds = fxs(stage, 'odds', count)
-    const freeze = fx(stage, 'freeze')
-    const camera = cameraWriter(stage)
-    const him = xs[0] - (phone ? 40 : 50)
-    return (p, f) => {
-      const { at, t } = beatOf(f, count)
-      hits.forEach((hit, i) => fadeTo(hit, ramp(f, i + 0.58, i + 0.62)))
-      // per board: the freeze, the lock and its odds, the push in for the slow shot, then back out
-      const locked = hold(t, 0.12, 0.28, 0.82, 0.95)
-      locks.forEach((lock, i) => fadeTo(lock, i === at ? locked : 0))
-      odds.forEach((ring, i) => ring?.setAttribute('stroke-dasharray', `${r1(i === at ? 100 * ODDS[i % ODDS.length] * ramp(t, 0.2, 0.38) : 0)} 100`))
-      fadeTo(freeze, 0.22 * locked)
-      camera(boardX(xs, at), GROUND.wasteland + TARGET_UP, 1 + PUSH * ease(hold(t, 0.35, 0.5, 0.72, 0.92)))
-      const shot = bell(t, 0.5, 0.7)
-      return survivor('wasteland', him, aim(ramp(f, 0, 0.12), shot))
-    }
+  // to the crater's edge with the wrist computer up, its needle climbing; back off and the syringe to the arm
+  move: (kit, t) => {
+    const base = KIT[kit]
+    const there = ease(ramp(t, 0, 0.28))
+    const away = ease(ramp(t, 0.5, 0.66))
+    const ahead = 90 * there - 70 * away
+    const moving = (there > 0 && there < 1) || (away > 0 && away < 1)
+    const gauge = ramp(t, 0.15, 0.48) * (1 - 0.8 * ramp(t, 0.82, 0.96))
+    const alarm = t > 0.36 && t < 0.86 ? 0.5 + 0.5 * Math.sin(t * 80) : 0
+    if (moving) return still({ ...walk((there + away) * 4), gauge, alarm }, ahead)
+    const looked = t < 0.5 ? blend(base, pose(WRIST), t, 0.28, 0.36) : blend(pose(WRIST), pose(JAB), t, 0.66, 0.78)
+    return still({ ...looked, gauge, alarm, syringe: t < 0.5 ? 0 : ramp(t, 0.66, 0.7) }, ahead)
+  },
+  reply: (stage) => {
+    const glow = fx(stage, 'glow')
+    return (t) => fadeTo(glow, 0.5 + 0.4 * Math.sin(Math.PI * 2 * ramp(t, 0, 1) * 2) ** 2)
   },
 }
 
-// ---------------------------------------------------------------- Ventures: the dogs fetch the tapes
+// ---------------------------------------------------------------- Ventures: the husky fetches the tape
+
+const MOUND = 250
+const VENTURE_DOGS = [-60, -120, 70]
+const RUNNER = 2
 
 const ventures: SceneDef = {
   zone: 'town',
   kit: null,
-  back: ({ xs }) => (
+  script: [1800, 1600],
+  ends: [0.5, 1],
+  back: () => (
     <>
-      {xs.map((x, i) => (
-        <g key={x} transform={propAt(x + 50 * fitOf(xs, 90), GROUND.town, fitOf(xs, 90))}>
-          <path d="M-40 0 Q0 -30 40 0 Z" fill={RUST} stroke={POSTER_INK} strokeWidth={3} />
-          <g data-fx={`tape-${i}`} transform="translate(0 10)">
-            <rect x={-22} y={-14} width={44} height={28} rx={4} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
-            <circle cx={-9} cy={0} r={6} fill={PHOSPHOR} />
-            <circle cx={9} cy={0} r={6} fill={PHOSPHOR} />
-          </g>
-        </g>
-      ))}
+      <path d={`M${MOUND - 50} 0 Q${MOUND} -36 ${MOUND + 50} 0 Z`} fill={RUST} stroke={POSTER_INK} strokeWidth={3} />
+      <Pack xs={VENTURE_DOGS} />
     </>
   ),
-  front: ({ xs, phone }) => <Pack zone="town" xs={heelOf(xs, phone)} />,
-  bind: (stage, { xs, count, phone }) => {
-    const tapes = fxs(stage, 'tape', count)
-    const dogs = packWriter(stage, 'town')
-    const heel = heelOf(xs, phone)
-    return (p, f) => {
-      tapes.forEach((tape, i) => transformTo(tape, `translate(0 ${r1(lerp(10, -70, ease(ramp(f, i + 0.5, i + 0.66))))})`))
-      const { at, t } = beatOf(f, count)
-      const runner = at % PACK.length
-      // the runner gets up, runs out to its mound, digs, turns and trots back to heel; the others watch
-      const out = ramp(t, 0.12, 0.38)
-      const back = ramp(t, 0.62, 0.9)
-      const dig = hold(t, 0.38, 0.44, 0.56, 0.62)
-      const mound = xs[at] + 50 * fitOf(xs, 90) - 70
-      const x = lerp(heel[runner], mound, ease(out) - ease(back))
+  front: () => (
+    <g data-fx="tape" transform={`translate(${MOUND} 10)`}>
+      <rect x={-18} y={-11} width={36} height={22} rx={3} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
+      <circle cx={-7} cy={0} r={5} fill={PHOSPHOR} />
+      <circle cx={7} cy={0} r={5} fill={PHOSPHOR} />
+    </g>
+  ),
+  // he points the husky out, then reaches for the tape it brings back
+  move: (kit, t) => {
+    const base = KIT[kit]
+    if (t < 0.5) return still(mix(base, pose(POINT), bell(t, 0, 0.45)))
+    return still(blend(base, pose({ ...REACH, armRight: -40, foreRight: -30 }), t, 0.8, 0.92))
+  },
+  reply: (stage) => {
+    const dogs = packWriter(stage)
+    const tape = fx(stage, 'tape')
+    const heel = VENTURE_DOGS[RUNNER]
+    return (t) => {
+      const out = ease(ramp(t, 0.12, 0.36))
+      const dig = t > 0.36 && t < 0.5 ? 1 : 0
+      const back = ease(ramp(t, 0.55, 0.82))
+      const x = lerp(heel, MOUND - 60, out - back)
       const running = (out > 0 && out < 1) || (back > 0 && back < 1)
-      const pose = running ? trot(t * 10) : mixDog(SITTING, { ...STANDING, dig }, hold(t, 0.05, 0.12, 0.9, 1))
-      PACK.forEach((_, i) => (i === runner ? dogs(i, x, pose, back > 0 && back < 1 ? -1 : 1) : dogs(i, heel[i], { ...SITTING, look: hold(t, 0.1, 0.2, 0.8, 0.95) })))
-      return survivor('town', heel[0] - (phone ? 30 : 60), mix(STAND, point(1), bell(t, 0, 0.35)))
+      const facing = back > 0 && back < 1 ? -1 : 1
+      const dogPose = running ? trot(t * 12) : dig ? { ...STANDING, dig: Math.abs(Math.sin(t * 60)) } : mixDog(SITTING, STANDING, ramp(t, 0.05, 0.12))
+      dogs(RUNNER, x, dogPose, facing)
+      dogs(0, VENTURE_DOGS[0], { ...SITTING, look: ramp(t, 0.1, 0.2) })
+      dogs(1, VENTURE_DOGS[1], { ...SITTING, look: ramp(t, 0.1, 0.2) })
+      // the tape: in the mound, up in the husky's jaws, then in his hand
+      const dug = ramp(t, 0.46, 0.5)
+      const handed = ease(ramp(t, 0.84, 0.94))
+      const mouth = { x: x + 50 * facing, y: -26 }
+      const hand = { x: 44, y: -104 }
+      const atDog = dug > 0 ? mouth : { x: MOUND, y: 10 }
+      transformTo(tape, `translate(${r1(lerp(atDog.x, hand.x, handed))} ${r1(lerp(atDog.y, hand.y, handed))})`)
     }
   },
-}
-
-/** Where the dogs sit at his heel in Ventures, in front of him and short of the first mound. */
-const heelOf = (xs: readonly number[], phone: boolean): number[] => {
-  const first = xs[0] - (phone ? 10 : 50)
-  return [first, first - 70, first - 140]
 }
 
 // ---------------------------------------------------------------- Bands: the radio mast
 
-const MAST_Y = 300
+const MAST = 250
+const LAMPS = [-90, -170, -250, -330]
 
 const bands: SceneDef = {
   zone: 'town',
-  kit: null,
-  radio: true,
-  back: ({ xs }) => (
-    <>
-      <path d={`M${r1(xs[0] - 60)} ${GROUND.town} L${r1((xs[0] + xs[xs.length - 1]) / 2)} ${MAST_Y - 40} L${r1(xs[xs.length - 1] + 60)} ${GROUND.town}`} stroke={STEEL} strokeWidth={6} fill="none" />
-      <path d={`M${r1(xs[0] - 70)} ${MAST_Y + 30} H${r1(xs[xs.length - 1] + 70)}`} stroke={STEEL_LIGHT} strokeWidth={4} />
-      {xs.map((x, i) => (
-        <g key={x} transform={`translate(${r1(x)} ${MAST_Y + 30})`}>
+  // both hands are on the radio, so he wears the plain jumpsuit with no sticks
+  kit: 'engineer',
+  script: [1600, 1600],
+  ends: [0.5, 1],
+  back: () => (
+    <g transform={`translate(${MAST} 0)`}>
+      <path d="M-50 0 L0 -350 L50 0 M-38 -80 H38 M-26 -170 H26 M-14 -260 H14" stroke={STEEL} strokeWidth={6} fill="none" />
+      {LAMPS.map((y, i) => (
+        <g key={y} transform={`translate(0 ${y})`}>
           <circle r={12} fill={INK} stroke={STEEL_LIGHT} strokeWidth={3} />
           <circle data-fx={`lamp-${i}`} r={9} fill={WARNING_RED} opacity={0.15} />
         </g>
       ))}
-    </>
+      <ellipse data-fx="wave-0" cx={0} cy={-350} rx={40} ry={16} fill="none" stroke={SHELTER_YELLOW} strokeWidth={4} opacity={0} />
+      <ellipse data-fx="wave-1" cx={0} cy={-350} rx={40} ry={16} fill="none" stroke={SHELTER_YELLOW} strokeWidth={4} opacity={0} />
+    </g>
   ),
-  front: NONE,
-  bind: (stage, { count, cx }) => {
-    const lamps = fxs(stage, 'lamp', count)
-    return (p, f) => {
-      lamps.forEach((lamp, i) => fadeTo(lamp, 0.15 + 0.85 * ramp(f, i + 0.7, i + 0.82)))
-      // per station the dial turns on to it and the needle locks; its lamp lights
-      const { at, t } = beatOf(f, count)
-      return survivor('town', cx - 40, tune((at + ease(ramp(t, 0.1, 0.7))) / count))
+  // the radio held at his chest and its dial turned on to the station
+  move: (_kit, t) => still(pose({ ...RADIO, dial: ease(ramp(t, 0.08, 0.46)) })),
+  reply: (stage) => {
+    const lamps = LAMPS.map((_, i) => fx(stage, `lamp-${i}`))
+    const waves = [fx(stage, 'wave-0'), fx(stage, 'wave-1')]
+    return (t) => {
+      lamps.forEach((lamp, i) => fadeTo(lamp, 0.15 + 0.85 * ramp(t, 0.5 + 0.1 * i, 0.58 + 0.1 * i)))
+      waves.forEach((wave, i) => {
+        const out = ramp(t, 0.6 + 0.15 * i, 0.95)
+        transformTo(wave, `translate(0 ${r1(-350 * 2 * out)}) scale(${(1 + 2 * out).toFixed(3)})`)
+        fadeTo(wave, out > 0 ? 1 - 0.7 * out : 0)
+      })
     }
   },
 }
 
-// ---------------------------------------------------------------- Muay Thai: the turn fight with the mutant
+// ---------------------------------------------------------------- Muay Thai: the turn fight
 
-const FOE_K = 1.6
-const STAR_Y = 260
-
-// His last hex, the mutant's, and the hex's width, the step a turn spends.
-const fight = ({ cx, phone }: Layout) => ({ foe: cx + 70, last: cx - 70, step: phone ? 35 : 140 / 3 })
-
-/** His hex before turn i's step: the first turn starts one hex further back. */
-const hexOf = (layout: Layout, i: number): number => {
-  const { last, step } = fight(layout)
-  return last - step * (layout.count - 1 - i)
-}
+const DUEL = { foe: 200, step: 46 }
 
 const hexPath = (x: number, w: number): string => {
-  const y = GROUND.town + 6
   const h = w * 0.32
-  return `M${r1(x - w / 2)} ${y} L${r1(x - w / 4)} ${r1(y - h / 2)} H${r1(x + w / 4)} L${r1(x + w / 2)} ${y} L${r1(x + w / 4)} ${r1(y + h / 2)} H${r1(x - w / 4)} Z`
+  return `M${r1(x - w / 2)} 6 L${r1(x - w / 4)} ${r1(6 - h / 2)} H${r1(x + w / 4)} L${r1(x + w / 2)} 6 L${r1(x + w / 4)} ${r1(6 + h / 2)} H${r1(x - w / 4)} Z`
 }
+
+const duelTarget = { x: DUEL.foe + FOE_HEAD.x, y: FOE_HEAD.y }
 
 const muayThai: SceneDef = {
   zone: 'town',
   kit: 'fighter',
-  back: (layout) => {
-    const { xs } = layout
-    const { foe, step } = fight(layout)
-    const hexes = Array.from({ length: Math.round((foe - hexOf(layout, -1)) / step) + 1 }, (_, j) => hexOf(layout, -1) + step * j)
-    return (
-      <>
-        {hexes.map((x) => (
-          <path key={x} d={hexPath(x, step * 1.33)} fill="none" stroke={PHOSPHOR} strokeOpacity={0.45} strokeWidth={2} />
-        ))}
-        {xs.map((x, i) => (
-          <g key={x} transform={propAt(x, STAR_Y, fitOf(xs, 60))}>
-            <path d="M0 -26 L7 -8 L26 -8 L11 4 L17 23 L0 12 L-17 23 L-11 4 L-26 -8 L-7 -8 Z" fill={INK} stroke={SHELTER_YELLOW} strokeWidth={3} />
-            <path data-fx={`star-${i}`} d="M0 -20 L5 -6 L20 -6 L8 3 L13 18 L0 9 L-13 18 L-8 3 L-20 -6 L-5 -6 Z" fill={SHELTER_YELLOW} opacity={0} />
-          </g>
-        ))}
-      </>
-    )
-  },
-  front: (layout) => (
+  script: [1600, 1400, 2000],
+  ends: [0.3, 0.55, 1],
+  back: () => (
     <>
-      <g data-fx="foe" transform={`translate(${r1(fight(layout).foe)} ${GROUND.town})`}>
-        <svg x={-66 * FOE_K} y={-146 * FOE_K} width={120 * FOE_K} height={150 * FOE_K} viewBox="0 0 120 150" overflow="visible">
-          <MutantFigure />
-        </svg>
-        <path data-fx="burst" d="M-74 -150 L-60 -132 L-80 -124 L-58 -118 L-66 -98 L-48 -112 L-36 -94 L-38 -118 L-18 -122 L-40 -132 L-30 -150 L-50 -138 Z" fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={3} opacity={0} />
-      </g>
-      <Freeze />
+      {[-1, 0, 1, 2, 3, 4].map((i) => (
+        <path key={i} d={hexPath(i * DUEL.step, DUEL.step * 1.33)} fill="none" stroke={PHOSPHOR} strokeOpacity={0.45} strokeWidth={2} />
+      ))}
     </>
   ),
-  bind: (stage, layout) => {
-    const { count } = layout
-    const stars = fxs(stage, 'star', count)
-    const foe = fx(stage, 'foe')
-    const joints = foe && foeJoints(foe)
+  front: () => (
+    <>
+      <Mutant x={DUEL.foe} />
+      <path
+        data-fx="burst"
+        transform={`translate(${duelTarget.x} ${duelTarget.y})`}
+        d="M0 -30 L8 -10 L28 -14 L12 2 L24 20 L4 10 L-6 30 L-8 8 L-28 12 L-14 -4 L-26 -20 L-6 -12 Z"
+        fill={SHELTER_YELLOW}
+        stroke={POSTER_INK}
+        strokeWidth={3}
+        opacity={0}
+      />
+      <Freeze />
+      <Target name="aim-head" x={duelTarget.x} y={duelTarget.y} size={64} odds={95} />
+    </>
+  ),
+  // his turn: a hex step and the knee; the foe's turn: the block; the last: the kick in slow time
+  move: (kit, t) => {
+    const guard = KIT[kit]
+    const stepped = ease(ramp(t, 0, 0.1))
+    const ahead = DUEL.step * stepped
+    if (t < 0.3) return still(mix(guard, pose(KNEE), bell(t, 0.1, 0.3)), ahead)
+    if (t < 0.55) return still(mix(guard, pose(BLOCK), bell(t, 0.32, 0.55)), ahead)
+    return still(mix(guard, pose(KICK), bell(t, 0.66, 0.9)), ahead)
+  },
+  reply: (stage, { phone }) => {
+    const spot = spotOf(phone)
+    const size = placeScale(phone)
+    const foe = foeWriter(stage)
     const burst = fx(stage, 'burst')
     const freeze = fx(stage, 'freeze')
+    const head = fx(stage, 'aim-head')
     const camera = cameraWriter(stage)
-    const { foe: foeX } = fight(layout)
-    return (p, f) => {
-      stars.forEach((star, i) => fadeTo(star, ramp(f, i + 0.35, i + 0.45)))
-      const { at, t } = beatOf(f, count)
-      const final = at === count - 1
-      // his turn: one hex step, then the knee to the body or the kick to the head
-      const stepped = ramp(t, 0, 0.22)
-      const x = lerp(hexOf(layout, at - 1), hexOf(layout, at), ease(stepped))
-      const strike = bell(t, 0.25, 0.5)
-      const reaction = ramp(strike, 0.6, 1)
-      const kneeing = at % 2 === 0
-      // the mutant's turn: his swing and the block; on the last turn the freeze, the push in, and he goes down
-      const swing = final ? 0 : bell(t, 0.55, 0.9)
-      const frozen = final ? hold(t, 0.45, 0.55, 0.85, 0.98) : 0
-      const done = final ? ramp(t, 0.6, 0.85) : 0
-      if (joints) setFoePose(joints, mixFoe(mixFoe(mixFoe(FOE_GUARD, kneeing ? FOE_KNEED : FOE_KICKED, reaction), FOE_SWING, swing), FOE_DOWN, done))
-      fadeTo(burst, Math.max(reaction, frozen))
+    return (t) => {
+      const kneed = bell(t, 0.14, 0.3)
+      const swing = bell(t, 0.32, 0.55)
+      const down = ease(ramp(t, 0.8, 0.95))
+      foe(mixFoe(mixFoe(mixFoe(FOE_GUARD, FOE_KNEED, kneed), FOE_SWING, swing), FOE_DOWN, down))
+      const frozen = ramp(t, 0.56, 0.62) * (1 - ramp(t, 0.9, 1))
       fadeTo(freeze, 0.22 * frozen)
-      camera(foeX - 20, GROUND.town - 200, 1 + PUSH * ease(frozen))
-      const guard = mix(GUARD, BLOCK, swing)
-      const striking = mix(guard, kneeing ? knee(strike) : kick(strike), Math.min(1, strike * 2))
-      const pose = done > 0 ? mix(GUARD, thumbsUp(1), done) : { ...striking, rise: striking.rise - 6 * Math.sin(Math.PI * stepped) }
-      return survivor('town', x + 30 * strike, pose)
+      fadeTo(head, ramp(t, 0.58, 0.64) * (1 - ramp(t, 0.74, 0.78)))
+      camera(spot + duelTarget.x * size, GROUND.town + duelTarget.y * size, 1 + PUSH * ease(ramp(t, 0.6, 0.7) * (1 - ramp(t, 0.9, 1))))
+      fadeTo(burst, Math.max(bell(t, 0.18, 0.28), ramp(t, 0.78, 0.82) * (1 - ramp(t, 0.92, 1))))
     }
   },
 }
 
 // ---------------------------------------------------------------- Contact: the public terminal
 
+const TERMINAL = 150
+const CONTACT_HEEL = [80, 150, 220]
+const CONTACT_FROM = -260
+
 const contact: SceneDef = {
   zone: 'town',
   kit: null,
-  back: ({ cx }) => (
-    <g transform={`translate(${r1(cx + 90)} ${GROUND.town})`}>
-      <rect x={-8} y={-120} width={16} height={120} fill={STEEL} />
-      <rect x={-56} y={-230} width={112} height={116} rx={8} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
-      <rect x={-44} y={-218} width={88} height={72} rx={6} fill={GLASS} />
-      <g data-fx="screen" opacity={0.2}>
-        <path d="M-34 -204 H26 M-34 -190 H14 M-34 -176 H30 M-34 -162 H4" stroke={PHOSPHOR} strokeWidth={4} />
+  script: [1800, 1400],
+  ends: [0.55, 1],
+  back: () => (
+    <>
+      <g transform={`translate(${TERMINAL} 0)`}>
+        <rect x={-8} y={-120} width={16} height={120} fill={STEEL} />
+        <rect x={-56} y={-230} width={112} height={116} rx={8} fill={BAKELITE} stroke={POSTER_INK} strokeWidth={3} />
+        <rect x={-44} y={-218} width={88} height={72} rx={6} fill={GLASS} />
+        <g data-fx="screen" opacity={0.2}>
+          <path d="M-34 -204 H26 M-34 -190 H14 M-34 -176 H30 M-34 -162 H4" stroke={PHOSPHOR} strokeWidth={4} />
+        </g>
+        <rect x={-40} y={-138} width={80} height={14} fill={CHROME} stroke={POSTER_INK} strokeWidth={2} />
       </g>
-      <rect x={-40} y={-138} width={80} height={14} fill={CHROME} stroke={POSTER_INK} strokeWidth={2} />
-    </g>
+      <Pack xs={CONTACT_HEEL.map((back) => CONTACT_FROM - back)} />
+    </>
   ),
-  front: ({ cx }) => <Pack zone="town" xs={CONTACT_HEEL.map((back) => cx - 420 - back)} />,
-  bind: (stage, { cx }) => {
+  move: (kit, t) => {
+    const there = ease(ramp(t, 0, 0.55))
+    const ahead = lerp(CONTACT_FROM, TERMINAL - 80, there)
+    if (there < 1) return still(walk(there * 10), ahead)
+    const tap = Math.abs(Math.sin(ramp(t, 0.62, 0.9) * Math.PI * 4))
+    const keyed = blend(KIT[kit], pose(KEYS), t, 0.55, 0.62)
+    return still({ ...keyed, foreRight: keyed.foreRight + 6 * tap }, ahead)
+  },
+  reply: (stage) => {
     const screen = fx(stage, 'screen')
-    const dogs = packWriter(stage, 'town')
-    return (p) => {
-      const there = ramp(p, 0.2, 0.5)
-      const x = lerp(cx - 420, cx + 10, there)
-      const moving = there > 0 && there < 1 ? 1 : 0
-      fadeTo(screen, 0.2 + 0.8 * ramp(p, 0.5, 0.6))
-      CONTACT_HEEL.forEach((back, i) => dogs(i, x - back, moving ? trot(p * 12 + i * 0.3) : SITTING))
-      const pose = moving ? walk(p * 12) : mix(STAND, typing(1, p * 8), ramp(p, 0.5, 0.58))
-      return survivor('town', x, pose)
+    const dogs = packWriter(stage)
+    return (t) => {
+      const there = ease(ramp(t, 0, 0.55))
+      const x = lerp(CONTACT_FROM, TERMINAL - 80, there)
+      const moving = there > 0 && there < 1
+      CONTACT_HEEL.forEach((back, i) => dogs(i, x - back, moving ? trot(t * 14 + i * 0.3) : mixDog(SITTING, { ...SITTING, look: 1 }, ramp(t, 0.6, 0.7))))
+      fadeTo(screen, 0.2 + 0.8 * ramp(t, 0.7, 0.85))
     }
   },
 }
-
-// How far behind him each dog walks out to the terminal.
-const CONTACT_HEEL = [120, 240, 360]
 
 const SCENE_DEFS: Record<SceneId, SceneDef> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
 
 export interface Scene {
   id: SceneId
   def: SceneDef
-  layout: Layout
+  /** The cards the section counts, for the theatre's reading line. */
+  layout: PropLayout
   /** His kit here: the scene's own, or the profession the page shows. */
   kit: Profession
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
 }
 
+/** The scene's writer: the place's reply and his frame at the scene's playhead, him placed at his spot. */
+export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<DwellerPose> {
+  const { def, kit, layout } = scene
+  const input: SceneInput = { phone: layout.phone, kit }
+  const spot = sceneSpot(scene)
+  const size = placeScale(layout.phone)
+  return (stage) => {
+    const reply = def.reply(stage, input)
+    return (_p, _f, play = START) => {
+      const t = moveAt(def.ends, play)
+      reply(t)
+      const frame = def.move(kit, t)
+      return { x: spot + frame.ahead * size, y: GROUND[def.zone], k: K * size, pose: frame.pose, opacity: frame.opacity ?? 1 }
+    }
+  }
+}
+
+/** Where he stands in a scene: his usual spot, shifted right on a wide screen where the scene asks. */
+export const sceneSpot = ({ def, layout }: Scene): number => spotOf(layout.phone) + (layout.phone ? 0 : (def.wideShift ?? 0))
+
+/** The input the scene's art reads. */
+export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, kit: scene.kit })
+
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 
+// The theatre reads only the count of a scene's layout; its band is not drawn on.
+const BAND = [0, 0] as const
+
 const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot }
+  return { id, def, layout: propLayout(items, BAND, phone), kit: def.kit ?? profession, slot }
 }
 
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
@@ -726,4 +901,3 @@ export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, 
   ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, phone)),
   sceneOf('contact', null, NO_ITEMS, profession, phone),
 ]
-

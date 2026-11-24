@@ -39,6 +39,10 @@ import {
 
 export const VIEW = '0 0 1440 900'
 
+/** A phone's view of the canvas: taller and from higher up, so the ground sits about half way down the
+ *  screen; the near plane carries each place's floor on below the canvas (ZONE_FLOOR). */
+export const PHONE_VIEW = '0 300 1440 1000'
+
 export type Zone = 'shelter' | 'wasteland' | 'town'
 
 interface ZoneArt {
@@ -252,3 +256,6 @@ export const ZONE_ART: Record<Zone, ZoneArt> = {
 
 /** The ground line his boots stand on in each place, in the canvas's units. */
 export const GROUND: Record<Zone, number> = { shelter: 826, wasteland: 790, town: 760 }
+
+/** Each place's floor colour, carried on below the canvas on a phone's taller view. */
+export const ZONE_FLOOR: Record<Zone, string> = { shelter: OLIVE_DARK, wasteland: DUST_DARK, town: STREET }

@@ -5,16 +5,19 @@ import type { LayerMotion } from '@/lib/scroll/stage'
 import { Stage, type StageLayer } from '../shared/theatre/Stage'
 import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform } from '../shared/figureScene'
-import { SurvivorFigure } from './survivor'
-import { survivorJoints, setSurvivorPose } from './pose'
-import type { Scene } from './scenes'
-import { GROUND, VIEW, ZONE_ART } from './zones'
+import { DWELLER_VIEW, DwellerFigure } from './dweller'
+import { dwellerJoints, setDwellerPose } from './pose'
+import { inputOf, placeScale, sceneSpot, sceneWriter, type Scene } from './scenes'
+import { GROUND, PHONE_VIEW, VIEW, ZONE_ART, ZONE_FLOOR } from './zones'
 import { POSTER_INK } from './palette'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the place's layers from its sky to the
-// ground he walks on, the scene's props and him in the figure layer. The shared engine fades each stage
-// and pushes its layers in; the scene's writer moves its props and hands back his place and pose.
+// ground he stands on, the place's art round his spot and him in the figure layer. The shared engine fades
+// each stage and pushes its layers in; the scene's writer plays the place and hands back his frame. Each
+// plane's art sits in a group (data-fx="cam-<layer>") the targeting shot's camera pushes in on. On a phone the
+// planes show a taller view from higher up the canvas, the ground half way down the screen, and the near
+// plane carries the floor on below the canvas.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -25,46 +28,62 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
   figure: { zoom: [1.06, 1.16], lift: [0, -3] },
 }
 
-const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
+const DWELLER_RIG = { joints: dwellerJoints, pose: setDwellerPose }
 
-/** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG)
+/** The scene as the shared theatre runs it: its script played by the scroll, him placed and posed each frame. */
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, (stage) => sceneWriter(scene)(stage), DWELLER_RIG, scene.def.script)
 
-/** A layer's plane, marked data-fx="cam-<layer>" for the camera a scene pushes in (scenes.tsx). */
-const plane = (name: string, children: ReactNode): ReactNode => (
-  <svg data-fx={`cam-${name}`} viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
-    {children}
+/** A layer's plane over the place's view, its art in the group the camera pushes in. */
+const plane = (name: string, phone: boolean, children: ReactNode): ReactNode => (
+  <svg viewBox={phone ? PHONE_VIEW : VIEW} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} focusable="false">
+    <g data-fx={`cam-${name}`}>{children}</g>
   </svg>
 )
 
 /** Him at his first frame's place. */
-function Survivor({ scene }: { scene: Scene }) {
-  const first = scene.def.bind(NO_NODES, scene.layout)(0, 0)
+function Dweller({ scene }: { scene: Scene }) {
+  const first = sceneWriter(scene)(NO_NODES)(0, 0)
   return (
-    <g data-fx="figure" transform={figureTransform(first)}>
-      <svg x={-50} y={-144} width={100} height={150} viewBox="0 0 100 150" overflow="visible">
-        <SurvivorFigure profession={scene.kit} motion="still" radio={scene.def.radio ?? false} />
+    <g data-fx="figure" transform={figureTransform(first)} opacity={first.opacity}>
+      <svg x={-52} y={-DWELLER_VIEW.soles} width={DWELLER_VIEW.width} height={DWELLER_VIEW.height} viewBox={`0 0 ${DWELLER_VIEW.width} ${DWELLER_VIEW.height}`} overflow="visible">
+        <DwellerFigure profession={scene.kit} />
       </svg>
     </g>
   )
 }
 
 const layersOf = (scene: Scene): StageLayer[] => {
-  const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[scene.def.zone]
+  const { zone, back, front } = scene.def
+  const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[zone]
+  const { phone } = scene.layout
+  const input = inputOf(scene)
+  const spot = sceneSpot(scene)
+  const at = `translate(${spot} ${GROUND[zone]}) scale(${placeScale(phone)})`
   return [
-    { name: 'sky', node: plane('sky', <Sky uid={scene.id} />) },
-    { name: 'far', node: plane('far', <Far />) },
-    { name: 'mid', node: plane('mid', <Mid />) },
-    { name: 'near', node: plane('near', <Near uid={scene.id} />) },
+    { name: 'sky', node: plane('sky', phone, <Sky uid={scene.id} />) },
+    { name: 'far', node: plane('far', phone, <Far />) },
+    { name: 'mid', node: plane('mid', phone, <Mid />) },
+    {
+      name: 'near',
+      node: plane(
+        'near',
+        phone,
+        <>
+          <Near uid={scene.id} />
+          {phone && <rect x={-400} y={896} width={2240} height={600} fill={ZONE_FLOOR[zone]} />}
+        </>,
+      ),
+    },
     {
       name: 'figure',
       node: plane(
         'figure',
+        phone,
         <>
-          <ellipse cx={scene.layout.cx} cy={GROUND[scene.def.zone] + 4} rx={340} ry={14} fill={POSTER_INK} opacity={0.12} />
-          {scene.def.back(scene.layout)}
-          <Survivor scene={scene} />
-          {scene.def.front(scene.layout)}
+          <ellipse cx={spot + 60} cy={GROUND[zone] + 4} rx={300} ry={14} fill={POSTER_INK} opacity={0.12} />
+          <g transform={at}>{back(input)}</g>
+          <Dweller scene={scene} />
+          {front && <g transform={at}>{front(input)}</g>}
         </>,
       ),
     },

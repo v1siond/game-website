@@ -1,123 +1,143 @@
+import type { Profession } from '@/lib/cv/professions'
 import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
 import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
-import s from './survivor.module.css'
+import s from './dweller.module.css'
 import d from './dog.module.css'
 import m from './mutant.module.css'
 
-// The survivor and his dogs posed by the scroll. His limbs are the shared rig's numbers (rigPose,
-// ../shared/rig); on top, his own overlays: the level up star with the wink, the targeting reticle, the
-// pistol and its flash, the held radio's tuning. The angles are the ones his CSS motions end on
-// (survivor.module.css), so he looks the same on the wrist terminal. His moves are the wasteland RPG's: the
-// crouched sneak, the lockpick on one knee, keying a terminal, the targeting stance and its shot, pointing a
-// dog out to fetch, the guard and the block of a turn fight, turning the radio's dial. The dogs trot in
-// profile, facing right, their paws swinging with the phase; the mutant of the Muay Thai scene keeps his
-// guard, takes the knee or the kick, swings back on his turn, and goes down.
+// The dweller, his dogs and the mutant posed by a scene's playhead. His limbs are the shared rig's numbers
+// (rigPose, ../shared/rig); he stands side on facing right, so a negative turn swings an arm or a thigh
+// forward and a positive one folds a shin back, his near side the rig's right. On top, each 0 to 1, what he
+// holds: the pistol and its flash, the bobblehead and its bob, the syringe, the radio and its dial, and his
+// wrist computer's needle and its red alarm. His thigh is 24 units to the knee and his shin 24 to the sole,
+// which sets how far a bent leg drops him (rise, positive down). The dogs trot in profile; the mutant keeps
+// his guard, takes the knee or the kick, swings back on his turn and goes down.
 
-/** The rig's pose and, 0 to 1: the star and wink, the reticle locked on, the pistol out, its flash, and the
- *  held radio's dial (its knob and needle, 0 to 1 across the band). */
-export type SurvivorPose = RigPose & { star: number; reticle: number; pistol: number; flash: number; needle: number }
-
-export const STAND: SurvivorPose = { ...RIG_STAND, star: 0, reticle: 0, pistol: 0, flash: 0, needle: 0 }
-
-export const mix = (a: SurvivorPose, b: SurvivorPose, t: number): SurvivorPose => rigMix(a, b, t)
-
-const pose = (partial: Partial<SurvivorPose>): SurvivorPose => ({ ...STAND, ...partial })
-
-/** The jaunty poster walk at `phase`, toward the viewer's right. */
-export const walk = (phase: number): SurvivorPose => pose(rigWalk(phase))
-
-/** The level up: the thumb up, a hop, the wink and the star, `t` of the way. */
-export const thumbsUp = (t: number): SurvivorPose => pose({ armRight: 70 * t, foreRight: 110 * t, rise: -6 * Math.sin(Math.PI * t), star: t })
-
-/** The wrist terminal raised and keyed, the key hand tapping with `tap`. */
-export const typing = (t: number, tap: number): SurvivorPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
-
-/** The targeting stance, the pistol up and the reticle locked, and the shot's recoil with `shot`. */
-export const aim = (t: number, shot: number): SurvivorPose =>
-  pose({ armLeft: (-88 - 16 * shot) * t, foreLeft: (-4 - 14 * shot) * t, armRight: 28 * t, foreRight: -95 * t, pistol: t, reticle: t, flash: shot * t })
-
-/** The bakelite radio held to his chest, his right hand on the knob turning the dial to `needle`. */
-export const tune = (needle: number): SurvivorPose => pose({ lean: -3, armLeft: -44, foreLeft: 118, armRight: 35, foreRight: -35, needle })
-
-/** The crouched sneak at `phase`, knees bent and the pistol held low, `t` of the way down into it. */
-export const sneak = (phase: number, t = 1): SurvivorPose => {
-  const step = rigWalk(phase)
-  return pose({
-    ...step,
-    rise: (10 + step.rise) * t,
-    lean: 6 * t,
-    thighRight: 14 * t,
-    shinRight: -26 * t,
-    thighLeft: -14 * t,
-    shinLeft: 26 * t,
-    armLeft: -32 * t,
-    foreLeft: -38 * t,
-    armRight: -18 * t,
-    foreRight: -40 * t,
-    pistol: t,
-  })
+export type DwellerPose = RigPose & {
+  pistol: number
+  flash: number
+  held: number
+  bob: number
+  syringe: number
+  radio: number
+  dial: number
+  gauge: number
+  alarm: number
 }
 
-/** Down on one knee at the lock, the pick in his left hand worked with `pick`, the tension tool in his right. */
-export const lockpick = (t: number, pick: number): SurvivorPose =>
-  pose({ rise: 30 * t, kneeRight: t, shinRight: -8 * t, thighLeft: -18 * t, shinLeft: 38 * t, armLeft: -62 * t, foreLeft: (-14 + 10 * pick) * t, armRight: -34 * t, foreRight: -62 * t })
+export const STAND: DwellerPose = { ...RIG_STAND, pistol: 0, flash: 0, held: 0, bob: 0, syringe: 0, radio: 0, dial: 0, gauge: 0, alarm: 0 }
 
-/** His left arm out, pointing a dog to the find. */
-export const point = (t: number): SurvivorPose => pose({ armLeft: -100 * t, foreLeft: -6 * t, lean: -3 * t })
+export const mix = (a: DwellerPose, b: DwellerPose, t: number): DwellerPose => rigMix(a, b, t)
+
+export const pose = (partial: Partial<DwellerPose>): DwellerPose => ({ ...STAND, ...partial })
+
+/** Each profession's resting kit: the dweller's arms down, the sticks forward, the Muay Thai guard with both
+ *  wraps up before his chin and the near foot ahead. */
+export const KIT: Record<Profession, DwellerPose> = {
+  engineer: STAND,
+  drummer: pose({ armRight: -15, foreRight: -55, armLeft: -10, foreLeft: -60 }),
+  fighter: pose({ armRight: -40, foreRight: -105, armLeft: -50, foreLeft: -100, thighRight: -12, thighLeft: 12 }),
+}
+
+/** His profile stride at `phase`, facing right. */
+export const walk = (phase: number): DwellerPose => pose(rigWalk(phase, 1))
+
+/** Down on the far knee: the far thigh straight down and its shin folded back flat, the near knee up before
+ *  him with its shin straight down to the foot. */
+export const KNEEL: Partial<DwellerPose> = { rise: 21, thighRight: -80, shinRight: 80, thighLeft: 0, shinLeft: 90 }
+
+/** The wrist computer raised before his face, the far hand's finger on its dial. */
+export const WRIST: Partial<DwellerPose> = { armRight: -70, foreRight: -85, armLeft: -55, foreLeft: -70 }
+
+/** The near forearm raised across before his eyes against the glare, leaning back a little. */
+export const SHADE: Partial<DwellerPose> = { armRight: -150, foreRight: 10, lean: -4 }
+
+/** The pistol up and level, the far hand under the near one. */
+export const AIM: Partial<DwellerPose> = { armRight: -90, foreRight: 0, armLeft: -78, foreLeft: -14, thighRight: -10, thighLeft: 10, pistol: 1 }
+
+/** Both hands low before him at the lock, the pick and the tension tool. */
+export const PICK: Partial<DwellerPose> = { armRight: -55, foreRight: -25, armLeft: -45, foreLeft: -30 }
+
+/** The near arm out at chest height, reaching; then the find held up before his face. */
+export const REACH: Partial<DwellerPose> = { armRight: -88, foreRight: -6 }
+export const HOLD_UP: Partial<DwellerPose> = { armRight: -55, foreRight: -95 }
+
+/** The far hand's syringe driven into the near upper arm. */
+export const JAB: Partial<DwellerPose> = { armRight: -15, armLeft: -70, foreLeft: -75, syringe: 1 }
+
+/** The near arm out, pointing the dog to the find. */
+export const POINT: Partial<DwellerPose> = { armRight: -95, foreRight: -5, lean: 2 }
+
+/** The radio held at his chest, the far hand under it and the near one on its dial. */
+export const RADIO: Partial<DwellerPose> = { armRight: -60, foreRight: -60, armLeft: -50, foreLeft: -55, radio: 1 }
+
+/** Both hands forward on a terminal's keys at chest height. */
+export const KEYS: Partial<DwellerPose> = { armRight: -72, foreRight: -22, armLeft: -62, foreLeft: -26 }
 
 /** The block on the foe's turn: both forearms up before the face, leaning back. */
-export const BLOCK: SurvivorPose = pose({ armRight: 58, foreRight: 122, armLeft: -58, foreLeft: -122, lean: -7, rise: 3 })
+export const BLOCK: Partial<DwellerPose> = { armRight: -55, foreRight: -115, armLeft: -50, foreLeft: -120, lean: -7, thighRight: -12, thighLeft: 14 }
 
-/** The guard of the fighter's kit, then the clinch knee `t` of the way. */
-export const knee = (t: number): SurvivorPose =>
-  pose({ armRight: 25 - 110 * t, foreRight: 150 - 125 * t, armLeft: -25 - 80 * t, foreLeft: -150 + 185 * t, lean: -8 * t, thighLeft: -105 * t, shinLeft: 115 * t })
+/** The clinch knee: both wraps pulling down at the head, the near knee driven up and forward. */
+export const KNEE: Partial<DwellerPose> = { armRight: -110, foreRight: -40, armLeft: -100, foreLeft: -45, thighRight: -105, shinRight: 110, lean: 4 }
 
-/** The side kick `t` of the way: the thigh up, the shin out, leaning back. */
-export const kick = (t: number): SurvivorPose =>
-  pose({ armRight: 25 - 35 * t, foreRight: 150 - 140 * t, armLeft: -25, foreLeft: -150, lean: -16 * t, thighLeft: -96 * t, shinLeft: -4 * t })
-
-/** The fighter's guard. */
-export const GUARD: SurvivorPose = pose({ armRight: 25, foreRight: 150, armLeft: -25, foreLeft: -150 })
+/** The side kick: the near leg out level at the head, leaning back to it, the guard kept. */
+export const KICK: Partial<DwellerPose> = { armRight: -40, foreRight: -105, armLeft: -50, foreLeft: -100, thighRight: -95, shinRight: 0, lean: -16, rise: 2 }
 
 const LIMB_CLASSES = {
   body: s.body,
-  armRight: s.armRight,
-  foreRight: s.foreRight,
-  armLeft: s.armLeft,
-  foreLeft: s.foreLeft,
-  thighRight: s.thighRight,
-  shinRight: s.shinRight,
-  thighLeft: s.thighLeft,
-  shinLeft: s.shinLeft,
+  armRight: s.armFront,
+  foreRight: s.foreFront,
+  armLeft: s.armBack,
+  foreLeft: s.foreBack,
+  thighRight: s.thighFront,
+  shinRight: s.shinFront,
+  thighLeft: s.thighBack,
+  shinLeft: s.shinBack,
 }
 
-const OVERLAY_CLASSES = { star: s.star, winkLine: s.winkLine, eyeShut: s.eyeShut, reticle: s.reticle, pistol: s.pistol, flash: s.flash }
-
-export type SurvivorJoints = RigJoints & Record<keyof typeof OVERLAY_CLASSES, SVGElement | null> & { root: HTMLElement | SVGElement | null }
+const GEAR_CLASSES = {
+  pistol: s.pistol,
+  flash: s.flash,
+  held: s.held,
+  heldHead: s.heldHead,
+  syringe: s.syringe,
+  radio: s.radio,
+  dial: s.dial,
+  needle: s.needle,
+  alarm: s.alarm,
+}
 
 const find = <Names extends string>(root: Element, classes: Record<Names, string>): Record<Names, SVGElement | null> =>
   Object.fromEntries(Object.entries(classes).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className as string}`)])) as Record<Names, SVGElement | null>
 
-/** His groups inside `root`, the group that holds one SurvivorFigure. */
-export const survivorJoints = (root: Element): SurvivorJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, OVERLAY_CLASSES), root: root as SVGElement })
+export type DwellerJoints = RigJoints & Record<keyof typeof GEAR_CLASSES, SVGElement | null>
 
-const show = (el: SVGElement | null, opacity: number, transform = 'none'): void => {
+/** His groups inside `root`, the group that holds one DwellerFigure. */
+export const dwellerJoints = (root: Element): DwellerJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, GEAR_CLASSES) })
+
+const show = (el: SVGElement | null, opacity: number, transform?: string): void => {
   if (!el) return
   el.style.opacity = opacity.toFixed(3)
-  el.style.transform = transform
+  if (transform) el.style.transform = transform
 }
 
-/** Writes `p` on his groups: the rig's limbs, then his overlays. Transforms and opacity only. */
-export function setSurvivorPose(j: SurvivorJoints, p: SurvivorPose): void {
+const spin = (el: SVGElement | null, deg: number): void => {
+  if (el) el.style.transform = `rotate(${deg.toFixed(1)}deg)`
+}
+
+/** Writes `p` on his groups: the rig's limbs, then what he holds. The bobblehead turns against his arm so it
+ *  stands upright in his hand. Transforms and opacity only. */
+export function setDwellerPose(j: DwellerJoints, p: DwellerPose): void {
   setRigPose(j, p)
-  show(j.star, p.star, `scale(${p.star.toFixed(3)}) rotate(${(-90 + 90 * p.star).toFixed(1)}deg)`)
-  show(j.winkLine, p.star)
-  show(j.eyeShut, 1 - p.star)
-  show(j.reticle, p.reticle)
   show(j.pistol, p.pistol)
   show(j.flash, p.flash)
-  // the held radio's knob and dial needle turn with --needle (survivor.module.css)
-  j.root?.style.setProperty('--needle', p.needle.toFixed(3))
+  show(j.held, p.held, `rotate(${(-(p.armRight + p.foreRight)).toFixed(1)}deg)`)
+  spin(j.heldHead, 14 * p.bob)
+  show(j.syringe, p.syringe)
+  show(j.radio, p.radio)
+  spin(j.dial, -120 + 240 * p.dial)
+  spin(j.needle, -60 + 120 * p.gauge)
+  show(j.alarm, p.alarm)
 }
 
 // ---- the dog ----
