@@ -6,18 +6,19 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { MYTH } from './palette'
 import { REST, bodyTransform, jointTransform, type Joint, type Pose } from './rig'
 
-// Him as a hero of the old myths, in three quarter profile facing right: the near arm with the short sword
-// in front of the chest, the far arm with the round shield and the far leg behind it in a darker shade, the
-// red cloak hanging from his shoulders behind him. One dark ink line round every shape over painted
-// gradient fills, the warm rim of the fire on the lit edge. A bronze cuirass, a leather kilt of strips with
-// the key band, bronze greaves, and the crested helm pushed back off his brow so his face shows.
+// Him as the hero of the god of war games, in their style, in three quarter profile facing right: the near
+// arm with the frost axe, the far arm with the round shield that folds out of the vambrace, a fur mantle over
+// the shoulders hanging behind him. One dark ink line round every shape over painted gradient fills, the warm
+// rim of the fire on the lit edge. A bronze cuirass, a leather kilt of strips, bronze greaves, his head bare.
+// The axe is a bearded war axe of our own with a frost edge and its runes; nothing is the games' hero.
 //
-// His traits come from HERO_IDENTITY: his skin, his dark hair under the helm, his full dark beard and dark
-// oval eyes. The Martial Artist wears his mongkhon in place of the helm.
+// His traits come from HERO_IDENTITY: his skin, his dark hair, his full dark beard and dark oval eyes. The
+// Martial Artist wears his mongkhon.
 //
 // Every limb is drawn hanging straight down and rig.ts turns it: HeroFigure draws one pose as SVG
 // attributes, and a scene's writer turns its joints ([data-joint]) and moves its body ([data-body]) as the
-// page scrolls (scenes.tsx).
+// page scrolls (scenes.tsx). The axe in his hand, the frost on it, the shield and the red light of the rage
+// are groups a scene shows and hides (data-fx axe-held, axe-frost, shield, rage).
 
 const INK = MYTH.inkLine
 
@@ -31,14 +32,13 @@ type Side = 'far' | 'near'
 
 const HEAD = 'M80 38 Q78 20 94 19 Q106 19 107 33 L109 42 Q108 50 102 53 L85 54 Q80 48 80 38 Z'
 const HAIR = 'M79 40 Q76 22 92 18 Q106 17 108 30 Q100 26 92 28 Q86 30 84 42 Z'
-const HELM = 'M77 30 Q78 12 95 10 Q110 11 111 24 L104 26 Q96 18 86 22 Q80 26 79 33 Z'
-const CREST = 'M80 14 Q88 -4 104 2 Q114 6 112 16 Q102 8 92 12 Q86 14 82 20 Z'
 const BROW = 'M92 32 L108 30 L108 34 L93 35 Z'
 const NOSE = 'M107 37 L111 44 L107 45'
 const BEARD = 'M84 44 Q86 50 89 52 L107 46 Q111 51 108 58 Q103 69 95 71 Q85 69 83 58 Z'
 const NECK = 'M85 50 L101 50 L103 64 L83 64 Z'
 
-const CLOAK = 'M74 62 Q66 64 62 80 L52 168 Q70 176 82 168 L86 110 Q88 80 92 62 Z'
+const MANTLE = 'M74 62 Q66 64 62 80 L58 132 Q70 140 82 132 L86 104 Q88 80 92 62 Z'
+const MANTLE_FUR = 'M70 56 Q86 46 104 54 Q112 60 110 68 Q98 62 86 64 Q76 66 70 74 Q64 66 70 56 Z'
 const TORSO = 'M76 62 Q86 54 100 58 Q111 62 113 74 Q115 90 107 104 L103 118 L76 118 Q69 100 71 84 Q71 70 76 62 Z'
 const CUIRASS = 'M75 66 Q86 58 100 61 Q110 65 112 76 Q113 90 106 104 L103 116 L77 116 Q71 100 72 84 Q72 72 75 66 Z'
 const CUIRASS_LINES = 'M95 80 Q104 90 111 82 M99 94 L101 112 M92 99 Q98 101 105 99'
@@ -60,10 +60,12 @@ const FIST: Record<Side, string> = {
   far: 'M78 119 Q84 115 90 119 L90 130 Q84 134 78 130 Z',
   near: 'M91 123 Q98 119 105 123 L105 135 Q98 139 91 135 Z',
 }
-// The short sword leaves the near fist forward and down, its guard across the fist.
-const SWORD_BLADE = 'M101 134 L106 132 L128 176 L126 182 L121 179 Z'
-const SWORD_EDGE = 'M104 134 L125 177'
-const SWORD_GUARD = 'M94 132 L110 126 L111 130 L96 136 Z'
+// The axe hangs from the near fist forward and down: the haft through the fist, the bearded head at its foot
+// with the frost edge, the runes cut in its cheek.
+const AXE_HAFT = 'M96 120 L101 119 L112 182 L107 183 Z'
+const AXE_HEAD = 'M106 160 L118 156 Q134 160 136 176 Q132 190 118 192 L114 184 Q122 180 120 172 L110 172 Z'
+const AXE_EDGE = 'M120 157 Q135 162 136 176 Q132 190 118 192'
+const AXE_RUNES = 'M114 162 L116 168 M118 164 L117 170 L120 168'
 // The round shield rides on the far forearm, its face to the front.
 const SHIELD_AT = { x: 86, y: 116, r: 30 }
 
@@ -134,14 +136,7 @@ function Head({ profession, ids, pose }: PartProps) {
       <path d={NOSE} fill={HERO_IDENTITY.skinShade} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
       <Inked d={BEARD} fill={HERO_IDENTITY.beard} />
       <path d="M89 58 Q95 64 104 58" stroke={MYTH.inkSoft} strokeWidth={1.2} fill="none" />
-      {profession === 'fighter' ? (
-        <Mongkhon />
-      ) : (
-        <>
-          <Inked d={CREST} fill={MYTH.crest} />
-          <Inked d={HELM} fill={`url(#${ids.bronze})`} />
-        </>
-      )}
+      {profession === 'fighter' && <Mongkhon />}
     </JointGroup>
   )
 }
@@ -199,22 +194,24 @@ function Leg({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }
   )
 }
 
-function Sword({ ids }: { ids: GradientIds }) {
+function Axe({ ids }: { ids: GradientIds }) {
   return (
-    <g>
-      <Inked d={SWORD_BLADE} fill={`url(#${ids.blade})`} />
-      <path d={SWORD_EDGE} fill="none" stroke={MYTH.bone} strokeWidth={1.2} />
-      {/* the god's light the sword keeps once it is given (scenes.tsx lights it) */}
-      <path d={SWORD_EDGE} fill="none" stroke={MYTH.bladeFire} strokeWidth={5} strokeLinecap="round" opacity={0} data-fx="sword-light" />
-      <Inked d={SWORD_GUARD} fill={MYTH.bronze} />
+    <g data-fx="axe-held">
+      <Inked d={AXE_HAFT} fill={`url(#${ids.leather})`} />
+      <Inked d={AXE_HEAD} fill={`url(#${ids.blade})`} />
+      <path d={AXE_EDGE} fill="none" stroke={MYTH.frost} strokeWidth={2.4} />
+      <path d={AXE_RUNES} fill="none" stroke={MYTH.frost} strokeWidth={1.2} />
+      {/* the frost that runs up the blade when he calls it (scenes.tsx) */}
+      <path d={AXE_EDGE} fill="none" stroke={MYTH.frostCore} strokeWidth={6} strokeLinecap="round" opacity={0} data-fx="axe-frost" />
     </g>
   )
 }
 
 function Shield({ ids }: { ids: GradientIds }) {
   const { x, y, r } = SHIELD_AT
+  // folded into the vambrace it is scaled down to nothing about the forearm (scenes.tsx unfolds it)
   return (
-    <g>
+    <g data-fx="shield">
       <circle cx={x} cy={y} r={r} fill={`url(#${ids.bronze})`} stroke={INK} strokeWidth={2.6} />
       <circle cx={x} cy={y} r={r - 6} fill="none" stroke={MYTH.leatherShade} strokeWidth={1.6} />
       <path d={`M${x - 10} ${y - 8} Q${x} ${y - 16} ${x + 10} ${y - 8} M${x - 12} ${y + 6} Q${x} ${y + 14} ${x + 12} ${y + 6}`} fill="none" stroke={MYTH.crest} strokeWidth={3} />
@@ -231,7 +228,7 @@ function Arm({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }
       <JointGroup joint={side === 'far' ? 'foreFar' : 'foreNear'} pose={pose}>
         <Inked d={FOREARM[side]} fill={skinOf(ids, side)} />
         <Inked d={BRACER[side]} fill={`url(#${ids.leather})`} />
-        {side === 'near' && <Sword ids={ids} />}
+        {side === 'near' && <Axe ids={ids} />}
         <Inked d={FIST[side]} fill={skinOf(ids, side)} />
         {side === 'far' && <Shield ids={ids} />}
       </JointGroup>
@@ -268,9 +265,10 @@ function Gradients({ ids }: { ids: GradientIds }) {
         <stop offset="0.6" stopColor={MYTH.steel} />
         <stop offset="1" stopColor={MYTH.steelShade} />
       </linearGradient>
+      {/* the fur of the mantle, lit at its top */}
       <linearGradient id={ids.cloak} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor={MYTH.crest} />
-        <stop offset="1" stopColor={MYTH.bloodDeep} />
+        <stop offset="0" stopColor={MYTH.furLight} />
+        <stop offset="1" stopColor={MYTH.fur} />
       </linearGradient>
     </defs>
   )
@@ -294,7 +292,11 @@ export function HeroFigure({ profession, pose = REST }: { profession: Profession
       <ellipse cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
       <g data-body="" transform={bodyTransform(pose)}>
         <JointGroup joint="chest" pose={pose}>
-          <Inked d={CLOAK} fill={`url(#${ids.cloak})`} />
+          <g data-fx="rage" opacity={0}>
+            <ellipse cx={88} cy={110} rx={54} ry={96} fill={MYTH.blood} opacity={0.35} />
+            <ellipse cx={88} cy={110} rx={34} ry={70} fill={MYTH.fire} opacity={0.3} />
+          </g>
+          <Inked d={MANTLE} fill={`url(#${ids.cloak})`} />
           <Arm side="far" {...parts} />
         </JointGroup>
         <Leg side="far" {...parts} />
@@ -302,6 +304,7 @@ export function HeroFigure({ profession, pose = REST }: { profession: Profession
         <Waist ids={ids} />
         <JointGroup joint="chest" pose={pose}>
           <Torso ids={ids} />
+          <Inked d={MANTLE_FUR} fill={`url(#${ids.cloak})`} />
           <Head profession={profession} {...parts} />
           <Arm side="near" {...parts} />
         </JointGroup>

@@ -26,10 +26,13 @@ export function LastGate({ still }: { still?: ReactNode }) {
   const title = sections.contact
 
   return (
-    <section ref={ref} data-scene="contact" data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative z-20 mx-auto max-w-6xl scroll-mt-8 px-4 pb-24 sm:px-6">
+    <section ref={ref} data-scene="contact" data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative z-20 mx-auto min-h-[130svh] max-w-6xl scroll-mt-8 px-4 pb-24 sm:px-6">
       {still}
+      {/* tall enough that its scene fully rises over the one before it, even at the page's end */}
       <div className={COLUMN}>
         <SectionTitle title={title} />
+        {/* under lg the realm travel plays in this gap first, as every section's scene does (stage.tsx) */}
+        <div className="max-lg:min-h-[115svh]" aria-hidden="true" />
         <div data-open={open || undefined} className={`relative h-80 overflow-hidden ${u.gateScene}`} aria-hidden="true">
           {/* the dawn behind the gate */}
           <div className={`absolute inset-x-[22%] bottom-0 top-8 rounded-t-full bg-[radial-gradient(ellipse_at_50%_80%,var(--myth-dawn-pale),var(--myth-dawn)_45%,var(--myth-blood)_100%)] ${u.dawn}`} />

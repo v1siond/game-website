@@ -66,7 +66,7 @@ export interface Pose extends Angles {
   y: number
 }
 
-export type Move = 'walk' | 'combo' | 'launch' | 'slam' | 'parry' | 'dodge' | 'bash' | 'raise' | 'finisher' | 'heave' | 'hurl' | 'climb'
+export type Move = 'walk' | 'combo' | 'launch' | 'slam' | 'parry' | 'dodge' | 'bash' | 'raise' | 'finisher' | 'heave' | 'hurl' | 'climb' | 'throw' | 'catch' | 'rage' | 'row'
 
 /** A key: when it falls in the move (0 to 1) and the joints it changes; the others hold from the key before. */
 export interface Key {
@@ -217,6 +217,42 @@ export const MOVES: Record<Move, MoveSpec> = {
       { at: 0.4, pose: { chest: 14, head: -12, armNear: -110, foreNear: -95, armFar: -168, foreFar: -12, thighNear: -30, shinNear: 50, thighFar: -10, shinFar: 30 } },
       { at: 0.7, pose: { chest: 8, armNear: -150, foreNear: -40, armFar: -120, foreFar: -60, thighNear: -70, shinNear: 95, thighFar: -40, shinFar: 80 } },
       { at: 1, pose: { ...CLIMB_HANG } },
+    ],
+  },
+  // the axe throw: wound back over the near shoulder, then whipped forward and let go at arm's length, the
+  // weight on the near leg, the arm held out after it
+  throw: {
+    keys: () => [
+      { at: 0, pose: {} },
+      { at: 0.45, pose: { armNear: -200, foreNear: -70, chest: -10, head: -6, thighNear: -20, shinNear: 10 } },
+      { at: 0.65, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
+      { at: 1, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
+    ],
+  },
+  // the recall: the near hand held out open for the axe, the jolt as it lands in the palm, back to his guard
+  catch: {
+    keys: (r) => [
+      { at: 0, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
+      { at: 0.4, pose: { armNear: -95, foreNear: -12, chest: -2, head: -6, thighNear: -20, shinNear: 12, thighFar: 16, shinFar: 8 } },
+      { at: 0.75, pose: { armNear: -70, foreNear: -40, chest: -10, head: -10, x: -8 } },
+      back(r),
+    ],
+  },
+  // the rage: the hands empty and clenched at his sides, the chest down, the head up in the roar, the legs set
+  rage: {
+    keys: () => [
+      { at: 0, pose: {} },
+      { at: 0.6, pose: { chest: 20, head: -22, armNear: 30, foreNear: -110, armFar: 20, foreFar: -110, thighNear: -30, shinNear: 40, thighFar: 20, shinFar: 30 } },
+      { at: 1, pose: { chest: 20, head: -22, armNear: 30, foreNear: -110, armFar: 20, foreFar: -110, thighNear: -30, shinNear: 40, thighFar: 20, shinFar: 30 } },
+    ],
+  },
+  // a stroke of the oars sat in the boat: the arms reach forward with the chest, then pull back to the chest
+  // as he leans back, and reach again
+  row: {
+    keys: () => [
+      { at: 0, pose: { thighNear: -85, shinNear: 85, thighFar: -80, shinFar: 80, chest: 20, armNear: -80, foreNear: -20, armFar: -75, foreFar: -20 } },
+      { at: 0.5, pose: { chest: -12, armNear: -25, foreNear: -110, armFar: -20, foreFar: -110 } },
+      { at: 1, pose: { chest: 20, armNear: -80, foreNear: -20, armFar: -75, foreFar: -20 } },
     ],
   },
 }

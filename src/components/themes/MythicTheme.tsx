@@ -33,15 +33,18 @@ const mythDisplay = Cinzel({
   variable: '--myth-display',
 })
 
-// Mythic, a hero of the old myths climbing out of the deep, painted in ink over colour: the page climbs from
-// the great hall to the gods' mountain. The fixed depths behind the page fade to the region in view
-// (data-zone): the great hall, the storm sea, the magma, the bronze giant's harbour and the summit at dawn.
-// Over them, on the shared theatre (./shared/theatre), every part of the page has his scene
-// (./Mythic/scenes): he stands in his guard in the hall, takes the gods' gift, fights the storm deck, climbs
-// the chain, launches and slams, parries the fire spirits, hurls the brutes, dodges the giant, duels the
-// champion and walks up into the dawn, one beat per card, scrubbed by the scroll and played back on the way
-// up. The sections read in a column on the left from lg, so the scenes play clear of them on the right.
-// Under reduced motion there is no theatre: each part carries its own scene, still, at its peak.
+// Mythic, the god of war games in their own style, painted in ink over colour: the page climbs from the
+// great hall to the gods' mountain, the Greek past of those games, and he plays their Norse moves in it. The
+// fixed depths behind the page fade to the region in view (data-zone): the great hall, the storm sea, the
+// magma, the bronze giant's harbour and the summit at dawn. Over them, on the shared theatre
+// (./shared/theatre), every part of the page has his scene (./Mythic/scenes), one to three of the games'
+// moves played by the scroll at the scene's own pace and back on the way up: the shield out of the
+// vambrace, the axe thrown and called back, the shield bash and the heavy blow, the chained blades and the
+// swing to the ledge, the frost locking a gear, Spartan Rage, the boat to the realm door, the runic ice
+// under the giant, the parry and the finisher, the realm travel light. The sections read in a column on the
+// left from lg, so the scenes play clear of them on the right; under lg each scene plays in a gap under its
+// title before the cards. Under reduced motion there is no theatre: each part carries its own scene, still,
+// at its end frame.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
 // container chain.

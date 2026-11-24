@@ -8,7 +8,8 @@ import type { TagListLook } from '@/components/cv/TagList'
 import u from './underworld.module.css'
 
 // A section in the descent: the gilded title plate over the section's cards, read in a column on the left
-// from lg so the section's scene (scenes.tsx, on the shared theatre) plays clear of it on the right.
+// from lg so the section's scene (scenes.tsx, on the shared theatre) plays clear of it on the right; under lg
+// the scene plays in a tall gap under the title before the cards come up.
 // useZoneStage marks it data-on once, the first time it scrolls into view, and every entrance inside starts
 // off that flag. While it is in view it hands its region to the page, which fades the fixed depths
 // (depths.tsx) to that region. Under reduced motion the section carries its own scene drawn settled
@@ -74,6 +75,9 @@ export function Stage({ id, title, zone, children }: { id: string; title: string
       {still(id)}
       <div className={COLUMN}>
         <SectionTitle title={title} />
+        {/* under lg the cards take the whole width, so the section's scene plays and holds in this gap first,
+            the title at its top and the floor clear of the cards (the head about 130svh with the title) */}
+        <div className="max-lg:min-h-[115svh]" aria-hidden="true" />
         {children}
       </div>
     </section>

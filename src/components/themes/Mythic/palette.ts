@@ -2,8 +2,8 @@ import { paletteVars } from '../shared/paletteVars'
 
 // Mythic's palette, every colour of the world once, painted in ink over colour: the crimson marble and gold
 // of the great hall, the eras behind the page (the storm sea, the magma, the harbour under the bronze giant,
-// the mountain at dawn), the parchment of the tech stack and the prophecies, and his own kit (the cloak's
-// crest red, leather, bronze and steel). The SVG art reads MYTH; MYTH_VARS puts the same values on the
+// the mountain at dawn), the parchment of the tech stack and the prophecies, and his own kit (the fur mantle,
+// leather, bronze and steel, the axe's frost). The SVG art reads MYTH; MYTH_VARS puts the same values on the
 // world's root as --myth-* variables for the CSS modules and the Tailwind arbitrary values.
 
 export const MYTH = {
@@ -111,6 +111,11 @@ export const MYTH = {
   steel: '#a4aab0',
   steelShade: '#4c5258',
   bladeFire: '#ff8a2a',
+  // ---- the frost of his axe and the fur of his mantle
+  frost: '#8fd4ff',
+  frostCore: '#e8f7ff',
+  fur: '#4e4034',
+  furLight: '#8a7460',
   wrap: '#efe7da',
 } as const
 
