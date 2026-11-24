@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import {
@@ -15,6 +15,7 @@ import {
   SHELTER_YELLOW,
   WARNING_RED,
 } from './palette'
+import { dwellerJoints, setDwellerPose, type DwellerPose } from './pose'
 import d from './dweller.module.css'
 
 // Him on a stage, side on and facing right, the way he acts in every scene: the shelter dweller drawn as the
@@ -268,5 +269,19 @@ export function DwellerFigure({ profession }: { profession: Profession }) {
         />
       </g>
     </g>
+  )
+}
+
+/** Him standing in one pose on a card (the Muay Thai badges, the terminal's access screen): his figure in its
+ *  own box, the pose written on its joints once it is on the page, the way a stage writes a frame. */
+export function DwellerSprite({ profession, pose, className = '' }: { profession: Profession; pose: DwellerPose; className?: string }) {
+  const ref = useRef<SVGSVGElement>(null)
+  useLayoutEffect(() => {
+    if (ref.current) setDwellerPose(dwellerJoints(ref.current), pose)
+  }, [pose])
+  return (
+    <svg ref={ref} viewBox={`0 0 ${DWELLER_VIEW.width} ${DWELLER_VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+      <DwellerFigure profession={profession} />
+    </svg>
   )
 }
