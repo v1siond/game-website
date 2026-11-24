@@ -1,7 +1,7 @@
 import type { Profession } from '@/lib/cv/professions'
 import { STAND as RIG_STAND, mix, type RigPose } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
+import { opacityTo, rigJoints, type RigJoints, rotateTo, setRigPose } from '../shared/rig'
 import s from './sprite.module.css'
 
 // The survivor posed by his scene's actions, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
@@ -122,20 +122,16 @@ export const decoJoints = (root: Element): DecoJoints => ({
   ...(Object.fromEntries(Object.entries(KIT_CLASSES).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className}`)])) as Record<keyof typeof KIT_CLASSES, SVGElement | null>),
 })
 
-const opacity = (el: SVGElement | null, value: number): void => {
-  if (el) el.style.opacity = value.toFixed(3)
-}
-
 /** Writes `p` on his groups: the rig's limbs, then his kit. Transforms and opacity only. */
 export function setDecoPose(j: DecoJoints, p: DecoPose): void {
   setRigPose(j, p)
-  if (j.head) j.head.style.transform = `rotate(${p.head.toFixed(1)}deg)`
-  if (j.body) j.body.style.opacity = p.knit.toFixed(3)
-  opacity(j.bolt, p.bolt)
-  opacity(j.arc, p.arc)
-  opacity(j.recorder, p.recorder)
-  opacity(j.sparks, p.sparks)
-  opacity(j.hit, p.hit)
-  opacity(j.chamber, p.chamber)
-  opacity(j.veins, 0.35 + 0.65 * p.sparks)
+  rotateTo(j.head, p.head)
+  opacityTo(j.body, p.knit)
+  opacityTo(j.bolt, p.bolt)
+  opacityTo(j.arc, p.arc)
+  opacityTo(j.recorder, p.recorder)
+  opacityTo(j.sparks, p.sparks)
+  opacityTo(j.hit, p.hit)
+  opacityTo(j.chamber, p.chamber)
+  opacityTo(j.veins, 0.35 + 0.65 * p.sparks)
 }

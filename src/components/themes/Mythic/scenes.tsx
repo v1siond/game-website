@@ -8,7 +8,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { hop } from '@/lib/motion/arc'
 import { actionLengths, elapsedOf, sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
+import { bell, fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { FOE, type FoeName } from './foes'
@@ -41,9 +41,6 @@ const HERO_HEIGHT = 300
 const HERO_SCALE = HERO_HEIGHT / FIGURE_BOX.height
 // A foe's 60 by 80 box, its feet at (30, 78).
 const FOE_FEET = { x: 30, y: 78 }
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 // ---- him ----
 

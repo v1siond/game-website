@@ -5,7 +5,7 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '../shared/stageNodes'
+import { bell, fadeTo, focusOn, fx, lerp, r1, transformTo } from '../shared/stageNodes'
 import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { DoorArt } from './shelterDoor'
 import { DogFigure, PACK } from './dog'
@@ -137,9 +137,6 @@ const START: Playhead = { action: 0, t: 0, done: false }
 /** How far the move has played at `play`: each action plays its stretch, from the end of the one before to its
  *  own end on the move's t. */
 const moveAt = (ends: readonly number[], { action, t }: Playhead): number => lerp(action > 0 ? ends[action - 1] : 0, ends[action] ?? 1, t)
-
-/** 0 outside from..to, rising to 1 and back inside it. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 const ease = (t: number): number => t * t * (3 - 2 * t)
 

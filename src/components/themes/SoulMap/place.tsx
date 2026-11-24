@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
-import { setRigPose } from '../shared/rig'
+import { rotateTo, setRigPose } from '../shared/rig'
 import { fx, lerp, transformTo } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
 import { knightJoints, type KnightJoints, type KnightPose } from './pose'
@@ -63,7 +63,7 @@ export const moveAt = (ends: readonly number[], { action, t }: Playhead): number
 export function poseKnight(joints: KnightJoints | null, pose: KnightPose): void {
   if (!joints) return
   setRigPose(joints.rig, pose)
-  if (joints.grip) joints.grip.style.transform = `rotate(${pose.grip.toFixed(1)}deg)`
+  rotateTo(joints.grip, pose.grip)
 }
 
 /** Finds his group and joints in `stage` once. */

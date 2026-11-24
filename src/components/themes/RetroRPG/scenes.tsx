@@ -6,7 +6,7 @@ import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { hop } from '@/lib/motion/arc'
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
-import { clamp01, fadeTo, fx, lerp, r1, transformTo, translateTo } from '../shared/stageNodes'
+import { bell, clamp01, fadeTo, fx, lerp, r1, transformTo, translateTo } from '../shared/stageNodes'
 import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { KEEPER, type PixelSprite } from './npcs'
 import { PixelArt, type Frame } from './walker'
@@ -64,9 +64,6 @@ const START: Playhead = { action: 0, t: 0, done: false }
 
 /** How far action `i` has played at `play`: all of it once a later one plays, `t` while it plays, none before. */
 const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
-
-/** A bump from 0 up to 1 and back over [from, to] of t. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** A place in the room `dx` from where he starts: right of the text on a wide screen; on a phone, inside its
  *  narrower view (about x 580 to 860), the room drawn closer. */

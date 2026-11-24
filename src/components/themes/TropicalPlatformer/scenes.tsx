@@ -7,7 +7,7 @@ import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { hop } from '@/lib/motion/arc'
 import { handAt, mix, walk } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp, r1, transformTo } from '../shared/stageNodes'
+import { bell, fadeTo, fx, lerp, r1, transformTo } from '../shared/stageNodes'
 import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { FIGURE_STAND, type FigurePose } from './character'
 import { Armadillo, Banana, BananaBunch, Barrel, Beetle, Boar, Burst, Cart, Crate, Deck, GoldLetter, NAME_LETTERS, PLANKS, Pit, PlankWall, Rails, Rope, StandingBarrel, boardAt, plankAt } from './props'
@@ -87,9 +87,6 @@ const START: Playhead = { action: 0, t: 0, done: false }
 const moveAt = (ends: readonly number[], { action, t }: Playhead): number => lerp(action > 0 ? ends[action - 1] : 0, ends[action] ?? 1, t)
 
 const ease = (t: number): number => t * t * (3 - 2 * t)
-
-/** 0 outside from..to, rising to 1 and back inside it. */
-const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
 /** His pose over a stretch of the move: from `a` to `b` while t runs from..to. */
 const blend = (a: FigurePose, b: FigurePose, t: number, from: number, to: number): FigurePose => mix(a, b, ease(ramp(t, from, to)))

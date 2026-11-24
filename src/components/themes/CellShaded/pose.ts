@@ -1,7 +1,7 @@
 import type { Profession } from '@/lib/cv/professions'
 import { STAND as RIG_STAND, mix, type RigPose } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
+import { opacityTo, rigJoints, type RigJoints, setRigPose } from '../shared/rig'
 import s from './sprite.module.css'
 
 // The commando posed by his scene's playhead, on the shared rig (rigPose, ../shared/rig): his limbs as the
@@ -166,18 +166,14 @@ export const celJoints = (root: Element): CelJoints => ({
   sling: one(root, s.sprSling),
 })
 
-const opacity = (el: SVGElement | null, value: number): void => {
-  if (el) el.style.opacity = value.toFixed(3)
-}
-
 /** Writes `p` on his groups: the rig's limbs, then his gear. Transforms and opacity only. */
 export function setCelPose(j: CelJoints, p: CelPose): void {
   setRigPose(j, p)
-  if (j.body) j.body.style.opacity = p.built.toFixed(3)
-  opacity(j.holo, p.holo)
-  opacity(j.turret, p.turret)
-  opacity(j.flash, p.flash)
-  opacity(j.rifle, p.rifle)
-  opacity(j.muzzle, p.muzzle)
-  opacity(j.sling, 1 - p.rifle)
+  opacityTo(j.body, p.built)
+  opacityTo(j.holo, p.holo)
+  opacityTo(j.turret, p.turret)
+  opacityTo(j.flash, p.flash)
+  opacityTo(j.rifle, p.rifle)
+  opacityTo(j.muzzle, p.muzzle)
+  opacityTo(j.sling, 1 - p.rifle)
 }

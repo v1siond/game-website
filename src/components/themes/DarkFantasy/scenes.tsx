@@ -10,7 +10,7 @@ import { mix } from '@/lib/motion/rigPose'
 import { elapsedOf, sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
-import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
+import { bell, fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage, type StageLayer } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { BattleBug, BUG_ASPECT, DeadBugCreature, HIT_FLASH_OPACITY } from './bug'
@@ -24,7 +24,6 @@ import {
   HOLD,
   REST,
   SIT,
-  bell,
   cast,
   charge,
   CLING,

@@ -140,13 +140,8 @@ export function frond(x: number, y: number, size: number, angle: number, fill: s
 export const spread = (count: number, from = 590, to = 1010): number[] =>
   Array.from({ length: count }, (_, i) => (count === 1 ? (from + to) / 2 : from + ((to - from) * i) / (count - 1)))
 
-export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
-
-/** A node an era writes per frame, by its data-fx name. */
-export const fx = (stage: ParentNode, name: string): Element | null => stage.querySelector(`[data-fx="${name}"]`)
-
-/** Every node whose data-fx name starts with a prefix, in document order. */
-export const fxAll = (stage: ParentNode, prefix: string): Element[] => Array.from(stage.querySelectorAll(`[data-fx^="${prefix}"]`))
+// The node finders and lerp every theatre writer shares (one owner, shared/stageNodes).
+export { fx, fxAll, lerp } from '../shared/stageNodes'
 
 export const tf = (node: Element | null, value: string): void => node?.setAttribute('transform', value)
 

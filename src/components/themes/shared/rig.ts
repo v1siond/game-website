@@ -17,8 +17,22 @@ export const rigJoints = (root: Element, classes: RigClasses): RigJoints =>
 
 const turn = (deg: number): string => `rotate(${deg.toFixed(1)}deg)`
 
-const write = (el: SVGElement | null, transform: string): void => {
+/** A group the writers move: an SVG group or an HTML box, written through its inline style. */
+type Part = SVGElement | HTMLElement | null
+
+/** Writes a css transform on a group, for a turn and a move the plain writers below do not cover. */
+export const transformStyleTo = (el: Part, transform: string): void => {
   if (el) el.style.transform = transform
+}
+
+const write = transformStyleTo
+
+/** Turns a group `deg` degrees round its css transform-origin. */
+export const rotateTo = (el: Part, deg: number): void => write(el, turn(deg))
+
+/** Shows a group at an opacity from 0 to 1. */
+export const opacityTo = (el: Part, opacity: number): void => {
+  if (el) el.style.opacity = opacity.toFixed(3)
 }
 
 /** Writes `p` on his groups. A knee coming toward the viewer foreshortens its thigh and shin. */
