@@ -198,7 +198,7 @@ export function SceneSection({ scene, slot, number, total, still }: SceneSection
   return (
     <section data-scene={scene.id} aria-labelledby={panelHeadingId(title)} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <NeonStage scene={scene} settled />}
-      <header className="flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh]">
+      <header className="flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
         <HudTitle number={number} total={total} title={title} />
       </header>
       <div className="max-w-[42rem]">
