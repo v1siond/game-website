@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useId, useLayoutEffect, useRef, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import {
@@ -21,8 +21,9 @@ import d from './dweller.module.css'
 // Him on a stage, side on and facing right, the way he acts in every scene: the shelter dweller drawn as the
 // atomic age poster cartoon (a big round head on a small body, one thick ink line round every flat fill), in
 // his own looks from HERO_IDENTITY (brown skin, short dark hair, the full beard, the dark eye) and the blue
-// jumpsuit with the yellow collar, stripe and cuffs, the wrist computer strapped on his near forearm. The
-// wrist terminal and the badge cards keep the front view (survivor.tsx).
+// jumpsuit with the yellow collar, stripe and cuffs, the wrist computer strapped on his near forearm. The badge
+// cards, the terminal's access screen and the wrist terminal's status tube show him side on too (DwellerSprite),
+// the tube in its green line tone.
 //
 // Per profession: the System Engineer in the jumpsuit; the Musician in it with a stick in each fist; the
 // Martial Artist with the suit rolled down to the waist, bare chested, his hands wrapped and his mongkhon on.
@@ -272,16 +273,36 @@ export function DwellerFigure({ profession }: { profession: Profession }) {
   )
 }
 
-/** Him standing in one pose on a card (the Muay Thai badges, the terminal's access screen): his figure in its
- *  own box, the pose written on its joints once it is on the page, the way a stage writes a frame. */
-export function DwellerSprite({ profession, pose, className = '' }: { profession: Profession; pose: DwellerPose; className?: string }) {
+export type DwellerTone = 'poster' | 'phosphor'
+
+// The tube's green line tone: each colour's lightness turned over and drawn in the phosphor green, so the dark
+// ink line glows brightest and the fills sit in darker greens on the glass, the way a green screen draws him.
+const PHOSPHOR_MATRIX = [
+  '-0.021 -0.0413 -0.0077 0 0.07',
+  '-0.3 -0.59 -0.11 0 1',
+  '-0.024 -0.0472 -0.0088 0 0.08',
+  '0 0 0 1 0',
+].join(' ')
+
+/** Him standing in one pose on a card (the Muay Thai badges, the terminal's access screen, the wrist terminal's
+ *  status tube): his figure in its own box, the pose written on its joints once it is on the page, the way a
+ *  stage writes a frame. */
+export function DwellerSprite({ profession, pose, tone = 'poster', className = '' }: { profession: Profession; pose: DwellerPose; tone?: DwellerTone; className?: string }) {
   const ref = useRef<SVGSVGElement>(null)
+  const filter = `dweller-tone-${useId().replace(/:/g, '')}`
   useLayoutEffect(() => {
     if (ref.current) setDwellerPose(dwellerJoints(ref.current), pose)
   }, [pose])
   return (
     <svg ref={ref} viewBox={`0 0 ${DWELLER_VIEW.width} ${DWELLER_VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <DwellerFigure profession={profession} />
+      {tone === 'phosphor' && (
+        <filter id={filter} colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values={PHOSPHOR_MATRIX} />
+        </filter>
+      )}
+      <g filter={tone === 'phosphor' ? `url(#${filter})` : undefined}>
+        <DwellerFigure profession={profession} />
+      </g>
     </svg>
   )
 }

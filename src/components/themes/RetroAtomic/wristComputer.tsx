@@ -9,7 +9,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { WorldCV } from '@/lib/cv/content'
 import { NameWords } from '@/components/cv/NameWords'
-import { SURVIVOR_ACTION, SurvivorSprite } from './survivor'
+import { DwellerSprite } from './dweller'
+import { KICK, KIT, WRIST, pose, type DwellerPose } from './pose'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -28,8 +29,8 @@ import atomic from './atomic.module.css'
 // - Profession switch: the top tabs are the shared ProfessionSwitch (radio group, arrows); the dial on
 //   the right turns to the picked tab with a mechanical overshoot, and clicking the dial steps to the
 //   next one. A switch collapses the screen to a line and reopens it on the new profession (the screen's
-//   content is keyed by profession, so the CSS power on plays per switch), and his status figure plays
-//   that profession's action: typing on the wrist terminal, the drum roll, or the knee and side kick.
+//   content is keyed by profession, so the CSS power on plays per switch), and his status figure stands
+//   side on in that profession's pose: reading the wrist computer, both sticks up, or the side kick.
 // - The second row of tabs jumps to the picked profession's sections.
 // - The bottom bar holds the profession's field and how long he has been at it, from the CV.
 
@@ -121,13 +122,21 @@ function SectionTabs({ profession }: { profession: Profession }) {
   )
 }
 
-/** His figure on the tube, in the green line tone, at the picked profession's work once the screen is on (`on`). */
+// His status on the tube, side on in a pose of his own per profession: the System Engineer raising the wrist
+// computer to read it, the Musician with both sticks up, the Martial Artist's side kick.
+const STATUS_POSE: Record<Profession, DwellerPose> = {
+  engineer: pose(WRIST),
+  drummer: KIT.drummer,
+  fighter: pose(KICK),
+}
+
+/** His figure on the tube, in the green line tone, at the picked profession's work. */
 function StatusFigure({ profession }: { profession: Profession }) {
   return (
     <div data-worlds-figure="" className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
       <div className={`absolute inset-3 ${atomic.statusFigure}`}>
-        <SurvivorSprite key={profession} profession={profession} tone="phosphor" motion={SURVIVOR_ACTION[profession]} className="h-full w-full" />
+        <DwellerSprite key={profession} profession={profession} tone="phosphor" pose={STATUS_POSE[profession]} className="h-full w-full" />
       </div>
     </div>
   )
