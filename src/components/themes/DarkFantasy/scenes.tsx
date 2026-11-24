@@ -115,11 +115,11 @@ const poseHim = ({ root, joints }: Him, place: Place, pose: WandererPose): void 
   if (joints) setWandererPose(joints, pose, place.lift)
 }
 
-/** The wanderer, the one figure of every scene. */
-function Wanderer({ x, face = 1 }: { x: number; face?: 1 | -1 }) {
+/** The wanderer, the one figure of every scene; the hero's is the world's figure. */
+function Wanderer({ x, face = 1, figure = false }: { x: number; face?: 1 | -1; figure?: boolean }) {
   return (
-    <g data-fx="wanderer" data-worlds-figure="" transform={placeOf({ x, face })}>
-      <WandererSprite box={BOX} />
+    <g data-fx="wanderer" transform={placeOf({ x, face })}>
+      <WandererSprite box={BOX} figure={figure} />
     </g>
   )
 }
@@ -159,7 +159,7 @@ const hero: SceneSpec = {
   light: DARK_FANTASY.ethereal,
   script: [1300, 1300],
   stage: (profession) => <ProfessionStage profession={profession} p={DARK_FANTASY} />,
-  figure: () => <Wanderer x={HERO_X} />,
+  figure: () => <Wanderer x={HERO_X} figure />,
   bind: (stage) => {
     const him = himIn(stage)
     return (play) => {

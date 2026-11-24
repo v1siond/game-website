@@ -111,8 +111,10 @@ function Shown({ name, children }: { name: Part; children: ReactNode }) {
   )
 }
 
-/** Him side on in the caverns, at rest; a scene poses his groups (pose.ts). */
-export function WandererSprite({ box }: { box: { width: number; height: number } }) {
+/** Him side on in the caverns, at rest; a scene poses his groups (pose.ts). `figure` marks his body, without
+ *  the slashes, the soul and the dash's shadow round him, as the world's figure (data-worlds-figure) the
+ *  launcher's portrait is cut from. */
+export function WandererSprite({ box, figure = false }: { box: { width: number; height: number }; figure?: boolean }) {
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} overflow="visible" aria-hidden="true" focusable="false">
       <g className={s.sprite}>
@@ -125,7 +127,7 @@ export function WandererSprite({ box }: { box: { width: number; height: number }
           <circle cx={54} cy={66} r={52} fill={P.soulBlue} opacity={0.18} />
           <circle cx={54} cy={66} r={46} fill="none" stroke={P.white} strokeWidth={2.4} strokeDasharray="22 14" opacity={0.85} />
         </Shown>
-        <g className={s.body}>
+        <g className={s.body} data-worlds-figure={figure ? '' : undefined}>
           <Arm side="back" />
           <Leg side="back" />
           <Leg side="front" />
@@ -133,16 +135,16 @@ export function WandererSprite({ box }: { box: { width: number; height: number }
           <path d={CLOAK_FOLDS} fill="none" stroke={P.cloakDark} strokeWidth={1.4} />
           <Head />
           <Arm side="front" />
-          <Shown name="arc">
-            <path d={SLASH.arc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
-          </Shown>
-          <Shown name="downArc">
-            <path d={SLASH.downArc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
-          </Shown>
-          <Shown name="upArc">
-            <path d={SLASH.upArc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
-          </Shown>
         </g>
+        <Shown name="arc">
+          <path d={SLASH.arc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
+        </Shown>
+        <Shown name="downArc">
+          <path d={SLASH.downArc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
+        </Shown>
+        <Shown name="upArc">
+          <path d={SLASH.upArc} fill={P.white} stroke={P.soulBlue} strokeWidth={1} />
+        </Shown>
       </g>
     </svg>
   )
