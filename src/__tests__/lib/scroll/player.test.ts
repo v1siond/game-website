@@ -1,4 +1,22 @@
-import { IDLE_FOLLOWER, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, crossOf, elapsedOf, follow, playheadAt, headingOf, restAt, sceneEnd, sceneLength, type Follower } from '@/lib/scroll/player'
+import {
+  IDLE_FOLLOWER,
+  MAX_SCENE_MS,
+  MIN_ACTION_MS,
+  actionLengths,
+  crossOf,
+  elapsedOf,
+  follow,
+  playheadAt,
+  headingOf,
+  pacedMoves,
+  restAt,
+  restingPlay,
+  sceneEnd,
+  sceneLength,
+  stagePlay,
+  type Follower,
+} from '@/lib/scroll/player'
+import { FIRST_FRAME_MS } from '@/lib/scroll/stage'
 
 describe('actionLengths', () => {
   it('gives every action at least the time to read it', () => {
@@ -18,6 +36,11 @@ describe('actionLengths', () => {
 
   it('plays at most three actions', () => {
     expect(actionLengths([1200, 1200, 1200, 1200])).toHaveLength(3)
+  })
+
+  it('works a script out once, however many frames ask for it', () => {
+    const script = [1500, 2000]
+    expect(actionLengths(script)).toBe(actionLengths(script))
   })
 })
 
@@ -90,6 +113,15 @@ describe('crossOf', () => {
   it('dissolves on the way down as before', () => {
     expect(crossOf([1, 1, 0.6, 0.1], 'down')).toEqual(crossOf([1, 1, 0.6, 0.1]))
   })
+
+  it('draws nothing for no stage, and the one stage whole', () => {
+    expect(crossOf([])).toEqual({ layers: [], lead: 0 })
+    expect(crossOf([0])).toEqual({ layers: [{ shown: true, opacity: 1 }], lead: 0 })
+  })
+
+  it('on the way back with no stage yet whole, shows the first and hides the ones rising over it', () => {
+    expect(crossOf([0.4, 0.2], 'up')).toEqual({ layers: [{ shown: true, opacity: 1 }, { shown: false, opacity: 0 }], lead: 0 })
+  })
 })
 
 describe('follow', () => {
@@ -121,8 +153,38 @@ describe('follow', () => {
   it('eases out of rest: the first frames move less than the scene would at full speed', () => {
     const first = follow(IDLE_FOLLOWER, script, 1, 1000)
     const second = follow(first.follower, script, 1, 1000 + FRAME)
-    expect(second.follower.drawn).toBeLessThan(2 * FRAME)
+    expect(second.follower.drawn).toBeLessThan(FRAME)
     expect(second.follower.drawn).toBeGreaterThan(0)
+  })
+
+  it('counts the first frame after rest as one frame at 60 fps', () => {
+    const first = follow(IDLE_FOLLOWER, script, 1, 5000)
+    const timed = follow({ ...IDLE_FOLLOWER, at: 5000 - FIRST_FRAME_MS }, script, 1, 5000)
+    expect(first.follower.drawn).toBeGreaterThan(0)
+    expect(first.follower.drawn).toBeCloseTo(timed.follower.drawn, 9)
+    expect(first.follower.speed).toBeCloseTo(timed.follower.speed, 9)
+  })
+
+  it('counts a frame after a hidden tab as a short one, so the scene does not jump', () => {
+    const moving = run(IDLE_FOLLOWER, 1, 400).follower
+    const after = follow(moving, script, 1, (moving.at ?? 0) + 60_000).follower
+    expect(after.drawn - moving.drawn).toBeLessThanOrEqual(100)
+  })
+
+  it('turns back through a stop when the scroll reverses in mid play, never past it and never faster than the scene', () => {
+    let { follower } = run(IDLE_FOLLOWER, 1, 600)
+    const turnedAt = follower.drawn
+    const drawn: number[] = []
+    for (let now = (follower.at ?? 0) + FRAME; drawn.length < 400; now += FRAME) {
+      follower = follow(follower, script, 0, now).follower
+      expect(Math.abs(follower.speed)).toBeLessThanOrEqual(1)
+      drawn.push(follower.drawn)
+    }
+    const peak = Math.max(...drawn)
+    expect(peak - turnedAt).toBeLessThan(100)
+    const falling = drawn.slice(drawn.indexOf(peak))
+    falling.slice(1).forEach((at, i) => expect(at).toBeLessThanOrEqual(falling[i]))
+    expect(drawn.at(-1)).toBe(0)
   })
 
   it('plays backward when the scroll goes back up', () => {
@@ -144,8 +206,75 @@ describe('follow', () => {
     expect(follow(follower, script, 1, 99_000).play).toEqual(sceneEnd(script))
   })
 
-  it('gives the end frame for the settled scene reduced motion shows', () => {
-    expect(playheadAt(script, sceneLength(script))).toEqual(sceneEnd(script))
+})
+
+describe('restingPlay', () => {
+  it('gives the end frame reduced motion and a settled stage show', () => {
+    expect(restingPlay([1500, 2000])).toEqual({ action: 1, t: 1, done: true })
+  })
+
+  it('gives a scene with no script its one frame, done', () => {
+    expect(restingPlay(undefined)).toEqual({ action: 0, t: 1, done: true })
+  })
+})
+
+describe('stagePlay', () => {
+  const script = [1500, 2000]
+  const total = sceneLength(script)
+
+  it('rests a stage just bound where the scroll puts it, so a rebind never replays the scene from its start', () => {
+    const run = stagePlay(null, script, 0.6, 1000, true)
+    expect(run.play).toEqual(playheadAt(script, 0.6 * total))
+    expect(run.playing).toBe(false)
+    expect(run.follower).toEqual({ drawn: 0.6 * total, speed: 0, at: 1000 })
+  })
+
+  it('plays the leading stage at its own pace toward the scroll', () => {
+    const run = stagePlay({ drawn: 0, speed: 0, at: 1000 }, script, 1, 1016, true)
+    expect(run.playing).toBe(true)
+    expect(run.follower?.drawn).toBeGreaterThan(0)
+    expect(run.follower?.drawn).toBeLessThan(16)
+  })
+
+  it('draws every other stage where the scroll puts it and keeps no follower for it', () => {
+    const run = stagePlay({ drawn: 0, speed: 0.5, at: 1000 }, script, 0.5, 1016, false)
+    expect(run).toEqual({ follower: null, play: playheadAt(script, 0.5 * total), playing: false })
+  })
+
+  it('draws a scene with no script at its one frame', () => {
+    expect(stagePlay(null, undefined, 0.3, 1000, true)).toEqual({ follower: null, play: restingPlay(undefined), playing: false })
+  })
+})
+
+describe('pacedMoves', () => {
+  const script = [1600]
+  const total = sceneLength(script)
+
+  it('rests a move first seen, or out of reach, where the scroll puts it', () => {
+    const { followers, phases, playing } = pacedMoves(new Map(), [{ key: 'a', target: 0.4, near: true }], script, 1000)
+    expect(phases).toEqual([0.4])
+    expect(playing).toBe(false)
+    expect(followers.get('a')).toEqual({ drawn: 0.4 * total, speed: 0, at: 1000 })
+  })
+
+  it('plays a held move in reach at its own pace and asks for frames', () => {
+    const held = new Map([['a', { drawn: 0, speed: 0, at: 1000 }]])
+    const { phases, playing } = pacedMoves(held, [{ key: 'a', target: 1, near: true }], script, 1016)
+    expect(playing).toBe(true)
+    expect(phases[0]).toBeGreaterThan(0)
+    expect(phases[0]).toBeLessThan(0.02)
+  })
+
+  it('forgets the moves of a room left in mid move, so coming back rests them instead of replaying', () => {
+    const held = new Map([['0:1', { drawn: 200, speed: 0.8, at: 1000 }]])
+    const { followers, playing } = pacedMoves(held, [{ key: '1:0', target: 0, near: true }], script, 1016)
+    expect(followers.has('0:1')).toBe(false)
+    expect(playing).toBe(false)
+  })
+
+  it('asks for no frame with no move in view (the hub, a gap, reduced motion)', () => {
+    const held = new Map([['0:1', { drawn: 200, speed: 0.8, at: 1000 }]])
+    expect(pacedMoves(held, [], script, 1016)).toEqual({ followers: new Map(), phases: [], playing: false })
   })
 })
 
@@ -171,5 +300,12 @@ describe('headingOf', () => {
     expect(headingOf(40, 'up')).toBe('down')
     expect(headingOf(-40, 'down')).toBe('up')
     expect(headingOf(0.3, 'up')).toBe('up')
+  })
+
+  it('keeps the way through a small reversal, a touch rubber band or a 2 px wheel, and turns once the lag passes 8 px', () => {
+    expect(headingOf(-2, 'down')).toBe('down')
+    expect(headingOf(6, 'up')).toBe('up')
+    expect(headingOf(-9, 'down')).toBe('up')
+    expect(headingOf(9, 'up')).toBe('down')
   })
 })

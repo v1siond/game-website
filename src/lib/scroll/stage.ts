@@ -109,7 +109,8 @@ export function stageState(span: StageSpan, position: number, viewport: number, 
   const rise = ramp(position, start, span.top + handover.inTo * viewport)
   const end = last ? span.bottom - viewport : span.bottom + handover.outTo * viewport
   const [playFrom, playTo] = playSpan(span, viewport, last, phone)
-  return { vis: rise, progress: ramp(position, start, end), play: ramp(position, playFrom, playTo) }
+  // A last section shorter than the screen ends before its stage starts: it plays through at once, not backward.
+  return { vis: rise, progress: ramp(position, start, Math.max(start + 1, end)), play: ramp(position, playFrom, playTo) }
 }
 
 /** The hero's stage: whole from the top of the page, under the stages that rise over it, its progress run

@@ -106,6 +106,12 @@ describe('stageState', () => {
     const end = 6000 - vh
     expect(stageState(span, end, vh, { last: true })).toMatchObject({ vis: 1, progress: 1 })
   })
+
+  it('plays a last section shorter than the screen through to its end instead of backward', () => {
+    const short = { top: 2000, bottom: 2300 }
+    expect(stageState(short, 1000, vh, { last: true }).progress).toBe(0)
+    expect(stageState(short, 2400, vh, { last: true }).progress).toBe(1)
+  })
 })
 
 describe('heroState', () => {

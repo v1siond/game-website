@@ -32,21 +32,32 @@ export interface Playhead {
 /** Ease in and out: slow out of rest, fastest at the middle, slow into the end. */
 export const easeInOut = (t: number): number => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
 
+// Each script's lengths, worked out once: a script is a constant of its scene, asked for every frame.
+const LENGTHS = new WeakMap<SceneScript, readonly number[]>()
+
 /**
  * The script's lengths as played: at most MAX_ACTIONS, each at least MIN_ACTION_MS, and the time over the
  * minimum shared out so the whole scene fits in MAX_SCENE_MS.
  */
-export function actionLengths(script: SceneScript): number[] {
+export function actionLengths(script: SceneScript): readonly number[] {
+  const known = LENGTHS.get(script)
+  if (known) return known
   const kept = script.slice(0, MAX_ACTIONS)
   const extras = kept.map((ms) => Math.max(0, ms - MIN_ACTION_MS))
   const extra = extras.reduce((sum, ms) => sum + ms, 0)
   const budget = MAX_SCENE_MS - kept.length * MIN_ACTION_MS
   const share = extra > budget ? budget / extra : 1
-  return extras.map((ms) => MIN_ACTION_MS + ms * share)
+  const lengths = extras.map((ms) => MIN_ACTION_MS + ms * share)
+  LENGTHS.set(script, lengths)
+  return lengths
 }
 
 /** The scene's end frame: the last action done. */
 export const sceneEnd = (script: SceneScript): Playhead => ({ action: Math.max(0, Math.min(script.length, MAX_ACTIONS) - 1), t: 1, done: true })
+
+/** Where a scene rests: its end frame, the one reduced motion, a settled stage and a scroll back show; a scene
+ *  with no script has one frame, done. */
+export const restingPlay = (script: SceneScript | undefined): Playhead => sceneEnd(script ?? [])
 
 /** Where the scene is `elapsedMs` after it started. */
 export function playheadAt(script: SceneScript, elapsedMs: number): Playhead {
@@ -81,8 +92,9 @@ export interface Cross {
 /** Which way the page is going: down the page plays the scenes on, up plays them back. */
 export type Heading = 'down' | 'up'
 
-// Under this many px of lag the page keeps the way it was going.
-const HEADING_PX = 1
+// Under this many px of lag the page keeps the way it was going, so a touch rubber band or a 2 px wheel
+// reversal in the middle of a dissolve does not cut the stage coming in.
+const HEADING_PX = 8
 
 /** The way the page is going from the drawn position's lag behind the scroll (positive on the way down), or
  *  `was` while it rests. */
@@ -152,4 +164,58 @@ export function follow(follower: Follower, script: SceneScript, progress: number
   const passed = Math.sign(gap) !== Math.sign(gap - step)
   const drawn = passed ? target : follower.drawn + step
   return { follower: { drawn, speed: passed ? 0 : speed, at: now }, play: playheadAt(script, drawn), playing: !passed }
+}
+
+/** A stage's scene drawn and whether it still plays. */
+export interface StagePlay {
+  /** The leading stage's follower; none for every other stage, which rests where the scroll puts it. */
+  follower: Follower | null
+  play: Playhead
+  playing: boolean
+}
+
+/**
+ * One frame of a stage's scene at the scroll's `played` share of it. The stage the page is in (`lead`) plays
+ * at its own pace from its follower; a stage just bound, or just become the lead, has none and starts at rest
+ * where the scroll puts it, so a rebind (a profession switch) never replays the scene from its start. Every
+ * other stage is drawn where the scroll puts it and keeps no follower, so none plays catching up under or over
+ * another.
+ */
+export function stagePlay(follower: Follower | null, script: SceneScript | undefined, played: number, now: number, lead: boolean): StagePlay {
+  if (!script) return { follower: null, play: restingPlay(undefined), playing: false }
+  if (!lead) return { follower: null, play: playheadAt(script, clamp01(played) * sceneLength(script)), playing: false }
+  return follow(follower ?? restAt(script, played, now), script, played, now)
+}
+
+/** A move the scroll plays by itself (a prop's move as the camera passes it), by its key. */
+export interface PacedMove {
+  key: string
+  /** Where the scroll puts the move, 0 to 1. */
+  target: number
+  /** Close enough to be seen playing; further off it rests where the scroll puts it. */
+  near: boolean
+}
+
+/**
+ * One frame of the moves in view, each played at the shared player's pace: a move held from the frame before
+ * and near follows the scroll; a move first seen or far off rests where the scroll puts it. Only the moves
+ * given are kept, so a move left in mid play (its room left, the hub, reduced motion) is forgotten and rests
+ * when seen again, and with no move in view nothing asks for a frame.
+ */
+export function pacedMoves(held: ReadonlyMap<string, Follower>, moves: readonly PacedMove[], script: SceneScript, now: number): { followers: Map<string, Follower>; phases: number[]; playing: boolean } {
+  const followers = new Map<string, Follower>()
+  const length = sceneLength(script)
+  let playing = false
+  const phases = moves.map(({ key, target, near }) => {
+    const was = held.get(key)
+    if (!was || !near) {
+      followers.set(key, restAt(script, target, now))
+      return target
+    }
+    const step = follow(was, script, target, now)
+    followers.set(key, step.follower)
+    playing ||= step.playing
+    return step.follower.drawn / length
+  })
+  return { followers, phases, playing }
 }
