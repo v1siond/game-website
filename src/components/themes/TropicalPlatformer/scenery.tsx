@@ -1,5 +1,6 @@
 import { memo, type ReactNode } from 'react'
 import { TONE_VARS, type Tone } from './palette'
+import { PropShading } from './props'
 import paint from './scenery.module.css'
 
 // The jungle's scenery: fan palms whose fronds split into fingers and droop, lit from above with a dark
@@ -108,6 +109,7 @@ export const SceneryDefs = memo(function SceneryDefs() {
             <rect key={y} x="0" y={y} width="400" height="3" className={paint.farLit} opacity="0.3" />
           ))}
         </g>
+        <PropShading />
       </defs>
     </svg>
   )

@@ -7,16 +7,16 @@ import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform, type FigureRig } from '../shared/figureScene'
 import type { RigJoints } from '../shared/rig'
 import { StageFigure, figureJoints, setFigurePose, type FigurePose } from './character'
-import type { Scene } from './scenes'
+import { inputOf, placeScale, sceneSpot, sceneWriter, type Scene } from './scenes'
 import { ToneScope } from './scenery'
-import { VIEW, ZONE_ART } from './zones'
+import { GROUND, PHONE_VIEW, PhoneFloor, VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the place's layers from its sky to the
-// ground he stands on, in the place's tone, then the scene's stops, him and what stands in front of him in
-// the figure layer, in one camera group the view pushes in on at a big hit. The shared engine fades each
-// stage and pushes its layers in; the scene's writer plays its stops' answers and hands back his place and
-// pose.
+// ground he stands on, in the place's tone, then the place's things round his spot and him in the figure
+// layer. The shared engine fades each stage and pushes its layers in (the parallax of the rendered jungle);
+// the scene's writer plays the place and hands back his frame. On a phone the planes show a taller view from
+// higher up the canvas, the ground half way down the screen, and the mid plane carries it on below the canvas.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -30,44 +30,61 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
 /** His limbs turn on the shared rig. */
 const FIGURE_RIG: FigureRig<RigJoints, FigurePose> = { joints: figureJoints, pose: setFigurePose }
 
-/** The scene as the shared theatre runs it: the stops' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, FIGURE_RIG)
+/** The scene as the shared theatre runs it: its script played by the scroll, him placed and posed each frame. */
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, (stage) => sceneWriter(scene)(stage), FIGURE_RIG, scene.def.script)
 
-/** One plane of the picture in the scene's tone. */
-const plane = (scene: Scene, children: ReactNode): ReactNode => (
-  <ToneScope tone={scene.def.zone} className="h-full w-full">
-    <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" className="h-full w-full" focusable="false">
-      {children}
-    </svg>
-  </ToneScope>
-)
-
-/** Him at his first frame's place. */
-function Figure({ scene }: { scene: Scene }) {
-  const first = scene.def.bind(NO_NODES, scene.layout)(0, 0)
+/** One plane of the picture in the scene's tone, over the place's view. */
+const plane = (scene: Scene, children: ReactNode): ReactNode => {
+  const { phone } = scene.layout
   return (
-    <g data-fx="figure" transform={figureTransform(first)}>
-      <StageFigure profession={scene.kit} />
+    <ToneScope tone={scene.def.zone} className="h-full w-full">
+      <svg viewBox={phone ? PHONE_VIEW : VIEW} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} className="h-full w-full" focusable="false">
+        {children}
+      </svg>
+    </ToneScope>
+  )
+}
+
+/** Him at his first frame's place, in the group his tumbles turn. */
+function Figure({ scene }: { scene: Scene }) {
+  const first = sceneWriter(scene)(NO_NODES)(0, 0)
+  return (
+    <g data-fx="figure" transform={figureTransform(first)} opacity={first.opacity}>
+      <g data-fx="tumble">
+        <StageFigure profession={scene.kit} />
+      </g>
     </g>
   )
 }
 
 const layersOf = (scene: Scene): StageLayer[] => {
-  const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[scene.def.zone]
+  const { zone, back, front } = scene.def
+  const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[zone]
+  const input = inputOf(scene)
+  const at = `translate(${sceneSpot(scene)} ${GROUND}) scale(${placeScale(scene.layout.phone)})`
   return [
     { name: 'sky', node: plane(scene, <Sky />) },
     { name: 'far', node: plane(scene, <Far />) },
-    { name: 'mid', node: plane(scene, <Mid />) },
+    {
+      name: 'mid',
+      node: plane(
+        scene,
+        <>
+          <Mid />
+          {scene.layout.phone && <PhoneFloor />}
+        </>,
+      ),
+    },
     { name: 'near', node: plane(scene, <Near />) },
     {
       name: 'figure',
       node: plane(
         scene,
-        <g data-fx="camera">
-          {scene.def.back(scene.layout)}
+        <>
+          <g transform={at}>{back(input)}</g>
           <Figure scene={scene} />
-          {scene.def.front?.(scene.layout)}
-        </g>,
+          {front && <g transform={at}>{front(input)}</g>}
+        </>,
       ),
     },
   ]

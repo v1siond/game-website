@@ -26,7 +26,11 @@
   transform-origin: 0 0;
 }
 
-/* ---- held angles ---- */
+/* ---- held angles: side on, the near arm raised forward and up for the wave, the far arm a little back ---- */
+
+.figure .armLeft {
+  transform: rotate(12deg);
+}
 
 .figure[data-pose='wave'] .armRight {
   transform: rotate(-150deg);

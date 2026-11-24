@@ -2,795 +2,748 @@ import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import type { Labels } from '@/lib/cv/labels'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
-import { drop, hop } from '@/lib/motion/arc'
-import { mix, walk } from '@/lib/motion/rigPose'
+import { hop } from '@/lib/motion/arc'
+import { handAt, mix, walk } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { trackAt, trackEase } from '@/lib/scroll/track'
-import { clamp01, fadeTo, focusOn, fx, lerp, r1, transformTo, translateTo } from '../shared/stageNodes'
-import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
+import { fadeTo, fx, lerp, r1, transformTo } from '../shared/stageNodes'
+import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import { FIGURE_STAND, type FigurePose } from './character'
+import { Armadillo, Banana, BananaBunch, Barrel, Beetle, Boar, Burst, Cart, Crate, Deck, GoldLetter, NAME_LETTERS, PLANKS, Pit, PlankWall, Rails, Rope, StandingBarrel, boardAt, plankAt } from './props'
 import { COLORS as C } from './palette'
 import { GROUND, type Zone } from './zones'
 
-// Each part of the page as a level of the jungle run: its place (the cliffs, the giant tree, the canopy, the
-// riverbank, the temple ruins, the lagoon, the river at dusk, the clearing, the beach at night), his kit, and
-// one stop per card the section counts. He holds his place while the jungle slides under him: as each card
-// is read the jungle runs one spacing to bring its stop (the run, his stride), then he makes the genre's
-// move there and the stop answers it (the beat), held once done; scroll up plays it back (the shared
-// trackAt). About: he jumps, hangs from a rock ledge and pulls himself up, and a flower opens beside him.
-// Work: he climbs the vine to the next deck of the giant tree and its lantern lights (the tree slides down
-// as he climbs). Tech: he whirls his sling at a coconut high in a palm; it drops and splits on a gem.
-// Services: he pushes a boulder off the bank and it splashes in as a stepping stone. Projects: he hangs his
-// weight on the temple's stone lever and the door grinds up. Ventures: he dives into the lagoon, swims to a
-// sunken chest and comes up with its pearl. Bands: he treads a floating log, each step a note, the frogs
-// hopping. Muay Thai: a swing kick from a branch at a hanging sack, then his knee. Contact: he rides the
-// zip line down to the beach camp and its fire lights. The hero: him by his stilt hut at sunset, a frond
-// swaying once.
+// Each part of the page as one place of the jungle barrel platformer it comes from, played the way that game
+// plays: he stands at one spot under a fixed camera and the shared scene player moves his move through the
+// scene's script of one to three actions (src/lib/scroll/player.ts), each action its own stretch of the move,
+// so every frame is a function of the playhead alone, plays the same backward, and the last action's end is
+// the frame reduced motion shows. Hero: a blast barrel fires him out in a tumbling arc onto the sunset trail.
+// About: he rolls into a beetle and it tumbles off, then jumps and grabs a banana bunch. Work: barrel cannons
+// across a pit, into the first, blasted into the second as it turns, blasted out to the far deck. Tech: he
+// slaps the ground hand over hand and a gold letter pops out of the earth into his hand. Services: he rides
+// the mine cart to the broken rail, jumps out over the gap and lands in the next cart. Projects: rope to
+// rope over a pit and a landing past it. Ventures: he rolls into the buddy crate, the boar steps out, he
+// hops on and it charges through a plank wall. Bands: a roll on a barrel head, then the bonus barrel bursts
+// into a ring of bananas. Muay Thai: an armadillo rolls in and uncurls, his side kick bowls it away.
+// Contact: he jumps for the last gold letter and the four letters of his name light over him.
 //
-// He is the jungle hero of character.tsx on the shared rig: every limb turns at its joint.
+// He is the jungle hero of character.tsx on the shared rig, side on and facing right.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-type Layout = PropLayout
+/** What a scene's art and writer read: the phone's narrower view, the kit he wears. */
+export interface SceneInput {
+  phone: boolean
+  kit: Profession
+}
 
-/** Him in a frame: where his feet are, his size, his pose and how visible he is. */
-export type FigureFrame = FigureState<FigurePose>
+/** His frame in a move: his pose, how far ahead of his spot and how high above the ground his soles are,
+ *  a tumble (`spin`, degrees round the middle of his tucked body) and how much of him shows. */
+interface Frame {
+  pose: FigurePose
+  ahead: number
+  lift?: number
+  spin?: number
+  opacity?: number
+}
 
 export interface SceneDef {
   zone: Zone
   /** His kit in the scene; null takes the profession the page shows. */
   kit: Profession | null
-  /** The stops behind him, drawn in the figure layer. */
-  back: (layout: Layout) => ReactNode
-  /** What stands in front of him (the water he swims in). */
-  front?: (layout: Layout) => ReactNode
-  bind: (stage: StageNodes, layout: Layout) => FigureWriter<FigurePose>
+  /** The scene's actions, each its length in ms. */
+  script: SceneScript
+  /** Where each action ends on the move's t, one per action, the last 1. */
+  ends: readonly number[]
+  /** How far right of his usual spot he stands, on a wide screen and on a phone (the hero: clear of its card
+   *  and the profession plates). */
+  shift?: { wide: number; phone: number }
+  /** The place's art round his spot (x 0 his spot, y 0 the ground), behind him and in front of him. */
+  back: (input: SceneInput) => ReactNode
+  front?: (input: SceneInput) => ReactNode
+  /** His move `t` of the way. */
+  move: (kit: Profession, t: number) => Frame
+  /** Binds the place's reply to his move and returns its writer over the move's t. */
+  reply: (stage: StageNodes, input: SceneInput) => (t: number) => void
 }
 
-// The middle of the band the scenes play in: right of the text column on a wide screen, the middle a phone shows.
-const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [880, 1320], phone: [560, 880] }
+/** Him in a frame, as the shared figure scene places him. */
+export type HeroState = FigureState<FigurePose>
 
-/** His size on the canvas: his 170 unit box about a quarter of the screen. */
-const K = 1.7
+// His size on the stage, and where he stands: right of the text column on a wide screen, the left of a
+// phone's view (zones.tsx PHONE_VIEW, x 480 to 1040) so the place before him shows whole.
+const K = 1.5
+const spotOf = (phone: boolean): number => (phone ? 580 : 820)
 
-/** Where he holds his place: right of the text on a wide screen, left of the middle on a phone. */
-const holdOf = ({ phone }: Layout): number => (phone ? 560 : 860)
+/** On a phone's narrow view the place round his spot, and he, are drawn at this share of their size. */
+export const placeScale = (phone: boolean): number => (phone ? 0.8 : 1)
 
-/** The stops stand this far apart; the next one waits one spacing ahead of him. */
-const SPACING = 600
+/** Before the section arrives a scene shows its first frame. */
+const START: Playhead = { action: 0, t: 0, done: false }
 
-/** His stride on the run between stops: a whole number of steps per spacing, so a run ends standing. */
-const STRIDE = 75
+/** How far the move has played at `play`: each action plays its stretch, from the end of the one before to its
+ *  own end on the move's t. */
+const moveAt = (ends: readonly number[], { action, t }: Playhead): number => lerp(action > 0 ? ends[action - 1] : 0, ends[action] ?? 1, t)
 
-// How far the view pushes in at a full push.
-const PUSH = 0.1
+const ease = (t: number): number => t * t * (3 - 2 * t)
 
-const EDGE = C.shadow
+/** 0 outside from..to, rising to 1 and back inside it. */
+const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
-const frame = (x: number, pose: FigurePose, k = K, lift = 0): FigureFrame => ({ x, y: GROUND - lift, k, pose, opacity: 1 })
+/** His pose over a stretch of the move: from `a` to `b` while t runs from..to. */
+const blend = (a: FigurePose, b: FigurePose, t: number, from: number, to: number): FigurePose => mix(a, b, ease(ramp(t, from, to)))
 
-/** A pose from the standing one with `turns` changed. */
+const still = (pose: FigurePose, ahead = 0, lift = 0): Frame => ({ pose, ahead, lift })
+
+// ---------------------------------------------------------------- his poses (the near side is the rig's right)
+
 const posed = (turns: Partial<FigurePose>): FigurePose => ({ ...FIGURE_STAND, ...turns })
 
-/** The bell a push follows over a move: 0, up to 1 at `at`, back to 0 `width` either side. */
-const bell = (t: number, at: number, width = 0.1): number => clamp01(1 - Math.abs(t - at) / width)
+const STAND = posed({ armLeft: 12 })
+const CROUCH = posed({ rise: 14, thighRight: -50, shinRight: 70, thighLeft: -30, shinLeft: 60, armRight: -30, foreRight: -40, armLeft: -10, foreLeft: -40 })
+/** Tucked into a ball for the roll and the blast: knees to the chest, arms round them. */
+const TUCK = posed({ rise: 44, thighRight: -120, shinRight: 140, thighLeft: -110, shinLeft: 140, armRight: -70, foreRight: -100, armLeft: -60, foreLeft: -100 })
+/** In the air reaching up: both arms high, the legs drawn up under him. */
+const REACH = posed({ armRight: -168, foreRight: -6, armLeft: -150, foreLeft: -10, thighRight: -40, shinRight: 60, thighLeft: -10, shinLeft: 40 })
+/** Hanging from both hands, the legs a little forward. */
+const HANG = posed({ armRight: -178, foreRight: 0, armLeft: -172, foreLeft: 0, thighRight: -20, shinRight: 10, thighLeft: -8, shinLeft: 14 })
+/** Holding a pickup up and out before him in the near hand, clear of his big head. */
+const HOLD_UP = posed({ armRight: -100, foreRight: -10, armLeft: 20 })
+/** Down on one knee for the hand slap. */
+const KNEEL = posed({ rise: 30, thighRight: -80, shinRight: 90, thighLeft: 10, shinLeft: 80, lean: 14 })
+/** Riding: seated with the knees forward, the hands on the rim or the boar's neck. */
+const RIDE = posed({ rise: 26, thighRight: -80, shinRight: 75, thighLeft: -70, shinLeft: 75, armRight: -60, foreRight: -30, armLeft: -50, foreLeft: -30 })
+const GUARD = posed({ armRight: -40, foreRight: -110, armLeft: -50, foreLeft: -105, thighRight: -12, thighLeft: 14 })
+const KICK = posed({ armRight: -30, foreRight: -110, armLeft: 20, foreLeft: -60, thighRight: -100, shinRight: 0, lean: -16, rise: 2 })
 
-/** A wobble that settles: `0` at the start and the end of its time t. */
-const wobble = (t: number): number => (t <= 0 || t >= 1 ? 0 : Math.sin(2 * Math.PI * t) * (1 - t))
-
-// ---------------------------------------------------------------- his poses
-
-const CROUCH = posed({ rise: 8, thighRight: -18, shinRight: 30, thighLeft: 18, shinLeft: -30, armRight: 20, armLeft: -20 })
-const ARMS_UP = { armRight: -172, armLeft: 172 }
-const HANG = posed({ ...ARMS_UP, thighRight: -8, thighLeft: 8 })
-const GUARD = posed({ armRight: -40, foreRight: -120, armLeft: 40, foreLeft: 120 })
-
-/** His climb up a vine: the hands reach over each other, the knees grip in turn. */
-const climb = (phase: number): FigurePose => {
-  const swing = Math.sin(phase * Math.PI)
-  return posed({ armRight: -150 - 25 * swing, foreRight: -20, armLeft: 150 - 25 * swing, foreLeft: 20, thighRight: -30 * Math.max(0, swing), shinRight: 50 * Math.max(0, swing), thighLeft: 30 * Math.max(0, -swing), shinLeft: -50 * Math.max(0, -swing) })
+/** The hand slap at `phase`: on one knee, the near hand and the far hand coming down in turn. */
+const slap = (phase: number): FigurePose => {
+  const near = Math.max(0, Math.sin(Math.PI * phase))
+  const far = Math.max(0, -Math.sin(Math.PI * phase))
+  return { ...KNEEL, armRight: -70 + 40 * near, foreRight: -40 + 20 * near, armLeft: -70 + 40 * far, foreLeft: -40 + 20 * far }
 }
 
-// ---------------------------------------------------------------- the stops writer
-
-/** Him at a moment of a move: his pose, how far ahead of his place and above the floor. */
-interface Him {
-  pose: FigurePose
-  ahead: number
-  lift?: number
+/** The drum roll at `phase`: the sticks over the barrel head, near and far coming down in turn. */
+const roll = (phase: number): FigurePose => {
+  const near = Math.max(0, Math.sin(Math.PI * phase))
+  const far = Math.max(0, -Math.sin(Math.PI * phase))
+  return posed({ armRight: -45 + 25 * near, foreRight: -70 + 30 * near, armLeft: -40 + 25 * far, foreLeft: -70 + 30 * far, thighRight: -6, thighLeft: 8 })
 }
 
-/** A key of a move: by `at` (0 to 1 of the move) he is in `pose`, `ahead` and `lift` up, having got there
- *  over an arc `arc` high; the first key is where the move starts. */
-interface Key extends Him {
-  at: number
-  arc?: number
+/** A walk step at `phase`, facing right. */
+const stride = (phase: number): FigurePose => ({ ...FIGURE_STAND, ...walk(phase, 1) })
+
+// His size in place units: soles to his raised hands, and the middle of his tucked body above the ground.
+const HANDS_UP = 188
+const TUCK_MIDDLE = 75
+
+/** The middle of his tucked body in his drawing, from his soles: what a tumble turns him round. */
+const BALL = { x: 6, y: -50 }
+
+// His near arm's joints in his drawing (character.tsx): the shoulder, the elbow, the middle of the hand.
+const ARM = { shoulder: [50, 62], elbow: [50, 81], hand: [50.8, 101] } as const
+
+/** Where his near hand is in a pose, from his soles, in place units (y up negative). */
+const handOf = (pose: FigurePose): [number, number] => {
+  const [x, y] = handAt({ shoulder: [...ARM.shoulder], elbow: [...ARM.elbow], hand: [...ARM.hand] }, pose.armRight, pose.foreRight)
+  return [(x - 50) * K, (y - 146 + pose.rise) * K]
 }
 
-/** A move from its keys in order of `at`: between two keys every number eases from one to the next; after
- *  the last he holds it. */
-function keyed(keys: readonly Key[]): (t: number) => Him {
-  return (t) => {
-    const next = keys.findIndex((key) => key.at > t)
-    if (next === -1) return keys[keys.length - 1]
-    const from = keys[Math.max(0, next - 1)]
-    const to = keys[next]
-    const u = next === 0 ? 0 : ramp(t, from.at, to.at)
-    const e = trackEase(u)
-    return { pose: mix(from.pose, to.pose, e), ahead: lerp(from.ahead, to.ahead, e), lift: lerp(from.lift ?? 0, to.lift ?? 0, e) + hop(u, to.arc ?? 0) }
-  }
+/** Where a thing he holds sits in a frame: at his near hand. */
+const heldIn = (frame: Frame): [number, number] => {
+  const [x, y] = handOf(frame.pose)
+  return [frame.ahead + x, -(frame.lift ?? 0) + y]
 }
 
-const STAND: Him = { pose: FIGURE_STAND, ahead: 0 }
+/** A flight from `from` to `to` (each [ahead, lift]) over an arc `height` above the straight line between them. */
+const flight = (u: number, from: readonly [number, number], to: readonly [number, number], height: number): [number, number] => [
+  lerp(from[0], to[0], u),
+  lerp(from[1], to[1], u) + hop(u, height),
+]
 
-/** How he gets to the next stop: walking along the ground, climbing while the tree slides down, or
- *  jumping from one floating log to the next. */
-type Run = 'walk' | 'climb' | 'leap'
+// ---------------------------------------------------------------- the hero: the sunset trail
 
-const RUN_POSE: Record<Run, (offset: number) => FigurePose> = {
-  walk: (offset) => posed(walk(offset / STRIDE, 0)),
-  climb: (offset) => climb(offset / STRIDE),
-  leap: () => CROUCH,
+// The blast barrel behind his spot, its mouth up and forward, and where he comes out of it.
+const HERO_BARREL = { x: -70, y: -70, angle: -40 }
+const mouthOf = ({ x, y, angle }: { x: number; y: number; angle: number }): [number, number] => {
+  const a = (angle * Math.PI) / 180
+  return [x + 60 * Math.cos(a), y + 60 * Math.sin(a)]
 }
-
-/** The run between beats: out of the last move's held end, back to his place. */
-function runOf(before: Him, run: number, offset: number, kind: Run): Him {
-  if (run <= 0) return before
-  const out = ramp(run, 0, 0.4)
-  return {
-    pose: mix(before.pose, RUN_POSE[kind](offset), trackEase(out)),
-    ahead: lerp(before.ahead, 0, out),
-    lift: lerp(before.lift ?? 0, 0, out) + (kind === 'leap' ? hop(run, 90) : 0),
-  }
-}
-
-interface StopsDef {
-  zone: Zone
-  kit: Profession | null
-  /** A card's stop, drawn round the spot where he makes his move (x 0 his place, y 0 the floor). */
-  stop: (i: number) => ReactNode
-  /** What of a stop stands in front of him. */
-  over?: (i: number) => ReactNode
-  /** The way the run goes: along the ground (the default), up the tree, from log to log. */
-  run?: Run
-  /** His move at a stop, `t` of the way; t 1 is its held end. */
-  move: (t: number) => Him
-  /** How far the view pushes in over his move. */
-  push?: (t: number) => number
-  /** Binds the stops' answers; the writer takes how far each card's answer has played, 0 to 1. */
-  reply: (stage: StageNodes, count: number) => (played: (i: number) => number) => void
-}
-
-/** A stop's place on the course: along it, or up it for a climb. */
-const stopAt = (hold: number, i: number, up: boolean): string => (up ? `translate(${hold} ${GROUND - SPACING * (i + 1)})` : `translate(${hold + SPACING * (i + 1)} ${GROUND})`)
-
-function Course({ name, layout, up, art }: { name: string; layout: Layout; up: boolean; art: (i: number) => ReactNode }) {
-  return (
-    <g data-fx={name}>
-      {Array.from({ length: Math.max(1, layout.count) }, (_, i) => (
-        <g key={i} transform={stopAt(holdOf(layout), i, up)}>
-          {art(i)}
-        </g>
-      ))}
-    </g>
-  )
-}
-
-const stopsScene = ({ zone, kit, stop, over, run = 'walk', move, push, reply }: StopsDef): SceneDef => {
-  const up = run === 'climb'
-  return {
-    zone,
-    kit,
-    back: (layout) => <Course name="course" layout={layout} up={up} art={stop} />,
-    front: over && ((layout) => <Course name="course-over" layout={layout} up={up} art={over} />),
-    bind: (stage, layout) => {
-      const count = Math.max(1, layout.count)
-      const hold = holdOf(layout)
-      const courses = [fx(stage, 'course'), fx(stage, 'course-over')]
-      const camera = fx(stage, 'camera')
-      const answers = reply(stage, count)
-      return (_p, f) => {
-        const beat = trackAt(f, count, SPACING)
-        courses.forEach((course) => (up ? translateTo(course, 0, beat.offset) : translateTo(course, -beat.offset, 0)))
-        answers((i) => (i < beat.at ? 1 : i === beat.at ? beat.act : 0))
-        const him = beat.act > 0 ? move(beat.act) : runOf(beat.at > 0 ? move(1) : STAND, beat.run, beat.offset, run)
-        const x = hold + him.ahead
-        const lift = him.lift ?? 0
-        const pushed = beat.act > 0 && push ? push(beat.act) : 0
-        transformTo(camera, pushed > 0 ? focusOn(x + 60, GROUND - lift - 140, 1 + PUSH * pushed) : '')
-        return frame(x, him.pose, K, lift)
-      }
-    },
-  }
-}
-
-/** A thing's two looks: the first shown until `on`, then the second. */
-const shown = (first: Element | null, second: Element | null, on: boolean): void => {
-  fadeTo(first, on ? 0 : 1)
-  fadeTo(second, on ? 1 : 0)
-}
-
-// ---------------------------------------------------------------- the stops' art
-
-const Rock = ({ x, width, height }: { x: number; width: number; height: number }) => (
-  <>
-    <path d={`M${x} 0 V${-height + 14} Q${x} ${-height} ${x + 14} ${-height} H${x + width - 14} Q${x + width} ${-height} ${x + width} ${-height + 14} V0 Z`} fill={C.stone} stroke={EDGE} strokeWidth={4} />
-    <path d={`M${x + 10} ${-height + 4} H${x + width - 10}`} stroke={C.fern} strokeWidth={8} strokeLinecap="round" />
-    <path d={`M${x + 30} ${-height * 0.6} L${x + 70} ${-height * 0.55} M${x + width - 60} ${-height * 0.3} L${x + width - 20} ${-height * 0.34}`} stroke={C.stoneDark} strokeWidth={4} strokeLinecap="round" />
-  </>
-)
-
-const Bloom = ({ name }: { name: string }) => (
-  <g data-fx={name} transform="scale(0)">
-    <use href="#tp-bloom" transform="scale(0.9)" />
-  </g>
-)
-
-const Deck = () => (
-  <>
-    <rect x={-80} y={-4} width={300} height={22} rx={4} fill={C.plank} stroke={EDGE} strokeWidth={4} />
-    <rect x={250} y={-SPACING} width={70} height={SPACING + 18} fill={C.bark} stroke={EDGE} strokeWidth={4} />
-    <path d={`M0 ${SPACING} C-14 ${SPACING * 0.66} 12 ${SPACING * 0.33} 0 0`} fill="none" stroke={C.moss} strokeWidth={8} strokeLinecap="round" />
-    <path d="M150 18 V90" stroke={EDGE} strokeWidth={3} />
-  </>
-)
-
-const Lantern = ({ lit }: { lit: boolean }) => <rect x={136} y={90} width={28} height={36} rx={6} fill={lit ? C.lamp : C.stoneDark} stroke={EDGE} strokeWidth={3} />
-
-const Coconut = () => <circle r={22} fill={C.husk} stroke={EDGE} strokeWidth={3} />
-
-const Gem = () => <path d="M0 -16 L12 0 L0 16 L-12 0 Z" fill={C.gem} stroke={EDGE} strokeWidth={3} strokeLinejoin="round" />
-
-const Stone = () => <circle r={7} fill={C.stoneDark} stroke={EDGE} strokeWidth={2} />
-
-const River = ({ from, to }: { from: number; to: number }) => (
-  <>
-    <rect x={from} y={-4} width={to - from} height={190} fill={C.water} />
-    <path d={`M${from + 20} 30 H${from + 90} M${to - 120} 70 H${to - 40}`} stroke={C.sunCore} strokeWidth={4} strokeLinecap="round" opacity={0.5} />
-  </>
-)
-
-const Boulder = () => (
-  <>
-    <circle r={55} fill={C.stone} stroke={EDGE} strokeWidth={4} />
-    <path d="M-30 -14 Q-10 -30 12 -20 M10 18 Q24 10 30 -4" fill="none" stroke={C.stoneDark} strokeWidth={4} strokeLinecap="round" />
-  </>
-)
-
-const Splash = () => (
-  <>
-    {[-50, -20, 20, 50].map((x) => (
-      <circle key={x} cx={x} cy={-30 - Math.abs(x) * 0.4} r={9} fill={C.sunCore} opacity={0.8} />
-    ))}
-  </>
-)
-
-const TEMPLE = { x: 170, width: 320, height: 340, door: { x: 280, width: 100, height: 170 } }
-
-const Temple = () => (
-  <>
-    <rect x={TEMPLE.x} y={-TEMPLE.height} width={TEMPLE.width} height={TEMPLE.height} fill={C.stone} stroke={EDGE} strokeWidth={4} />
-    <path d={`M${TEMPLE.x - 20} ${-TEMPLE.height} H${TEMPLE.x + TEMPLE.width + 20} L${TEMPLE.x + TEMPLE.width - 30} ${-TEMPLE.height - 50} H${TEMPLE.x + 30} Z`} fill={C.stoneDark} stroke={EDGE} strokeWidth={4} />
-    <rect x={TEMPLE.door.x} y={-TEMPLE.door.height} width={TEMPLE.door.width} height={TEMPLE.door.height} fill={C.lamp} opacity={0.8} />
-    <path d={`M${TEMPLE.x} -120 H${TEMPLE.door.x} M${TEMPLE.door.x + TEMPLE.door.width} -220 H${TEMPLE.x + TEMPLE.width}`} stroke={C.stoneDark} strokeWidth={4} />
-    <rect x={10} y={-300} width={40} height={300} fill={C.stoneDark} stroke={EDGE} strokeWidth={4} />
-  </>
-)
-
-const Door = () => <rect x={TEMPLE.door.x} y={-TEMPLE.door.height} width={TEMPLE.door.width} height={TEMPLE.door.height} fill={C.stoneDark} stroke={EDGE} strokeWidth={4} />
-
-/** The temple's lever, turning round its pin on the post: the handle at the far end. */
-const LEVER = { pin: { x: 30, y: -300 }, length: 100, from: -32, to: 28 }
-
-const Lever = () => (
-  <>
-    <rect x={0} y={-8} width={LEVER.length} height={16} rx={6} fill={C.bark} stroke={EDGE} strokeWidth={4} />
-    <circle cx={LEVER.length} r={12} fill={C.plank} stroke={EDGE} strokeWidth={4} />
-    <circle r={8} fill={C.stone} stroke={EDGE} strokeWidth={3} />
-  </>
-)
-
-const Chest = ({ open }: { open: boolean }) => (
-  <>
-    <rect x={-40} y={-40} width={80} height={40} rx={4} fill={C.bark} stroke={EDGE} strokeWidth={4} />
-    <path d={open ? 'M-40 -40 L-30 -84 H30 L40 -40' : 'M-40 -40 Q0 -64 40 -40 Z'} fill={C.plank} stroke={EDGE} strokeWidth={4} strokeLinejoin="round" />
-    <rect x={-6} y={-30} width={12} height={12} fill={C.sunGold} stroke={EDGE} strokeWidth={2} />
-  </>
-)
-
-const Pearl = () => <circle r={12} fill={C.parchment} stroke={EDGE} strokeWidth={3} />
-
-const Log = () => (
-  <>
-    <rect x={-110} y={-18} width={220} height={38} rx={19} fill={C.bark} stroke={EDGE} strokeWidth={4} />
-    <ellipse cx={110} cy={1} rx={12} ry={19} fill={C.plank} stroke={EDGE} strokeWidth={3} />
-  </>
-)
-
-const Grain = () => <path d="M-80 -4 H-30 M-10 8 H50 M60 -6 H90" stroke={C.barkDark} strokeWidth={4} strokeLinecap="round" />
-
-const Pad = ({ x }: { x: number }) => <ellipse cx={x} cy={6} rx={40} ry={10} fill={C.fern} stroke={EDGE} strokeWidth={3} />
-
-const Frog = () => (
-  <>
-    <ellipse cy={-12} rx={18} ry={13} fill={C.moss} stroke={EDGE} strokeWidth={3} />
-    <circle cx={-8} cy={-24} r={5} fill={C.parchment} stroke={EDGE} strokeWidth={2} />
-    <circle cx={8} cy={-24} r={5} fill={C.parchment} stroke={EDGE} strokeWidth={2} />
-  </>
-)
-
-const Note = () => (
-  <>
-    <ellipse cx={-6} rx={9} ry={7} fill={C.sunCore} transform="rotate(-20 -6 0)" />
-    <path d="M2 -2 V-34 L16 -26" fill="none" stroke={C.sunCore} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-  </>
-)
-
-const BRANCH = -330
-
-const Branch = () => (
-  <>
-    <rect x={300} y={-560} width={60} height={560} fill={C.bark} stroke={EDGE} strokeWidth={4} />
-    <path d={`M-60 ${BRANCH} H310`} stroke={EDGE} strokeWidth={22} strokeLinecap="round" />
-    <path d={`M-60 ${BRANCH} H310`} stroke={C.bark} strokeWidth={16} strokeLinecap="round" />
-  </>
-)
-
-const Sack = () => (
-  <>
-    <path d="M0 0 V70" stroke={EDGE} strokeWidth={4} />
-    <path d="M-34 70 Q-40 150 -20 210 H20 Q40 150 34 70 Z" fill={C.husk} stroke={EDGE} strokeWidth={4} strokeLinejoin="round" />
-    <path d="M-30 100 H30" stroke={C.plank} strokeWidth={5} />
-  </>
-)
-
-// ---------------------------------------------------------------- the hero
-
-const HERO_AT = { wide: { hut: 180, frond: 1440, him: 1180 }, phone: { hut: 470, frond: 1000, him: 820 } }
-
-const Hut = () => (
-  <>
-    <path d="M10 0 V-150 M130 0 V-150" stroke={EDGE} strokeWidth={14} />
-    <rect x={-10} y={-170} width={160} height={20} rx={4} fill={C.shadowSoft} />
-    <rect x={10} y={-260} width={120} height={92} fill={C.shadowSoft} />
-    <path d="M-20 -256 L70 -330 L160 -256 Z" fill={EDGE} />
-    <rect x={56} y={-228} width={30} height={60} fill={C.lamp} opacity={0.7} />
-  </>
-)
+const HERO_MOUTH = mouthOf(HERO_BARREL)
+const HERO_LAND = 200
 
 const hero: SceneDef = {
   zone: 'sunset',
   kit: null,
-  back: ({ phone }) => {
-    const at = HERO_AT[phone ? 'phone' : 'wide']
-    return (
-      <>
-        <g transform={`translate(${at.hut} ${GROUND})`}>
-          <Hut />
-        </g>
-        <g data-fx="frond" transform={`translate(${at.frond} 120)`}>
-          <use href="#tp-frond" transform="scale(-1 1) rotate(60) scale(2.6)" />
-        </g>
-      </>
-    )
+  script: [1800],
+  ends: [1],
+  shift: { wide: 230, phone: 50 },
+  back: () => (
+    <g data-fx="hero-barrel" transform={`translate(${HERO_BARREL.x} ${HERO_BARREL.y}) rotate(${HERO_BARREL.angle})`}>
+      <Barrel blast />
+      <g data-fx="hero-burst" opacity="0" transform="translate(70 0)">
+        <Burst size={70} />
+      </g>
+    </g>
+  ),
+  move: (_kit, t) => {
+    if (t < 0.08) return { pose: TUCK, ahead: HERO_MOUTH[0], lift: -HERO_MOUTH[1], opacity: 0 }
+    if (t < 0.7) {
+      const u = ramp(t, 0.08, 0.7)
+      const [ahead, lift] = flight(u, [HERO_MOUTH[0], -HERO_MOUTH[1]], [HERO_LAND, 0], 200)
+      return { pose: blend(TUCK, CROUCH, t, 0.55, 0.7), ahead, lift, spin: 720 * ease(ramp(t, 0.08, 0.6)) }
+    }
+    return still(blend(CROUCH, STAND, t, 0.72, 0.95), HERO_LAND)
   },
-  bind: (stage, { phone }) => {
-    const frond = fx(stage, 'frond')
-    const at = HERO_AT[phone ? 'phone' : 'wide']
-    return (p) => {
-      // the frond sways once in the evening wind as the page moves on
-      transformTo(frond, `translate(${at.frond} 120) rotate(${r1(10 * wobble(ramp(p, 0, 0.45)))})`)
-      return frame(at.him, FIGURE_STAND, phone ? 1.9 : 2.2)
+  reply: (stage) => {
+    const barrel = fx(stage, 'hero-barrel')
+    const burst = fx(stage, 'hero-burst')
+    return (t) => {
+      const kick = bell(t, 0.06, 0.2)
+      transformTo(barrel, `translate(${HERO_BARREL.x - 10 * kick} ${HERO_BARREL.y + 6 * kick}) rotate(${HERO_BARREL.angle})`)
+      fadeTo(burst, kick)
     }
   },
 }
 
-// ---------------------------------------------------------------- the sections
+// ---------------------------------------------------------------- about: the roll and the banana bunch
 
-// About: the ledge. He crouches, jumps and catches the ledge's lip, hangs, swings a leg up and pulls
-// himself over; the flower on the ledge opens at BLOOM.
-const ABOUT = { rock: { x: 70, width: 300, height: 260 }, flower: 260, bloom: [0.62, 0.82] as const }
+const BEETLE_FROM = 420
+const ROLL_TO = 170
+const BUNCH = { x: 300, y: -330 }
+const BUNCH_LAND = 270
 
-const about = stopsScene({
+const aboutMove = (t: number): Frame => {
+  if (t < 0.08) return still(blend(STAND, CROUCH, t, 0, 0.08))
+  if (t < 0.4) return { pose: TUCK, ahead: ROLL_TO * ease(ramp(t, 0.08, 0.4)), spin: 900 * ease(ramp(t, 0.08, 0.4)) }
+  if (t < 0.55) return still(blend(TUCK, STAND, t, 0.4, 0.5), ROLL_TO)
+  if (t < 0.85) {
+    const u = ramp(t, 0.55, 0.85)
+    const [ahead, lift] = flight(u, [ROLL_TO, 0], [BUNCH_LAND, 0], 160)
+    return { pose: u < 0.8 ? blend(CROUCH, REACH, t, 0.55, 0.62) : blend(REACH, CROUCH, t, 0.8, 0.85), ahead, lift }
+  }
+  return still(blend(CROUCH, HOLD_UP, t, 0.86, 0.98), BUNCH_LAND)
+}
+
+const about: SceneDef = {
   zone: 'jungle',
   kit: null,
-  stop: (i) => (
-    <>
-      <Rock {...ABOUT.rock} />
-      <g transform={`translate(${ABOUT.flower} ${-ABOUT.rock.height})`}>
-        <path d="M0 0 V-40" stroke={C.moss} strokeWidth={6} />
-        <g transform="translate(0 -40)">
-          <Bloom name={`bloom-${i}`} />
-        </g>
+  script: [1600, 1700],
+  ends: [0.48, 1],
+  back: () => (
+    <g>
+      <path d={`M${BUNCH.x} -700 V${BUNCH.y}`} stroke={C.moss} strokeWidth={6} data-fx="about-vine" />
+      <g data-fx="about-beetle" transform={`translate(${BEETLE_FROM} 0)`}>
+        <Beetle />
       </g>
-    </>
+    </g>
   ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.12, pose: CROUCH, ahead: 0 },
-    { at: 0.28, pose: HANG, ahead: 80, lift: 90, arc: 40 },
-    { at: 0.4, pose: posed({ ...ARMS_UP, thighRight: -70, shinRight: 70, thighLeft: 10 }), ahead: 85, lift: 120 },
-    { at: 0.52, pose: CROUCH, ahead: 140, lift: ABOUT.rock.height },
-    { at: 0.6, pose: FIGURE_STAND, ahead: 150, lift: ABOUT.rock.height },
-  ]),
-  reply: (stage, count) => {
-    const blooms = fxs(stage, 'bloom', count)
-    return (played) =>
-      blooms.forEach((bloom, i) => {
-        const g = ramp(played(i), ABOUT.bloom[0], ABOUT.bloom[1])
-        const w = 0.3 * wobble(g)
-        transformTo(bloom, `scale(${(g + w).toFixed(3)} ${(g - w).toFixed(3)})`)
-      })
+  // The bunch hangs in front of him, so it shows in his hand once caught.
+  front: () => (
+    <g data-fx="about-bunch" transform={`translate(${BUNCH.x} ${BUNCH.y})`}>
+      <BananaBunch />
+    </g>
+  ),
+  move: (_kit, t) => aboutMove(t),
+  reply: (stage) => {
+    const beetle = fx(stage, 'about-beetle')
+    const bunch = fx(stage, 'about-bunch')
+    const vine = fx(stage, 'about-vine')
+    return (t) => {
+      // the beetle walks in at him until the ball hits it at 0.36, then flips and tumbles away
+      const hit = ramp(t, 0.36, 0.55)
+      const walked = lerp(BEETLE_FROM, 250, ease(ramp(t, 0, 0.36)))
+      transformTo(beetle, `translate(${r1(walked + 260 * hit)} ${r1(-hop(hit, 160) + 400 * hit * hit * hit)}) rotate(${r1(200 * hit)})`)
+      fadeTo(beetle, 1 - ramp(t, 0.5, 0.56))
+      // the bunch is caught at the top of his jump (0.69) and rides in his near hand from then on
+      const caught = t >= 0.69
+      const [hx, hy] = heldIn(aboutMove(t))
+      transformTo(bunch, caught ? `translate(${r1(hx)} ${r1(hy - 6)})` : `translate(${BUNCH.x} ${BUNCH.y})`)
+      fadeTo(vine, caught ? 0 : 1)
+    }
   },
-})
+}
 
-// Work: the climb. The tree slides down while he climbs the vine to the next deck; on the deck he steps
-// to the lantern and it lights at LIT.
-const WORK = { lit: 0.45 }
+// ---------------------------------------------------------------- work: the barrel cannons over the pit
 
-const work = stopsScene({
+const PIT_WORK = { from: 70, to: 430 }
+const CANNON_A = { x: 150, y: -150, angle: -40 }
+const CANNON_B = { x: 340, y: -300 }
+// The second barrel turns from its mouth up and back to its mouth down at the far deck.
+const B_FROM = -150
+const B_TO = 30
+const WORK_LAND = 460
+
+const work: SceneDef = {
   zone: 'treetop',
   kit: 'engineer',
-  run: 'climb',
-  stop: (i) => (
-    <>
-      <Deck />
-      <g data-fx={`dark-${i}`}>
-        <Lantern lit={false} />
+  script: [1400, 1400, 1700],
+  ends: [0.3, 0.6, 1],
+  back: () => (
+    <g>
+      <Pit from={PIT_WORK.from} to={PIT_WORK.to} />
+      <Deck width={140} height={220} />
+      <g data-fx="work-a" transform={`translate(${CANNON_A.x} ${CANNON_A.y}) rotate(${CANNON_A.angle})`}>
+        <Barrel blast />
+        <g data-fx="work-burst-a" opacity="0" transform="translate(70 0)">
+          <Burst size={70} />
+        </g>
       </g>
-      <g data-fx={`lit-${i}`} opacity={0}>
-        <Lantern lit />
+      <g data-fx="work-b" transform={`translate(${CANNON_B.x} ${CANNON_B.y}) rotate(${B_FROM})`}>
+        <Barrel blast />
+        <g data-fx="work-burst-b" opacity="0" transform="translate(70 0)">
+          <Burst size={70} />
+        </g>
       </g>
-    </>
+    </g>
   ),
-  move: keyed([
-    { at: 0, pose: climb(0), ahead: 0 },
-    { at: 0.15, pose: FIGURE_STAND, ahead: 0 },
-    { at: 0.32, pose: posed(walk(1, 0)), ahead: 70 },
-    { at: WORK.lit, pose: posed({ armRight: -60, foreRight: -40 }), ahead: 100 },
-    { at: 0.6, pose: FIGURE_STAND, ahead: 100 },
-  ]),
-  reply: (stage, count) => {
-    const lamps = fxs(stage, 'dark', count).map((dark, i) => ({ dark, lit: fx(stage, `lit-${i}`) }))
-    return (played) => lamps.forEach(({ dark, lit }, i) => shown(dark, lit, played(i) >= WORK.lit))
+  move: (_kit, t) => {
+    const a: [number, number] = [CANNON_A.x - 10, -CANNON_A.y - TUCK_MIDDLE]
+    const b: [number, number] = [CANNON_B.x - 10, -CANNON_B.y - TUCK_MIDDLE]
+    if (t < 0.06) return still(blend(STAND, CROUCH, t, 0, 0.06))
+    if (t < 0.26) {
+      const [ahead, lift] = flight(ramp(t, 0.06, 0.26), [0, 0], a, 90)
+      return { pose: blend(CROUCH, TUCK, t, 0.06, 0.16), ahead, lift, opacity: 1 - ramp(t, 0.22, 0.26) }
+    }
+    if (t < 0.33) return { pose: TUCK, ahead: a[0], lift: a[1], opacity: 0 }
+    if (t < 0.5) {
+      const [ahead, lift] = flight(ramp(t, 0.33, 0.5), a, b, 60)
+      return { pose: TUCK, ahead, lift, spin: 540 * ramp(t, 0.33, 0.5), opacity: 1 - ramp(t, 0.47, 0.5) }
+    }
+    if (t < 0.64) return { pose: TUCK, ahead: b[0], lift: b[1], opacity: 0 }
+    if (t < 0.88) {
+      const u = ramp(t, 0.64, 0.88)
+      const [ahead, lift] = flight(u, b, [WORK_LAND, 0], 120)
+      return { pose: blend(TUCK, CROUCH, t, 0.8, 0.88), ahead, lift, spin: 360 * ease(ramp(t, 0.64, 0.82)) }
+    }
+    return still(blend(CROUCH, STAND, t, 0.88, 1), WORK_LAND)
   },
-})
+  reply: (stage) => {
+    const a = fx(stage, 'work-a')
+    const b = fx(stage, 'work-b')
+    const burstA = fx(stage, 'work-burst-a')
+    const burstB = fx(stage, 'work-burst-b')
+    return (t) => {
+      // each barrel bucks as he goes in, fires with a burst at its mouth, and the second turns to aim between
+      const inA = bell(t, 0.25, 0.32)
+      const fireA = bell(t, 0.32, 0.42)
+      transformTo(a, `translate(${CANNON_A.x - 8 * fireA} ${CANNON_A.y + 6 * inA}) rotate(${CANNON_A.angle})`)
+      fadeTo(burstA, fireA)
+      const turn = lerp(B_FROM, B_TO, ease(ramp(t, 0.5, 0.62)))
+      const inB = bell(t, 0.49, 0.55)
+      const fireB = bell(t, 0.63, 0.73)
+      transformTo(b, `translate(${CANNON_B.x - 8 * fireB} ${CANNON_B.y + 6 * inB}) rotate(${r1(turn)})`)
+      fadeTo(burstB, fireB)
+    }
+  },
+}
 
-// Tech: the sling. He loads a stone, whirls it twice over his head and lets fly at the coconut high in the
-// palm; it drops, splits and the gem rolls out.
-const TECH = { palm: 300, nut: { x: 270, y: -300 }, whirl: [0.15, 0.36] as const, fly: [0.36, 0.48] as const, fall: [0.48, 0.62] as const }
+// ---------------------------------------------------------------- tech: the hand slap and the gold letter
 
-const tech = stopsScene({
+const DIG = 90
+
+const techMove = (t: number): Frame => {
+  if (t < 0.08) return still(blend(STAND, KNEEL, t, 0, 0.08))
+  if (t < 0.5) return still(slap(8 * ramp(t, 0.08, 0.5)))
+  if (t < 0.6) return still(blend(KNEEL, STAND, t, 0.5, 0.6))
+  return still(blend(STAND, HOLD_UP, t, 0.7, 0.82))
+}
+
+const tech: SceneDef = {
   zone: 'jungle',
   kit: 'engineer',
-  stop: (i) => (
-    <>
-      <use href="#tp-palm" transform={`translate(${TECH.palm} 0) scale(1.8)`} />
-      <g data-fx={`gem-${i}`} opacity={0}>
-        <Gem />
+  script: [1800, 1500],
+  ends: [0.55, 1],
+  back: () => (
+    <g>
+      <g data-fx="tech-dust" opacity="0" transform={`translate(${DIG} 0)`}>
+        <ellipse rx={70} ry={12} fill={C.sandLight} opacity={0.7} />
       </g>
-      <g data-fx={`nut-${i}`}>
-        <Coconut />
+      <path data-fx="tech-crack" opacity="0" d={`M${DIG - 40} 2 L${DIG - 14} -4 L${DIG} 4 L${DIG + 16} -3 L${DIG + 42} 2`} fill="none" stroke={C.shadow} strokeWidth={4} />
+      <g data-fx="tech-glint" opacity="0" transform={`translate(${DIG} -40)`}>
+        <Burst size={60} />
       </g>
-      <g data-fx={`stone-${i}`} opacity={0}>
-        <Stone />
-      </g>
-    </>
+    </g>
   ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.1, pose: posed({ armRight: 20, armLeft: -30, foreLeft: -40 }), ahead: 0 },
-    { at: 0.2, pose: posed({ armRight: -175, foreRight: -10, lean: -4 }), ahead: 0 },
-    { at: 0.28, pose: posed({ armRight: -150, foreRight: -40, lean: -4 }), ahead: 0 },
-    { at: TECH.fly[0], pose: posed({ armRight: -110, lean: 6, thighRight: -10 }), ahead: 10 },
-    { at: 0.5, pose: posed({ armRight: -60 }), ahead: 10 },
-    { at: 0.62, pose: FIGURE_STAND, ahead: 10 },
-  ]),
-  push: (t) => bell(t, TECH.fly[1]),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'nut', count).map((nut, i) => ({ nut, stone: fx(stage, `stone-${i}`), gem: fx(stage, `gem-${i}`) }))
-    return (played) =>
-      stops.forEach(({ nut, stone, gem }, i) => {
-        const t = played(i)
-        const whirl = ramp(t, TECH.whirl[0], TECH.whirl[1])
-        const fly = ramp(t, TECH.fly[0], TECH.fly[1])
-        const spin = 4 * Math.PI * whirl
-        const sx = whirl < 1 ? 20 + 40 * Math.cos(spin) : lerp(30, TECH.nut.x, fly)
-        const sy = whirl < 1 ? -300 + 14 * Math.sin(spin) : lerp(-300, TECH.nut.y, fly) - hop(fly, 30)
-        translateTo(stone, sx, sy)
-        fadeTo(stone, whirl > 0 && fly < 1 ? 1 : 0)
-        const fall = ramp(t, TECH.fall[0], TECH.fall[1])
-        const split = ramp(t, TECH.fall[1], TECH.fall[1] + 0.08)
-        transformTo(nut, `translate(${TECH.nut.x} ${r1(TECH.nut.y + drop(fall, -TECH.nut.y - 22))}) scale(${(1 - 0.4 * split).toFixed(3)} ${(1 - split).toFixed(3)})`)
-        const roll = ramp(t, TECH.fall[1], 0.8)
-        transformTo(gem, `translate(${r1(TECH.nut.x - 70 * roll)} -16) rotate(${r1(-200 * roll)})`)
-        fadeTo(gem, split > 0 ? 1 : 0)
-      })
-  },
-})
-
-// Services: the boulder. He sets his shoulder to it and pushes it off the bank; it rolls, tips over the
-// edge and splashes into the river, where it stays as a stepping stone.
-const SERVICES = { from: 110, edge: 220, rest: { x: 330, y: 40 }, roll: [0.15, 0.45] as const, tip: [0.45, 0.6] as const, river: [220, 560] as const }
-
-const services = stopsScene({
-  zone: 'jungle',
-  kit: 'engineer',
-  stop: (i) => (
-    <>
-      <River from={SERVICES.river[0]} to={SERVICES.river[1]} />
-      <g data-fx={`boulder-${i}`} transform={`translate(${SERVICES.from} -55)`}>
-        <Boulder />
-      </g>
-      <g data-fx={`splash-${i}`} opacity={0} transform={`translate(${SERVICES.rest.x} 0)`}>
-        <Splash />
-      </g>
-    </>
+  // The letter flies in front of him into his hand.
+  front: () => (
+    <g data-fx="tech-letter" opacity="0" transform={`translate(${DIG} 0)`}>
+      <GoldLetter letter="A" />
+    </g>
   ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.12, pose: posed({ lean: 12, armRight: -70, armLeft: -40, rise: 4 }), ahead: 20 },
-    { at: 0.3, pose: posed({ lean: 16, armRight: -75, armLeft: -45, thighLeft: 22, thighRight: -10, rise: 4 }), ahead: 70 },
-    { at: SERVICES.roll[1], pose: posed({ lean: 16, armRight: -80, armLeft: -50, thighLeft: 22, rise: 4 }), ahead: 110 },
-    { at: 0.6, pose: FIGURE_STAND, ahead: 120 },
-  ]),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'boulder', count).map((boulder, i) => ({ boulder, splash: fx(stage, `splash-${i}`) }))
-    return (played) =>
-      stops.forEach(({ boulder, splash }, i) => {
-        const t = played(i)
-        const roll = trackEase(ramp(t, SERVICES.roll[0], SERVICES.roll[1]))
-        const tip = ramp(t, SERVICES.tip[0], SERVICES.tip[1])
-        const x = lerp(lerp(SERVICES.from, SERVICES.edge, roll), SERVICES.rest.x, tip)
-        const y = -55 + drop(tip, 55 + SERVICES.rest.y)
-        transformTo(boulder, `translate(${r1(x)} ${r1(y)}) rotate(${r1(((x - SERVICES.from) / 55) * 57)})`)
-        const spray = ramp(t, SERVICES.tip[1] - 0.02, SERVICES.tip[1] + 0.14)
-        transformTo(splash, `translate(${SERVICES.rest.x} ${r1(-40 * Math.sin(Math.PI * spray))})`)
-        fadeTo(splash, spray > 0 && spray < 1 ? 1 : 0)
-      })
+  move: (_kit, t) => techMove(t),
+  reply: (stage) => {
+    const dust = fx(stage, 'tech-dust')
+    const crack = fx(stage, 'tech-crack')
+    const letter = fx(stage, 'tech-letter')
+    const glint = fx(stage, 'tech-glint')
+    return (t) => {
+      // a puff of dust on each of the eight slaps, the ground cracking open over them
+      const beat = (8 * ramp(t, 0.08, 0.5)) % 1
+      fadeTo(dust, t > 0.08 && t < 0.5 ? 0.8 * (1 - beat) : 0)
+      fadeTo(crack, ramp(t, 0.2, 0.5))
+      // the letter springs up out of the crack and drops into his raised hand
+      const up = ramp(t, 0.56, 0.82)
+      const [hx, hy] = heldIn(techMove(t))
+      const y = lerp(-20, hy - 34, up) - hop(up, 200)
+      const x = lerp(DIG, hx + 6, ease(up))
+      transformTo(letter, `translate(${r1(x)} ${r1(y)}) rotate(${r1(360 * (1 - ease(up)))})`)
+      fadeTo(letter, ramp(t, 0.55, 0.6))
+      fadeTo(glint, bell(t, 0.54, 0.66) + 0.8 * bell(t, 0.8, 0.95))
+    }
   },
-})
+}
 
-// Projects: the lever. He jumps to the stone lever's handle and hangs his weight on it; it comes down, he
-// drops and the temple door grinds up on the light inside.
-const PROJECTS = { pull: [0.3, 0.5] as const, door: [0.5, 0.72] as const }
+// ---------------------------------------------------------------- services: the mine cart over the broken rail
 
-const projects = stopsScene({
+const RAIL_END = 200
+const RAIL_ON = 320
+const CART_ONE = { from: -20, to: RAIL_END - 50 }
+const CART_TWO = { from: RAIL_ON + 60, to: 450 }
+// His soles in a cart: on its floor.
+const IN_CART = 22
+
+const services: SceneDef = {
   zone: 'dusk',
   kit: 'engineer',
-  stop: (i) => (
-    <>
-      <Temple />
-      <g data-fx={`door-${i}`}>
-        <Door />
-      </g>
-      <g data-fx={`lever-${i}`} transform={`translate(${LEVER.pin.x} ${LEVER.pin.y}) rotate(${LEVER.from})`}>
-        <Lever />
-      </g>
-    </>
+  script: [1600, 1800],
+  ends: [0.47, 1],
+  back: () => (
+    <g>
+      <Pit from={RAIL_END} to={RAIL_ON} />
+      <Rails from={-300} to={RAIL_END} />
+      <path d={`M${RAIL_END - 4} 0 L${RAIL_END + 26} 30`} stroke={C.stoneDark} strokeWidth={6} />
+      <Rails from={RAIL_ON} to={900} />
+    </g>
   ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.12, pose: CROUCH, ahead: 0 },
-    { at: PROJECTS.pull[0], pose: HANG, ahead: 100, lift: 185, arc: 30 },
-    { at: PROJECTS.pull[1], pose: posed({ ...ARMS_UP, thighRight: -14, thighLeft: 14 }), ahead: 112, lift: 115 },
-    { at: 0.58, pose: CROUCH, ahead: 112 },
-    { at: 0.66, pose: FIGURE_STAND, ahead: 112 },
-  ]),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'lever', count).map((lever, i) => ({ lever, door: fx(stage, `door-${i}`) }))
-    return (played) =>
-      stops.forEach(({ lever, door }, i) => {
-        const t = played(i)
-        transformTo(lever, `translate(${LEVER.pin.x} ${LEVER.pin.y}) rotate(${r1(lerp(LEVER.from, LEVER.to, trackEase(ramp(t, PROJECTS.pull[0], PROJECTS.pull[1]))))})`)
-        translateTo(door, 0, -(TEMPLE.door.height - 10) * trackEase(ramp(t, PROJECTS.door[0], PROJECTS.door[1])))
-      })
+  // He stands in the carts, so they are drawn over his legs.
+  front: () => (
+    <g>
+      <g data-fx="cart-one" transform={`translate(${CART_ONE.from} 0)`}>
+        <Cart />
+      </g>
+      <g data-fx="cart-two" transform={`translate(${CART_TWO.from} 0)`}>
+        <Cart />
+      </g>
+    </g>
+  ),
+  move: (_kit, t) => {
+    const one = lerp(CART_ONE.from, CART_ONE.to, ease(ramp(t, 0, 0.47)))
+    if (t < 0.5) return still(blend(RIDE, mix(RIDE, CROUCH, 0.5), t, 0.4, 0.5), one, IN_CART)
+    if (t < 0.78) {
+      const [ahead, lift] = flight(ramp(t, 0.5, 0.78), [CART_ONE.to, IN_CART], [CART_TWO.from, IN_CART], 170)
+      return { pose: blend(REACH, CROUCH, t, 0.66, 0.78), ahead, lift }
+    }
+    return still(blend(CROUCH, RIDE, t, 0.78, 0.88), lerp(CART_TWO.from, CART_TWO.to, ease(ramp(t, 0.78, 1))), IN_CART)
   },
-})
+  reply: (stage) => {
+    const one = fx(stage, 'cart-one')
+    const two = fx(stage, 'cart-two')
+    return (t) => {
+      // the first cart runs to the broken end, then tips over the edge and drops into the gap
+      const x = lerp(CART_ONE.from, CART_ONE.to, ease(ramp(t, 0, 0.47)))
+      const tip = ramp(t, 0.5, 0.8)
+      transformTo(one, `translate(${r1(x + 90 * tip)} ${r1(300 * tip * tip)}) rotate(${r1(70 * tip)})`)
+      fadeTo(one, 1 - ramp(t, 0.72, 0.8))
+      const x2 = lerp(CART_TWO.from, CART_TWO.to, ease(ramp(t, 0.78, 1)))
+      transformTo(two, `translate(${r1(x2)} 0)`)
+    }
+  },
+}
 
-// Ventures: the dive. He dives off the bank into the lagoon, swims down to the sunken chest, it opens and
-// he comes up treading water with its pearl.
-const VENTURES = { chest: { x: 360, y: 150 }, open: 0.55, rise: [0.58, 0.74] as const, lagoon: [140, 900] as const }
+// ---------------------------------------------------------------- projects: rope to rope over the pit
 
-const SWIM = posed({ lean: 90, ...ARMS_UP, thighRight: -20, thighLeft: 20 })
+const PIT_ROPES = { from: 60, to: 390 }
+const ROPE_TOP = -560
+const ROPE_LENGTH = 320
+const ROPE_ONE = 150
+const ROPE_TWO = 320
+const ROPES_LAND = 450
 
-const ventures = stopsScene({
+/** The rope's end (where his hands hold) at `angle` for a rope hung at x `top`. */
+const ropeEnd = (top: number, angle: number): [number, number] => {
+  const a = (angle * Math.PI) / 180
+  return [top - ROPE_LENGTH * Math.sin(a), ROPE_TOP + ROPE_LENGTH * Math.cos(a)]
+}
+
+/** Him hanging from the end of a rope at `angle`: his hands at its knot, his body along it. */
+const hanging = (top: number, angle: number): Frame => {
+  const [x, y] = ropeEnd(top, angle)
+  return { pose: { ...HANG, lean: angle * 0.6 }, ahead: x - 14, lift: -(y + HANDS_UP) }
+}
+
+// Each rope's swing over the move: the first held back toward him, swung forward with him on it, then
+// left swinging; the second waits back and carries him forward.
+const ropeOne = (t: number): number => (t < 0.28 ? 32 : t < 0.6 ? lerp(32, -34, ease(ramp(t, 0.28, 0.6))) : lerp(-34, 0, ease(ramp(t, 0.6, 1))))
+const ropeTwo = (t: number): number => (t < 0.68 ? 26 : lerp(26, -32, ease(ramp(t, 0.68, 0.86))))
+
+const projects: SceneDef = {
+  zone: 'dusk',
+  kit: 'engineer',
+  script: [1600, 1900],
+  ends: [0.45, 1],
+  back: () => (
+    <g>
+      <Pit from={PIT_ROPES.from} to={PIT_ROPES.to} />
+      <g data-fx="rope-one" transform={`translate(${ROPE_ONE} ${ROPE_TOP})`}>
+        <Rope length={ROPE_LENGTH} angle={32} />
+      </g>
+      <g data-fx="rope-two" transform={`translate(${ROPE_TWO} ${ROPE_TOP})`}>
+        <Rope length={ROPE_LENGTH} angle={26} />
+      </g>
+    </g>
+  ),
+  move: (_kit, t) => {
+    if (t < 0.06) return still(blend(STAND, CROUCH, t, 0, 0.06))
+    if (t < 0.28) {
+      const caught = hanging(ROPE_ONE, 32)
+      const [ahead, lift] = flight(ramp(t, 0.06, 0.28), [0, 0], [caught.ahead, caught.lift ?? 0], 60)
+      return { pose: blend(CROUCH, HANG, t, 0.06, 0.18), ahead, lift }
+    }
+    if (t < 0.6) return hanging(ROPE_ONE, ropeOne(t))
+    if (t < 0.68) {
+      const from = hanging(ROPE_ONE, -34)
+      const to = hanging(ROPE_TWO, 26)
+      const [ahead, lift] = flight(ramp(t, 0.6, 0.68), [from.ahead, from.lift ?? 0], [to.ahead, to.lift ?? 0], 50)
+      return { pose: HANG, ahead, lift }
+    }
+    if (t < 0.86) return hanging(ROPE_TWO, ropeTwo(t))
+    if (t < 0.95) {
+      const from = hanging(ROPE_TWO, -32)
+      const [ahead, lift] = flight(ramp(t, 0.86, 0.95), [from.ahead, from.lift ?? 0], [ROPES_LAND, 0], 40)
+      return { pose: blend(HANG, CROUCH, t, 0.86, 0.95), ahead, lift }
+    }
+    return still(blend(CROUCH, STAND, t, 0.95, 1), ROPES_LAND)
+  },
+  reply: (stage) => {
+    const one = fx(stage, 'rope-one')
+    const two = fx(stage, 'rope-two')
+    return (t) => {
+      transformTo(one?.firstElementChild ?? null, `rotate(${r1(ropeOne(t))})`)
+      transformTo(two?.firstElementChild ?? null, `rotate(${r1(ropeTwo(t))})`)
+    }
+  },
+}
+
+// ---------------------------------------------------------------- ventures: the buddy crate and the charge
+
+const CRATE_X = 190
+const ROLLED = 110
+const SADDLE = 100
+// Seated, his hips are this far above his soles: the lift that puts his seat on the saddle, his legs astride.
+const SEAT = 34
+const CHARGE_TO = 430
+const WALL_X = 400
+
+const boarAt = (t: number): number => lerp(CRATE_X, CHARGE_TO, ease(ramp(t, 0.62, 0.95)))
+
+const ventures: SceneDef = {
   zone: 'jungle',
   kit: 'engineer',
-  stop: (i) => (
-    <>
-      <rect x={VENTURES.lagoon[0]} y={-4} width={VENTURES.lagoon[1] - VENTURES.lagoon[0]} height={200} fill={C.waterDeep} />
-      <g transform={`translate(${VENTURES.chest.x} ${VENTURES.chest.y})`}>
-        <g data-fx={`shut-${i}`}>
-          <Chest open={false} />
-        </g>
-        <g data-fx={`open-${i}`} opacity={0}>
-          <Chest open />
-        </g>
+  script: [1500, 1900],
+  ends: [0.44, 1],
+  back: () => (
+    <g>
+      <g data-fx="wall" transform={`translate(${WALL_X} 0)`}>
+        <PlankWall />
       </g>
-      <g data-fx={`pearl-${i}`} opacity={0}>
-        <Pearl />
+      <g data-fx="boar" opacity="0" transform={`translate(${CRATE_X} 0)`}>
+        <Boar />
       </g>
-    </>
+      <g data-fx="crate" transform={`translate(${CRATE_X} 0)`}>
+        <Crate />
+      </g>
+    </g>
   ),
-  over: () => (
-    <>
-      <rect x={VENTURES.lagoon[0]} y={0} width={VENTURES.lagoon[1] - VENTURES.lagoon[0]} height={200} fill={C.water} opacity={0.55} />
-      <path d={`M${VENTURES.lagoon[0]} 0 H${VENTURES.lagoon[1]}`} stroke={C.sunCore} strokeWidth={5} opacity={0.7} />
-    </>
-  ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.1, pose: CROUCH, ahead: 0 },
-    { at: 0.22, pose: posed({ lean: 120, ...ARMS_UP }), ahead: 170, lift: 40, arc: 60 },
-    { at: 0.32, pose: posed({ lean: 160, ...ARMS_UP }), ahead: 230, lift: -90 },
-    { at: 0.42, pose: SWIM, ahead: 300, lift: -130 },
-    { at: 0.5, pose: posed({ ...SWIM, thighRight: 20, thighLeft: -20 }), ahead: 340, lift: -140 },
-    { at: VENTURES.rise[1], pose: posed({ armRight: -130, armLeft: 60, thighRight: -20, shinRight: 30, thighLeft: 20, shinLeft: -30 }), ahead: 360, lift: -150 },
-  ]),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'pearl', count).map((pearl, i) => ({ pearl, shut: fx(stage, `shut-${i}`), open: fx(stage, `open-${i}`) }))
-    return (played) =>
-      stops.forEach(({ pearl, shut, open }, i) => {
-        const t = played(i)
-        shown(shut, open, t >= VENTURES.open)
-        const rise = trackEase(ramp(t, VENTURES.rise[0], VENTURES.rise[1]))
-        translateTo(pearl, lerp(VENTURES.chest.x, VENTURES.chest.x + 40, rise), lerp(VENTURES.chest.y - 50, -10, rise))
-        fadeTo(pearl, t >= VENTURES.open ? 1 : 0)
-      })
+  move: (_kit, t) => {
+    if (t < 0.06) return still(blend(STAND, CROUCH, t, 0, 0.06))
+    if (t < 0.3) return { pose: TUCK, ahead: ROLLED * ease(ramp(t, 0.06, 0.3)), spin: 720 * ease(ramp(t, 0.06, 0.3)) }
+    if (t < 0.46) return still(blend(TUCK, STAND, t, 0.3, 0.4), ROLLED)
+    if (t < 0.6) {
+      const [ahead, lift] = flight(ramp(t, 0.46, 0.6), [ROLLED, 0], [CRATE_X - 10, SADDLE - SEAT], 80)
+      return { pose: blend(CROUCH, RIDE, t, 0.46, 0.58), ahead, lift }
+    }
+    const x = boarAt(t)
+    return { pose: { ...RIDE, lean: -10 * bell(t, 0.62, 0.95) }, ahead: x - 10, lift: SADDLE - SEAT - 6 * Math.abs(Math.sin(t * 40)) * bell(t, 0.62, 0.95) }
   },
-})
+  reply: (stage) => {
+    const crate = fx(stage, 'crate')
+    const boards = [0, 1, 2, 3].map((i) => fx(stage, `crate-board-${i}`))
+    const boar = fx(stage, 'boar')
+    const wall = fx(stage, 'wall')
+    const planks = Array.from({ length: PLANKS }, (_, i) => fx(stage, `plank-${i}`))
+    return (t) => {
+      // the crate's boards fly apart and the boar steps out; it charges once he is on and smashes the wall
+      const burst = ramp(t, 0.3, 0.44)
+      boards.forEach((board, i) => transformTo(board, boardAt(i, burst)))
+      fadeTo(crate, 1 - ramp(t, 0.4, 0.46))
+      fadeTo(boar, ramp(t, 0.3, 0.38))
+      transformTo(boar, `translate(${r1(boarAt(t))} 0)`)
+      const smash = ramp(t, 0.8, 1)
+      planks.forEach((plank, i) => transformTo(plank, plankAt(i, smash)))
+      fadeTo(wall, 1 - ramp(t, 0.92, 1))
+    }
+  },
+}
 
-// Bands: the log. He leaps onto the log the card floats in and treads it as it rolls under him, each step
-// a note; the frogs on the lily pads hop in time.
-const BANDS = { steps: [0.2, 0.3, 0.4, 0.5, 0.6] as const, frogs: [210, 330] as const, notes: [0.25, 0.85] as const }
+// ---------------------------------------------------------------- bands: the drum roll and the bonus barrel
 
-const STEP_RIGHT = posed({ thighRight: -30, shinRight: 40, armRight: -80, armLeft: 70 })
-const STEP_LEFT = posed({ thighLeft: 30, shinLeft: -40, armRight: -70, armLeft: 80 })
+const DRUM_X = 78
+const BONUS_X = 230
+const RING = 8
 
-const bands = stopsScene({
+const ringSpot = (i: number, out: number): [number, number] => {
+  const a = Math.PI * (0.1 + (0.8 * i) / (RING - 1))
+  return [BONUS_X - 30 + Math.cos(a) * -180 * out, -120 - Math.sin(a) * 190 * out]
+}
+
+const bands: SceneDef = {
   zone: 'dusk',
   kit: 'drummer',
-  run: 'leap',
-  stop: (i) => (
-    <>
-      <River from={-SPACING / 2} to={SPACING / 2} />
-      {BANDS.frogs.map((x, n) => (
-        <g key={x}>
-          <Pad x={x} />
-          <g data-fx={`frog-${i}-${n}`} transform={`translate(${x} 0)`}>
-            <Frog />
-          </g>
-        </g>
-      ))}
-      <g data-fx={`log-${i}`}>
-        <Log />
-        <g data-fx={`grain-${i}`}>
-          <Grain />
-        </g>
+  script: [1700, 1700],
+  ends: [0.5, 1],
+  back: () => (
+    <g>
+      <g transform={`translate(${DRUM_X} 0)`}>
+        <StandingBarrel />
       </g>
-      {[0, 1, 2].map((n) => (
-        <g key={n} data-fx={`note-${i}-${n}`} opacity={0}>
-          <Note />
+      <g data-fx="bonus" transform={`translate(${BONUS_X} 0)`}>
+        <StandingBarrel bonus />
+      </g>
+      <g data-fx="bonus-burst" opacity="0" transform={`translate(${BONUS_X} -60)`}>
+        <Burst size={120} />
+      </g>
+      {Array.from({ length: RING }, (_, i) => (
+        <g key={i} data-fx={`banana-${i}`} opacity="0" transform={`translate(${BONUS_X} -60)`}>
+          <Banana />
         </g>
       ))}
-    </>
+    </g>
   ),
-  move: keyed([
-    { at: 0, pose: CROUCH, ahead: 0, lift: 18 },
-    { at: 0.12, pose: posed({ armRight: -80, armLeft: 80 }), ahead: 0, lift: 18 },
-    ...BANDS.steps.map((at, s) => ({ at, pose: s % 2 === 0 ? STEP_RIGHT : STEP_LEFT, ahead: 0, lift: 18 })),
-    { at: 0.7, pose: posed({ armRight: -85, armLeft: 85 }), ahead: 0, lift: 18 },
-  ]),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'log', count).map((log, i) => ({
-      log,
-      grain: fx(stage, `grain-${i}`),
-      frogs: BANDS.frogs.map((_, n) => fx(stage, `frog-${i}-${n}`)),
-      notes: [0, 1, 2].map((n) => fx(stage, `note-${i}-${n}`)),
-    }))
-    return (played) =>
-      stops.forEach(({ log, grain, frogs, notes }, i) => {
-        const t = played(i)
-        const bob = BANDS.steps.reduce((sum, at) => sum + hop(ramp(t, at, at + 0.06), 5), 0)
-        translateTo(log, 0, bob)
-        translateTo(grain, -60 * ramp(t, BANDS.steps[0], 0.7), 0)
-        frogs.forEach((frog, n) => translateTo(frog, BANDS.frogs[n], -hop(ramp(t, BANDS.steps[1 + 2 * n], BANDS.steps[1 + 2 * n] + 0.12), 50)))
-        notes.forEach((note, n) => {
-          const rise = ramp(t, BANDS.notes[0] + n * 0.12, BANDS.notes[1] - (2 - n) * 0.05)
-          translateTo(note, 40 + 50 * n + 16 * Math.sin(4 * rise), -60 - 220 * rise)
-          fadeTo(note, rise > 0 ? 1 - ramp(rise, 0.7, 1) : 0)
-        })
-      })
+  move: (_kit, t) => {
+    if (t < 0.06) return still(blend(STAND, roll(0), t, 0, 0.06))
+    if (t < 0.46) return still(roll(10 * ramp(t, 0.06, 0.46)))
+    return still(blend(roll(0), HOLD_UP, t, 0.62, 0.74))
   },
-})
+  reply: (stage) => {
+    const bonus = fx(stage, 'bonus')
+    const burst = fx(stage, 'bonus-burst')
+    const bananas = Array.from({ length: RING }, (_, i) => fx(stage, `banana-${i}`))
+    return (t) => {
+      const shake = bell(t, 0.5, 0.62) * Math.sin(t * 160)
+      transformTo(bonus, `translate(${r1(BONUS_X + 4 * shake)} 0) rotate(${r1(5 * shake)} 0 -48)`)
+      fadeTo(bonus, 1 - ramp(t, 0.62, 0.66))
+      fadeTo(burst, bell(t, 0.6, 0.78))
+      const out = ease(ramp(t, 0.62, 0.86))
+      bananas.forEach((banana, i) => {
+        const [x, y] = ringSpot(i, out)
+        transformTo(banana, `translate(${r1(lerp(BONUS_X, x, out))} ${r1(lerp(-60, y, out))}) rotate(${r1(360 * (1 - out))})`)
+        fadeTo(banana, ramp(t, 0.62, 0.66))
+      })
+    }
+  },
+}
 
-// Muay Thai: the swing kick. He jumps to the branch, swings both legs up into the sack, drops into his
-// guard and drives his knee into it; each hit swings it round, the first shakes a coconut loose.
-const MUAY = { sack: 150, hits: [0.4, 0.68] as const, nut: [0.42, 0.56] as const }
+// ---------------------------------------------------------------- muay thai: the armadillo
 
-const muayThai = stopsScene({
+const ROLL_FROM = 600
+const UNCURLED = 230
+const STEP_IN = 60
+
+const muayThai: SceneDef = {
   zone: 'jungle',
   kit: 'fighter',
-  stop: (i) => (
-    <>
-      <Branch />
-      <g data-fx={`sack-${i}`} transform={`translate(${MUAY.sack} ${BRANCH})`}>
-        <Sack />
+  script: [1500, 1700],
+  ends: [0.47, 1],
+  back: () => (
+    <g>
+      <g data-fx="armadillo" transform={`translate(${ROLL_FROM} -40)`}>
+        <Armadillo />
       </g>
-      <g data-fx={`fall-${i}`} opacity={0}>
-        <Coconut />
+      <g data-fx="mt-burst" opacity="0" transform={`translate(${UNCURLED - 40} -60)`}>
+        <Burst size={80} />
       </g>
-    </>
+    </g>
   ),
-  move: keyed([
-    { at: 0, ...STAND },
-    { at: 0.1, pose: GUARD, ahead: 0 },
-    { at: 0.18, pose: CROUCH, ahead: 0 },
-    { at: 0.3, pose: HANG, ahead: 20, lift: 160, arc: 30 },
-    { at: MUAY.hits[0], pose: posed({ ...ARMS_UP, thighRight: -100, thighLeft: -88, lean: -18 }), ahead: 30, lift: 160 },
-    { at: 0.52, pose: CROUCH, ahead: 40 },
-    { at: MUAY.hits[1], pose: posed({ ...GUARD, thighRight: -80, shinRight: 80 }), ahead: 50, lift: 10, arc: 16 },
-    { at: 0.8, pose: GUARD, ahead: 50 },
-  ]),
-  push: (t) => bell(t, MUAY.hits[0] + 0.02),
-  reply: (stage, count) => {
-    const stops = fxs(stage, 'sack', count).map((sack, i) => ({ sack, nut: fx(stage, `fall-${i}`) }))
-    return (played) =>
-      stops.forEach(({ sack, nut }, i) => {
-        const t = played(i)
-        const swing = MUAY.hits.reduce((sum, at) => sum + (t > at ? 22 * Math.exp(-(t - at) * 8) * Math.sin((t - at) * 28) : 0), 0)
-        transformTo(sack, `translate(${MUAY.sack} ${BRANCH}) rotate(${r1(-swing)})`)
-        const fall = ramp(t, MUAY.nut[0], MUAY.nut[1])
-        translateTo(nut, MUAY.sack + 70 * fall, BRANCH + 200 + drop(fall, -BRANCH - 222))
-        fadeTo(nut, fall > 0 ? 1 : 0)
-      })
+  move: (_kit, t) => {
+    if (t < 0.5) return still(blend(STAND, GUARD, t, 0.2, 0.4))
+    if (t < 0.6) return still(GUARD, STEP_IN * ease(ramp(t, 0.5, 0.6)))
+    if (t < 0.8) return still(blend(GUARD, KICK, t, 0.6, 0.68), STEP_IN)
+    return still(blend(KICK, GUARD, t, 0.8, 0.92), STEP_IN)
   },
-})
+  reply: (stage) => {
+    const dillo = fx(stage, 'armadillo')
+    const walker = fx(stage, 'armadillo-walk')
+    const rolled = fx(stage, 'armadillo-ball')
+    const burst = fx(stage, 'mt-burst')
+    return (t) => {
+      // it rolls in at him and uncurls, then the kick curls it up and bowls it away up the clearing
+      const come = ease(ramp(t, 0, 0.36))
+      const x = lerp(ROLL_FROM, UNCURLED, come)
+      const hit = ramp(t, 0.68, 0.98)
+      const ball = t < 0.68 ? 1 - ramp(t, 0.36, 0.46) : Math.min(1, ramp(t, 0.68, 0.72) * 2)
+      const spin = t < 0.68 ? -400 * come : 600 * hit
+      fadeTo(walker, 1 - ball)
+      fadeTo(rolled, ball)
+      transformTo(rolled, `rotate(${r1(spin)})`)
+      transformTo(dillo, `translate(${r1(x + 380 * hit)} ${r1(-40 - hop(hit, 220))})`)
+      fadeTo(dillo, 1 - ramp(t, 0.9, 1))
+      fadeTo(burst, bell(t, 0.66, 0.8))
+    }
+  },
+}
 
-// ---------------------------------------------------------------- Contact: the zip line to the camp
+// ---------------------------------------------------------------- contact: the last gold letter
 
-const CONTACT = { ride: [0.15, 0.5] as const, land: 0.56, fire: 0.62, lanterns: 0.7, from: { dx: -540, y: -540 }, to: { dx: 0, y: -210 } }
-
-// His hands on the line hang this far above his feet.
-const REACH = 171
+const STUMP = 150
+const JUMP_FROM = 110
+const LETTER_X = 250
+const LETTER_Y = -250
+const CONTACT_LAND = 260
+// The letters' row once all four are his: high over him, the last one flown up into its place.
+const ROW_Y = -340
+const rowX = (i: number): number => 60 + i * 80
 
 const contact: SceneDef = {
   zone: 'night',
   kit: null,
-  back: ({ cx }) => (
-    <>
-      <rect x={cx + CONTACT.from.dx - 90} y={GROUND + CONTACT.from.y + 20} width={150} height={20} fill={C.plank} stroke={EDGE} strokeWidth={4} />
-      <path d={`M${cx + CONTACT.from.dx - 70} ${GROUND + CONTACT.from.y + 40} V${GROUND} M${cx + CONTACT.from.dx + 40} ${GROUND + CONTACT.from.y + 40} V${GROUND}`} stroke={EDGE} strokeWidth={12} />
-      <path d={`M${cx + CONTACT.from.dx} ${GROUND + CONTACT.from.y} Q${cx - 240} ${GROUND - 260} ${cx + 60} ${GROUND + CONTACT.to.y - 10} L${cx + 80} ${GROUND}`} fill="none" stroke={C.plankLight} strokeWidth={4} />
-      <g transform={`translate(${cx + 180} ${GROUND})`}>
-        <path d="M-40 0 L40 0 M-30 -6 L30 -26 M-30 -26 L30 -6" stroke={C.bark} strokeWidth={10} strokeLinecap="round" />
-        <path data-fx="fire" d="M-30 -10 Q-24 -70 0 -110 Q24 -70 30 -10 Z" fill={C.lamp} opacity={0} />
-      </g>
-      {[cx + 300, cx + 400].map((x) => (
-        <g key={x}>
-          <path d={`M${x} ${GROUND} V${GROUND - 160}`} stroke={C.bark} strokeWidth={8} />
-          <rect data-fx={`lantern-${x - cx}`} x={x - 14} y={GROUND - 200} width={28} height={36} rx={6} fill={C.lamp} opacity={0.15} stroke={EDGE} strokeWidth={3} />
+  script: [1700, 1500],
+  ends: [0.53, 1],
+  back: () => (
+    <g>
+      <path d={`M${STUMP - 34} 0 L${STUMP - 28} -58 Q${STUMP} -66 ${STUMP + 28} -58 L${STUMP + 34} 0 Z`} fill="url(#tp-wood)" stroke={C.shadow} strokeWidth={3} />
+      <ellipse cx={STUMP} cy={-60} rx={28} ry={8} fill="#d9a35f" stroke={C.shadow} strokeWidth={3} />
+      {NAME_LETTERS.map((letter, i) => (
+        <g key={letter} data-fx={`letter-${i}`} transform={`translate(${i === 3 ? LETTER_X : rowX(i)} ${i === 3 ? LETTER_Y : ROW_Y})`} opacity={i === 3 ? 1 : 0.35}>
+          <GoldLetter letter={letter} />
         </g>
       ))}
-    </>
+      <g data-fx="row-glow" opacity="0" transform={`translate(${rowX(1.5)} ${ROW_Y})`}>
+        <ellipse rx={230} ry={70} fill="url(#tp-burst)" />
+      </g>
+    </g>
   ),
-  bind: (stage, { cx }) => {
-    const fire = fx(stage, 'fire')
-    const lanterns = [fx(stage, 'lantern-300'), fx(stage, 'lantern-400')]
-    return (p) => {
-      const ride = ramp(p, CONTACT.ride[0], CONTACT.ride[1])
-      const along = trackEase(ride)
-      const x = cx + lerp(CONTACT.from.dx, CONTACT.to.dx, along)
-      const line = lerp(CONTACT.from.y, CONTACT.to.y, along) + 60 * Math.sin(Math.PI * along)
-      const hanging = -(line + REACH)
-      const landing = ramp(p, CONTACT.ride[1], CONTACT.land)
-      const lift = ride < 1 ? hanging : lerp(-(CONTACT.to.y + REACH), 0, landing)
-      const pose = ride < 1 ? posed({ ...ARMS_UP, thighRight: -40, thighLeft: -30 }) : mix(CROUCH, FIGURE_STAND, ramp(p, CONTACT.land, CONTACT.land + 0.06))
-      fadeTo(fire, ramp(p, CONTACT.fire, CONTACT.fire + 0.06))
-      lanterns.forEach((lantern, n) => fadeTo(lantern, 0.15 + 0.85 * ramp(p, CONTACT.lanterns + 0.04 * n, CONTACT.lanterns + 0.04 * n + 0.05)))
-      return frame(x, pose, K, Math.max(0, lift))
+  move: (_kit, t) => {
+    if (t < 0.25) return still(stride(4 * ramp(t, 0, 0.25)), JUMP_FROM * ramp(t, 0, 0.25))
+    if (t < 0.5) {
+      const [ahead, lift] = flight(ramp(t, 0.25, 0.5), [JUMP_FROM, 0], [CONTACT_LAND, 0], 150)
+      return { pose: blend(CROUCH, REACH, t, 0.25, 0.33), ahead, lift }
+    }
+    return still(blend(blend(REACH, CROUCH, t, 0.5, 0.54), STAND, t, 0.56, 0.7), CONTACT_LAND)
+  },
+  reply: (stage) => {
+    const letters = NAME_LETTERS.map((_, i) => fx(stage, `letter-${i}`))
+    const glow = fx(stage, 'row-glow')
+    return (t) => {
+      // the last letter is taken at the top of his jump, flies up into its place in the row, and all four light
+      const taken = ramp(t, 0.38, 0.4)
+      const fly = ease(ramp(t, 0.58, 0.76))
+      const from: [number, number] = [LETTER_X, LETTER_Y]
+      transformTo(letters[3], `translate(${r1(lerp(from[0], rowX(3), fly))} ${r1(lerp(from[1], ROW_Y, fly) - hop(fly, 60))}) scale(${(1 + 0.3 * bell(t, 0.38, 0.5)).toFixed(3)})`)
+      const lit = ramp(t, 0.78, 0.9)
+      letters.forEach((letter, i) => fadeTo(letter, i === 3 ? 1 : 0.35 + 0.65 * lit))
+      fadeTo(glow, 0.8 * lit + 0.6 * taken * bell(t, 0.38, 0.5))
     }
   },
 }
@@ -800,20 +753,50 @@ const SCENE_DEFS: Record<SceneId, SceneDef> = { hero, about, work, tech, service
 export interface Scene {
   id: SceneId
   def: SceneDef
-  layout: Layout
+  /** The cards the section counts, for the theatre's reading line. */
+  layout: PropLayout
   /** His kit here: the scene's own, or the profession the page shows. */
   kit: Profession
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
 }
 
+/** The scene's writer: the place's reply and his frame at the scene's playhead, him placed at his spot and
+ *  his tumble turning him round the middle of his tucked body (stage.tsx data-fx="tumble"). */
+export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<FigurePose> {
+  const { def, kit, layout } = scene
+  const input: SceneInput = { phone: layout.phone, kit }
+  const spot = sceneSpot(scene)
+  const size = placeScale(layout.phone)
+  return (stage) => {
+    const reply = def.reply(stage, input)
+    const tumble = fx(stage, 'tumble')
+    return (_p, _f, play = START) => {
+      const t = moveAt(def.ends, play)
+      reply(t)
+      const frame = def.move(kit, t)
+      transformTo(tumble, frame.spin ? `rotate(${r1(frame.spin % 360)} ${BALL.x} ${BALL.y})` : '')
+      return { x: spot + frame.ahead * size, y: GROUND - (frame.lift ?? 0) * size, k: K * size, pose: frame.pose, opacity: frame.opacity ?? 1 }
+    }
+  }
+}
+
+/** Where he stands in a scene: his usual spot, shifted right where the scene asks. */
+export const sceneSpot = ({ def, layout }: Scene): number => spotOf(layout.phone) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
+
+/** The input the scene's art reads. */
+export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, kit: scene.kit })
+
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 
+// The theatre reads only the count of a scene's layout; its band is not drawn on.
+const BAND = [0, 0] as const
+
 const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot }
+  return { id, def, layout: propLayout(items, BAND, phone), kit: def.kit ?? profession, slot }
 }
 
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */

@@ -9,6 +9,10 @@ import paint from './scenery.module.css'
 
 export const VIEW = '0 0 1440 1080'
 
+/** A phone's view of the canvas (xMidYMin slice): x 480 to 1040 from y 294, so the ground sits half way down
+ *  its screen with the place before him in view; the ground runs on below the canvas (PhoneFloor). */
+export const PHONE_VIEW = '480 294 560 1212'
+
 /** The ground line he stands on. */
 export const GROUND = 900
 
@@ -70,6 +74,11 @@ const Mid = memo(function Mid() {
       <path d={`M0 ${GROUND - 6} Q360 ${GROUND - 22} 720 ${GROUND - 4} T1440 ${GROUND - 8}`} className={paint.rim} strokeWidth={4} opacity={0.5} />
     </>
   )
+})
+
+/** The ground carried on below the canvas for a phone's taller view. */
+export const PhoneFloor = memo(function PhoneFloor() {
+  return <rect x={0} y={1070} width={1440} height={500} className={paint.leafShade} />
 })
 
 const Near = memo(function Near() {
