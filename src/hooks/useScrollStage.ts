@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLatest } from './useLatest'
 import { FIRST_FRAME_MS, SETTLE_TAU_MS, jumpStart, settleStep } from '@/lib/scroll/stage'
 
@@ -19,8 +19,10 @@ import { FIRST_FRAME_MS, SETTLE_TAU_MS, jumpStart, settleStep } from '@/lib/scro
  *
  * `draw(position, lag, metrics)`: `position` is the drawn scroll position in px, `lag` how far it trails
  * the real scroll (scrollY - position, positive while scrolling down), which a world can write as a
- * translate on content it wants to settle with the art. The first draw runs in a layout effect, so the
- * first paint already shows the stages where the scroll is.
+ * translate on content it wants to settle with the art. It returns true while something it draws still
+ * plays toward the scroll (a scene catching up at its own pace), and the loop keeps drawing until it says
+ * otherwise, even once the scroll rests: one loop owns every frame, so nothing is drawn twice. The first draw
+ * runs in a layout effect, so the first paint already shows the stages where the scroll is.
  */
 
 export interface StageMetrics {
@@ -35,8 +37,9 @@ export interface ScrollStageOptions {
   enabled: boolean
   /** Reads the layout at scroll position `scrollY`; runs outside the frames. */
   measure: (scrollY: number, metrics: StageMetrics) => void
-  /** Writes the stages for the drawn position; runs inside a frame, so it only writes. */
-  draw: (position: number, lag: number, metrics: StageMetrics) => void
+  /** Writes the stages for the drawn position; runs inside a frame, so it only writes. True asks for another
+   *  frame while the scroll rests. */
+  draw: (position: number, lag: number, metrics: StageMetrics) => boolean | void
   /** The settle's time constant in ms, SETTLE_TAU_MS when left out; 0 draws at the scroll. */
   tauMs?: number
   /** What the stages are built from: a new value (new content, stages bound again) measures and draws at once. */
@@ -50,13 +53,17 @@ const readMetrics = (): StageMetrics => ({ viewport: window.innerHeight, phone: 
 export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, tauMs = SETTLE_TAU_MS, content }: ScrollStageOptions): (element: T | null) => void {
   const [element, setElement] = useState<T | null>(null)
   const latest = useLatest({ measure, draw, tauMs })
+  // Whether the last draw asked for more frames, and the loop's starter once it runs.
+  const more = useRef(false)
+  const start = useRef<(() => void) | null>(null)
 
   // The first frame, and the first after new content: measure and draw at the scroll before the browser paints.
   useLayoutEffect(() => {
     if (!enabled || !element) return
     const metrics = readMetrics()
     latest.current.measure(window.scrollY, metrics)
-    latest.current.draw(window.scrollY, 0, metrics)
+    more.current = latest.current.draw(window.scrollY, 0, metrics) === true
+    if (more.current) start.current?.()
   }, [enabled, element, latest, content])
 
   useEffect(() => {
@@ -70,9 +77,9 @@ export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, 
       const target = window.scrollY
       const step = settleStep(drawn, target, lastTime ? now - lastTime : FIRST_FRAME_MS, latest.current.tauMs)
       drawn = step.drawn
-      latest.current.draw(drawn, target - drawn, metrics)
+      more.current = latest.current.draw(drawn, target - drawn, metrics) === true
       lastTime = step.settled ? 0 : now
-      frame = step.settled ? 0 : requestAnimationFrame(tick)
+      frame = step.settled && !more.current ? 0 : requestAnimationFrame(tick)
     }
 
     const request = () => {
@@ -90,6 +97,8 @@ export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, 
     observer.observe(element)
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', resize, { passive: true })
+    start.current = request
+    if (more.current) request()
     let live = true
     document.fonts?.ready.then(() => {
       if (live) resize()
@@ -97,6 +106,7 @@ export function useScrollStage<T extends HTMLElement>({ enabled, measure, draw, 
 
     return () => {
       live = false
+      start.current = null
       observer.disconnect()
       window.removeEventListener('scroll', request)
       window.removeEventListener('resize', resize)

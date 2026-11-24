@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_FOLLOWER, crossOf, follow, headingOf, restAt, type Follower, type Heading } from '@/lib/scroll/player'
+import { crossOf, headingOf, stagePlay, type Follower, type Heading } from '@/lib/scroll/player'
 import { heroState, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
@@ -12,7 +12,9 @@ import type { EraWriter, Layer } from './eras/era'
 // writes only each visible stage's opacity, its layers' transforms and its era's props and pose. The era of
 // the stage the page is in plays its script by the scroll, forward and back, at no more than its own speed
 // (src/lib/scroll/player.ts), every other stage resting where the scroll puts it; while that one has not caught
-// up with the scroll the engine draws every frame, scrolled or not. On the way down each stage dissolves in
+// up with the scroll the engine draws every frame, scrolled or not (its draw asks the shared loop for them). Bound
+// again, a stage keeps what the page shows: its visibility is read off the DOM and its era rests where the
+// scroll puts it. On the way down each stage dissolves in
 // over the one before it and the one under it is hidden once it is whole, so the screen never dips to dark; on
 // the way back the page cuts to the stage it returns to (crossOf, src/lib/scroll/player.ts). The rail's
 // current mark changes only when the leading scene does.
@@ -40,11 +42,12 @@ interface Bound {
   rail: Element | null
   span: StageSpan
   shown: boolean
-  follower: Follower
+  follower: Follower | null
 }
 
-const bind = (theatre: HTMLElement, scene: Scene): Bound => {
-  const stage = theatre.querySelector<HTMLElement>(`[data-stage="${scene.id}"]`)!
+const bind = (theatre: HTMLElement, scene: Scene): Bound | null => {
+  const stage = theatre.querySelector<HTMLElement>(`[data-stage="${scene.id}"]`)
+  if (!stage) return null
   return {
     scene,
     stage,
@@ -53,8 +56,9 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     rail: document.querySelector(`[data-rail="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
-    shown: false,
-    follower: IDLE_FOLLOWER,
+    // a stage bound again keeps the visibility the page shows, so the first draw hides it if it must
+    shown: stage.style.visibility === 'visible',
+    follower: null,
   }
 }
 
@@ -75,11 +79,10 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
   const heading = useRef<Heading>('down')
-  const frame = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
-    bound.current = reduced || !theatre ? [] : scenes.map((scene) => bind(theatre, scene))
+    bound.current = reduced || !theatre ? [] : scenes.flatMap((scene) => bind(theatre, scene) ?? [])
     lead.current = ''
   }, [scenes, reduced])
 
@@ -108,7 +111,7 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   }, [])
 
   const draw = useCallback(
-    function drawFrame(position: number, lag: number, metrics: StageMetrics) {
+    (position: number, lag: number, metrics: StageMetrics): boolean => {
       const { viewport, phone } = metrics
       settleText(lag)
       const all = bound.current
@@ -123,26 +126,24 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
       all.forEach((each, i) => {
         const { shown, opacity } = cross.layers[i]
         show(each, shown)
+        if (!shown) {
+          each.follower = null
+          return
+        }
         // Only the stage the page is in plays at its own pace; the others rest where the scroll puts them.
-        const { script } = each.scene.era
-        const run = follow(i === cross.lead ? each.follower : restAt(script, states[i].play, now), script, states[i].play, now)
+        const run = stagePlay(each.follower, each.scene.era.script, states[i].play, now, i === cross.lead)
         each.follower = run.follower
         playing ||= run.playing
-        if (!shown) return
         each.stage.style.opacity = opacity.toFixed(3)
         for (const { el, layer } of each.layers) el.style.transform = layerTransform(LAYER_MOTION[layer], states[i].progress, phone ? PHONE_MOTION : 1)
         each.write(states[i].progress, run.play)
       })
-      // A scene has not caught up with the scroll: draw again next frame, whether or not the page scrolls.
-      cancelAnimationFrame(frame.current)
-      frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
-      if (all.length === 0) return
-      mark(all[cross.lead])
+      if (all.length > 0) mark(all[cross.lead])
+      // A scene has not caught up with the scroll: the loop draws again next frame, whether or not the page scrolls.
+      return playing
     },
     [mark, settleText],
   )
-
-  useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
   const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   const textRef = useCallback(

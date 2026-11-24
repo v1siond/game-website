@@ -2,7 +2,8 @@
 
 import { useLayoutEffect, useRef, type ReactNode, type Ref } from 'react'
 import { layerTransform } from '@/lib/scroll/stage'
-import { SETTLED_PROGRESS, movingLayers, restingPlay, type LayerMotions, type TheatreScene } from './useTheatre'
+import { restingPlay } from '@/lib/scroll/player'
+import { SETTLED_PROGRESS, movingLayers, type LayerMotions, type TheatreScene } from './useTheatre'
 import css from './theatre.module.css'
 
 // One scene's picture: its layers, back to front, which the engine dissolves in over the one before. In the

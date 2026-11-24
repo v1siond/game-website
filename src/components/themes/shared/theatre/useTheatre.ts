@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_FOLLOWER, crossOf, follow, headingOf, restAt, sceneEnd, type Follower, type Heading, type Playhead, type SceneScript } from '@/lib/scroll/player'
+import { crossOf, headingOf, stagePlay, type Follower, type Heading, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
@@ -16,7 +16,8 @@ import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, 
 // a scene with a script, its playhead: the scroll plays the script of the stage the page is in, forward on the
 // way down and back on the way up, at no more than its own speed (src/lib/scroll/player.ts), and every other
 // stage rests where the scroll puts it; while that scene has not caught up with the scroll the engine draws
-// every frame.
+// every frame (its draw asks the shared loop for them). Bound again (a profession switch), a stage keeps what
+// the page shows: its visibility is read off the DOM and its scene rests where the scroll puts it.
 // The first scene is the hero. The text layer settles with the art: it is drawn at the settled position, the
 // lag written as a translate and cleared at rest, so pictures and cards come to rest together (as Era
 // Postcards' settleText).
@@ -37,9 +38,6 @@ export interface TheatreScene {
   /** The scene's actions, played by the scroll at no more than their own speed; none for a scene the scroll drives directly. */
   script?: SceneScript
 }
-
-/** Where a scene with `script` rests: its end frame, the one reduced motion and a scroll back show. */
-export const restingPlay = (script: SceneScript | undefined): Playhead => sceneEnd(script ?? [])
 
 /** Each layer's push in across its scene, by the layer's name. */
 export type LayerMotions = Readonly<Record<string, LayerMotion>>
@@ -68,7 +66,7 @@ interface Bound {
   triggers: number[]
   shown: boolean
   script: SceneScript | undefined
-  follower: Follower
+  follower: Follower | null
 }
 
 /** Every layer of a stage with its motion; a layer with no motion stays still. */
@@ -87,22 +85,12 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
     triggers: [],
-    shown: false,
+    // a stage bound again keeps the visibility the page shows, so the first draw hides it if it must
+    shown: stage.style.visibility === 'visible',
     script: scene.script,
-    follower: IDLE_FOLLOWER,
+    follower: null,
   }
 }
-
-/** A scene's playhead at `now`. The stage the page is in (`lead`) follows the scroll's `played` share of it at
- *  no more than its own speed, true in `playing` while it has not caught up; every other stage rests where the
- *  scroll puts it, so a stage the page leaves or flies past never plays catching up under or over another. */
-const playOf = (bound: Bound, played: number, now: number, lead: boolean): { play: Playhead; playing: boolean } => {
-  if (!bound.script) return { play: restingPlay(undefined), playing: false }
-  const { follower, play, playing } = follow(lead ? bound.follower : restAt(bound.script, played, now), bound.script, played, now)
-  bound.follower = follower
-  return { play, playing }
-}
-
 
 const show = (bound: Bound, visible: boolean): void => {
   if (bound.shown === visible) return
@@ -117,7 +105,6 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
   const heading = useRef<Heading>('down')
-  const frame = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -144,7 +131,7 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   }, [])
 
   const draw = useCallback(
-    function drawFrame(position: number, lag: number, metrics: StageMetrics) {
+    (position: number, lag: number, metrics: StageMetrics): boolean => {
       const { viewport, phone } = metrics
       settleText(lag)
       const all = bound.current
@@ -159,21 +146,24 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
       all.forEach((each, i) => {
         const { shown, opacity } = layers[i]
         show(each, shown)
-        const { play, playing: runs } = playOf(each, states[i].play, now, i === lead)
-        playing ||= runs
-        if (!shown) return
+        if (!shown) {
+          each.follower = null
+          return
+        }
+        // the stage the page is in plays at its own pace; every other one rests where the scroll puts it
+        const run = stagePlay(each.follower, each.script, states[i].play, now, i === lead)
+        each.follower = run.follower
+        playing ||= run.playing
+        const { play } = run
         each.stage.style.opacity = opacity.toFixed(3)
         for (const layer of each.layers) layer.el.style.transform = layerTransform(layer.motion, states[i].progress, phone ? PHONE_MOTION : 1)
         each.write(states[i].progress, itemsReached(each.triggers, position, viewport), play)
       })
-      // A scene has not caught up with the scroll: draw again next frame, whether or not the page scrolls.
-      cancelAnimationFrame(frame.current)
-      frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
+      // A scene has not caught up with the scroll: the loop draws again next frame, whether or not the page scrolls.
+      return playing
     },
     [settleText],
   )
-
-  useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
   const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   const textRef = useCallback(
