@@ -104,6 +104,11 @@ export const TRAIL = {
   LEAF_LIGHT: '#a8f088',
   LEAF_DARK: '#1c6020',
   HUD: '#000000',
+  // The water level's lake, from the bright band under the surface to the dark floor, and its sleeping fish.
+  LAKE_TOP: '#3c8ce8',
+  LAKE_FLOOR: '#123c8c',
+  PLUM: '#8c4a9c',
+  PLUM_DARK: '#4e2258',
 } as const
 
 // The inks both of his pixel figures share, the map walker (sprite.ts) and the side view hero (side.ts):

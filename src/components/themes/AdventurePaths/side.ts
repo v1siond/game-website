@@ -175,7 +175,7 @@ const OVERLAYS = {
   grip: ['...........KAAK.', '...........KAAK.', '..........KTKK..', '..........KTK...', '...........KAAK.', '...........KAAK.', '..........KTK...'],
 } as const
 
-export type HeroPose = 'stand' | 'runA' | 'runB' | 'jump' | 'stomp' | 'kick' | 'grab' | 'cheer' | 'carry' | 'throw'
+export type HeroPose = 'stand' | 'runA' | 'runB' | 'jump' | 'stomp' | 'kick' | 'grab' | 'cheer' | 'carry' | 'throw' | 'strokeA' | 'strokeB'
 
 interface PoseParts {
   torso: keyof typeof TORSOS
@@ -196,6 +196,10 @@ const POSES: Record<HeroPose, PoseParts> = {
   // the crate held up over his head in both hands, then flung forward off the stride
   carry: { torso: 'hold', legs: 'stand', overlay: 'grip' },
   throw: { torso: 'armFront', legs: 'stride' },
+  // the swim: a stroke with both arms up and the legs kicked apart, then the glide with the arm reaching
+  // forward and the feet together
+  strokeA: { torso: 'armsUp', legs: 'stride' },
+  strokeB: { torso: 'armFront', legs: 'together' },
 }
 
 export const HERO_POSES = Object.keys(POSES) as HeroPose[]
