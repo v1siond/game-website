@@ -310,12 +310,15 @@ interface GumshoeProps {
   profession: Profession
   /** Its size where it is drawn inside another SVG (the theatre's canvas). */
   box?: { width: number; height: number }
+  /** Its size where it is drawn in the page (the menu). */
+  className?: string
 }
 
-/** Him side on as the scenes' detective, standing in a profession's kit; a scene poses his groups (pose.ts). */
-export function GumshoeSprite({ profession, box }: GumshoeProps) {
+/** Him side on as the scenes' detective, standing in a profession's kit; a scene poses his groups (pose.ts),
+ *  the menu draws him at rest. */
+export function GumshoeSprite({ profession, box, className = '' }: GumshoeProps) {
   return (
-    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} className="overflow-visible" aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <g className={`${s.sprite} ${KIT_CLASS[profession]}`}>
         <ellipse cx={62} cy={SOLES_Y + 0.5} rx={26} ry={3.4} fill={NOIR.ink} opacity={0.6} />
         <g className={s.body}>

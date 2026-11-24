@@ -11,7 +11,7 @@ import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { NOIR_BUTTON, LOOK } from './actions'
-import { HitStar } from './backdrop'
+import { InkStamp } from './backdrop'
 import page from './page.module.css'
 
 // The cards each section lists, each a crooked slab whose words sit level so they read. A card that is a
@@ -49,7 +49,7 @@ export function TechSlab({ category, index }: { category: CVData['techStack'][nu
   return (
     <div className={`p-5 ${page.slab}`} style={crookOf(index)}>
       <h3 className="flex items-center gap-2 text-2xl uppercase tracking-widest">
-        <HitStar className="h-5 w-5" />
+        <InkStamp className="h-6 w-6" />
         {category.name}
       </h3>
       <TagList items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} look={CHIPS} />
