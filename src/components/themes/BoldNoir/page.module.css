@@ -309,6 +309,14 @@
   width: min(640px, 100%);
 }
 
+/* From lg the cards keep to the left 40%, so his step of the case plays clear of them on the right. */
+@media (min-width: 1024px) {
+  .body,
+  .goalCopy {
+    width: min(640px, 40vw);
+  }
+}
+
 .delivered {
   transform: rotate(2deg);
 }
@@ -342,13 +350,22 @@
     padding-bottom: 60svh;
   }
 
+  /* The step of the case fills the lower screen, so the title rides at the top of the head and the cards
+     come up only after it has played and held for most of a screen. */
   .head {
-    min-height: 115svh;
+    min-height: 130svh;
+    justify-content: flex-start;
+    padding-top: 64px;
     padding-bottom: 10svh;
   }
 
   .body {
     width: 100%;
+  }
+
+  /* The case closes and its stars hold for most of a screen before the calling card comes up over them. */
+  .goal {
+    padding-top: 130svh;
   }
 }
 

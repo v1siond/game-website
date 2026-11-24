@@ -1,80 +1,93 @@
-import { hop } from '@/lib/motion/arc'
+import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { NOIR } from '../palette'
-import { roomPlace } from '../place'
-import { ambush } from '../pose'
-import { Shadow } from '../shadow'
+import { share, still, stepPlace, type Frame } from '../case'
+import { Hood, hoodOf } from '../hood'
+import { DIVE, cuff, look, run } from '../pose'
 
-// Projects: the gallery after hours. For each project a crate comes to him on the dash, a guard beyond it
-// watching a painting on the wall. He springs out from behind the crate in one leap onto the guard's back,
-// the guard goes down on his face, the mask is torn off and flung high, and the painting lights.
+// Projects: the foot chase, in the back lot behind a block. A man bursts out of a doorway and runs for the
+// fence, getting a hand up on it; he goes after him flat out and dives into the tackle, pulling him down off
+// the fence; then he kneels on his back and the cuffs go on. Bolt, chase and tackle, cuffed.
 
-// The guard stands this far right of him, the painting beyond; the leap clears this high and lands him on
-// the fallen guard this high.
-const GUARD = 230
-const PAINTING = 400
-const HEIGHT = 230
-const ON_HIM = 60
+const DOOR = 140
+const FENCE = 470
+// The man reaches the fence here and is laid down here, his feet toward him.
+const AT_FENCE = 430
+const DOWN_AT = 300
+// He runs to here, dives to here and kneels here.
+const DIVE_FROM = 230
+const DIVE_TO = 330
+const KNEEL_AT = 350
+// One stride of a run carries this far.
+const STRIDE = 70
 
-function Painting() {
+function Lot() {
   return (
-    <g transform={`translate(${PAINTING} -330)`}>
-      <rect x={-80} y={-70} width={160} height={140} fill={NOIR.coal} stroke={NOIR.paperDim} strokeWidth="8" />
-      <path d="M-60 50 L-20 -10 L10 20 L30 0 L60 50 Z" fill={NOIR.smoke} />
-    </g>
-  )
-}
-
-function Lit() {
-  return (
-    <g transform={`translate(${PAINTING} -330)`}>
-      <polygon points="-30,-300 30,-300 120,-70 -120,-70" fill={NOIR.paper} opacity="0.2" />
-      <rect x={-72} y={-62} width={144} height={124} fill={NOIR.paper} opacity="0.25" />
-      <path d="M0 -40 L9 -16 L34 -16 L14 0 L22 26 L0 10 L-22 26 L-14 0 L-34 -16 L-9 -16 Z" fill={NOIR.red} stroke={NOIR.paper} strokeWidth="3" />
-    </g>
-  )
-}
-
-function Crate() {
-  return (
-    <g transform="translate(10 0)">
-      <rect x={-110} y={-150} width={220} height={150} fill={NOIR.smoke} stroke={NOIR.ink} strokeWidth="6" />
-      <path d="M-110 -150 L110 0 M110 -150 L-110 0" stroke={NOIR.ink} strokeWidth="6" />
-    </g>
-  )
-}
-
-export const projects = roomPlace({
-  light: NOIR.paperDim,
-  back: (i) => (
     <>
-      <Painting />
-      <g data-fx={`painting-${i}`} opacity="0">
-        <Lit />
+      {/* the back of the block and its doorway */}
+      <rect x={DOOR - 50} y={-300} width={100} height={300} fill={NOIR.ink} stroke={NOIR.ash} strokeWidth="5" />
+      <g data-fx="door">
+        <rect x={DOOR - 46} y={-296} width={92} height={296} fill={NOIR.smoke} />
+        <circle cx={DOOR + 30} cy={-150} r={5} fill={NOIR.fog} />
       </g>
-      <g transform={`translate(${GUARD} 0)`}>
-        <Shadow name={`guard-${i}`} />
+      <rect x={DOOR - 70} y={-330} width={140} height={22} fill={NOIR.smoke} />
+      <g data-fx="doorway-light" opacity="0">
+        <polygon points={`${DOOR - 46},0 ${DOOR + 46},0 ${DOOR + 120},20 ${DOOR - 120},20`} fill={NOIR.paper} opacity="0.2" />
       </g>
+      {/* the chain link fence */}
+      <path d={`M${FENCE} 0 V-280 M${FENCE + 160} 0 V-280 M${FENCE} -280 H${FENCE + 160}`} stroke={NOIR.fog} strokeWidth="6" />
+      <path
+        d={Array.from({ length: 9 }, (_, i) => `M${FENCE + i * 20} -280 L${FENCE + i * 20 + 120} -160 M${FENCE + i * 20} -160 L${FENCE + i * 20 + 120} -40`).join(' ')}
+        stroke={NOIR.ash}
+        strokeWidth="2"
+        opacity="0.8"
+      />
+    </>
+  )
+}
+
+export const projects = stepPlace({
+  light: NOIR.paper,
+  script: [1400, 1700, 1500],
+  back: () => (
+    <>
+      <Lot />
+      <Hood name="runner" />
     </>
   ),
-  front: () => <Crate />,
-  move: (_profession, t) => {
-    const leap = ramp(t, 0.2, 0.8)
-    return { pose: ambush(t), ahead: (GUARD - 30) * leap, lift: hop(leap, HEIGHT) + ON_HIM * ramp(leap, 0.5, 1) }
-  },
-  reply: (stage, { count }) => {
-    const guards = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}`))
-    const masks = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}-mask`))
-    const paintings = Array.from({ length: count }, (_, i) => fx(stage, `painting-${i}`))
-    return (played) =>
-      guards.forEach((guard, i) => {
-        const t = played(i)
-        const down = ramp(t, 0.6, 0.8)
-        const flung = ramp(t, 0.62, 0.9)
-        transformTo(guard, `rotate(${(80 * down).toFixed(1)})`)
-        transformTo(masks[i], `translate(${(-140 * flung).toFixed(1)} ${(-220 * flung).toFixed(1)}) rotate(${(-300 * flung).toFixed(1)} 0 -250)`)
-        fadeTo(paintings[i], ramp(t, 0.8, 1))
+  bind: (stage, { profession }) => {
+    const door = fx(stage, 'door')
+    const light = fx(stage, 'doorway-light')
+    const runner = hoodOf(stage, 'runner')
+    return (play): Frame => {
+      const bolted = share(play, 0)
+      const chased = share(play, 1)
+      const cuffed = share(play, 2)
+      // the door flies open and the light from inside falls out
+      const open = ramp(bolted, 0, 0.15)
+      transformTo(door, `translate(${DOOR - 46} 0) scale(${(1 - 0.9 * open).toFixed(3)} 1) translate(${-(DOOR - 46)} 0)`)
+      fadeTo(light, open)
+      const ran = ramp(bolted, 0.1, 0.85)
+      const pulled = ramp(chased, 0.7, 0.95)
+      const runnerX = lerp(lerp(DOOR, AT_FENCE, ran), DOWN_AT, pulled)
+      const stride = Math.sin((Math.PI * (runnerX - DOOR)) / STRIDE) * 32 * (1 - ramp(bolted, 0.8, 0.9))
+      runner({
+        x: runnerX,
+        lean: 14 * (1 - ramp(bolted, 0.8, 0.9)) * (1 - pulled),
+        legF: stride * (1 - pulled),
+        legB: -stride * (1 - pulled),
+        arm: 160 * ramp(bolted, 0.8, 0.95) * (1 - pulled) + 150 * ramp(cuffed, 0.3, 0.6),
+        down: pulled,
       })
+      if (cuffed > 0) return { pose: cuff(cuffed), ahead: lerp(DIVE_TO, KNEEL_AT, ramp(cuffed, 0, 0.35)), lift: 0 }
+      if (chased > 0) {
+        const sprint = ramp(chased, 0, 0.6)
+        const dive = ramp(chased, 0.6, 0.85)
+        if (dive === 0) return { pose: run((DIVE_FROM * sprint) / STRIDE), ahead: DIVE_FROM * sprint, lift: 0 }
+        return { pose: mix(run(DIVE_FROM / STRIDE), DIVE, ramp(dive, 0, 0.3)), ahead: lerp(DIVE_FROM, DIVE_TO, dive), lift: 40 * Math.sin(Math.PI * dive) }
+      }
+      return still(look(profession, -0.3 * ramp(bolted, 0.1, 0.4)))
+    }
   },
 })

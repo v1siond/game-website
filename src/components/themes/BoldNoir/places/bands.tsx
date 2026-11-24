@@ -1,77 +1,87 @@
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, translateTo } from '../../shared/stageNodes'
+import { elapsedOf } from '@/lib/scroll/player'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { NOIR } from '../palette'
-import type { Place } from '../place'
-import { FLOOR, Sleuth, placeSleuth } from '../street'
-import { drum, noirJoints, setNoirPose } from '../pose'
-import { Shadow } from '../shadow'
+import { holdX, share, still, stepPlace } from '../case'
+import { Canvas, FLOOR } from '../street'
+import { RoomFloor, RoomWall } from '../room'
+import { crash, drum } from '../pose'
 
-// Bands: the club upstairs. He has slipped onto the empty drummer's stool behind the kit and plays as
-// if he belonged there; for each band a guard walks the floor in front of the stage, past him without a
-// look, the other way each time, and the stage light comes up on him a little more with each one.
+// Bands: a jazz club of the 1940s, the score the game plays its city to. On the bandstand, the piano and the
+// upright bass standing behind him, he plays brushes on the snare under a wide spot, at the steady pace of a
+// roll however the page is scrolled; then both sticks come down on the cymbal for the last hit, the
+// spot closes in onto him alone and the room's lights dim, the way the game's investigation music ends once
+// every clue is found.
 
-const SEAT_X = 900
-// The guard walks between these x, the first time right to left.
-const WALK_FROM = 1380
-const WALK_TO = 420
+const SCRIPT = [2000, 1500]
+const BEAT_MS = 110
+const SNARE = 70
+const CYMBAL = 150
+
+function Bandstand() {
+  return (
+    <>
+      <rect x={-520} y={-30} width={1000} height={30} fill={NOIR.coal} stroke={NOIR.smoke} strokeWidth="4" />
+      {/* the upright piano and the bass behind him */}
+      <rect x={-460} y={-250} width={200} height={220} fill={NOIR.ink} stroke={NOIR.ash} strokeWidth="4" />
+      <path d="M-450 -130 H-270" stroke={NOIR.paperDim} strokeWidth="10" />
+      <path d="M-450 -130 H-270" stroke={NOIR.ink} strokeWidth="10" strokeDasharray="4 8" />
+      <path d="M-180 -30 Q-230 -110 -196 -160 Q-220 -210 -190 -240 L-176 -360 L-166 -360 L-160 -240 Q-130 -210 -154 -160 Q-120 -110 -170 -30 Z" fill={NOIR.smoke} stroke={NOIR.ink} strokeWidth="4" />
+    </>
+  )
+}
 
 function Kit() {
   return (
     <>
-      <rect x={SEAT_X - 200} y={FLOOR - 16} width={400} height={16} fill={NOIR.coal} stroke={NOIR.smoke} strokeWidth="4" />
-      <circle cx={SEAT_X} cy={FLOOR - 62} r={46} fill={NOIR.red} stroke={NOIR.ink} strokeWidth="6" />
-      <circle cx={SEAT_X} cy={FLOOR - 62} r={30} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="4" />
-      <path d={`M${SEAT_X + 120} ${FLOOR - 40} V${FLOOR - 260} M${SEAT_X + 70} ${FLOOR - 270} H${SEAT_X + 180}`} stroke={NOIR.paperDim} strokeWidth="6" />
-      <ellipse cx={SEAT_X + 125} cy={FLOOR - 270} rx={60} ry={8} fill={NOIR.paperDim} />
-      <path d={`M${SEAT_X - 130} ${FLOOR - 40} V${FLOOR - 170}`} stroke={NOIR.paperDim} strokeWidth="6" />
-      <ellipse cx={SEAT_X - 130} cy={FLOOR - 172} rx={48} ry={12} fill={NOIR.ash} stroke={NOIR.ink} strokeWidth="4" />
-    </>
-  )
-}
-
-function Spotlight() {
-  return (
-    <g data-fx="spot" opacity="0">
-      <polygon points={`${SEAT_X - 40},0 ${SEAT_X + 40},0 ${SEAT_X + 240},${FLOOR} ${SEAT_X - 240},${FLOOR}`} fill={NOIR.paper} opacity="0.22" />
-      <ellipse cx={SEAT_X} cy={FLOOR} rx={240} ry={20} fill={NOIR.paper} opacity="0.3" />
-    </g>
-  )
-}
-
-/** Where the guard is on his round `t` of the way through band `at`'s walk. */
-const guardX = (at: number, t: number): number => {
-  const [from, to] = at % 2 === 0 ? [WALK_FROM, WALK_TO] : [WALK_TO, WALK_FROM]
-  return from + (to - from) * t
-}
-
-export const bands: Place = {
-  light: NOIR.paper,
-  floor: ({ profession }) => (
-    <>
-      <Spotlight />
-      <Sleuth x={SEAT_X} profession={profession} />
-      <Kit />
-      <g data-fx="patrol" transform={`translate(${WALK_FROM} ${FLOOR + 60})`}>
-        <g data-fx="patrol-face">
-          <Shadow name="guard" />
-        </g>
+      <path d={`M${SNARE} -30 V-110`} stroke={NOIR.fog} strokeWidth="5" />
+      <rect x={SNARE - 36} y={-142} width={72} height={30} fill={NOIR.ash} stroke={NOIR.ink} strokeWidth="4" />
+      <ellipse cx={SNARE} cy={-142} rx={36} ry={7} fill={NOIR.paper} stroke={NOIR.ink} strokeWidth="3" />
+      <path d={`M${CYMBAL} -30 V-240`} stroke={NOIR.fog} strokeWidth="5" />
+      <g data-fx="cymbal">
+        <ellipse cx={CYMBAL} cy={-244} rx={56} ry={9} fill={NOIR.fog} stroke={NOIR.ink} strokeWidth="3" />
       </g>
     </>
+  )
+}
+
+export const bands = stepPlace({
+  light: NOIR.paper,
+  script: SCRIPT,
+  mid: () => <RoomWall />,
+  near: () => <RoomFloor />,
+  set: (input) => (
+    <Canvas>
+      {/* the club's lamps along the back wall, the spot from above */}
+        <g data-fx="bulbs">
+          {Array.from({ length: 9 }, (_, i) => -40 + i * 210).map((x) => (
+            <g key={x}>
+              <circle cx={x} cy={420} r={50} fill={NOIR.paper} opacity="0.08" />
+              <circle cx={x} cy={420} r={10} fill={NOIR.paperDim} />
+            </g>
+          ))}
+        </g>
+        <g data-fx="spot" transform={`translate(${holdX(input)} 0)`}>
+          <polygon points={`-60,0 60,0 360,${FLOOR} -360,${FLOOR}`} fill={NOIR.paper} opacity="0.16" />
+        </g>
+    </Canvas>
   ),
-  bind: (stage, { count }) => {
-    const root = fx(stage, 'detective')
-    const joints = root ? noirJoints(root) : null
+  back: () => <Bandstand />,
+  front: () => <Kit />,
+  bind: (stage, input) => {
+    const bulbs = fx(stage, 'bulbs')
     const spot = fx(stage, 'spot')
-    const patrol = fx(stage, 'patrol')
-    const face = fx(stage, 'patrol-face')
-    placeSleuth(root, SEAT_X)
-    return (_progress, reached) => {
-      const at = Math.min(count - 1, Math.max(0, Math.floor(reached)))
-      const walked = ramp(reached - at, 0, 1) + (reached >= count ? 1 : 0)
-      translateTo(patrol, guardX(at, Math.min(1, walked)), FLOOR + 60)
-      face?.setAttribute('transform', `scale(${at % 2 === 0 ? -1 : 1} 1)`)
-      fadeTo(spot, Math.min(1, reached / Math.max(1, count)))
-      if (joints) setNoirPose(joints, drum(ramp(reached, 0, 0.3), reached * 8))
+    const cymbal = fx(stage, 'cymbal')
+    const x = holdX(input)
+    return (play) => {
+      const hit = share(play, 1)
+      const close = ramp(hit, 0.5, 0.9)
+      transformTo(spot, `translate(${x} 0) scale(${(1 - 0.6 * close).toFixed(3)} 1)`)
+      fadeTo(bulbs, 1 - 0.85 * close)
+      const ring = hit > 0.55 ? 6 * Math.sin(Math.PI * 6 * ramp(hit, 0.55, 1)) * (1 - ramp(hit, 0.55, 1)) : 0
+      transformTo(cymbal, `rotate(${ring.toFixed(1)} ${CYMBAL} -244)`)
+      if (hit > 0) return still(crash(hit))
+      return still(drum(ramp(share(play, 0), 0, 0.15), elapsedOf(SCRIPT, play) / BEAT_MS))
     }
   },
-}
+})

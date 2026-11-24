@@ -1,7 +1,8 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Bold Noir's palette: a heist night, black slabs and white paper cut on diagonals, with one loud red for
-// the menu's pick, the cut-in, the calling card and the props that light as he works them. Paper on red
+// Bold Noir's palette: the black and white mode of the 1947 detective game the world is drawn from, black
+// slabs and white paper cut on diagonals, with one loud red for the menu's pick, the calling card and what
+// lights as he works a case (the tie, the roof light, the clue, the stars). Paper on red
 // measures 5:1, so a red box that carries paper text is the deeper redPlate (7:1); ink text sits on paper.
 
 export const NOIR = {
