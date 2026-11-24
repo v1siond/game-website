@@ -46,9 +46,9 @@ export const SH = {
   coat: '#16171a',
   coatLit: '#2b2d32',
   shape: '#3a3530',
-  // The night through the windows, and the dawn through the front door.
+  // The night through the windows, and the lamp light through the lit room's door.
   moon: '#9fb4c8',
-  dawn: '#f2c890',
+  lampLight: '#f2c890',
 } as const
 
 export const SH_VARS = paletteVars('sh', SH)

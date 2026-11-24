@@ -70,7 +70,7 @@ export default function RetroRPGTheme() {
   const sections = scenes.filter((scene): scene is Scene & { slot: NonNullable<Scene['slot']> } => scene.slot !== null)
 
   return (
-    <div className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--rpg-void)] [--theatre-veil:var(--rpg-void)] ${world.world}`} style={RPG_VARS}>
+    <div className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--rpg-void)] ${world.world}`} style={RPG_VARS}>
       <SkipLink className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2" />
       {!reduced && (
         <Theatre theatreRef={theatreRef}>

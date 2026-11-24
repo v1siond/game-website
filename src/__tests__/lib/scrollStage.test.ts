@@ -6,12 +6,9 @@ import {
   itemsReached,
   jumpStart,
   layerTransform,
-  leadOf,
   ramp,
   settleStep,
-  stageOpacity,
   stageState,
-  veilOpacity,
 } from '@/lib/scroll/stage'
 
 describe('ramp', () => {
@@ -94,10 +91,9 @@ describe('stageState', () => {
     expect(stageState(span, 2000 + HANDOVER.inTo * vh, vh).vis).toBe(1)
   })
 
-  it('sinks back to dark between its out lines and plays backwards on the way up', () => {
-    const middle = 6000 + ((HANDOVER.outFrom + HANDOVER.outTo) / 2) * vh
-    expect(stageState(span, middle, vh).vis).toBeCloseTo(0.5)
-    expect(stageState(span, 6000 + HANDOVER.outTo * vh, vh).vis).toBe(0)
+  it('never sinks to dark: it stays whole past its section, for the next stage to dissolve in over it', () => {
+    expect(stageState(span, 6000 + HANDOVER.outTo * vh, vh).vis).toBe(1)
+    expect(stageState(span, 9000, vh).vis).toBe(1)
     expect(stageState(span, 3000, vh)).toEqual(stageState(span, 3000, vh))
   })
 
@@ -113,10 +109,10 @@ describe('stageState', () => {
 })
 
 describe('heroState', () => {
-  it('fades out over the first three quarters of a screen while its progress runs a whole screen', () => {
+  it('stays whole under the next stage while its progress runs a whole screen', () => {
     expect(heroState(0, 1000)).toEqual({ vis: 1, progress: 0 })
-    expect(heroState(375, 1000)).toEqual({ vis: 0.5, progress: 0.375 })
-    expect(heroState(750, 1000).vis).toBe(0)
+    expect(heroState(375, 1000)).toEqual({ vis: 1, progress: 0.375 })
+    expect(heroState(750, 1000).vis).toBe(1)
     expect(heroState(1000, 1000).progress).toBe(1)
   })
 })
@@ -131,21 +127,6 @@ describe('itemsReached', () => {
   })
 })
 
-describe('stage and veil opacity', () => {
-  it('eases the stage in with a power of 1.6', () => {
-    expect(stageOpacity(0)).toBe(0)
-    expect(stageOpacity(0.5)).toBeCloseTo(0.5 ** 1.6)
-    expect(stageOpacity(1)).toBe(1)
-  })
-
-  it('darkens the veil up to 0.8 while the stage is under 65 percent visible', () => {
-    expect(veilOpacity(0)).toBeCloseTo(0.8)
-    expect(veilOpacity(0.325)).toBeCloseTo(0.4)
-    expect(veilOpacity(0.65)).toBe(0)
-    expect(veilOpacity(1)).toBe(0)
-  })
-})
-
 describe('layerTransform', () => {
   const motion = { zoom: [1.04, 1.13] as const, lift: [0, -2] as const }
 
@@ -156,12 +137,5 @@ describe('layerTransform', () => {
 
   it('scales the motion down for a phone', () => {
     expect(layerTransform(motion, 1, 0.5)).toBe('translate3d(0,-1.00%,0) scale(1.0650)')
-  })
-})
-
-describe('leadOf', () => {
-  it('is the index of the most visible stage, the first on a tie', () => {
-    expect(leadOf([0, 0.4, 0.9, 0.9])).toBe(2)
-    expect(leadOf([0, 0, 0])).toBe(0)
   })
 })

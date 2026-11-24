@@ -26,15 +26,16 @@ const PHONE_QUERY = '(max-width: 1023.98px)'
 
 // Survival Horror: an old house at night seen the way the genre shows it, one fixed camera per room. The
 // hero is his file card and the inventory that changes profession over the main hall (./SurvivalHorror/hall).
-// Then every section of the active profession is one room of the house (./SurvivalHorror/rooms) that rises
-// from dark, holds while its paper panel scrolls over it, and sinks back into dark while the next one rises;
-// in each room he makes one move of the genre per card (./SurvivalHorror/scenes): reads the notes on the wall
-// by his flashlight, searches a cabinet's drawers, shoves a crate down the corridor, sets a lock's dials,
-// spends one shot per shape, hides from the pursuer, lights the gallery's lamps, blocks and kicks. Contact is
-// a letter by the front door (./SurvivalHorror/letter), which he unbars at dawn and walks out of. Every motion
-// is a function of the scroll position, on the shared theatre (./shared/theatre) and its settle: stop and
-// art and text come to rest together, scroll up and it plays back. Under reduced motion there is no theatre
-// and no scrub: each section carries its own picture, still, at its settled frame.
+// Then every section of the active profession is one room of the house (./SurvivalHorror/rooms) that
+// dissolves in over the one before and holds while its paper panel scrolls over it. In each room he plays a
+// short scene of one to three different actions once the section arrives (./SurvivalHorror/scenes): he reads
+// a note on the study wall by his flashlight, pulls a file from a cabinet, shoves a crate and climbs it, sets
+// a lock's dials, fires one shot as the pursuer appears behind him, runs from it, lights the gallery's lamps,
+// blocks and kicks. Contact is a letter by the door of the lit room (./SurvivalHorror/letter), which he runs
+// through and shuts the pursuer out of. The scenes play on time and hold their end frame, on the shared
+// theatre (./shared/theatre, src/lib/scroll/player.ts); the rooms' push in and the text follow the scroll and
+// its settle. Under reduced motion there is no theatre: each section carries its own picture, still, at its
+// end frame.
 //
 // The root carries the palette as --sh-* variables and the pointer as --mx and --my (usePointerVars), the
 // only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden, so the
@@ -61,7 +62,7 @@ export default function SurvivalHorrorTheme() {
   return (
     <div
       ref={rootRef}
-      className={`relative min-h-screen overflow-x-clip [--focus-halo:var(--sh-void)] [--focus-ring:var(--sh-flame)] [--theatre-ground:var(--sh-void)] [--theatre-veil:var(--sh-void)] ${look.root}`}
+      className={`relative min-h-screen overflow-x-clip [--focus-halo:var(--sh-void)] [--focus-ring:var(--sh-flame)] [--theatre-ground:var(--sh-void)] ${look.root}`}
       style={SH_VARS}
     >
       <SkipLink />

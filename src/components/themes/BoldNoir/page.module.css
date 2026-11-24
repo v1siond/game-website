@@ -28,7 +28,6 @@
 
 .theatre {
   --theatre-ground: var(--noir-ink);
-  --theatre-veil: var(--noir-ink);
 }
 
 /* The shade under the text column, so the slabs sit on a calmer frame; it fades with its stage. */

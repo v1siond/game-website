@@ -25,7 +25,6 @@
 
 .theatre {
   --theatre-ground: var(--deco-abyss);
-  --theatre-veil: var(--deco-abyss);
 }
 
 /* The shade under the text column, so the panels sit on a calmer frame; it fades with its stage. */

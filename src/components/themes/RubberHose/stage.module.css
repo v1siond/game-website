@@ -1,7 +1,7 @@
 /* Rubber Hose's look on the shared theatre's stages (../shared/theatre): a scrim of the film's dark under
    the text column, so the paper cards' edges and the banners read on the brightest set (the meadow's pale
-   sky); it fades with its stage. The theatre's ground and veil are the film's black (--theatre-ground and
-   --theatre-veil on the world's root). */
+   sky); it fades with its stage. The theatre's ground is the film's black (--theatre-ground on the world's
+   root). */
 
 .reel::after {
   content: '';

@@ -175,7 +175,6 @@
 /* The theatre's colours: the select screen's deepest blue behind every scene and the dark a scene fades into. */
 .root {
   --theatre-ground: #020520;
-  --theatre-veil: #020520;
 }
 
 .tourStage {

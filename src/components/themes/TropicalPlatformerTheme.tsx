@@ -89,7 +89,7 @@ export default function TropicalPlatformerTheme() {
     <div
       ref={rootRef}
       style={ROOT_VARS}
-      className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--tp-jungle-deep)] [--theatre-veil:var(--tp-jungle-deep)] ${look.root} ${paint.scene} ${jungleFace.variable}`}
+      className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--tp-jungle-deep)] ${look.root} ${paint.scene} ${jungleFace.variable}`}
     >
       <SkipLink />
       <SceneryDefs />

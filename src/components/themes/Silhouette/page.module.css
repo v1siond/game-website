@@ -17,7 +17,6 @@
 
 .theatre {
   --theatre-ground: var(--sh-void);
-  --theatre-veil: var(--sh-black);
 }
 
 /* ---- the top bar: his initials, back to the top ---- */

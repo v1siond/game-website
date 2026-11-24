@@ -1,6 +1,7 @@
-// Pure math behind the scroll stages (useScrollStage): a full screen picture per section that rises from
-// dark, holds while the section's text scrolls over it and sinks back into dark as the next one rises, the
-// open world trailer hand over (score C47 research vi.md). Every value is a function of a scroll position, so the
+// Pure math behind the scroll stages (useScrollStage): a full screen picture per section that rises in over
+// the one before it and stays whole while the section's text scrolls over it, until the next one rises over
+// it in turn: a cross dissolve, never a dip to dark (his 11-23 words, C55; the engines draw it with crossOf,
+// src/lib/scroll/player.ts). Every value is a function of a scroll position, so the
 // stages play forwards on the way down and backwards on the way up, and nothing moves while the scroll
 // rests. The settle is the eased follow that draws the stages a little behind the scroll and brings them to
 // rest about a second after it stops. No DOM here.
@@ -53,27 +54,27 @@ export interface StageSpan {
 }
 
 /**
- * When a stage rises and sinks, in viewport heights from its section's top (in) and bottom (out): it rises
- * from top + inFrom to top + inTo and sinks from bottom + outFrom to bottom + outTo, so between two sections
- * there is a short dark dip where both stages are low.
+ * When a stage rises and how long its scene runs, in viewport heights from its section's top (in) and bottom
+ * (out): it rises from top + inFrom to top + inTo, and its progress runs on to bottom + outTo.
  */
 export interface Handover {
   inFrom: number
   inTo: number
-  outFrom: number
   outTo: number
 }
 
-export const HANDOVER: Handover = { inFrom: -0.55, inTo: 0.25, outFrom: -1.15, outTo: -0.35 }
+// A stage is whole by the time its section's top reaches the screen's top, so a reader stopped there never
+// sees two rooms at once.
+export const HANDOVER: Handover = { inFrom: -0.55, inTo: 0, outTo: -0.35 }
 
-/** How visible a stage is (0 dark to 1 full) and how far its scene has played (0 to 1). */
+/** How far a stage has risen over the one before (0 not yet, 1 whole) and how far its scene has played (0 to 1). */
 export interface StageState {
   vis: number
   progress: number
 }
 
 interface StageOptions {
-  /** The last stage never sinks: it holds to the end of the page, where its progress reaches 1. */
+  /** The last stage's scene runs to the end of the page, where its progress reaches 1. */
   last?: boolean
   handover?: Handover
 }
@@ -82,16 +83,13 @@ export function stageState(span: StageSpan, position: number, viewport: number, 
   const start = span.top + handover.inFrom * viewport
   const rise = ramp(position, start, span.top + handover.inTo * viewport)
   const end = last ? span.bottom - viewport : span.bottom + handover.outTo * viewport
-  const sink = last ? 0 : ramp(position, span.bottom + handover.outFrom * viewport, end)
-  return { vis: Math.min(rise, 1 - sink), progress: ramp(position, start, end) }
+  return { vis: rise, progress: ramp(position, start, end) }
 }
 
-// The hero's stage is up at the top of the page and fades out over its first three quarters of a screen.
-const HERO_OUT_SCREENS = 0.75
-
-/** The hero's stage: full at the top, gone by HERO_OUT_SCREENS, its progress run over the first screen. */
+/** The hero's stage: whole from the top of the page, under the stages that rise over it, its progress run
+ *  over the first screen. */
 export const heroState = (position: number, viewport: number): StageState => ({
-  vis: 1 - ramp(position, 0, HERO_OUT_SCREENS * viewport),
+  vis: 1,
   progress: ramp(position, 0, viewport),
 })
 
@@ -101,16 +99,6 @@ const ITEM_RAMP_SCREENS = 0.3
 /** How many items have scrolled past their triggers (px of scroll), the one passing now as a fraction. */
 export const itemsReached = (triggers: readonly number[], position: number, viewport: number): number =>
   triggers.reduce((sum, at) => sum + ramp(position, at, at + ITEM_RAMP_SCREENS * viewport), 0)
-
-/** The stage's opacity from its visibility, eased in so it climbs out of the dark slowly. */
-export const stageOpacity = (vis: number): number => vis ** 1.6
-
-// The black veil over a stage: up to VEIL_MAX while the stage is under VEIL_BELOW visible, the fade to dark
-// done with opacity instead of a brightness filter.
-const VEIL_MAX = 0.8
-const VEIL_BELOW = 0.65
-
-export const veilOpacity = (vis: number): number => VEIL_MAX * (1 - clamp01(vis / VEIL_BELOW))
 
 /** A layer's push in across its scene: scale from zoom[0] to zoom[1], lift (percent of its height) likewise. */
 export interface LayerMotion {
@@ -124,7 +112,3 @@ export function layerTransform(motion: LayerMotion, progress: number, amount = 1
   const lift = (motion.lift[0] + (motion.lift[1] - motion.lift[0]) * progress) * amount
   return `translate3d(0,${lift.toFixed(2)}%,0) scale(${zoom.toFixed(4)})`
 }
-
-/** The index of the most visible stage, the first one on a tie: the stage the page is in. */
-export const leadOf = (visibilities: readonly number[]): number =>
-  visibilities.reduce((lead, vis, index) => (vis > visibilities[lead] ? index : lead), 0)

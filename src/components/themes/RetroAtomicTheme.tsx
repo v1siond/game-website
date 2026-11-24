@@ -59,7 +59,7 @@ export default function RetroAtomicTheme() {
 
   return (
     <div
-      className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] [--theatre-ground:theme(colors.atomic.bunker)] [--theatre-veil:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}
+      className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] [--theatre-ground:theme(colors.atomic.bunker)] ${atomic.root} ${atomicFace.variable}`}
     >
       <SkipLink />
       {!reduced && (

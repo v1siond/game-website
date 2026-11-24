@@ -2,13 +2,13 @@
 
 import { useLayoutEffect, useRef, type ReactNode, type Ref } from 'react'
 import { layerTransform } from '@/lib/scroll/stage'
-import { SETTLED_PROGRESS, movingLayers, type LayerMotions, type TheatreScene } from './useTheatre'
+import { SETTLED_PROGRESS, movingLayers, restingPlay, type LayerMotions, type TheatreScene } from './useTheatre'
 import css from './theatre.module.css'
 
-// One scene's picture: its layers, back to front, and the black veil the engine fades it into. In the
+// One scene's picture: its layers, back to front, which the engine dissolves in over the one before. In the
 // theatre every stage is a fixed full screen picture behind the text, moved by the engine (useTheatre);
 // under reduced motion a stage sits at the top of its own section instead, drawn once at its settled frame
-// (the middle of its scene, every card reached). The markup is the picture's first frame, so the server
+// (the middle of its scene, every card reached, its script at its end frame). The markup is the picture's first frame, so the server
 // drawn hero already shows.
 
 export interface StageLayer {
@@ -32,7 +32,7 @@ export function Stage({ scene, layers, motion, settled = false, className = '' }
     const stage = ref.current
     if (!settled || !stage) return
     for (const layer of movingLayers(stage, motion)) layer.el.style.transform = layerTransform(layer.motion, SETTLED_PROGRESS)
-    scene.bind(stage)(SETTLED_PROGRESS, scene.count)
+    scene.bind(stage)(SETTLED_PROGRESS, scene.count, restingPlay(scene.script))
   }, [scene, motion, settled])
 
   return (
@@ -42,7 +42,6 @@ export function Stage({ scene, layers, motion, settled = false, className = '' }
           {node}
         </div>
       ))}
-      <div data-veil="" className={css.veil} />
     </div>
   )
 }

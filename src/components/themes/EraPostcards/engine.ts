@@ -2,15 +2,17 @@
 
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { heroState, itemsReached, layerTransform, leadOf, stageOpacity, stageState, veilOpacity, type StageSpan, type StageState } from '@/lib/scroll/stage'
+import { crossOf } from '@/lib/scroll/player'
+import { heroState, itemsReached, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
 
 // The world's side of the scroll stage engine (src/hooks/useScrollStage.ts): it binds every stage of the
-// theatre once (its layers, its veil, the era's writer), measures each section and the reading line of
-// each counted card on load and resize, and per frame writes only each visible stage's opacity, its veil,
-// its layers' transforms and its era's props and pose. The rail's current mark changes only when the
-// leading scene does.
+// theatre once (its layers, the era's writer), measures each section and the reading line of each counted
+// card on load and resize, and per frame writes only each visible stage's opacity, its layers' transforms
+// and its era's props and pose. Each stage dissolves in over the one before it and the one under it is
+// hidden once it is whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). The rail's
+// current mark changes only when the leading scene does.
 //
 // The text settles with the art: the page scroll stays native (scrollbar, keyboard, find in page, screen
 // readers and touch momentum are the browser's own) and the text layer, main with the footer under it, is drawn where the settled
@@ -27,9 +29,6 @@ const TEXT_REST_PX = 0.5
 const READ_LINE = 0.62
 // On a phone the layers zoom and lift this share of the desktop motion.
 const PHONE_MOTION = 0.6
-// The hero's whole stage shrinks by this much over the first screen, more on a phone.
-const HERO_SHRINK = 0.1
-const HERO_SHRINK_PHONE = 0.15
 
 /** The counted cards of a section: the items of the list or the facts its frame marks with data-era-items. */
 const ITEMS = '[data-era-items="list"] > ul > li, [data-era-items="facts"] > dl > div'
@@ -37,7 +36,6 @@ const ITEMS = '[data-era-items="list"] > ul > li, [data-era-items="facts"] > dl 
 interface Bound {
   scene: Scene
   stage: HTMLElement
-  veil: HTMLElement
   layers: Array<{ el: HTMLElement; layer: Layer }>
   write: EraWriter
   section: HTMLElement | null
@@ -52,7 +50,6 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
   return {
     scene,
     stage,
-    veil: stage.querySelector<HTMLElement>('[data-veil]')!,
     layers: Array.from(stage.querySelectorAll<HTMLElement>('[data-layer]'), (el) => ({ el, layer: el.dataset.layer as Layer })),
     write: scene.era.bind(stage, scene.input),
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
@@ -115,19 +112,18 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
     (position: number, lag: number, { viewport, phone }: StageMetrics) => {
       settleText(lag)
       const all = bound.current
-      const visibilities = all.map((each, i) => {
-        const { vis, progress } = stateOf(each, position, viewport, i === all.length - 1)
-        show(each, vis > 0)
-        if (vis <= 0) return 0
-        each.stage.style.opacity = stageOpacity(vis).toFixed(3)
-        each.veil.style.opacity = veilOpacity(vis).toFixed(3)
-        if (each.scene.id === 'hero') each.stage.style.transform = `scale(${(1 - (phone ? HERO_SHRINK_PHONE : HERO_SHRINK) * progress).toFixed(4)})`
-        for (const { el, layer } of each.layers) el.style.transform = layerTransform(LAYER_MOTION[layer], progress, phone ? PHONE_MOTION : 1)
-        each.write(progress, itemsReached(each.triggers, position, viewport))
-        return vis
+      const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1))
+      const cross = crossOf(states.map((state) => state.vis))
+      all.forEach((each, i) => {
+        const { shown, opacity } = cross.layers[i]
+        show(each, shown)
+        if (!shown) return
+        each.stage.style.opacity = opacity.toFixed(3)
+        for (const { el, layer } of each.layers) el.style.transform = layerTransform(LAYER_MOTION[layer], states[i].progress, phone ? PHONE_MOTION : 1)
+        each.write(states[i].progress, itemsReached(each.triggers, position, viewport))
       })
       if (all.length === 0) return
-      mark(all[leadOf(visibilities)])
+      mark(all[cross.lead])
     },
     [mark, settleText],
   )

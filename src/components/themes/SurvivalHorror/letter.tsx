@@ -8,9 +8,9 @@ import type { Scene } from './scenes'
 import { SurvivorStage } from './stage'
 import look from './world.module.css'
 
-// Contact as a letter left by the front door, which he unbars at dawn and walks out of behind the page
-// (./scenes): his line typed on the paper, the ways to reach him under it. Under reduced motion the door's
-// picture sits still behind it.
+// Contact as a letter left by the door of the lit room, which he runs through and shuts the pursuer out of
+// behind the page (./scenes): his line typed on the paper, the ways to reach him under it. Under reduced
+// motion the door's picture sits still behind it.
 
 const HEADING = sectionHeadingId('Contact')
 

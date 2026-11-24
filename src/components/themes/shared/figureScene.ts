@@ -1,4 +1,5 @@
 import type { StageItems } from '@/lib/cv/stageItems'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import type { TheatreScene } from './theatre/useTheatre'
 import { fadeTo, fx, r1, spread, transformTo } from './stageNodes'
 
@@ -44,8 +45,9 @@ export interface FigureState<Pose> {
   opacity: number
 }
 
-/** A scene's frame at progress p with f props' cards reached; it moves the props and returns the figure. */
-export type FigureWriter<Pose> = (p: number, f: number) => FigureState<Pose>
+/** A scene's frame at progress p with f props' cards reached and its script at `play`; it moves the props
+ *  (none: its first frame) and returns the figure. */
+export type FigureWriter<Pose> = (p: number, f: number, play?: Playhead) => FigureState<Pose>
 
 /** How a world finds its figure's joints in the figure group and writes a pose on them. */
 export interface FigureRig<Joints, Pose> {
@@ -58,23 +60,26 @@ export const figureTransform = ({ x, y, k }: Pick<FigureState<unknown>, 'x' | 'y
 
 /**
  * The scene as the theatre runs it: the world's writer, bound to the stage, then the figure placed and
- * posed from what it returns. The lead cards are taken off `reached` before the writer reads it.
+ * posed from what it returns. The lead cards are taken off `reached` before the writer reads it. A scene
+ * with a `script` plays it on time from its arrival (src/lib/scroll/player.ts).
  */
 export function figureScene<Pose, Joints>(
   id: string,
   layout: PropLayout,
   bind: (stage: StageNodes, layout: PropLayout) => FigureWriter<Pose>,
   rig: FigureRig<Joints, Pose>,
+  script?: SceneScript,
 ): TheatreScene {
   return {
     id,
     count: layout.lead + layout.count,
+    script,
     bind: (stage) => {
       const group = fx(stage, 'figure')
       const joints = group && rig.joints(group)
       const write = bind(stage, layout)
-      return (progress, reached) => {
-        const state = write(progress, reached - layout.lead)
+      return (progress, reached, play) => {
+        const state = write(progress, reached - layout.lead, play)
         if (!group || !joints) return
         transformTo(group, figureTransform(state))
         fadeTo(group, state.opacity)

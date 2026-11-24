@@ -76,7 +76,6 @@
 /* The theatre's colours: the caverns' void behind every scene and the dark a scene fades into. */
 .root {
   --theatre-ground: var(--df-void);
-  --theatre-veil: var(--df-void);
 }
 
 .stage {
