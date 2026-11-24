@@ -1,23 +1,24 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Marcellus } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useWorldView } from '@/components/cv/CVDataProvider'
-import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { CopyrightLine } from './shared/CopyrightLine'
-import { usePointerVars } from '@/hooks/usePointerVars'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { SkipLink } from '@/components/themes/shared/SkipLink'
+import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { CopyrightLine } from './shared/CopyrightLine'
+import { SkipLink } from './shared/SkipLink'
+import { Stage, Theatre } from './shared/theatre/Stage'
+import { useTheatre } from './shared/theatre/useTheatre'
+import { LastFireContact, TopBar } from './SoulMap/chrome'
+import { ShrineHero } from './SoulMap/hero'
 import { CARVED, SOUL_VARS } from './SoulMap/palette'
-import { RunProvider } from './SoulMap/run'
-import { AshFall } from './SoulMap/ash'
-import { ShrineHero } from './SoulMap/shrine'
-import { ClassSelect } from './SoulMap/classSelect'
-import { SECTION_VIEWS } from './SoulMap/views'
-import { LastFire } from './SoulMap/lastFire'
-import { RunOverlay } from './SoulMap/hud'
-import ashen from './SoulMap/ashen.module.css'
+import { PhoneView } from './SoulMap/ruins'
+import { LAYER_MOTION, scenesOf, type SoulScene } from './SoulMap/scenes'
+import { PlaceSection } from './SoulMap/sections'
+import page from './SoulMap/page.module.css'
 
 // The carved serif, Marcellus, the closest free face to the banner capitals the world was drawn for: the
 // root carries its --soul-carved variable and CARVED reads it.
@@ -28,55 +29,66 @@ const soulCarved = Marcellus({
   variable: '--soul-carved',
 })
 
-// Soul Map: the ash and bonfire world of a hard knight action game (named in code only), played the way
-// that game is played. The hero is the ruined shrine at dusk where the fire is kindled (./SoulMap/shrine),
-// the profession switch is the class pick with its status sheet (classSelect), and each profession's
-// sections are that game's own mechanics (views): the lift ride down through the jobs, items to pick up,
-// messages on the floor, summon signs, a bout behind a fog wall. Contact is the last fire to kindle
-// (lastFire). The run (run.tsx) keeps the souls, health, stamina and the flask that the HUD shows (hud).
+// Soul Map: his CV as one way through a ruined kingdom at dusk under ash, the world of the dark action game
+// it comes from, one fire the only warm light in it. A big hero (the shrine where the fire catches, him in
+// his armour, his name in carved capitals, the class menu where he picks a profession), then every section
+// of the shown profession is one full screen place that rises from dark, holds while its cards scroll over
+// it, and goes dark while the next one rises: the rest by the fire, the plunge off a ledge, the parry and
+// riposte, the fog gate, the demon's arena, the great door, the bell tower, the shield knight, and the last
+// fire with its chest at the end. In each he is the heavy knight side on, and the shared scene player plays
+// its one to three of the game's moves at their own pace as the section arrives (the shared theatre): scroll
+// up and it plays back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque
+// from its first frame.
 //
-// The root carries the palette as --soul-* variables and the pointer as --mx and --my (usePointerVars),
-// the only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden,
-// so the root never becomes a scroll container. The footer leaves room for the fixed HUD.
+// Under reduced motion there is no theatre: each section carries its own picture, still, at its end frame.
+// A phone frames the ruins from higher up (SoulMap/ruins PhoneView).
+
+const PHONE_QUERY = '(max-width: 767.98px)'
+
+const hasSlot = (scene: SoulScene): scene is SoulScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function SoulMapTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const reducedMotion = useReducedMotion()
-  const rootRef = usePointerVars(!reducedMotion)
+  const cv = useCVData()
+  const labels = useLabels()
+  const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
+  const scenes = useMemo(
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
+    [view, cv, labels, active],
+  )
+  const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
+  const hero = scenes[0]
+  const contact = scenes[scenes.length - 1]
 
   return (
-    <RunProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] [--focus-halo:var(--soul-abyss)] ${CARVED} ${ashen.world} ${soulCarved.variable}`} style={SOUL_VARS}>
+    <PhoneView.Provider value={phone}>
+      <div style={SOUL_VARS} className={`${page.root} ${reduced ? page.still : ''} ${CARVED} ${soulCarved.variable}`}>
         <SkipLink />
-        <AshFall />
-
-        <header className="relative z-20">
-          <ShrineHero />
-        </header>
-
-        <div className="relative z-20">
-          <ClassSelect />
-        </div>
-
-        <main id="main-content" className="relative z-20">
+        {!reduced && (
+          <Theatre theatreRef={theatreRef} className={page.theatre}>
+            {scenes.map((scene) => (
+              <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} />
+            ))}
+          </Theatre>
+        )}
+        <TopBar anchor={hero.anchor} />
+        <main id="main-content" ref={textRef} className={page.main}>
+          <ShrineHero scene={hero} still={reduced} />
           <ProfessionRegion>
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+            {scenes.filter(hasSlot).map((scene) => (
+              <PlaceSection key={scene.id} scene={scene} still={reduced} />
+            ))}
           </ProfessionRegion>
+          <LastFireContact scene={contact} still={reduced} />
         </main>
-
-        <div className="relative z-20">
-          <LastFire profession={active} />
-        </div>
-
-        <footer className="relative z-20 pb-20 pt-6 text-center sm:pb-28">
-          <p className="text-sm text-[color:var(--soul-text-soft)]">
+        <footer className={page.footer}>
+          <p className={page.copyright}>
             <CopyrightLine />
           </p>
         </footer>
-
-        <RunOverlay />
       </div>
-    </RunProvider>
+    </PhoneView.Provider>
   )
 }

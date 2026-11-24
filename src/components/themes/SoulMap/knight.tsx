@@ -4,46 +4,27 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { SOUL } from './palette'
 import knight from './knight.module.css'
 
-// Him as this world's knight, a parody of the generic armoured warrior the hard knight action game opens
-// with (the Warrior class's iron helm, leather and mail, the elite knight's blue surcoat with its fire
-// warding emblem, a heater shield and a straight longsword; named here in code only). Painted, not
-// outlined: steel, mail, leather and the one saturated blue, lit by gradients, heavy and seven heads tall.
+// Him as this world's knight, the heavy armoured warrior of the dark action game the world comes from: an
+// iron helm, leather and mail, a plain dusk blue surcoat, a straight sword and a heater shield.
+// Painted, not outlined: steel, mail, leather and the one saturated blue, lit by gradients, heavy and
+// seven heads tall.
 //
-// The helm stays on with its visor hinged up: the closed helm is the silhouette that reads as that knight,
-// and with the visor up his face shows under it, his eyes, his nose and the full dark beard, in his own
-// colours (HERO_IDENTITY). The Martial Artist takes the helm off and wears the mongkhon on his bare head.
+// The helm stays on with its visor hinged up: with the visor up his face shows under it, his eyes, his
+// nose and the full dark beard, in his own colours (HERO_IDENTITY). The Martial Artist takes the helm off
+// and wears the mongkhon on his bare head.
 //
-// Gear per look:
-// - knight: the longsword in his right hand, the shield on his left arm (the hero, the class menu's rest).
-// - engineer: a smith's hammer for the anvil, the sword left at the forge, the shield kept on the arm.
+// Gear per profession:
+// - engineer: a straight sword, the shield kept on the arm.
 // - drummer: two drum mallets, the shield slung on his back.
 // - fighter: no helm, no shield, no sword: red hand wraps and the mongkhon.
 //
-// He faces right, so his left side, the shield arm, is the near one. Every part is its own group turning
-// round its joint (knight.module.css runs the poses with transforms only): the far arm and forearm, the
-// near arm and forearm, both thighs and shins, the body and the head. A phantom (a summoned spirit of him)
-// draws the same figure in gold light. viewBox 60 by 96, feet on y 95.
+// He faces right, so his left side, the shield arm, is the near one. Every limb is two groups, upper and
+// lower, each turning round its own joint (knight.module.css), and what the far hand holds turns in its
+// grip at the hand, so a theatre scene's writer (pose.ts) poses him on the shared rig with transforms
+// only: the blade ahead, point down for a plunge, or up. viewBox 60 by 96, feet on y 95.
 
-export type KnightPose =
-  | 'idle'
-  | 'walk'
-  | 'roll'
-  | 'guard'
-  | 'swing'
-  | 'sit'
-  | 'seated'
-  | 'drink'
-  | 'rise'
-  | 'respawn'
-  | 'act'
-  | 'strike'
-  | 'hit'
-  | 'down'
-  | 'getUp'
-  | 'praise'
-  | 'write'
-
-export type KnightGear = 'knight' | Profession
+/** His box: the viewBox's size and the y his soles stand on. */
+export const KNIGHT_VIEW = { width: 60, height: 96, soles: 95 } as const
 
 interface Ink {
   steelLight: string
@@ -54,14 +35,12 @@ interface Ink {
   leatherDark: string
   surcoat: string
   surcoatDark: string
-  emblem: string
   skin: string
   skinShade: string
   hair: string
   beard: string
   eyes: string
   wraps: string
-  blade: string
 }
 
 const STEEL_INK: Ink = {
@@ -73,108 +52,12 @@ const STEEL_INK: Ink = {
   leatherDark: SOUL.leatherDark,
   surcoat: SOUL.surcoat,
   surcoatDark: SOUL.surcoatDark,
-  emblem: SOUL.emblem,
   skin: HERO_IDENTITY.skin,
   skinShade: HERO_IDENTITY.skinShade,
   hair: HERO_IDENTITY.hair,
   beard: HERO_IDENTITY.beard,
   eyes: HERO_IDENTITY.eyes,
   wraps: SOUL.wraps,
-  blade: SOUL.steelLight,
-}
-
-// The summoned phantom: the same knight in gold light, lighter where the steel is lit.
-const PHANTOM_INK: Ink = {
-  steelLight: SOUL.flameCore,
-  steel: SOUL.phantom,
-  steelDark: SOUL.glow,
-  mail: SOUL.glow,
-  leather: SOUL.glowDeep,
-  leatherDark: SOUL.glowDeep,
-  surcoat: SOUL.lantern,
-  surcoatDark: SOUL.glow,
-  emblem: SOUL.flameCore,
-  skin: SOUL.phantom,
-  skinShade: SOUL.glow,
-  hair: SOUL.glowDeep,
-  beard: SOUL.glowDeep,
-  eyes: SOUL.glowDeep,
-  wraps: SOUL.lantern,
-  blade: SOUL.flameCore,
-}
-
-// The invading phantom: the same figure in red light, the sparring partner in the ring.
-const INVADER_INK: Ink = {
-  steelLight: SOUL.invaderLight,
-  steel: SOUL.invader,
-  steelDark: SOUL.invaderDeep,
-  mail: SOUL.invader,
-  leather: SOUL.invaderDeep,
-  leatherDark: SOUL.invaderDeep,
-  surcoat: SOUL.invader,
-  surcoatDark: SOUL.invaderDeep,
-  emblem: SOUL.invaderLight,
-  skin: SOUL.invaderLight,
-  skinShade: SOUL.invader,
-  hair: SOUL.invaderDeep,
-  beard: SOUL.invaderDeep,
-  eyes: SOUL.invaderDeep,
-  wraps: SOUL.invaderLight,
-  blade: SOUL.invaderLight,
-}
-
-// The ghost a bloodstain replays: his last moments in the dark red of the stain, see through.
-const BLOOD_INK: Ink = {
-  steelLight: SOUL.bloodBright,
-  steel: SOUL.blood,
-  steelDark: SOUL.invaderDeep,
-  mail: SOUL.blood,
-  leather: SOUL.invaderDeep,
-  leatherDark: SOUL.invaderDeep,
-  surcoat: SOUL.blood,
-  surcoatDark: SOUL.invaderDeep,
-  emblem: SOUL.bloodBright,
-  skin: SOUL.bloodBright,
-  skinShade: SOUL.blood,
-  hair: SOUL.invaderDeep,
-  beard: SOUL.invaderDeep,
-  eyes: SOUL.invaderDeep,
-  wraps: SOUL.bloodBright,
-  blade: SOUL.bloodBright,
-}
-
-// The spirit that writes a message on the floor: white blue, the way another world's player shows.
-const SCRIBE_INK: Ink = {
-  steelLight: SOUL.fog,
-  steel: SOUL.spirit,
-  steelDark: SOUL.spiritDeep,
-  mail: SOUL.spiritDeep,
-  leather: SOUL.spiritDeep,
-  leatherDark: SOUL.spiritDeep,
-  surcoat: SOUL.spirit,
-  surcoatDark: SOUL.spiritDeep,
-  emblem: SOUL.fog,
-  skin: SOUL.spirit,
-  skinShade: SOUL.spiritDeep,
-  hair: SOUL.spiritDeep,
-  beard: SOUL.spiritDeep,
-  eyes: SOUL.spiritDeep,
-  wraps: SOUL.spirit,
-  blade: SOUL.fog,
-}
-
-// A spirit draws him in light instead of steel: a summoned one in gold, an invading one in red, a
-// bloodstain's ghost in dark red, a message's writer in white blue.
-export type KnightSpirit = 'summon' | 'invader' | 'blood' | 'scribe'
-
-const SPIRIT_INK: Record<KnightSpirit, Ink> = { summon: PHANTOM_INK, invader: INVADER_INK, blood: BLOOD_INK, scribe: SCRIBE_INK }
-
-// How see through each spirit is (knight.module.css).
-const SPIRIT_CLASS: Record<KnightSpirit, string> = {
-  summon: knight.phantom,
-  invader: knight.phantom,
-  blood: knight.ghost,
-  scribe: knight.ghost,
 }
 
 interface Paint {
@@ -187,23 +70,15 @@ interface Paint {
 
 const HAND_Y = 53.5
 
+// The straight sword: the grip and pommel in the fist, the crossguard, and the blade with its lit edge.
 function Sword({ x, paint }: { x: number; paint: Paint }) {
   return (
-    <g transform={`rotate(-35 ${x} ${HAND_Y})`}>
-      <circle cx={x} cy={HAND_Y - 3.6} r={1.2} fill={paint.ink.steelDark} />
-      <rect x={x - 0.7} y={HAND_Y - 3} width={1.4} height={4.4} fill={paint.ink.leatherDark} />
-      <rect x={x - 4} y={HAND_Y + 1.1} width={8} height={1.4} rx={0.5} fill={paint.ink.steelDark} />
-      <path d={`M${x - 0.8} ${HAND_Y + 2.5} H${x + 0.8} L${x + 0.6} ${HAND_Y + 31} L${x} ${HAND_Y + 33} L${x - 0.6} ${HAND_Y + 31} Z`} fill={paint.ink.blade} />
-      <line x1={x} y1={HAND_Y + 3} x2={x} y2={HAND_Y + 26} stroke={paint.ink.steel} strokeWidth={0.4} />
-    </g>
-  )
-}
-
-function Hammer({ x, paint }: { x: number; paint: Paint }) {
-  return (
     <g transform={`rotate(-80 ${x} ${HAND_Y})`}>
-      <rect x={x - 0.7} y={HAND_Y - 2} width={1.4} height={11} fill={paint.ink.leather} />
-      <rect x={x - 3.6} y={HAND_Y + 8.4} width={7.2} height={4} rx={0.6} fill={paint.steelFill} />
+      <circle cx={x} cy={HAND_Y - 3.2} r={1.1} fill={paint.ink.steelDark} />
+      <rect x={x - 0.6} y={HAND_Y - 2.4} width={1.2} height={4.2} fill={paint.ink.leatherDark} />
+      <rect x={x - 3.4} y={HAND_Y + 1.6} width={6.8} height={1.3} rx={0.5} fill={paint.ink.steelDark} />
+      <path d={`M${x - 1.1} ${HAND_Y + 2.9} H${x + 1.1} V${HAND_Y + 24} L${x} ${HAND_Y + 26.4} L${x - 1.1} ${HAND_Y + 24} Z`} fill={paint.ink.steel} />
+      <path d={`M${x + 0.15} ${HAND_Y + 3} V${HAND_Y + 25}`} stroke={paint.ink.steelLight} strokeWidth={0.5} />
     </g>
   )
 }
@@ -213,16 +88,6 @@ function Mallet({ x, paint }: { x: number; paint: Paint }) {
     <g transform={`rotate(-70 ${x} ${HAND_Y})`}>
       <rect x={x - 0.5} y={HAND_Y - 1.5} width={1} height={10} fill={paint.ink.leather} />
       <circle cx={x} cy={HAND_Y + 9.2} r={1.9} fill={paint.ink.leatherDark} />
-    </g>
-  )
-}
-
-function Flask({ x, className }: { x: number; className: string }) {
-  return (
-    <g className={className}>
-      <rect x={x - 0.7} y={HAND_Y - 6.4} width={1.4} height={2.4} fill={SOUL.bone} />
-      <circle cx={x} cy={HAND_Y - 2.4} r={2.5} fill={SOUL.estus} />
-      <circle cx={x - 0.8} cy={HAND_Y - 3.2} r={0.8} fill={SOUL.flameCore} opacity={0.8} />
     </g>
   )
 }
@@ -256,9 +121,7 @@ function Face({ ink }: { ink: Ink }) {
     <>
       <path d="M31 14 H38.2 Q39.4 18.5 38.6 22.5 L37.6 27 H31 Z" fill={ink.skin} />
       <path d="M31 14 H33 V27 H31 Z" fill={ink.skinShade} opacity={0.6} />
-      <g className={knight.eyes}>
-        <ellipse cx={35.8} cy={17.9} rx={0.75} ry={1} fill={ink.eyes} />
-      </g>
+      <ellipse cx={35.8} cy={17.9} rx={0.75} ry={1} fill={ink.eyes} />
       <line x1={34.6} y1={16.3} x2={37.3} y2={16.1} stroke={ink.hair} strokeWidth={0.7} strokeLinecap="round" />
       <path d="M38.2 18 L39.7 20.7 L38.3 21.1 Z" fill={ink.skinShade} />
       <path d="M30.6 20.6 Q34.6 22.3 38.8 21.4 Q39.7 25 37.8 28.1 Q34.4 30.6 30.6 29 Z" fill={ink.beard} />
@@ -291,9 +154,9 @@ function BareHead({ paint }: { paint: Paint }) {
       <Face ink={ink} />
       <path d="M27 21.6 Q29 23 31 22.4 V29.4 Q28.4 28.6 27 21.6 Z" fill={ink.beard} />
       {/* the mongkhon: the corded ring round his head, its tail standing up behind */}
-      <path d="M24 15.2 Q31 12 38.6 14.4" fill="none" stroke={SOUL.emblem} strokeWidth={1.6} strokeLinecap="round" />
+      <path d="M24 15.2 Q31 12 38.6 14.4" fill="none" stroke={SOUL.cord} strokeWidth={1.6} strokeLinecap="round" />
       <path d="M24 15.2 Q31 12 38.6 14.4" fill="none" stroke={ink.wraps} strokeWidth={1.6} strokeDasharray="1.2 1.4" strokeLinecap="round" />
-      <path d="M24.6 15.4 Q20 13.2 18.8 8.8 Q21.8 11.8 25.2 13.2 Z" fill={SOUL.emblem} />
+      <path d="M24.6 15.4 Q20 13.2 18.8 8.8 Q21.8 11.8 25.2 13.2 Z" fill={SOUL.cord} />
     </>
   )
 }
@@ -351,24 +214,13 @@ interface Gear {
   near: (paint: Paint) => ReactNode
 }
 
-const GEAR: Record<KnightGear, Gear> = {
-  knight: {
-    helm: true,
-    shield: 'arm',
-    far: (paint) => (
-      <>
-        <Sword x={FAR_X} paint={paint} />
-        <Gauntlet x={FAR_X} paint={paint} wrapped={false} />
-      </>
-    ),
-    near: (paint) => <Gauntlet x={NEAR_X} paint={paint} wrapped={false} />,
-  },
+const GEAR: Record<Profession, Gear> = {
   engineer: {
     helm: true,
     shield: 'arm',
     far: (paint) => (
       <>
-        <Hammer x={FAR_X} paint={paint} />
+        <Sword x={FAR_X} paint={paint} />
         <Gauntlet x={FAR_X} paint={paint} wrapped={false} />
       </>
     ),
@@ -399,61 +251,54 @@ const GEAR: Record<KnightGear, Gear> = {
 }
 
 interface KnightProps {
-  gear: KnightGear
-  pose?: KnightPose
-  spirit?: KnightSpirit
-  // Faces left instead of right (an opponent).
-  facingLeft?: boolean
+  profession: Profession
+  box?: { width: number; height: number }
   className?: string
 }
 
-// Memoised: his props are plain values, so a scene that re-renders around him (the arena on every stamina
-// tick) leaves the sprite alone until his pose or gear changes.
-export const Knight = memo(function Knight({ gear, pose = 'idle', spirit, facingLeft = false, className = '' }: KnightProps) {
+// Memoised on its plain props, so a parent render that leaves his outfit and box as they are does not
+// redraw him under the writer's transforms.
+export const Knight = memo(function Knight({ profession, box, className = '' }: KnightProps) {
   const id = useId()
-  const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
-  const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
-  const look = GEAR[gear]
-  const spiritClass = spirit ? SPIRIT_CLASS[spirit] : ''
+  const paint: Paint = { ink: STEEL_INK, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
+  const look = GEAR[profession]
 
   return (
     <svg
-      viewBox="0 0 60 96"
-      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spiritClass} ${facingLeft ? knight.facingLeft : ''} ${className}`}
+      viewBox={`0 0 ${KNIGHT_VIEW.width} ${KNIGHT_VIEW.height}`}
+      {...box}
+      className={`${knight.sprite} ${className}`}
       aria-hidden="true"
       focusable="false"
     >
       <defs>
         <linearGradient id={`${id}-steel`} x1="0" y1="0" x2="1" y2="0.4">
-          <stop offset="0" stopColor={ink.steelDark} />
-          <stop offset="0.45" stopColor={ink.steel} />
-          <stop offset="0.75" stopColor={ink.steelLight} />
-          <stop offset="1" stopColor={ink.steel} />
+          <stop offset="0" stopColor={STEEL_INK.steelDark} />
+          <stop offset="0.45" stopColor={STEEL_INK.steel} />
+          <stop offset="0.75" stopColor={STEEL_INK.steelLight} />
+          <stop offset="1" stopColor={STEEL_INK.steel} />
         </linearGradient>
         <linearGradient id={`${id}-coat`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={ink.surcoat} />
-          <stop offset="1" stopColor={ink.surcoatDark} />
+          <stop offset="0" stopColor={STEEL_INK.surcoat} />
+          <stop offset="1" stopColor={STEEL_INK.surcoatDark} />
         </linearGradient>
       </defs>
-      <ellipse cx={31} cy={95.2} rx={12} ry={1.6} fill={SOUL.ink} opacity={spirit ? 0 : 0.5} />
+      <ellipse cx={31} cy={95.2} rx={12} ry={1.6} fill={SOUL.ink} opacity={0.5} />
       <g className={knight.whole}>
         <Arm shoulderX={27} paint={paint} upper={knight.armFar} fore={knight.foreFar}>
-          <g className={knight.farItem}>{look.far(paint)}</g>
-          <Flask x={FAR_X} className={knight.flask} />
+          <g className={knight.grip}>{look.far(paint)}</g>
         </Arm>
         <Leg hipX={27} paint={paint} thigh={knight.legFar} shin={knight.shinFar} />
-        <g className={knight.body}>
+        <g>
           {look.shield === 'back' && <SlungShield paint={paint} />}
-          <path d="M22.4 54 H38.6 L40 70 H21 Z" fill={ink.mail} />
+          <path d="M22.4 54 H38.6 L40 70 H21 Z" fill={STEEL_INK.mail} />
           <path d="M23 50 H38 L40.6 69 Q35 71 31 68.4 Q27 71 20.4 69 Z" fill={paint.coatFill} />
           <path d="M22.4 31 Q30 28.4 38 31 Q39.6 40 38.4 50 H23.2 Q21.6 40 22.4 31 Z" fill={paint.steelFill} />
           <path d="M25 33 Q30.6 31.6 36 33 L36.6 50 H24.6 Z" fill={paint.coatFill} />
-          <circle cx={30.8} cy={40} r={2.1} fill="none" stroke={ink.emblem} strokeWidth={0.9} />
-          <path d="M30.8 36.4 V43.6 M27.2 40 H34.4" stroke={ink.emblem} strokeWidth={0.7} />
-          <rect x={22.8} y={48.4} width={16} height={2.6} rx={0.6} fill={ink.leatherDark} />
-          <rect x={29.6} y={48.2} width={2.6} height={3} fill={ink.emblem} />
-          <path d="M25.4 26 H36 L37 31.6 H24.4 Z" fill={ink.mail} />
-          <g className={knight.head}>{look.helm ? <HelmedHead paint={paint} /> : <BareHead paint={paint} />}</g>
+          <rect x={22.8} y={48.4} width={16} height={2.6} rx={0.6} fill={STEEL_INK.leatherDark} />
+          <rect x={29.6} y={48.2} width={2.6} height={3} fill={STEEL_INK.steel} />
+          <path d="M25.4 26 H36 L37 31.6 H24.4 Z" fill={STEEL_INK.mail} />
+          <g>{look.helm ? <HelmedHead paint={paint} /> : <BareHead paint={paint} />}</g>
         </g>
         <Leg hipX={33} paint={paint} thigh={knight.legNear} shin={knight.shinNear} />
         <Arm shoulderX={33} paint={paint} upper={knight.armNear} fore={knight.foreNear} pauldron>
