@@ -19,9 +19,13 @@
 
 /* The field's bands: chaos units play right of the text column (about x 1080 to 1660 of the 1920 field), frost
    units left of it (about 280 to 820). Under 1024 px the screen shows only the field's middle, so each band
-   shrinks to two thirds about its own middle and moves there. */
+   shrinks to two thirds about its own middle and moves there. On a phone each band also stands up the screen,
+   its floor at about 60% of it, so the units play clear of the cards rising from below while the head holds
+   them alone; the hero's units stand low instead, the king under the middle node of the profession menu and
+   the golem under the right one, smaller, clear of the menu the hero card ends on. */
 @media (max-width: 1023.98px) {
-  .chaosBand {
+  .chaosBand,
+  .heroBand {
     transform: translateX(-410px) scale(0.66);
     transform-origin: 1370px 1000px;
   }
@@ -29,6 +33,21 @@
   .frostBand {
     transform: translateX(410px) scale(0.66);
     transform-origin: 550px 1000px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .chaosBand {
+    transform: translate(-410px, -350px) scale(0.66);
+  }
+
+  .frostBand {
+    transform: translate(410px, -350px) scale(0.66);
+  }
+
+  .heroBand {
+    transform: translate(-195px, 75px) scale(0.58);
+    transform-origin: 1130px 1000px;
   }
 }
 

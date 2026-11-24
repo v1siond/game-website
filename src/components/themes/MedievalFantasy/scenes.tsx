@@ -709,11 +709,14 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
   ]
 }
 
+/** The band a scene's units stand in (world.module.css): the hero's own, else its realm's. */
+const bandOf = ({ id, realm }: RealmScene): string => (id === 'hero' ? look.heroBand : realm === 'chaos' ? look.chaosBand : look.frostBand)
+
 /** A scene's field: its units in the 1920 by 1080 picture, cut from its foot to the screen. */
 function Field({ scene }: { scene: RealmScene }) {
   return (
     <svg className="block h-full w-full" viewBox={`0 0 ${FIELD.width} ${FIELD.height}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-      <g className={scene.realm === 'chaos' ? look.chaosBand : look.frostBand}>{SCENES[scene.id].figure(scene)}</g>
+      <g className={bandOf(scene)}>{SCENES[scene.id].figure(scene)}</g>
     </svg>
   )
 }
