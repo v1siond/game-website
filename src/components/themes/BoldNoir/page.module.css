@@ -2,12 +2,10 @@
    palette.ts). Fills are flat, depth comes from stacked flat layers and hard offset shadows, never a
    gradient. The text is plain HTML in normal flow over the fixed theatre; it is never scaled, faded or
    blurred, so it is opaque from its first frame. Every word sits on an opaque slab, speech box, red panel
-   or tag, so it reads on any frame of any place. Nothing moves on its own: a hover kicks a link out, a
-   pick plays the cut-in once. */
+   or tag, so it reads on any frame of any place. Nothing moves on its own: a hover kicks a link out. */
 
 .root {
   --snap: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --cut: cubic-bezier(0.7, 0, 0.2, 1);
   --crook: polygon(0 8px, 100% 0, calc(100% - 8px) 100%, 6px calc(100% - 10px));
   /* The keyboard focus ring (globals.css) in the one loud red, and the paper halo just outside it, so the
      pair stands out where the ring melts into a surface. */
@@ -137,32 +135,53 @@
   transform: translate3d(6px, -6px, 0) rotate(-1.5deg);
 }
 
-/* ---- ransom note lettering ---- */
+/* ---- the case's paper: the typed file, the index card ---- */
 
-.letter {
-  display: inline-block;
-  transform: translate3d(0, var(--y, 0), 0) rotate(var(--r, 0deg));
-}
-
-.letterInk {
-  background: var(--noir-ink);
-  color: var(--noir-paper);
-  outline: 2px solid var(--noir-paper);
-}
-
-.letterPaper {
-  background: var(--noir-paper);
+/* What is typed on the paper: the typewriter face, ink on the paper. */
+.typed {
+  font-family: var(--noir-type), 'Courier New', monospace;
+  letter-spacing: 0.02em;
   color: var(--noir-ink);
 }
 
-.letterRed {
-  background: var(--noir-red-plate);
-  color: var(--noir-paper);
+/* The case file: a sheet of paper with its folder's tab on top, a hard ink drop and a red rule under the
+   tab. The content inside stays level so it reads. */
+.file {
+  position: relative;
+  isolation: isolate;
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+  box-shadow: 8px 8px 0 var(--noir-ink), 8px 8px 0 3px var(--noir-red-plate);
 }
 
-/* A bare letter, no box, paper on the card's coal: the cut that keeps the word uneven. */
-.letterBare {
-  color: var(--noir-paper);
+.file::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 24px;
+  width: 38%;
+  height: 18px;
+  background: var(--noir-paper);
+  clip-path: polygon(0 100%, 8% 0, 92% 0, 100% 100%);
+}
+
+.file::after {
+  content: '';
+  position: absolute;
+  inset: 14px 0 auto;
+  height: 3px;
+  background: var(--noir-red-plate);
+}
+
+/* The index card: paper with the red head rule and the faint ruled lines of a card from the case's box. */
+.indexCard {
+  position: relative;
+  background:
+    linear-gradient(var(--noir-red-plate), var(--noir-red-plate)) 0 26px / 100% 3px no-repeat,
+    repeating-linear-gradient(to bottom, transparent 0 31px, color-mix(in srgb, var(--noir-ash) 35%, transparent) 31px 32px) 0 30px / 100% calc(100% - 30px) no-repeat,
+    var(--noir-paper);
+  color: var(--noir-ink);
+  box-shadow: 8px 8px 0 var(--noir-ink);
 }
 
 /* ---- the case bar: his initials, back to the top ---- */
@@ -200,7 +219,7 @@
   z-index: 1;
 }
 
-/* ---- the hero: the calling card and his lines, the wardrobe, then the menu, over the rooftop ---- */
+/* ---- the hero: the case file and his lines, the wardrobe, then the menu, over the street ---- */
 .hero {
   position: relative;
   min-height: 100svh;
@@ -211,7 +230,7 @@
   transform: rotate(-3deg);
 }
 
-/* ---- the profession menu: crooked slabs, the pick swells and tilts, the red jag behind it ---- */
+/* ---- the profession menu: crooked slabs, the pick swells and tilts, the red folder behind it ---- */
 
 .menuItem {
   transform: skewX(-10deg);
@@ -231,45 +250,18 @@
   transform: skewX(10deg);
 }
 
-.jag {
+.tab {
   transform: scale(0, 0.6);
   transition: transform 180ms var(--snap);
 }
 
-.menuItem:hover .jag,
-.menuItem:focus-visible .jag {
+.menuItem:hover .tab,
+.menuItem:focus-visible .tab {
   transform: scale(0.85, 0.85);
 }
 
-.menuItem[aria-checked='true'] .jag {
+.menuItem[aria-checked='true'] .tab {
   transform: scale(1, 1);
-}
-
-/* Him with the flat red silhouette offset behind (static, never animated). */
-.redShadow {
-  filter: drop-shadow(5px 3px 0 var(--noir-red));
-}
-
-/* The cut-in on a profession pick, once per pick: the red band and his eyes strip sweep across and out. */
-.cutBand {
-  animation: cutAcross 680ms var(--cut) both;
-}
-
-.cutStrip {
-  animation: cutAcross 680ms var(--cut) 60ms both;
-}
-
-@keyframes cutAcross {
-  0% {
-    transform: translate3d(-115%, 0, 0) skewY(-8deg);
-  }
-  32%,
-  68% {
-    transform: translate3d(0, 0, 0) skewY(-8deg);
-  }
-  100% {
-    transform: translate3d(115%, 0, 0) skewY(-8deg);
-  }
 }
 
 /* ---- a place: a tall head that holds the picture alone, then brings its title up, then the cards ---- */
@@ -296,7 +288,7 @@
   width: min(640px, 46vw);
 }
 
-/* ---- the end: the calling card over the wall it is pinned to ---- */
+/* ---- the end: the index card over the captain's desk ---- */
 .goal {
   position: relative;
   display: flex;
@@ -363,7 +355,7 @@
     width: 100%;
   }
 
-  /* The case closes and its stars hold for most of a screen before the calling card comes up over them. */
+  /* The case closes and its stars hold for most of a screen before the index card comes up over them. */
   .goal {
     padding-top: 130svh;
   }
@@ -371,7 +363,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .menuItem,
-  .jag,
+  .tab,
   .lift,
   .kick {
     transition: none;

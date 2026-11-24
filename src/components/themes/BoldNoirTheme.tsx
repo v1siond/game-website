@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { Special_Elite } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
@@ -11,7 +12,7 @@ import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from './shared/SkipLink'
 import { Stage, Theatre } from './shared/theatre/Stage'
 import { useTheatre } from './shared/theatre/useTheatre'
-import { CallingCardContact, CaseBar } from './BoldNoir/chrome'
+import { IndexCardContact, CaseBar } from './BoldNoir/chrome'
 import { RooftopHero } from './BoldNoir/hero'
 import { NOIR_VARS } from './BoldNoir/palette'
 import { LAYER_MOTION, scenesOf, type NoirScene } from './BoldNoir/scenes'
@@ -20,7 +21,7 @@ import page from './BoldNoir/page.module.css'
 
 // Bold Noir: his CV as one case of the 1947 detective game the world is drawn from, in its black and white
 // mode: ink, smoke, fog and paper, with one red for what is lit. The page keeps the rhythm of the Rockstar VI
-// site: a big hero (a street under the City Hall tower, his calling card with his name in cut-outs, the menu
+// site: a big hero (a street under the City Hall tower, his case file with his name typed on it, the menu
 // where he picks a profession), then every section of the shown profession is one full screen place of the
 // case that rises from dark, holds while its cards scroll over it, and gives way to the next: the crime
 // scene, the call box, the interrogation room, the drive, the foot chase, the newsstand, the jazz club, the
@@ -34,6 +35,10 @@ import page from './BoldNoir/page.module.css'
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
+
+// The world's typewriter face for what is typed on the case's paper: the main carries its --noir-type
+// variable and the world's css reads it.
+const noirType = Special_Elite({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--noir-type' })
 
 // A phone sees the middle of the canvas only, so the places stage their steps nearer its middle.
 const PHONE_QUERY = '(max-width: 767.98px)'
@@ -66,14 +71,14 @@ export default function BoldNoirTheme() {
         </Theatre>
       )}
       <CaseBar anchor={hero.anchor} />
-      <main id="main-content" ref={textRef} className={page.main}>
+      <main id="main-content" ref={textRef} className={`${page.main} ${noirType.variable}`}>
         <RooftopHero scene={hero} still={reduced} />
         <ProfessionRegion>
           {scenes.filter(hasSlot).map((scene) => (
             <PlaceSection key={scene.id} scene={scene} still={reduced} />
           ))}
         </ProfessionRegion>
-        <CallingCardContact scene={contact} still={reduced} />
+        <IndexCardContact scene={contact} still={reduced} />
       </main>
       <footer className={page.footer}>
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />

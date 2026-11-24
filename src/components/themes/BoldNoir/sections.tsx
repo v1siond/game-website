@@ -10,7 +10,7 @@ import { ProjectList } from '@/components/cv/ProjectList'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
-import { HitStar } from './backdrop'
+import { InkStamp } from './backdrop'
 import { BULLETS, BandPanel, CaseFile, CompanyTag, RankCard, ServiceSlab, TechSlab, crookOf } from './cards'
 import { LAYER_MOTION, type NoirScene } from './scenes'
 import page from './page.module.css'
@@ -134,7 +134,7 @@ function MuayThaiCards({ slot }: { slot: SlotOf<'muayThai'> }) {
           renderAchievement={(achievement, index) => (
             <span className="flex items-center gap-4">
               <span className="block h-12 w-12 flex-shrink-0" aria-hidden="true">
-                <HitStar className="h-full w-full" />
+                <InkStamp className="h-full w-full" />
               </span>
               <span className={`block flex-1 px-4 py-3 ${page.slab}`} style={crookOf(index)}>
                 {achievement}
