@@ -1,4 +1,4 @@
-import { ARRIVE_VIS, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, arrive, crossOf, playheadAt, sceneEnd, type SceneClock } from '@/lib/scroll/player'
+import { ARRIVE_VIS, IDLE_CLOCK, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, advance, arrive, crossOf, playheadAt, sceneEnd, type SceneClock } from '@/lib/scroll/player'
 
 describe('actionLengths', () => {
   it('gives every action at least the time to read it', () => {
@@ -83,5 +83,25 @@ describe('crossOf', () => {
   it('names the stage the page is in: the last one at least half risen', () => {
     expect(crossOf([1, 1, 0.6, 0.1]).lead).toBe(2)
     expect(crossOf([1, 0.4]).lead).toBe(0)
+  })
+})
+
+describe('advance', () => {
+  const script = [1500, 2000] as const
+
+  it('holds the first frame and asks for no frames until the scene arrives', () => {
+    expect(advance(IDLE_CLOCK, script, 0.2, 100)).toEqual({ clock: IDLE_CLOCK, play: { action: 0, t: 0, done: false }, playing: false })
+  })
+
+  it('plays on from the arrival and asks for the next frame while it runs', () => {
+    const { clock } = advance(IDLE_CLOCK, script, 1, 100)
+    const later = advance(clock, script, 0, 100 + 1500 + 1000)
+    expect(later.play.action).toBe(1)
+    expect(later.playing).toBe(true)
+  })
+
+  it('stops asking for frames once the end frame holds', () => {
+    const { clock } = advance(IDLE_CLOCK, script, 1, 100)
+    expect(advance(clock, script, 1, 10_000)).toEqual({ clock, play: sceneEnd(script), playing: false })
   })
 })

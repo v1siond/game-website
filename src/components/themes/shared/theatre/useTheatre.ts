@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_CLOCK, arrive, crossOf, playheadAt, sceneEnd, type Playhead, type SceneClock, type SceneScript } from '@/lib/scroll/player'
+import { IDLE_CLOCK, advance, crossOf, sceneEnd, type Playhead, type SceneClock, type SceneScript } from '@/lib/scroll/player'
 import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
@@ -93,9 +93,9 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
 /** A scene's playhead at `now`, its clock started once it has risen to `rise`; true in `playing` while it runs. */
 const playOf = (bound: Bound, rise: number, now: number): { play: Playhead; playing: boolean } => {
   if (!bound.script) return { play: restingPlay(undefined), playing: false }
-  bound.clock = arrive(bound.clock, rise, now)
-  const play = playheadAt(bound.script, bound.clock.startedAt === null ? 0 : now - bound.clock.startedAt)
-  return { play, playing: bound.clock.startedAt !== null && !play.done }
+  const { clock, play, playing } = advance(bound.clock, bound.script, rise, now)
+  bound.clock = clock
+  return { play, playing }
 }
 
 const show = (bound: Bound, visible: boolean): void => {

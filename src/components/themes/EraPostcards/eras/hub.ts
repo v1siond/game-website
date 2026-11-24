@@ -1,12 +1,14 @@
 import { HUB } from '../palette'
 import { clouds, defs, fx, fxAll, glow, linear, radial, rect, ridge, r1, stars, svg, tf } from '../draw'
 import { courier, joints, setPose, type Pose } from '../courier'
-import { clamp01, type Era } from './era'
+import { share, type Era } from './era'
+import type { Playhead } from '@/lib/scroll/player'
 
 // The Chronoport, the hub of every era (the hero), and its night twin, the beacon (contact): the ring of
-// the time portal over its platform, between floating isles. In the hero the swirl turns, three crates
-// float up and spin, and he looks up at the ring and reaches for it; at the beacon the ring stands open, a
-// beam of light climbs out of it and he raises a hand to signal.
+// the time portal over its platform, between floating isles; the swirl turns with the scroll. The hero plays
+// two actions as the page opens: three crates float up off the platform and spin, then he looks up at the
+// ring and reaches for it. The beacon plays two: a beam of light climbs out of the open ring, then he raises
+// a hand to signal.
 
 const ring = (id: string, open: boolean): string => `
   ${defs(
@@ -57,10 +59,14 @@ const CRATES = [
   { id: 'bob-2', x: 1300, y: 760, size: 40 },
 ] as const
 
-// He stands on the middle pad, under the ring.
-const heroPose = (p: number): Partial<Pose> => ({ x: 800, y: 878, scale: 1.4, head: -8 - p * 10, lean: -p * 6, shF: 12 + p * 40, elF: 14 + p * 60, scarf: p * 14 })
+// He stands on the middle pad, under the ring, and reaches up `t` of the way.
+const heroPose = (t: number): Partial<Pose> => ({ x: 800, y: 878, scale: 1.4, head: -8 - t * 14, lean: -t * 6, shF: 12 + t * 120, elF: 14 + t * 20, scarf: t * 14 })
+
+/** Crate i floated up `t` of the way. */
+const bobOf = (i: number, t: number): string => `translate(${CRATES[i].x} ${CRATES[i].y}) translate(0 ${r1(-t * (60 + i * 40))}) rotate(${r1(t * (i % 2 ? 30 : -24))})`
 
 export const hero: Era = {
+  script: [1600, 2000],
   build: () => ({
     sky: svg(`${defs(linear('h-sky', [[0, HUB.skyTop], [0.45, HUB.skyMid], [0.75, HUB.skyLow], [1, HUB.skyHorizon]]))}${rect('url(#h-sky)')}${stars(11, 160, 520, HUB.star)}
       ${glow('h-sun', 800, 720, 520, HUB.sun, 0.7)}
@@ -69,7 +75,7 @@ export const hero: Era = {
     far: svg(`${ridge(13, { y: 700, amp: 70, fill: HUB.ridgeFar })}${ridge(14, { y: 760, amp: 50, fill: HUB.ridgeNear })}${isles(HUB.isle, HUB.isleLit)}`),
     mid: svg(ring('h', false)),
     near: svg(`${platform('h')}${CRATES.map(({ id, x, y, size }) => crate(id, x, y, size)).join('')}`),
-    figure: svg(`<g data-worlds-figure="">${courier(heroPose(0))}</g>`),
+    figure: svg(`<g data-worlds-figure="">${courier(heroPose(1))}</g>`),
     fg: svg(`<path d="M-200,1000 L-200,820 Q60,800 180,880 Q260,940 360,1000 Z" fill="${HUB.ground}"/><path d="M1800,1000 L1800,800 Q1500,820 1420,900 Q1360,960 1300,1000 Z" fill="${HUB.ground}"/>
       <path d="M-200,860 Q300,990 700,1010" stroke="${HUB.ringCyan}" stroke-width="3" fill="none" opacity="0.5"/>`),
   }),
@@ -77,37 +83,42 @@ export const hero: Era = {
     const j = joints(stage)
     const swirl = fx(stage, 'swirl')
     const bobs = fxAll(stage, 'bob-')
-    return (p) => {
+    return (p, play) => {
       tf(swirl, `rotate(${r1(p * 220)} 800 470)`)
-      bobs.forEach((node, i) => tf(node, `translate(${CRATES[i].x} ${CRATES[i].y}) translate(0 ${r1(-p * (60 + i * 40))}) rotate(${r1(p * (i % 2 ? 30 : -24))})`))
-      setPose(j, heroPose(p))
+      bobs.forEach((node, i) => tf(node, bobOf(i, share(play, 0))))
+      setPose(j, heroPose(share(play, 1)))
     }
   },
 }
 
-const beaconPose = (p: number): Partial<Pose> => {
-  const raise = clamp01(p * 1.8)
-  return { x: 800, y: 878, scale: 1.4, shF: 12 + raise * 160, elF: 14 - raise * 10, head: -raise * 14, scarf: raise * 20 }
-}
+// He raises a hand to signal, `raise` of the way.
+const beaconPose = (raise: number): Partial<Pose> => ({ x: 800, y: 878, scale: 1.4, shF: 12 + raise * 160, elF: 14 - raise * 10, head: -raise * 14, scarf: raise * 20 })
+
+/** The beam out of the ring, climbed `t` of the way. */
+const beamOf = (t: number): string => `translate(800 880) scale(${r1(0.4 + t * 0.6)} ${r1(t)}) translate(-800 -880)`
+
+const beaconAt = (play: Playhead): { beam: number; raise: number } => ({ beam: share(play, 0), raise: share(play, 1) })
 
 export const beacon: Era = {
+  script: [1800, 1600],
   build: () => ({
     sky: svg(`${defs(linear('bc-sky', [[0, HUB.nightTop], [0.6, HUB.nightMid], [1, HUB.nightLow]]), linear('bc-aur', [[0, HUB.aurora, 0], [0.5, HUB.aurora, 0.32], [1, HUB.ringCyan, 0]], [0, 0, 1, 0]))}${rect('url(#bc-sky)')}${stars(91, 300, 700, HUB.nightStar)}
       <g data-fx="aurora"><path d="M-400,260 Q0,140 400,240 T1200,220 T2000,240 L2000,320 Q1600,300 1200,320 T400,330 T-400,340 Z" fill="url(#bc-aur)"/></g>`),
     far: svg(`${ridge(92, { y: 760, amp: 60, fill: HUB.nightRidge })}${isles(HUB.nightIsle, HUB.ringCyan)}`),
-    mid: svg(`${defs(linear('bc-beam', [[0, HUB.beam, 0], [0.5, HUB.beamCore, 0.75], [1, HUB.beam, 0]], [0, 0, 1, 0]))}<g data-fx="beam" transform="translate(800 880) scale(0.4 0) translate(-800 -880)"><rect x="660" y="-200" width="280" height="1080" fill="url(#bc-beam)" opacity="0.7"/><rect x="760" y="-200" width="80" height="1080" fill="url(#bc-beam)"/></g>${ring('bc', true)}`),
+    mid: svg(`${defs(linear('bc-beam', [[0, HUB.beam, 0], [0.5, HUB.beamCore, 0.75], [1, HUB.beam, 0]], [0, 0, 1, 0]))}<g data-fx="beam" transform="${beamOf(1)}"><rect x="660" y="-200" width="280" height="1080" fill="url(#bc-beam)" opacity="0.7"/><rect x="760" y="-200" width="80" height="1080" fill="url(#bc-beam)"/></g>${ring('bc', true)}`),
     near: svg(platform('bc')),
-    figure: svg(courier(beaconPose(0))),
+    figure: svg(courier(beaconPose(1))),
     fg: svg(`<path d="M-200,1000 L-200,840 Q80,820 200,900 Q260,950 320,1000 Z" fill="${HUB.nightGround}"/><path d="M1800,1000 L1800,820 Q1500,840 1420,910 Q1370,960 1330,1000 Z" fill="${HUB.nightGround}"/>`),
   }),
   bind: (stage) => {
     const j = joints(stage)
     const [beam, aurora, swirl] = ['beam', 'aurora', 'swirl'].map((name) => fx(stage, name))
-    return (p) => {
-      tf(beam, `translate(800 880) scale(${r1(0.4 + p * 0.8)} ${r1(clamp01(p * 1.6))}) translate(-800 -880)`)
+    return (p, play) => {
+      const { beam: climbed, raise } = beaconAt(play)
+      tf(beam, beamOf(climbed))
       tf(aurora, `translate(${r1(-p * 300)} 0)`)
       tf(swirl, `rotate(${r1(-p * 260)} 800 470)`)
-      setPose(j, beaconPose(p))
+      setPose(j, beaconPose(raise))
     }
   },
 }

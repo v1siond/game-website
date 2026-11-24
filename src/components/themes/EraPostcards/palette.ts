@@ -199,13 +199,12 @@ export const TOMB = {
   goldDim: '#c99a3c',
   columnNear: '#3b200d',
   columnMid: '#331a0b',
-  vault: '#3a2410',
-  vaultEdge: '#d9a441',
-  vaultLight: '#ffe7a3',
-  ring: '#7a5a26',
+  tablet: '#2a1608',
   glyph: '#5ff2d8',
-  rope: '#c9a06a',
-  guardLight: '#ffe7a3',
+  torchGlow: '#ffb02e',
+  stick: '#6b4423',
+  flame: '#ffb02e',
+  flameCore: '#fff3c4',
   mote: '#ffe7a3',
   frame: '#120803',
   sand: '#e8b866',
@@ -247,7 +246,7 @@ export const MARKET = {
   awningEdge: '#ffcf6a',
 } as const
 
-/** Projects: the long wall at sunset, its towers, the searchlight and the wanted stars of the chase. */
+/** Projects: the long wall at sunset, its towers and the dragon kite he flies from the walkway. */
 export const WALL = {
   skyTop: '#26093f',
   skyMid: '#86164e',
@@ -266,11 +265,9 @@ export const WALL = {
   merlon: '#4a1a28',
   merlonLit: '#ff9a6b',
   walkEdge: '#ffb07a',
-  gap: '#0c0310',
-  star: '#ffd36b',
-  starOff: '#3a1430',
-  starEdge: '#2a0a26',
-  search: '#fff2b0',
+  kite: '#d8283c',
+  kiteEdge: '#ffcf4a',
+  line: '#fff2d6',
   branch: '#14030f',
   petal: '#ffb3cf',
 } as const
