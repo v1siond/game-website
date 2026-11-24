@@ -38,6 +38,9 @@ const GOLD: Tone = { base: FS.gold, shade: FS.orange }
 // of the same school in the red gi with the long swept back blond hair, clean shaven and bare headed.
 export type Who = 'hero' | 'partner'
 
+/** How the hair (or the mask) is drawn over the head. */
+type HairStyle = 'spiky' | 'swept' | 'shaved' | 'mohawk' | 'topknot' | 'crew' | 'mask'
+
 interface Look {
   skin: Tone
   skinFar: Tone
@@ -45,8 +48,18 @@ interface Look {
   giFar: Tone
   wrap: Tone
   hair: string
-  beard: boolean
+  hairStyle: HairStyle
+  /** The beard's colour; none clean shaven. */
+  beard: string | null
+  /** The bare chested fighter's trunks, their waistband, his gloves and the bands on his arms. */
+  trunks: Tone
+  sash: Tone
+  gloves: Tone
+  armband: Tone
 }
+
+// The fight kit a look starts from: blue trunks on a gold band, red gloves, red bands on the arms.
+const KIT = { trunks: SHORTS, sash: GOLD, gloves: RED, armband: RED }
 
 const LOOKS: Record<Who, Look> = {
   hero: {
@@ -56,7 +69,9 @@ const LOOKS: Record<Who, Look> = {
     giFar: { base: FS.giShade, shade: FS.giDeep },
     wrap: RED,
     hair: HERO_IDENTITY.hair,
-    beard: true,
+    hairStyle: 'spiky',
+    beard: HERO_IDENTITY.beard,
+    ...KIT,
   },
   partner: {
     skin: { base: FS.rivalSkin, shade: FS.rivalSkinShade },
@@ -65,7 +80,9 @@ const LOOKS: Record<Who, Look> = {
     giFar: { base: FS.rivalGiShade, shade: FS.rivalGiDeep },
     wrap: { base: FS.belt, shade: INK },
     hair: FS.rivalHair,
-    beard: false,
+    hairStyle: 'swept',
+    beard: null,
+    ...KIT,
   },
 }
 
@@ -93,6 +110,34 @@ const COSTUME: Record<Who, Record<Profession, Costume>> = {
     fighter: { ...LOOKS.hero, ...GEAR.fighter },
   },
   partner: { engineer: PARTNER, drummer: PARTNER, fighter: PARTNER },
+}
+
+// ---- the rivals of the tour: archetypes of the genre in costumes of our own, on the same rig ----
+
+export type Rival = 'school' | 'brawler' | 'kickboxer' | 'wrestler' | 'master' | 'commando' | 'dancer' | 'nakMuay'
+
+const tone = (base: string, shade: string): Tone => ({ base, shade })
+const skinOf = (base: string, shade: string, deep: string) => ({ skin: tone(base, shade), skinFar: tone(shade, deep) })
+const dressOf = (base: string, shade: string, deep: string) => ({ gi: tone(base, shade), giFar: tone(shade, deep) })
+const NO_WRAP = tone(FS.belt, INK)
+
+const RIVALS: Record<Rival, Costume> = {
+  // The rival of his own school: the red gi, the swept blond hair.
+  school: PARTNER,
+  // The street brawler: bare chested in torn jeans, wrapped fists, a red mohawk.
+  brawler: { ...KIT, ...skinOf('#e2a27a', '#b06c48', FS.skinDeep), ...dressOf('#3b5fa8', '#26407a', '#162650'), wrap: tone('#e8e0c8', '#9a927a'), hair: '#d23a2a', hairStyle: 'mohawk', beard: '#6a3a22', top: 'bare', legs: 'gi', head: 'none', hands: 'wraps', armband: tone('#e8e0c8', '#9a927a') },
+  // The kickboxer: red trunks on a white band, black gloves, the head shaved.
+  kickboxer: { ...KIT, ...skinOf('#8a5434', '#5e3219', '#3a1e0e'), ...dressOf(FS.gi, FS.giShade, FS.giDeep), wrap: NO_WRAP, hair: '#2a1a12', hairStyle: 'shaved', beard: null, top: 'bare', legs: 'shorts', head: 'none', hands: 'gloves', trunks: tone(FS.p2, FS.p2Dark), sash: tone(FS.gi, FS.giShade), gloves: tone('#2a2a36', FS.belt), armband: tone(FS.gi, FS.giShade) },
+  // The masked wrestler: green trunks, the green and gold mask, taped hands.
+  wrestler: { ...KIT, ...skinOf('#d99a6c', '#a86a44', FS.skinDeep), ...dressOf(FS.gi, FS.giShade, FS.giDeep), wrap: tone('#e8e0c8', '#9a927a'), hair: '#1f9a4a', hairStyle: 'mask', beard: null, top: 'bare', legs: 'shorts', head: 'none', hands: 'wraps', trunks: tone('#1f9a4a', '#126630'), sash: GOLD, armband: GOLD },
+  // The old master: the plum gi, the white top knot and long white beard.
+  master: { ...KIT, ...skinOf('#e9b890', '#b98660', FS.skinDeep), ...dressOf('#6a2a7a', '#46185a', '#2a0c3a'), wrap: NO_WRAP, hair: '#eeeae0', hairStyle: 'topknot', beard: '#eeeae0', top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' },
+  // The commando: olive fatigues, the crew cut, black wraps.
+  commando: { ...KIT, ...skinOf('#e8b48c', '#b8805a', FS.skinDeep), ...dressOf('#6b7a3a', '#4a5626', '#2e3616'), wrap: NO_WRAP, hair: '#c98a3a', hairStyle: 'crew', beard: null, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' },
+  // The dancer: bare chested in loose white trousers, the black top knot, bare hands.
+  dancer: { ...KIT, ...skinOf('#a8683e', '#7a4424', '#4a2410'), ...dressOf(FS.gi, FS.giShade, FS.giDeep), wrap: tone('#ffd23f', FS.orange), hair: '#15100e', hairStyle: 'topknot', beard: '#15100e', top: 'bare', legs: 'gi', head: 'none', hands: 'wraps', armband: tone('#ffd23f', FS.orange) },
+  // The nak muay of the temple: blue trunks, blue gloves, the mongkhon, the head shaved close.
+  nakMuay: { ...KIT, ...skinOf('#c9895a', '#98603a', FS.skinDeep), ...dressOf(FS.gi, FS.giShade, FS.giDeep), wrap: NO_WRAP, hair: '#1a120e', hairStyle: 'crew', beard: null, top: 'bare', legs: 'shorts', head: 'mongkhon', hands: 'gloves', trunks: tone('#1a8ad6', '#0e5a92'), gloves: tone('#1a8ad6', '#0e5a92'), armband: tone('#1a8ad6', '#0e5a92') },
 }
 
 // ---- geometry ----
@@ -182,8 +227,8 @@ function Hand({ arm, costume, skin }: { arm: ArmPose; costume: Costume; skin: To
   if (costume.hands === 'gloves') {
     return (
       <>
-        <Limb from={plus(arm.h, u, -5)} to={plus(arm.h, u, -1)} w1={9.4} w2={9.4} tone={GOLD} />
-        <Round at={plus(arm.h, u, 2.4)} r={7.2} tone={RED} />
+        <Limb from={plus(arm.h, u, -5)} to={plus(arm.h, u, -1)} w1={9.4} w2={9.4} tone={costume.sash} />
+        <Round at={plus(arm.h, u, 2.4)} r={7.2} tone={costume.gloves} />
         <circle cx={r1(arm.h[0] + u[0] * 2.4 - 2.4)} cy={r1(arm.h[1] + u[1] * 2.4 - 2.6)} r={1.8} fill={FS.flash} opacity={0.75} />
       </>
     )
@@ -236,7 +281,7 @@ function Arm({ arm, costume, far }: { arm: ArmPose; costume: Costume; far: boole
       <Limb from={arm.s} to={arm.e} w1={10.4} w2={8.6} tone={skin} />
       <Limb from={arm.e} to={arm.h} w1={8.8} w2={7.4} tone={skin} />
       {costume.top === 'gi' && <TornSleeve arm={arm} tone={far ? costume.giFar : costume.gi} />}
-      {costume.top === 'bare' && <Limb from={lerp(arm.s, arm.e, 0.3)} to={lerp(arm.s, arm.e, 0.42)} w1={11.4} w2={11} tone={RED} />}
+      {costume.top === 'bare' && <Limb from={lerp(arm.s, arm.e, 0.3)} to={lerp(arm.s, arm.e, 0.42)} w1={11.4} w2={11} tone={costume.armband} />}
       <Hand arm={arm} costume={costume} skin={skin} />
     </g>
   )
@@ -251,7 +296,7 @@ function Leg({ leg, hip, costume, far }: { leg: LegPose; hip: Pt; costume: Costu
         <Limb from={hip} to={leg.k} w1={13} w2={10.6} tone={skin} />
         <Limb from={leg.k} to={leg.a} w1={10.4} w2={7.6} tone={skin} />
         {foot}
-        <Limb from={hip} to={lerp(hip, leg.k, 0.55)} w1={19} w2={17} tone={far ? { base: SHORTS.shade, shade: FS.panel } : SHORTS} />
+        <Limb from={hip} to={lerp(hip, leg.k, 0.55)} w1={19} w2={17} tone={far ? { base: costume.trunks.shade, shade: FS.panel } : costume.trunks} />
       </g>
     )
   }
@@ -279,12 +324,12 @@ function Torso({ frame, costume }: { frame: Frame; costume: Costume }) {
         <path
           d={`M${pt([chest[0] - 7, chest[1]])} Q${pt([chest[0] - 1, chest[1] + 5])} ${pt([chest[0] + 7, chest[1] + 1])} M${pt(lerp(n, h, 0.5))} L${pt(lerp(n, h, 0.82))} M${pt([h[0] - 5, h[1] - 18])} H${r1(h[0] + 5)}`}
           fill="none"
-          stroke={HERO_IDENTITY.skinShade}
+          stroke={costume.skin.shade}
           strokeWidth={1.4}
           strokeLinecap="round"
         />
-        <Limb from={[h[0] - 12, h[1] - 4]} to={[h[0] + 12, h[1] - 4]} w1={5.6} w2={5.6} tone={GOLD} />
-        <Limb from={[h[0] - 11, h[1] + 1]} to={[h[0] + 11, h[1] + 1]} w1={8} w2={8} tone={SHORTS} />
+        <Limb from={[h[0] - 12, h[1] - 4]} to={[h[0] + 12, h[1] - 4]} w1={5.6} w2={5.6} tone={costume.sash} />
+        <Limb from={[h[0] - 11, h[1] + 1]} to={[h[0] + 11, h[1] + 1]} w1={8} w2={8} tone={costume.trunks} />
       </g>
     )
   }
@@ -416,6 +461,46 @@ function SweptHair({ color, wind }: { color: string; wind: number }) {
   )
 }
 
+// His own short dark spiky hair.
+const SPIKY = 'M-9 2 C-10 -6 -6 -12 1 -12.5 L3 -15.4 L4.2 -12.2 L7.2 -13.8 L7.6 -10.6 L10.2 -10 C9.6 -7 8.6 -6 7 -5.4 C3 -7 -2 -6 -4 -3 L-5 2 Z'
+// The skull's cap, the line a short cut follows.
+const CAP = 'M-8.6 1 C-10 -6 -6 -11.6 1 -11.8 C6 -11.8 9.4 -9 10 -6 C6 -7.6 0 -7.4 -4 -4.4 L-5 1 Z'
+
+function Ink({ d, fill }: { d: string; fill: string }) {
+  return <path d={d} fill={fill} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
+}
+
+// Each hair style (or the wrestler's mask) over the head, in the look's hair colour.
+const HAIR: Record<HairStyle, (color: string, wind: number) => ReactNode> = {
+  spiky: (color) => <Ink d={SPIKY} fill={color} />,
+  swept: (color, wind) => <SweptHair color={color} wind={wind} />,
+  shaved: (color) => <path d={CAP} fill={color} opacity={0.35} />,
+  crew: (color) => <Ink d="M-8.8 0 C-10 -7 -7 -12.6 1 -12.8 L9.6 -11.6 C10.4 -9 10 -7 9.6 -6 C6 -7.6 0 -7.4 -4 -4.4 L-5 0 Z" fill={color} />,
+  mohawk: (color) => (
+    <>
+      <path d={CAP} fill={color} opacity={0.3} />
+      <Ink d="M-6 -6 L-10 -14 L-4 -11 L-3 -19 L1 -12.6 L4 -19 L5.4 -11.8 L10 -15 L8.6 -8 C4 -10.6 -2 -10 -6 -6 Z" fill={color} />
+    </>
+  ),
+  topknot: (color) => (
+    <>
+      <Ink d={CAP} fill={color} />
+      <Ink d="M-6 -12 C-9 -18 -2 -21 0 -16 C1 -13 -2 -11 -6 -12 Z" fill={color} />
+    </>
+  ),
+  mask: (color) => (
+    <>
+      <Ink d="M-8.6 2 C-10 -7 -5 -12.4 1 -12.4 C7 -12.4 10.4 -8 9.8 -2 L10 4 C8 6 6 7 5 7 C3 7 2 6 1.6 4.4 C-1 8 -5 9 -8 6 Z" fill={color} />
+      <path d="M1 -12.4 C-1 -6 -1 0 1.6 4.4" fill="none" stroke={FS.gold} strokeWidth={2} />
+      <ellipse cx={5.6} cy={-0.6} rx={3.4} ry={3} fill={FS.gold} stroke={INK} strokeWidth={1} />
+    </>
+  ),
+}
+
+function Hair({ costume, wind }: { costume: Costume; wind: number }) {
+  return <>{HAIR[costume.hairStyle](costume.hair, wind)}</>
+}
+
 // The head in three quarter view facing right: the ear, the heavy brow over the oval eye, the nose. Him
 // with the spiky short hair and the full beard over the jaw and round the mouth; the partner clean
 // shaven under the swept back hair.
@@ -437,7 +522,7 @@ function Head({ frame, costume }: { frame: Frame; costume: Costume }) {
       {costume.beard && (
         <path
           d="M-0.8 -2 L0.8 -2 C1.5 1.5 4 3 6.6 3.2 C7.6 3 8.6 3.3 9.6 4 L9.4 5.2 C9 9 5 12 0.5 11.8 C-3 11.5 -5.2 8 -4.6 3 Z"
-          fill={HERO_IDENTITY.beard}
+          fill={costume.beard}
           stroke={INK}
           strokeWidth={1.1}
           strokeLinejoin="round"
@@ -445,17 +530,7 @@ function Head({ frame, costume }: { frame: Frame; costume: Costume }) {
       )}
       <path d="M6 6.4 L8.8 6.2" stroke={skin.shade} strokeWidth={1.1} strokeLinecap="round" />
       <ellipse cx={-2.6} cy={0.8} rx={2} ry={2.8} fill={skin.base} stroke={INK} strokeWidth={1.1} />
-      {costume.beard ? (
-        <path
-          d="M-9 2 C-10 -6 -6 -12 1 -12.5 L3 -15.4 L4.2 -12.2 L7.2 -13.8 L7.6 -10.6 L10.2 -10 C9.6 -7 8.6 -6 7 -5.4 C3 -7 -2 -6 -4 -3 L-5 2 Z"
-          fill={costume.hair}
-          stroke={INK}
-          strokeWidth={1.2}
-          strokeLinejoin="round"
-        />
-      ) : (
-        <SweptHair color={costume.hair} wind={frame.wind} />
-      )}
+      <Hair costume={costume} wind={frame.wind} />
       <Headgear costume={costume} />
       <path d="M3 -3.4 L7.8 -2.2" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
       <ellipse cx={5.6} cy={-0.4} rx={1.1} ry={1.7} fill={HERO_IDENTITY.eyes} />
@@ -675,15 +750,17 @@ interface ScrubFighterProps {
   profession: Profession
   poses: readonly FighterPose[]
   who?: Who
+  /** The rival of the round this partner is dressed as; none: the rival of his own school. */
+  rival?: Rival
   /** The partner stands facing him, the strip mirrored. */
   mirror?: boolean
 }
 
 /** Him or his partner in a theatre scene: an SVG element one cell big (160 by 170), placed by its parent. The
  *  scene draws the energy waves itself, so they can meet in the middle. */
-export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who = 'hero', mirror = false }: ScrubFighterProps) {
+export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who = 'hero', rival, mirror = false }: ScrubFighterProps) {
   const clip = `fs-${useId().replace(/:/g, '')}`
-  const costume = COSTUME[who][profession]
+  const costume = rival ? RIVALS[rival] : COSTUME[who][profession]
   const facing = mirror ? `translate(${CELL.width} 0) scale(-1 1)` : undefined
   return (
     <svg viewBox={`0 0 ${CELL.width} ${CELL.height}`} width={CELL.width} height={CELL.height} overflow="visible" aria-hidden="true" focusable="false">

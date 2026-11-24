@@ -4,7 +4,6 @@ import { useMemo, type ComponentType } from 'react'
 import { Alfa_Slab_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionId, type SectionSlot } from '@/lib/cv/sectionPlan'
@@ -36,9 +35,11 @@ const fsFace = Alfa_Slab_One({
 // hero is the versus splash (./FighterSelect/versus) and the select grid with the player one cursor
 // (./selector) on the castle rooftop. Then each section is a full screen stage of the arcade tour that rises
 // from the dark, holds while its arcade screen scrolls over it and sinks as the next rises (the shared
-// theatre on the scroll stage engine), and on it he fights the section's bout, one beat per card
-// (./FighterSelect/theatre). Contact is the win quote over the temple ring (./challenger). Under reduced
-// motion every section carries its own stage, still at its settled frame.
+// theatre on the scroll stage engine), and on it he fights that round's rival on that round's stage, one kind
+// of the genre's moves per round, played by the shared scene player at its own pace (./FighterSelect/theatre);
+// below lg a section's own screen is 130svh, so the round plays clear of its cards. Contact is the win quote
+// over the castle rooftop (./challenger). Under reduced motion every section carries its own stage, still at
+// its last frame.
 //
 // The page stands on the select screen's deep blue under CRT scanlines. The root carries the palette as
 // --fs-* variables (the one inline style, variables only) and clips sideways overflow with overflow-x:
@@ -75,7 +76,7 @@ function TourSection({ scene, profession, labels, still }: SectionProps) {
   return (
     <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
       {still && <TourStage scene={scene} profession={profession} settled />}
-      <div className="min-h-[100svh]" />
+      <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
       <div className={COLUMN}>
         <ArcadePanel accent={accent} title={labels.sections[scene.slot.titleKey]} id={id}>
           <Cards slot={scene.slot} />
@@ -90,12 +91,11 @@ export default function FighterSelectTheme() {
   const view = useWorldView()
   const labels = useLabels()
   const { professionalSummary } = useCVData()
-  const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
 
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
-    [view.sections, professionalSummary.bio, labels, highlights, active],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, active),
+    [view.sections, professionalSummary.bio, labels, active],
   )
   const { theatreRef, textRef } = useTheatre(scenes, TOUR_MOTION, reduced)
   const gates = scenes.filter((scene): scene is TourScene & { slot: SectionSlot } => scene.slot !== null)

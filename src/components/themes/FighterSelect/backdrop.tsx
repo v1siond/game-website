@@ -3,14 +3,16 @@
 import type { ReactNode } from 'react'
 import { FS } from './palette'
 
-// The arcade tour's stages, one country's stage after the next, drawn on one 1600 by 900 canvas for the
-// theatre's scenes (theatre.tsx): the castle rooftop under the moon behind his entrance and the bonus
-// stage; the street market at noon, its crowd round the stalls and a rider, behind his jobs, his
-// move list and his services; the harbour at sunset with the crowd dancing on the yacht's deck behind his
-// projects, ventures and bands; the temple ring with its crowd behind the Muay Thai record and the win
-// quote. Every stage stands still: only the scroll moves the theatre.
+// The arcade tour's stages, a place of its own for every round, drawn on one 1600 by 900 canvas for the
+// theatre's scenes (theatre.tsx), each with its own crowd: the castle rooftop under the moon for his
+// entrance and the win; the dojo hall with its students kneeling along the wall (About); the street market
+// at noon (Work); the factory floor under the crane, the workers on the gantry (Tech Stack); the subway
+// platform with the train in and the riders at its windows (Services); the harbour at sunset, the crowd on
+// the yacht's deck (Projects); the neon plaza at night under the signs (Ventures); the concert stage, the
+// crowd's hands up at the front (Bands); the temple ring (Muay Thai). Every stage stands still: only the
+// scroll moves the theatre.
 
-export type Zone = 'castle' | 'market' | 'harbour' | 'temple'
+export type Zone = 'castle' | 'dojo' | 'market' | 'factory' | 'subway' | 'harbour' | 'plaza' | 'concert' | 'temple'
 
 export const W = 1600
 export const H = 900
@@ -192,10 +194,127 @@ const TEMPLE = (
   </>
 )
 
+// The dojo hall: paper screens, the scroll on the far wall, the wooden floor, the students kneeling in a row.
+const DOJO = (
+  <>
+    <rect width={W} height={H} fill="#e8d3a6" />
+    {[0, 320, 640, 960, 1280].map((x) => (
+      <g key={x}>
+        <rect x={x + 10} y={120} width={300} height={440} fill="#f6ecd2" stroke="#5a3a1e" strokeWidth={10} />
+        <path d={`M${x + 110} 120 V560 M${x + 210} 120 V560 M${x + 10} 266 H${x + 310} M${x + 10} 412 H${x + 310}`} stroke="#5a3a1e" strokeWidth={5} />
+      </g>
+    ))}
+    <rect y={80} width={W} height={40} fill="#5a3a1e" />
+    <rect x={720} y={170} width={160} height={300} fill="#fbf6e8" stroke={FS.ink} strokeWidth={5} />
+    <circle cx={800} cy={300} r={52} fill="none" stroke={FS.ink} strokeWidth={14} strokeDasharray="250 80" />
+    <rect y={560} width={W} height={340} fill="#a8743e" />
+    {Array.from({ length: 12 }, (_, k) => (
+      <path key={k} d={`M${k * 150 - 40} 560 L${k * 150 - 200} 900`} stroke="#7a5228" strokeWidth={4} />
+    ))}
+    <path d="M0 560 H1600" stroke={FS.ink} strokeWidth={5} />
+    <Crowd groups={[[40, 6], [1180, 6]]} base={600} scale={1.5} />
+  </>
+)
+
+// The factory floor: girders, the crane's hook over the floor, the furnace glow, the workers on the gantry.
+const FACTORY = (
+  <>
+    <rect width={W} height={H} fill="#2a2e3a" />
+    <rect x={1080} y={260} width={360} height={300} fill="#ff7a1a" opacity={0.85} />
+    <rect x={1100} y={280} width={320} height={260} fill="#ffcf4a" opacity={0.7} />
+    {[100, 500, 900, 1300].map((x) => (
+      <path key={x} d={`M${x} 0 V560 M${x + 60} 0 V560 M${x} 80 L${x + 60} 160 L${x} 240 L${x + 60} 320 L${x} 400 L${x + 60} 480`} stroke="#5b6078" strokeWidth={8} fill="none" />
+    ))}
+    <rect y={300} width={W} height={24} fill="#4a4e60" stroke={FS.ink} strokeWidth={4} />
+    <path d="M740 0 V180 M740 180 Q700 230 740 250 Q780 230 760 200" stroke={FS.ink} strokeWidth={8} fill="none" />
+    <Crowd groups={[[60, 5], [560, 4]]} base={300} scale={1.3} />
+    <rect y={580} width={W} height={320} fill="#4a4a52" />
+    {Array.from({ length: 10 }, (_, k) => (
+      <path key={k} d={`M${k * 180} 580 L${k * 180 - 140} 900`} stroke="#3a3a40" strokeWidth={4} />
+    ))}
+    <path d="M0 580 H1600" stroke={FS.ink} strokeWidth={5} />
+    <path d="M0 596 H1600" stroke={FS.gold} strokeWidth={10} strokeDasharray="60 40" />
+  </>
+)
+
+// The subway platform: the tiled wall, the train in with its riders at the windows, the yellow edge line.
+const SUBWAY = (
+  <>
+    <rect width={W} height={H} fill="#d8dcc8" />
+    {Array.from({ length: 20 }, (_, k) => (
+      <path key={k} d={`M0 ${40 + k * 28} H1600`} stroke="#b8bca8" strokeWidth={2} />
+    ))}
+    <rect x={60} y={260} width={1480} height={340} rx={30} fill="#9aa4b8" stroke={FS.ink} strokeWidth={6} />
+    <path d="M60 330 H1540" stroke={FS.p2} strokeWidth={14} />
+    {[140, 460, 780, 1100, 1420].map((x) => (
+      <g key={x}>
+        <rect x={x - 30} y={360} width={160} height={110} rx={10} fill="#2a3448" stroke={FS.ink} strokeWidth={4} />
+        <CrowdGroup x={x + 4} base={470} count={3} gap={44} scale={1.3} i={x} />
+      </g>
+    ))}
+    <rect y={600} width={W} height={300} fill="#8a8e96" />
+    <path d="M0 600 H1600" stroke={FS.ink} strokeWidth={5} />
+    <path d="M0 620 H1600" stroke={FS.gold} strokeWidth={16} />
+  </>
+)
+
+// The neon plaza at night: the towers, the signs lit, the wet street, the crowd under the signs.
+const PLAZA = (
+  <>
+    <rect width={W} height={H} fill="#0a0a2a" />
+    {[[0, 220], [240, 140], [520, 260], [860, 120], [1120, 200], [1380, 160]].map(([x, y]) => (
+      <rect key={x} x={x} y={y} width={240} height={600} fill="#161640" stroke="#24245a" strokeWidth={4} />
+    ))}
+    <rect x={260} y={200} width={200} height={70} rx={14} fill="none" stroke={FS.p2} strokeWidth={10} />
+    <rect x={880} y={170} width={200} height={90} rx={45} fill="none" stroke={FS.cyan} strokeWidth={10} />
+    <path d="M1150 260 H1330 M1150 300 H1290" stroke={FS.gold} strokeWidth={12} strokeLinecap="round" />
+    <path d="M560 320 L620 400 L680 320 L740 400" stroke="#ff4fd8" strokeWidth={10} fill="none" />
+    <rect y={600} width={W} height={300} fill="#1a1a3a" />
+    <path d="M0 600 H1600" stroke={FS.ink} strokeWidth={5} />
+    <rect x={260} y={640} width={200} height={20} fill={FS.p2} opacity={0.3} />
+    <rect x={880} y={650} width={200} height={20} fill={FS.cyan} opacity={0.3} />
+    <Crowd groups={[[40, 5], [560, 4], [1200, 5]]} base={630} />
+  </>
+)
+
+// The concert stage: the truss and its lights, the speaker stacks, the drum riser, hands up at the front.
+const CONCERT = (
+  <>
+    <rect width={W} height={H} fill="#2a0a2a" />
+    {[300, 800, 1300].map((x) => (
+      <path key={x} d={`M${x - 20} 60 L${x - 220} 600 H${x + 220} L${x + 20} 60 Z`} fill={FS.gold} opacity={0.14} />
+    ))}
+    <path d="M0 50 H1600 M0 76 H1600" stroke={FS.steel} strokeWidth={8} />
+    {Array.from({ length: 40 }, (_, k) => (
+      <line key={k} x1={k * 40} y1={50} x2={k * 40 + 40} y2={76} stroke={FS.steel} strokeWidth={3} />
+    ))}
+    {[40, 1420].map((x) => (
+      <g key={x}>
+        <rect x={x} y={240} width={140} height={340} fill={FS.ink} stroke={FS.steel} strokeWidth={4} />
+        {[300, 400, 500].map((y) => (
+          <circle key={y} cx={x + 70} cy={y} r={36} fill={FS.panel} stroke={FS.steel} strokeWidth={4} />
+        ))}
+      </g>
+    ))}
+    <rect x={640} y={400} width={320} height={60} fill={FS.p2Dark} stroke={FS.ink} strokeWidth={4} />
+    <ellipse cx={800} cy={380} rx={70} ry={50} fill={FS.panelLight} stroke={FS.chrome} strokeWidth={5} />
+    <ellipse cx={700} cy={350} rx={40} ry={10} fill={FS.gold} />
+    <ellipse cx={900} cy={340} rx={44} ry={10} fill={FS.gold} />
+    <rect y={580} width={W} height={320} fill="#3a2418" />
+    <path d="M0 580 H1600" stroke={FS.ink} strokeWidth={5} />
+    <Crowd groups={[[20, 8], [560, 6], [1100, 8]]} base={900} scale={2.2} />
+  </>
+)
+
 /** Each stage's art on the canvas. */
 export const ZONE_ART: Record<Zone, ReactNode> = {
   castle: CASTLE,
+  dojo: DOJO,
   market: MARKET,
+  factory: FACTORY,
+  subway: SUBWAY,
   harbour: HARBOUR,
+  plaza: PLAZA,
+  concert: CONCERT,
   temple: TEMPLE,
 }
