@@ -7,9 +7,9 @@ import { CEL } from '../palette'
 import { still, stopsPlace } from '../place'
 import { shoot } from '../pose'
 
-// About at noon: for each line of the record a signpost comes to him on the run, a bandit behind the rock
-// beyond it. The bandit pops up, he brings the rifle off his back and fires, the crit starburst pops on the
-// hood, the bandit goes over, and a sun starburst sticker slaps onto the sign.
+// About at noon: a signpost before him, a raider behind the rock beyond it. First the raider pops up and he
+// brings the rifle off his back and aims; then the burst, the crit starburst pops on the hood, the raider
+// goes over and a sun starburst sticker slaps onto the sign.
 
 // The bandit stands this far right of him behind its rock, and pops up from this far down.
 const BANDIT = 330
@@ -33,34 +33,34 @@ const HIT = { x: BANDIT, y: -230 }
 
 export const about = stopsPlace({
   hour: HOURS.noon,
-  back: (i) => (
+  script: [1600, 2000],
+  ends: [0.38, 1],
+  back: () => (
     <>
       <Signpost />
-      <g data-fx={`sticker-${i}`} opacity="0">
+      <g data-fx="sticker" opacity="0">
         <Burst x={200} y={-245} r={34} fill={CEL.sun} />
       </g>
-      <g data-fx={`pop-${i}`} transform={`translate(${BANDIT} ${HIDDEN})`}>
-        <Bandit name={`bandit-${i}`} />
+      <g data-fx="pop" transform={`translate(${BANDIT} ${HIDDEN})`}>
+        <Bandit name="bandit" />
       </g>
     </>
   ),
-  front: (i) => (
+  front: () => (
     <>
       <Rock />
-      <Shot name={`shot-${i}`} from={muzzleFromStop()} to={HIT} />
+      <Shot name="shot" from={muzzleFromStop()} to={HIT} />
     </>
   ),
   move: (_profession, t) => still(shoot(t)),
-  reply: (stage, { count }) => {
-    const pops = Array.from({ length: count }, (_, i) => fx(stage, `pop-${i}`))
-    const shots = Array.from({ length: count }, (_, i) => shotOf(stage, `shot-${i}`, `bandit-${i}`))
-    const stickers = Array.from({ length: count }, (_, i) => fx(stage, `sticker-${i}`))
-    return (played) =>
-      shots.forEach((shot, i) => {
-        const t = played(i)
-        translateTo(pops[i], BANDIT, HIDDEN * (1 - ramp(t, 0.05, 0.25)))
-        shot(t)
-        fadeTo(stickers[i], ramp(t, 0.8, 0.9))
-      })
+  reply: (stage) => {
+    const pop = fx(stage, 'pop')
+    const shot = shotOf(stage, 'shot', 'bandit')
+    const sticker = fx(stage, 'sticker')
+    return (t) => {
+      translateTo(pop, BANDIT, HIDDEN * (1 - ramp(t, 0.05, 0.25)))
+      shot(t)
+      fadeTo(sticker, ramp(t, 0.8, 0.9))
+    }
   },
 })

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { fx, transformTo } from '../shared/stageNodes'
 import { HATCH } from './ink'
@@ -8,8 +8,9 @@ import cel from './cel.module.css'
 
 // The drawing kit of the inked desert behind the page, drawn like a comic: flat saturated fills under one
 // black ink line, hatching on the shadow sides. Every scene is a stack of SVG layers on one 1600 by 1000
-// canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x 570 to 1030, and a
-// desktop crop the same art: the sky in three hard bands of the scene's hour with its sun, the far mesas,
+// canvas anchored to its bottom centre (xMidYMax slice) on a wide screen; a phone frames it from y 280 down
+// past its foot (PHONE_VIEW), so it sees about x 520 to 1080 with the sand half way down the screen and the
+// sand and the sky's low band run on below the canvas to fill it: the sky in three hard bands of the scene's hour with its sun, the far mesas,
 // the near dunes, the packed sand he runs, and the scrub and dust in front. He is the commando
 // (sprite.tsx) drawn into the canvas and posed by the scene's writer (pose.ts).
 
@@ -17,6 +18,13 @@ export const W = 1600
 export const H = 1000
 /** The top of the packed sand: his soles and every prop stand on it. */
 export const FLOOR = 880
+/** How far the sand runs on below the canvas, for a phone's taller view. */
+const BELOW = 500
+const VIEW = `0 0 ${W} ${H}`
+const PHONE_VIEW = `0 280 ${W} 1200`
+
+/** Whether the scene's canvas is framed for a phone; its layers are drawn inside the scene's own value. */
+export const PhoneView = createContext(false)
 
 /** His drawn height on the canvas, about a third of the view. */
 export const FIGURE_H = 300
@@ -38,8 +46,9 @@ export const HOURS = {
 } as const satisfies Record<string, Hour>
 
 export function Canvas({ children, inked = true }: { children: ReactNode; inked?: boolean }) {
+  const phone = useContext(PhoneView)
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className={inked ? cel.inked : undefined} aria-hidden="true" focusable="false">
+    <svg viewBox={phone ? PHONE_VIEW : VIEW} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} className={inked ? cel.inked : undefined} aria-hidden="true" focusable="false">
       {children}
     </svg>
   )
@@ -55,7 +64,7 @@ export function Sky({ hour }: { hour: Hour }) {
     <Canvas inked={false}>
       <rect x={-200} width={W + 400} height={380} fill={hour.high} />
       <rect x={-200} y={380} width={W + 400} height={240} fill={hour.mid} />
-      <rect x={-200} y={620} width={W + 400} height={H - 620} fill={hour.low} />
+      <rect x={-200} y={620} width={W + 400} height={H + BELOW - 620} fill={hour.low} />
       {hour.sun && (
         <g>
           <circle cx={hour.sun.x} cy={hour.sun.y} r={90} fill={hour.sun.fill} stroke={CEL.ink} strokeWidth="5" />
@@ -92,8 +101,8 @@ export function Dunes() {
 export function Ground() {
   return (
     <Canvas>
-      <rect x={-200} y={FLOOR} width={W + 400} height={H - FLOOR} fill={CEL.sand} />
-      <rect x={-200} y={FLOOR + 60} width={W + 400} height={H - FLOOR - 60} fill={CEL.duneShade} data-bare />
+      <rect x={-200} y={FLOOR} width={W + 400} height={H + BELOW - FLOOR} fill={CEL.sand} />
+      <rect x={-200} y={FLOOR + 60} width={W + 400} height={H + BELOW - FLOOR - 60} fill={CEL.duneShade} data-bare />
       <path d="M-40 920 L40 900 L90 930 M520 940 L600 910 L660 935 M1160 925 L1230 905 L1300 930" fill="none" strokeWidth="4" stroke={CEL.ink} />
     </Canvas>
   )
@@ -124,10 +133,10 @@ export function Front() {
 /** The dust drifts this far across a scene. */
 const DUST_DRIFT = 260
 
-/** Drifts the dust with the scene's progress. */
-export function dustWriter(stage: ParentNode): (progress: number) => void {
+/** Drifts the dust over the scene's script, `played` 0 to 1 of it. */
+export function dustWriter(stage: ParentNode): (played: number) => void {
   const dust = fx(stage, 'dust')
-  return (progress) => transformTo(dust, `translate(${(progress * DUST_DRIFT).toFixed(1)} 0)`)
+  return (played) => transformTo(dust, `translate(${(played * DUST_DRIFT).toFixed(1)} 0)`)
 }
 
 const figureAt = (x: number, lift = 0): string =>
@@ -146,8 +155,8 @@ export function Commando({ x, profession }: { x: number; profession: Profession 
 export const placeCommando = (node: Element | null, x: number, lift = 0): void => transformTo(node, figureAt(x, lift))
 
 /** Where his rifle's muzzle is on the canvas when he aims it level, standing at `x` and `lift` above the
- *  sand: his front shoulder (89.5, 58 in the sprite's units) plus the arm and the rifle held out along it. */
+ *  sand: his shoulder (60, 60 in the sprite's units) and the arm and the rifle held out along it to x 190. */
 export const muzzleAt = (x: number, lift = 0): { x: number; y: number } => {
   const scale = FIGURE_H / SPRITE_VIEW.height
-  return { x: x - FIGURE_W / 2 + (89.5 + 126) * scale, y: FLOOR - lift - (SPRITE_VIEW.soles - 58) * scale }
+  return { x: x - FIGURE_W / 2 + 190 * scale, y: FLOOR - lift - (SPRITE_VIEW.soles - 60) * scale }
 }

@@ -6,7 +6,7 @@ import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import { rarityOf } from './loot'
 import { CEL } from './palette'
-import type { Place, PlaceInput } from './place'
+import { START, type Place, type PlaceInput } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -17,12 +17,12 @@ import { services } from './places/services'
 import { tech } from './places/tech'
 import { ventures } from './places/ventures'
 import { work } from './places/work'
-import { Canvas, Dunes, Front, Ground, Mesas, Sky, dustWriter } from './desert'
+import { Canvas, Dunes, Front, Ground, Mesas, PhoneView, Sky, dustWriter } from './desert'
 
 // The page as scenes, one day in the desert: the mesa top at noon (hero), one place per section of the
 // shown profession in reading order, noon to the town's afternoon to dusk, and the station at night
-// (contact). Each scene names its place, its anchor and how many cards its section counts (stageItems),
-// read from the same slot the section's cards are drawn from: one beat per card.
+// (contact). Each scene names its place, its anchor, its script and how many cards its section counts
+// (stageItems, for the theatre's reading line), read from the same slot the section's cards are drawn from.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -49,47 +49,51 @@ export interface CelScene extends TheatreScene {
   slot: SectionSlot | null
 }
 
-const layersOf = ({ hour, back, set, floor }: Place, input: PlaceInput): StageLayer[] => [
-  { name: 'sky', node: <Sky hour={hour} /> },
-  ...(back ? [{ name: 'back', node: back(input) }] : []),
-  { name: 'far', node: <Mesas /> },
-  { name: 'mid', node: <Dunes /> },
-  { name: 'near', node: <Ground /> },
-  ...(set ? [{ name: 'set', node: set(input) }] : []),
-  { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
-  { name: 'fg', node: <Front /> },
-]
+// Every layer is drawn inside the scene's phone value, so its canvas frames itself for the screen.
+const layersOf = ({ hour, back, set, floor }: Place, input: PlaceInput): StageLayer[] =>
+  [
+    { name: 'sky', node: <Sky hour={hour} /> },
+    ...(back ? [{ name: 'back', node: back(input) }] : []),
+    { name: 'far', node: <Mesas /> },
+    { name: 'mid', node: <Dunes /> },
+    { name: 'near', node: <Ground /> },
+    ...(set ? [{ name: 'set', node: set(input) }] : []),
+    { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
+    { name: 'fg', node: <Front /> },
+  ].map(({ name, node }) => ({ name, node: <PhoneView.Provider value={input.phone}>{node}</PhoneView.Provider> }))
 
 /** A project's chest shows its rarity's colour; no other card colours its stop. */
 const tonesOf = (slot: SectionSlot | null): string[] => (slot?.id === 'projects' ? slot.projects.map((project) => CEL[rarityOf(project)]) : [])
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): CelScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): CelScene => {
   const place = PLACES[id]
-  const input = { count, tones: tonesOf(slot), profession }
+  const input = { count, tones: tonesOf(slot), profession, phone }
+  const actions = place.script.length
   return {
     id,
     anchor: ANCHORS[id],
     slot,
     count,
+    script: place.script,
     layers: layersOf(place, input),
     bind: (stage) => {
       const dust = dustWriter(stage)
       const write = place.bind(stage, input)
-      return (progress, reached) => {
-        dust(progress)
-        write(progress, reached)
+      return (progress, reached, play = START) => {
+        dust((Math.min(play.action, actions - 1) + play.t) / actions)
+        write(progress, reached, play)
       }
     },
   }
 }
 
 /** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): CelScene[] {
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): CelScene[] {
   const sections = slots.map((slot) => {
     const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession)
+    return sceneOf(slot.id, slot, lead + count, profession, phone)
   })
-  return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
+  return [sceneOf('hero', null, 0, profession, phone), ...sections, sceneOf('contact', null, 0, profession, phone)]
 }
 
 /** Each layer's push in across its scene: the sky and its art move least, the scrub in front most, which

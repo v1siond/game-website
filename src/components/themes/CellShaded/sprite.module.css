@@ -1,8 +1,9 @@
 /*
- * His figure (sprite.tsx). Every part turns round its own joint in the 120 by 200 viewBox (transform-box:
- * view-box): the whole of him round his feet, the arms at the shoulders and elbows, the legs at the hips
- * and knees, so a forearm turns at the elbow wherever the shoulder took it. A theatre scene's writer
- * (pose.ts) poses the parts with inline transforms from the scroll. The hologram, the turret and its
+ * His figure (sprite.tsx), side on. Every part turns round its own joint in the 120 by 200 viewBox
+ * (transform-box: view-box): the whole of him round his feet, both arms at one shoulder and their
+ * elbows, the legs at the hips side by side and the knees, so a forearm turns at the elbow wherever the
+ * shoulder took it. A theatre scene's writer (pose.ts) poses the parts with inline transforms from its
+ * playhead. The hologram, the turret and its
  * muzzle flash, the rifle in his hand and its flash rest hidden until a pose shows them. Transform and
  * opacity only.
  */
@@ -12,15 +13,15 @@
 }
 
 .sprRoot { transform-origin: 60px 196px; }
-.sprArmB { transform-origin: 30.5px 58px; }
-.sprArmF { transform-origin: 89.5px 58px; }
-.sprForeB { transform-origin: 31px 89px; }
-.sprForeF { transform-origin: 89px 89px; }
-.sprLegB { transform-origin: 46.5px 111px; }
-.sprLegF { transform-origin: 73.5px 111px; }
-.sprShinB { transform-origin: 46px 146px; }
-.sprShinF { transform-origin: 74px 146px; }
-.sprTurret { transform-origin: 138px 196px; }
+.sprArmB,
+.sprArmF { transform-origin: 60px 60px; }
+.sprForeB,
+.sprForeF { transform-origin: 60px 89px; }
+.sprLegB { transform-origin: 57px 111px; }
+.sprLegF { transform-origin: 63px 111px; }
+.sprShinB { transform-origin: 57px 146px; }
+.sprShinF { transform-origin: 63px 146px; }
+.sprTurret { transform-origin: 132px 196px; }
 
 .sprHolo,
 .sprTurret,

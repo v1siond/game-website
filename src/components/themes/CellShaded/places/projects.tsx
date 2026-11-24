@@ -5,10 +5,10 @@ import { CEL } from '../palette'
 import { still, stopsPlace } from '../place'
 import { loot } from '../pose'
 
-// Projects at dusk: for each project a loot chest comes to him on the run. He kneels at it and throws the
-// lid off; a column of the rarity's light stands up out of it (the rarity from the project's own facts,
-// loot.ts, shown by its colour only), a weapon in the same colour floats up into the light, and he springs
-// up with a fist thrown at it.
+// Projects at dusk: a loot chest before him. First he kneels at it and throws the lid off, and a column of
+// the rarity's light stands up out of it (the rarity of his first project, from its own facts, loot.ts,
+// shown by its colour only); then a weapon in the same colour floats up into the light and he springs up
+// with a fist thrown at it.
 
 const CHEST = 170
 // The weapon floats up out of the chest to this height.
@@ -39,35 +39,35 @@ function Weapon({ tone }: { tone: string }) {
 
 export const projects = stopsPlace({
   hour: HOURS.dusk,
-  back: (i, { tones }) => (
+  script: [1800, 2000],
+  ends: [0.5, 1],
+  back: ({ tones }) => (
     <>
-      <g data-fx={`light-${i}`} opacity="0">
-        <Light tone={tones[i] ?? CEL.common} />
+      <g data-fx="light" opacity="0">
+        <Light tone={tones[0] ?? CEL.common} />
       </g>
       <Chest />
-      <g data-fx={`lid-${i}`} transform={`translate(${CHEST} -80)`}>
+      <g data-fx="lid" transform={`translate(${CHEST} -80)`}>
         <path d="M-62 0 Q0 -46 62 0 Z" fill={CEL.steel} />
       </g>
-      <g data-fx={`weapon-${i}`} transform={`translate(${CHEST} -60)`} opacity="0">
-        <Weapon tone={tones[i] ?? CEL.common} />
+      <g data-fx="weapon" transform={`translate(${CHEST} -60)`} opacity="0">
+        <Weapon tone={tones[0] ?? CEL.common} />
       </g>
     </>
   ),
   move: (_profession, t) => still(loot(t)),
-  reply: (stage, { count }) => {
-    const lights = Array.from({ length: count }, (_, i) => fx(stage, `light-${i}`))
-    const lids = Array.from({ length: count }, (_, i) => fx(stage, `lid-${i}`))
-    const weapons = Array.from({ length: count }, (_, i) => fx(stage, `weapon-${i}`))
-    return (played) =>
-      lights.forEach((light, i) => {
-        const t = played(i)
-        const open = ramp(t, 0.35, 0.5)
-        transformTo(lids[i], `translate(${(CHEST - 60 * open).toFixed(1)} ${(-80 - 90 * open).toFixed(1)}) rotate(${(-120 * open).toFixed(1)})`)
-        fadeTo(lids[i], 1 - ramp(t, 0.45, 0.55))
-        fadeTo(light, ramp(t, 0.4, 0.55))
-        const rise = ramp(t, 0.5, 0.85)
-        fadeTo(weapons[i], ramp(t, 0.5, 0.6))
-        transformTo(weapons[i], `translate(${CHEST} ${(-60 + (FLOAT + 60) * rise).toFixed(1)}) rotate(${(-12 + 12 * rise).toFixed(1)})`)
-      })
+  reply: (stage) => {
+    const light = fx(stage, 'light')
+    const lid = fx(stage, 'lid')
+    const weapon = fx(stage, 'weapon')
+    return (t) => {
+      const open = ramp(t, 0.35, 0.5)
+      transformTo(lid, `translate(${(CHEST - 60 * open).toFixed(1)} ${(-80 - 90 * open).toFixed(1)}) rotate(${(-120 * open).toFixed(1)})`)
+      fadeTo(lid, 1 - ramp(t, 0.45, 0.55))
+      fadeTo(light, ramp(t, 0.4, 0.55))
+      const rise = ramp(t, 0.5, 0.85)
+      fadeTo(weapon, ramp(t, 0.5, 0.6))
+      transformTo(weapon, `translate(${CHEST} ${(-60 + (FLOAT + 60) * rise).toFixed(1)}) rotate(${(-12 + 12 * rise).toFixed(1)})`)
+    }
   },
 })
