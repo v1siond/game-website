@@ -1,19 +1,19 @@
 import { ramp } from '@/lib/scroll/stage'
 import { fx, transformTo } from '../../shared/stageNodes'
 import { CEL } from '../palette'
-import type { Place } from '../place'
+import { START, moveAt, type Place } from '../place'
 import { Canvas, Commando, FLOOR, HOURS, placeCommando } from '../desert'
 import { celJoints, deploy, setCelPose } from '../pose'
 
-// The hero: noon on the mesa top. Behind him the speed rays of the comic's freeze frame turn as the page
-// starts to scroll; once they rest he deploys his gear: the engineer drops his turret beside him and
-// works it from the wrist computer until it fires, the others throw a fist up to the sun.
+// The hero: noon on the mesa top. First the speed rays of the comic's freeze frame turn behind him and he
+// deploys his gear: the engineer's turret comes down before him as he raises his wrist computer, the others
+// throw a fist up to the sun. Then he works the computer and the turret fires.
 
 const RAYS = { x: 1180, y: 560, r: 900 }
-const HERO_X = 1180
-// The rays turn this far over the hero's scroll and rest by this share of it.
+/** Where he stands on the rock: right of the hero text on a wide screen, the middle of a phone's view. */
+const heroX = (phone: boolean): number => (phone ? 760 : 1180)
+// The rays turn this far over the first action.
 const TURN = 24
-const RESTED_BY = 0.5
 
 const RAY_PATHS = Array.from({ length: 18 }, (_, i) => {
   const from = (i * 2 * Math.PI) / 18
@@ -22,7 +22,10 @@ const RAY_PATHS = Array.from({ length: 18 }, (_, i) => {
   return `M${RAYS.x},${RAYS.y} L${point(from)} L${point(to)} Z`
 })
 
-const raysAt = (progress: number): string => `rotate(${(TURN * ramp(progress, 0, RESTED_BY)).toFixed(1)} ${RAYS.x} ${RAYS.y})`
+// The deploy's first action ends here on its t, the turret firing in the second.
+const ENDS = [0.55, 1]
+
+const raysAt = (t: number): string => `rotate(${(TURN * ramp(t, 0, 0.55)).toFixed(1)} ${RAYS.x} ${RAYS.y})`
 
 /** The freeze frame's speed rays in the sky behind him. */
 function Rays() {
@@ -37,28 +40,30 @@ function Rays() {
   )
 }
 
-/** The rock he stands on, a low mesa top in the sand. */
-function Rock() {
+/** The rock he stands on, a low mesa top in the sand round `x`. */
+function Rock({ x }: { x: number }) {
   return (
     <Canvas>
-      <path d={`M1000 ${FLOOR + 20} L1030 ${FLOOR} L1330 ${FLOOR} L1360 ${FLOOR + 20} Z`} fill={CEL.mesa} />
+      <path d={`M${x - 180} ${FLOOR + 20} L${x - 150} ${FLOOR} L${x + 150} ${FLOOR} L${x + 180} ${FLOOR + 20} Z`} fill={CEL.mesa} />
     </Canvas>
   )
 }
 
 export const hero: Place = {
   hour: HOURS.noon,
+  script: [1600, 1800],
   back: () => <Rays />,
-  set: () => <Rock />,
-  floor: ({ profession }) => <Commando x={HERO_X} profession={profession} />,
-  bind: (stage, { profession }) => {
+  set: ({ phone }) => <Rock x={heroX(phone)} />,
+  floor: ({ profession, phone }) => <Commando x={heroX(phone)} profession={profession} />,
+  bind: (stage, { profession, phone }) => {
     const rays = fx(stage, 'rays')
     const root = fx(stage, 'commando')
     const joints = root ? celJoints(root) : null
-    placeCommando(root, HERO_X)
-    return (progress) => {
-      transformTo(rays, raysAt(progress))
-      if (joints) setCelPose(joints, deploy(profession, ramp(progress, RESTED_BY - 0.2, RESTED_BY + 0.25)))
+    placeCommando(root, heroX(phone))
+    return (_progress, _reached, play = START) => {
+      const t = moveAt(ENDS, play)
+      transformTo(rays, raysAt(t))
+      if (joints) setCelPose(joints, deploy(profession, t))
     }
   },
 }

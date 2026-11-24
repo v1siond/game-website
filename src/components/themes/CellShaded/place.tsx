@@ -1,33 +1,34 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { mix } from '@/lib/motion/rigPose'
-import { ramp } from '@/lib/scroll/stage'
-import { trackAt } from '@/lib/scroll/track'
-import { fx, transformTo } from '../shared/stageNodes'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
+import { fx, lerp } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
 import { Commando, FLOOR, placeCommando, type Hour } from './desert'
-import { celJoints, rest, run, setCelPose, type CelPose } from './pose'
+import { celJoints, setCelPose, type CelPose } from './pose'
 
-// What every place of the desert is, and the run and gun that the sections play: he holds his place near
-// the middle of the frame and the desert scrolls past him, one stop per card of the section. Each card is
-// a beat: a short run in which the sand brings the card's stop to him (a bandit behind a signpost, a
-// barricade, a chest, a ledge), then his move at it, whose last frame is the move's own pose, held.
+// What every place of the desert is, and the one stop each section plays at: he stands at it under a
+// fixed camera (a signpost with a raider behind it, sandbags, a chest, a ledge), and the shared scene
+// player moves his move through the scene's script of one to three actions (src/lib/scroll/player.ts).
+// Each action plays its own stretch of the move, so every frame is a function of the playhead alone: an
+// action reads the same played backward, and the last action's end is the frame reduced motion shows.
 
 export interface PlaceInput {
-  /** The beats, one per card. */
+  /** The cards the section counts, for the theatre's reading line. */
   count: number
   profession: Profession
-  /** Each stop's own colour, where its card gives it one (a project's rarity). */
+  /** The stop's own colours, where the section's cards give them (the projects' rarities). */
   tones: readonly string[]
+  /** A phone's narrower, taller view. */
+  phone: boolean
 }
 
-/** A scene's picture as the theatre runs it: its hour, optional art of its own in the sky behind the mesas
- *  and on the sand, what stands on its sand (him among it) and the binder that finds the nodes the scroll
- *  moves once and returns the per frame writer. The writer takes the scene's progress (0 when its stage
- *  starts to rise, 1 when it has sunk) and how many of the section's cards have crossed the reading line,
- *  fractional. */
+/** A scene's picture as the theatre runs it: its hour, its script, optional art of its own in the sky
+ *  behind the mesas and on the sand, what stands on its sand (him among it) and the binder that finds the
+ *  nodes once and returns the per frame writer, which reads the scene's playhead. */
 export interface Place {
   hour: Hour
+  /** The scene's actions, each its length in ms. */
+  script: SceneScript
   /** Its own art in the sky, behind the mesas. */
   back?: (input: PlaceInput) => ReactNode
   /** Its own art standing on the sand, behind him. */
@@ -45,82 +46,58 @@ export interface Frame {
 
 export const still = (pose: CelPose): Frame => ({ pose, ahead: 0, lift: 0 })
 
-const blend = (a: Frame, b: Frame, t: number): Frame => ({
-  pose: mix(a.pose, b.pose, t),
-  ahead: a.ahead + (b.ahead - a.ahead) * t,
-  lift: a.lift + (b.lift - a.lift) * t,
-})
+/** Before the section arrives a scene shows its first frame. */
+export const START: Playhead = { action: 0, t: 0, done: false }
 
-/** A run and gun section: each card's stop, drawn round the spot where he makes his move (x 0 his place,
- *  y 0 the sand), behind him and in front of him; his move there; the world's reply to it. */
+/** Where he stands on the sand: right of the text column on a wide screen, the left of a phone's view (about
+ *  x 520 to 1080) so the stop before him shows whole. */
+export const holdX = (phone: boolean): number => (phone ? 600 : 860)
+
+/** How far the move has played at `play`: each action plays its stretch, from the end of the one before to
+ *  its own end on the move's t (0 to 1). */
+export const moveAt = (ends: readonly number[], { action, t }: Playhead): number => lerp(action > 0 ? ends[action - 1] : 0, ends[action] ?? 1, t)
+
+/** A section's stop: its art round the spot where he stands (x 0 his place, y 0 the sand), behind him and in
+ *  front of him; his move there; the world's reply to it. */
 export interface Stops {
   hour: Hour
-  back: (i: number, input: PlaceInput) => ReactNode
-  front?: (i: number, input: PlaceInput) => ReactNode
-  /** His move at stop `at`, `t` of the way; t 1 is the move's held pose. */
-  move: (profession: Profession, t: number, at: number, count: number) => Frame
-  /** Binds the world's replies and returns their writer: how far each card's reply has played, 0 to 1. */
-  reply: (stage: ParentNode, input: PlaceInput) => (played: (i: number) => number) => void
+  script: SceneScript
+  /** Where each action ends on the move's t, one per action, the last 1. */
+  ends: readonly number[]
+  back: (input: PlaceInput) => ReactNode
+  front?: (input: PlaceInput) => ReactNode
+  /** His move `t` of the way; t 1 is the move's held pose. */
+  move: (profession: Profession, t: number) => Frame
+  /** Binds the world's reply and returns its writer over the move's t. */
+  reply: (stage: ParentNode, input: PlaceInput) => (t: number) => void
 }
 
-/** Where he holds on the sand, right of the text column and in a phone's view. */
-export const HOLD_X = 860
-/** The stops stand this far apart; the next one waits one spacing ahead of him. */
-const SPACING = 440
-// One step of his run carries him this far over the sand.
-const STEP = 80
-
-const stopX = (i: number): number => HOLD_X + SPACING * (i + 1)
-
-function Track({ input, art, name }: { input: PlaceInput; art: (i: number, input: PlaceInput) => ReactNode; name: string }) {
-  return (
-    <g data-fx={name}>
-      {Array.from({ length: input.count }, (_, i) => (
-        <g key={i} transform={`translate(${stopX(i)} ${FLOOR})`}>
-          {art(i, input)}
-        </g>
-      ))}
-    </g>
-  )
-}
-
-/**
- * The beat writer: the sand scrolled under him, the run between beats, his move at the beat's stop and the
- * world's replies. The run blends out of the last move's held pose while the sand brings the next stop,
- * then the move takes over from the run.
- */
-function beatsOf(stage: ParentNode, input: PlaceInput, stops: Stops): (reached: number) => void {
-  const tracks = [fx(stage, 'stops-back'), fx(stage, 'stops-front')]
-  const root = fx(stage, 'commando')
-  const joints = root ? celJoints(root) : null
-  const replies = stops.reply(stage, input)
-  const waiting = still(rest(input.profession))
-  return (reached) => {
-    const beat = trackAt(reached, input.count, SPACING)
-    tracks.forEach((track) => transformTo(track, `translate(${(-beat.offset).toFixed(1)} 0)`))
-    replies((i) => (i < beat.at ? 1 : i === beat.at ? beat.act : 0))
-    const stride = still(run(input.profession, beat.offset / STEP))
-    const before = beat.at > 0 ? stops.move(input.profession, 1, beat.at - 1, input.count) : waiting
-    const move = stops.move(input.profession, beat.act, beat.at, input.count)
-    const frame = beat.act > 0 ? blend(stride, move, ramp(beat.act, 0, 0.15)) : blend(before, stride, ramp(beat.run, 0, 0.4))
-    placeCommando(root, HOLD_X + frame.ahead, frame.lift)
-    if (joints) setCelPose(joints, frame.pose)
-  }
-}
-
-/** A run and gun section as a scene: its stops behind him, him, its stops in front, run by the beat writer,
- *  all in one camera group a reply can push in on. */
+/** A section's stop as a scene: its art behind him, him, its art in front, in one camera group a reply can
+ *  push in on, played by the scene's script. */
 export const stopsPlace = (stops: Stops): Place => ({
   hour: stops.hour,
-  floor: (input) => (
-    <g data-fx="camera">
-      <Track input={input} art={stops.back} name="stops-back" />
-      <Commando x={HOLD_X} profession={input.profession} />
-      {stops.front && <Track input={input} art={stops.front} name="stops-front" />}
-    </g>
-  ),
+  script: stops.script,
+  floor: (input) => {
+    const at = `translate(${holdX(input.phone)} ${FLOOR})`
+    return (
+      <g data-fx="camera">
+        <g transform={at}>{stops.back(input)}</g>
+        <Commando x={holdX(input.phone)} profession={input.profession} />
+        {stops.front && <g transform={at}>{stops.front(input)}</g>}
+      </g>
+    )
+  },
   bind: (stage, input) => {
-    const beats = beatsOf(stage, input, stops)
-    return (_progress, reached) => beats(reached)
+    const root = fx(stage, 'commando')
+    const joints = root ? celJoints(root) : null
+    const reply = stops.reply(stage, input)
+    const x = holdX(input.phone)
+    return (_progress, _reached, play = START) => {
+      const t = moveAt(stops.ends, play)
+      reply(t)
+      const frame = stops.move(input.profession, t)
+      placeCommando(root, x + frame.ahead, frame.lift)
+      if (joints) setCelPose(joints, frame.pose)
+    }
   },
 })

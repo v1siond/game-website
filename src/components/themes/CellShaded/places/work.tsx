@@ -6,10 +6,9 @@ import { CEL } from '../palette'
 import { stopsPlace } from '../place'
 import { slide } from '../pose'
 
-// Work in the town's afternoon: for each job a sandbag barricade comes to him on the run, the job's bounty
-// notice on its board beyond it with the wanted bandit beside it. He slides in behind the barricade, comes
-// up on one knee with the rifle over it and fires, the bandit goes over and the notice takes the red done
-// stamp.
+// Work in the town's afternoon: a sandbag barricade before him, the bounty notice on its board beyond it
+// with the wanted raider beside it. First he slides in behind the barricade; then he comes up on one knee
+// with the rifle over it and fires, the raider goes over and the notice takes the done stamp.
 
 const BANDIT = 400
 const NOTICE = 250
@@ -58,32 +57,32 @@ const muzzle = muzzleFromStop(-KNEELING)
 
 export const work = stopsPlace({
   hour: HOURS.town,
-  back: (i) => (
+  script: [1600, 2200],
+  ends: [0.4, 1],
+  back: () => (
     <>
       <Notice />
-      <g data-fx={`done-${i}`} opacity="0">
+      <g data-fx="done" opacity="0">
         <Done />
       </g>
       <g transform={`translate(${BANDIT} 0)`}>
-        <Bandit name={`bandit-${i}`} />
+        <Bandit name="bandit" />
       </g>
     </>
   ),
-  front: (i) => (
+  front: () => (
     <>
       <Sandbags />
-      <Shot name={`shot-${i}`} from={{ x: muzzle.x + SLID, y: muzzle.y }} to={{ x: BANDIT, y: -230 }} />
+      <Shot name="shot" from={{ x: muzzle.x + SLID, y: muzzle.y }} to={{ x: BANDIT, y: -230 }} />
     </>
   ),
   move: (_profession, t) => ({ pose: slide(t), ahead: SLID * ramp(t, 0, 0.4), lift: 0 }),
-  reply: (stage, { count }) => {
-    const shots = Array.from({ length: count }, (_, i) => shotOf(stage, `shot-${i}`, `bandit-${i}`))
-    const stamps = Array.from({ length: count }, (_, i) => fx(stage, `done-${i}`))
-    return (played) =>
-      shots.forEach((shot, i) => {
-        const t = played(i)
-        shot(t, [0.5, 0.8])
-        fadeTo(stamps[i], ramp(t, 0.85, 0.95))
-      })
+  reply: (stage) => {
+    const shot = shotOf(stage, 'shot', 'bandit')
+    const done = fx(stage, 'done')
+    return (t) => {
+      shot(t, [0.5, 0.8])
+      fadeTo(done, ramp(t, 0.85, 0.95))
+    }
   },
 })

@@ -7,16 +7,15 @@ import { CEL } from '../palette'
 import { still, stopsPlace } from '../place'
 import { deploy } from '../pose'
 
-// Tech in the town's afternoon: for each group of tools a relay pylon comes to him on the run, a scout
-// drone hovering over it. He deploys his turret beside him and works it from his wrist computer until it
-// fires; the drone is shot out of the air in a crit starburst and drops to the sand, and the pylon's beacon
-// lights in the hologram blue.
+// Tech in the town's afternoon: a relay pylon before him, a scout drone hovering over it. First he works his
+// wrist computer and his turret deploys before him; then it fires, the drone is shot out of the air in a crit
+// starburst and drops to the sand, and the pylon's beacon lights in the hologram blue.
 
-const PYLON = 330
-const DRONE = { x: 330, y: -400 }
-// The turret's muzzle, at (206, 140) in the sprite's 120 by 200 units, from his place.
+const PYLON = 360
+const DRONE = { x: 360, y: -400 }
+// The turret's muzzle, at (204, 138) in the sprite's 120 by 200 units, from his place.
 const SCALE = FIGURE_H / 200
-const TURRET = { x: (206 - 60) * SCALE, y: -(196 - 140) * SCALE }
+const TURRET = { x: (204 - 60) * SCALE, y: -(196 - 138) * SCALE }
 
 function Pylon() {
   return (
@@ -40,34 +39,34 @@ function Beacon() {
 
 export const tech = stopsPlace({
   hour: HOURS.town,
-  back: (i) => (
+  script: [1800, 2000],
+  ends: [0.5, 1],
+  back: () => (
     <>
       <Pylon />
-      <g data-fx={`beacon-${i}`} opacity="0">
+      <g data-fx="beacon" opacity="0">
         <Beacon />
       </g>
-      <g data-fx={`drone-${i}`} transform={`translate(${DRONE.x} ${DRONE.y})`}>
-        <Drone name={`drone-body-${i}`} />
+      <g data-fx="drone" transform={`translate(${DRONE.x} ${DRONE.y})`}>
+        <Drone name="drone-body" />
       </g>
-      <Shot name={`shot-${i}`} from={TURRET} to={{ x: DRONE.x, y: DRONE.y - 30 }} />
+      <Shot name="shot" from={TURRET} to={{ x: DRONE.x, y: DRONE.y - 30 }} />
     </>
   ),
   move: (profession, t) => still(deploy(profession, t)),
-  reply: (stage, { count }) => {
-    const drones = Array.from({ length: count }, (_, i) => fx(stage, `drone-${i}`))
-    const bodies = Array.from({ length: count }, (_, i) => fx(stage, `drone-body-${i}`))
-    const tracers = Array.from({ length: count }, (_, i) => fx(stage, `shot-${i}-tracer`))
-    const crits = Array.from({ length: count }, (_, i) => fx(stage, `shot-${i}-crit`))
-    const beacons = Array.from({ length: count }, (_, i) => fx(stage, `beacon-${i}`))
-    return (played) =>
-      drones.forEach((drone, i) => {
-        const t = played(i)
-        fadeTo(tracers[i], t > 0.6 && t < 0.75 ? 0.9 : 0)
-        fadeTo(crits[i], ramp(t, 0.65, 0.72))
-        const fall = ramp(t, 0.72, 0.95)
-        transformTo(drone, `translate(${DRONE.x} ${(DRONE.y + drop(fall, -DRONE.y)).toFixed(1)})`)
-        transformTo(bodies[i], `rotate(${(70 * fall).toFixed(1)})`)
-        fadeTo(beacons[i], ramp(t, 0.85, 0.95))
-      })
+  reply: (stage) => {
+    const drone = fx(stage, 'drone')
+    const body = fx(stage, 'drone-body')
+    const tracer = fx(stage, 'shot-tracer')
+    const crit = fx(stage, 'shot-crit')
+    const beacon = fx(stage, 'beacon')
+    return (t) => {
+      fadeTo(tracer, t > 0.6 && t < 0.75 ? 0.9 : 0)
+      fadeTo(crit, ramp(t, 0.65, 0.72))
+      const fall = ramp(t, 0.72, 0.95)
+      transformTo(drone, `translate(${(DRONE.x + 90 * fall).toFixed(1)} ${(DRONE.y + drop(fall, -DRONE.y)).toFixed(1)})`)
+      transformTo(body, `rotate(${(70 * fall).toFixed(1)})`)
+      fadeTo(beacon, ramp(t, 0.85, 0.95))
+    }
   },
 })

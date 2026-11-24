@@ -2,7 +2,6 @@ import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../shared/stageNodes'
 import { FLOOR, muzzleAt } from './desert'
-import { HOLD_X } from './place'
 import { Burst } from './ink'
 import { CEL } from './palette'
 
@@ -44,8 +43,8 @@ export function Drone({ name }: { name: string }) {
 
 /** The canvas point his rifle's muzzle is at, relative to the stop he is acting at, `lift` above the sand. */
 export const muzzleFromStop = (lift = 0): { x: number; y: number } => {
-  const { x, y } = muzzleAt(HOLD_X, lift)
-  return { x: x - HOLD_X, y: y - FLOOR }
+  const { x, y } = muzzleAt(0, lift)
+  return { x, y: y - FLOOR }
 }
 
 /** The tracer of a shot from `from` to `to` and the crit starburst where it hits, both hidden until fired. */

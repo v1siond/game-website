@@ -5,6 +5,7 @@ import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -24,6 +25,9 @@ import page from './CellShaded/page.module.css'
 const celFace = Bangers({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--cel-face' })
 
 const ROOT_VARS = paletteVars('cel', CEL)
+
+// A phone frames the desert from higher up, so the sand stays clear of the cards (desert.tsx).
+const PHONE_QUERY = '(max-width: 767.98px)'
 
 // Cell Shaded: his CV as one day in an inked desert, drawn like a comic in flat saturated fills under one
 // black ink line. The page keeps the rhythm of the Rockstar VI site: a big hero (the intro card at noon on
@@ -49,9 +53,10 @@ export default function CellShadedTheme() {
   const cv = useCVData()
   const labels = useLabels()
   const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
+    [view, cv, labels, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]

@@ -68,8 +68,9 @@ export const CEL = {
 
   // The red flavour line on a card and the achievement star
   flavour: '#b3170c',
-  // The flavour red a step deeper for its words on the card paper (7:1); the stamp's frame keeps flavour.
-  flavourText: '#9c140a',
+  // The flavour red a step deeper for its words on the card paper, 7:1 even on the paper's shade; the
+  // stamp's frame keeps flavour.
+  flavourText: '#861108',
   crit: '#ff2a1a',
 
   // The station's hologram and its glow
