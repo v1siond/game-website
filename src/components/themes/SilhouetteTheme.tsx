@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -11,6 +12,7 @@ import { SkipLink } from './shared/SkipLink'
 import { Stage, Theatre } from './shared/theatre/Stage'
 import { useTheatre } from './shared/theatre/useTheatre'
 import { ClearingContact, TopBar } from './Silhouette/chrome'
+import { PhoneView } from './Silhouette/forest'
 import { WakeHero } from './Silhouette/hero'
 import { SHADE_VARS, TYPEWRITER } from './Silhouette/palette'
 import { LAYER_MOTION, scenesOf, type ShadeScene } from './Silhouette/scenes'
@@ -32,6 +34,9 @@ import page from './Silhouette/page.module.css'
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
 
+// A phone frames the forest from higher up (Silhouette/forest PhoneView).
+const PHONE_QUERY = '(max-width: 767.98px)'
+
 const hasSlot = (scene: ShadeScene): scene is ShadeScene & { slot: SectionSlot } => scene.slot !== null
 
 export default function SilhouetteTheme() {
@@ -40,6 +45,7 @@ export default function SilhouetteTheme() {
   const cv = useCVData()
   const labels = useLabels()
   const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
     [view, cv, labels, active],
@@ -49,30 +55,32 @@ export default function SilhouetteTheme() {
   const contact = scenes[scenes.length - 1]
 
   return (
-    <div style={SHADE_VARS} className={`${page.root} ${reduced ? page.still : ''} ${TYPEWRITER}`}>
-      <SkipLink />
-      {!reduced && (
-        <Theatre theatreRef={theatreRef} className={page.theatre}>
-          {scenes.map((scene) => (
-            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} />
-          ))}
-        </Theatre>
-      )}
-      <TopBar anchor={hero.anchor} />
-      <main id="main-content" ref={textRef} className={page.main}>
-        <WakeHero scene={hero} still={reduced} />
-        <ProfessionRegion>
-          {scenes.filter(hasSlot).map((scene) => (
-            <PlaceSection key={scene.id} scene={scene} still={reduced} />
-          ))}
-        </ProfessionRegion>
-        <ClearingContact scene={contact} still={reduced} />
-      </main>
-      <footer className={page.footer}>
-        <p className={page.copyright}>
-          <CopyrightLine />
-        </p>
-      </footer>
-    </div>
+    <PhoneView.Provider value={phone}>
+      <div style={SHADE_VARS} className={`${page.root} ${reduced ? page.still : ''} ${TYPEWRITER}`}>
+        <SkipLink />
+        {!reduced && (
+          <Theatre theatreRef={theatreRef} className={page.theatre}>
+            {scenes.map((scene) => (
+              <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} />
+            ))}
+          </Theatre>
+        )}
+        <TopBar anchor={hero.anchor} />
+        <main id="main-content" ref={textRef} className={page.main}>
+          <WakeHero scene={hero} still={reduced} />
+          <ProfessionRegion>
+            {scenes.filter(hasSlot).map((scene) => (
+              <PlaceSection key={scene.id} scene={scene} still={reduced} />
+            ))}
+          </ProfessionRegion>
+          <ClearingContact scene={contact} still={reduced} />
+        </main>
+        <footer className={page.footer}>
+          <p className={page.copyright}>
+            <CopyrightLine />
+          </p>
+        </footer>
+      </div>
+    </PhoneView.Provider>
   )
 }

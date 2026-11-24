@@ -1,11 +1,13 @@
-import type { ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { FIGURE_VIEW, ShadeFigure } from './figure'
 import { LIGHTS, SHADE, type Light, type LightName } from './palette'
 
 // The drawing kit of the black forest behind the page: black shapes against a lit sky, depth by fog. Every
-// scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice),
-// so a phone, which sees about x 570 to 1030, and a desktop crop the same art: the sky in its light with a
+// scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice);
+// a phone (PhoneView) frames it from higher up and right of the middle (PHONE_VIEW, x 765 to 1455),
+// so the floor sits half way down its screen with him, the obstacle and where he ends in view, and the ground
+// and the gaps run on below the canvas. The art is the same at every width: the sky in its light with a
 // glow low on the horizon, the place's far shapes pale with fog, the fog band, the mid trunks a shade
 // darker, the black ground he walks, and soft black shapes out of focus in front. Focus is faked with light,
 // not blur: the far layer is pale and low in contrast, the near one dim and soft edged. He is the figure
@@ -20,9 +22,17 @@ export const FLOOR = 880
 export const FIGURE_H = 260
 const FIGURE_W = (FIGURE_H * FIGURE_VIEW.width) / FIGURE_VIEW.height
 
+/** Whether the canvas is drawn for a phone's narrow, tall screen. */
+export const PhoneView = createContext(false)
+
+// The phone's view of the canvas: 690 wide, so where he starts and where he lands both stay in view at the
+// scene's full push in, and its top at y 134 so the floor (880) sits half way down a phone's screen.
+const PHONE_VIEW = '765 134 690 1493'
+
 export function Canvas({ children }: { children: ReactNode }) {
+  const phone = useContext(PhoneView)
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+    <svg viewBox={phone ? PHONE_VIEW : `0 0 ${W} ${H}`} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} aria-hidden="true" focusable="false">
       {children}
     </svg>
   )
@@ -121,7 +131,7 @@ export function Trunks({ light }: { light: Light }) {
 export function Ground({ light }: { light: Light }) {
   return (
     <Canvas>
-      <path d={`M0 ${FLOOR + 6} Q240 ${FLOOR - 8} 520 ${FLOOR} T1100 ${FLOOR - 2} T1600 ${FLOOR + 4} V${H} H0 Z`} fill={SHADE.black} />
+      <path d={`M0 ${FLOOR + 6} Q240 ${FLOOR - 8} 520 ${FLOOR} T1100 ${FLOOR - 2} T1600 ${FLOOR + 4} V${H + 600} H0 Z`} fill={SHADE.black} />
       <path d={`M0 ${FLOOR + 6} Q240 ${FLOOR - 8} 520 ${FLOOR} T1100 ${FLOOR - 2} T1600 ${FLOOR + 4}`} fill="none" stroke={light.rim} strokeOpacity={0.25} strokeWidth={2} />
     </Canvas>
   )
@@ -148,11 +158,12 @@ export function Front() {
   )
 }
 
-/** His group's transform: his centre at `x`, his soles `lift` above the floor, turned `over` of a half
- *  turn round his middle (1 upside down, standing on a ceiling). */
+/** His group's transform: his centre at `x`, his soles `lift` above the floor, turned `over` of a head over
+ *  heels flip round his middle seen side on (1 upside down on a ceiling, still facing the way he goes). */
 export const figureAt = (x: number, lift = 0, over = 0): string => {
   const top = FLOOR - lift - FIGURE_H * (FIGURE_VIEW.soles / FIGURE_VIEW.height)
-  const turn = over ? ` rotate(${(180 * over).toFixed(1)} ${(FIGURE_W / 2).toFixed(1)} ${(FIGURE_H / 2).toFixed(1)})` : ''
+  const mid = FIGURE_H / 2
+  const turn = over ? ` translate(0 ${mid}) scale(1 ${Math.cos(Math.PI * over).toFixed(3)}) translate(0 ${-mid})` : ''
   return `translate(${(x - FIGURE_W / 2).toFixed(1)} ${top.toFixed(1)})${turn}`
 }
 

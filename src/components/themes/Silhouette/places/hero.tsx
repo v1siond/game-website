@@ -1,18 +1,16 @@
-import { ramp } from '@/lib/scroll/stage'
 import { fx, transformTo } from '../../shared/stageNodes'
 import { FLOOR } from '../forest'
 import { SHADE } from '../palette'
-import type { Scene } from '../place'
+import { START, type Scene } from '../place'
 
 // The hero: the edge of the forest at dawn, where he wakes (his figure stands in the hero itself, with the
 // outfit plate), a rope hanging out of the boughs ahead of him. As the page starts to scroll the rope
-// swings out once and comes to rest as the forest sinks.
+// swings out once and comes to rest.
 
 const ROPE_X = 1290
 const ROPE_END = FLOOR - 300
-// The rope swings out this far over this share of the hero's scroll, and back.
+// The rope swings out this far and back, once, over the hero's one action.
 const SWING = 4
-const SWUNG = [0.05, 0.6] as const
 
 const ropeAt = (sway: number): string => `rotate(${sway.toFixed(2)} ${ROPE_X} 0)`
 
@@ -27,9 +25,10 @@ function Rope() {
 }
 
 export const hero: Scene = {
+  script: [1400],
   floor: () => <Rope />,
   bind: (stage) => {
     const rope = fx(stage, 'rope')
-    return (progress) => transformTo(rope, ropeAt(SWING * Math.sin(Math.PI * ramp(progress, ...SWUNG))))
+    return (_progress, _reached, play = START) => transformTo(rope, ropeAt(SWING * Math.sin(Math.PI * play.t)))
   },
 }
