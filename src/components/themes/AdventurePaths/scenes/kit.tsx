@@ -9,10 +9,7 @@ import { TRAIL } from '../palette'
 // The drawing kit of the side view levels behind the page. Every level is a stack of SVG layers on one
 // 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice), so a phone, which sees about x 570
 // to 1030, and a desktop crop the same art. The ground's top is at GROUND. He and the foes are the pixel
-// sprites of side.ts, every frame drawn once and one shown at a time by the scene's writer. A level's
-// things stand along a course that runs past the canvas: he holds his place and the course slides under
-// him the way a side scroller's camera follows him (panOf, stops.tsx), so every section has room for as
-// many things as it has cards.
+// sprites of side.ts, every frame drawn once and one shown at a time by the scene's writer.
 
 export const W = 1600
 export const H = 1000
@@ -239,20 +236,11 @@ const STRIDE = 34
 /** His run frame at x along the ground. */
 export const runFrame = (x: number): HeroPose => (Math.floor(x / STRIDE) % 2 === 0 ? 'runA' : 'runB')
 
-/** Slides the course groups (data-fx="course", behind him, and "course-front", in front of him) and the
- *  ground's pattern left under him by `offset`. */
-export function panOf(stage: ParentNode, tiled = false): (offset: number) => void {
-  const courses = [fx(stage, 'course'), fx(stage, 'course-front')]
-  const ground = fx(stage, 'ground')
-  const step = tiled ? TILE : GRASS_STEP
-  return (offset) => {
-    courses.forEach((course) => transformTo(course, `translate(${r1(-offset)} 0)`))
-    transformTo(ground, `translate(${r1(-(offset % step))} 0)`)
-  }
-}
-
 /** How tall he stands on the canvas, feet to the top of his head. */
 export const HERO_TALL = HERO.height * PX
+
+/** How tall a foe's frame is on the canvas. */
+export const FOE_TALL = FOE.height * PX
 
 /** The critter's walk frames and its squashed and tipped frames, for a FoeRig. */
 export const CRITTER_FRAMES = ['critterA', 'critterB', 'critterFlat', 'critterTipped'] as const

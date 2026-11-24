@@ -1,123 +1,86 @@
-import { hop } from '@/lib/motion/arc'
+import { drop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
+import { fx, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, CRITTER_FRAMES, Canvas, Cloud, DomeHills, FoeRig, GROUND, GrassGround, Placed, Sky, critterStep } from './kit'
-import type { Level } from './level'
-import { Coin, Tree } from './pieces'
-import { StopsFigure, keyed, stopsWriter, type Stops } from './stops'
+import { BLOCK, GROUND, TileGround, rigOf } from './kit'
+import { levelLayers } from './frame'
+import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { FilledBlock } from './pieces'
+import { mapWriter } from './worldMap'
 
-// The services: the stretch between levels, trees off along the path. For each service a
-// critter walks up the path at him; he tucks into a roll and bowls into it, the critter tumbles away onto
-// its back, and a coin springs up where it stood with a ring round it.
+// The switch palace: from the map he walks onto its spot and drops into its one colour room, landing in a
+// ground pound on the giant switch, which presses flat. Then the map comes back and the dotted outline
+// blocks along the path fill in solid, a bridge over the river to the next level.
 
-const CRITTER_FROM = 380
-const HIT_X = 230
-const ROLL_END = 170
-const ROLL = [0.12, 0.5] as const
-const COIN_TOP = -280
-const COIN_W = 10 * BLOCK
+const SIZE = 24 * BLOCK
+// The giant switch: two blocks wide, its plate on top, past his start.
+const SWITCH = 120
+const SWITCH_W = 2 * SIZE
+const PLATE_H = 40
 
-const course: Stops = {
-  back: (i) => (
+function Room() {
+  return (
     <>
-      <g data-fx={`coin-${i}`} transform={`translate(${HIT_X - COIN_W / 2} -60)`} opacity={0}>
-        <circle data-fx={`ring-${i}`} cx={COIN_W / 2} cy={28} r={10} fill="none" stroke={TRAIL.COIN} strokeWidth={6} />
-        <g transform={`scale(${BLOCK})`}>
-          <Coin />
-        </g>
-      </g>
-      <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_FROM} 0)`}>
-        <g transform="scale(-1 1)">
-          <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
-        </g>
-      </g>
+      <rect x={-200} y={-50} width={2000} height={1100} fill={TRAIL.BLOCK_DARK} />
+      {Array.from({ length: 18 }, (_, i) => (
+        <rect key={i} x={-120 + i * 100} y={0} width={60} height={GROUND} fill={TRAIL.BLOCK} opacity={0.35} />
+      ))}
     </>
-  ),
-  move: keyed([
-    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
-    { at: ROLL[0], pose: 'stomp', ahead: 0, lift: 0 },
-    { at: ROLL[1], pose: 'stomp', ahead: ROLL_END, lift: 0, spin: 720 },
-    { at: ROLL[1] + 0.08, pose: 'stomp', ahead: ROLL_END, lift: 0, spin: 720 },
-    { at: ROLL[1] + 0.1, pose: 'stand', ahead: ROLL_END, lift: 0, spin: 720 },
-  ]),
-  reply: (stage, { count }) => {
-    const stops = Array.from({ length: count }, (_, i) => ({
-      critter: fx(stage, `critter-at-${i}`),
-      critterFace: frames(fx(stage, `critter-${i}`), 'critterA'),
-      coin: fx(stage, `coin-${i}`),
-      ring: fx(stage, `ring-${i}`),
-    }))
-    return (played) =>
-      stops.forEach(({ critter, critterFace, coin, ring }, i) => {
-        const t = played(i)
-        const walk = lerp(CRITTER_FROM, HIT_X, ramp(t, 0, ROLL[1]))
-        const tumble = ramp(t, ROLL[1], ROLL[1] + 0.25)
-        const x = walk + 170 * tumble
-        transformTo(critter, `translate(${r1(x)} ${r1(-hop(tumble, 160))}) rotate(${r1(-540 * tumble)} 0 -27)`)
-        critterFace(tumble >= 1 ? 'critterTipped' : critterStep(walk))
-        const rise = ramp(t, ROLL[1], ROLL[1] + 0.2)
-        translateTo(coin, HIT_X - COIN_W / 2, lerp(-60, COIN_TOP, rise))
-        fadeTo(coin, rise > 0 ? 1 : 0)
-        const rings = ramp(t, ROLL[1] + 0.15, ROLL[1] + 0.4)
-        ring?.setAttribute('r', r1(10 + 70 * rings).toString())
-        fadeTo(ring, 1 - rings)
-      })
-  },
+  )
+}
+
+function GiantSwitch({ x }: { x: number }) {
+  return (
+    <g transform={`translate(${x - SWITCH_W / 2} ${GROUND - SIZE})`}>
+      <g data-fx="plate">
+        <rect x={20} y={-PLATE_H} width={SWITCH_W - 40} height={PLATE_H} rx={8} fill={TRAIL.ROUTE} stroke={TRAIL.HUD} strokeWidth={5} />
+        <rect x={34} y={-PLATE_H + 8} width={SWITCH_W - 120} height={8} rx={4} fill={TRAIL.ROUTE_LIGHT} />
+      </g>
+      {[0, 1].map((i) => (
+        <g key={i} transform={`translate(${i * SIZE} 0) scale(${BLOCK})`}>
+          <FilledBlock fill={TRAIL.STONE} />
+        </g>
+      ))}
+    </g>
+  )
 }
 
 export const services: Level = {
-  layers: (input) => [
-    {
-      name: 'sky',
-      node: (
-        <Canvas>
-          <Sky id="ap-services-sky" top={TRAIL.SKY_HIGH} low={TRAIL.SKY_LOW} />
-          <Cloud x={300} y={140} scale={2} />
-          <Cloud x={1100} y={90} scale={2.6} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'far',
-      node: (
-        <Canvas>
-          {[80, 420, 980, 1380].map((x, i) => (
-            <Placed key={x} x={x} y={GROUND - 60 - (4 + (i % 2)) * 56} scale={4 + (i % 2)}>
-              <Tree />
-            </Placed>
-          ))}
-        </Canvas>
-      ),
-    },
-    {
-      name: 'mid',
-      node: (
-        <Canvas>
-          <DomeHills base={880} fill={TRAIL.HILL_NEAR} edge={TRAIL.HILL_NEAR_DARK} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'near',
-      node: (
-        <Canvas>
-          <GrassGround />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'figure',
-      node: <StopsFigure stops={course} input={input} />,
-    },
-    {
-      name: 'fg',
-      node: (
-        <Canvas>
-          <Bush x={1540} fill={TRAIL.HILL_NEAR_DARK} />
-        </Canvas>
-      ),
-    },
-  ],
-  bind: (stage, input) => stopsWriter(stage, input, course),
+  script: [MAP_MS, 1300, 1700],
+  layers: (input) => {
+    const x = startX(input)
+    return levelLayers(
+      {
+        sky: <Room />,
+        near: (
+          <TileGround>
+            <FilledBlock fill={TRAIL.BLOCK} />
+          </TileGround>
+        ),
+        things: <GiantSwitch x={x + reach(input, SWITCH)} />,
+      },
+      input,
+    )
+  },
+  bind: (stage, input) => {
+    const map = mapWriter(stage, input)
+    const hero = rigOf(stage, 'hero', 'stand')
+    const plate = fx(stage, 'plate')
+    const x = startX(input) + reach(input, SWITCH)
+    const top = GROUND - SIZE - PLATE_H
+    return (play) => {
+      const walked = phase(play, 0)
+      const pounding = phase(play, 1)
+      const filling = phase(play, 2)
+      // the map: walked on and opened, then back over the room to fill the bridge
+      const back = ramp(filling, 0, 0.3)
+      map({ walk: ramp(walked, 0, 0.6), open: filling > 0 ? 1 - back : ramp(walked, 0.55, 1), fill: ramp(filling, 0.3, 0.95) })
+      const fall = ramp(pounding, 0, 0.55)
+      const press = ramp(pounding, 0.55, 0.75)
+      // the plate presses down onto its base, scaled from its foot
+      transformTo(plate, `scale(1 ${(1 - 0.75 * press).toFixed(3)})`)
+      const y = fall < 1 ? -60 + drop(fall, top + 60) : top + PLATE_H * 0.75 * press
+      hero(x, y, fall < 1 ? (fall < 0.6 ? 'jump' : 'stomp') : press < 1 ? 'stomp' : 'cheer')
+    }
+  },
 }
