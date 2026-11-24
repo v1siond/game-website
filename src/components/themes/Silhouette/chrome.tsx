@@ -12,7 +12,7 @@ import page from './page.module.css'
 
 // The page's fixed top bar and its end. The bar is a black strip with his initials in typewriter type, the
 // way back to the top. The end is the clearing: the contact panel with his line and the ways to reach him,
-// beside the lamp he lights.
+// where he sits down in the light.
 
 // Under his line at the end: the hero's actions, the CV, and Enter into the engine.
 const END_SITES = ['cv', 'engine'] as const

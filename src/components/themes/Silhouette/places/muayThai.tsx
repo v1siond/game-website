@@ -1,27 +1,25 @@
 import { drop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { Canvas, FIGURE_H, FLOOR, W } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { AT, type Place } from '../place'
-import { CROUCH, kick, rest } from '../pose'
+import { type Frame, type Place } from '../place'
+import { CROUCH, STRIKE, rest } from '../pose'
 
-// Muay Thai in the gravity room: a machine room with a ceiling, a heavy bag hanging from it. Gravity flips:
-// he falls up to the ceiling and lands on it upside down in a crouch; he kicks the bag hanging before him,
-// which swings away; then gravity flips back and he drops to the floor and lands in his guard.
+// Muay Thai in the gravity room: a machine room with a ceiling, a gravity switch on the wall at his hand,
+// and a saw blade running along a rail on the floor toward him. He strikes the switch and falls up to the
+// ceiling, landing on it upside down, as the saw runs by under him; then gravity flips back, he drops to
+// the floor and lands in his guard, the saw gone past.
 
 // Low enough that a phone's view, its top at y 134 under the page's bar, shows the ceiling and him on it.
 const CEILING = 330
 // Standing on the ceiling upside down, his soles are on it: the lift that puts the top of his box there.
 const UP = FLOOR - CEILING - FIGURE_H
-const BAG = 260
-// He stands back from the bag's spot so it hangs a kick's reach ahead of him, never over him.
-const BACK = -0.6 * AT
-// A kicked bag swings away from him this far.
-const SWING = 18
+const SWITCH = { x: -20, y: -170 }
+const SAW = { r: 64, from: 700, to: -900 }
 
-/** The room's ceiling and its girders over the path. */
+/** The ceiling and its girder over the room. */
 function Ceiling({ light }: { light: Light }) {
   return (
     <Canvas>
@@ -31,37 +29,51 @@ function Ceiling({ light }: { light: Light }) {
   )
 }
 
-const swung = (t: number): string => `rotate(${(SWING * t).toFixed(1)} 0 ${CEILING - FLOOR})`
+function move(profession: Parameters<typeof rest>[0], t: number): Frame {
+  if (t < 0.36) {
+    const struck = ramp(t, 0, 0.1)
+    const fall = ramp(t, 0.12, 0.33)
+    return { pose: fall > 0 ? mix(STRIKE, CROUCH, ramp(t, 0.12, 0.2)) : mix(rest(profession), STRIKE, struck), ahead: 0, lift: drop(fall, UP), over: ramp(t, 0.12, 0.3) }
+  }
+  if (t < 0.68) return { pose: CROUCH, ahead: 0, lift: UP, over: 1 }
+  const fall = ramp(t, 0.68, 0.9)
+  return { pose: mix(CROUCH, rest(profession), ramp(t, 0.88, 1)), ahead: 0, lift: UP - drop(fall, UP), over: 1 - ramp(t, 0.68, 0.82) }
+}
 
 export const muayThai: Place = {
-  script: [1600, 1600, 1600],
-  ends: [0.33, 0.66, 1],
+  script: [1600, 1600, 1400],
+  ends: [0.36, 0.68, 1],
   mid: ({ light }) => <Ceiling light={light} />,
   obstacle: ({ light }) => (
-    <g data-fx="bag" transform={swung(0)}>
-      <line x1={0} y1={CEILING - FLOOR} x2={0} y2={CEILING - FLOOR + 60} stroke={SHADE.black} strokeWidth={5} />
-      <path d={`M-44 ${CEILING - FLOOR + 60} H44 L44 ${CEILING - FLOOR + BAG} Q0 ${CEILING - FLOOR + BAG + 16} -44 ${CEILING - FLOOR + BAG} Z`} fill={SHADE.black} />
-      <g data-fx="edge" opacity="0">
-        <path d={`M44 ${CEILING - FLOOR + 60} V${CEILING - FLOOR + BAG}`} stroke={light.rim} strokeWidth={6} />
+    <>
+      <rect x={-1200} y={-14} width={2400} height={14} fill={SHADE.black} />
+      <path d="M-1200 -14 H1200" stroke={light.rim} strokeOpacity={0.3} strokeWidth={2} />
+      <rect x={SWITCH.x - 16} y={SWITCH.y - 30} width={32} height={60} fill={light.mid} />
+      <g data-fx="lever" transform={`rotate(-30 ${SWITCH.x} ${SWITCH.y + 10})`}>
+        <rect x={SWITCH.x - 4} y={SWITCH.y - 24} width={8} height={34} fill={SHADE.black} />
       </g>
-    </g>
+      <g data-fx="saw" transform={`translate(${SAW.from} ${-SAW.r - 14})`}>
+        <circle r={SAW.r} fill={SHADE.black} />
+        <g data-fx="teeth">
+          {Array.from({ length: 16 }, (_, i) => (
+            <path key={i} d={`M${-8} ${-SAW.r + 2} L0 ${-SAW.r - 14} L8 ${-SAW.r + 2} Z`} transform={`rotate(${i * 22.5})`} fill={SHADE.black} />
+          ))}
+        </g>
+        <circle r={10} fill={light.mid} />
+      </g>
+    </>
   ),
-  move: (profession, t) => {
-    if (t < 0.33) return { pose: CROUCH, ahead: BACK, lift: drop(ramp(t, 0, 0.3), UP), over: ramp(t, 0, 0.25) }
-    if (t < 0.66) {
-      const struck = kick(profession, ramp(t, 0.36, 0.56))
-      return { pose: t < 0.56 ? mix(CROUCH, struck, ramp(t, 0.33, 0.38)) : mix(struck, CROUCH, ramp(t, 0.58, 0.66)), ahead: BACK, lift: UP, over: 1 }
-    }
-    const fall = ramp(t, 0.66, 0.9)
-    return { pose: mix(CROUCH, rest(profession), ramp(t, 0.88, 1)), ahead: BACK, lift: UP - drop(fall, UP), over: 1 - ramp(t, 0.66, 0.8) }
-  },
+  move,
   reply: (stage) => {
-    const bag = fx(stage, 'bag')
-    const edge = fx(stage, 'edge')
+    const lever = fx(stage, 'lever')
+    const saw = fx(stage, 'saw')
     return (t) => {
-      const hit = ramp(t, 0.5, 0.6)
-      transformTo(bag, swung(hit * (1 - 0.7 * ramp(t, 0.66, 1))))
-      fadeTo(edge, hit)
+      const thrown = ramp(t, 0.06, 0.1) - ramp(t, 0.7, 0.74)
+      transformTo(lever, `rotate(${(-30 + 60 * thrown).toFixed(1)} ${SWITCH.x} ${SWITCH.y + 10})`)
+      const run = ramp(t, 0.3, 0.7)
+      const x = lerp(SAW.from, SAW.to, run)
+      transformTo(saw, `translate(${x.toFixed(1)} ${-SAW.r - 14}) rotate(${(-x * 1.2).toFixed(1)})`)
+      fadeTo(saw, 1 - ramp(run, 0.9, 1))
     }
   },
 }

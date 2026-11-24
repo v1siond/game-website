@@ -1,80 +1,87 @@
-import { drop, hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
-import { FIGURE_H } from '../forest'
+import { fadeTo, fx, transformTo, translateTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { AT, type Frame, type Place } from '../place'
-import { CROUCH, HANG, TUCK, rest, run } from '../pose'
+import { SHOVE, rest, walk } from '../pose'
 
-// Work at the chasm: a rope hangs over a gap in the path from a beam with a bell. He runs, leaps and takes
-// the rope; then he swings out over the gap, lets go at the top of the swing and lands crouched on the far
-// side as the bell rings out in light, the rope swinging back behind him.
+// Work at a gap in the path: a dead trunk stands at its near edge, kept from falling by a rope pegged into
+// the ground, and an open bear trap lies by his feet. He shoves the trap along the ground to the rope; it
+// snaps shut on the rope and cuts it, and the trunk falls across the gap; then he walks over on the trunk
+// to the far side.
 
-const LENGTH = 560
-// The rope swings out this far, in degrees, and he lets go at the top.
-const OUT = 32
-const GAP = { from: -40, to: 260 }
-// Where he lands past the gap, from his place.
-const LANDED = AT + GAP.to + 60
-// His run up to the rope, its steps.
-const STEP = 70
-
-const rad = (deg: number): number => (deg * Math.PI) / 180
-
-/** The rope's swing at t: still until he takes it, out to the top, then back behind him once he lets go. */
-const angleAt = (t: number): number => OUT * ramp(t, 0.4, 0.72) * (1 - ramp(t, 0.72, 1))
-
-/** The rope's end, from his place: where his hands are while he hangs on it. */
-const ropeEnd = (deg: number): { x: number; lift: number } => ({
-  x: AT + LENGTH * Math.sin(rad(deg)),
-  lift: 300 + LENGTH - LENGTH * Math.cos(rad(deg)) - FIGURE_H * 0.95,
-})
+const GAP = { from: 80, to: 340 }
+const TRUNK = { x: 55, h: 330, w: 30 }
+const PEG = 0
+// The trap's foot, from the obstacle's foot, before and after he shoves it to the rope.
+const TRAP_FROM = -70
+const TRAP_TO = PEG - 6
+// The trunk's top as it lies across the gap, the height he walks at.
+const ON_TRUNK = TRUNK.w / 2
+const ACROSS = AT + TRUNK.x + TRUNK.h - 20
+const STEP = 55
 
 function move(profession: Parameters<typeof rest>[0], t: number): Frame {
-  if (t < 0.25) return { pose: run(profession, (60 * ramp(t, 0, 0.25)) / STEP), ahead: 60 * ramp(t, 0, 0.25), lift: 0, over: 0 }
-  const caught = ropeEnd(0)
   if (t < 0.4) {
-    const leap = ramp(t, 0.25, 0.4)
-    return { pose: mix(rest(profession), TUCK, leap), ahead: lerp(60, caught.x, leap), lift: caught.lift * leap + hop(leap, 30), over: 0 }
+    const shoved = ramp(t, 0.08, 0.36)
+    return { pose: mix(rest(profession), SHOVE, ramp(t, 0, 0.1) - ramp(t, 0.34, 0.4)), ahead: (TRAP_TO - TRAP_FROM) * shoved, lift: 0, over: 0 }
   }
-  const end = ropeEnd(angleAt(Math.min(t, 0.72)))
-  if (t < 0.72) return { pose: HANG, ahead: end.x, lift: end.lift, over: 0 }
-  const fall = ramp(t, 0.72, 0.9)
-  return { pose: mix(TUCK, CROUCH, ramp(t, 0.86, 0.96)), ahead: lerp(end.x, LANDED, fall), lift: end.lift - drop(fall, end.lift), over: 0 }
+  const from = TRAP_TO - TRAP_FROM
+  const along = ramp(t, 0.66, 1)
+  const ahead = from + (ACROSS - from) * along
+  const onTrunk = ahead > AT + TRUNK.x - 20 && ahead < ACROSS + 10 ? ON_TRUNK : 0
+  return { pose: along > 0 && along < 1 ? walk(profession, ahead / STEP) : rest(profession), ahead, lift: onTrunk * Math.min(1, along * 8), over: 0 }
 }
 
-function Gap({ light }: { light: Light }) {
-  return <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={700} fill={light.mid} />
+/** The bear trap, open (data-fx trap-open) or sprung shut (trap-shut). */
+function Trap() {
+  return (
+    <g data-fx="trap" transform={`translate(${TRAP_FROM} 0)`}>
+      <rect x={-34} y={-8} width={68} height={8} fill={SHADE.black} />
+      <g data-fx="trap-open">
+        <path d="M-34 -8 Q-50 -40 -20 -46 L-14 -38 Q-34 -34 -26 -8 Z M34 -8 Q50 -40 20 -46 L14 -38 Q34 -34 26 -8 Z" fill={SHADE.black} />
+      </g>
+      <g data-fx="trap-shut" opacity="0">
+        <path d="M-18 -8 Q-20 -46 0 -52 Q20 -46 18 -8 Z" fill={SHADE.black} />
+      </g>
+    </g>
+  )
 }
 
 export const work: Place = {
-  script: [1600, 2000],
-  ends: [0.4, 1],
-  obstacle: ({ light }) => (
+  script: [2000, 1400, 1600],
+  ends: [0.4, 0.66, 1],
+  obstacle: ({ light }: { light: Light }) => (
     <>
-      <Gap light={light} />
-      <g transform={`translate(0 ${-300 - LENGTH})`}>
-        <rect x={-70} y={-20} width={140} height={20} fill={SHADE.black} />
-        <path d="M-26 0 Q-26 50 -34 60 H34 Q26 50 26 0 Z" fill={SHADE.black} />
-        <g data-fx="bell" opacity="0">
-          <circle cx={0} cy={40} r={90} fill={light.rim} opacity={0.2} />
-          <path d="M-20 10 Q-20 46 -26 54 H26 Q20 46 20 10 Z" fill={light.rim} />
-        </g>
-        <g data-fx="rope">
-          <line x1={0} y1={0} x2={0} y2={LENGTH} stroke={SHADE.black} strokeWidth={7} />
-          <circle cx={0} cy={LENGTH + 6} r={10} fill={SHADE.black} />
-        </g>
+      <rect x={GAP.from} y={-2} width={GAP.to - GAP.from} height={700} fill={light.far} />
+      <g data-fx="trunk">
+        <rect x={TRUNK.x - TRUNK.w / 2} y={-TRUNK.h} width={TRUNK.w} height={TRUNK.h} fill={SHADE.black} />
+        <path d={`M${TRUNK.x} ${-TRUNK.h + 60} L${TRUNK.x + 40} ${-TRUNK.h + 20} M${TRUNK.x} ${-TRUNK.h + 140} L${TRUNK.x - 36} ${-TRUNK.h + 100}`} stroke={SHADE.black} strokeWidth={8} />
       </g>
+      <line data-fx="rope" x1={PEG} y1={0} x2={TRUNK.x} y2={-TRUNK.h + 30} stroke={SHADE.black} strokeWidth={4} />
+      <line data-fx="cut" x1={TRUNK.x} y1={-TRUNK.h + 30} x2={TRUNK.x - 20} y2={-TRUNK.h + 120} stroke={SHADE.black} strokeWidth={4} opacity="0" />
+      <rect x={PEG - 4} y={-18} width={8} height={18} fill={SHADE.black} />
+      <Trap />
     </>
   ),
   move,
   reply: (stage) => {
+    const trap = fx(stage, 'trap')
+    const open = fx(stage, 'trap-open')
+    const shut = fx(stage, 'trap-shut')
+    const trunk = fx(stage, 'trunk')
     const rope = fx(stage, 'rope')
-    const bell = fx(stage, 'bell')
+    const cut = fx(stage, 'cut')
     return (t) => {
-      transformTo(rope, `rotate(${(-angleAt(t)).toFixed(1)} 0 0)`)
-      fadeTo(bell, ramp(t, 0.86, 0.96))
+      const sprung = ramp(t, 0.4, 0.43)
+      const fallen = ramp(t, 0.44, 0.62)
+      translateTo(trap, TRAP_FROM + (TRAP_TO - TRAP_FROM) * ramp(t, 0.08, 0.36), 0)
+      fadeTo(open, 1 - sprung)
+      fadeTo(shut, sprung)
+      fadeTo(rope, 1 - sprung)
+      fadeTo(cut, sprung)
+      // falls as a weight does, slow off the top and fast at the end
+      transformTo(trunk, `rotate(${(90 * fallen * fallen).toFixed(1)} ${TRUNK.x} 0)`)
     }
   },
 }

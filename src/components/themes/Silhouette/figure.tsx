@@ -113,8 +113,10 @@ export const ShadeFigure = memo(function ShadeFigure({ profession, box, classNam
         <path d={HAIR} fill={BLACK} />
         <path d={NOSE} fill={BLACK} />
         <path d={BEARD} fill={BLACK} />
-        <ellipse cx={20.6} cy={11.4} rx={1.2} ry={1.9} fill={SHADE.glow} />
-        <ellipse cx={25} cy={11.4} rx={1.5} ry={2} fill={SHADE.glow} />
+        <g data-fx="eyes">
+          <ellipse cx={20.6} cy={11.4} rx={1.2} ry={1.9} fill={SHADE.glow} />
+          <ellipse cx={25} cy={11.4} rx={1.5} ry={2} fill={SHADE.glow} />
+        </g>
         {look.headwear}
         <Leg x={21.8} upper={s.legF} lower={s.shinF} />
         <Arm x={23.4} look={look} upper={s.armF} lower={s.foreF} />

@@ -1,70 +1,66 @@
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { Canvas, gearPath } from '../forest'
+import { fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
-import { still, type Place } from '../place'
-import { DUCK, pull } from '../pose'
+import { AT, type Frame, type Place } from '../place'
+import { CROUCH, DIVE, rest } from '../pose'
 
-// Projects on the sawmill floor: a lever stands in the path under a saw blade hung on a long arm. He throws
-// the lever; then the arm swings the blade down through the path, he drops flat and it stops just over his
-// back, its edge catching the light.
+// Projects in the press corridor: a hydraulic crusher pounds the floor ahead of him on its beat. It slams
+// down once as he waits, crouched and timing it; as it lifts again he dives under it and rolls clear on the
+// far side, and it slams down behind him.
 
-const PIVOT_Y = -860
-const ARM = 600
-const BLADE_R = 56
-// The arm waits this far ahead of him, in degrees, and swings through to just past his back.
-const WAIT = 60
-const OVER = -8
-const LEVER_X = -50
+const PRESS = { from: -10, to: 200, h: 120 }
+const TOP = -560
+// How high the press head's foot hangs at t: down once in the first action, up as he goes, down behind him.
+function footAt(t: number): number {
+  const slam1 = ramp(t, 0.12, 0.2) - ramp(t, 0.3, 0.46)
+  const slam2 = ramp(t, 0.74, 0.8)
+  return lerp(TOP + PRESS.h, 0, Math.max(slam1, slam2)) - PRESS.h
+}
+const PAST = AT + PRESS.to + 90
 
-const BLADE = gearPath(0, ARM, BLADE_R, 18)
+function move(profession: Parameters<typeof rest>[0], t: number): Frame {
+  if (t < 0.5) return { pose: mix(rest(profession), CROUCH, ramp(t, 0.02, 0.12)), ahead: 0, lift: 0, over: 0 }
+  const dive = ramp(t, 0.5, 0.72)
+  const pose = t < 0.72 ? mix(CROUCH, DIVE, ramp(t, 0.5, 0.56)) : mix(DIVE, CROUCH, ramp(t, 0.72, 0.84))
+  return { pose, ahead: lerp(0, PAST, dive), lift: 0, over: 0 }
+}
 
-const swungAt = (t: number): number => WAIT + (OVER - WAIT) * ramp(t, 0.4, 0.85)
-
-function MillWheel({ light }: { light: Light }) {
+function PressFrame({ light }: { light: Light }) {
   return (
-    <Canvas>
-      <g fill={light.far} opacity={0.85}>
-        <path d={gearPath(1320, 360, 220, 20)} fillRule="evenodd" />
-        <rect x={180} y={260} width={220} height={620} />
-        <path d="M160 260 L290 160 L420 260 Z" />
-      </g>
-    </Canvas>
+    <>
+      <rect x={PRESS.from - 40} y={TOP - 400} width={30} height={400 - TOP} fill={SHADE.black} />
+      <rect x={PRESS.to + 10} y={TOP - 400} width={30} height={400 - TOP} fill={SHADE.black} />
+      <rect x={PRESS.from - 60} y={TOP - 40} width={PRESS.to - PRESS.from + 120} height={40} fill={SHADE.black} />
+      <path d={`M${PRESS.from} 0 H${PRESS.to}`} stroke={light.rim} strokeOpacity={0.35} strokeWidth={4} />
+    </>
   )
 }
 
 export const projects: Place = {
-  script: [1400, 1800],
-  ends: [0.4, 1],
-  far: ({ light }) => <MillWheel light={light} />,
+  script: [2000, 2000],
+  ends: [0.5, 1],
   obstacle: ({ light }) => (
     <>
-      <g transform={`translate(${LEVER_X} 0)`}>
-        <rect x={-14} y={-24} width={28} height={24} fill={SHADE.black} />
-        <g data-fx="lever" transform="rotate(-35 0 -20)">
-          <line x1={0} y1={-20} x2={0} y2={-120} stroke={SHADE.black} strokeWidth={8} />
-          <circle cx={0} cy={-124} r={12} fill={SHADE.black} />
-        </g>
+      <PressFrame light={light} />
+      <g data-fx="press" transform={`translate(0 ${TOP})`}>
+        <rect x={PRESS.from + 70} y={-600} width={PRESS.to - PRESS.from - 140} height={600} fill={SHADE.black} />
+        <rect x={PRESS.from} y={0} width={PRESS.to - PRESS.from} height={PRESS.h} fill={SHADE.black} />
       </g>
-      <g data-fx="arm" transform={`translate(-90 ${PIVOT_Y}) rotate(${-WAIT})`}>
-        <line x1={0} y1={0} x2={0} y2={ARM} stroke={SHADE.black} strokeWidth={10} />
-        <path d={BLADE} fill={SHADE.black} fillRule="evenodd" />
-        <g data-fx="edge" opacity="0">
-          <path d={BLADE} fill="none" stroke={light.rim} strokeWidth={4} />
-        </g>
+      <g data-fx="dust" opacity="0">
+        <ellipse cx={PRESS.from - 40} cy={-14} rx={50} ry={14} fill={light.rim} opacity={0.25} />
+        <ellipse cx={PRESS.to + 40} cy={-14} rx={50} ry={14} fill={light.rim} opacity={0.25} />
       </g>
     </>
   ),
-  move: (profession, t) => still(t < 0.4 ? pull(profession, t / 0.4) : mix(pull(profession, 1), DUCK, ramp(t, 0.4, 0.6))),
+  move,
   reply: (stage) => {
-    const lever = fx(stage, 'lever')
-    const arm = fx(stage, 'arm')
-    const edge = fx(stage, 'edge')
+    const press = fx(stage, 'press')
+    const dust = fx(stage, 'dust')
     return (t) => {
-      transformTo(lever, `rotate(${(-35 + 70 * ramp(t, 0.1, 0.4)).toFixed(1)} 0 -20)`)
-      transformTo(arm, `translate(-90 ${PIVOT_Y}) rotate(${(-swungAt(t)).toFixed(1)})`)
-      fadeTo(edge, ramp(t, 0.8, 1))
+      translateTo(press, 0, footAt(t))
+      const struck = Math.max(ramp(t, 0.19, 0.2) - ramp(t, 0.24, 0.32), ramp(t, 0.79, 0.8) - ramp(t, 0.86, 0.96))
+      fadeTo(dust, struck)
     }
   },
 }

@@ -18,9 +18,11 @@ import { tech } from './places/tech'
 import { ventures } from './places/ventures'
 import { work } from './places/work'
 
-// The page as scenes, one walk through the black forest: its edge at dawn (hero), one place per section of
-// the shown profession in reading order, from the black lake to the edge of the machine city, and
-// the clearing at the end (contact). Every place past the hero stands in the profession's own light: cold
+// The page as scenes, one way through the black forest and into the machine city, the game's own set
+// pieces one per place: its edge at dawn where he wakes (hero), one place per section of the shown
+// profession in reading order, the boulder on the slope, the trap and the trunk, the flooded hold, the
+// conveyor and the hook, the crusher, the wall gun, the gear and the gravity room, and the clearing at the
+// end (contact). Every place past the hero stands in the profession's own light: cold
 // dawn for the System Engineer, an ember sunset for the Musician, a crimson dusk for the Martial Artist.
 // Each scene names its place, its anchor, its script of one to three actions the scroll plays, and how many
 // cards its section counts (stageItems) for the theatre's reading line.
@@ -37,7 +39,7 @@ const PLACES: Record<SceneId, Scene> = {
   ventures: scenePlace(ventures),
   bands: scenePlace(bands),
   muayThai: scenePlace(muayThai),
-  contact,
+  contact: scenePlace(contact),
 }
 
 const ANCHORS: Record<SceneId, string> = {

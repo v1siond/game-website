@@ -19,20 +19,20 @@ import { LAYER_MOTION, scenesOf, type ShadeScene } from './Silhouette/scenes'
 import { PlaceSection } from './Silhouette/sections'
 import page from './Silhouette/page.module.css'
 
-// Silhouette: his CV as one walk through a black forest in the fog, black shapes against a lit sky, the
-// way a monochrome puzzle platformer is drawn. The page keeps the rhythm of the Rockstar VI site: a big
-// hero (the forest's edge at dawn, him on his mound, his name as a silent film intertitle, the levers that
-// change his profession), then every section of the shown profession is one full screen place of the walk
-// that rises from dark, holds while its cards scroll over it, and goes dark while the next one rises: the
-// spider's thicket, the ropes over the chasm, the flooded hold, the trap line, the sawmill, the edge of
-// the machine city, the live floor, the forest ring, and the clearing with its lamp at the end. He is the
-// small black figure in each place and does one thing per card of the section: lights a lantern, hangs off
-// a rope, pushes a crate. Every motion is a function of the scroll position (the shared theatre on
-// useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
-// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame.
+// Silhouette: his CV as one way through a black forest in the fog and on into a city of machines, black
+// shapes against a lit sky, the way the monochrome puzzle platformer it comes from is drawn. A big hero (the
+// forest's edge at dawn, where he wakes in the grass, his name as a silent film intertitle, the levers that
+// change his profession), then every section of the shown profession is one full screen place that rises
+// from dark, holds while its cards scroll over it, and goes dark while the next one rises. Each place is
+// one of the game's set pieces, a different trap or machine every time: the boulder on the slope, the
+// trap that cuts the rope, the flooded hold, the conveyor to the hook, the crusher, the wall gun, the
+// turning gear, the gravity room and its saw, and the quiet clearing at the end. The shared scene player
+// plays each place's one to three actions at their own pace as the section arrives: scroll up and it plays
+// back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first
+// frame.
 //
-// Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
-// its settled frame.
+// Under reduced motion there is no theatre: each section carries its own picture, still, at its end frame,
+// and he stands awake in the hero.
 
 // A phone frames the forest from higher up (Silhouette/forest PhoneView).
 const PHONE_QUERY = '(max-width: 767.98px)'

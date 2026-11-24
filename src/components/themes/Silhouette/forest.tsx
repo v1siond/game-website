@@ -147,10 +147,18 @@ function Soft({ d }: { d: string }) {
   )
 }
 
-/** In front, out of focus: a bough hanging into the top corner and grass at both bottom corners. */
+/** In front, out of focus: a bough hanging into the top corner and grass at both bottom corners, and the
+ *  dark vignette the game's camera sees every place through. */
 export function Front() {
   return (
     <Canvas>
+      <defs>
+        <radialGradient id="sh-vignette" cx="0.5" cy="0.5" r="0.72">
+          <stop offset="0.55" stopColor={SHADE.black} stopOpacity="0" />
+          <stop offset="1" stopColor={SHADE.black} stopOpacity="0.75" />
+        </radialGradient>
+      </defs>
+      <rect width={W} height={H} fill="url(#sh-vignette)" />
       <Soft d="M0 0 H320 Q220 60 160 130 Q80 200 0 220 Z" />
       <Soft d="M0 1000 L0 800 L30 920 L60 760 L90 910 L120 830 L150 950 L186 860 L204 1000 Z" />
       <Soft d="M1600 1000 L1600 780 L1564 920 L1534 820 L1498 930 L1468 860 L1438 1000 Z" />
