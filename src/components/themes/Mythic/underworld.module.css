@@ -292,9 +292,18 @@
   transition-delay: calc(0.4s + var(--i) * 0.25s);
 }
 
+/* Struck, the stamp goes from the blood it is cut in to the frost of a deed done (ink on frost, 11.4:1),
+   just after it lands. It is set here over its utility class, which only gives the colour it is struck in. */
 [data-on] .fulfilled {
   opacity: 1;
   transform: scale(1) rotate(-10deg);
+  background-color: var(--myth-frost);
+  color: var(--myth-ink);
+  transition:
+    opacity 0.2s ease calc(0.4s + var(--i) * 0.25s),
+    transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) calc(0.4s + var(--i) * 0.25s),
+    background-color 0.3s ease calc(0.75s + var(--i) * 0.25s),
+    color 0.3s ease calc(0.75s + var(--i) * 0.25s);
 }
 
 /* ---------------------------------------------------------------- the realm door (gate.tsx) */
@@ -357,9 +366,12 @@
     transform: none !important;
   }
 
-  /* The fulfilled stamp's end frame is its tilt at full size, not the scale(2) it is struck from. */
+  /* The fulfilled stamp's end frame is its tilt at full size in the frost of a deed done, not the scale(2)
+     and blood it is struck from. */
   .fulfilled {
     transform: rotate(-10deg) !important;
+    background-color: var(--myth-frost) !important;
+    color: var(--myth-ink) !important;
   }
 }
 
