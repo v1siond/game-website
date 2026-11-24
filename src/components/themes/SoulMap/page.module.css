@@ -1,0 +1,209 @@
+/* Soul Map: the page over the ruins at dusk. The text is plain HTML in normal flow over the fixed theatre;
+   it is never scaled, faded or blurred, so it is opaque from its first frame. Every word sits on the
+   game's opaque menu panel, its plate or its stone buttons, so it reads on any frame of any place. Every
+   colour reads the palette's CSS variables (--soul-*, set on the root from palette.ts). */
+
+.root {
+  /* The keyboard focus ring (globals.css) in the banner gold, and the abyss just outside it. */
+  --focus-ring: var(--soul-glow);
+  --focus-halo: var(--soul-abyss);
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--soul-abyss);
+  color: var(--soul-text);
+}
+
+.theatre {
+  --theatre-ground: var(--soul-abyss);
+  --theatre-veil: var(--soul-ink);
+}
+
+/* ---- the top bar: his initials, back to the top ---- */
+.hud {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 6px 220px 6px clamp(16px, 5vw, 80px);
+  border-bottom: 1px solid var(--soul-glow-deep);
+  background: var(--soul-ink);
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-block: 1px solid var(--soul-glow-deep);
+  color: var(--soul-glow);
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+}
+
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- the menu panel: dark stone, a thin worn gold frame and a darker inner edge ---- */
+.panel {
+  background: linear-gradient(180deg, var(--soul-cavern), var(--soul-deep));
+  border: 1px solid var(--soul-ridge);
+  box-shadow: inset 0 0 0 3px var(--soul-ink), inset 0 0 0 4px var(--soul-glow-deep);
+}
+
+/* An item slot: a tool, a skill, a service. */
+.slot {
+  background: var(--soul-ink);
+  border: 1px solid var(--soul-rock);
+}
+
+/* A section's title, set like an area's name: carved capitals on a black plate between two gold rules. */
+.titlePlate {
+  display: inline-block;
+  padding: 12px 24px;
+  border-block: 1px solid var(--soul-glow-deep);
+  background: var(--soul-ink);
+}
+
+/* ---- the buttons, cut like the game's menu entries: the lit highlight sweeps in behind the word ---- */
+.button {
+  position: relative;
+  isolation: isolate;
+  background: var(--soul-abyss);
+  border-top: 1px solid var(--soul-glow-deep);
+  border-bottom: 1px solid var(--soul-glow-deep);
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent, var(--soul-panel), transparent);
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+.button:hover::before,
+.button:focus-visible::before,
+.button[aria-checked='true']::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.buttonLit,
+.button[aria-checked='true'] {
+  border-color: var(--soul-glow);
+}
+
+/* ---- the hero: his name and the class menu over the shrine ---- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+}
+
+/* ---- a place: a tall head that holds the picture alone, then brings its title up, then the cards ---- */
+.level {
+  position: relative;
+  padding: 0 clamp(16px, 5vw, 80px) 70svh;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-height: 125svh;
+  padding-bottom: 12svh;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(640px, 46vw);
+}
+
+/* ---- the end: the contact panel at the last fire, with room under it for the chest to open ---- */
+.goal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 150svh;
+  padding: 30svh clamp(16px, 5vw, 80px) 70svh;
+}
+
+.goalCopy {
+  width: min(640px, 100%);
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 40px;
+  text-align: center;
+}
+
+.copyright {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 12px;
+  background: var(--soul-ink);
+  color: var(--soul-text-soft);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767.98px) {
+  .hud {
+    min-height: 48px;
+    padding: 4px 180px 4px 16px;
+  }
+
+  .level {
+    padding-bottom: 60svh;
+  }
+
+  /* a phone holds the place alone a little longer, so its last action plays before the cards come up */
+  .head {
+    min-height: 130svh;
+    padding-bottom: 10svh;
+  }
+
+  .body {
+    width: 100%;
+  }
+}
+
+/* Reduced motion: each stage sits still at the top of its section, so the heads need one screen only. */
+.still .hero,
+.still .level,
+.still .goal {
+  isolation: isolate;
+}
+
+.still .level {
+  padding-bottom: 20svh;
+}
+
+.still .head {
+  min-height: 100svh;
+}
+
+.still .goal {
+  min-height: 100svh;
+  padding-top: 10svh;
+  padding-bottom: 20svh;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button::before {
+    transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+  }
+}
