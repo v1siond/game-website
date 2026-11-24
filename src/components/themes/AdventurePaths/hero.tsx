@@ -7,6 +7,9 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { NameWords } from '@/components/cv/NameWords'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLatest } from '@/hooks/useLatest'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useScrollFollow } from '@/hooks/useScrollFollow'
+import { clamp01 } from '@/lib/scroll/progress'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import { cssVars } from '@/lib/cssVars'
@@ -235,6 +238,12 @@ function HubMap({ name }: { name: string }) {
   const { navigation, trail } = useLabels()
   const hub = useHub(active)
   const [ox, oy] = shareOf(landmarkPoint(hub.entering ?? active), HUB.width, HUB.height)
+  // the map's life at rest (clouds, breaths, blink) follows the scroll over the first screen
+  const life = useRef<HTMLElement>(null)
+  const reduced = useReducedMotion()
+  useScrollFollow((scroll, viewport) => {
+    life.current?.style.setProperty('--map-t', clamp01(scroll / viewport).toFixed(4))
+  }, !reduced)
 
   const pick = (option: ProfessionOption) => hub.goTo(option.id, option.optionProps.onClick)
 
@@ -243,7 +252,7 @@ function HubMap({ name }: { name: string }) {
   }
 
   return (
-    <section className={page.map} aria-label={navigation.professionSelection}>
+    <section ref={life} className={page.map} aria-label={navigation.professionSelection}>
       <div className={map.mapTilt}>
         <div className="relative overflow-hidden rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-parchment)] shadow-[0_10px_0_var(--ap-bark)]" data-season={hub.season}>
           <NameBox place={hub.standing} />

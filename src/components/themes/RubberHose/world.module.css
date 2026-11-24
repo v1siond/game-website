@@ -36,9 +36,9 @@
 
 /* ---- the film frame ---- */
 
-/* A strip of film stock down the page edge, its sprocket holes running past as the film starts and
-   coming to rest. The holes are one repeating gradient on an element taller than the screen, so each run
-   is a single translate that ends where it began. */
+/* A strip of film stock down the page edge, its sprocket holes running past as the page scrolls
+   (backdrop.tsx writes --reel, 0 up to one hole). The holes are one repeating gradient on an element taller
+   than the screen, so a run of one hole ends where it began. */
 .filmStrip {
   background: var(--hose-film);
 }
@@ -50,17 +50,11 @@
   background-size: 50% 2rem;
   background-repeat: repeat-y;
   background-position: center top;
-  animation: sprocketRun 1.6s linear 3;
+  transform: translate3d(0, calc(var(--reel, 0) * 1px), 0);
 }
 
 .sprocketsReverse {
-  animation-direction: reverse;
-}
-
-@keyframes sprocketRun {
-  to {
-    transform: translate3d(0, 2rem, 0);
-  }
+  transform: translate3d(0, calc(var(--reel, 0) * -1px), 0);
 }
 
 /* The double ink rule framing the page like a cartoon's title frame. */
@@ -68,35 +62,18 @@
   border: 8px double var(--hose-ink);
 }
 
-/* The film grain: a noise tile larger than the screen jumping in steps, like grain changing per frame,
-   for the reel's first 4.5 s. */
+/* The film grain: a noise tile larger than the screen jumping between its frames as the page scrolls,
+   like grain changing per frame (backdrop.tsx writes --grain-x and --grain-y). */
 .grain {
   position: absolute;
   inset: -10%;
   opacity: 0.15;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  animation: grainJump 0.5s steps(5) 9;
+  transform: translate3d(calc(var(--grain-x, 0) * 1%), calc(var(--grain-y, 0) * 1%), 0);
 }
 
-@keyframes grainJump {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  25% {
-    transform: translate3d(-3%, 2%, 0);
-  }
-  50% {
-    transform: translate3d(2%, -3%, 0);
-  }
-  75% {
-    transform: translate3d(-2%, -2%, 0);
-  }
-  100% {
-    transform: translate3d(3%, 3%, 0);
-  }
-}
-
-/* The sepia vignette darkening the edges, and the projector's flicker over it, twice. */
+/* The sepia vignette darkening the edges, and the projector's flicker over it now and then as the page
+   scrolls (backdrop.tsx writes --flicker). */
 .vignette {
   background: radial-gradient(
     circle at 50% 50%,
@@ -108,33 +85,16 @@
 
 .flicker {
   background: var(--hose-ink);
-  opacity: 0;
-  animation: flicker 2.4s linear 2;
+  opacity: var(--flicker, 0);
 }
 
-@keyframes flicker {
-  0%,
-  7%,
-  10%,
-  49%,
-  52%,
-  100% {
-    opacity: 0;
-  }
-  8% {
-    opacity: 0.08;
-  }
-  50% {
-    opacity: 0.05;
-  }
-}
-
-/* A note drifting up the bottom third of the page once on its own --delay, at the old pace, swaying as it
-   climbs and fading out. */
+/* A note drifting up the bottom third of the page as the first screen scrolls by, swaying as it climbs and
+   fading out, each its own --lag behind the first: the scroll (--notes, 0 to 1) sets the frame of a paused
+   keyframe through its delay, so scrolling back brings it down again. */
 .noteRise {
   opacity: 0;
-  animation: noteRise 4.2s linear;
-  animation-delay: var(--delay, 0s);
+  animation: noteRise 1s linear both paused;
+  animation-delay: calc(clamp(0, (var(--notes, 0) - var(--lag, 0)) / (1 - var(--lag, 0)), 0.999) * -1s);
 }
 
 @keyframes noteRise {
@@ -304,9 +264,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sprockets,
-  .grain,
-  .flicker,
   .beatBounce,
   .titleBounce {
     animation: none;

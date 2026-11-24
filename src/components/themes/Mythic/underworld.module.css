@@ -3,8 +3,8 @@
  * (sprite.module.css). Colours are the palette's --myth-* variables, set once on the root (paletteVars).
  * Motion is transform and opacity only; shadows, borders and gradients are fixed, never animated. Each
  * block names the component that uses it. Nothing loops (BD29): every motion plays a bounded number of
- * runs inside 5 s of its trigger (an era's own clock, a scene's data-on, the page load for the hall and
- * the embers) and rests on a still frame. Under prefers-reduced-motion every animation and transition
+ * runs inside 5 s of its trigger (an era's run scrubbed by the scroll with its region's first scene, a
+ * scene's data-on) and rests on a still frame. Under prefers-reduced-motion every animation and transition
  * is off and every reveal is in its final state (the components also pass their end state from the start).
  */
 
@@ -110,7 +110,7 @@
   transform: translate3d(calc(var(--mx, 0) * -22px), calc(var(--my, 0) * -8px), 0);
 }
 
-/* Embers drifting up through every region, once each from the page load, out of step, burnt out at the top. */
+/* Embers drifting up through the great hall on its era's run, out of step, burnt out at the top. */
 .ember {
   position: absolute;
   bottom: -2rem;
@@ -121,7 +121,7 @@
   background: var(--myth-fire-core);
   opacity: 0;
   animation: ember-rise 4.8s linear;
-  animation-delay: calc(var(--i) * -0.6s);
+  --era-lead: calc(var(--i) * 0.6s);
 }
 
 @keyframes ember-rise {
@@ -131,12 +131,13 @@
   100% { transform: translate3d(calc(var(--drift) * 1px), -110vh, 0) scale(0.4); opacity: 0; }
 }
 
-/* The braziers and soul lamps: the flame scales on its base, four flickers on its era's clock (depths.tsx),
+/* The braziers and soul lamps: the flame scales on its base, four flickers on its era's run (depths.tsx),
    ending back on its own shape, still lit. */
 .flame {
   transform-box: fill-box;
   transform-origin: 50% 100%;
   animation: flicker 0.9s ease-in-out 4 alternate;
+  --era-len: 3.6s;
 }
 
 @keyframes flicker {
@@ -375,18 +376,16 @@
   }
 }
 
-/* ---------------------------------------------------------------- each era's own clock (depths.tsx)
-   Only the era on screen runs its clock: every era's parts sit paused until the root's data-zone names it,
-   so each plays its bounded runs the first time its era is in view. Under .depths, so the pause outranks
+/* ---------------------------------------------------------------- each era's run (depths.tsx)
+   No clock: every era part is held paused and drawn where its era's --era-t puts it, 0 to 1, the share the
+   first scene of its region has played on the shared scene player (scenes.tsx). A part's run is --era-len
+   long (4.8 s unless it says otherwise) and starts --era-lead into it, so the delay seeks the run to
+   lead + t * len. Unwritten, --era-t is 1 and the part shows its end frame. Under .depths, so it outranks
    each part's own animation shorthand below. */
 .depths .era {
   animation-play-state: paused;
-}
-.root[data-zone='hall'] .zoneHall .era,
-.root[data-zone='storm'] .zoneStorm .era,
-.root[data-zone='harbour'] .zoneHarbour .era,
-.root[data-zone='olympus'] .zoneOlympus .era {
-  animation-play-state: running;
+  animation-fill-mode: both;
+  animation-delay: calc(-1 * (var(--era-lead, 0s) + var(--era-t, 1) * var(--era-len, 4.8s)));
 }
 
 /* the storm: rain driving down at a slant for 4.8 s, one double lightning flash, one roll of the swell, the
@@ -401,6 +400,7 @@
 .lightning {
   opacity: 0;
   animation: lightning 4.5s linear;
+  --era-len: 4.5s;
 }
 @keyframes lightning {
   0%, 88%, 92%, 95%, 100% { opacity: 0; }
@@ -418,6 +418,7 @@
   transform-box: fill-box;
   transform-origin: 0% 0%;
   animation: sail-flap 3.6s ease-in-out;
+  --era-len: 3.6s;
 }
 @keyframes sail-flap {
   0%, 100% { transform: skewY(0) scaleX(1); }
@@ -490,8 +491,8 @@
 }
 .smoke {
   animation: smoke 4.8s linear forwards;
-  /* each plume 1.6 s behind the one before it (depths.tsx sets --i) */
-  animation-delay: calc(var(--i, 0) * -1.6s);
+  /* each plume 1.6 s further into its rise than the one before it (depths.tsx sets --i) */
+  --era-lead: calc(var(--i, 0) * 1.6s);
 }
 /* a plume rises and thins out, and a new one gathers over its fire and holds */
 @keyframes smoke {

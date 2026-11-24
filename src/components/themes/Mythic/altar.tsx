@@ -5,7 +5,7 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import type { Zone } from './stage'
+import { ZONE_OF, type Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -72,7 +72,7 @@ function TalentPlate({ id, label, optionProps }: ProfessionOption) {
 
 export function Altar() {
   const { navigation } = useLabels()
-  const { ref } = useZoneStage<Zone>('hall')
+  const { ref } = useZoneStage<Zone>(ZONE_OF.hero)
 
   return (
     <section ref={ref} className="relative z-20 px-4 py-12 sm:px-6" aria-label={navigation.professionSelection}>

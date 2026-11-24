@@ -35,7 +35,7 @@ const FRAMES: SectionFrames = {
     const { sections: titles, cards } = useLabels()
     const { highlights } = useAboutBlock()
     return (
-      <Stage id={slot.id} title={titles.about} zone="hall">
+      <Stage id={slot.id} title={titles.about}>
         <div className={`max-w-prose p-5 sm:p-6 ${u.panel}`}>
           <p className="whitespace-pre-line text-lg leading-relaxed">{slot.bio}</p>
           <div data-stage-items="">
@@ -49,7 +49,7 @@ const FRAMES: SectionFrames = {
   work: function WorkFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.workExperience} zone="storm">
+      <Stage id={slot.id} title={titles.workExperience}>
         <Trials jobs={slot.jobs} />
       </Stage>
     )
@@ -57,7 +57,7 @@ const FRAMES: SectionFrames = {
   tech: function TechFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.techStack} zone="storm">
+      <Stage id={slot.id} title={titles.techStack}>
         <Codex categories={slot.categories} />
       </Stage>
     )
@@ -65,7 +65,7 @@ const FRAMES: SectionFrames = {
   services: function ServicesFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.services} zone="storm">
+      <Stage id={slot.id} title={titles.services}>
         <ul className={MASONRY_LIST} data-stage-items="">
           {slot.services.map((service) => (
             <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
@@ -80,7 +80,7 @@ const FRAMES: SectionFrames = {
   projects: function ProjectsFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.projects} zone="magma">
+      <Stage id={slot.id} title={titles.projects}>
         <Sagas projects={slot.projects} />
       </Stage>
     )
@@ -88,7 +88,7 @@ const FRAMES: SectionFrames = {
   ventures: function VenturesFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.ventures} zone="magma">
+      <Stage id={slot.id} title={titles.ventures}>
         <Votives companies={slot.companies} />
       </Stage>
     )
@@ -96,7 +96,7 @@ const FRAMES: SectionFrames = {
   bands: function BandsFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.bands} zone="harbour">
+      <Stage id={slot.id} title={titles.bands}>
         <Portraits musician={slot.musician} bands={slot.bands} />
       </Stage>
     )
@@ -104,7 +104,7 @@ const FRAMES: SectionFrames = {
   muayThai: function MuayThaiFrame({ slot }) {
     const titles = useLabels().sections
     return (
-      <Stage id={slot.id} title={titles.muayThai} zone="harbour">
+      <Stage id={slot.id} title={titles.muayThai}>
         <Runestones martialArts={slot.martialArts} />
       </Stage>
     )

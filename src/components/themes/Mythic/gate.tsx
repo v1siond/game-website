@@ -6,7 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { RealmDoors } from './realmDoors'
 import { ContactActions, SlabButton } from './buttons'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { COLUMN, SectionTitle, mythHeadingId, type Zone } from './stage'
+import { COLUMN, SectionTitle, ZONE_OF, mythHeadingId, type Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -21,7 +21,7 @@ const GATE_LEAVES = { left: u.gateLeft, right: u.gateRight }
 
 export function LastGate({ still }: { still?: ReactNode }) {
   const { sections, myth } = useLabels()
-  const { ref, on, reduced } = useZoneStage<Zone>('olympus')
+  const { ref, on, reduced } = useZoneStage<Zone>(ZONE_OF.contact)
   const [open, setOpen] = useState(false)
   const toHall = () => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
   const title = sections.contact

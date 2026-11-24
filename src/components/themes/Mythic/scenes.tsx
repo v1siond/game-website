@@ -6,7 +6,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
 import { hop } from '@/lib/motion/arc'
-import { actionLengths, elapsedOf, sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
+import { actionLengths, elapsedOf, sceneEnd, sceneLength, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, focusOn, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
@@ -15,6 +15,7 @@ import { FOE, type FoeName } from './foes'
 import { MYTH } from './palette'
 import { bodyTransform, jointTransform, poseAt, REST, type Joint, type Pose } from './rig'
 import { FIGURE_BOX, HeroFigure } from './sprite'
+import { ZONE_OF, type Zone } from './stage'
 import s from './sprite.module.css'
 
 // His scenes on the shared theatre, one per part of the page, over the fixed depths of the descent
@@ -636,27 +637,54 @@ const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[
 export interface MythScene extends TheatreScene {
   id: SceneId
   profession: Profession
+  /** The region whose painted era this scene plays (depths.tsx), when it is the first scene in that region. */
+  era?: Zone
 }
 
-const sceneOf = (id: SceneId, count: number, profession: Profession): MythScene => {
+// The first scene in a region also plays that region's era behind the page: the era's parts are CSS runs
+// held paused (underworld.module.css), scrubbed by --era-t, the share of the scene played, so the storm,
+// the giant's blow and the dawn follow the scroll with the scene, back on the way up, again every pass.
+const eraWriter = (zone: Zone | undefined, script: SceneScript) => {
+  if (!zone) return () => undefined
+  let era: HTMLElement | null = null
+  return (play: Playhead) => {
+    era ??= document.querySelector<HTMLElement>(`[data-era="${zone}"]`)
+    era?.style.setProperty('--era-t', (elapsedOf(script, play) / sceneLength(script)).toFixed(4))
+  }
+}
+
+const sceneOf = (id: SceneId, count: number, profession: Profession, era?: Zone): MythScene => {
   const spec = SCENES[id]
   const scene: MythScene = {
     id,
     count,
     profession,
+    era,
     script: spec.script,
     bind: (stage): StageWriter => {
       const write = spec.bind(stage, scene)
+      const writeEra = eraWriter(era, spec.script)
       // drawn settled (reduced motion) there is no playhead, and the scene holds its end frame
-      return (_progress, _reached, play) => write(play ?? sceneEnd(spec.script))
+      return (_progress, _reached, play) => {
+        const at = play ?? sceneEnd(spec.script)
+        write(at)
+        writeEra(at)
+      }
     },
   }
   return scene
 }
 
-/** The page's scenes in order: the hero, the profession's sections, the contact. */
+/** The page's scenes in order: the hero, the profession's sections, the contact; the first in each region
+ *  plays its era. */
 export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[], profession: Profession): MythScene[] {
-  return [sceneOf('hero', 0, profession), ...slots.map((slot) => sceneOf(slot.id, countOf(slot, labels, highlights), profession)), sceneOf('contact', 0, profession)]
+  const ids: SceneId[] = ['hero', ...slots.map((slot) => slot.id), 'contact']
+  const counts = new Map(slots.map((slot) => [slot.id, countOf(slot, labels, highlights)]))
+  return ids.map((id, index) => {
+    const zone = ZONE_OF[id]
+    const leads = ids.findIndex((other) => ZONE_OF[other] === zone) === index
+    return sceneOf(id, counts.get(id as SectionId) ?? 0, profession, leads ? zone : undefined)
+  })
 }
 
 /** A scene's picture: its field of figures over the depths. */

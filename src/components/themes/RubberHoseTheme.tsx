@@ -17,7 +17,7 @@ import { sectionPlan } from '@/lib/cv/sectionPlan'
 import { headingId } from '@/lib/cv/sectionText'
 import { HOSE, HOSE_VARS } from './RubberHose/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
+import { FilmBackdrop } from './RubberHose/backdrop'
 import { CartoonTitle } from './RubberHose/art'
 import { CartoonCharacter } from './RubberHose/selector'
 import { HoseLink } from './RubberHose/actions'
@@ -93,9 +93,7 @@ export default function RubberHoseTheme() {
           ))}
         </Theatre>
       )}
-      <FilmFrame />
-      <FilmGrain />
-      <RisingNotes />
+      <FilmBackdrop playing={!reduced} />
 
       {/* the page sits inside the film frame */}
       <div ref={textRef} className="relative z-20 mx-6 sm:mx-14">
