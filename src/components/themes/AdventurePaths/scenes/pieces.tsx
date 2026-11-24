@@ -1,11 +1,10 @@
 import { TRAIL } from '../palette'
 
 // The level's things he hits and passes, drawn the way the 16 bit games draw them: square blocks with a
-// black outline and a light top left bevel, the plain item box and the box once open with what it held,
-// the bricks, the spinning coin seen side on, the crate, the spring pad, the switch plate and the blocks it
-// fills, the drum he lands on, the finish gate with its ribbon, and the trees, rocks, ladder and hatch of
-// the path. Each is a group drawn in its own small box from the origin (a block is 24 by 24), which a
-// scene places and scales on its canvas (kit.tsx).
+// black outline and a light top left bevel, the plain item box and the box once open, the cave's and the
+// fortress's bricks, the coin seen side on, the drum and the note, the filled blocks of the note row and
+// the switch palace, and the trees and rocks of the path. Each is a group drawn in its own small box from
+// the origin (a block is 24 by 24), which a scene places and scales on its canvas (kit.tsx).
 
 const OUTLINE = { stroke: TRAIL.HUD, strokeWidth: 2 }
 
@@ -32,16 +31,6 @@ export function OpenBox() {
         <rect x={1} y={2} width={22} height={7} rx={2} fill={TRAIL.BLOCK} {...OUTLINE} />
         <rect x={10} y={6} width={4} height={3} fill={TRAIL.HUD} />
       </g>
-    </>
-  )
-}
-
-export function Brick() {
-  return (
-    <>
-      <rect x={1} y={1} width={22} height={22} fill={TRAIL.BRICK} {...OUTLINE} />
-      <path d="M2 8 H22 M2 15 H22 M8 2 V8 M16 8 V15 M8 15 V22" stroke={TRAIL.BRICK_DARK} strokeWidth={2} />
-      <path d="M2 2 H22" stroke={TRAIL.PAGE} strokeWidth={1} opacity={0.5} />
     </>
   )
 }
@@ -95,60 +84,11 @@ export function Note() {
   return <path d="M5 1 H11 V4 H7 V11 A3 2.6 0 1 1 5 8.6 Z" fill={TRAIL.COIN} stroke={TRAIL.HUD} strokeWidth={1} />
 }
 
-/** The switch plate, 28 wide, its top at y 0; the scene presses it down into its frame once he lands. */
-export function SwitchPlate() {
-  return <rect x={3} y={0} width={22} height={3} rx={1} fill={TRAIL.ROUTE} stroke={TRAIL.HUD} strokeWidth={1} />
-}
-
-/** The switch plate's frame round the plate, 28 wide from y 1 to 4. */
-export function SwitchFrame() {
-  return <rect x={1} y={2} width={26} height={2} fill={TRAIL.STONE_DARK} stroke={TRAIL.HUD} strokeWidth={1} />
-}
-
-/** A block the switch plate fills: its dotted outline, and the solid block in `fill` the scene fades in. */
-export function OutlineBlock() {
-  return <rect x={1.5} y={1.5} width={21} height={21} rx={2} fill="none" stroke={TRAIL.HUD} strokeWidth={1.5} strokeDasharray="3 2" />
-}
-
 export function FilledBlock({ fill }: { fill: string }) {
   return (
     <>
       <rect x={1} y={1} width={22} height={22} rx={2} fill={fill} {...OUTLINE} />
       <path d="M3 3 H21 V5 H5 V21 H3 Z" fill={TRAIL.PAGE} opacity={0.45} />
-    </>
-  )
-}
-
-/** The spring pad, 24 wide, its top at y 0 and its feet at y 12: a red pad on a coil the scene squashes. */
-export function SpringPad() {
-  return (
-    <>
-      <path d="M6 3 L18 5 L6 7 L18 9 L6 11" stroke={TRAIL.STONE_DARK} strokeWidth={2} fill="none" />
-      <rect x={3} y={10} width={18} height={2} fill={TRAIL.STONE_DARK} stroke={TRAIL.HUD} strokeWidth={1} />
-      <rect x={1} y={0} width={22} height={3} rx={1} fill={TRAIL.ROUTE} stroke={TRAIL.HUD} strokeWidth={1} />
-    </>
-  )
-}
-
-/** A wooden crate, 24 by 24: its plank frame and the brace across it. */
-export function Crate() {
-  return (
-    <>
-      <rect x={1} y={1} width={22} height={22} fill={TRAIL.CRATE} {...OUTLINE} />
-      <rect x={3} y={3} width={18} height={18} fill="none" stroke={TRAIL.CRATE_DARK} strokeWidth={2} />
-      <path d="M4 20 L20 4" stroke={TRAIL.CRATE_DARK} strokeWidth={3} />
-      <path d="M3 3 H21" stroke={TRAIL.PAGE} strokeWidth={1} opacity={0.5} />
-    </>
-  )
-}
-
-/** The plain power-up an item box holds, a gem 16 by 18 drawn round its centre. */
-export function PowerUp() {
-  return (
-    <>
-      <path d="M-8 -3 L-4 -9 H4 L8 -3 L0 9 Z" fill={TRAIL.RUNE} stroke={TRAIL.HUD} strokeWidth={1.5} strokeLinejoin="round" />
-      <path d="M-4 -9 L-2 -3 H2 L4 -9 M-8 -3 H8 M-2 -3 L0 9 L2 -3" stroke={TRAIL.TEAL} strokeWidth={1} fill="none" />
-      <path d="M-5 -4 L-3 -7" stroke={TRAIL.PAGE} strokeWidth={1.5} strokeLinecap="round" />
     </>
   )
 }
@@ -170,70 +110,6 @@ export function Rock() {
     <>
       <path d="M1 18 L4 7 Q8 1 15 2 L24 3 Q30 6 31 18 Z" fill={TRAIL.STONE} stroke={TRAIL.STONE_DARK} strokeWidth={2} strokeLinejoin="round" />
       <path d="M7 8 Q11 4 16 5" stroke={TRAIL.STONE_LIGHT} strokeWidth={2} fill="none" strokeLinecap="round" />
-    </>
-  )
-}
-
-/** A ladder `rungs` rungs tall, 14 wide, from the origin down, 8 between rungs. */
-export function Ladder({ rungs }: { rungs: number }) {
-  const height = rungs * 8
-  return (
-    <>
-      <path d={`M1 0 V${height} M13 0 V${height}`} stroke={TRAIL.WOOD} strokeWidth={2.5} />
-      {Array.from({ length: rungs }, (_, i) => (
-        <path key={i} d={`M1 ${4 + i * 8} H13`} stroke={TRAIL.WOOD_LIGHT} strokeWidth={2} />
-      ))}
-    </>
-  )
-}
-
-/** The hatch in the ceiling the ladder comes down through, 28 wide, standing open. */
-export function Hatch() {
-  return (
-    <>
-      <rect x={0} y={0} width={28} height={4} fill={TRAIL.HUD} />
-      <rect x={-2} y={-1} width={4} height={6} fill={TRAIL.WOOD} stroke={TRAIL.HUD} strokeWidth={1} />
-      <rect x={-16} y={4} width={16} height={3} fill={TRAIL.WOOD} stroke={TRAIL.HUD} strokeWidth={1} transform="rotate(70 0 4)" />
-    </>
-  )
-}
-
-/** The finish gate, 70 wide and 64 tall from its left post's foot at (0, 64): two posts and the banner. */
-export function FinishGate() {
-  return (
-    <>
-      <rect x={0} y={6} width={6} height={58} fill={TRAIL.STONE_LIGHT} stroke={TRAIL.HUD} strokeWidth={1.5} />
-      <rect x={64} y={6} width={6} height={58} fill={TRAIL.STONE_LIGHT} stroke={TRAIL.HUD} strokeWidth={1.5} />
-      <rect x={-2} y={0} width={74} height={12} rx={2} fill={TRAIL.ROUTE} stroke={TRAIL.HUD} strokeWidth={1.5} />
-      {[8, 20, 32, 44, 56].map((x, i) => (
-        <rect key={x} x={x} y={3} width={6} height={6} fill={i % 2 === 0 ? TRAIL.PAGE : TRAIL.HUD} />
-      ))}
-    </>
-  )
-}
-
-/** Half of the finish ribbon, `length` long from the post it is tied to, along +x. */
-export function Ribbon({ length }: { length: number }) {
-  return <rect x={0} y={-1.5} width={length} height={3} fill={TRAIL.GOLD} stroke={TRAIL.HUD} strokeWidth={0.75} />
-}
-
-/** A short flag on its pole, 16 wide and 30 tall from the pole's foot at the origin up. */
-export function LedgeFlag() {
-  return <rect x={0} y={-30} width={2} height={30} fill={TRAIL.STONE_DARK} />
-}
-
-export function Pennant() {
-  return <path d="M2 0 L16 4 L2 8 Z" fill={TRAIL.ROUTE} stroke={TRAIL.HUD} strokeWidth={1} />
-}
-
-/** A burst: eight sparks round a hot centre, drawn round the origin, 34 across. */
-export function Firework() {
-  return (
-    <>
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-        <rect key={angle} x={-2} y={-16} width={4} height={8} fill={angle % 90 === 0 ? TRAIL.COIN : TRAIL.PAGE} transform={`rotate(${angle})`} />
-      ))}
-      <circle r={4} fill={TRAIL.COIN} />
     </>
   )
 }

@@ -206,6 +206,14 @@
   width: min(640px, 100%);
 }
 
+/* From lg the cards keep to the left 40%, so the level plays clear of them on the right. */
+@media (min-width: 1024px) {
+  .body,
+  .goalCopy {
+    width: min(640px, 40vw);
+  }
+}
+
 .footer {
   position: relative;
   z-index: 1;

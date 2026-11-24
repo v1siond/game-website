@@ -1,178 +1,116 @@
 import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
+import { fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, CRITTER_FRAMES, Canvas, DomeHills, FoeRig, GrassGround, PillHills, Sky, Stars } from './kit'
-import type { Level } from './level'
-import { Brick, Crate } from './pieces'
-import { StopsFigure, keyed, stopsWriter, type Stops } from './stops'
+import { Cloud, GROUND, HERO_TALL, PillHills, Sky, rigOf } from './kit'
+import { Foe, foeOf, levelLayers } from './frame'
+import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { mapWriter } from './worldMap'
 
-// The tech stack: a night stretch. For each category a crate waits on the ground with a critter and a
-// stack of bricks past it; he lifts the crate over his head and throws it, and it knocks the critter over
-// on its back and bursts the bricks, the pieces flying.
+// Level 3, the sky, which scrolls on its own: from the map he walks onto the third spot. He rides a row
+// of moving platforms as the screen carries the clouds past, hopping from one to the next; a spiked foe
+// sits on the last one and he spin jumps off it safely, spinning high above the spikes.
 
-const SIZE = 24 * BLOCK
-const CRITTER_X = 200
-const BRICKS_X = 300
-// The crate's top left: on the ground in front of him, held over his head, then flung.
-const CRATE = { ground: [50, -SIZE], held: [-21, -150 - SIZE], critter: [CRITTER_X - SIZE, -54 - SIZE], bricks: [BRICKS_X - SIZE + 20, -2 * SIZE + 20], rest: [BRICKS_X - SIZE - 30, -SIZE] } as const
-// The shares of his move: the lift, the throw, the critter hit, the bricks hit, the crate down.
-const LIFT = [0.12, 0.28] as const
-const THROW = 0.42
-const KNOCK = 0.6
-const BURST = 0.72
-const DOWN = 0.86
+// The platforms ride at this height, each this wide and this far apart; the screen scrolls one gap over
+// the ride, so he ends where he started.
+const DECK = GROUND - 120
+const PLANK = 200
+const GAP = 260
 
-// The four pieces a brick breaks into: how far each flies across and up, and how far it spins.
-const PIECES: ReadonlyArray<readonly [number, number, number]> = [
-  [-90, -220, -200],
-  [90, -240, 220],
-  [-60, -120, -140],
-  [70, -100, 160],
-]
-
-const STARS: ReadonlyArray<readonly [number, number]> = [
-  [120, 90],
-  [340, 210],
-  [520, 60],
-  [760, 160],
-  [980, 80],
-  [1180, 220],
-  [1390, 110],
-  [1520, 260],
-  [640, 300],
-  [260, 340],
-]
-
-/** The crate's top left at t of his move. */
-function crateAt(t: number): readonly [number, number, number] {
-  const along = (from: readonly number[], to: readonly number[], u: number, arc = 0): readonly [number, number, number] => [lerp(from[0], to[0], u), lerp(from[1], to[1], u) - hop(u, arc), 0]
-  if (t < LIFT[0]) return [...CRATE.ground, 0]
-  if (t < THROW) return along(CRATE.ground, CRATE.held, ramp(t, LIFT[0], LIFT[1]))
-  if (t < KNOCK) return along(CRATE.held, CRATE.critter, ramp(t, THROW, KNOCK), 90)
-  if (t < BURST) return along(CRATE.critter, CRATE.bricks, ramp(t, KNOCK, BURST), 30)
-  const down = ramp(t, BURST, DOWN)
-  return [lerp(CRATE.bricks[0], CRATE.rest[0], down), lerp(CRATE.bricks[1], CRATE.rest[1], down * down), 14 * down]
+/** A moving platform: a plank of gold blocks with a dark edge. */
+function Platform({ name, x }: { name: string; x: number }) {
+  return (
+    <g data-fx={name} transform={`translate(${x} ${DECK})`}>
+      <rect x={-PLANK / 2} y={0} width={PLANK} height={30} rx={4} fill={TRAIL.BLOCK} stroke={TRAIL.HUD} strokeWidth={4} />
+      {[-1, 0, 1].map((i) => (
+        <rect key={i} x={i * 60 - 6} y={8} width={12} height={12} fill={TRAIL.BLOCK_DARK} />
+      ))}
+    </g>
+  )
 }
 
-const course: Stops = {
-  back: (i) => (
-    <>
-      {[0, 1].map((j) => (
-        <g key={j}>
-          <g data-fx={`brick-${i}-${j}`} transform={`translate(${BRICKS_X} ${-(j + 1) * SIZE}) scale(${BLOCK})`}>
-            <Brick />
-          </g>
-          {PIECES.map((_, k) => (
-            <g key={k} data-fx={`piece-${i}-${j}-${k}`} opacity={0}>
-              <g transform={`scale(${BLOCK / 2})`}>
-                <Brick />
-              </g>
-            </g>
-          ))}
-        </g>
+/** The spikes on the foe's back. */
+function Spikes() {
+  return (
+    <g transform="translate(0 -84)">
+      {[-30, -10, 10, 30].map((x) => (
+        <path key={x} d={`M${x - 10} 0 L${x} -26 L${x + 10} 0 Z`} fill={TRAIL.PAGE} stroke={TRAIL.HUD} strokeWidth={3} strokeLinejoin="round" />
       ))}
-      <g data-fx={`critter-at-${i}`} transform={`translate(${CRITTER_X} 0)`}>
-        <g transform="scale(-1 1)">
-          <FoeRig name={`critter-${i}`} kinds={CRITTER_FRAMES} />
-        </g>
-      </g>
-    </>
-  ),
-  front: (i) => (
-    <g data-fx={`crate-${i}`} transform={`translate(${CRATE.ground[0]} ${CRATE.ground[1]})`}>
-      <g transform={`scale(${BLOCK})`}>
-        <Crate />
-      </g>
     </g>
-  ),
-  move: keyed([
-    { at: 0, pose: 'stand', ahead: 0, lift: 0 },
-    { at: LIFT[0], pose: 'stand', ahead: 0, lift: 0 },
-    { at: THROW, pose: 'carry', ahead: 0, lift: 0 },
-    { at: BURST, pose: 'throw', ahead: 20, lift: 0 },
-    { at: BURST + 0.02, pose: 'stand', ahead: 20, lift: 0 },
-  ]),
-  reply: (stage, { count }) => {
-    const stops = Array.from({ length: count }, (_, i) => ({
-      crate: fx(stage, `crate-${i}`),
-      critter: fx(stage, `critter-at-${i}`),
-      critterFace: frames(fx(stage, `critter-${i}`), 'critterA'),
-      bricks: [0, 1].map((j) => ({ brick: fx(stage, `brick-${i}-${j}`), pieces: PIECES.map((_, k) => fx(stage, `piece-${i}-${j}-${k}`)) })),
-    }))
-    return (played) =>
-      stops.forEach(({ crate, critter, critterFace, bricks }, i) => {
-        const t = played(i)
-        const [cx, cy, tilt] = crateAt(t)
-        transformTo(crate, `translate(${r1(cx)} ${r1(cy)}) rotate(${r1(tilt)} ${SIZE / 2} ${SIZE / 2})`)
-        const knock = ramp(t, KNOCK, KNOCK + 0.14)
-        translateTo(critter, CRITTER_X + 60 * knock, -hop(knock, 70))
-        critterFace(knock > 0 ? 'critterTipped' : 'critterA')
-        const fly = ramp(t, BURST, BURST + 0.26)
-        bricks.forEach(({ brick, pieces }, j) => {
-          fadeTo(brick, t >= BURST ? 0 : 1)
-          pieces.forEach((piece, k) => {
-            const [dx, dy, spin] = PIECES[k]
-            const px = BRICKS_X + SIZE / 4 + dx * fly
-            const py = -(j + 1) * SIZE + dy * fly + 900 * fly * fly
-            transformTo(piece, `translate(${r1(px)} ${r1(py)}) rotate(${r1(spin * fly)})`)
-            fadeTo(piece, fly > 0 && fly < 1 ? 1 : 0)
-          })
-        })
-      })
-  },
+  )
 }
 
 export const tech: Level = {
-  layers: (input) => [
-    {
-      name: 'sky',
-      node: (
-        <Canvas>
-          <Sky id="ap-tech-sky" top={TRAIL.NIGHT_SKY} low={TRAIL.NIGHT_SKY_LOW} />
-          <Stars at={STARS} />
-          <circle cx={1280} cy={170} r={70} fill={TRAIL.LANTERN} />
-          <circle cx={1306} cy={150} r={62} fill={TRAIL.NIGHT_SKY} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'far',
-      node: (
-        <Canvas>
-          <PillHills base={800} fill={TRAIL.NIGHT_HILL} edge={TRAIL.NIGHT_HILL_NEAR} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'mid',
-      node: (
-        <Canvas>
-          <DomeHills base={880} fill={TRAIL.NIGHT_HILL_NEAR} edge={TRAIL.NIGHT_SKY} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'near',
-      node: (
-        <Canvas>
-          <GrassGround shade={TRAIL.NIGHT_SKY} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'figure',
-      node: <StopsFigure stops={course} input={input} />,
-    },
-    {
-      name: 'fg',
-      node: (
-        <Canvas>
-          <Bush x={20} fill={TRAIL.NIGHT_HILL_NEAR} />
-          <Bush x={1540} fill={TRAIL.NIGHT_HILL_NEAR} />
-        </Canvas>
-      ),
-    },
-  ],
-  bind: (stage, input) => stopsWriter(stage, input, course),
+  script: [MAP_MS, 1700, 1500],
+  layers: (input) => {
+    const x = startX(input)
+    return levelLayers(
+      {
+        sky: <Sky id="ap-tech-sky" top={TRAIL.SKY_HIGH} low={TRAIL.SKY_LOW} />,
+        far: <PillHills base={1060} fill={TRAIL.HILL_FAR} edge={TRAIL.HILL_FAR_EDGE} />,
+        mid: (
+          <g data-fx="clouds">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Cloud key={i} x={i * 360 - 100} y={200 + (i % 3) * 130} scale={2.2} />
+            ))}
+          </g>
+        ),
+        near: (
+          <g data-fx="floor">
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <Cloud key={i} x={i * 300 - 200} y={GROUND + 30} scale={3.2} fill={TRAIL.CLOUD} />
+            ))}
+          </g>
+        ),
+        things: (
+          <>
+            <Platform name="deck-0" x={x} />
+            <Platform name="deck-1" x={x + reach(input, GAP)} />
+            <Platform name="deck-2" x={x + reach(input, 2 * GAP)} />
+            <Foe name="spiky" x={x + reach(input, 2 * GAP)} y={DECK}>
+              <Spikes />
+            </Foe>
+          </>
+        ),
+      },
+      input,
+    )
+  },
+  bind: (stage, input) => {
+    const map = mapWriter(stage, input)
+    const hero = rigOf(stage, 'hero', 'stand')
+    const spiky = foeOf(stage, 'spiky')
+    const clouds = fx(stage, 'clouds')
+    const floor = fx(stage, 'floor')
+    const decks = [0, 1, 2].map((i) => fx(stage, `deck-${i}`))
+    const x0 = startX(input)
+    const gap = reach(input, GAP)
+    const scroll = gap
+    return (play) => {
+      const walked = phase(play, 0)
+      map({ walk: ramp(walked, 0, 0.6), open: ramp(walked, 0.55, 1) })
+      // the screen scrolls on its own: the course slides left under him as he rides
+      const riding = phase(play, 1)
+      const spinning = phase(play, 2)
+      const pan = scroll * riding
+      transformTo(clouds, `translate(${r1(-0.4 * pan)} 0)`)
+      transformTo(floor, `translate(${r1(-0.7 * pan)} 0)`)
+      const bob = (i: number) => 14 * Math.sin(riding * Math.PI * 2 + i)
+      decks.forEach((deck, i) => translateTo(deck, x0 + i * gap - pan, DECK + bob(i)))
+      spiky(x0 + 2 * gap - pan, DECK + bob(2), 'critterA', 0, spinning >= 0.5 ? 1 - ramp(spinning, 0.5, 0.8) : 1)
+      // he rides the first deck, then hops onto the second as the first drifts off
+      const hopAcross = ramp(riding, 0.45, 0.8)
+      const onDeck = DECK + bob(hopAcross >= 1 ? 1 : 0)
+      const rideX = lerp(x0, x0 + gap, hopAcross) - pan
+      if (spinning <= 0) {
+        hero(rideX, onDeck - hop(hopAcross, 140), hopAcross > 0 && hopAcross < 1 ? 'jump' : 'stand')
+        return
+      }
+      // the spin jump: up off the deck, down onto the spikes and off them, spinning, high above
+      const startSpin = x0 + gap - scroll
+      const footX = lerp(startSpin, x0 + 2 * gap - scroll, ramp(spinning, 0, 0.5))
+      const lift = spinning < 0.5 ? hop(spinning * 2, 180) : 240 * ramp(spinning, 0.5, 1) ** 0.6
+      hero(footX, DECK + bob(1) - lift - (spinning >= 0.5 ? HERO_TALL * 0.2 : 0), 'jump', false, spinning * 1080)
+    }
+  },
 }

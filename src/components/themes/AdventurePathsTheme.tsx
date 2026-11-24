@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { usePointerVars } from '@/hooks/usePointerVars'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -20,20 +21,21 @@ import { LevelSection } from './AdventurePaths/sections'
 import map from './AdventurePaths/map.module.css'
 import page from './AdventurePaths/page.module.css'
 
-// Adventure Paths: his CV as a side view platform course seen from its overworld map. The page keeps the
-// rhythm of the Rockstar VI site: a big hero (his name plaque and the overworld map he picks a profession
-// on, over the plains), then every section of the shown profession is one full screen level that rises
-// from dark, holds while its cards scroll over it, and sinks into dark while the next level rises: the ?
-// blocks, the sky ledges, the shell run, the mushroom path, the switch palace, the coin room, the note
-// blocks, the fortress, and the goal pole at the end. He is the plumber styled hero in each level and does
-// one thing per card of the section: hits a block, lands on a ledge, stomps a foe. Every motion is a
-// function of the scroll position (the shared theatre on useScrollStage), drawn with the settle: stop and
-// it comes to rest, scroll up and it plays back. The text is plain HTML in the page flow over the fixed
-// theatre of pictures, opaque from its first frame.
+// Adventure Paths: his CV as one world of a 16 bit side view platformer, played from start to finish. The
+// hero is his house at the head of the path, under his name plaque and the world map he picks a profession
+// on; every section of the shown profession is one place on the map in order (./AdventurePaths/scenes):
+// the plains, the cave, the sky, the switch palace, the water, the fortress and the castle, and the goal at
+// the end. Each level opens on the map, his marker walking from the last spot to its own, and plays its
+// one to three different actions on time once its section arrives, then holds its end frame (the shared
+// theatre). He is himself as a 16 bit sprite. The cards read in a column on the left, so the levels play
+// clear of them on the right. The text is plain HTML in the page flow over the fixed theatre of pictures,
+// opaque from its first frame.
 //
 // The whole world renders on the server: every CV string is in the HTML and the hero's picture shows its
-// first frame through CSS before the engine runs. Under reduced motion there is no theatre and no scrub:
-// each section carries its own picture, still, at its settled frame.
+// first frame through CSS before the engine runs. Under reduced motion there is no theatre: each section
+// carries its own picture, still, at its end frame.
+
+const PHONE_QUERY = '(max-width: 767.98px)'
 
 const hasSlot = (scene: TrailScene): scene is TrailScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -41,12 +43,12 @@ export default function AdventurePathsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const cv = useCVData()
-  const labels = useLabels()
   const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
   const pointerRef = usePointerVars(!reduced)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), active, phone),
+    [view, cv, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]

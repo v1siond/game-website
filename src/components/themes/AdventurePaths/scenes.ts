@@ -1,7 +1,5 @@
-import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
-import { stageItems } from '@/lib/cv/stageItems'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import type { StageLayer } from '../shared/theatre/Stage'
 import { about } from './scenes/about'
@@ -9,6 +7,8 @@ import { bands } from './scenes/bands'
 import { goal } from './scenes/goal'
 import { hub } from './scenes/hub'
 import type { Level } from './scenes/level'
+import type { SpotId } from './scenes/worldMap'
+import { stubPlay, type Playhead, type SceneScript } from './playStub'
 import { muayThai } from './scenes/muayThai'
 import { projects } from './scenes/projects'
 import { services } from './scenes/services'
@@ -16,9 +16,9 @@ import { tech } from './scenes/tech'
 import { ventures } from './scenes/ventures'
 import { work } from './scenes/work'
 
-// The page as scenes: the hub (hero), one level per section of the shown profession in reading order,
-// the goal (contact). Each scene names its picture, its anchor and how many cards its section counts
-// (stageItems), read from the same slot the section's cards are drawn from.
+// The page as scenes: the start (hero), one level per section of the shown profession in reading order,
+// the goal (contact), the way one world of the 16 bit platformer is played from start to finish. Each
+// scene names its picture, its anchor and its script, the actions it plays once its section arrives.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -43,23 +43,36 @@ const SCENE_DEFS: Record<SceneId, SceneDef> = {
 export interface TrailScene extends TheatreScene, Omit<SceneDef, 'level'> {
   id: SceneId
   layers: StageLayer[]
+  /** The level's actions, played on time once its section arrives. */
+  script: SceneScript
   /** The section's slot; the hero and the goal have none. */
   slot: SectionSlot | null
 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): TrailScene => {
+/** A scene's spot on the world map: the hero's is his house. */
+const spotOf = (id: SceneId): SpotId => (id === 'hero' ? 'home' : id)
+
+const sceneOf = (id: SceneId, slot: SectionSlot | null, before: SceneId, profession: Profession, phone: boolean): TrailScene => {
   const { level, ...def } = SCENE_DEFS[id]
-  const input = { count, profession }
-  return { ...def, id, slot, count, layers: level.layers(input), bind: (stage) => level.bind(stage, input) }
+  const input = { profession, phone, from: spotOf(before), at: spotOf(id) }
+  return {
+    ...def,
+    id,
+    slot,
+    count: 0,
+    script: level.script,
+    layers: level.layers(input),
+    bind: (stage) => {
+      const write = level.bind(stage, input)
+      return (progress, _reached, play?: Playhead) => write(play ?? stubPlay(level.script, progress))
+    },
+  }
 }
 
-/** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): TrailScene[] {
-  const sections = slots.map((slot) => {
-    const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession)
-  })
-  return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
+/** Every scene of the page in order; each level opens on the map walk from the scene before it. */
+export function scenesOf(slots: readonly SectionSlot[], profession: Profession, phone: boolean): TrailScene[] {
+  const ids: SceneId[] = ['hero', ...slots.map((slot) => slot.id), 'contact']
+  return ids.map((id, i) => sceneOf(id, slots.find((slot) => slot.id === id) ?? null, ids[Math.max(0, i - 1)], profession, phone))
 }
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. The ground

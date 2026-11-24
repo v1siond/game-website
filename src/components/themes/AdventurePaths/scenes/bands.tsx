@@ -1,175 +1,132 @@
 import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
-import { BLOCK, Bush, Canvas, DomeHills, GrassGround, HERO_TALL, PillHills, Sky, Stars } from './kit'
-import type { Level } from './level'
-import { DrumPad, Note } from './pieces'
-import { StopsFigure, keyed, stopsWriter, type Move, type Stops } from './stops'
+import { BLOCK, Cloud, GROUND, Sky, Stars, rigOf } from './kit'
+import { levelLayers } from './frame'
+import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { DrumPad, FilledBlock, Note } from './pieces'
+import { mapWriter } from './worldMap'
 
-// The bands: a night stretch, one band a stop in the order the section lists them. At each a pit cuts the
-// path with a rope hanging over it and a drum past it; he leaps for the rope, swings out across the pit,
-// lets go and comes down on the drum's head, which booms, the notes flying up off it.
+// The Musician's bonus level, at night: from the map he walks onto its spot. He bounces along a row of note
+// blocks, each dipping under him and sending a note up; on the big one at the end he spin jumps and it
+// launches him up to a cloud stage, where he lands at a drum and plays a fill, the notes flying.
 
-const PIT = { x: 30, width: 220 }
-const ANCHOR = { x: 140, y: -560 }
-const ROPE = 300
-const SWING = 35
-// His hands hold the rope a little ahead of his middle.
-const HANDS = 18
-const DRUM_X = 280
-const DRUM_TALL = 18 * BLOCK - 8
-const ON_DRUM = DRUM_X + (24 * BLOCK) / 2
-const NOTES = 3
-// The shares of his move: the grab, the let go, the landing, the boom's bounce done.
-const GRAB = 0.25
-const LET_GO = 0.6
-const LAND = 0.75
-const BOOMED = 0.95
+const SIZE = 24 * BLOCK
+// The note blocks: how many, how far past his start the row starts; the big one at its end.
+const BLOCKS = 3
+const ROW = -60
+const BIG = 3
+// The cloud stage high over the row, and the drum on it.
+const STAGE_Y = GROUND - 470
 
 const STARS: ReadonlyArray<readonly [number, number]> = [
-  [140, 120],
-  [420, 60],
-  [700, 200],
-  [960, 90],
-  [1240, 170],
-  [1480, 70],
+  [90, 80],
+  [300, 160],
+  [520, 60],
+  [760, 130],
+  [980, 50],
+  [1180, 170],
+  [1400, 90],
+  [1520, 220],
 ]
 
-/** The rope's swing, in degrees off straight down, at t of his move: still until he grabs it, out with him,
- *  then easing back once he lets go. */
-const swingAt = (t: number): number => (t < LET_GO ? SWING * ramp(t, GRAB, LET_GO) : SWING * (1 - ramp(t, LET_GO, 1)) ** 2)
-
-/** Where he hangs from the rope at swing `a` degrees. */
-function hangAt(a: number): Move {
-  const rad = (a * Math.PI) / 180
-  return { pose: 'grab', ahead: ANCHOR.x + ROPE * Math.sin(rad) - HANDS, lift: -ANCHOR.y - ROPE * Math.cos(rad) - HERO_TALL }
-}
-
-const GRABBED = hangAt(0)
-const LET_GO_AT = hangAt(SWING)
-
-const leap = keyed([
-  { at: 0, pose: 'stand', ahead: 0, lift: 0 },
-  { at: 0.12, pose: 'runA', ahead: 30, lift: 0 },
-  { at: GRAB, pose: 'jump', ahead: GRABBED.ahead ?? 0, lift: GRABBED.lift ?? 0, arc: 40 },
-])
-
-const land = keyed([
-  { at: LET_GO, pose: 'jump', ahead: LET_GO_AT.ahead ?? 0, lift: LET_GO_AT.lift ?? 0 },
-  { at: LAND, pose: 'jump', ahead: ON_DRUM, lift: DRUM_TALL, arc: 60 },
-  { at: LAND + 0.05, pose: 'stomp', ahead: ON_DRUM, lift: DRUM_TALL - 8 },
-  { at: BOOMED, pose: 'jump', ahead: ON_DRUM, lift: DRUM_TALL, arc: 80 },
-  { at: BOOMED + 0.01, pose: 'stand', ahead: ON_DRUM, lift: DRUM_TALL },
-])
-
-const course: Stops = {
-  back: (i) => (
-    <>
-      <rect x={PIT.x} y={0} width={PIT.width} height={140} fill={TRAIL.HUD} />
-      <rect x={ANCHOR.x - 30} y={ANCHOR.y - 12} width={60} height={12} rx={4} fill={TRAIL.WOOD} stroke={TRAIL.HUD} strokeWidth={3} />
-      <g data-fx={`rope-${i}`} transform={`translate(${ANCHOR.x} ${ANCHOR.y})`}>
-        <path d={`M0 0 V${ROPE}`} stroke={TRAIL.WOOD_LIGHT} strokeWidth={6} />
-      </g>
-      <g transform={`translate(${DRUM_X} ${-18 * BLOCK})`}>
-        <g data-fx={`drum-${i}`}>
-          <g transform={`scale(${BLOCK})`}>
-            <DrumPad />
-          </g>
+function NoteBlock({ i, x, big = false }: { i: number; x: number; big?: boolean }) {
+  const k = big ? 1.4 : 1
+  return (
+    <g data-fx={`note-block-${i}`} transform={`translate(${x} ${GROUND - SIZE * k})`}>
+      <g transform={`scale(${BLOCK * k})`}>
+        <FilledBlock fill={big ? TRAIL.ROUTE_LIGHT : TRAIL.PAGE} />
+        <g transform="translate(6 5)">
+          <Note />
         </g>
       </g>
-      <g data-fx={`boom-${i}`} opacity={0}>
-        {[0, 1].map((k) => (
-          <ellipse key={k} data-fx={`ring-${i}-${k}`} cx={ON_DRUM} cy={-DRUM_TALL} rx={60} ry={18} fill="none" stroke={TRAIL.LANTERN} strokeWidth={5} />
-        ))}
-      </g>
-      {Array.from({ length: NOTES }, (_, j) => (
-        <g key={j} data-fx={`note-${i}-${j}`} opacity={0}>
-          <g transform={`scale(${BLOCK})`}>
-            <Note />
-          </g>
-        </g>
-      ))}
-    </>
-  ),
-  move: (t) => (t < GRAB ? leap(t) : t < LET_GO ? hangAt(swingAt(t)) : land(t)),
-  reply: (stage, { count }) => {
-    const stops = Array.from({ length: count }, (_, i) => ({
-      rope: fx(stage, `rope-${i}`),
-      drum: fx(stage, `drum-${i}`),
-      boom: fx(stage, `boom-${i}`),
-      rings: [0, 1].map((k) => fx(stage, `ring-${i}-${k}`)),
-      notes: Array.from({ length: NOTES }, (_, j) => fx(stage, `note-${i}-${j}`)),
-    }))
-    return (played) =>
-      stops.forEach(({ rope, drum, boom, rings, notes }, i) => {
-        const t = played(i)
-        transformTo(rope, `translate(${ANCHOR.x} ${ANCHOR.y}) rotate(${r1(-swingAt(t))})`)
-        // The drum's head gives under him and the boom goes out in two rings.
-        const give = hop(ramp(t, LAND, LAND + 0.1), 1)
-        transformTo(drum, `translate(0 ${r1(give * 10)}) scale(1 ${(1 - give * 0.14).toFixed(3)})`)
-        const boomed = ramp(t, LAND, LAND + 0.25)
-        fadeTo(boom, boomed > 0 && boomed < 1 ? 1 : 0)
-        rings.forEach((ring, k) => {
-          const grow = 1 + 2.4 * ramp(boomed, k * 0.3, 1)
-          transformTo(ring, `translate(${r1(ON_DRUM * (1 - grow))} ${r1(-DRUM_TALL * (1 - grow))}) scale(${grow.toFixed(3)})`)
-        })
-        notes.forEach((note, j) => {
-          const rise = ramp(t, LAND + j * 0.05, LAND + 0.2 + j * 0.05)
-          translateTo(note, ON_DRUM - 70 + j * 60, lerp(-DRUM_TALL - 40, -DRUM_TALL - 240 - (j % 2) * 60, rise))
-          fadeTo(note, rise > 0 ? 1 : 0)
-        })
-      })
-  },
+    </g>
+  )
 }
 
 export const bands: Level = {
-  layers: (input) => [
-    {
-      name: 'sky',
-      node: (
-        <Canvas>
-          <Sky id="ap-bands-sky" top={TRAIL.NIGHT_SKY} low={TRAIL.NIGHT_SKY_LOW} />
-          <Stars at={STARS} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'far',
-      node: (
-        <Canvas>
-          <PillHills base={800} fill={TRAIL.NIGHT_HILL} edge={TRAIL.NIGHT_HILL_NEAR} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'mid',
-      node: (
-        <Canvas>
-          <DomeHills base={880} fill={TRAIL.NIGHT_HILL_NEAR} edge={TRAIL.NIGHT_SKY} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'near',
-      node: (
-        <Canvas>
-          <GrassGround shade={TRAIL.NIGHT_SKY} />
-        </Canvas>
-      ),
-    },
-    {
-      name: 'figure',
-      node: <StopsFigure stops={course} input={input} />,
-    },
-    {
-      name: 'fg',
-      node: (
-        <Canvas>
-          <Bush x={1520} fill={TRAIL.NIGHT_HILL_NEAR} />
-        </Canvas>
-      ),
-    },
-  ],
-  bind: (stage, input) => stopsWriter(stage, input, course),
+  script: [MAP_MS, 1600, 1900],
+  layers: (input) => {
+    const x = startX(input)
+    const step = reach(input, 130)
+    return levelLayers(
+      {
+        sky: (
+          <>
+            <Sky id="ap-bands-sky" top={TRAIL.NIGHT_SKY} low={TRAIL.NIGHT_SKY_LOW} />
+            <Stars at={STARS} />
+          </>
+        ),
+        near: <rect x={-200} y={GROUND} width={2000} height={200} fill={TRAIL.NIGHT_HILL_NEAR} />,
+        things: (
+          <>
+            {Array.from({ length: BLOCKS }, (_, i) => (
+              <NoteBlock key={i} i={i} x={x + ROW + i * step} />
+            ))}
+            <NoteBlock i={BIG} x={x + ROW + BLOCKS * step + 20} big />
+            <g transform={`translate(${x + reach(input, 260)} ${STAGE_Y})`}>
+              <Cloud x={-160} y={-10} scale={3.4} fill={TRAIL.NIGHT_CLOUD} />
+              <g transform={`translate(70 ${-18 * BLOCK * 1.4}) scale(${BLOCK * 1.4})`}>
+                <DrumPad />
+              </g>
+            </g>
+            {[0, 1, 2, 3].map((i) => (
+              <g key={i} data-fx={`note-${i}`} opacity={0}>
+                <g transform={`scale(${BLOCK})`}>
+                  <Note />
+                </g>
+              </g>
+            ))}
+          </>
+        ),
+      },
+      input,
+    )
+  },
+  bind: (stage, input) => {
+    const map = mapWriter(stage, input)
+    const hero = rigOf(stage, 'hero', 'stand')
+    const x0 = startX(input)
+    const step = reach(input, 130)
+    const blocks = Array.from({ length: BLOCKS + 1 }, (_, i) => fx(stage, `note-block-${i}`))
+    const notes = [0, 1, 2, 3].map((i) => fx(stage, `note-${i}`))
+    const blockX = (i: number) => x0 + ROW + i * step + (i === BIG ? 20 : 0)
+    const topOf = (i: number) => GROUND - SIZE * (i === BIG ? 1.4 : 1)
+    const middle = (i: number) => blockX(i) + (SIZE * (i === BIG ? 1.4 : 1)) / 2
+    const drumX = x0 + reach(input, 260) + 40
+    return (play) => {
+      const walked = phase(play, 0)
+      map({ walk: ramp(walked, 0, 0.6), open: ramp(walked, 0.55, 1) })
+      const bouncing = phase(play, 1)
+      const launching = phase(play, 2)
+      // he lands on block i at bouncing (i + 1) / (BLOCKS + 1); each dips and sends its note up
+      const on = Math.min(BLOCKS, Math.floor(bouncing * (BLOCKS + 1)))
+      const u = bouncing * (BLOCKS + 1) - on
+      blocks.forEach((block, i) => {
+        const struck = i < BLOCKS ? ramp(bouncing, (i + 1) / (BLOCKS + 1), (i + 1.4) / (BLOCKS + 1)) : ramp(launching, 0, 0.2)
+        translateTo(block, blockX(i), topOf(i) + 16 * Math.sin(Math.PI * struck))
+      })
+      notes.forEach((note, i) => {
+        const rise = i < BLOCKS ? ramp(bouncing, (i + 1) / (BLOCKS + 1), (i + 2) / (BLOCKS + 1)) : ramp(launching, 0.6, 1)
+        const nx = i < BLOCKS ? middle(i) : drumX + 40
+        translateTo(note, nx - 20, (i < BLOCKS ? topOf(i) : STAGE_Y - 220) - 40 - 160 * rise)
+        fadeTo(note, rise > 0 && rise < 1 ? 1 : 0)
+      })
+      if (launching > 0) {
+        const fly = ramp(launching, 0, 0.5)
+        const x = lerp(middle(BIG), drumX - 60, fly)
+        const y = lerp(topOf(BIG), STAGE_Y - 20, fly) - hop(fly, 260)
+        const beat = Math.floor(ramp(launching, 0.55, 1) * 8) % 2 === 0
+        hero(x, y, fly < 1 ? 'jump' : launching >= 1 ? 'cheer' : beat ? 'stomp' : 'stand', false, fly < 1 ? fly * 720 : 0)
+        return
+      }
+      // from his start onto the first block, then block to block
+      const from = on === 0 ? x0 - reach(input, 120) : middle(on - 1)
+      const fromY = on === 0 ? GROUND : topOf(on - 1)
+      const x = lerp(from, middle(on), u)
+      const y = lerp(fromY, topOf(on), u) - hop(u, 150)
+      hero(bouncing <= 0 ? x0 - reach(input, 120) : x, bouncing <= 0 ? GROUND : y, bouncing <= 0 ? 'stand' : 'jump')
+    }
+  },
 }
