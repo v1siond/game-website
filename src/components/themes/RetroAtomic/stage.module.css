@@ -1,7 +1,7 @@
 /* Retro Atomic's look on the shared theatre's stages (../shared/theatre): the wrist terminal's scanlines laid
    over the picture, a vignette, and a scrim under the text column so the glass panels' edges and the titles
    read on the brightest frame (the wasteland's pale haze); all fade with their stage. The theatre's ground
-   and veil are the shelter's bunker dark and ink (--theatre-ground and --theatre-veil on the world's root). */
+   is the shelter's bunker dark (--theatre-ground on the world's root). */
 
 .tube::after {
   content: '';

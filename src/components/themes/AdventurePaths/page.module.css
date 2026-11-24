@@ -14,7 +14,6 @@
 
 .theatre {
   --theatre-ground: var(--ap-night);
-  --theatre-veil: var(--ap-hud);
 }
 
 /* The shade under the text column, so the HUD plates and cards sit on a calmer frame; it fades with its stage. */

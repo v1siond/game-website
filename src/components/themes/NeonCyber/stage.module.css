@@ -1,7 +1,7 @@
 /* Neon Cyber's look on the shared theatre's stages (../shared/theatre): the visor's static scanlines and
    vignette, and a scrim under the text column so the titles read on the brightest frame; all fade with
-   their stage. The theatre's ground and veil are the night's void and ink (--theatre-ground and
-   --theatre-veil on the world's root). */
+   their stage. The theatre's ground is the night's void (--theatre-ground on the world's
+   root). */
 
 .visor::after {
   content: '';

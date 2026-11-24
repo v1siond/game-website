@@ -7,8 +7,8 @@ import { LAYERS, type Layer } from './eras/era'
 import { LAYER_MOTION, lookVars, type Scene } from './scenes'
 import css from './eras.module.css'
 
-// One era picture: its six layers, each an SVG built once from code (eras/*), and the black veil the
-// engine fades it into the dark with. In the theatre every stage is a fixed full screen picture behind the
+// One era picture: its six layers, each an SVG built once from code (eras/*), which the engine dissolves
+// in over the one before. In the theatre every stage is a fixed full screen picture behind the
 // text, moved by the engine (engine.ts); under reduced motion each stage sits at the top of its own
 // section instead, drawn once at its settled frame (the middle of its scene, every item reached).
 
@@ -40,7 +40,6 @@ export function Stage({ scene, settled = false }: { scene: Scene; settled?: bool
       {LAYERS.map((name) => (
         <div key={name} data-layer={name} className={css.layer} dangerouslySetInnerHTML={html[name]} />
       ))}
-      <div data-veil="" className={css.veil} />
     </div>
   )
 }

@@ -5,7 +5,6 @@
 
 .root {
   --theatre-ground: var(--realm-bg-void);
-  --theatre-veil: var(--realm-bg-void);
 }
 
 .stage {

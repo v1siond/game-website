@@ -64,7 +64,7 @@ export default function NeonCyberTheme() {
   return (
     <div
       ref={rootRef}
-      className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--neon-void)] [--theatre-veil:var(--neon-ink)] ${world.root} ${neonFace.variable}`}
+      className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--neon-void)] ${world.root} ${neonFace.variable}`}
       style={NEON_VARS}
     >
       <SkipLink />
