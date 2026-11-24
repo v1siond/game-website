@@ -2,6 +2,7 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
+import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import type { Chamber, ChamberInput } from './chamber'
@@ -18,9 +19,9 @@ import { work } from './chambers/work'
 import { Canvas, Floor, Front, Hall, Skyline, Water, bubblesWriter } from './city'
 
 // The page as scenes: the station lobby (hero), one chamber per section of the shown profession in reading
-// order, the revival chamber (contact). Each scene names its chamber, its anchor and how many cards its
-// section counts (stageItems), read from the same slot the section's cards are drawn from: one beat per
-// card.
+// order, the revival chamber (contact). Each scene names its chamber, its anchor and its chamber's script,
+// which plays on time once the section arrives, whatever the number of its cards (stageItems still counts
+// them for the theatre's settled frame).
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -59,33 +60,34 @@ const layersOf = (id: SceneId, { light, set, floor }: Chamber, input: ChamberInp
   { name: 'fg', node: <Front /> },
 ]
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): DecoScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): DecoScene => {
   const { chamber, ...def } = SCENE_DEFS[id]
-  const input = { count, profession }
+  const input = { profession, phone }
   return {
     ...def,
     id,
     slot,
     count,
+    script: chamber.script,
     layers: layersOf(id, chamber, input),
     bind: (stage) => {
       const bubbles = bubblesWriter(stage)
       const write = chamber.bind(stage, input)
-      return (progress, reached) => {
+      return (progress, _reached, play) => {
         bubbles(progress)
-        write(progress, reached)
+        write(play ?? sceneEnd(chamber.script))
       }
     },
   }
 }
 
 /** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): DecoScene[] {
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): DecoScene[] {
   const sections = slots.map((slot) => {
     const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession)
+    return sceneOf(slot.id, slot, lead + count, profession, phone)
   })
-  return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
+  return [sceneOf('hero', null, 0, profession, phone), ...sections, sceneOf('contact', null, 0, profession, phone)]
 }
 
 /** Each layer's push in across its scene: the far towers move least, the kelp most, which gives the depth.

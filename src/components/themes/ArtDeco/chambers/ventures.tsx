@@ -1,13 +1,13 @@
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo, translateTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { still, stopsChamber } from '../chamber'
+import { fightChamber, share, still } from '../chamber'
 import { Raider, foeOf } from '../foes'
 import { lay } from '../pose'
 
-// Ventures: propaganda square. For each venture he crouches and lays a glowing ring on the floor with the
-// charged hand, and waits; a raider walks into it, the ring sparks and the raider falls, and the maroon
-// banner over the square drops open under its gold rod, its sunburst lit.
+// Ventures: propaganda square. He crouches and lays a glowing ring on the floor with the charged hand, a trap
+// as the game's powers can be laid; then a raider walks into it, the ring sparks and the raider falls, and
+// the maroon banner over the square drops open under its gold rod, its sunburst lit.
 
 const RING = 220
 const FOE_FROM = 560
@@ -43,41 +43,42 @@ function Rod() {
   return <rect x={-104} y={ROD - 14} width={208} height={16} rx={8} fill={C.gold} stroke={C.brassDark} strokeWidth="2" />
 }
 
-export const ventures = stopsChamber({
+export const ventures = fightChamber({
   light: C.neonPink,
-  back: (i) => (
+  script: [1400, 1800],
+  back: () => (
     <>
       <g transform={`translate(${BANNER} 0)`}>
-        <g data-fx={`banner-${i}`} transform={unrolled(0)}>
+        <g data-fx="banner" transform={unrolled(0)}>
           <Banner />
         </g>
         <Rod />
-        <g data-fx={`lit-${i}`} opacity="0">
+        <g data-fx="lit" opacity="0">
           <Lit />
         </g>
       </g>
-      <ellipse data-fx={`ring-${i}`} cx={RING} cy={0} rx={70} ry={14} fill="none" stroke={C.bolt} strokeWidth="8" opacity="0" />
-      <g data-fx={`walk-${i}`} transform={`translate(${FOE_FROM} 0)`}>
-        <Raider name={`raider-${i}`} />
+      <ellipse data-fx="ring" cx={RING} cy={0} rx={70} ry={14} fill="none" stroke={C.bolt} strokeWidth="8" opacity="0" />
+      <g data-fx="walk" transform={`translate(${FOE_FROM} 0)`}>
+        <Raider name="raider" />
       </g>
     </>
   ),
-  move: (profession, t) => still(lay(profession, t)),
-  reply: (stage, { count }) => {
-    const rings = Array.from({ length: count }, (_, i) => fx(stage, `ring-${i}`))
-    const walks = Array.from({ length: count }, (_, i) => fx(stage, `walk-${i}`))
-    const foes = Array.from({ length: count }, (_, i) => foeOf(stage, `raider-${i}`))
-    const banners = Array.from({ length: count }, (_, i) => fx(stage, `banner-${i}`))
-    const lits = Array.from({ length: count }, (_, i) => fx(stage, `lit-${i}`))
-    return (played) =>
-      rings.forEach((ring, i) => {
-        const t = played(i)
-        fadeTo(ring, ramp(t, 0.3, 0.4) * (1 - 0.5 * ramp(t, 0.8, 1)))
-        translateTo(walks[i], FOE_FROM + (RING - FOE_FROM) * ramp(t, 0.4, 0.65), 0)
-        foes[i](t, [0.65, 0.75], [0.72, 0.85])
-        const open = ramp(t, 0.85, 1)
-        transformTo(banners[i], unrolled(open))
-        fadeTo(lits[i], open)
-      })
+  bind: (stage, { profession }) => {
+    const ring = fx(stage, 'ring')
+    const walk = fx(stage, 'walk')
+    const foe = foeOf(stage, 'raider')
+    const banner = fx(stage, 'banner')
+    const lit = fx(stage, 'lit')
+    return (play) => {
+      const laid = share(play, 0)
+      const caught = share(play, 1)
+      fadeTo(ring, ramp(laid, 0.5, 0.8) * (1 - 0.5 * ramp(caught, 0.7, 1)))
+      translateTo(walk, FOE_FROM + (RING - FOE_FROM) * ramp(caught, 0, 0.4), 0)
+      foe(caught, [0.4, 0.55], [0.5, 0.7])
+      const open = ramp(caught, 0.7, 1)
+      transformTo(banner, unrolled(open))
+      fadeTo(lit, open)
+      return still(lay(profession, laid))
+    }
   },
 })

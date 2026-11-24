@@ -1,18 +1,19 @@
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, focusOn, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { HOLD_X, still, stopsChamber } from '../chamber'
+import { mix } from '@/lib/motion/rigPose'
+import { fightChamber, holdX, share, still } from '../chamber'
 import { Canvas, FLOOR } from '../city'
 import { BrassGuard } from '../foes'
-import { strike } from '../pose'
+import { rest, strike } from '../pose'
 
-// Muay Thai: the fight club on the old theatre's stage, its maroon curtains drawn back. For each line of the
-// record a brass guard in its diving suit stands in his way; he knees it and throws the round kick, it
-// staggers back, and on the blow it sinks to one knee, its porthole lamp going dark. On the last line the
-// frame pushes in on him over the kneeling guard.
+// Muay Thai: the fight club on the old theatre's stage, its maroon curtains drawn back. A brass guard in its
+// diving suit stands in his way; he drives a knee into it and it rocks; then the round kick staggers it back
+// and it sinks to one knee, its porthole lamp going dark, the frame pushing in on him over it as he settles
+// back into his guard.
 
 const FOE = 260
-// The last guard's fall pushes the camera in this far.
+// The guard's fall pushes the camera in this far.
 const PUSH = 0.2
 
 /** The stage's maroon curtains drawn back to both sides, and its gold valance. */
@@ -27,30 +28,33 @@ function Curtains() {
   )
 }
 
-export const muayThai = stopsChamber({
+export const muayThai = fightChamber({
   light: C.blood,
+  script: [1300, 1600],
   set: () => <Curtains />,
-  back: (i) => (
+  back: () => (
     <g transform={`translate(${FOE} 0)`}>
-      <BrassGuard name={`guard-${i}`} />
+      <BrassGuard name="guard" />
     </g>
   ),
-  move: (profession, t) => still(strike(profession, t)),
-  reply: (stage, { count }) => {
-    const guards = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}`))
-    const lamps = Array.from({ length: count }, (_, i) => fx(stage, `guard-${i}-lamp`))
+  bind: (stage, input) => {
+    const { profession } = input
+    const guard = fx(stage, 'guard')
+    const lamp = fx(stage, 'guard-lamp')
     const camera = fx(stage, 'camera')
-    return (played) => {
-      guards.forEach((guard, i) => {
-        const t = played(i)
-        const stagger = Math.sin(Math.PI * ramp(t, 0.55, 0.75))
-        const kneel = ramp(t, 0.72, 0.9)
-        // down on its knee: the suit sinks into its legs from its feet up, leaning forward over them
-        transformTo(guard, `translate(${(40 * stagger + 20 * kneel).toFixed(1)} 0) rotate(${(10 * stagger - 8 * kneel).toFixed(1)}) scale(1 ${(1 - 0.3 * kneel).toFixed(3)})`)
-        fadeTo(lamps[i], 1 - 0.85 * kneel)
-      })
-      const last = count > 0 ? ramp(played(count - 1), 0.72, 0.95) : 0
-      transformTo(camera, focusOn(HOLD_X + FOE / 2, FLOOR - 180, 1 + PUSH * last))
+    return (play) => {
+      const kneed = share(play, 0)
+      const kicked = share(play, 1)
+      // the knee rocks it, the kick staggers it back and it sinks onto one knee, its suit settling into its legs
+      const rocked = 0.4 * Math.sin(Math.PI * ramp(kneed, 0.4, 0.9))
+      const stagger = Math.sin(Math.PI * ramp(kicked, 0.3, 0.6))
+      const kneel = ramp(kicked, 0.5, 0.8)
+      const sway = rocked + stagger
+      transformTo(guard, `translate(${(40 * sway + 20 * kneel).toFixed(1)} 0) rotate(${(10 * sway - 8 * kneel).toFixed(1)}) scale(1 ${(1 - 0.3 * kneel).toFixed(3)})`)
+      fadeTo(lamp, 1 - 0.85 * kneel)
+      transformTo(camera, focusOn(holdX(input) + FOE / 2, FLOOR - 180, 1 + PUSH * ramp(kicked, 0.5, 0.9)))
+      const blow = kicked > 0 ? strike(profession, 0.5 + 0.5 * ramp(kicked, 0, 0.4)) : strike(profession, 0.5 * kneed)
+      return still(mix(blow, rest(profession), ramp(kicked, 0.65, 1)))
     }
   },
 })

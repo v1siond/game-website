@@ -1,22 +1,20 @@
-import { ramp } from '@/lib/scroll/stage'
 import { fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import type { Chamber } from '../chamber'
+import { share, type Chamber } from '../chamber'
 import { Canvas, Survivor, placeSurvivor } from '../city'
 import { decoJoints, lift, setDecoPose } from '../pose'
 
 // The hero: the bathysphere station's lobby at the bottom of the sea. Beyond the great window, between his
-// sign and the vending machine, the bathysphere rides its rails down from the surface as the page starts
-// to scroll and docks over him, its porthole lit; he waits on the lobby floor in his kit and raises the
-// charged hand to it as it arrives.
+// sign and the vending machine, the bathysphere rides its rails down from the surface and docks over him,
+// its porthole lit, as the game brings its hero down into the city; then he raises the charged hand and the
+// sparks run over it. Two actions on time from the page's first paint.
 
 const SPHERE = { x: 780, y: 420, r: 90 }
-// The sphere starts this far up its rails and docks over this share of the hero's scroll.
+// The sphere starts this far up its rails.
 const DESCENT = 560
-const DOCKED_BY = 0.7
 const HERO_X = 780
 
-const sphereAt = (progress: number): string => `translate(0 ${(-DESCENT * (1 - ramp(progress, 0, DOCKED_BY))).toFixed(1)})`
+const sphereAt = (docked: number): string => `translate(0 ${(-DESCENT * (1 - docked)).toFixed(1)})`
 
 /** The rails, its cable and the bathysphere on them, beyond the window. */
 function Descent() {
@@ -42,6 +40,7 @@ function Descent() {
 
 export const hero: Chamber = {
   light: C.waterGlow,
+  script: [2400, 1500],
   set: () => <Descent />,
   floor: ({ profession }) => <Survivor x={HERO_X} profession={profession} />,
   bind: (stage, { profession }) => {
@@ -49,9 +48,9 @@ export const hero: Chamber = {
     const root = fx(stage, 'survivor')
     const joints = root ? decoJoints(root) : null
     placeSurvivor(root, HERO_X)
-    return (progress) => {
-      transformTo(sphere, sphereAt(progress))
-      if (joints) setDecoPose(joints, lift(profession, 0.55 * ramp(progress, 0.35, DOCKED_BY)))
+    return (play) => {
+      transformTo(sphere, sphereAt(share(play, 0)))
+      if (joints) setDecoPose(joints, lift(profession, 0.55 * share(play, 1)))
     }
   },
 }

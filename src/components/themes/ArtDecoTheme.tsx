@@ -5,6 +5,7 @@ import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -27,14 +28,19 @@ const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap'
 // section of the shown profession is one full screen chamber that rises from dark, holds while its cards
 // scroll over it, and sinks into dark while the next chamber rises: the power station, the diary archive,
 // the glass tunnel, the telekinesis hall, the pipe works, propaganda square, theatre row, the fight club, and
-// the revival chamber at the end. He is the survivor with the wrench and the charged hand in each chamber
-// and does one thing per card of the section: throws a bolt into a fuse box, listens to a diary, seals a
-// leak, lifts a crate. Every motion is a function of the scroll position (the shared theatre on
-// useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
+// the revival chamber at the end. He is the survivor with the wrench and the charged hand, after the art
+// deco shooter the world is drawn from, and each chamber plays one to three different moves of that game
+// once its section arrives, on time and at the same speed however the page is scrolled, then holds the end
+// frame: the bathysphere docks, a bolt then the wrench, the camera flash, a turret hacked from one knee, a
+// crate flung, a ride on the overhead rail, a trap laid, the snare's spark, a knee and a kick, the revival
+// chamber. The layers' push in still follows the scroll (the shared theatre on useScrollStage). The text
 // is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame.
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
+
+// A phone sees the middle of the canvas only, so the chambers stage their fights nearer its middle.
+const PHONE_QUERY = '(max-width: 767.98px)'
 
 const hasSlot = (scene: DecoScene): scene is DecoScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -44,9 +50,10 @@ export default function ArtDecoTheme() {
   const cv = useCVData()
   const labels = useLabels()
   const reduced = useReducedMotion()
+  const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
+    [view, cv, labels, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
