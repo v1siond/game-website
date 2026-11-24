@@ -5,10 +5,11 @@ import type { Labels } from '@/lib/cv/labels'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
 import { drop } from '@/lib/motion/arc'
+import { sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { clamp01, fadeTo, focusOn, fx, lerp, r1, spread, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
-import { SETTLED_PROGRESS, type LayerMotions, type StageWriter, type TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
+import type { LayerMotions, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { ChaosLand } from './chaosZone'
 import { FrostLand } from './frostZone'
 import { GolemRise, RISEN, ROCK_COUNT, riseWriter } from './golem'
@@ -18,7 +19,6 @@ import {
   AuraRing,
   Barracks,
   Champion,
-  Creep,
   Glint,
   GoldMine,
   Hall,
@@ -34,20 +34,17 @@ import {
 } from './units'
 import look from './world.module.css'
 
-// The two realms as the page's scenes, each section a moment of a real time strategy match with him as the
-// hero unit: the frost king, selected with his ring, on the field in every scene. Each card's beat opens with
-// his gesture, his free hand raised for an order or his blade pointed or raised for a spell, and then his
-// units answer. The hero: he selects the golem standing beside him. About is the economy, a worker's trip from
-// the mine to the hall with gold per highlight. Work builds the hall a card's share at a time, a worker
-// hammering, until the banner goes up. The Tech Stack trains a soldier from the barracks to the rally flag per
-// category, then box selects the rank and orders it on. Services clears a creep camp, a creep per service,
-// and he levels up in the gold column with the camera pushed in. Projects calls ice down on an enemy column per
-// project, then raises the fallen as his own. Ventures sends a dead worker to claim a gold mine per venture.
-// Bands pulses his aura once per band, his raised soldiers marching a step to it. The Muay Thai record is his
-// duel with a champion, a blow per line, closed by the meteor he summons, the golem standing from its crater.
-// The contact: he waits, selected, for the next order. Every pose is a function of the scene's progress and
-// the cards reached, so it plays back on the way up and rests when the scroll does; a scene drawn settled
-// (reduced motion) holds its peak.
+// The two realms as the page's scenes, a real time strategy campaign told in order with him as the hero unit:
+// the frost king, selected with his ring, on the field in every scene. First the chaos field, his warband
+// against the kingdom: the hero selects the golem, About gathers gold, Work raises the hall, the Tech Stack
+// trains the rank and sends it on, and Services is the clash, the kingdom's blue line falling to his warband.
+// Then the frost: in Projects his ice kills the kingdom's column and he raises its fallen as his own dead,
+// Ventures sends a dead worker to claim the mines, Bands spreads his aura and the dead march to it, and the
+// contact waits for the next order. The Muay Thai record is a duel with a champion closed by the meteor and the
+// golem. Each scene is a short script of one to three actions the shared scene player moves through
+// (src/lib/scroll/player.ts), each at its own pace and never per card; every frame is a function of the
+// playhead alone, so an action reads the same played backward, and the end frame is the one a scene drawn
+// settled (reduced motion) shows.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 type Realm = 'chaos' | 'frost'
@@ -64,26 +61,13 @@ export const REALM_MOTION: LayerMotions = {
 const FIELD = { width: 1920, height: 1080 }
 const FLOOR = 1000
 
-// The stretches of a scene's progress the close after the last card plays over.
-const CLOSE = [0.74, 0.9] as const
-const closeAt = (t: number): number => lerp(CLOSE[0], CLOSE[1], t)
-
-/** The card playing `reached` cards in, how far through it (0 to 1) and the close after the last card. */
-interface Beat {
-  card: number
-  f: number
-  close: number
-}
-
-const beatOf = (progress: number, reached: number, count: number): Beat => {
-  const card = Math.max(0, Math.min(count - 1, Math.floor(reached)))
-  return { card, f: count === 0 ? 0 : Math.min(1, reached - card), close: reached >= count ? ramp(progress, ...CLOSE) : 0 }
-}
+/** How far action `i` has played at `play`: all of it once a later one plays, `t` while it plays, none before. */
+const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
 
 /** A bump from 0 up to 1 and back over [from, to] of t. */
 const bell = (t: number, from: number, to: number): number => Math.sin(Math.PI * ramp(t, from, to))
 
-/** His gesture over a beat: up over its first fifth, held while the unit answers, down over its last fifth. */
+/** His gesture over an action: up over its first fifth, held while his units answer, down over its last fifth. */
 const gesture = (f: number): number => ramp(f, 0, 0.2) * (1 - ramp(f, 0.8, 1))
 
 /** A unit's feet at (x, y), facing right (1) or left (-1), at `size`. */
@@ -138,12 +122,10 @@ const poseKing = (nodes: KingNodes, { x, hand = 0, blade = 0, glow = GLOW_REST, 
   fadeTo(nodes.ring, ring)
 }
 
-/** An order: the free hand raised over the beat's gesture. */
+/** An order: the free hand raised over the action's gesture. */
 const order = (f: number): Pick<KingPose, 'hand'> => ({ hand: HAND_UP * gesture(f) })
-/** A spell: the blade raised and lit over the beat's gesture. */
+/** A spell: the blade raised and lit over the action's gesture. */
 const cast = (f: number): Pick<KingPose, 'blade' | 'glow'> => ({ blade: BLADE_UP * gesture(f), glow: lerp(GLOW_REST, GLOW_CAST, gesture(f)) })
-/** A target named: the blade pointed over the beat's gesture. */
-const point = (f: number): Pick<KingPose, 'blade'> => ({ blade: BLADE_POINT * gesture(f) })
 
 /** Him, the hero unit, and his ring under him. */
 function KingUnit({ x, figure = false }: { x: number; figure?: boolean }) {
@@ -175,20 +157,18 @@ const blow = (t: number): number => (t < 0.4 ? -70 * ramp(t, 0, 0.4) : lerp(-70,
 
 // ---- the scenes ----
 
-interface Peak {
-  progress: number
-  reached: number
-}
+/** A scene's writer: the frame at the playhead. The land's push in is the theatre's own. */
+type SceneWriter = (play: Playhead) => void
 
 interface SceneSpec {
   realm: Realm
+  script: SceneScript
   figure: (scene: RealmScene) => ReactNode
-  bind: (stage: HTMLElement, scene: RealmScene) => StageWriter
-  peak: (count: number) => Peak
+  bind: (stage: HTMLElement, scene: RealmScene) => SceneWriter
 }
 
-// The hero: he stands by the golem; as the page starts to scroll his ring lights, he raises his hand and the
-// golem's ring lights, the golem nodding to the order.
+// The hero: he stands by the golem. His ring lights and he raises his hand for an order, then the golem's ring
+// lights and the golem nods to it as his hand comes down.
 const HERO = { king: 1130, golem: 1460, golemSize: 1.1 }
 const GOLEM_BOX = { feetX: 80, feetY: 190 }
 const golemAt = (x: number, size: number, lift = 0): string =>
@@ -196,6 +176,7 @@ const golemAt = (x: number, size: number, lift = 0): string =>
 
 const hero: SceneSpec = {
   realm: 'chaos',
+  script: [1400, 1600],
   figure: (scene) => (
     <>
       <g transform={place(HERO.golem)}>
@@ -212,22 +193,24 @@ const hero: SceneSpec = {
     const rise = riseWriter(stage)
     const ring = fx(stage, 'golem-ring')
     const golem = fx(stage, 'golem-at')
-    return (progress) => {
+    return (play) => {
+      const ordered = share(play, 0)
+      const answered = share(play, 1)
       rise(RISEN)
-      poseKing(king, { x: HERO.king, ring: ramp(progress, 0.04, 0.1), hand: HAND_UP * ramp(progress, 0.1, 0.2) })
-      fadeTo(ring, ramp(progress, 0.2, 0.26))
-      transformTo(golem, golemAt(HERO.golem, HERO.golemSize, 8 * bell(progress, 0.26, 0.36)))
+      poseKing(king, { x: HERO.king, ring: ramp(ordered, 0, 0.4), hand: HAND_UP * ramp(ordered, 0.3, 1) * (1 - ramp(answered, 0.6, 1)) })
+      fadeTo(ring, ramp(answered, 0, 0.3))
+      transformTo(golem, golemAt(HERO.golem, HERO.golemSize, 8 * bell(answered, 0.2, 0.8)))
     }
   },
-  peak: () => ({ progress: 0.4, reached: 0 }),
 }
 
-// About, the economy: per highlight he orders a worker to the mine, the worker walks out, mines, and carries the
-// gold back to the hall, a glint at the drop. After the last a second worker comes out to join him.
+// About, the economy: he orders a worker to the mine and the worker walks out to it, mines two blows of gold and
+// carries it back to the hall, a glint at the drop, while a second worker steps out to join him.
 const ABOUT = { king: 1100, hall: 1280, hallSize: 0.55, mine: 1600, mineSize: 0.8, from: 1360, to: 1510, second: 1420 }
 
 const about: SceneSpec = {
   realm: 'chaos',
+  script: [1800, 1400, 1800],
   figure: () => (
     <>
       <g transform={place(ABOUT.hall, 1, FLOOR, ABOUT.hallSize)}>
@@ -249,38 +232,39 @@ const about: SceneSpec = {
       <KingUnit x={ABOUT.king} />
     </>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
     const worker = unitNodes(stage, 'worker')
     const sack = fx(stage, 'worker-sack')
     const marker = fx(stage, 'marker')
     const glint = fx(stage, 'drop')
     const second = fx(stage, 'second-at')
-    return (progress, reached) => {
-      const { f, close } = beatOf(progress, reached, scene.count)
-      const out = ramp(f, 0.2, 0.5)
-      const back = ramp(f, 0.6, 0.9)
+    return (play) => {
+      const out = share(play, 0)
+      const mined = play.action === 1 ? play.t : 0
+      const back = share(play, 2)
+      const home = play.action === 2
       const x = lerp(ABOUT.from, ABOUT.to, out - back)
-      const home = back > 0
-      poseKing(king, { x: ABOUT.king, ...order(f) })
-      fadeTo(marker, bell(f, 0.05, 0.35))
-      transformTo(worker.root, `${place(x, home ? -1 : 1)} translate(0 ${r1(stride(x))})`)
-      swingArm(worker.arm, blow(ramp(f, 0.5, 0.6)))
+      const walking = (out > 0 && out < 1) || (back > 0 && back < 1)
+      poseKing(king, { x: ABOUT.king, hand: HAND_UP * bell(out, 0, 0.6) })
+      fadeTo(marker, bell(out, 0, 0.5))
+      transformTo(worker.root, `${place(x, home ? -1 : 1)} translate(0 ${r1(walking ? stride(x) : 0)})`)
+      swingArm(worker.arm, blow((mined * 2) % 1))
       fadeTo(sack, home ? 1 : 0)
-      fadeTo(glint, bell(f, 0.88, 1))
-      transformTo(second, place(lerp(ABOUT.hall, ABOUT.second, close)))
-      fadeTo(second, ramp(close, 0, 0.2))
+      fadeTo(glint, bell(back, 0.8, 1))
+      transformTo(second, place(lerp(ABOUT.hall, ABOUT.second, ramp(back, 0.4, 1))))
+      fadeTo(second, ramp(back, 0.4, 0.6))
     }
   },
-  peak: (count) => ({ progress: SETTLED_PROGRESS, reached: count - 1 + 0.75 }),
 }
 
-// Work, the base going up: per job he orders the build, the worker hammers under the scaffold and the hall rises
-// a card's share of its five stages. After the last the banner goes up on its top.
+// Work, the base going up: he orders the build and the worker hammers under the scaffold while the hall rises
+// through its five stages, then the scaffold comes down and the banner goes up on its top.
 const WORK = { king: 1100, worker: 1270, hall: 1450, bannerRise: 40 }
 
 const work: SceneSpec = {
   realm: 'chaos',
+  script: [2800, 1400],
   figure: () => (
     <>
       <g transform={place(WORK.hall)}>
@@ -292,34 +276,33 @@ const work: SceneSpec = {
       <KingUnit x={WORK.king} />
     </>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
     const arm = fx(stage, 'worker-arm')
     const parts = Array.from({ length: HALL_STAGES }, (_, i) => fx(stage, `hall-${i}`))
     const scaffold = fx(stage, 'hall-scaffold')
     const banner = fx(stage, 'hall-banner')
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const raising = ramp(f, 0.25, 0.85)
-      const built = ((card + raising) * HALL_STAGES) / scene.count
-      poseKing(king, { x: WORK.king, ...order(f) })
-      swingArm(arm, f > 0.2 && f < 0.85 ? -60 * Math.abs(Math.sin(f * Math.PI * 6)) : 0)
+    return (play) => {
+      const raised = share(play, 0)
+      const flown = share(play, 1)
+      const built = raised * HALL_STAGES
+      poseKing(king, { x: WORK.king, ...order(raised) })
+      swingArm(arm, play.action === 0 ? -60 * Math.abs(Math.sin(raised * Math.PI * 8)) : 0)
       for (const [i, part] of parts.entries()) {
         const up = clamp01(built - i)
         transformTo(part, `scale(1 ${up.toFixed(3)})`)
         fadeTo(part, up > 0 ? 1 : 0)
       }
-      fadeTo(scaffold, bell(f, 0.15, 0.9) * (close > 0 ? 0 : 1))
-      transformTo(banner, `translate(0 ${r1(WORK.bannerRise * (1 - close))})`)
-      fadeTo(banner, ramp(close, 0, 0.3))
+      fadeTo(scaffold, ramp(raised, 0, 0.05) * (1 - ramp(flown, 0, 0.3)))
+      transformTo(banner, `translate(0 ${r1(WORK.bannerRise * (1 - flown))})`)
+      fadeTo(banner, ramp(flown, 0, 0.3))
     }
   },
-  peak: () => ({ progress: CLOSE[1], reached: Number.MAX_SAFE_INTEGER }),
 }
 
-// The Tech Stack, training: per category he orders a soldier, the barracks door lights and the soldier steps
-// out to his place in the rank by the rally flag. After the last he drags a box over the rank, its rings light,
-// he points it on and a marker blinks where it goes, the rank leaning into the march.
+// The Tech Stack, training: he orders the rank and a soldier per category steps out of the barracks after the
+// one before to his place by the rally flag. Then he drags a box over the rank, its rings light, he points it
+// on towards the kingdom's line and a marker blinks where it goes, the rank leaning into the march.
 const TECH = { king: 1100, flag: 1320, barracks: 1570, rank: [1200, 1450] as const, backRow: 26, march: 1660 }
 
 /** Where soldier i of `count` stands: two rows near the flag, the back row a little up the field. */
@@ -329,8 +312,15 @@ const rankSlot = (i: number, count: number): { x: number; y: number } => {
   return { x: xs[Math.floor(i / 2)], y: FLOOR - (i % 2 === 0 ? TECH.backRow : 0) }
 }
 
+/** How far soldier i of `count` has walked from the door when the training is `t` through: one after another. */
+const trainedOf = (t: number, i: number, count: number): number => {
+  const start = (i / Math.max(1, count)) * 0.65
+  return ramp(t, start, start + 0.35)
+}
+
 const tech: SceneSpec = {
   realm: 'chaos',
+  script: [2600, 2000],
   figure: (scene) => (
     <>
       <g transform={place(TECH.barracks)}>
@@ -367,56 +357,45 @@ const tech: SceneSpec = {
     const box = fx(stage, 'box')
     const marker = fx(stage, 'marker')
     const soldiers = Array.from({ length: scene.count }, (_, i) => ({ at: fx(stage, `soldier-at-${i}`), ring: fx(stage, `ring-${i}`), slot: rankSlot(i, scene.count) }))
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const boxed = ramp(close, 0, 0.3)
-      poseKing(king, { x: TECH.king, ...(close > 0 ? { hand: HAND_UP * bell(close, 0.35, 0.75) } : order(f)) })
-      fadeTo(door, 0.7 * bell(f, 0.15, 0.45) * (close > 0 ? 0 : 1))
+    return (play) => {
+      const trained = share(play, 0)
+      const sent = share(play, 1)
+      const boxed = ramp(sent, 0, 0.3)
+      poseKing(king, { x: TECH.king, hand: play.action === 0 ? HAND_UP * gesture(trained) : HAND_UP * bell(sent, 0.35, 0.75) })
+      fadeTo(door, 0.7 * bell(trained, 0, 1))
       transformTo(box, `scale(${boxed.toFixed(3)} 1)`)
-      fadeTo(box, boxed * (1 - ramp(close, 0.6, 0.8)))
-      fadeTo(marker, bell(close, 0.5, 0.9))
+      fadeTo(box, boxed * (1 - ramp(sent, 0.6, 0.8)))
+      fadeTo(marker, bell(sent, 0.5, 0.9))
       for (const [i, { at, ring, slot }] of soldiers.entries()) {
-        const walk = i < card ? 1 : i === card ? ramp(f, 0.35, 0.9) : 0
+        const walk = trainedOf(trained, i, scene.count)
         const x = lerp(TECH.barracks, slot.x, walk)
         const y = lerp(FLOOR, slot.y, walk)
-        const lean = 6 * ramp(close, 0.6, 1)
-        transformTo(at, `${place(x, walk < 1 ? -1 : 1, y)} translate(0 ${r1(walk < 1 ? stride(x) : 0)}) rotate(${r1(lean)})`)
-        fadeTo(at, i < card ? 1 : i === card ? ramp(f, 0.25, 0.35) : 0)
-        fadeTo(ring, ramp(close, 0.3, 0.45))
+        const lean = 6 * ramp(sent, 0.6, 1)
+        transformTo(at, `${place(x, walk < 1 ? -1 : 1, y)} translate(0 ${r1(walk > 0 && walk < 1 ? stride(x) : 0)}) rotate(${r1(lean)})`)
+        fadeTo(at, ramp(walk, 0, 0.1))
+        fadeTo(ring, ramp(sent, 0.3, 0.45))
       }
     }
   },
-  peak: () => ({ progress: closeAt(0.55), reached: Number.MAX_SAFE_INTEGER }),
 }
 
-// Services, a creep camp: per service he points his blade at a creep, his troop strikes and it falls, a coin's
-// glint over it. After the last he levels up in the gold column, the camera pushed in on him.
-const SERVICES = { king: 1100, troop: [1250, 1290, 1330] as const, troopStep: 30, camp: [1470, 1680] as const, backRow: 22, zoom: 1.25 }
-
-const creepSlot = (i: number, count: number): { x: number; y: number } => ({
-  x: spread(count, ...SERVICES.camp)[i],
-  y: FLOOR - (i % 2 === 1 ? SERVICES.backRow : 0),
-})
+// Services, the clash: the kingdom's blue line marches in from the right, he points his blade at it and his
+// warband steps in and strikes, the kingdom's soldiers falling one after another. Then he levels up in the gold
+// column with the camera pushed in on him.
+const SERVICES = { king: 1100, troop: [1250, 1290, 1330] as const, troopStep: 30, foes: [1400, 1480, 1560] as const, backRow: 22, enter: 260, zoom: 1.25 }
 
 const services: SceneSpec = {
   realm: 'chaos',
-  figure: (scene) => (
+  script: [1600, 1800, 1400],
+  figure: () => (
     <g data-fx="camera">
-      {Array.from({ length: scene.count }, (_, i) => {
-        const slot = creepSlot(i, scene.count)
-        return (
-          <g key={i}>
-            <g data-fx={`creep-at-${i}`} transform={place(slot.x, -1, slot.y)}>
-              <Creep name={`creep-${i}`} />
-            </g>
-            <g transform={`translate(${slot.x} ${slot.y - 90})`}>
-              <Glint name={`coin-${i}`} />
-            </g>
-          </g>
-        )
-      })}
+      {SERVICES.foes.map((x, i) => (
+        <g key={x} data-fx={`foe-at-${i}`} transform={place(x, -1, FLOOR - (i % 2 === 1 ? SERVICES.backRow : 0))}>
+          <Soldier name={`foe-${i}`} side="enemy" />
+        </g>
+      ))}
       {SERVICES.troop.map((x, i) => (
-        <g key={x} transform={place(x)}>
+        <g key={x} data-fx={`troop-at-${i}`} transform={place(x)}>
           <Soldier name={`troop-${i}`} side="ours" />
         </g>
       ))}
@@ -426,48 +405,55 @@ const services: SceneSpec = {
       <KingUnit x={SERVICES.king} />
     </g>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
     const camera = fx(stage, 'camera')
     const level = fx(stage, 'level')
-    const troop = SERVICES.troop.map((x, i) => ({ x, ...unitNodes(stage, `troop-${i}`) }))
-    const creeps = Array.from({ length: scene.count }, (_, i) => ({ at: fx(stage, `creep-at-${i}`), coin: fx(stage, `coin-${i}`), slot: creepSlot(i, scene.count) }))
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const push = ramp(close, 0, 0.5)
-      poseKing(king, { x: SERVICES.king, ...(close > 0 ? { hand: HAND_UP * ramp(close, 0, 0.2) } : point(f)) })
-      transformTo(camera, focusOn(SERVICES.king, FLOOR - 160, lerp(1, SERVICES.zoom, push)))
-      fadeTo(level, ramp(close, 0.1, 0.35))
+    const troop = SERVICES.troop.map((x, i) => ({ x, root: fx(stage, `troop-at-${i}`), arm: fx(stage, `troop-${i}-arm`) }))
+    const foes = SERVICES.foes.map((x, i) => ({ x, y: FLOOR - (i % 2 === 1 ? SERVICES.backRow : 0), at: fx(stage, `foe-at-${i}`) }))
+    return (play) => {
+      const marched = share(play, 0)
+      const struck = share(play, 1)
+      const levelled = share(play, 2)
+      const blade = BLADE_POINT * ramp(marched, 0.5, 1) * (1 - ramp(struck, 0.7, 1))
+      poseKing(king, { x: SERVICES.king, blade, hand: HAND_UP * ramp(levelled, 0, 0.25) })
+      transformTo(camera, focusOn(SERVICES.king, FLOOR - 160, lerp(1, SERVICES.zoom, ramp(levelled, 0, 0.6))))
+      fadeTo(level, ramp(levelled, 0.1, 0.4))
       for (const { x, root, arm } of troop) {
-        const step = SERVICES.troopStep * bell(f, 0.25, 0.75) * (close > 0 ? 0 : 1)
-        transformTo(root, place(x + step))
-        swingArm(arm, close > 0 ? 0 : blow(ramp(f, 0.3, 0.65)))
+        transformTo(root, place(x + SERVICES.troopStep * bell(struck, 0.1, 0.8)))
+        swingArm(arm, play.action === 1 ? blow(ramp(struck, 0.2, 0.6)) : 0)
       }
-      for (const [i, { at, coin, slot }] of creeps.entries()) {
-        const down = i < card || close > 0 ? 1 : i === card ? ramp(f, 0.55, 0.8) : 0
-        transformTo(at, `${place(slot.x, -1, slot.y)} rotate(${r1(-80 * down)})`)
-        fadeTo(at, 1 - 0.65 * down)
-        fadeTo(coin, i === card && close === 0 ? bell(f, 0.72, 1) : 0)
+      for (const [i, { x, y, at }] of foes.entries()) {
+        const fx0 = x + SERVICES.enter * (1 - marched)
+        const down = ramp(struck, 0.45 + 0.1 * i, 0.65 + 0.1 * i)
+        transformTo(at, `${place(fx0, -1, y)} translate(0 ${r1(marched < 1 ? stride(fx0) : 0)}) rotate(${r1(-80 * down)})`)
+        fadeTo(at, ramp(marched, 0, 0.2) * (1 - 0.5 * down))
       }
     }
   },
-  peak: () => ({ progress: closeAt(0.6), reached: Number.MAX_SAFE_INTEGER }),
 }
 
-// Projects, the spell: per project an enemy column marches over the frozen lake, he raises his blade, ice shards
-// fall on it and it falls. After the last he raises the fallen as his own, standing and turning to face out.
+// Projects, the frost: the kingdom's column marches over the frozen lake, he raises his blade and ice falls on
+// it and its soldiers fall. Then he raises his hand, a cold ring glows under each body and the fallen stand up
+// as his own dead, turning to face out with him, a trace of the ring left under their feet.
 const PROJECTS = { king: 340, column: [690, 750, 810] as const, enter: 190, shardsPer: 2 }
 
 const projects: SceneSpec = {
   realm: 'frost',
+  script: [1600, 1600, 1800],
   figure: (scene) => (
     <>
       {PROJECTS.column.map((x, j) => (
-        <g key={x} data-fx={`foe-at-${j}`} transform={place(x, -1)}>
-          <g data-fx={`foe-live-${j}`}>
+        <g key={x} transform={`${place(x)} scale(0.6)`}>
+          <AuraRing name={`grave-${j}`} fill={REALM.frostIceBright} />
+        </g>
+      ))}
+      {PROJECTS.column.map((x, j) => (
+        <g key={x} data-fx={`foe-at-${j}`} transform={place(x)}>
+          <g data-fx={`foe-live-${j}`} opacity="0">
             <Soldier name={`foe-${j}`} side="enemy" />
           </g>
-          <g data-fx={`foe-raised-${j}`} opacity="0">
+          <g data-fx={`foe-raised-${j}`}>
             <Soldier name={`raised-${j}`} side="raised" />
           </g>
         </g>
@@ -482,45 +468,54 @@ const projects: SceneSpec = {
       <KingUnit x={PROJECTS.king} figure={scene.figure} />
     </>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
-    const last = scene.count - 1
-    const foes = PROJECTS.column.map((x, j) => ({ x, at: fx(stage, `foe-at-${j}`), live: fx(stage, `foe-live-${j}`), raised: fx(stage, `foe-raised-${j}`) }))
+    const foes = PROJECTS.column.map((x, j) => ({
+      x,
+      at: fx(stage, `foe-at-${j}`),
+      live: fx(stage, `foe-live-${j}`),
+      raised: fx(stage, `foe-raised-${j}`),
+      grave: fx(stage, `grave-${j}`),
+    }))
     const shards = PROJECTS.column.flatMap((x, j) =>
       Array.from({ length: PROJECTS.shardsPer }, (_, k) => ({ x: x + (k === 0 ? -14 : 16), delay: 0.06 * (j + k), at: fx(stage, `shard-at-${j}-${k}`), node: fx(stage, `shard-${j}-${k}`) })),
     )
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const march = ramp(f, 0, 0.35)
-      const fall = close > 0 ? 1 : ramp(f, 0.6, 0.85)
-      const gone = card < last ? ramp(f, 0.9, 1) : 0
-      const rise = ramp(close, 0.2, 0.6)
-      const turn = ramp(close, 0.6, 0.8)
-      poseKing(king, { x: PROJECTS.king, ...(close > 0 ? { blade: BLADE_UP * bell(close, 0, 0.6), glow: lerp(GLOW_REST, GLOW_CAST, bell(close, 0, 0.6)) } : cast(f)) })
-      for (const { x, at, live, raised } of foes) {
+    return (play) => {
+      const march = share(play, 0)
+      const frozen = share(play, 1)
+      const raising = share(play, 2)
+      const fall = ramp(frozen, 0.45, 0.75)
+      const rise = ramp(raising, 0.3, 0.7)
+      const turn = ramp(raising, 0.75, 0.9)
+      poseKing(king, {
+        x: PROJECTS.king,
+        ...(play.action === 2 ? { hand: HAND_UP * gesture(raising), glow: lerp(GLOW_REST, GLOW_CAST, gesture(raising)) } : cast(frozen)),
+      })
+      for (const { x, at, live, raised, grave } of foes) {
         const fx0 = x + PROJECTS.enter * (1 - march)
         const lying = fall * (1 - rise)
         transformTo(at, `${place(fx0, turn > 0.5 ? 1 : -1)} translate(0 ${r1(march < 1 ? stride(fx0) : 0)}) rotate(${r1(-75 * lying)})`)
-        fadeTo(at, close > 0 ? 1 : ramp(f, 0, 0.1) * (1 - 0.5 * fall) * (1 - gone))
+        fadeTo(at, ramp(march, 0, 0.15) * (1 - 0.4 * lying))
         fadeTo(live, 1 - rise)
         fadeTo(raised, rise)
+        fadeTo(grave, Math.max(bell(raising, 0, 0.8), 0.4 * ramp(raising, 0.5, 1)))
       }
       for (const { x, delay, at, node } of shards) {
-        const t = close > 0 ? 0 : ramp(f, 0.4 + delay, 0.6 + delay)
+        const t = ramp(frozen, 0.2 + delay, 0.45 + delay)
         transformTo(at, `translate(${r1(x)} ${r1(FLOOR - 40 - 520 + drop(t, 520))})`)
         fadeTo(node, t > 0 && t < 1 ? 1 : 0)
       }
     }
   },
-  peak: (count) => ({ progress: SETTLED_PROGRESS, reached: count - 1 + 0.62 }),
 }
 
-// Ventures, claiming the mines: per venture he orders a dead worker to a gold mine, the worker walks to it and the
-// mine's light rises over it, the mine his. After the last the mines pulse together.
-const VENTURES = { king: 320, start: 420, mines: [540, 800] as const, mineSize: 0.6 }
+// Ventures, claiming the mines: he orders a dead worker out and it walks along the near lane in front of the
+// mines, each mine's light rising as it passes, to the last mine's door. Then the claimed mines pulse together.
+const VENTURES = { king: 320, start: 420, mines: [540, 800] as const, mineSize: 0.6, lane: 26, door: 80 }
 
 const ventures: SceneSpec = {
   realm: 'frost',
+  script: [2600, 1400],
   figure: (scene) => (
     <>
       {spread(scene.count, ...VENTURES.mines).map((x, i) => (
@@ -535,30 +530,31 @@ const ventures: SceneSpec = {
   bind: (stage, scene) => {
     const king = kingNodes(stage)
     const xs = spread(scene.count, ...VENTURES.mines)
+    const last = xs[xs.length - 1] - VENTURES.door
     const worker = fx(stage, 'worker')
     const lights = xs.map((_, i) => fx(stage, `mine-${i}-light`))
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const from = card === 0 ? VENTURES.start : xs[card - 1] - 50
-      const x = lerp(from, xs[card] - 50, ramp(f, 0.25, 0.7))
-      poseKing(king, { x: VENTURES.king, ...order(f) })
-      transformTo(worker, `${place(x)} translate(0 ${r1(stride(x))})`)
+    return (play) => {
+      const walked = share(play, 0)
+      const pulse = bell(share(play, 1), 0, 1)
+      const x = lerp(VENTURES.start, last, ramp(walked, 0.15, 1))
+      poseKing(king, { x: VENTURES.king, ...order(walked) })
+      transformTo(worker, `${place(x, 1, FLOOR + VENTURES.lane)} translate(0 ${r1(walked > 0 && walked < 1 ? stride(x) : 0)})`)
       for (const [i, light] of lights.entries()) {
-        const claimed = i < card ? 1 : i === card ? ramp(f, 0.6, 0.95) : 0
+        const claimed = clamp01((x - (xs[i] - VENTURES.door - 60)) / 60)
         transformTo(light, `scale(1 ${claimed.toFixed(3)})`)
-        fadeTo(light, claimed * (1 + 0.6 * bell(close, 0, 0.6)) * 0.7)
+        fadeTo(light, claimed * (1 + 0.6 * pulse) * 0.7)
       }
     }
   },
-  peak: (count) => ({ progress: SETTLED_PROGRESS, reached: count - 1 + 0.85 }),
 }
 
-// Bands, the aura: per band he raises his blade, his aura spreads out from him and his raised soldiers march a
-// step in time to it. After the last the march halts in line, the aura held at its widest.
-const BANDS = { king: 340, rank: [500, 640, 720, 800] as const, march: 120 }
+// Bands, the aura: he raises his blade and his aura spreads out from him, then his raised soldiers march out in
+// step to it and halt in line, the aura held at its widest.
+const BANDS = { king: 340, rank: [560, 640, 720, 800] as const, march: 120, steps: 3 }
 
 const bands: SceneSpec = {
   realm: 'frost',
+  script: [1600, 2400],
   figure: (scene) => (
     <>
       <g data-fx="aura-at" transform={place(BANDS.king)}>
@@ -572,35 +568,32 @@ const bands: SceneSpec = {
       <KingUnit x={BANDS.king} figure={scene.figure} />
     </>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
     const aura = fx(stage, 'aura')
     const auraAt = fx(stage, 'aura-at')
     const marchers = BANDS.rank.map((x, i) => ({ x, node: fx(stage, `marcher-${i}`) }))
-    const step = BANDS.march / scene.count
-    return (progress, reached) => {
-      const { card, f, close } = beatOf(progress, reached, scene.count)
-      const spreadOut = close > 0 ? 1 : ramp(f, 0.2, 0.7)
-      poseKing(king, { x: BANDS.king, ...(close > 0 ? { blade: BLADE_UP, glow: GLOW_CAST } : cast(f)) })
-      transformTo(auraAt, `${place(BANDS.king)} scale(${lerp(0.3, close > 0 ? 2.2 : 2.6, spreadOut).toFixed(3)})`)
-      fadeTo(aura, close > 0 ? 0.85 * ramp(close, 0, 0.3) : 1 - ramp(f, 0.45, 0.75))
+    return (play) => {
+      const raised = share(play, 0)
+      const marched = share(play, 1)
+      poseKing(king, { x: BANDS.king, blade: BLADE_UP * ramp(raised, 0, 0.4), glow: lerp(GLOW_REST, GLOW_CAST, ramp(raised, 0, 0.4)) })
+      transformTo(auraAt, `${place(BANDS.king)} scale(${lerp(0.3, 2.4, ramp(raised, 0.2, 1)).toFixed(3)})`)
+      fadeTo(aura, 0.85 * ramp(raised, 0.2, 0.4))
       for (const { x, node } of marchers) {
-        const walked = step * (card + ramp(f, 0.45, 0.75))
-        transformTo(node, `${place(x + walked)} translate(0 ${r1(-6 * bell(f, 0.45, 0.75))})`)
+        transformTo(node, `${place(x + BANDS.march * marched)} translate(0 ${r1(-6 * Math.abs(Math.sin(marched * Math.PI * BANDS.steps)))})`)
       }
     }
   },
-  peak: () => ({ progress: closeAt(0.5), reached: Number.MAX_SAFE_INTEGER }),
 }
 
-// The Muay Thai record, a duel of champions: per line he steps in and cuts at the enemy champion, a stun's spark
-// on it as it staggers, and it swings back. After the last he raises his blade and summons the meteor, which
-// falls by the champion with a stun, the golem standing from its crater and the champion falling, the camera
-// pushed in.
+// The Muay Thai record, a duel of champions: he steps in and cuts at the enemy champion, a stun's spark on it as
+// it staggers and swings back. Then he raises his blade and summons the meteor, which falls by the champion and
+// fells it, the camera pushed in, and the golem stands from its crater.
 const DUEL = { king: 1130, step: 50, champion: 1580, crater: 1390, golemSize: 1.05, zoom: 1.18 }
 
 const muayThai: SceneSpec = {
   realm: 'chaos',
+  script: [1800, 1600, 1600],
   figure: (scene) => (
     <g data-fx="camera">
       <g data-fx="champion-at" transform={place(DUEL.champion)}>
@@ -615,42 +608,44 @@ const muayThai: SceneSpec = {
       <KingUnit x={DUEL.king} />
     </g>
   ),
-  bind: (stage, scene) => {
+  bind: (stage) => {
     const king = kingNodes(stage)
     const camera = fx(stage, 'camera')
     const champion = fx(stage, 'champion-at')
     const axe = fx(stage, 'champion-arm')
     const spark = fx(stage, 'spark')
     const rise = riseWriter(stage)
-    return (progress, reached) => {
-      const { f, close } = beatOf(progress, reached, scene.count)
-      const lunge = close > 0 ? 0 : bell(f, 0.1, 0.6)
-      const cut = close > 0 ? 0 : f < 0.3 ? BLADE_UP * 0.7 * ramp(f, 0.05, 0.3) : lerp(BLADE_UP * 0.7, -20, ramp(f, 0.3, 0.45)) * (1 - ramp(f, 0.7, 1))
-      const stagger = close > 0 ? 0 : bell(f, 0.4, 0.8)
-      const summon = bell(close, 0, 0.5)
-      const fall = ramp(close, 0.15, 0.35)
-      const down = ramp(close, 0.35, 0.6)
+    return (play) => {
+      const f = play.action === 0 ? play.t : 0
+      const summoned = share(play, 1)
+      const stood = share(play, 2)
+      const lunge = bell(f, 0.1, 0.6)
+      const cut = f < 0.3 ? BLADE_UP * 0.7 * ramp(f, 0.05, 0.3) : lerp(BLADE_UP * 0.7, -20, ramp(f, 0.3, 0.45)) * (1 - ramp(f, 0.7, 1))
+      const stagger = bell(f, 0.4, 0.8)
+      const summon = bell(summoned, 0, 0.6)
+      const down = ramp(summoned, 0.6, 1)
       poseKing(king, {
         x: DUEL.king + DUEL.step * lunge,
-        blade: close > 0 ? BLADE_UP * summon : cut,
-        glow: close > 0 ? lerp(GLOW_REST, GLOW_CAST, summon) : GLOW_REST,
+        blade: play.action === 0 ? cut : BLADE_UP * summon,
+        glow: lerp(GLOW_REST, GLOW_CAST, summon),
       })
       transformTo(champion, `${place(DUEL.champion + 24 * stagger)} rotate(${r1(6 * stagger + 80 * down)})`)
-      transformTo(axe, `rotate(${r1(close > 0 ? 0 : 50 * bell(f, 0.6, 0.9))} -37 -110)`)
+      transformTo(axe, `rotate(${r1(50 * bell(f, 0.6, 0.9))} -37 -110)`)
       fadeTo(champion, 1 - 0.4 * down)
-      fadeTo(spark, close > 0 ? bell(close, 0.33, 0.6) : bell(f, 0.38, 0.6))
-      rise({ fall, burst: ramp(close, 0.35, 0.5), built: ROCK_COUNT * ramp(close, 0.45, 0.6), whole: ramp(close, 0.6, 0.75) })
-      transformTo(camera, focusOn(DUEL.crater, FLOOR - 150, lerp(1, DUEL.zoom, ramp(close, 0.1, 0.45))))
+      fadeTo(spark, Math.max(bell(f, 0.38, 0.6), bell(summoned, 0.55, 0.85)))
+      rise({ fall: ramp(summoned, 0.3, 0.6), burst: ramp(stood, 0, 0.25), built: ROCK_COUNT * ramp(stood, 0.15, 0.6), whole: ramp(stood, 0.6, 0.9) })
+      transformTo(camera, focusOn(DUEL.crater, FLOOR - 150, lerp(1, DUEL.zoom, ramp(summoned, 0.2, 0.9))))
     }
   },
-  peak: () => ({ progress: closeAt(0.42), reached: Number.MAX_SAFE_INTEGER }),
 }
 
-// The contact: he waits before the ice throne, selected, and the order marker blinks once at his feet.
+// The contact: he waits before the ice throne; his ring lights, he lifts his hand and the order marker lights
+// at his feet for the next order.
 const CONTACT = { king: 340 }
 
 const contact: SceneSpec = {
   realm: 'frost',
+  script: [1600],
   figure: (scene) => (
     <>
       <g transform={place(CONTACT.king + 120)}>
@@ -662,12 +657,12 @@ const contact: SceneSpec = {
   bind: (stage) => {
     const king = kingNodes(stage)
     const marker = fx(stage, 'marker')
-    return (progress) => {
-      poseKing(king, { x: CONTACT.king, ring: ramp(progress, 0.05, 0.12), hand: 40 * bell(progress, 0.12, 0.4) })
-      fadeTo(marker, bell(progress, 0.12, 0.4))
+    return (play) => {
+      const t = share(play, 0)
+      poseKing(king, { x: CONTACT.king, ring: ramp(t, 0, 0.3), hand: 40 * ramp(t, 0.2, 0.6) })
+      fadeTo(marker, ramp(t, 0.4, 0.7))
     }
   },
-  peak: () => ({ progress: 0.26, reached: 0 }),
 }
 
 const SCENES: Record<SceneId, SceneSpec> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
@@ -695,14 +690,11 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, figure: b
     realm: spec.realm,
     count,
     figure,
+    script: spec.script,
     bind: (stage) => {
       const write = spec.bind(stage, scene)
-      const peak = spec.peak(count)
-      return (progress, reached) => {
-        // Drawn settled (reduced motion), the scene holds its peak.
-        if (progress === SETTLED_PROGRESS && reached >= count) write(peak.progress, Math.min(peak.reached, count))
-        else write(progress, reached)
-      }
+      const end = sceneEnd(spec.script)
+      return (_progress, _reached, play = end) => write(play)
     },
   }
   return scene
