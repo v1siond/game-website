@@ -43,10 +43,8 @@ export const TRAIL = {
   ROUTE_LIGHT: '#e77a5c',
   ROUTE_DARK: '#6e1f12',
   BLUE_DARK: '#1f3f78',
-  // The map's watercolour washes over the parchment: the sea, the sand of the shore, the meadow on the
-  // plateau tops and the brown cliff faces under them, each with its shade.
-  // Bright as the 16 bit overworld map (research image 28): blue sea, light sand paths, grass green
-  // plateaus on tan cliffs.
+  // The world map's flat colours, bright as the 16 bit overworld map (research image 28): blue sea, light
+  // sand paths, grass green plateaus on tan cliffs, each with its shade.
   SEA: '#4f9cf0',
   SEA_DEEP: '#1f5cc8',
   SAND: '#f0d898',

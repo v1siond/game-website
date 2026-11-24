@@ -19,11 +19,10 @@ import { JOURNAL_SERIF } from './palette'
 import { LAYER_MOTION, type TrailScene } from './scenes'
 import page from './page.module.css'
 
-// One section per level: a tall head that first shows the level alone and then brings the HUD title up
-// from the bottom, then the cards, the message windows and paper cards of the 16 bit games, then a screen
-// of the level alone before it sinks. The cards a level counts sit inside an element marked
-// data-stage-items, which the theatre measures for the reading line that sets his beat. Every field comes
-// from the shared lists and the card view models.
+// One section per level: a tall head that first shows the level alone while it plays and then brings the
+// HUD title up from the bottom (on a phone the title rides at its top), then the cards, the message
+// windows and paper cards of the 16 bit games, then a screen of the level alone. Every field comes from
+// the shared lists and the card view models.
 
 /** A card: the message window's white page with the black outline and a hard drop. */
 const PAPER_CARD = 'rounded-md border-[3px] border-[color:var(--ap-hud)] bg-[color:var(--ap-page)] p-4 text-[color:var(--ap-ink)] shadow-[0_5px_0_var(--ap-hud)]'

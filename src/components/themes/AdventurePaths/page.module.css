@@ -188,7 +188,7 @@
   box-shadow: 0 5px 0 var(--ap-hud);
 }
 
-/* ---- The goal: the contact over the run through the finish gate ---- */
+/* ---- The goal: the contact over the run through the goal gate ---- */
 .goal {
   position: relative;
   display: flex;
@@ -245,13 +245,22 @@
     padding-bottom: 60svh;
   }
 
+  /* On a phone the level fills the lower screen, so the title rides at the top of the head and the cards
+     come up only after a full screen of the level alone. */
   .head {
     min-height: 115svh;
+    justify-content: flex-start;
+    padding-top: 64px;
     padding-bottom: 10svh;
   }
 
   .body {
     width: 100%;
+  }
+
+  /* The run through the goal plays a full screen on its own before the contact comes up over it. */
+  .goal {
+    padding-top: 100svh;
   }
 }
 

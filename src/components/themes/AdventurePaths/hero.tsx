@@ -22,13 +22,14 @@ import { TrailWalker } from './walker'
 import map from './map.module.css'
 import page from './page.module.css'
 
-// The hero: a big first screen over the plains picture (scenes/hub.tsx), his name plaque and the overworld
-// map he picks a profession on. He stands on the landmark of the shown profession. Each landmark is a radio
-// of the shared ProfessionSwitch laid over the map; choosing one sends him back along his trail to the
-// crossroads and out along the chosen one, and on arrival the profession changes and the camera dives into
-// the landmark and back, the way the map enters a level. Arrow keys change the profession at once and he
-// walks after it. One walk at a time: a pick made while he walks waits for him to arrive. His outfit plate
-// sits under the plaque from lg, its fan opening down into the free sky, and under the map below lg, its fan opening up into a band of open sky.
+// The hero: a big first screen over his house at the head of the path (scenes/hub.tsx), his name plaque
+// and the world map he picks a profession on. He stands on the place of the shown profession. Each place
+// is a radio of the shared ProfessionSwitch laid over the map; choosing one sends him back along his path
+// to the crossroads and out along the chosen one, and on arrival the profession changes and the camera
+// dives into the place and back, the way the map enters a level. Arrow keys change the profession at once
+// and he walks after it. One walk at a time: a pick made while he walks waits for him to arrive. His
+// outfit plate sits under the plaque from lg, its fan opening down into the free sky, and under the map
+// below lg, its fan opening up into a band of open sky.
 
 // The wardrobe's journal plate: ink on the page, 14.8 to 1, edged in bark.
 const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TRAIL.BARK }

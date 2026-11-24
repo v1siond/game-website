@@ -16,11 +16,6 @@ export interface Trail {
   cumulative: number[]
 }
 
-export interface TrailDot {
-  x: number
-  y: number
-}
-
 const SAMPLES_PER_CURVE = 24
 
 type Curve = readonly [Point, Point, Point, Point]
@@ -96,17 +91,6 @@ export function pointAt(trail: Trail, along: number): Point {
   const span = cumulative[high] - cumulative[low]
   const t = span === 0 ? 0 : (along - cumulative[low]) / span
   return [samples[low][0] + (samples[high][0] - samples[low][0]) * t, samples[low][1] + (samples[high][1] - samples[low][1]) * t]
-}
-
-/** Dots every `spacing` map units, the first one step after the start so a stop's tile is never covered. */
-export function dotsAlong(trail: Trail, spacing: number): TrailDot[] {
-  const count = Math.max(Math.floor(trail.length / spacing), 1)
-  const step = trail.length / count
-  return Array.from({ length: count - 1 }, (_, index) => {
-    const along = step * (index + 1)
-    const [x, y] = pointAt(trail, along)
-    return { x: round(x), y: round(y) }
-  })
 }
 
 /** A point in map units as a share of the map's box, for an HTML layer laid over the SVG. */

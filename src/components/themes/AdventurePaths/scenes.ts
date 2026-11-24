@@ -8,7 +8,7 @@ import { goal } from './scenes/goal'
 import { hub } from './scenes/hub'
 import type { Level } from './scenes/level'
 import type { SpotId } from './scenes/worldMap'
-import { stubPlay, type Playhead, type SceneScript } from './playStub'
+import { sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { muayThai } from './scenes/muayThai'
 import { projects } from './scenes/projects'
 import { services } from './scenes/services'
@@ -64,7 +64,7 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, before: SceneId, profess
     layers: level.layers(input),
     bind: (stage) => {
       const write = level.bind(stage, input)
-      return (progress, _reached, play?: Playhead) => write(play ?? stubPlay(level.script, progress))
+      return (_progress, _reached, play?: Playhead) => write(play ?? sceneEnd(level.script))
     },
   }
 }

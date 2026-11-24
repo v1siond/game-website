@@ -1,6 +1,6 @@
 import type { Profession } from '@/lib/cv/professions'
 import type { StageLayer } from '../../shared/theatre/Stage'
-import type { Playhead, SceneScript } from '../playStub'
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import type { SpotId } from './worldMap'
 
 // What every level is: its script (each action's length, played on time once its section arrives), its

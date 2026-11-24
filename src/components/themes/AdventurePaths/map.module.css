@@ -29,57 +29,7 @@
   transform-origin: center;
 }
 
-/* The hills on the map breathe in two frames, out of step with each other (--i), and rest unbreathed
-   (2.25 cycles end in the first frame of the third). */
-.hill {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: hill-breathe 1.6s steps(2, jump-none) 2.25 forwards;
-  animation-delay: calc(var(--i, 0) * -0.4s);
-}
-
-@keyframes hill-breathe {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.03, 0.95);
-  }
-}
-
-/* The ship at anchor rocks, the torch flames flicker, the clouds drift and part toward the pointer. */
-.ship {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: ship-rock 3.2s ease-in-out 1 forwards;
-}
-
-@keyframes ship-rock {
-  0%,
-  100% {
-    transform: rotate(-3deg) translate3d(0, 0, 0);
-  }
-  50% {
-    transform: rotate(3deg) translate3d(0, 2px, 0);
-  }
-}
-
-.flame {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: flame-flick 0.5s steps(2, jump-none) 9.25 forwards;
-  animation-delay: calc(var(--i, 0) * -0.25s);
-}
-
-@keyframes flame-flick {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(0.85, 1.18);
-  }
-}
-
+/* The clouds drift and part toward the pointer. */
 .cloud {
   transform: translate3d(calc(var(--mx) * var(--depth, 14px)), calc(var(--my) * 6px), 0);
   transition: transform 400ms ease-out;
@@ -358,9 +308,6 @@
     transition: none;
   }
 
-  .hill,
-  .ship,
-  .flame,
   .cloudDrift,
 
   .nameBox,

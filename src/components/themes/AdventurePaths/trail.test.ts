@@ -1,4 +1,4 @@
-import { buildTrail, dotsAlong, pointAt, shareOf } from './trail'
+import { buildTrail, pointAt, shareOf } from './trail'
 import { walkPosition } from './walk'
 
 describe('expedition trail geometry', () => {
@@ -18,13 +18,6 @@ describe('expedition trail geometry', () => {
     expect(pointAt(straight, 50)[0]).toBeCloseTo(50, 0)
     expect(pointAt(straight, -10)).toEqual([0, 0])
     expect(pointAt(straight, 900)).toEqual([200, 0])
-  })
-
-  it('sets dots at even steps between the ends, never on them', () => {
-    const dots = dotsAlong(straight, 20)
-    expect(dots).toHaveLength(9)
-    expect(dots[0].x).toBeCloseTo(20, 0)
-    expect(dots[dots.length - 1].x).toBeCloseTo(180, 0)
   })
 
   it('refuses a trail of one stop', () => {

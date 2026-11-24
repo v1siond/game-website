@@ -1,10 +1,10 @@
 import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
-import { fx, lerp, translateTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { BLOCK, GROUND, HERO_TALL, Placed, TileGround, rigOf, runFrame } from './kit'
 import { Foe, foeOf, levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, phase, startX, type Level, type LevelInput } from './level'
 import { CaveBrick } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -13,8 +13,10 @@ import { mapWriter } from './worldMap'
 // climbs it up to the exit ledge, the cave mouth bright past it.
 
 const SIZE = 24 * BLOCK
-// The fence: how far past his start it stands, how tall, and the ledge on top.
-const FENCE = 380
+// The fence: how far past his start it stands (nearer on a phone, so he ends on the ledge in view), how
+// tall, and the ledge on top; the walker stands between him and the fence.
+const fenceAt = ({ phone }: LevelInput): number => (phone ? 160 : 380)
+const foeAt = ({ phone }: LevelInput): number => (phone ? 110 : 300)
 const FENCE_W = 150
 const LEDGE_Y = GROUND - 420
 
@@ -81,11 +83,11 @@ export const work: Level = {
         ),
         things: (
           <>
-            <Fence x={x + reach(input, FENCE)} />
+            <Fence x={x + fenceAt(input)} />
             <Placed name="block" x={x + 40} y={GROUND - SIZE}>
               <Stone />
             </Placed>
-            <Foe name="walker" x={x + reach(input, 300)} />
+            <Foe name="walker" x={x + foeAt(input)} />
           </>
         ),
       },
@@ -98,8 +100,8 @@ export const work: Level = {
     const walker = foeOf(stage, 'walker')
     const block = fx(stage, 'block')
     const x0 = startX(input)
-    const fenceX = x0 + reach(input, FENCE)
-    const foeX = x0 + reach(input, 300)
+    const fenceX = x0 + fenceAt(input)
+    const foeX = x0 + foeAt(input)
     return (play) => {
       const walked = phase(play, 0)
       map({ walk: ramp(walked, 0, 0.6), open: ramp(walked, 0.55, 1) })
@@ -114,6 +116,7 @@ export const work: Level = {
       const by = flying ? lerp(held[1], GROUND - SIZE - 40, fly) - hop(fly, 60) : lerp(ground[1], held[1], lift)
       const knocked = ramp(throwing, 0.75, 1)
       translateTo(block, fly >= 1 ? bx + 300 * knocked : bx, fly >= 1 ? by + 200 * knocked ** 2 : by)
+      fadeTo(block, 1 - knocked)
       walker(foeX + 400 * knocked, GROUND - hop(knocked, 120), knocked > 0 ? 'critterTipped' : 'critterA', 0, 1 - knocked)
       // to the fence and up it, hand over hand, onto the ledge
       const climbing = phase(play, 2)
@@ -121,7 +124,7 @@ export const work: Level = {
       const up = ramp(climbing, 0.25, 0.85)
       const over = ramp(climbing, 0.85, 1)
       if (climbing > 0) {
-        const x = go < 1 ? lerp(x0, fenceX + 30, go) : lerp(fenceX + 30, fenceX + FENCE_W + 40, over)
+        const x = go < 1 ? lerp(x0, fenceX + 30, go) : lerp(fenceX + 30, fenceX + FENCE_W - 10, over)
         const y = go < 1 ? GROUND - hop(ramp(go, 0.6, 1), 80) - 80 * ramp(go, 0.8, 1) : lerp(GROUND - 80, LEDGE_Y, up) - hop(over, 40)
         const climbStep = Math.floor(up * 8) % 2 === 1
         hero(x, y, over >= 1 ? 'stand' : go < 0.6 ? runFrame(x) : over > 0 ? 'jump' : 'grab', climbStep)

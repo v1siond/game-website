@@ -14,7 +14,6 @@ import { Stage, Theatre } from './shared/theatre/Stage'
 import { useTheatre } from './shared/theatre/useTheatre'
 import { Goal, Hud } from './AdventurePaths/chrome'
 import { ExpeditionHero } from './AdventurePaths/hero'
-import { MapDefs } from './AdventurePaths/art'
 import { TRAIL_VARS } from './AdventurePaths/palette'
 import { LAYER_MOTION, scenesOf, type TrailScene } from './AdventurePaths/scenes'
 import { LevelSection } from './AdventurePaths/sections'
@@ -56,7 +55,6 @@ export default function AdventurePathsTheme() {
 
   return (
     <div ref={pointerRef} style={TRAIL_VARS} className={`${page.root} ${map.root} ${reduced ? page.still : ''} [--focus-ring:var(--ap-ink)] [--focus-halo:var(--ap-parchment)]`}>
-      <MapDefs />
       <SkipLink className={page.skip} />
       {!reduced && (
         <Theatre theatreRef={theatreRef} className={page.theatre}>
