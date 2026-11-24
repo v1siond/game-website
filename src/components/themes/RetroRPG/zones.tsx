@@ -1,15 +1,23 @@
 import type { ComponentType, ReactNode } from 'react'
 import { RPG } from './palette'
 
-// The five places of the walk, each as the layers of a scene's stage (stage.tsx): the stone ruins (a grey
-// green block wall, its broken columns and arch, moss on the flagstones), the snow town (pines, the log
-// houses, the drifts), the crystal cave (the rock strata, the crystal clusters, the stalagmites, the rock
-// floor), the volcano (the cones and their smoke, the basalt shelf, the lava channel) and the market town
+// The five places of the run, each as the layers of a scene's stage (stage.tsx): the ruins (a violet brick
+// wall, its broken columns and arch, red leaves on the flagstones), the snow forest (pines, the log houses,
+// the drifts), the dark blue cave (the rock strata, the glowing crystal clusters, the stalagmites, the rock
+// floor), the hot lab country (the cones and their smoke, the basalt shelf, the lava channel) and the town
 // (sky, the timbered house fronts, the awnings of the stalls, the lawn and the road). Every layer is drawn
 // on the genre's 320 by 180 grid of hard pixels and blown up to the 1440 by 810 canvas, so a pixel is 4.5
 // canvas units and the art stays crisp at any width.
 
 export const VIEW = '0 0 1440 810'
+
+/** A phone's view: the room from above the doors down past the floor, its top on the screen's top, so the floor
+ *  sits about half way down the screen and stays clear of the cards when a scene ends; below the picture the
+ *  floor's colour runs on under the cards. */
+export const PHONE_VIEW = '0 360 1440 620'
+
+/** The picture's bottom, where the floor's colour takes over on a phone. */
+export const PICTURE_BOTTOM = 810
 
 /** One grid pixel in canvas units. */
 export const PX = 4.5
@@ -21,6 +29,8 @@ export interface ZoneArt {
   far: ComponentType
   mid: ComponentType
   near: ComponentType
+  /** The floor's colour, carried on below the picture where a phone's view reaches past it. */
+  floor: string
 }
 
 /** The ground line his feet stand on in every place, on the grid. */
@@ -335,9 +345,9 @@ function TownNear() {
 }
 
 export const ZONE_ART: Record<Zone, ZoneArt> = {
-  ruins: { sky: RuinsSky, far: RuinsFar, mid: RuinsMid, near: RuinsNear },
-  snow: { sky: SnowSky, far: SnowFar, mid: SnowMid, near: SnowNear },
-  cave: { sky: CaveSky, far: CaveFar, mid: CaveMid, near: CaveNear },
-  volcano: { sky: VolcanoSky, far: VolcanoFar, mid: VolcanoMid, near: VolcanoNear },
-  town: { sky: TownSky, far: TownFar, mid: TownMid, near: TownNear },
+  ruins: { sky: RuinsSky, far: RuinsFar, mid: RuinsMid, near: RuinsNear, floor: RPG.stone },
+  snow: { sky: SnowSky, far: SnowFar, mid: SnowMid, near: SnowNear, floor: RPG.snow },
+  cave: { sky: CaveSky, far: CaveFar, mid: CaveMid, near: CaveNear, floor: RPG.caveFloor },
+  volcano: { sky: VolcanoSky, far: VolcanoFar, mid: VolcanoMid, near: VolcanoNear, floor: RPG.basalt },
+  town: { sky: TownSky, far: TownFar, mid: TownMid, near: TownNear, floor: RPG.borderShade },
 }

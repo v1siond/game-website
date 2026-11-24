@@ -31,9 +31,6 @@ export const RPG = {
   duskLow: '#4a3a78',
   hillFar: '#2a2f5e',
   hillNear: '#1d4a3a',
-  // The save point's light.
-  runeGlow: '#7ff0ff',
-  runeCore: '#e8ffff',
   // His sprite (sprite.ts): the dark outline, his hair and beard lifted to read on black, his own clothes
   // per profession (the System Engineer's teal shirt and jeans, the Musician's black tee and black jeans,
   // the Martial Artist's red shorts and gold wraps), the sticks' wood and the snare's red shell.
@@ -47,23 +44,18 @@ export const RPG = {
   wraps: '#f0b030',
   stickWood: '#efe0b0',
   snare: '#c43a3a',
-  // The cast he meets (npcs.ts): the critter's shell and shine, the villagers' and the bandmates' clothes.
-  critter: '#5a2c78',
-  critterShine: '#a070c8',
-  critterBelly: '#f09028',
-  coatRed: '#b8442e',
+  // The cast he meets (npcs.ts): the keeper's coat and the portrait's.
   coatGreen: '#3f8a4a',
-  coatBlue: '#3a5ab0',
   coatGold: '#c89a30',
   villagerHair: '#6a4a2a',
-  // The places he walks through as the page scrolls (zones.tsx): the grey green stone ruins with moss,
-  // the snow town of log houses among the pines, the crystal cave, the volcano over its lava channel, the
-  // market town with its awnings.
-  stone: '#5c6658',
-  stoneLit: '#7f8a78',
-  stoneDark: '#33392f',
-  moss: '#5f9a3a',
-  mossDark: '#2f5a24',
+  // The places of the underground the page runs through (zones.tsx), in the source game's order and
+  // colours: the violet brick ruins with their red leaves, the snow forest among the pines, the dark blue
+  // cave of glowing water plants, the hot lab country over its lava, the town with its awnings.
+  stone: '#6a4f8c',
+  stoneLit: '#8a6aae',
+  stoneDark: '#3a2a54',
+  moss: '#b83a3a',
+  mossDark: '#6a1e2a',
   snow: '#85a3d8',
   snowShade: '#7281b1',
   snowCap: '#cfdbff',
@@ -71,9 +63,9 @@ export const RPG = {
   pineLit: '#426377',
   wood: '#c69158',
   woodDark: '#88473b',
-  caveWall: '#22283a',
-  caveFloor: '#2e3448',
-  caveLine: '#40486a',
+  caveWall: '#0e1a3a',
+  caveFloor: '#152448',
+  caveLine: '#24407a',
   crystal: '#40ffff',
   crystalViolet: '#b080ff',
   heatSky: '#3a1a14',
@@ -87,7 +79,7 @@ export const RPG = {
   townBeam: '#6a4428',
   townRoof: '#a8402a',
   awning: '#d8c870',
-  // The chests' and the counters' wood: warm boards and their dark seams.
+  // The counters' wood: warm boards and their dark seams.
   shopWood: '#ae853b',
   shopDark: '#73553b',
 } as const

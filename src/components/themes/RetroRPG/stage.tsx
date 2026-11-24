@@ -8,13 +8,13 @@ import { NO_NODES, figureScene, figureTransform, type FigureRig } from '../share
 import { frames } from '../shared/stageNodes'
 import { StageFigure, type Frame } from './walker'
 import type { Scene } from './scenes'
-import { VIEW, ZONE_ART } from './zones'
+import { PHONE_VIEW, PICTURE_BOTTOM, VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the place's layers from its back wall to
 // the floor he walks on, then the scene's stops and him in the figure layer, in one camera group the view
 // pushes in with, all on the genre's hard pixel grid. The shared engine fades each stage and pushes its
-// layers in; the scene's writer plays its stops' answers and hands back his place and frame.
+// layers in; the scene's writer moves its props at the playhead and hands back his place and frame.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -32,10 +32,12 @@ const WALKER_RIG: FigureRig<(frame: string) => void, Frame> = {
 }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and framed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, WALKER_RIG)
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, WALKER_RIG, scene.def.script)
 
-const plane = (children: ReactNode): ReactNode => (
-  <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" shapeRendering="crispEdges" focusable="false">
+/** A layer's picture: the whole room from its foot on a wide screen; on a phone, the view from its top that
+ *  keeps the floor half way down the screen (zones.tsx PHONE_VIEW). */
+const plane = (children: ReactNode, phone: boolean): ReactNode => (
+  <svg viewBox={phone ? PHONE_VIEW : VIEW} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} shapeRendering="crispEdges" focusable="false">
     {children}
   </svg>
 )
@@ -51,12 +53,22 @@ function Walker({ scene }: { scene: Scene }) {
 }
 
 const layersOf = (scene: Scene): StageLayer[] => {
-  const { sky: Sky, far: Far, mid: Mid, near: Near } = ZONE_ART[scene.def.zone]
+  const { sky: Sky, far: Far, mid: Mid, near: Near, floor } = ZONE_ART[scene.def.zone]
+  const { phone } = scene.layout
   return [
-    { name: 'sky', node: plane(<Sky />) },
-    { name: 'far', node: plane(<Far />) },
-    { name: 'mid', node: plane(<Mid />) },
-    { name: 'near', node: plane(<Near />) },
+    { name: 'sky', node: plane(<Sky />, phone) },
+    { name: 'far', node: plane(<Far />, phone) },
+    { name: 'mid', node: plane(<Mid />, phone) },
+    {
+      name: 'near',
+      node: plane(
+        <>
+          <Near />
+          {phone && <rect x={-200} y={PICTURE_BOTTOM} width={1840} height={400} fill={floor} />}
+        </>,
+        phone,
+      ),
+    },
     {
       name: 'figure',
       node: plane(
@@ -64,6 +76,7 @@ const layersOf = (scene: Scene): StageLayer[] => {
           {scene.def.back(scene.layout)}
           <Walker scene={scene} />
         </g>,
+        phone,
       ),
     },
   ]

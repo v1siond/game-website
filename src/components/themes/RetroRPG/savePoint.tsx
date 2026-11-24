@@ -13,32 +13,26 @@ import { RpgStage } from './stage'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 
-// Contact as the save point: a journal open on its lectern over a glowing rune circle, which pulses over
-// the closing window the way a save point glows in its room. Clicking it saves: the circle flares once,
+// Contact as the save point: a star of light over its glow, which pulses over the closing window the way
+// a save point sparkles in its room. Clicking it saves: the star flares once,
 // pixel sparks burst round it, the window flashes white and stays in its saved state (yellow border), and
 // the window shows the save line, his name beside the profession, over the contact line and the options.
-// On the stage behind (scenes.tsx) he walks up to the save point and kneels at it as the section comes in.
+// On the stage behind (scenes.tsx) he walks up to the save star and touches it, and the save box opens.
 //
 // Pattern: CSS loops for the pulse (steps(), opacity), one click state (data-saved) that plays the flare
 // and the flash once per click (the key replays them).
 
 const CONTACT_HEADING = headingId('rpg', 'Contact')
 
-/** The save point: the rune circle on the floor, its glow, and the journal open on its lectern. */
-function SaveRune() {
+/** The save point: a four point star of light over its glow, drawn for this page. */
+function SaveStar() {
   return (
     <svg viewBox="0 0 16 16" className="h-full w-full" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      <g className={world.rune}>
-        <rect x="1" y="12" width="14" height="3" fill={RPG.runeGlow} />
-        <rect x="3" y="11" width="10" height="1" fill={RPG.runeGlow} />
+      <g className={world.starGlow}>
+        <rect x="3" y="3" width="10" height="10" fill={RPG.gold} opacity="0.35" />
       </g>
-      <rect x="2" y="13" width="12" height="1" fill={RPG.runeCore} />
-      <rect x="7" y="7" width="2" height="6" fill={RPG.woodDark} />
-      <rect x="5" y="12" width="6" height="1" fill={RPG.woodDark} />
-      <path d="M3 4 H8 V7 H3 Z M8 4 H13 V7 H8 Z" fill={RPG.border} />
-      <rect x="7" y="4" width="2" height="3" fill={RPG.borderShade} />
-      <rect x="4" y="5" width="3" height="1" fill={RPG.borderShade} />
-      <rect x="9" y="5" width="3" height="1" fill={RPG.borderShade} />
+      <path d="M8 1 L9.5 6.5 L15 8 L9.5 9.5 L8 15 L6.5 9.5 L1 8 L6.5 6.5 Z" fill={RPG.gold} />
+      <rect x="7" y="7" width="2" height="2" fill={RPG.border} />
     </svg>
   )
 }
@@ -60,7 +54,7 @@ export function SavePoint({ profession, scene, still }: { profession: Profession
             aria-label={labels.actions.save}
           >
             <span key={saves} className={`block h-full w-full ${saved ? world.saveFlare : ''}`}>
-              <SaveRune />
+              <SaveStar />
             </span>
           </button>
           {saved && <Sparkles key={saves} className="pointer-events-none absolute left-1/2 top-0 h-14 w-14 -translate-x-1/2 scale-150" />}

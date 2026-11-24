@@ -28,14 +28,13 @@ import world from './RetroRPG/world.module.css'
 
 const PHONE_QUERY = '(max-width: 767.98px)'
 
-// Retro RPG, a 16 bit role playing game. The hero is the genre's encounter screen: him on the battle
-// field, the window with his name and lines, the stats line, and the command window that switches the
-// profession, over the ruins where his critter faces him. Then every section of the active profession is
-// one full screen scene of the walk (./RetroRPG/scenes) that rises from dark, holds while its title and
-// windows scroll over it, and sinks back into dark while the next one rises: from the stone ruins through
-// the snow town, the crystal cave, the volcano and the market town, him making the genre's move once per
-// card at the stop it brings. Contact is the save point, which he walks up to back in the ruins. Every motion is a function of the
-// scroll position, on the shared theatre (./shared/theatre) and its settle: scroll up and it plays back.
+// Retro RPG, after the 16 bit style role playing game it comes from. The hero is the encounter screen: him
+// on the battle field, the window with his name and lines, the stats line, and the command window that
+// switches the profession. Then every section of the active profession is one full screen room of the run
+// through the underground (./RetroRPG/scenes), in the game's order of places: the violet ruins, the snow
+// forest, the dark glowing cave, the hot lab country, a town and the battle screen, each with its own short
+// script of actions the scroll plays forward and back at the scene's own speed. Contact is the last save
+// star, which he walks up to and touches. All of it runs on the shared theatre (./shared/theatre).
 // Under reduced motion there is no theatre: each section carries its own picture, still, at its settled
 // frame.
 //
