@@ -3,14 +3,14 @@
 import { useLayoutEffect, useMemo, useRef, type Ref } from 'react'
 import { cssVars } from '@/lib/cssVars'
 import { layerTransform } from '@/lib/scroll/stage'
-import { LAYERS, type Layer } from './eras/era'
+import { END, LAYERS, type Layer } from './eras/era'
 import { LAYER_MOTION, lookVars, type Scene } from './scenes'
 import css from './eras.module.css'
 
 // One era picture: its six layers, each an SVG built once from code (eras/*), which the engine dissolves
 // in over the one before. In the theatre every stage is a fixed full screen picture behind the
 // text, moved by the engine (engine.ts); under reduced motion each stage sits at the top of its own
-// section instead, drawn once at its settled frame (the middle of its scene, every item reached).
+// section instead, drawn once at its settled frame (the middle of its scene, its script at its end frame).
 
 /** The progress a settled stage is drawn at: the middle of its scene, its picture at rest. */
 const SETTLED_PROGRESS = 0.5
@@ -32,7 +32,7 @@ export function Stage({ scene, settled = false }: { scene: Scene; settled?: bool
     stage.querySelectorAll<HTMLElement>('[data-layer]').forEach((layer) => {
       layer.style.transform = layerTransform(LAYER_MOTION[layer.dataset.layer as keyof typeof LAYER_MOTION], SETTLED_PROGRESS)
     })
-    scene.era.bind(stage, scene.input)(SETTLED_PROGRESS, scene.input.count)
+    scene.era.bind(stage, scene.input)(SETTLED_PROGRESS, END)
   }, [scene, settled])
 
   return (

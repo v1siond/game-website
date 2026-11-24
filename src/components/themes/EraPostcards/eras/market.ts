@@ -2,10 +2,12 @@ import { mulberry32 } from '@/lib/random/seeded'
 import { MARKET } from '../palette'
 import { clouds, defs, fade, fx, glow, linear, radial, rect, r1, spread, stars, svg, tf } from '../draw'
 import { courier, joints, setPose, type Pose } from '../courier'
-import { reached, type Era } from './era'
+import type { Playhead } from '@/lib/scroll/player'
+import { END, share, type Era } from './era'
 
-// Services: the lantern market by night, domed rooftops under the moon. He swings on a rope over the roofs
-// and a lantern per service lights on the string as it is read; the moon rises.
+// Services: the lantern market by night, domed rooftops under the moon, which rises with the scroll. He
+// hangs from a rope over the roofs and plays two actions: he swings out in one long arc over the street,
+// then, as the swing settles, the lanterns on the string light one after another from left to right.
 
 const domes = (seed: number, base: number, fill: string, lit: string, scale: number): string => {
   const random = mulberry32(seed)
@@ -27,23 +29,29 @@ const lanternsAt = (count: number): number[] => spread(count, 470, 1130)
 
 const sag = (x: number): number => 300 + 90 * Math.sin(((x - 470) / 660) * Math.PI)
 
-const swingAngle = (p: number): number => Math.sin(p * Math.PI * 3) * 34
+// The swing: one long arc out over the first action, then it dies down over the second.
+const swingPhase = (play: Playhead): number => share(play, 0) * 1.5 + share(play, 1) * 1
+const swingAngle = (play: Playhead): number => Math.sin(swingPhase(play) * Math.PI) * 34 * (1 - 0.7 * share(play, 1))
 
-const swingPose = (p: number): Partial<Pose> => {
-  const angle = swingAngle(p)
-  const kick = Math.cos(p * Math.PI * 3)
+/** How lit lantern i of `count` is: they light left to right over the second action. */
+const litOf = (play: Playhead, i: number, count: number): number => Math.min(1, Math.max(0, share(play, 1) * (count + 1) - i))
+
+const swingPose = (play: Playhead): Partial<Pose> => {
+  const angle = swingAngle(play)
+  const kick = Math.cos(swingPhase(play) * Math.PI)
   return { x: 820, y: 560, scale: 1.2, shF: 172, shB: 168, elF: 4, elB: 6, hipF: 20 + kick * 25, hipB: -10 - kick * 20, kneeF: -30, kneeB: -50, lean: -angle * 0.3, head: -10, scarf: -angle * 0.8 }
 }
 
 export const market: Era = {
+  script: [2000, 2000],
   build: ({ count }) => {
     const xs = lanternsAt(count)
     const lanterns = xs
       .map(
         (x, i) => `<g transform="translate(${r1(x)} ${r1(sag(x))})">
-    <g data-fx="lglow-${i}" opacity="0">${defs(radial(`sv-g-${i}`, [[0, MARKET.lanternGlow, 0.9], [1, MARKET.lanternGlowEdge, 0]]))}<circle cy="30" r="70" fill="url(#sv-g-${i})"/></g>
+    <g data-fx="lglow-${i}">${defs(radial(`sv-g-${i}`, [[0, MARKET.lanternGlow, 0.9], [1, MARKET.lanternGlowEdge, 0]]))}<circle cy="30" r="70" fill="url(#sv-g-${i})"/></g>
     <path d="M0,0 v10" stroke="${MARKET.string}" stroke-width="2"/><path d="M-12,14 h24 l-4,34 h-16 Z" fill="${MARKET.lantern}" stroke="${MARKET.trim}" stroke-width="2"/>
-    <path data-fx="lcore-${i}" d="M-8,18 h16 l-3,26 h-10 Z" fill="${MARKET.lanternCore}" opacity="0.1"/></g>`,
+    <path data-fx="lcore-${i}" d="M-8,18 h16 l-3,26 h-10 Z" fill="${MARKET.lanternCore}"/></g>`,
       )
       .join('')
     const first = xs[0]
@@ -59,7 +67,7 @@ export const market: Era = {
       near: svg(`<path d="M-200,1000 L-200,860 L520,860 L520,900 L1100,900 L1100,850 L1800,850 L1800,1000 Z" fill="${MARKET.street}"/>
         <path d="M-200,860 L520,860 M1100,850 L1800,850" stroke="${MARKET.trim}" stroke-width="3"/>
         <g fill="${MARKET.urn}"><rect x="180" y="800" width="40" height="60" rx="8"/><path d="M170,800 q30,-50 60,0 Z" fill="${MARKET.urnLeaf}"/><rect x="1300" y="790" width="36" height="60" rx="8"/><path d="M1290,790 q28,-44 56,0 Z" fill="${MARKET.urnLeaf}"/></g>`),
-      figure: svg(`${string}${lanterns}<g data-fx="swing"><path d="M820,110 L820,330" stroke="${MARKET.rope}" stroke-width="4"/>${courier(swingPose(0))}</g>`),
+      figure: svg(`${string}${lanterns}<g data-fx="swing" transform="rotate(${r1(swingAngle(END))} 820 110)"><path d="M820,110 L820,330" stroke="${MARKET.rope}" stroke-width="4"/>${courier(swingPose(END))}</g>`),
       fg: svg(`<g data-fx="lamp"><path d="M200,-20 v110" stroke="${MARKET.lampPost}" stroke-width="4"/><path d="M160,90 h80 l-14,110 h-52 Z" fill="${MARKET.lamp}" stroke="${MARKET.lampEdge}" stroke-width="4"/><path d="M178,104 h44 l-10,82 h-24 Z" fill="${MARKET.lampLight}"/>${glow('sv-lamp', 200, 150, 160, MARKET.lampGlow, 0.6)}</g>
         <path d="M1250,-20 L1800,-20 L1800,140 Q1700,170 1640,120 Q1580,170 1520,120 Q1460,170 1400,120 Q1340,170 1280,120 Z" fill="${MARKET.awning}"/><path d="M1250,110 Q1340,160 1400,110 Q1460,160 1520,110 Q1580,160 1640,110 Q1700,160 1800,120" stroke="${MARKET.awningEdge}" stroke-width="4" fill="none"/>`),
     }
@@ -68,15 +76,16 @@ export const market: Era = {
     const j = joints(stage)
     const lamps = Array.from({ length: count }, (_, i) => [fx(stage, `lglow-${i}`), fx(stage, `lcore-${i}`)] as const)
     const [swing, moon, lamp] = ['swing', 'moon', 'lamp'].map((name) => fx(stage, name))
-    return (p, f) => {
-      tf(swing, `rotate(${r1(swingAngle(p))} 820 110)`)
+    return (p, play) => {
+      tf(swing, `rotate(${r1(swingAngle(play))} 820 110)`)
       tf(moon, `translate(0 ${r1(60 - p * 90)})`)
       tf(lamp, `rotate(${r1(Math.sin(p * 7) * 6)} 200 -20)`)
       lamps.forEach(([glowNode, core], i) => {
-        fade(glowNode, reached(f, i))
-        fade(core, 0.1 + reached(f, i) * 0.9)
+        const lit = litOf(play, i, count)
+        fade(glowNode, lit)
+        fade(core, 0.1 + lit * 0.9)
       })
-      setPose(j, swingPose(p))
+      setPose(j, swingPose(play))
     }
   },
 }

@@ -28,13 +28,13 @@ const PHONE_QUERY = '(max-width: 1023.98px)'
 // hero is his file card and the inventory that changes profession over the main hall (./SurvivalHorror/hall).
 // Then every section of the active profession is one room of the house (./SurvivalHorror/rooms) that
 // dissolves in over the one before and holds while its paper panel scrolls over it. In each room he plays a
-// short scene of one to three different actions once the section arrives (./SurvivalHorror/scenes): he reads
+// short scene of one to three different actions as the section scrolls in (./SurvivalHorror/scenes): he reads
 // a note on the study wall by his flashlight, pulls a file from a cabinet, shoves a crate and climbs it, sets
 // a lock's dials, fires one shot as the pursuer appears behind him, runs from it, lights the gallery's lamps,
 // blocks and kicks. Contact is a letter by the door of the lit room (./SurvivalHorror/letter), which he runs
-// through and shuts the pursuer out of. The scenes play on time and hold their end frame, on the shared
-// theatre (./shared/theatre, src/lib/scroll/player.ts); the rooms' push in and the text follow the scroll and
-// its settle. Under reduced motion there is no theatre: each section carries its own picture, still, at its
+// through and shuts the pursuer out of. The scroll plays the scenes, forward on the way down and back on the
+// way up, at no more than their own speed, on the shared theatre (./shared/theatre, src/lib/scroll/player.ts);
+// the rooms' push in and the text follow the scroll and its settle. Under reduced motion there is no theatre: each section carries its own picture, still, at its
 // end frame.
 //
 // The root carries the palette as --sh-* variables and the pointer as --mx and --my (usePointerVars), the

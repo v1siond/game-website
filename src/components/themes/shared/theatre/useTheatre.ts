@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_CLOCK, arrive, crossOf, playheadAt, sceneEnd, type Playhead, type SceneClock, type SceneScript } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, crossOf, follow, sceneEnd, type Follower, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
@@ -12,8 +12,9 @@ import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, 
 // measures each section ([data-scene]) and the reading line of each counted card ([data-stage-items]) on load
 // and resize, and per frame writes only each visible stage's opacity, its layers' transforms and the scene's
 // own writer, which poses the world's figure and props from the scene's progress, the cards reached and, for
-// a scene with a script, its playhead: the script plays on time from the section's arrival, one action after
-// another, and holds its end frame (src/lib/scroll/player.ts); while one plays the engine draws every frame.
+// a scene with a script, its playhead: the scroll plays the script, forward on the way down and back on the
+// way up, at no more than its own speed (src/lib/scroll/player.ts); while a scene has not caught up with the
+// scroll the engine draws every frame.
 // The first scene is the hero. The text layer settles with the art: it is drawn at the settled position, the
 // lag written as a translate and cleared at rest, so pictures and cards come to rest together (as Era
 // Postcards' settleText).
@@ -31,7 +32,7 @@ export interface TheatreScene {
   bind: StageBinder
   /** How many cards the scene counts: the settled frame shows them all reached. */
   count: number
-  /** The scene's actions, played on time from its arrival; none for a scene the scroll drives. */
+  /** The scene's actions, played by the scroll at no more than their own speed; none for a scene the scroll drives directly. */
   script?: SceneScript
 }
 
@@ -65,7 +66,7 @@ interface Bound {
   triggers: number[]
   shown: boolean
   script: SceneScript | undefined
-  clock: SceneClock
+  follower: Follower
 }
 
 /** Every layer of a stage with its motion; a layer with no motion stays still. */
@@ -86,16 +87,17 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
     triggers: [],
     shown: false,
     script: scene.script,
-    clock: IDLE_CLOCK,
+    follower: IDLE_FOLLOWER,
   }
 }
 
-/** A scene's playhead at `now`, its clock started once it has risen to `rise`; true in `playing` while it runs. */
-const playOf = (bound: Bound, rise: number, now: number): { play: Playhead; playing: boolean } => {
+/** A scene's playhead at `now`, following the scroll's `played` share of it at no more than its own speed;
+ *  true in `playing` while it has not caught up. */
+const playOf = (bound: Bound, played: number, now: number): { play: Playhead; playing: boolean } => {
   if (!bound.script) return { play: restingPlay(undefined), playing: false }
-  bound.clock = arrive(bound.clock, rise, now)
-  const play = playheadAt(bound.script, bound.clock.startedAt === null ? 0 : now - bound.clock.startedAt)
-  return { play, playing: bound.clock.startedAt !== null && !play.done }
+  const { follower, play, playing } = follow(bound.follower, bound.script, played, now)
+  bound.follower = follower
+  return { play, playing }
 }
 
 const show = (bound: Bound, visible: boolean): void => {
@@ -148,14 +150,14 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
       all.forEach((each, i) => {
         const { shown, opacity } = layers[i]
         show(each, shown)
-        const { play, playing: runs } = playOf(each, states[i].vis, now)
+        const { play, playing: runs } = playOf(each, states[i].play, now)
         playing ||= runs
         if (!shown) return
         each.stage.style.opacity = opacity.toFixed(3)
         for (const layer of each.layers) layer.el.style.transform = layerTransform(layer.motion, states[i].progress, phone ? PHONE_MOTION : 1)
         each.write(states[i].progress, itemsReached(each.triggers, position, viewport), play)
       })
-      // A script is playing: draw again next frame, on time, whether or not the page scrolls.
+      // A scene has not caught up with the scroll: draw again next frame, whether or not the page scrolls.
       cancelAnimationFrame(frame.current)
       frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
     },

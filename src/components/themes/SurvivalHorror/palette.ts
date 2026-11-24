@@ -42,9 +42,14 @@ export const SH = {
   cargo: '#45443e',
   strap: '#2a1c12',
   gunmetal: '#2c3034',
-  // The shapes in the dark: the pursuer's long coat and the hunched shape's skin.
+  // The shapes in the dark: the pursuer's long coat, its pale grey stitched head, the bared teeth and raw
+  // gums, the olive launcher on its back, and the hunched shape's skin.
   coat: '#16171a',
   coatLit: '#2b2d32',
+  pursuerSkin: '#8c857b',
+  gums: '#7a2a2a',
+  launcher: '#4f5f2c',
+  launcherLit: '#6d7d3e',
   shape: '#3a3530',
   // The night through the windows, and the lamp light through the lit room's door.
   moon: '#9fb4c8',

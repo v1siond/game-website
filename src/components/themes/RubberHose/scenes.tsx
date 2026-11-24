@@ -14,8 +14,8 @@ import { TOON_STAND, type ToonPose } from './toon'
 
 // The page as one boss fight in the big top (arena.tsx), the structure of the 1930s cartoon run and gun:
 // the hero is the map and the boss rolling in, each section is a stage of the fight against the steam
-// calliope (boss.tsx), and the contact is the knockout. Each scene plays one to three different actions
-// on time once its section arrives, then holds its end frame (the shared scene player,
+// calliope (boss.tsx), and the contact is the knockout. Each scene's one to three different actions are
+// played by the scroll, forward and back, at no more than their own speed (the shared scene player,
 // src/lib/scroll/player.ts). He stands on the left facing the boss on the right, side on, and fights with the
 // genre's verbs: shoot, jump, dash, the parry slap on anything pink, a charged shot and a super.
 //

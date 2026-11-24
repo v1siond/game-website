@@ -61,7 +61,7 @@ export const figureTransform = ({ x, y, k }: Pick<FigureState<unknown>, 'x' | 'y
 /**
  * The scene as the theatre runs it: the world's writer, bound to the stage, then the figure placed and
  * posed from what it returns. The lead cards are taken off `reached` before the writer reads it. A scene
- * with a `script` plays it on time from its arrival (src/lib/scroll/player.ts).
+ * with a `script` has it played by the scroll at no more than its own speed (src/lib/scroll/player.ts).
  */
 export function figureScene<Pose, Joints>(
   id: string,

@@ -1,9 +1,13 @@
-// What every era picture is: six layers on the shared canvas, from the sky to the foreground, and a binder
-// that caches the nodes the scroll moves and returns the per frame writer. The writer takes:
-//   p  the scene's progress, 0 when its stage starts to rise, 1 when it has sunk;
-//   f  how many of the section's items have scrolled past the reading line, fractional (0 to count).
-// The props a section counts (photos, mile signs, lock rings, lanterns, crates, shards, screens, torches) are
-// drawn once per item, so the picture holds as many as the section has cards.
+import type { Playhead, SceneScript } from '@/lib/scroll/player'
+
+// What every era picture is: six layers on the shared canvas, from the sky to the foreground, a script of
+// one to three different actions (each one's length in ms) that the scroll plays at no more than its own
+// speed (src/lib/scroll/player.ts), and a binder that caches the nodes the scene moves and returns the per frame
+// writer. The writer takes:
+//   p     the scene's progress, 0 when its stage starts to rise, 1 when its section has gone by: the
+//         ambient drift only (smoke, sand, petals), never his actions;
+//   play  where the script is: the action playing and how far, eased, then its end frame held.
+// The markup a build returns is the scene's end frame, the picture reduced motion shows.
 
 export const LAYERS = ['sky', 'far', 'mid', 'near', 'figure', 'fg'] as const
 
@@ -19,27 +23,16 @@ export interface EraInput {
   featured: number
 }
 
-export type EraWriter = (p: number, f: number) => void
+export type EraWriter = (p: number, play: Playhead) => void
 
 export interface Era {
+  script: SceneScript
   build: (input: EraInput) => Layers
   bind: (stage: Element, input: EraInput) => EraWriter
 }
 
-/** The share of item i that has been reached, 0 to 1. */
-export const reached = (f: number, i: number): number => Math.min(1, Math.max(0, f - i))
+/** How far action `i` of the script has played: done before it, `t` while it plays, none after. */
+export const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
 
-export const clamp01 = (t: number): number => Math.min(1, Math.max(0, t))
-
-/** The ease in and out of a 0 to 1 time. */
-export const ease = (t: number): number => {
-  const c = clamp01(t)
-  return c * c * (3 - 2 * c)
-}
-
-/** A move inside one card's time u (0 to 1): it rises by `up`, holds at its peak (1), and sinks from `down`;
- *  a `down` of 1 or more holds the peak to the card's end. A stopped scroll mid card shows the peak. */
-export function peakOf(u: number, up: number, down: number): number {
-  if (down >= 1) return ease(u / up)
-  return ease(u / up) * (1 - ease((u - down) / (1 - down)))
-}
+/** The end frame of a script, every action done. */
+export const END: Playhead = { action: 2, t: 1, done: true }

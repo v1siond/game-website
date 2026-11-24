@@ -104,14 +104,14 @@ describe('stageState', () => {
 
   it('never sinks the last stage, which holds to the end of the page', () => {
     const end = 6000 - vh
-    expect(stageState(span, end, vh, { last: true })).toEqual({ vis: 1, progress: 1 })
+    expect(stageState(span, end, vh, { last: true })).toMatchObject({ vis: 1, progress: 1 })
   })
 })
 
 describe('heroState', () => {
   it('stays whole under the next stage while its progress runs a whole screen', () => {
-    expect(heroState(0, 1000)).toEqual({ vis: 1, progress: 0 })
-    expect(heroState(375, 1000)).toEqual({ vis: 1, progress: 0.375 })
+    expect(heroState(0, 1000)).toMatchObject({ vis: 1, progress: 0 })
+    expect(heroState(375, 1000)).toMatchObject({ vis: 1, progress: 0.375 })
     expect(heroState(750, 1000).vis).toBe(1)
     expect(heroState(1000, 1000).progress).toBe(1)
   })
@@ -137,5 +137,32 @@ describe('layerTransform', () => {
 
   it('scales the motion down for a phone', () => {
     expect(layerTransform(motion, 1, 0.5)).toBe('translate3d(0,-1.00%,0) scale(1.0650)')
+  })
+})
+
+const VIEWPORT = 1000
+
+describe('the scroll that plays a scene', () => {
+  const tall = { top: 5000, bottom: 9000 }
+
+  it('starts as the stage arrives over its section and is played through a screen later, the section still in view', () => {
+    expect(stageState(tall, 5000 - 0.25 * VIEWPORT, VIEWPORT).play).toBe(0)
+    expect(stageState(tall, 5000 + 0.5 * VIEWPORT, VIEWPORT).play).toBeGreaterThan(0.5)
+    expect(stageState(tall, 5000 + 0.95 * VIEWPORT, VIEWPORT).play).toBe(1)
+  })
+
+  it('plays a short section through while half of it is still on screen', () => {
+    const short = { top: 5000, bottom: 5800 }
+    expect(stageState(short, short.bottom - 0.5 * VIEWPORT, VIEWPORT).play).toBe(1)
+  })
+
+  it('plays the last section through by the end of the page', () => {
+    const last = { top: 5000, bottom: 5900 }
+    expect(stageState(last, last.bottom - VIEWPORT, VIEWPORT, { last: true }).play).toBe(1)
+  })
+
+  it('plays the hero over the first part of a screen of scroll from the top', () => {
+    expect(heroState(0, VIEWPORT).play).toBe(0)
+    expect(heroState(0.6 * VIEWPORT, VIEWPORT).play).toBe(1)
   })
 })

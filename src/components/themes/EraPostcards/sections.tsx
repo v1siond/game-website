@@ -19,10 +19,9 @@ import { Stage } from './stage'
 import css from './page.module.css'
 
 // One section per era: a tall head that first shows the picture alone and then brings
-// the title up from the bottom, then the cards, then a screen of picture alone before it sinks. The cards
-// a scene counts sit in an element marked data-era-items (a list, or the record's facts), which the engine
-// measures for the reading line that lights each prop. Every field comes from the shared lists and the
-// card view models.
+// the title up from the bottom, then the cards, then a screen of picture alone before the next one rises.
+// The era's scene plays as the section scrolls in, while its picture is still alone on the screen. Every field
+// comes from the shared lists and the card view models.
 
 const BULLETS: MarkedLinesLook = { list: css.bullets, line: '', marker: null, heading: css.subhead }
 const STONES: MarkedLinesLook = { list: css.stones, line: `${css.card} ${css.stone}`, marker: <span className={css.stoneMark} aria-hidden="true" /> }
@@ -41,7 +40,7 @@ function AboutCards() {
         <p className={css.bio}>{bio}</p>
         <AboutFacts look={FACTS} />
       </article>
-      <div data-era-items="list">
+      <div>
         <MarkedLines items={highlights} label={cards.keyAchievements} look={STONES} />
       </div>
     </>
@@ -51,7 +50,7 @@ function AboutCards() {
 function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
   const { cards, years } = useLabels()
   return (
-    <div data-era-items="list">
+    <div>
       <ul className={css.stack}>
         {slot.jobs.map((job) => {
           const card = jobCard(job, years)
@@ -75,7 +74,7 @@ function WorkCards({ slot }: { slot: SlotOf<'work'> }) {
 
 function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
   return (
-    <div data-era-items="list" className={css.techList}>
+    <div className={css.techList}>
       <TechList
         categories={slot.categories}
         headingClassName={`${css.display} ${css.cardTitle} ${css.cardTitleWide}`}
@@ -90,7 +89,7 @@ function TechCards({ slot }: { slot: SlotOf<'tech'> }) {
 
 function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
   return (
-    <div data-era-items="list">
+    <div>
       <ul className={css.grid}>
         {slot.services.map((service) => (
           <li key={service.id} className={css.card}>
@@ -106,7 +105,7 @@ function ServiceCards({ slot }: { slot: SlotOf<'services'> }) {
 function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
   const { cards } = useLabels()
   return (
-    <div data-era-items="list">
+    <div>
       <ProjectList
         projects={slot.projects}
         className={css.stack}
@@ -145,7 +144,7 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
 function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
   const { cards, sections } = useLabels()
   return (
-    <div data-era-items="list">
+    <div>
       <VentureList
         companies={slot.companies}
         className={css.stack}
@@ -187,7 +186,7 @@ function BandCards({ slot }: { slot: SlotOf<'bands'> }) {
         </p>
         <p>{slot.musician.line}</p>
       </article>
-      <div data-era-items="list">
+      <div>
         <BandList
           bands={slot.bands}
           className={css.stack}
@@ -224,7 +223,7 @@ function MuayThaiCards({ slot }: { slot: SlotOf<'muayThai'> }) {
   return (
     <article className={`${css.card} ${css.lead}`}>
       <h3 className={`${css.display} ${css.cardTitle} ${css.cardTitleWide}`}>{slot.martialArts.primary.title}</h3>
-      <div data-era-items="facts">
+      <div>
         <MuayThaiRecord martialArts={slot.martialArts} classNames={RECORD} />
       </div>
     </article>

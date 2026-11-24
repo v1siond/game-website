@@ -50,9 +50,9 @@ const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOS
 // plays: the hero is the title card over the isle map, his marker walking up to the big top before the
 // iris opens on the ring and the steam calliope rolls in; each section of the active profession is a stage
 // of the fight, the calliope changing form as it escalates, and he shoots, jumps, dashes, slaps the pink
-// things away and fires his charged shot and his super; Contact is the knockout and his bow. Each scene
-// plays its one to three actions on time when its section arrives and holds its end frame, on the shared
-// theatre (./shared/theatre). The cards read in a column on the left from lg, so the fight plays clear of
+// things away and fires his charged shot and his super; Contact is the knockout and his bow. Each scene's
+// one to three actions are played by the scroll, forward on the way down and back on the way up, at no more
+// than their own speed, on the shared theatre (./shared/theatre). The cards read in a column on the left from lg, so the fight plays clear of
 // them on the right. Under reduced motion there is no theatre: each section carries its own picture,
 // still, at its end frame.
 //

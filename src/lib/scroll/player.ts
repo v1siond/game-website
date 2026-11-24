@@ -1,10 +1,14 @@
 // Pure timing behind a section's scene player (useTheatre): a scene is a short script of one to three
-// different actions that plays on time once its section arrives in view, each action eased and long enough
-// to be read, then holds its end frame. It never steps per card and never scrubs with the scroll: the clock
-// starts once and runs on, so a scene scrolled back to shows its end frame. Also the cross transition between
-// stages: the next stage dissolves in over the one under it, so the screen never dips to dark. No DOM here.
+// different actions, each eased and long enough to be read, played by the scroll the way the Rockstar VI
+// site plays its scenes: scrolling down plays it forward, scrolling up plays it back, every pass plays it
+// again and nothing moves while the scroll rests. The scroll sets where the scene should be; the drawn scene
+// follows it at no more than the scene's own speed, easing out of rest and into its stop like the settle, so
+// a small flick never races a long action (his 11-23 words, C55: "controlled speed of animations, similar to
+// the smooth scroll effect, but applied to the animations"). Also the cross transition between stages: the
+// next stage dissolves in over the one under it, so the screen never dips to dark. No DOM here.
 
 import { clamp01 } from './progress'
+import { FIRST_FRAME_MS, SETTLE_TAU_MS } from './stage'
 
 /** The least time an action takes, so it can be seen. */
 export const MIN_ACTION_MS = 1200
@@ -15,9 +19,6 @@ export const MAX_SCENE_MS = 5000
 /** A scene plays at most this many actions. */
 export const MAX_ACTIONS = 3
 
-/** A scene's clock starts once its stage is this visible. */
-export const ARRIVE_VIS = 0.6
-
 /** Each action's wished length in ms, in order. */
 export type SceneScript = readonly number[]
 
@@ -27,13 +28,6 @@ export interface Playhead {
   t: number
   done: boolean
 }
-
-/** When the scene's clock started, in ms; null until it arrives. */
-export interface SceneClock {
-  startedAt: number | null
-}
-
-export const IDLE_CLOCK: SceneClock = { startedAt: null }
 
 /** Ease in and out: slow out of rest, fastest at the middle, slow into the end. */
 export const easeInOut = (t: number): number => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2)
@@ -65,8 +59,18 @@ export function playheadAt(script: SceneScript, elapsedMs: number): Playhead {
   return sceneEnd(script)
 }
 
-/** The clock once the stage is `vis` visible at `now`: started on arrival, never again. */
-export const arrive = (clock: SceneClock, vis: number, now: number): SceneClock => (clock.startedAt === null && vis >= ARRIVE_VIS ? { startedAt: now } : clock)
+/** The time before the ease: the t that easeInOut turns into `eased`. */
+const uneased = (eased: number): number => (eased < 0.5 ? Math.cbrt(eased / 4) : 1 - Math.cbrt(2 * (1 - eased)) / 2)
+
+/** How long the scene has played at `play`, in ms: the even clock behind the eased playhead, for a thing that moves at a steady pace. */
+export function elapsedOf(script: SceneScript, { action, t }: Playhead): number {
+  const lengths = actionLengths(script)
+  const before = lengths.slice(0, action).reduce((sum, ms) => sum + ms, 0)
+  return before + uneased(t) * lengths[action]
+}
+
+/** How long the whole scene plays, in ms. */
+export const sceneLength = (script: SceneScript): number => actionLengths(script).reduce((sum, ms) => sum + ms, 0)
 
 /** How each stage is drawn in the cross transition, and the stage the page is in. */
 export interface Cross {
@@ -88,4 +92,42 @@ export function crossOf(rises: readonly number[]): Cross {
     return { shown: rise > 0, opacity: easeInOut(clamp01(rise)) }
   })
   return { layers, lead }
+}
+
+/** Where the drawn scene is (ms into it), how fast it moves (ms of scene per ms), and the time of its last frame. */
+export interface Follower {
+  drawn: number
+  speed: number
+  at: number | null
+}
+
+export const IDLE_FOLLOWER: Follower = { drawn: 0, speed: 0, at: null }
+
+/** The drawn scene never runs faster than the scene itself: one ms of it per ms. */
+const MAX_SPEED = 1
+// The speed eases toward the one wanted over this time constant, so the scene eases out of rest.
+const SPEED_TAU_MS = 90
+// Within this many ms of scene the drawing snaps to where the scroll says and rests.
+const REST_MS = 1
+// A frame after a long pause (a hidden tab) counts as this many ms at most.
+const MAX_FRAME_MS = 100
+
+/**
+ * One frame of the scene following the scroll: `progress` (0 to 1 over the scroll that plays the scene) sets
+ * where the scene should be; the speed wanted is the way left over the settle's time constant, capped at the
+ * scene's own speed, and the speed eases toward it, so the drawn scene eases out of rest, runs no faster than
+ * the scene, slows into its stop and never passes it, forward or back. `playing` asks for the next frame
+ * until it rests where the scroll says.
+ */
+export function follow(follower: Follower, script: SceneScript, progress: number, now: number): { follower: Follower; play: Playhead; playing: boolean } {
+  const target = clamp01(progress) * sceneLength(script)
+  const dt = follower.at === null ? FIRST_FRAME_MS : Math.min(MAX_FRAME_MS, Math.max(0, now - follower.at))
+  const gap = target - follower.drawn
+  if (Math.abs(gap) < REST_MS) return { follower: { drawn: target, speed: 0, at: now }, play: playheadAt(script, target), playing: false }
+  const wanted = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, gap / SETTLE_TAU_MS))
+  const speed = follower.speed + (wanted - follower.speed) * (1 - Math.exp(-dt / SPEED_TAU_MS))
+  const step = speed * dt
+  const passed = Math.sign(gap) !== Math.sign(gap - step)
+  const drawn = passed ? target : follower.drawn + step
+  return { follower: { drawn, speed: passed ? 0 : speed, at: now }, play: playheadAt(script, drawn), playing: !passed }
 }
