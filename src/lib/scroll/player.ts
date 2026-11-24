@@ -89,3 +89,12 @@ export function crossOf(rises: readonly number[]): Cross {
   })
   return { layers, lead }
 }
+
+/** What a frame needs to know of a scene at `now`: its clock, started once it is `vis` visible, where it
+ *  is, and whether it is still playing (so the engine draws again next frame). */
+export function advance(clock: SceneClock, script: SceneScript, vis: number, now: number): { clock: SceneClock; play: Playhead; playing: boolean } {
+  const next = arrive(clock, vis, now)
+  if (next.startedAt === null) return { clock: next, play: playheadAt(script, 0), playing: false }
+  const play = playheadAt(script, now - next.startedAt)
+  return { clock: next, play, playing: !play.done }
+}

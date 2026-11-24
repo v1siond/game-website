@@ -1,12 +1,15 @@
 import { HIGHWAY } from '../palette'
 import { defs, fx, fxAll, glow, linear, rect, r1, stars, stripedSun, svg, tf } from '../draw'
 import { courier, joints, setPose, type Pose } from '../courier'
-import type { Era } from './era'
+import { hop } from '@/lib/motion/arc'
+import type { Playhead } from '@/lib/scroll/player'
+import { END, share, type Era } from './era'
 
-// Work: the desert highway, 1957. A time trial on a hover bike: a mile sign per job carries the year it
-// started and passes by as its card is read; the stopwatch hand runs, the mesas, the poles and the road
-// slide at three speeds, a tumbleweed rolls across. He sits on the bike's saddle with both hands on its
-// steering wheel: the saddle and the wheel are drawn behind him, the hull in front of his legs.
+// Work: the desert highway, 1957. A time trial on a hover bike, in two actions: he opens the throttle and
+// the mesas, the poles and the road stream past at three speeds while the stopwatch hand sweeps and the mile
+// sign of the year his career started flies by; then the bike jumps a rise in the road and lands, a
+// tumbleweed rolling past under it. He sits on the bike's saddle with both hands on its steering wheel: the
+// saddle and the wheel are drawn behind him, the hull in front of his legs.
 
 const poles = Array.from({ length: 16 }, (_, i) => {
   const x = -200 + i * 260
@@ -37,23 +40,30 @@ export const bike = `<g data-fx="bike-hull">
 
 export const RIDE: Partial<Pose> = { x: 850, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
 
-// The bob of the bike and its rider on the air cushion.
-const bob = (p: number): number => Math.sin(p * 60) * 3
+// How far the road has run: the launch speeds it up, the jump keeps it going.
+const travelOf = (play: Playhead): number => share(play, 0) ** 2 * 0.7 + share(play, 1) * 0.6
 
-const ridePose = (p: number): Partial<Pose> => ({ ...RIDE, y: 870 + bob(p), scarf: -16 + Math.sin(p * 40) * 8 })
+// The bob of the bike and its rider on the air cushion, and the jump over the rise.
+const liftOf = (play: Playhead): number => Math.sin(travelOf(play) * 60) * 3 - hop(share(play, 1), 70)
+
+const ridePose = (play: Playhead): Partial<Pose> => ({ ...RIDE, y: 870 + liftOf(play), scarf: -16 + Math.sin(travelOf(play) * 40) * 8, lean: 18 - 10 * Math.sin(share(play, 1) * Math.PI) })
+
+// The mile sign flies past over the launch, from the right edge to off the left.
+const signX = (play: Playhead): number => 2000 - share(play, 0) * 2600
 
 export const highway: Era = {
+  script: [2200, 1800],
   build: ({ years }) => {
-    const signs = years
-      .map(
-        (year, i) => `
-    <g data-fx="sign-${i}" transform="translate(2000 0)">
+    const first = years.length > 0 ? Math.min(...years) : null
+    const signs =
+      first === null
+        ? ''
+        : `
+    <g data-fx="sign" transform="translate(${signX(END)} 0)">
       <rect x="-4" y="700" width="8" height="130" fill="${HIGHWAY.signPost}"/>
       <rect x="-62" y="640" width="124" height="70" rx="8" fill="${HIGHWAY.sign}" stroke="${HIGHWAY.signEdge}" stroke-width="4"/>
-      <text x="0" y="688" text-anchor="middle" font-family="var(--ep-face), sans-serif" font-weight="900" font-size="40" fill="${HIGHWAY.signText}">${year}</text>
-    </g>`,
-      )
-      .join('')
+      <text x="0" y="688" text-anchor="middle" font-family="var(--ep-face), sans-serif" font-weight="900" font-size="40" fill="${HIGHWAY.signText}">${first}</text>
+    </g>`
     return {
       sky: svg(`${defs(linear('wk-sky', [[0, HIGHWAY.skyTop], [0.35, HIGHWAY.skyMid], [0.62, HIGHWAY.skyLow], [0.8, HIGHWAY.skyDusk], [1, HIGHWAY.skyHorizon]]))}${rect('url(#wk-sky)')}${stars(31, 70, 300, HIGHWAY.star)}
         ${glow('wk-halo', 800, 600, 380, HIGHWAY.halo, 0.6)}${stripedSun('wk-sun', 800, 600, 220, [[0, HIGHWAY.sunTop], [1, HIGHWAY.sunBottom]])}
@@ -65,27 +75,27 @@ export const highway: Era = {
         <g data-fx="poles">${poles}${cacti}</g>`),
       near: svg(`<rect x="-200" y="820" width="2000" height="120" fill="${HIGHWAY.road}"/><rect x="-200" y="820" width="2000" height="5" fill="${HIGHWAY.roadEdge}"/><rect x="-200" y="932" width="2000" height="4" fill="${HIGHWAY.roadEdge}" opacity="0.6"/>
         <g data-fx="dashes">${dashes}</g><rect x="-200" y="936" width="2000" height="80" fill="${HIGHWAY.shoulder}"/>${signs}`),
-      figure: svg(`${cockpit}${courier(ridePose(0))}${bike}`),
+      figure: svg(`${cockpit}${courier(ridePose(END))}${bike}`),
       fg: svg(`<g data-fx="dust" opacity="0.6">${Array.from({ length: 30 }, (_, i) => `<rect x="${(i * 211) % 4800}" y="${600 + ((i * 97) % 380)}" width="${60 + (i % 5) * 30}" height="2" fill="${HIGHWAY.dust}"/>`).join('')}</g>
-        <g data-fx="weed" transform="translate(1700 960)"><circle r="34" fill="none" stroke="${HIGHWAY.weed}" stroke-width="5" stroke-dasharray="12 6"/><circle r="20" fill="none" stroke="${HIGHWAY.weed}" stroke-width="4" stroke-dasharray="8 5"/></g>`),
+        <g data-fx="weed" transform="translate(1900 960)"><circle r="34" fill="none" stroke="${HIGHWAY.weed}" stroke-width="5" stroke-dasharray="12 6"/><circle r="20" fill="none" stroke="${HIGHWAY.weed}" stroke-width="4" stroke-dasharray="8 5"/></g>`),
     }
   },
-  bind: (stage, { count }) => {
+  bind: (stage) => {
     const j = joints(stage)
-    const signs = Array.from({ length: count }, (_, i) => fx(stage, `sign-${i}`))
-    const [mesas, polesNode, dashNode, dust, weed, hand] = ['mesas', 'poles', 'dashes', 'dust', 'weed', 'hand'].map((name) => fx(stage, name))
+    const [mesas, polesNode, dashNode, dust, weed, hand, sign] = ['mesas', 'poles', 'dashes', 'dust', 'weed', 'hand', 'sign'].map((name) => fx(stage, name))
     const bikeParts = fxAll(stage, 'bike-')
-    return (p, f) => {
-      const travel = p + f * 0.25
+    return (p, play) => {
+      const travel = p * 0.1 + travelOf(play)
       tf(mesas, `translate(${r1(-travel * 160)} 0)`)
       tf(polesNode, `translate(${r1(-travel * 900)} 0)`)
       tf(dashNode, `translate(${r1(-((travel * 3200) % 160) - 160)} 0)`)
       tf(dust, `translate(${r1(-travel * 2600)} 0)`)
-      tf(weed, `translate(${r1(1700 - travel * 2200)} ${r1(960 - Math.abs(Math.sin(travel * 18)) * 30)}) rotate(${r1(-travel * 1400)})`)
-      tf(hand, `rotate(${r1(f * 90 + p * 360)})`)
-      signs.forEach((sign, i) => tf(sign, `translate(${r1(1180 - (f - i) * 820)} 0)`))
-      bikeParts.forEach((part) => tf(part, `translate(0 ${r1(bob(p))})`))
-      setPose(j, ridePose(p))
+      const rolled = share(play, 1)
+      tf(weed, `translate(${r1(1900 - rolled * 2400)} ${r1(960 - Math.abs(Math.sin(rolled * 9)) * 30)}) rotate(${r1(-rolled * 900)})`)
+      tf(hand, `rotate(${r1(travel * 360)})`)
+      tf(sign, `translate(${r1(signX(play))} 0)`)
+      bikeParts.forEach((part) => tf(part, `translate(0 ${r1(liftOf(play))})`))
+      setPose(j, ridePose(play))
     }
   },
 }

@@ -1,16 +1,17 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { crossOf } from '@/lib/scroll/player'
-import { heroState, itemsReached, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
+import { IDLE_CLOCK, advance, crossOf, type SceneClock } from '@/lib/scroll/player'
+import { heroState, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
 
 // The world's side of the scroll stage engine (src/hooks/useScrollStage.ts): it binds every stage of the
-// theatre once (its layers, the era's writer), measures each section and the reading line of each counted
-// card on load and resize, and per frame writes only each visible stage's opacity, its layers' transforms
-// and its era's props and pose. Each stage dissolves in over the one before it and the one under it is
+// theatre once (its layers, the era's writer), measures each section on load and resize, and per frame
+// writes only each visible stage's opacity, its layers' transforms and its era's props and pose. Each era's
+// script plays on time from its section's arrival and holds its end frame (src/lib/scroll/player.ts);
+// while one plays the engine draws every frame, scrolled or not. Each stage dissolves in over the one before it and the one under it is
 // hidden once it is whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). The rail's
 // current mark changes only when the leading scene does.
 //
@@ -25,13 +26,8 @@ import type { EraWriter, Layer } from './eras/era'
 // Under this many px of lag the text is drawn at the scroll, with no transform.
 const TEXT_REST_PX = 0.5
 
-// A card counts as reached once its top crosses this share of the screen from the top.
-const READ_LINE = 0.62
 // On a phone the layers zoom and lift this share of the desktop motion.
 const PHONE_MOTION = 0.6
-
-/** The counted cards of a section: the items of the list or the facts its frame marks with data-era-items. */
-const ITEMS = '[data-era-items="list"] > ul > li, [data-era-items="facts"] > dl > div'
 
 interface Bound {
   scene: Scene
@@ -41,8 +37,8 @@ interface Bound {
   section: HTMLElement | null
   rail: Element | null
   span: StageSpan
-  triggers: number[]
   shown: boolean
+  clock: SceneClock
 }
 
 const bind = (theatre: HTMLElement, scene: Scene): Bound => {
@@ -55,8 +51,8 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     rail: document.querySelector(`[data-rail="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
-    triggers: [],
     shown: false,
+    clock: IDLE_CLOCK,
   }
 }
 
@@ -76,6 +72,7 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   const lead = useRef('')
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
+  const frame = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -83,12 +80,11 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
     lead.current = ''
   }, [scenes, reduced])
 
-  const measure = useCallback((scrollY: number, { viewport }: StageMetrics) => {
+  const measure = useCallback((scrollY: number) => {
     const origin = scrollY - lagNow.current
     for (const each of bound.current) {
       const box = each.section?.getBoundingClientRect()
       each.span = box ? { top: box.top + origin, bottom: box.bottom + origin } : { top: 0, bottom: 0 }
-      each.triggers = Array.from(each.section?.querySelectorAll(ITEMS) ?? [], (item) => item.getBoundingClientRect().top + origin - READ_LINE * viewport)
     }
   }, [])
 
@@ -109,24 +105,35 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   }, [])
 
   const draw = useCallback(
-    (position: number, lag: number, { viewport, phone }: StageMetrics) => {
+    function drawFrame(position: number, lag: number, metrics: StageMetrics) {
+      const { viewport, phone } = metrics
       settleText(lag)
       const all = bound.current
+      const now = performance.now()
       const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1))
       const cross = crossOf(states.map((state) => state.vis))
+      let playing = false
       all.forEach((each, i) => {
         const { shown, opacity } = cross.layers[i]
         show(each, shown)
+        const run = advance(each.clock, each.scene.era.script, states[i].vis, now)
+        each.clock = run.clock
+        playing ||= run.playing
         if (!shown) return
         each.stage.style.opacity = opacity.toFixed(3)
         for (const { el, layer } of each.layers) el.style.transform = layerTransform(LAYER_MOTION[layer], states[i].progress, phone ? PHONE_MOTION : 1)
-        each.write(states[i].progress, itemsReached(each.triggers, position, viewport))
+        each.write(states[i].progress, run.play)
       })
+      // A script is playing: draw again next frame, on time, whether or not the page scrolls.
+      cancelAnimationFrame(frame.current)
+      frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
       if (all.length === 0) return
       mark(all[cross.lead])
     },
     [mark, settleText],
   )
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), [])
 
   const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
   const textRef = useCallback(
