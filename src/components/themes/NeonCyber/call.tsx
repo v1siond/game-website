@@ -23,7 +23,7 @@ export function IncomingCall({ scene, profession, number, still }: { scene: Scen
   return (
     <section data-scene="contact" className="relative px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]" aria-labelledby={panelHeadingId(sections.contact)}>
       {still && <NeonStage scene={scene} settled />}
-      <header className="flex min-h-[80svh] items-end pb-10 motion-reduce:min-h-[70svh]">
+      <header className="flex min-h-[80svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
         <HudTitle number={number} total={number} title={sections.contact} />
       </header>
       <RecruiterHero

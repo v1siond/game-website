@@ -55,9 +55,11 @@ export const NEON = {
   sunset: '#aa5a2c',
   sunsetGlow: '#e5a868',
 
-  // The hero's kit: the long coat and its lit collar, the trousers
-  coat: '#2b3150',
-  coatLit: '#434c78',
+  // The hero's kit: the cropped yellow jacket, its black panels and the collar's lit lining, the chrome
+  // arm, the trousers
+  jacket: '#e2b318',
+  jacketShade: '#9c7a0c',
+  chromeLit: '#c9ccd6',
   trousers: '#2d2a3d',
   shoe: '#15121c',
   stickWood: '#f5d28a',

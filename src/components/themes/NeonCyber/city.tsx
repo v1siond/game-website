@@ -11,6 +11,10 @@ import { NEON } from './palette'
 
 export const VIEW = '0 0 1600 900'
 
+/** A phone's view: from 256 down past the canvas, so a tall screen shows about 550 units across with the
+ *  street (y 856) half way down it; the near layer's street runs on below the canvas to fill it. */
+export const PHONE_VIEW = '0 256 1600 1200'
+
 const FAR_TOWERS = [
   { x: 40, w: 130, h: 520 },
   { x: 210, w: 90, h: 640 },
@@ -98,7 +102,7 @@ export function Near() {
       {/* the LED strip bolted onto the right wall, and the cables sagging between the walls */}
       <rect x={1384} y={470} width={8} height={300} fill={NEON.hud} fillOpacity={0.7} />
       <path d="M220 450 Q800 560 1380 430 M220 480 Q820 620 1380 470" stroke={NEON.ink} strokeWidth={3} fill="none" />
-      <rect y={860} width={1600} height={40} fill={NEON.ink} />
+      <rect y={860} width={1600} height={600} fill={NEON.ink} />
     </>
   )
 }

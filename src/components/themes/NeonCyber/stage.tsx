@@ -4,7 +4,7 @@ import { memo, type ReactNode } from 'react'
 import type { LayerMotion } from '@/lib/scroll/stage'
 import { Stage, type StageLayer } from '../shared/theatre/Stage'
 import type { TheatreScene } from '../shared/theatre/useTheatre'
-import { DISTRICT_ART, Far, Mid, Near, Rain, VIEW } from './city'
+import { DISTRICT_ART, Far, Mid, Near, PHONE_VIEW, Rain, VIEW } from './city'
 import { HeroFigure } from './figure'
 import { heroJoints, setHeroPose } from './pose'
 import { GROUND, type Scene } from './scenes'
@@ -29,10 +29,12 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
 const HERO_RIG = { joints: heroJoints, pose: setHeroPose }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, HERO_RIG)
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, HERO_RIG, scene.def.script)
 
-const plane = (children: ReactNode): ReactNode => (
-  <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
+/** A layer's picture: the whole city from its foot on a wide screen; on a phone, the view from its top that
+ *  keeps the street about half way down the screen, clear of the cards (city.tsx PHONE_VIEW). */
+const plane = (children: ReactNode, phone: boolean): ReactNode => (
+  <svg viewBox={phone ? PHONE_VIEW : VIEW} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} focusable="false">
     {children}
   </svg>
 )
@@ -43,7 +45,7 @@ function Hero({ scene }: { scene: Scene }) {
   return (
     <g data-fx="figure" data-worlds-figure={scene.id === 'hero' ? '' : undefined} transform={figureTransform(first)}>
       <svg x={-50} y={-144} width={100} height={150} viewBox="0 0 100 150" overflow="visible">
-        <HeroFigure profession={scene.kit} motion="still" />
+        <HeroFigure profession={scene.kit} motion="still" snare={scene.id === 'bands'} />
       </svg>
     </g>
   )
@@ -51,11 +53,12 @@ function Hero({ scene }: { scene: Scene }) {
 
 const layersOf = (scene: Scene): StageLayer[] => {
   const District = DISTRICT_ART[scene.def.district]
+  const { phone } = scene.layout
   return [
-    { name: 'sky', node: plane(<Far uid={scene.id} />) },
-    { name: 'district', node: plane(<District uid={scene.id} />) },
-    { name: 'mid', node: plane(<Mid />) },
-    { name: 'near', node: plane(<Near />) },
+    { name: 'sky', node: plane(<Far uid={scene.id} />, phone) },
+    { name: 'district', node: plane(<District uid={scene.id} />, phone) },
+    { name: 'mid', node: plane(<Mid />, phone) },
+    { name: 'near', node: plane(<Near />, phone) },
     {
       name: 'figure',
       node: plane(
@@ -65,9 +68,10 @@ const layersOf = (scene: Scene): StageLayer[] => {
           <Hero scene={scene} />
           {scene.def.front(scene.layout)}
         </g>,
+        phone,
       ),
     },
-    { name: 'fg', node: plane(<Rain />) },
+    { name: 'fg', node: plane(<Rain />, phone) },
   ]
 }
 
