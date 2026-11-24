@@ -246,9 +246,9 @@
   }
 
   /* On a phone the level fills the lower screen, so the title rides at the top of the head and the cards
-     come up only after a full screen of the level alone. */
+     come up only after the level has played and held for most of a screen. */
   .head {
-    min-height: 115svh;
+    min-height: 130svh;
     justify-content: flex-start;
     padding-top: 64px;
     padding-bottom: 10svh;

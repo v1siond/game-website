@@ -236,10 +236,11 @@
   gap: 12px;
 }
 
+/* The pad is an oval: its ring curves in at the corners, so the side padding keeps the words clear of it. */
 .pad {
   display: grid;
   min-width: 150px;
-  padding: 10px 18px 12px;
+  padding: 10px 30px 12px;
   color: var(--ep-chalk);
   text-decoration: none;
   text-shadow: none;
@@ -295,10 +296,10 @@
   max-width: 900px;
 }
 
-/* The title stands on its era's plate; the display face's line box is shorter than its glyph box, so the
-   plate reaches past it on both sides. */
+/* The title stands on its era's plate; the display face's line box is shorter than its glyph box (about a
+   fifth of the size on each side), so the plate reaches past the glyph box on both sides. */
 .head .title {
-  padding: 14px 22px 18px;
+  padding: 24px 22px 28px;
   border-radius: 20px;
   background: var(--era-card);
 }
@@ -364,7 +365,8 @@
 .cardTitle {
   font-size: clamp(1.9rem, 3vw, 2.5rem);
   color: var(--ep-chalk);
-  padding-right: 120px;
+  /* room for the stamp on the card's corner */
+  padding-right: 160px;
 }
 
 .cardTitleWide {
@@ -402,9 +404,10 @@
   position: absolute;
   top: 18px;
   right: 18px;
-  max-width: 130px;
+  max-width: 150px;
   margin: 0;
-  padding: 6px 10px;
+  /* tilted, the words' box grows past their line, so the padding keeps them clear of the dashed edge */
+  padding: 10px 14px;
   text-align: center;
   border: 2px dashed var(--era-accent);
   border-radius: 6px;
@@ -619,8 +622,9 @@
     padding: 0 16px 60svh;
   }
 
+  /* the era's scene plays and holds for most of a screen before the title and the cards come up over it */
   .head {
-    min-height: 115svh;
+    min-height: 130svh;
     padding-bottom: 10svh;
   }
 

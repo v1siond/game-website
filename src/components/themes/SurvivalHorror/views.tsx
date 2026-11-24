@@ -100,7 +100,7 @@ export function SceneSection({ scene, slot, still }: { scene: Scene; slot: Secti
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[4vw]">
       {still && <SurvivorStage scene={scene} settled />}
-      <div className="min-h-[80svh] motion-reduce:min-h-[70svh]" aria-hidden="true" />
+      <div className="min-h-[80svh] motion-reduce:min-h-[70svh] max-md:min-h-[130svh]" aria-hidden="true" />
       <div className={`relative p-4 sm:p-6 lg:w-[min(42rem,46vw)] ${look.panel}`}>
         <h2 id={id} className={PANEL_HEADING}>
           {title}

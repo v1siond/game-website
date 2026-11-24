@@ -170,22 +170,6 @@ export function Soldier({ name, side }: { name: string; side: keyof typeof SOLDI
   )
 }
 
-/** A creep of the wild camps: a hunched tusked beast, 70 high. */
-export function Creep({ name }: { name: string }) {
-  return (
-    <g data-fx={name}>
-      <ellipse cx="0" cy="0" rx="30" ry="6" fill={REALM.stone1} opacity="0.45" />
-      <rect x="-20" y="-22" width="9" height="22" rx="3" fill={REALM.moss24} />
-      <rect x="8" y="-22" width="9" height="22" rx="3" fill={REALM.moss24} />
-      <ellipse cx="-2" cy="-36" rx="30" ry="20" fill={REALM.moss27} />
-      <path d="M-26,-48 Q-6,-64 18,-50" fill="none" stroke={REALM.moss23} strokeWidth="6" />
-      <ellipse cx="-24" cy="-42" rx="14" ry="12" fill={REALM.moss28} />
-      <path d="M-34,-38 Q-40,-46 -36,-54" fill="none" stroke={REALM.ember77} strokeWidth="3.5" />
-      <circle cx="-28" cy="-46" r="2.5" fill={REALM.chaosFireBright} />
-    </g>
-  )
-}
-
 /** The enemy champion: a horned brute with a great axe, 150 high, facing left at the hero. Its axe arm is
  *  marked `${name}-arm`, turning about its shoulder (-30, -110). */
 export function Champion({ name }: { name: string }) {

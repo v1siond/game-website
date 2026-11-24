@@ -84,7 +84,7 @@ function RealmSection({ scene, layout, isLargeScreen, still }: SectionProps) {
   return (
     <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
       {still && <RealmStage scene={scene} settled />}
-      <div className="min-h-[100svh]" />
+      <div className="min-h-[100svh] max-md:min-h-[130svh]" />
       <div className={COLUMN[REALM_OF[scene.slot.id]]}>
         <Frame slot={scene.slot} layout={layout} isLargeScreen={isLargeScreen} />
       </div>
