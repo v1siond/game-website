@@ -25,8 +25,8 @@ import page from './AdventurePaths/page.module.css'
 // on; every section of the shown profession is one place on the map in order (./AdventurePaths/scenes):
 // the plains, the cave, the sky, the switch palace, the water, the fortress and the castle, and the goal at
 // the end. Each level opens on the map, his marker walking from the last spot to its own, and plays its
-// one to three different actions on time once its section arrives, then holds its end frame (the shared
-// theatre). He is himself as a 16 bit sprite. The cards read in a column on the left, so the levels play
+// one to three different actions as its section scrolls in, forward on the way down and back on the way up,
+// at no more than their own speed (the shared theatre). He is himself as a 16 bit sprite. The cards read in a column on the left, so the levels play
 // clear of them on the right. The text is plain HTML in the page flow over the fixed theatre of pictures,
 // opaque from its first frame.
 //

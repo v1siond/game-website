@@ -20,7 +20,7 @@ import css from './page.module.css'
 
 // One section per era: a tall head that first shows the picture alone and then brings
 // the title up from the bottom, then the cards, then a screen of picture alone before the next one rises.
-// The era's scene plays once the section arrives, while its picture is still alone on the screen. Every field
+// The era's scene plays as the section scrolls in, while its picture is still alone on the screen. Every field
 // comes from the shared lists and the card view models.
 
 const BULLETS: MarkedLinesLook = { list: css.bullets, line: '', marker: null, heading: css.subhead }

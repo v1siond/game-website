@@ -3,7 +3,7 @@ import type { StageLayer } from '../../shared/theatre/Stage'
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import type { SpotId } from './worldMap'
 
-// What every level is: its script (each action's length, played on time once its section arrives), its
+// What every level is: its script (each action's length, played by the scroll as its section comes in), its
 // layers on the shared canvas (kit.tsx), from the sky to the world map laid over it, and a binder that
 // finds the nodes its actions move and returns the writer of a playhead. Every level but the hero opens on
 // the world map: his marker walks to the level's spot and the spot opens into the level (worldMap.tsx).

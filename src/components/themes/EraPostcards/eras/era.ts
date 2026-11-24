@@ -1,8 +1,8 @@
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
 
 // What every era picture is: six layers on the shared canvas, from the sky to the foreground, a script of
-// one to three different actions (each one's length in ms) that plays on time once its section arrives
-// (src/lib/scroll/player.ts), and a binder that caches the nodes the scene moves and returns the per frame
+// one to three different actions (each one's length in ms) that the scroll plays at no more than its own
+// speed (src/lib/scroll/player.ts), and a binder that caches the nodes the scene moves and returns the per frame
 // writer. The writer takes:
 //   p     the scene's progress, 0 when its stage starts to rise, 1 when its section has gone by: the
 //         ambient drift only (smoke, sand, petals), never his actions;

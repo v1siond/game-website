@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { IDLE_CLOCK, advance, crossOf, type SceneClock } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, crossOf, follow, type Follower } from '@/lib/scroll/player'
 import { heroState, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
@@ -10,8 +10,8 @@ import type { EraWriter, Layer } from './eras/era'
 // The world's side of the scroll stage engine (src/hooks/useScrollStage.ts): it binds every stage of the
 // theatre once (its layers, the era's writer), measures each section on load and resize, and per frame
 // writes only each visible stage's opacity, its layers' transforms and its era's props and pose. Each era's
-// script plays on time from its section's arrival and holds its end frame (src/lib/scroll/player.ts);
-// while one plays the engine draws every frame, scrolled or not. Each stage dissolves in over the one before it and the one under it is
+// script is played by the scroll, forward and back, at no more than its own speed (src/lib/scroll/player.ts);
+// while one has not caught up with the scroll the engine draws every frame, scrolled or not. Each stage dissolves in over the one before it and the one under it is
 // hidden once it is whole, so the screen never dips to dark (crossOf, src/lib/scroll/player.ts). The rail's
 // current mark changes only when the leading scene does.
 //
@@ -38,7 +38,7 @@ interface Bound {
   rail: Element | null
   span: StageSpan
   shown: boolean
-  clock: SceneClock
+  follower: Follower
 }
 
 const bind = (theatre: HTMLElement, scene: Scene): Bound => {
@@ -52,7 +52,7 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
     rail: document.querySelector(`[data-rail="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
     shown: false,
-    clock: IDLE_CLOCK,
+    follower: IDLE_FOLLOWER,
   }
 }
 
@@ -116,15 +116,15 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
       all.forEach((each, i) => {
         const { shown, opacity } = cross.layers[i]
         show(each, shown)
-        const run = advance(each.clock, each.scene.era.script, states[i].vis, now)
-        each.clock = run.clock
+        const run = follow(each.follower, each.scene.era.script, states[i].play, now)
+        each.follower = run.follower
         playing ||= run.playing
         if (!shown) return
         each.stage.style.opacity = opacity.toFixed(3)
         for (const { el, layer } of each.layers) el.style.transform = layerTransform(LAYER_MOTION[layer], states[i].progress, phone ? PHONE_MOTION : 1)
         each.write(states[i].progress, run.play)
       })
-      // A script is playing: draw again next frame, on time, whether or not the page scrolls.
+      // A scene has not caught up with the scroll: draw again next frame, whether or not the page scrolls.
       cancelAnimationFrame(frame.current)
       frame.current = playing ? requestAnimationFrame(() => drawFrame(position, lag, metrics)) : 0
       if (all.length === 0) return

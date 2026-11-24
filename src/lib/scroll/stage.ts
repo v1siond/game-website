@@ -67,10 +67,27 @@ export interface Handover {
 // sees two rooms at once.
 export const HANDOVER: Handover = { inFrom: -0.55, inTo: 0, outTo: -0.35 }
 
-/** How far a stage has risen over the one before (0 not yet, 1 whole) and how far its scene has played (0 to 1). */
+/** How far a stage has risen over the one before (0 not yet, 1 whole), how far its scene has played (0 to
+ *  1, the layers' push in), and how far the scroll has played its actions (0 to 1, for the scene player). */
 export interface StageState {
   vis: number
   progress: number
+  play: number
+}
+
+// A section's actions play from its stage's arrival (this many screens before its top reaches the screen's
+// top) over this many screens of scroll, ended while the section is still in view: by the time half a screen
+// of it is left, or for the last one by the page's end.
+const PLAY_FROM = -0.25
+const PLAY_SCREENS = 1.2
+const PLAY_LEFT_SCREENS = 0.5
+// The hero plays its actions over this much of the first screen.
+const HERO_PLAY_SCREENS = 0.6
+
+function playSpan(span: StageSpan, viewport: number, last: boolean): readonly [number, number] {
+  const start = span.top + PLAY_FROM * viewport
+  const latest = last ? span.bottom - viewport : span.bottom - PLAY_LEFT_SCREENS * viewport
+  return [start, Math.max(start + 1, Math.min(start + PLAY_SCREENS * viewport, latest))]
 }
 
 interface StageOptions {
@@ -83,14 +100,16 @@ export function stageState(span: StageSpan, position: number, viewport: number, 
   const start = span.top + handover.inFrom * viewport
   const rise = ramp(position, start, span.top + handover.inTo * viewport)
   const end = last ? span.bottom - viewport : span.bottom + handover.outTo * viewport
-  return { vis: rise, progress: ramp(position, start, end) }
+  const [playFrom, playTo] = playSpan(span, viewport, last)
+  return { vis: rise, progress: ramp(position, start, end), play: ramp(position, playFrom, playTo) }
 }
 
 /** The hero's stage: whole from the top of the page, under the stages that rise over it, its progress run
- *  over the first screen. */
+ *  over the first screen and its actions over the first part of it. */
 export const heroState = (position: number, viewport: number): StageState => ({
   vis: 1,
   progress: ramp(position, 0, viewport),
+  play: ramp(position, 0, HERO_PLAY_SCREENS * viewport),
 })
 
 // An item counts as reached over this many screens of scroll after its trigger.

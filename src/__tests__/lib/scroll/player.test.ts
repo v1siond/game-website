@@ -1,4 +1,4 @@
-import { ARRIVE_VIS, IDLE_CLOCK, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, advance, arrive, crossOf, elapsedOf, playheadAt, sceneEnd, type SceneClock } from '@/lib/scroll/player'
+import { IDLE_FOLLOWER, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, crossOf, elapsedOf, follow, playheadAt, sceneEnd, sceneLength, type Follower } from '@/lib/scroll/player'
 
 describe('actionLengths', () => {
   it('gives every action at least the time to read it', () => {
@@ -62,23 +62,6 @@ describe('elapsedOf', () => {
   })
 })
 
-describe('arrive', () => {
-  const idle: SceneClock = { startedAt: null }
-
-  it('waits while the scene is not yet in view', () => {
-    expect(arrive(idle, ARRIVE_VIS - 0.01, 500)).toEqual(idle)
-  })
-
-  it('starts the clock when the scene arrives', () => {
-    expect(arrive(idle, ARRIVE_VIS, 500)).toEqual({ startedAt: 500 })
-  })
-
-  it('never restarts: back in view later, the time already run shows the end frame', () => {
-    const started = arrive(idle, 1, 500)
-    expect(arrive(started, 1, 90_000)).toEqual({ startedAt: 500 })
-  })
-})
-
 describe('crossOf', () => {
   it('shows only the top fully risen stage and the ones rising over it, never a dip to dark', () => {
     const cross = crossOf([1, 1, 0.5, 0])
@@ -98,22 +81,59 @@ describe('crossOf', () => {
   })
 })
 
-describe('advance', () => {
+describe('follow', () => {
   const script = [1500, 2000] as const
+  const total = sceneLength(script)
+  const FRAME = 1000 / 60
 
-  it('holds the first frame and asks for no frames until the scene arrives', () => {
-    expect(advance(IDLE_CLOCK, script, 0.2, 100)).toEqual({ clock: IDLE_CLOCK, play: { action: 0, t: 0, done: false }, playing: false })
+  /** Frames of the follow toward `progress` from `from`, for `ms` of real time. */
+  function run(from: Follower, progress: number, ms: number, start = 1000): { follower: Follower; playing: boolean } {
+    let follower = from
+    let playing = true
+    for (let now = start; now <= start + ms; now += FRAME) ({ follower, playing } = follow(follower, script, progress, now))
+    return { follower, playing }
+  }
+
+  it('moves a small way for a small scroll, and comes to rest there', () => {
+    const { follower, playing } = run(IDLE_FOLLOWER, 0.05, 2000)
+    expect(follower.drawn).toBeCloseTo(0.05 * total, 0)
+    expect(playing).toBe(false)
   })
 
-  it('plays on from the arrival and asks for the next frame while it runs', () => {
-    const { clock } = advance(IDLE_CLOCK, script, 1, 100)
-    const later = advance(clock, script, 0, 100 + 1500 + 1000)
-    expect(later.play.action).toBe(1)
-    expect(later.playing).toBe(true)
+  it('never plays faster than the scene runs: a flick to the end takes at least the scene to cover', () => {
+    const halfway = run(IDLE_FOLLOWER, 1, total / 2)
+    expect(halfway.follower.drawn).toBeLessThanOrEqual(total / 2)
+    expect(halfway.playing).toBe(true)
+    expect(run(IDLE_FOLLOWER, 1, total * 1.5).follower.drawn).toBeCloseTo(total, 0)
   })
 
-  it('stops asking for frames once the end frame holds', () => {
-    const { clock } = advance(IDLE_CLOCK, script, 1, 100)
-    expect(advance(clock, script, 1, 10_000)).toEqual({ clock, play: sceneEnd(script), playing: false })
+  it('eases out of rest: the first frames move less than the scene would at full speed', () => {
+    const first = follow(IDLE_FOLLOWER, script, 1, 1000)
+    const second = follow(first.follower, script, 1, 1000 + FRAME)
+    expect(second.follower.drawn).toBeLessThan(2 * FRAME)
+    expect(second.follower.drawn).toBeGreaterThan(0)
+  })
+
+  it('plays backward when the scroll goes back up', () => {
+    const ended = run(IDLE_FOLLOWER, 1, total * 2).follower
+    const back = run(ended, 0, 1000, (ended.at ?? 0) + FRAME).follower
+    expect(back.drawn).toBeLessThan(total)
+    expect(back.drawn).toBeGreaterThanOrEqual(total - 1000 - FRAME)
+    expect(run(back, 0, total * 2, (back.at ?? 0) + FRAME).follower.drawn).toBe(0)
+  })
+
+  it('asks for no more frames once it rests on the target, and never passes it', () => {
+    const rested = run(IDLE_FOLLOWER, 0.5, total * 2).follower
+    expect(rested.drawn).toBe(0.5 * total)
+    expect(follow(rested, script, 0.5, 90_000)).toEqual({ follower: { ...rested, at: 90_000 }, play: playheadAt(script, 0.5 * total), playing: false })
+  })
+
+  it('draws the playhead at the time it has reached', () => {
+    const { follower } = run(IDLE_FOLLOWER, 1, total * 2)
+    expect(follow(follower, script, 1, 99_000).play).toEqual(sceneEnd(script))
+  })
+
+  it('gives the end frame for the settled scene reduced motion shows', () => {
+    expect(playheadAt(script, sceneLength(script))).toEqual(sceneEnd(script))
   })
 })

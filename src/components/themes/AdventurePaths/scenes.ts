@@ -18,7 +18,7 @@ import { work } from './scenes/work'
 
 // The page as scenes: the start (hero), one level per section of the shown profession in reading order,
 // the goal (contact), the way one world of the 16 bit platformer is played from start to finish. Each
-// scene names its picture, its anchor and its script, the actions it plays once its section arrives.
+// scene names its picture, its anchor and its script, the actions the scroll plays as its section comes in.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -43,7 +43,7 @@ const SCENE_DEFS: Record<SceneId, SceneDef> = {
 export interface TrailScene extends TheatreScene, Omit<SceneDef, 'level'> {
   id: SceneId
   layers: StageLayer[]
-  /** The level's actions, played on time once its section arrives. */
+  /** The level's actions, played by the scroll as its section comes in. */
   script: SceneScript
   /** The section's slot; the hero and the goal have none. */
   slot: SectionSlot | null

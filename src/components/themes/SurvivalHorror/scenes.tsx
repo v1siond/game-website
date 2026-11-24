@@ -16,8 +16,8 @@ import { SH } from './palette'
 import { CROUCH, GUARD, aim, block, kick, mix, pull, raiseLight, reach, read, run, shove, sweep, turn, walk, type SurvivorPose } from './pose'
 
 // Each part of the page as a scene in a room of the old house: its room, its props and a short script of
-// one to three different actions that plays on time once the section arrives (src/lib/scroll/player.ts),
-// each eased and long enough to be seen, then holds its end frame. Nothing steps per card. He faces right
+// one to three different actions that the scroll plays, forward and back, at no more than its own speed
+// (src/lib/scroll/player.ts), each eased and long enough to be seen. Nothing steps per card. He faces right
 // and every move goes forward. The hero: he switches his flashlight on and sweeps the hall with it. About: he
 // walks up to the notes pinned on the study wall and reads one by its light. Work: he walks to a filing
 // cabinet and pulls a drawer out toward him, a file in his hand. Tech: he shoves a crate along the corridor
@@ -44,7 +44,7 @@ export type SurvivorState = FigureState<SurvivorPose>
 
 export interface SceneDef {
   room: Room
-  /** The scene's actions, each one's length in ms, played in order from its arrival. */
+  /** The scene's actions, each one's length in ms, played in order by the scroll. */
   script: SceneScript
   /** The props behind him and in front of him, drawn in the figure layer. */
   back: (layout: Layout) => ReactNode
