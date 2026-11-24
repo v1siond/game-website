@@ -1,26 +1,10 @@
 import { SH } from './palette'
 
-// What waits in the dark of the house, drawn as silhouettes with their feet on (0, 0), facing left toward
-// him: the tall pursuer in a long hooded coat who walks the rooms, and the hunched shape that comes at him
-// out of the dark. The scenes move them whole by their transforms (./scenes); nothing inside them moves.
+// The hunched shape that comes at him out of the dark, drawn as a silhouette with its feet on (0, 0), facing
+// left toward him. The scenes move it whole by its transform (./scenes); nothing inside it moves. The pursuer
+// has joints and paces of its own (./pursuer).
 
 const LINE = SH.void
-
-/** The pursuer: a head taller than him, the hood low over a face kept in shadow, the coat to his boots. */
-export function Pursuer() {
-  return (
-    <g>
-      <ellipse cx={0} cy={1} rx={22} ry={2.6} fill={SH.void} opacity={0.6} />
-      <path d="M-15 0 L-12 -60 L12 -60 L16 0 Z" fill={SH.coat} stroke={LINE} strokeWidth={1.4} />
-      <path d="M-20 -58 Q-22 -110 -14 -128 Q0 -136 14 -128 Q22 -110 18 -58 Z" fill={SH.coat} stroke={LINE} strokeWidth={1.4} />
-      <path d="M-4 -126 L-2 -64" stroke={SH.coatLit} strokeWidth={1.6} />
-      <path d="M-22 -120 L-30 -74 L-24 -72 L-16 -112 Z" fill={SH.coatLit} stroke={LINE} strokeWidth={1.4} />
-      <path d="M-14 -132 Q-16 -158 0 -162 Q14 -160 13 -132 Q0 -126 -14 -132 Z" fill={SH.coat} stroke={LINE} strokeWidth={1.4} />
-      <path d="M-11 -138 Q-6 -146 2 -144 L0 -134 Z" fill={SH.void} />
-      <circle cx={-6} cy={-140} r={0.9} fill={SH.flame} opacity={0.8} />
-    </g>
-  )
-}
 
 /** The hunched shape: low on bent legs, one long arm reaching for him. */
 export function Shape() {

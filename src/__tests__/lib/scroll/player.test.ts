@@ -1,4 +1,4 @@
-import { ARRIVE_VIS, IDLE_CLOCK, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, advance, arrive, crossOf, playheadAt, sceneEnd, type SceneClock } from '@/lib/scroll/player'
+import { ARRIVE_VIS, IDLE_CLOCK, MAX_SCENE_MS, MIN_ACTION_MS, actionLengths, advance, arrive, crossOf, elapsedOf, playheadAt, sceneEnd, type SceneClock } from '@/lib/scroll/player'
 
 describe('actionLengths', () => {
   it('gives every action at least the time to read it', () => {
@@ -47,6 +47,18 @@ describe('playheadAt', () => {
   it('takes the same time whatever the cards: one action per script entry', () => {
     expect(playheadAt([1200], 600).action).toBe(0)
     expect(sceneEnd([1200, 1200, 1200])).toEqual({ action: 2, t: 1, done: true })
+  })
+})
+
+describe('elapsedOf', () => {
+  const script = [1500, 2000] as const
+
+  it('reads the time back from a playhead at an even pace, whatever the easing', () => {
+    for (const ms of [0, 200, 750, 1499, 1500, 2600, 3400]) expect(elapsedOf(script, playheadAt(script, ms))).toBeCloseTo(ms, 6)
+  })
+
+  it('gives the whole scene at its end frame', () => {
+    expect(elapsedOf(script, sceneEnd(script))).toBe(3500)
   })
 })
 

@@ -3,14 +3,15 @@ import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import type { Labels } from '@/lib/cv/labels'
-import type { Playhead, SceneScript } from '@/lib/scroll/player'
+import { actionLengths, elapsedOf, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { hop } from '@/lib/motion/arc'
 import { handAt, type ArmPivots } from '@/lib/motion/rigPose'
 import { fadeTo, focusOn, fx, lerp, r1, transformTo } from '../shared/stageNodes'
 import { propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
 import type { Room } from './rooms'
-import { Pursuer, Shape } from './foes'
+import { Shape } from './foes'
+import { PACES, PURSUER_POSES, Pursuer, mixPose, posePursuer, pursuerAt, stride, type PursuerPose, type PursuerPoseName } from './pursuer'
 import { SH } from './palette'
 import { CROUCH, GUARD, aim, block, kick, mix, pull, raiseLight, reach, read, run, shove, sweep, turn, walk, type SurvivorPose } from './pose'
 
@@ -21,11 +22,12 @@ import { CROUCH, GUARD, aim, block, kick, mix, pull, raiseLight, reach, read, ru
 // walks up to the notes pinned on the study wall and reads one by its light. Work: he walks to a filing
 // cabinet and pulls a drawer out toward him, a file in his hand. Tech: he shoves a crate along the corridor
 // and climbs onto it toward the high window. Services: he turns a lock's dials and the shackle springs open.
-// Projects: a shape lurches out of the dark, he spends one shot on it, and behind him the pursuer steps out
-// of the wall. Ventures: he runs from the pursuer and vaults the fallen cabinet it stops at. Bands: he lights
-// the gallery's first lamp and the rest light down the hall. Muay Thai: a shape lunges, he blocks, then
-// kicks it down, the camera pushed in. Contact: he runs through the door of the lit room and shuts it, and the
-// pursuer stops outside it. Projects, ventures and contact are one chase: it appears, he runs, he gets in.
+// Projects: a shape lurches out of the dark, he spends one shot on it, and behind him the pursuer stomps out
+// of the wall. Ventures: the pursuer rushes him, he vaults the fallen cabinet and it lunges over it, a hand
+// short. Bands: he lights the gallery's first lamp and the rest light down the hall. Muay Thai: a shape
+// lunges, he blocks, then kicks it down, the camera pushed in. Contact: he runs through the door of the lit
+// room and shuts it, and the pursuer rushes up and hammers on it. Projects, ventures and contact are one
+// chase: it appears, he runs, he gets in. The pursuer (./pursuer) always comes on at one steady speed.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -75,8 +77,35 @@ const muzzle = ({ x, y, k, pose }: SurvivorState): readonly [number, number] => 
   return [x + (hx - 52) * k, y + (hy - 144 + pose.rise) * k]
 }
 
-/** The pursuer as a group at `x`, facing right after him when `after`, else left toward him. */
-const pursuerAt = (x: number, after: boolean, bob = 0): string => `translate(${r1(x)} ${r1(GROUND - bob)}) scale(${after ? -K : K} ${K})`
+// The pursuer's paces, in room units a second: it walks out of the dark, then rushes him faster than he
+// runs, always at one steady speed, never eased, so its stomps keep time with the floor it covers.
+const WALK_SPEED = 22
+const RUSH_SPEED = 70
+
+/** Where it is `ms` into the scene when it comes on at `speed` and stops at `stop` at `arriveMs`. */
+const comingOn = (stop: number, arriveMs: number, speed: number, ms: number): number => stop - (speed * Math.max(0, arriveMs - ms)) / 1000
+
+/** What it does once it stops: each move a pose reached over its ms, in order, from the pose it stopped in. */
+function then(from: PursuerPose, moves: readonly (readonly [PursuerPoseName, number])[], ms: number): PursuerPose {
+  let pose = from
+  let left = ms
+  for (const [name, length] of moves) {
+    if (left < length) return mixPose(pose, PURSUER_POSES[name], Math.max(0, left) / length)
+    pose = PURSUER_POSES[name]
+    left -= length
+  }
+  return pose
+}
+
+/** The pursuer at `x` in `pose`, written to its stage nodes. */
+function pursuerWriter(stage: StageNodes): (x: number, pose: PursuerPose) => void {
+  const node = fx(stage, 'pursuer')
+  const posed = posePursuer(stage)
+  return (x, pose) => {
+    transformTo(node, pursuerAt(x, GROUND, K))
+    posed(pose)
+  }
+}
 
 // ---------------------------------------------------------------- the hero: the flashlight on
 
@@ -294,12 +323,14 @@ const services: SceneDef = {
 
 const SHAPE_K = 0.8
 
+const PROJECTS_SCRIPT: SceneScript = [2200, 2200]
+
 const projects: SceneDef = {
   room: 'projects',
-  script: [2200, 2200],
+  script: PROJECTS_SCRIPT,
   back: (layout) => (
     <>
-      <g data-fx="pursuer" transform={pursuerAt(at(layout, 0.02), true)} opacity={0}>
+      <g data-fx="pursuer" transform={pursuerAt(at(layout, -0.05), GROUND, K)} opacity={0}>
         <Pursuer />
       </g>
       <g data-fx="shape" transform={`translate(${r1(at(layout, 1.1))} ${GROUND}) scale(${SHAPE_K})`} opacity={0}>
@@ -312,17 +343,25 @@ const projects: SceneDef = {
     const shape = fx(stage, 'shape')
     const flash = fx(stage, 'flash')
     const pursuer = fx(stage, 'pursuer')
+    const placePursuer = pursuerWriter(stage)
     const x = at(layout, 0.48)
+    // it steps out of the wall at the second action and walks up behind him, then stands
+    const [shotMs] = actionLengths(PROJECTS_SCRIPT)
+    const out = at(layout, -0.05)
+    const stop = at(layout, 0.12)
+    const arrive = shotMs + ((stop - out) / WALK_SPEED) * 1000
     return (_p, _f, play = START) => {
       const shot = share(play, 0)
       const appears = share(play, 1)
+      const ms = elapsedOf(PROJECTS_SCRIPT, play)
       const near = ramp(shot, 0, 0.5)
       const recoil = ramp(shot, 0.55, 0.6) * (1 - ramp(shot, 0.6, 0.8))
       const down = ramp(shot, 0.6, 0.85)
       transformTo(shape, `translate(${r1(lerp(at(layout, 1.1), at(layout, 0.86), near))} ${GROUND}) rotate(${r1(80 * down)}) scale(${SHAPE_K})`)
       fadeTo(shape, (0.4 + 0.6 * near) * (1 - 0.5 * down))
-      fadeTo(pursuer, appears)
-      transformTo(pursuer, pursuerAt(lerp(at(layout, -0.05), at(layout, 0.12), appears), true))
+      const walked = Math.max(out, comingOn(stop, arrive, WALK_SPEED, ms))
+      fadeTo(pursuer, ramp(ms, shotMs, shotMs + 600))
+      placePursuer(walked, then(stride(PACES.walk, walked, K), [['stand', 400]], ms - arrive))
       const pose = { ...aim(ramp(shot, 0.1, 0.45)), foreRight: -4 - 20 * recoil }
       const state = him(x, play.action === 0 ? pose : mix(aim(1), raiseLight(1), appears))
       const [mx, my] = muzzle(state)
@@ -347,26 +386,37 @@ function Debris({ x }: { x: number }) {
 
 const debrisAt = (layout: Layout): number => at(layout, 0.52)
 
+/** How long the pursuer's lunge over the cabinet takes. */
+const LUNGE_MS = 500
+
+const VENTURES_SCRIPT: SceneScript = [2000, 1800]
+
 const ventures: SceneDef = {
   room: 'ventures',
-  script: [2000, 1800],
+  script: VENTURES_SCRIPT,
   back: (layout) => (
-    <g data-fx="pursuer" transform={pursuerAt(at(layout, -0.05), true)}>
-      <Pursuer />
+    <g data-fx="pursuer" transform={pursuerAt(debrisAt(layout) - 26, GROUND, K)}>
+      <Pursuer row={PURSUER_POSES.lunge} />
     </g>
   ),
   front: (layout) => <Debris x={debrisAt(layout)} />,
   bind: (stage, layout) => {
-    const pursuer = fx(stage, 'pursuer')
+    const placePursuer = pursuerWriter(stage)
     const debris = debrisAt(layout)
     const from = at(layout, 0.15)
     const before = debris - 22
     const after = at(layout, 0.96)
+    // it rushes him the whole scene at one speed, kept behind him, and reaches the cabinet once he is over,
+    // in time for its lunge to end with the scene
+    const [runMs, vaultMs] = actionLengths(VENTURES_SCRIPT)
+    const stop = debris - 26
+    const arrive = runMs + vaultMs - LUNGE_MS
     return (_p, _f, play = START) => {
       const fled = share(play, 0)
       const vaulted = share(play, 1)
-      const chased = lerp(at(layout, -0.05), debris - 48, (fled + vaulted) / 2)
-      transformTo(pursuer, pursuerAt(chased, true, hop(((fled + vaulted) * 4) % 1, 2)))
+      const ms = elapsedOf(VENTURES_SCRIPT, play)
+      const chased = comingOn(stop, arrive, RUSH_SPEED, ms)
+      placePursuer(chased, then(stride(PACES.rush, chased, K), [['lunge', LUNGE_MS]], ms - arrive))
       if (play.action === 0) return him(lerp(from, before, fled), run(fled * 5))
       const over = ramp(vaulted, 0, 0.5)
       const pose = vaulted < 0.5 ? mix(run(0), CROUCH, Math.sin(over * Math.PI) * 0.7) : run(4 + vaulted * 3)
@@ -468,28 +518,34 @@ function LitDoor({ x }: { x: number }) {
   )
 }
 
+const CONTACT_SCRIPT: SceneScript = [2200, 1800]
+
 const contact: SceneDef = {
   room: 'contact',
-  script: [2200, 1800],
+  script: CONTACT_SCRIPT,
   back: (layout) => <LitDoor x={doorAt(layout)} />,
   front: (layout) => (
-    <g data-fx="pursuer" transform={pursuerAt(at(layout, -0.1), true)} opacity={0}>
-      <Pursuer />
+    <g data-fx="pursuer" transform={pursuerAt(doorAt(layout) - 40, GROUND, K)}>
+      <Pursuer row={PURSUER_POSES.pound} />
     </g>
   ),
   bind: (stage, layout) => {
     const leaf = fx(stage, 'leaf')
-    const pursuer = fx(stage, 'pursuer')
+    const placePursuer = pursuerWriter(stage)
     const door = doorAt(layout)
     const hinge = door + 20
     const from = at(layout, 0.05)
+    // it rushes in behind him at one speed, reaches the door just after it shuts, raises a fist and hammers it
+    const [runMs] = actionLengths(CONTACT_SCRIPT)
+    const stop = door - 40
+    const arrive = runMs + 400
     return (_p, _f, play = START) => {
       const ran = share(play, 0)
-      const stopped = share(play, 1)
       const open = ramp(ran, 0.45, 0.65) * (1 - ramp(ran, 0.85, 1))
       transformTo(leaf, `translate(${hinge} 0) scale(${(1 - 0.85 * open).toFixed(3)} 1) translate(${-hinge} 0)`)
-      fadeTo(pursuer, ramp(stopped, 0, 0.3))
-      transformTo(pursuer, pursuerAt(lerp(at(layout, -0.1), door - 46, ramp(stopped, 0, 0.8)), true, hop((stopped * 3) % 1, 2) * (1 - ramp(stopped, 0.7, 0.8))))
+      const ms = elapsedOf(CONTACT_SCRIPT, play)
+      const chased = comingOn(stop, arrive, RUSH_SPEED, ms)
+      placePursuer(chased, then(stride(PACES.rush, chased, K), [['raise', 350], ['pound', 250]], ms - arrive))
       const x = lerp(from, door + 4, ran)
       const inside = ramp(ran, 0.7, 0.85)
       return him(x, run(ran * 6), GROUND, 1 - inside)

@@ -65,6 +65,16 @@ export function playheadAt(script: SceneScript, elapsedMs: number): Playhead {
   return sceneEnd(script)
 }
 
+/** The time before the ease: the t that easeInOut turns into `eased`. */
+const uneased = (eased: number): number => (eased < 0.5 ? Math.cbrt(eased / 4) : 1 - Math.cbrt(2 * (1 - eased)) / 2)
+
+/** How long the scene has played at `play`, in ms: the even clock behind the eased playhead, for a thing that moves at a steady pace. */
+export function elapsedOf(script: SceneScript, { action, t }: Playhead): number {
+  const lengths = actionLengths(script)
+  const before = lengths.slice(0, action).reduce((sum, ms) => sum + ms, 0)
+  return before + uneased(t) * lengths[action]
+}
+
 /** The clock once the stage is `vis` visible at `now`: started on arrival, never again. */
 export const arrive = (clock: SceneClock, vis: number, now: number): SceneClock => (clock.startedAt === null && vis >= ARRIVE_VIS ? { startedAt: now } : clock)
 
