@@ -26,7 +26,32 @@
   transform-origin: 0 0;
 }
 
-/* ---- held angles ---- */
+/* ---- held angles: side on in his low stance, the knees bent and the long arms hanging a little ahead; the near
+   arm raised forward and up for the wave ---- */
+
+.figure .thighRight {
+  transform: rotate(-14deg);
+}
+
+.figure .shinRight {
+  transform: rotate(18deg);
+}
+
+.figure .thighLeft {
+  transform: rotate(10deg);
+}
+
+.figure .shinLeft {
+  transform: rotate(12deg);
+}
+
+.figure .armRight {
+  transform: rotate(-10deg);
+}
+
+.figure .armLeft {
+  transform: rotate(6deg);
+}
 
 .figure[data-pose='wave'] .armRight {
   transform: rotate(-150deg);

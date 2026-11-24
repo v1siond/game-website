@@ -104,7 +104,10 @@ export default function TropicalPlatformerTheme() {
       <Canopy />
 
       <div ref={textRef} className="relative z-20">
-        <header data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-16 pt-10 sm:px-8 sm:pt-16 md:px-20">
+        {/* On a phone the name and card start most of a screen down, so the blast barrel firing him onto the trail
+            plays in view first (the reduced motion still shows there), and the outfit fan below the card keeps
+            its room clear of the profession plates. */}
+        <header data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-16 pt-10 max-md:pb-48 max-md:pt-[62svh] sm:px-8 sm:pt-16 md:px-20">
           {reduced && <JungleStage scene={scenes[0]} settled />}
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
@@ -142,7 +145,9 @@ export default function TropicalPlatformerTheme() {
             ))}
           </ProfessionRegion>
 
-          <section data-scene={contact.id} className="relative mx-auto max-w-3xl px-4 pb-8 pt-[60svh] motion-reduce:pt-16" aria-labelledby={CONTACT_HEADING}>
+          {/* The space under the contact card lets its scene, the jump for the last letter and the four lighting, play
+            out before the page ends. */}
+          <section data-scene={contact.id} className="relative mx-auto max-w-3xl px-4 pb-[70svh] pt-[60svh] motion-reduce:pb-8 motion-reduce:pt-16" aria-labelledby={CONTACT_HEADING}>
             {reduced && <JungleStage scene={contact} settled />}
             <PostsGate>
               <div className="relative">

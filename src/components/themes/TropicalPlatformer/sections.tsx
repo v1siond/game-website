@@ -238,7 +238,7 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <JungleStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-6 motion-reduce:min-h-[70svh]">
+      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-6 max-md:min-h-[130svh] motion-reduce:min-h-[70svh]">
         <LevelSign id={id} title={title} />
       </header>
       <div className="relative max-w-[42rem]">
