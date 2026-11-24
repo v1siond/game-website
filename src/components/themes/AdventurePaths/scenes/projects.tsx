@@ -15,8 +15,10 @@ import { mapWriter } from './worldMap'
 // fish leaps behind him and jumps out onto the dry shore ledge by the exit door; the sleeper turns back to its
 // bed. A slow gold fish swims back and forth through it all. Our own fish, seaweed and coins.
 
-// The water's surface, the shore ledge's top (dry, just above it) and where the ledge starts past him.
-const SURFACE = 300
+// The water's surface, the shore ledge's top (dry, just above it) and where the ledge starts past him. The
+// surface sits low enough that the door and him standing on the ledge stay clear of the top bar once the
+// layers push in.
+const SURFACE = 440
 const SHORE_Y = SURFACE - 10
 const SHORE = 315
 
@@ -27,9 +29,9 @@ const BESIDE_DOOR = 90
 
 // Where his feet go under water: the depth he dives to, the deepest point of his swim (over the sleeper) and
 // where he ends it; how far a stroke lifts him and how many he takes.
-const DIVE_Y = 560
-const DEEP_Y = 720
-const SWIM_END_Y = 640
+const DIVE_Y = 620
+const DEEP_Y = 770
+const SWIM_END_Y = 690
 const LIFT = 70
 const STROKES = 4
 
@@ -46,7 +48,7 @@ const OUT_Y = SURFACE + HERO_TALL * 0.4
 
 // The sleeper's bed on the lake floor, and the slow swimmer's depth.
 const BED_Y = GROUND - 46
-const SWIMMER_Y = 440
+const SWIMMER_Y = 540
 
 /** The quick lift then the slow sink of one stroke over its own time u: 0 to `LIFT` up in the first quarter, back down over the rest. */
 const strokeLift = (u: number): number => LIFT * (u < 0.25 ? u / 0.25 : 1 - (u - 0.25) / 0.75)
@@ -353,7 +355,7 @@ export const projects: Level = {
           hero(lerp(end.x, exitX, climb), lerp(end.y, OUT_Y, climb) - strokeLift(stroke) * (1 - climb), stroke < 0.25 ? 'strokeA' : 'strokeB', false, stroke < 0.25 ? -10 : 0)
           return
         }
-        hero(lerp(exitX, shore + reach(input, DOOR) - BESIDE_DOOR, out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 220), out < 1 ? 'jump' : 'stand')
+        hero(lerp(exitX, shore + reach(input, DOOR) - BESIDE_DOOR, out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 150), out < 1 ? 'jump' : 'stand')
         return
       }
 
