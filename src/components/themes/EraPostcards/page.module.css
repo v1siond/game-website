@@ -622,8 +622,9 @@
     padding: 0 16px 60svh;
   }
 
+  /* the era's scene plays and holds for most of a screen before the title and the cards come up over it */
   .head {
-    min-height: 115svh;
+    min-height: 130svh;
     padding-bottom: 10svh;
   }
 

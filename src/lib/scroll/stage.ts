@@ -77,30 +77,35 @@ export interface StageState {
 
 // A section's actions play from its stage's arrival (this many screens before its top reaches the screen's
 // top) over this many screens of scroll, ended while the section is still in view: by the time half a screen
-// of it is left, or for the last one by the page's end.
+// of it is left, or for the last one by the page's end. A phone's cards cover the whole width once they come
+// up, so there they play over a shorter scroll, done while the head still holds the room alone.
 const PLAY_FROM = -0.25
 const PLAY_SCREENS = 1.2
+const PHONE_PLAY_SCREENS = 0.55
 const PLAY_LEFT_SCREENS = 0.5
 // The hero plays its actions over this much of the first screen.
 const HERO_PLAY_SCREENS = 0.6
 
-function playSpan(span: StageSpan, viewport: number, last: boolean): readonly [number, number] {
+function playSpan(span: StageSpan, viewport: number, last: boolean, phone: boolean): readonly [number, number] {
   const start = span.top + PLAY_FROM * viewport
   const latest = last ? span.bottom - viewport : span.bottom - PLAY_LEFT_SCREENS * viewport
-  return [start, Math.max(start + 1, Math.min(start + PLAY_SCREENS * viewport, latest))]
+  const length = (phone ? PHONE_PLAY_SCREENS : PLAY_SCREENS) * viewport
+  return [start, Math.max(start + 1, Math.min(start + length, latest))]
 }
 
 interface StageOptions {
   /** The last stage's scene runs to the end of the page, where its progress reaches 1. */
   last?: boolean
+  /** A phone plays the scene's actions over a shorter scroll. */
+  phone?: boolean
   handover?: Handover
 }
 
-export function stageState(span: StageSpan, position: number, viewport: number, { last = false, handover = HANDOVER }: StageOptions = {}): StageState {
+export function stageState(span: StageSpan, position: number, viewport: number, { last = false, phone = false, handover = HANDOVER }: StageOptions = {}): StageState {
   const start = span.top + handover.inFrom * viewport
   const rise = ramp(position, start, span.top + handover.inTo * viewport)
   const end = last ? span.bottom - viewport : span.bottom + handover.outTo * viewport
-  const [playFrom, playTo] = playSpan(span, viewport, last)
+  const [playFrom, playTo] = playSpan(span, viewport, last, phone)
   return { vis: rise, progress: ramp(position, start, end), play: ramp(position, playFrom, playTo) }
 }
 

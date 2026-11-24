@@ -56,8 +56,8 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound => {
   }
 }
 
-const stateOf = (bound: Bound, position: number, viewport: number, last: boolean): StageState =>
-  bound.scene.id === 'hero' ? heroState(position, viewport) : stageState(bound.span, position, viewport, { last })
+const stateOf = (bound: Bound, position: number, viewport: number, last: boolean, phone: boolean): StageState =>
+  bound.scene.id === 'hero' ? heroState(position, viewport) : stageState(bound.span, position, viewport, { last, phone })
 
 const show = (bound: Bound, visible: boolean): void => {
   if (bound.shown === visible) return
@@ -110,7 +110,7 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
       settleText(lag)
       const all = bound.current
       const now = performance.now()
-      const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1))
+      const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1, phone))
       const cross = crossOf(states.map((state) => state.vis))
       let playing = false
       all.forEach((each, i) => {

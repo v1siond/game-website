@@ -156,6 +156,12 @@ describe('the scroll that plays a scene', () => {
     expect(stageState(short, short.bottom - 0.5 * VIEWPORT, VIEWPORT).play).toBe(1)
   })
 
+  it('plays it over a shorter scroll on a phone, done while the head still holds the room alone', () => {
+    expect(stageState(tall, 5000 - 0.25 * VIEWPORT, VIEWPORT, { phone: true }).play).toBe(0)
+    expect(stageState(tall, 5000 + 0.3 * VIEWPORT, VIEWPORT, { phone: true }).play).toBe(1)
+    expect(stageState(tall, 5000 + 0.3 * VIEWPORT, VIEWPORT).play).toBeLessThan(1)
+  })
+
   it('plays the last section through by the end of the page', () => {
     const last = { top: 5000, bottom: 5900 }
     expect(stageState(last, last.bottom - VIEWPORT, VIEWPORT, { last: true }).play).toBe(1)
