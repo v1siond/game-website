@@ -722,6 +722,9 @@ const bands: SceneDef = {
   },
 }
 
+/** Him and the dummy on the sparring screen: smaller on a phone, so both stand inside its view. */
+const sparSize = ({ phone }: Layout): number => (phone ? 0.8 : 1)
+
 // Muay Thai, sparring on the battle screen: the attack bar's slider runs and stops on its centre, then he
 // lands a knee and a kick on the dummy, which shakes under a white flash.
 const muayThai: SceneDef = {
@@ -732,7 +735,7 @@ const muayThai: SceneDef = {
     const { bx, w, top } = boxOf(layout)
     return (
       <BattleScreen layout={layout}>
-        <g data-fx="dummy" transform={`translate(${bx + 70} ${top - 10})`}>
+        <g data-fx="dummy" transform={`translate(${bx + 70} ${top - 10}) scale(${sparSize(layout)})`}>
           <Dummy />
         </g>
         <rect data-fx="hit" x={bx + 20} y={top - 190} width={100} height={180} fill={RPG.border} opacity={0} />
@@ -747,6 +750,7 @@ const muayThai: SceneDef = {
     const hit = fx(stage, 'hit')
     const slider = fx(stage, 'slider')
     const { bx, w, top } = boxOf(layout)
+    const size = sparSize(layout)
     const stand = bx - 90
     return (_p, _f, play = START) => {
       const aimed = share(play, 0)
@@ -755,10 +759,10 @@ const muayThai: SceneDef = {
       const knee = bell(struck, 0.15, 0.45)
       const kick = bell(struck, 0.5, 0.85)
       const shake = Math.max(knee, kick)
-      transformTo(dummy, `translate(${bx + 70} ${top - 10}) rotate(${r1(8 * shake + 6 * ramp(struck, 0.7, 1))})`)
+      transformTo(dummy, `translate(${bx + 70} ${top - 10}) scale(${size}) rotate(${r1(8 * shake + 6 * ramp(struck, 0.7, 1))})`)
       fadeTo(hit, 0.7 * Math.max(bell(struck, 0.25, 0.4), bell(struck, 0.6, 0.75)))
       const frame: Frame = struck === 0 ? 'actA' : struck < 0.45 ? 'knee' : struck < 0.9 ? 'kick' : 'standR'
-      return walker(stand + 30 * Math.max(knee, kick), frame, 1, K, top - 10)
+      return walker(stand + 30 * Math.max(knee, kick), frame, 1, K * size, top - 10)
     }
   },
 }
