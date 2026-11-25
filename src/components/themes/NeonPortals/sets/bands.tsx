@@ -1,11 +1,11 @@
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp, r1, transformTo } from '../../shared/stageNodes'
-import { sideOn } from '../motion'
+import { sideOn, YAW } from '../motion'
 import { READY } from '../sidePose'
 import { INK } from './cast'
 import { Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, type SetPiece } from './kit'
 
-// Bands, the sky (research notes, the plane levels: a biplane brings the blimps down one by one, enemy planes
+// Bands, the fourth room's sky (research notes, the plane levels: a biplane brings the blimps down one by one, enemy planes
 // coming at it from the front [24] [31] [1]): an old country of patchwork fields under a sky of clouds, our
 // own era with no markings. 1 take off: he climbs into the biplane on the strip and lifts off. 2 fire: he
 // shoots the blimps down one by one on a drum fill, the bursts coming closer and closer together. 3 loop: he
@@ -104,6 +104,7 @@ function Country() {
 
 export const bands: SetPiece = {
   script: [1300, 2000, 1500],
+  focus: 380,
   sky: ['#7ec4ee', '#f8e4b4'],
   art: () => (
     <>
@@ -143,7 +144,7 @@ export const bands: SetPiece = {
       transformTo(propeller, `translate(80 0) scale(1 ${Math.cos(u * 60).toFixed(2)}) translate(-80 0)`)
       // him in the cockpit: climbing in on the strip, then at the stick, leant into the climb
       const climbIn = ramp(u, 0, 0.12)
-      pose({ x: -50, y: lerp(30, 4, climbIn), s: 0.55, move: sideOn({ ...READY, armRight: -70, foreRight: -40, armLeft: -60, foreLeft: -50, head: -6 * bell(u, 0.4, 1) }, 1) })
+      pose({ x: -50, y: lerp(30, 4, climbIn), s: 0.55, move: sideOn({ ...READY, armRight: -70, foreRight: -40, armLeft: -60, foreLeft: -50, head: -6 * bell(u, 0.4, 1) }, YAW.right) })
       guard(-104, -92, u)
 
       // the blimps drift, and each falls on its last stroke of the fill, smoking, gone

@@ -3,9 +3,8 @@ import { fadeTo } from '../../shared/stageNodes'
 import { Cottage, Goat, Toad } from './cast'
 import { along, placeTo } from './kit'
 
-// The village of the run's first era (research notes, the medieval village [8] [13]), shared by About and the
-// time trial that replays it (Ventures): a sunny road of stone into the distance between thatched cottages,
-// goats and toads at its edges, seen from behind him as he runs into the screen. The cottages, the fence
+// The village of the first room's first level (research notes, the medieval village [8] [13]), About's place:
+// a sunny road of stone into the distance between thatched cottages, goats and toads at its edges, seen from behind him as he runs into the screen. The cottages, the fence
 // and the road's stones stream toward the camera as he goes; `travel` is how far he has run.
 
 /** The road's vanishing point and its near end, where his feet are. */

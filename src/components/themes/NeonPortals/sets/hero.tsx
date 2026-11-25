@@ -1,7 +1,7 @@
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp } from '../../shared/stageNodes'
-import { sideOn, THREE_QUARTER } from '../motion'
+import { GUARD, sideOn, YAW } from '../motion'
 import { AIR, BOUNCE, land, READY, REST } from '../sidePose'
 import { seeded } from '../world'
 import { Fortress, FlameTrail, PortalRing, Storm } from './cast'
@@ -11,13 +11,17 @@ import { Glow, Hero, heroOf, part, placeTo, type SetPiece } from './kit'
 // jungle coast, and on the beach the round pad of the time machine with its first portal dark. 1 the
 // clockmaker's sky fortress streaks down in flames and crashes beyond the surf; the living storm it held
 // rises out of the wreck and dives into the portal. 2 he looks up at the trail it burned across the sky.
-// 3 he leaps onto the pad and the first portal lights. The end frame: him on the pad, the portal glowing.
+// 3 he leaps onto the pad and the first portal lights. He watches side on, the crash to his right, leaps
+// across side on, and on the pad turns round to us. The end frame: him on the pad, his face to us, the
+// portal glowing.
 
 const START = 300
 const PAD = { x: 462, y: 392 }
 const PORTAL = { x: 552, y: 262, r: 78 }
 const SKY_FROM = { x: -300, y: -330 }
 const CRASH = { x: 420, y: 300 }
+// On the pad he turns to face us, a little toward the portal.
+const ON_PAD = YAW.front - 20
 // The fortress's heading as it falls, in degrees, for its trail.
 const HEADING = (Math.atan2(CRASH.y - SKY_FROM.y, CRASH.x - SKY_FROM.x) * 180) / Math.PI
 
@@ -71,6 +75,7 @@ function Beach() {
 
 export const hero: SetPiece = {
   script: [1800, 1200, 1600],
+  focus: START,
   sky: ['#0b0a2a', '#3a2160'],
   art: () => (
     <>
@@ -119,21 +124,21 @@ export const hero: SetPiece = {
         const flinch = bell(u, 0.6, 0.9)
         const look = ramp(u, 1.05, 1.5)
         const side = { ...mix(REST, { ...REST, armRight: -150, foreRight: -105 }, look), head: -24 * look, stretch: -0.08 * flinch }
-        pose({ x: START + 18 * ramp(u, 1, 1.6), y: 400, move: sideOn(side, THREE_QUARTER) })
+        pose({ x: START + 18 * ramp(u, 1, 1.6), y: 400, move: sideOn(side, YAW.right) })
         return
       }
       const crouch = ramp(u, 2, 2.15)
       const air = ramp(u, 2.15, 2.72)
       const from = START + 18
       if (air <= 0) {
-        pose({ x: from, y: 400, move: sideOn(mix(REST, BOUNCE, crouch), 1) })
+        pose({ x: from, y: 400, move: sideOn(mix(REST, BOUNCE, crouch), YAW.right) })
         return
       }
       if (air < 1) {
-        pose({ x: lerp(from, PAD.x, air), y: lerp(400, PAD.y, air) - 150 * Math.sin(Math.PI * air), move: sideOn(AIR, 1) })
+        pose({ x: lerp(from, PAD.x, air), y: lerp(400, PAD.y, air) - 150 * Math.sin(Math.PI * air), move: sideOn(AIR, YAW.right) })
         return
       }
-      pose({ x: PAD.x, y: PAD.y, move: sideOn(land(ramp(u, 2.72, 3), READY), lerp(1, THREE_QUARTER, ramp(u, 2.8, 3))) })
+      pose({ x: PAD.x, y: PAD.y, move: { ...sideOn(land(ramp(u, 2.72, 3), READY), YAW.right), pose: GUARD, yaw: lerp(YAW.right, ON_PAD, ramp(u, 2.8, 3)) } })
     }
   },
 }

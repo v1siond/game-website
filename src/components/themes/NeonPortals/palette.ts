@@ -7,8 +7,8 @@ import { paletteVars } from '../shared/paletteVars'
 //
 // Every text pair is on an opaque panel, never on the art. WCAG ratio, measured with contrast.py:
 // INK on PANEL 16.9:1, on RAISED 15.6:1; MUTED on PANEL 11.3:1, on RAISED 10.5:1; WHITE on PANEL 19.1:1;
-// PANEL on GOLD 13.3:1; each era's tint (ERA_TINT_SHARE of the way from a1 to white) 9.8:1 or more on
-// PANEL and 9.0:1 or more on RAISED, the trial's the lowest, and PANEL on a tint (the lit button) the
+// PANEL on GOLD 13.3:1; each era's tint (ERA_TINT_SHARE of the way from a1 to white) 10.6:1 or more on
+// PANEL and 9.8:1 or more on RAISED, the highway's the lowest, and PANEL on a tint (the lit button) the
 // same. AAA (7:1) everywhere.
 export const PORTAL = {
   VOID: '#070418',
@@ -44,10 +44,10 @@ export const ERAS = {
   hub: { a1: '#5cf2ff', a2: '#b88cff', wall: '#0d0828', shape: 'ellipse' },
   village: { a1: '#ffc35c', a2: '#8ff06a', wall: '#1a1006', shape: 'arch' },
   swamp: { a1: '#ff8a3d', a2: '#ff4a3d', wall: '#1c0a04', shape: 'pointed' },
-  deepSea: { a1: '#4fd8ff', a2: '#3dffd2', wall: '#04121c', shape: 'hex' },
   highway: { a1: '#ff5db8', a2: '#ffa24c', wall: '#1e0716', shape: 'rounded' },
   colosseum: { a1: '#ffd166', a2: '#43f5e4', wall: '#171006', shape: 'trapezoid' },
-  trial: { a1: '#6cf0ff', a2: '#ffd34d', wall: '#071418', shape: 'chamfer' },
+  glass: { a1: '#4fd8ff', a2: '#ff8a3d', wall: '#04121c', shape: 'hex' },
+  tower: { a1: '#5ff0c8', a2: '#ffd34d', wall: '#071418', shape: 'chamfer' },
   sky: { a1: '#9fd4ff', a2: '#ff8f5a', wall: '#0a1226', shape: 'chamfer' },
   core: { a1: '#ff6bf2', a2: '#ffd34d', wall: '#160626', shape: 'gable' },
   saved: { a1: '#e8fbff', a2: '#5cf2ff', wall: '#071420', shape: 'ellipse' },

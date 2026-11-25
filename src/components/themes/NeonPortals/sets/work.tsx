@@ -1,17 +1,17 @@
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp, transformTo } from '../../shared/stageNodes'
-import { fromBehind, IDLE, mixPose, runPose, sideOn, THREE_QUARTER, type Move } from '../motion'
-import { AIR, land, READY, run as sideRun } from '../sidePose'
+import { fromBehind, fromFront, GUARD, IDLE, mixPose, runPose, tucked, YAW, type Move } from '../motion'
+import { READY } from '../sidePose'
 import { INK } from './cast'
 import { along, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
 // Work, the chase (research notes, the prehistoric levels where a giant beast chases him over lava and
 // fallen trees [11] [18]; the series' signature run reversed, at the viewer [35]): a swamp under a smoking
 // volcano, giant ferns, a pool of lava across the near ground. 1 turn: he runs into the screen, the ground
-// shakes, a horned beast the size of a house bursts out of the ferns ahead, and he skids and turns. 2 flee:
-// he runs straight at the camera, the beast filling the frame behind him. 3 leap: he double jumps the lava
-// and the beast stops at its edge. The end frame: him safe on the near bank, the beast snorting across the
-// lava.
+// shakes, a horned beast the size of a house bursts out of the ferns ahead, and he skids and turns round
+// (his back, his side, his front). 2 flee: he runs straight at the camera, his face to us, the beast filling
+// the frame behind him. 3 leap: he double jumps the lava toward us and the beast stops at its edge. The end
+// frame: him safe on the near bank facing us, the beast snorting across the lava.
 
 const ROAD = { vx: 330, vy: 196, near: 455 }
 const LAVA = { far: 95, near: 22 }
@@ -30,17 +30,18 @@ function heroZ(u: number): number {
 /** The beast's depth: out of the ferns, after him, stopped at the lava's far edge. */
 const beastZ = (u: number): number => (u < 1 ? lerp(900, 700, ramp(u, 0.45, 0.75)) : lerp(700, 150, ramp(u, 1, 2.45)))
 
-/** His move at `u`, the stride at `phase`. */
+/** His move at `u`, the stride at `phase`: his back running in, the skid, the turn round toward the beast's
+ *  side, his front running out at us, the double jump and the landing. */
 function moveAt(u: number, phase: number): Move {
   if (u < 0.5) return fromBehind(runPose(phase))
   if (u < 0.75) return fromBehind({ ...mixPose(runPose(phase), IDLE, ramp(u, 0.5, 0.6)), lean: -10 * bell(u, 0.5, 0.75) })
   if (u < 1) {
     const turn = ramp(u, 0.75, 0.98)
-    return { pose: { ...IDLE, look: turn }, side: READY, facing: -THREE_QUARTER }
+    return { pose: mixPose(IDLE, GUARD, turn), side: READY, yaw: lerp(YAW.back, -YAW.front, turn) }
   }
-  if (u < 2) return sideOn(sideRun(phase / Math.PI), -THREE_QUARTER)
-  if (u < 2.72) return sideOn(AIR, -THREE_QUARTER)
-  return sideOn(land(ramp(u, 2.72, 3), READY), -THREE_QUARTER)
+  if (u < 2) return fromFront(runPose(phase))
+  if (u < 2.72) return fromFront(tucked(0))
+  return fromFront(mixPose(tucked(0), GUARD, ramp(u, 2.72, 2.9)))
 }
 
 /** His height over a hop of the double jump. */
@@ -124,6 +125,7 @@ function Swamp() {
 
 export const work: SetPiece = {
   script: [1300, 2000, 1500],
+  focus: ROAD.vx,
   sky: ['#f08a4a', '#f4d48a'],
   art: () => (
     <>

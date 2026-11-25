@@ -11,9 +11,9 @@ import { applyPose, FIGURE_BOX, FIGURE_RASTER, Runner, runnerParts } from '../ru
 // three actions (src/lib/scroll/player.ts); `u` is the action playing plus how far it has played (0 to 3),
 // so every frame is a function of the playhead alone and reads the same played backward, and the end of the
 // last action is the frame reduced motion shows. He is the corridor's runner (runner.tsx), drawn once per
-// set: from behind when he runs into the screen, side on for the moves that show him whole, turned three
-// quarters to the camera when he runs at it. From About on the firefly guardian, our own small creature,
-// rides at his shoulder.
+// set and turned the way he moves (motion.ts): his back when he runs into the screen, his front when he runs
+// at the camera, his side when he runs across it, and every spin a turn in depth. From About on the firefly
+// guardian, our own small creature, rides at his shoulder.
 
 /** What a set piece knows of the page: the profession shown and how many cards its section has. */
 export interface SetInput {
@@ -30,6 +30,8 @@ export interface SetPiece {
   art: (input: SetInput) => ReactNode
   /** Finds the nodes it moves once and returns its writer over `u`. */
   bind: (root: Element, input: SetInput) => (u: number) => void
+  /** The middle of its action across the box, in box units, which a phone moves to the zigzag's side. */
+  focus: number
 }
 
 /** The playhead as one number: the action playing plus how far it has played. */
@@ -108,8 +110,8 @@ export function guardOf(root: Element): (x: number, y: number, u: number, shown?
   }
 }
 
-/** Where the guardian rides: just behind his shoulder, at his size. */
-export const shoulder = (x: number, y: number, s = 1, facing = 1): [number, number] => [x - 46 * s * Math.sign(facing || 1), y - 168 * s]
+/** Where the guardian rides: just behind his shoulder, at his size, `ahead` 1 when he faces right, -1 left. */
+export const shoulder = (x: number, y: number, s = 1, ahead = 1): [number, number] => [x - 46 * s * ahead, y - 168 * s]
 
 // ---- pieces ----
 

@@ -105,7 +105,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={SHAPES.pointed(w * 0.36, h * 0.3).replace(/Z$/, '')} color={e.a1} width={6} transform={`translate(0 ${r1(-h * 0.6)})`} />
     </>
   ),
-  deepSea: (w, h, e) => (
+  glass: (w, h, e) => (
     <>
       {[
         [-0.56, 0.3],
@@ -133,7 +133,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <circle cx={0} cy={r1(-h / 2 - 110)} r={18} fill={e.a2} />
     </>
   ),
-  trial: (w, h, e) => {
+  tower: (w, h, e) => {
     const teeth = Array.from({ length: 11 }, (_, i) => {
       const x = -w * 0.5 + (i * w) / 10
       return `M ${r1(x - 60)} ${r1(-h / 2)} L ${r1(x)} ${r1(-h / 2 + 130)} L ${r1(x + 60)} ${r1(-h / 2)}`
@@ -211,7 +211,7 @@ export function gateArt(era: Era, tw: number): PlaneArt {
   )
 }
 
-// The decor that turns with the scroll: the hub's time ring, the village's star wheel, the trial
+// The decor that turns with the scroll: the hub's time ring, the village's star wheel, the tower's
 // corona, the sky's laser fan, the saved's rays. Its place and turn are in world.ts DECOR.
 const DECOR_ART: Partial<Record<Era, (tw: number) => PlaneArt>> = {
   hub: (tw) => {
@@ -251,14 +251,14 @@ const DECOR_ART: Partial<Record<Era, (tw: number) => PlaneArt>> = {
       </>,
     )
   },
-  trial: () => {
+  tower: () => {
     const r = TH * 0.2
     const rays = Array.from({ length: 16 }, (_, i) => {
       const a = (i / 16) * Math.PI * 2
       const out = r * (i % 2 ? 1.5 : 1.8)
       return `M ${r1(Math.cos(a) * r * 1.1)} ${r1(Math.sin(a) * r * 1.1)} L ${r1(Math.cos(a) * out)} ${r1(Math.sin(a) * out)}`
     }).join(' ')
-    return centred(r * 4, r * 4, <Neon d={rays} color={ERAS.trial.a1} width={6} />)
+    return centred(r * 4, r * 4, <Neon d={rays} color={ERAS.tower.a1} width={6} />)
   },
   sky: () => {
     const beams = Array.from({ length: 7 }, (_, i) => {

@@ -1,16 +1,18 @@
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp, transformTo } from '../../shared/stageNodes'
-import { sideOn, THREE_QUARTER } from '../motion'
-import { dance, READY, run as sideRun } from '../sidePose'
+import { danceFront, fromFront, sideOn, YAW } from '../motion'
+import { READY, run as sideRun } from '../sidePose'
 import { INK, PortalRing } from './cast'
 import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Contact, the ending (research notes: with every core back the machine implodes and traps the villains,
-// shrunk to infants, in a prison outside of time; the hub's save screen [1] [45]; his victory dance, C44 r4):
+// Contact, the ending and a hint of the game's real one (research notes: the machine implodes and the evil
+// spirit is trapped in a prison outside of time with the scientist and the time traveller, both shrunk to
+// infants [1]; the hub's save screen [45]; his victory dance, C44 r4):
 // the machine's hub, its ring of portals going dark one by one, and the save monitor glowing. 1 escape: the
 // passage collapses behind him and he outruns it into the hub. 2 dance: at the save monitor he does his
-// victory dance as the screen saves his run, while the villains, babies now in a floating bubble, bicker and
-// drift away. The end frame: him mid dance at the save monitor, the bubble drifting off.
+// victory dance, turned round to us, as the screen saves his run, while the clockmaker and the pendulum man,
+// babies now, and the storm shrunk to a puff bicker in a floating bubble and drift away. The end frame: him
+// mid dance at the save monitor, his face to us, the bubble drifting off.
 
 const FLOOR = 400
 const MOUTH = { x: 40, y: FLOOR }
@@ -25,17 +27,17 @@ const PORTALS = [
   [540, 120],
 ] as const
 const BUBBLE_FROM = { x: 70, y: 260 }
-const BUBBLE_TO = { x: 560, y: 70 }
+const BUBBLE_TO = { x: 400, y: 60 }
 
 /** His frame at `u`. */
 function heroAt(u: number): HeroAt {
   if (u < 1) {
     const go = ramp(u, 0.05, 0.85)
-    return { x: lerp(START, STOP, go), y: FLOOR, move: sideOn(go < 1 ? sideRun(u * 7) : READY, 1) }
+    return { x: lerp(START, STOP, go), y: FLOOR, move: sideOn(go < 1 ? sideRun(u * 7) : READY, YAW.right) }
   }
   const t = ramp(u, 1.05, 2)
-  // four swings of the dance, ending on a swing's height; he turns three quarters to the camera to dance
-  return { x: STOP, y: FLOOR, move: sideOn(dance(4 * t + 0.5 * ramp(u, 1.05, 1.2)), lerp(1, -THREE_QUARTER, ramp(u, 1.05, 1.2)), -10 * Math.abs(Math.sin(Math.PI * 4 * t))) }
+  // he turns round to us (his side, his front) and dances: four swings, ending on a swing's height
+  return { x: STOP, y: FLOOR, move: { ...fromFront(danceFront(4 * t + 0.5)), side: READY, yaw: lerp(YAW.right, YAW.front, ramp(u, 1.05, 1.2)) } }
 }
 
 function Hub() {
@@ -85,35 +87,45 @@ function Monitor() {
   )
 }
 
-/** The villains as babies in their bubble: the clockmaker with his white tuft and goggles on his brow, and
- *  the storm as a little cloud with a dummy; `data-np` baby-a and baby-b jostle. */
+/** The villains in their bubble outside of time: the clockmaker and the pendulum man as babies (his white
+ *  tuft and goggles on his brow; a tiny tall hat and a dummy), and the storm shrunk to a puff between them;
+ *  `data-np` baby-a and baby-b jostle. */
 function Bubble() {
   return (
     <g>
-      <circle r={70} fill="#c9f6ff" opacity={0.18} stroke="#e8fbff" strokeWidth={4} />
-      <path d="M-40 -40 Q-20 -58 6 -60" fill="none" stroke="#fff" strokeWidth={6} strokeLinecap="round" opacity={0.7} />
+      <circle r={78} fill="#c9f6ff" opacity={0.18} stroke="#e8fbff" strokeWidth={4} />
+      <path d="M-44 -44 Q-22 -64 6 -66" fill="none" stroke="#fff" strokeWidth={6} strokeLinecap="round" opacity={0.7} />
       <g data-np="baby-a">
-        <ellipse cx={-22} cy={18} rx={20} ry={18} fill="#f4f0ff" stroke={INK} strokeWidth={3} />
-        <circle cx={-22} cy={-12} r={20} fill="#f0c8a0" stroke={INK} strokeWidth={3} />
-        <path d="M-36 -28 C-44 -44 -30 -46 -26 -32 C-24 -48 -10 -44 -14 -30" fill="#f4f1ea" stroke={INK} strokeWidth={2} />
-        <rect x={-36} y={-26} width={28} height={8} rx={4} fill="#ffd34d" stroke={INK} strokeWidth={2} />
-        <circle cx={-28} cy={-10} r={2.5} fill={INK} />
-        <circle cx={-16} cy={-10} r={2.5} fill={INK} />
-        <path d="M-28 0 Q-22 -4 -16 0" fill="none" stroke={INK} strokeWidth={2.5} />
+        <ellipse cx={-30} cy={22} rx={20} ry={18} fill="#f4f0ff" stroke={INK} strokeWidth={3} />
+        <circle cx={-30} cy={-8} r={20} fill="#f0c8a0" stroke={INK} strokeWidth={3} />
+        <path d="M-44 -24 C-52 -40 -38 -42 -34 -28 C-32 -44 -18 -40 -22 -26" fill="#f4f1ea" stroke={INK} strokeWidth={2} />
+        <rect x={-44} y={-22} width={28} height={8} rx={4} fill="#ffd34d" stroke={INK} strokeWidth={2} />
+        <circle cx={-36} cy={-6} r={2.5} fill={INK} />
+        <circle cx={-24} cy={-6} r={2.5} fill={INK} />
+        <path d="M-36 4 Q-30 0 -24 4" fill="none" stroke={INK} strokeWidth={2.5} />
       </g>
       <g data-np="baby-b">
-        <path d="M6 10 C-4 6 -2 -12 10 -12 C12 -26 32 -28 36 -14 C50 -14 52 6 40 10 C40 22 12 24 6 10 Z" fill="#5a3a9a" stroke="#b18cff" strokeWidth={3} />
-        <circle cx={18} cy={-4} r={3} fill="#ffe14d" />
-        <circle cx={32} cy={-4} r={3} fill="#ffe14d" />
-        <circle cx={25} cy={8} r={6} fill="#ff8ac8" stroke={INK} strokeWidth={2} />
+        <ellipse cx={30} cy={24} rx={18} ry={17} fill="#1f6a66" stroke={INK} strokeWidth={3} />
+        <circle cx={30} cy={-4} r={18} fill="#e2d8c8" stroke={INK} strokeWidth={3} />
+        <rect x={20} y={-38} width={20} height={20} rx={2} fill="#16202a" stroke={INK} strokeWidth={2} />
+        <rect x={14} y={-22} width={32} height={6} rx={2} fill="#16202a" stroke={INK} strokeWidth={2} />
+        <circle cx={24} cy={-4} r={2.5} fill={INK} />
+        <circle cx={36} cy={-4} r={2.5} fill={INK} />
+        <circle cx={30} cy={8} r={5} fill="#ff8ac8" stroke={INK} strokeWidth={2} />
       </g>
-      <path data-np="squabble" d="M-6 -36 l6 -8 l4 8 l6 -8 l4 8" fill="none" stroke="#ff4a3d" strokeWidth={3} strokeLinejoin="round" />
+      <g transform="translate(0 46)">
+        <path d="M-12 6 C-20 4 -18 -8 -8 -8 C-6 -18 10 -18 12 -8 C22 -8 22 6 12 8 C10 14 -8 14 -12 6 Z" fill="#5a3a9a" stroke="#b18cff" strokeWidth={2.5} />
+        <circle cx={-4} cy={-1} r={2} fill="#ffe14d" />
+        <circle cx={6} cy={-1} r={2} fill="#ffe14d" />
+      </g>
+      <path data-np="squabble" d="M-6 -40 l6 -8 l4 8 l6 -8 l4 8" fill="none" stroke="#ff4a3d" strokeWidth={3} strokeLinejoin="round" />
     </g>
   )
 }
 
 export const contact: SetPiece = {
   script: [1500, 2200],
+  focus: 300,
   sky: ['#05020f', '#140a30'],
   art: () => (
     <>
@@ -163,8 +175,8 @@ export const contact: SetPiece = {
       const drift = ramp(u, 0.5, 2)
       placeTo(bubble, lerp(BUBBLE_FROM.x, BUBBLE_TO.x, drift), lerp(BUBBLE_FROM.y, BUBBLE_TO.y, drift) - 20 * Math.sin(Math.PI * drift), lerp(0.6, 0.85, ramp(u, 0.5, 0.8)))
       fadeTo(bubble, ramp(u, 0.45, 0.6))
-      transformTo(babyA, `rotate(${(10 * Math.sin(u * 13)).toFixed(1)} -22 10)`)
-      transformTo(babyB, `rotate(${(-12 * Math.sin(u * 11 + 1)).toFixed(1)} 25 0)`)
+      transformTo(babyA, `rotate(${(10 * Math.sin(u * 13)).toFixed(1)} -30 14)`)
+      transformTo(babyB, `rotate(${(-12 * Math.sin(u * 11 + 1)).toFixed(1)} 30 14)`)
       fadeTo(squabble, Math.abs(Math.sin(u * 9)))
 
       const at = heroAt(u)

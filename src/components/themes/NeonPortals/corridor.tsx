@@ -29,8 +29,11 @@ import {
   settledCam,
   sparksFor,
   sparkView,
+  swingAt,
+  swingOf,
   troughAt,
   viewOf,
+  vpxOf,
   type Corridor,
   type Keyframe,
   type Plane,
@@ -77,6 +80,8 @@ interface Drawn {
   era: Era | ''
   fog: number
   runner: boolean | null
+  /** The vanishing point drawn, px across. */
+  vpx: number
 }
 
 /** A scene bound on the page: its node, its writer and its follower on the player. */
@@ -153,13 +158,15 @@ function placeRunner(refs: Refs, view: View, move: Move) {
   applyPose(refs.runner!, move)
 }
 
-/** Binds each scene's node and writer, and places its box on the screen. */
+/** Binds each scene's node and writer, places its box on the screen on its side, and opens it about its own
+ *  vanishing point. */
 function bindScenes(root: HTMLElement, scenes: readonly SceneSpec[], view: View, foot: { x: number; y: number }): BoundScene[] {
   return scenes.flatMap((spec, i) => {
     const el = root.querySelector<HTMLElement>(`[data-np-scene="${spec.id}"]`)
     if (!el) return []
-    const box = boxOf(view.vw, view.vh, i === 0 ? foot : null)
+    const box = boxOf(view.vw, view.vh, i === 0 ? foot : null, spec.cards, spec.set.focus)
     el.querySelector('[data-np="box"]')?.setAttribute('transform', `translate(${round2(box.x)} ${round2(box.y)}) scale(${box.k.toFixed(4)})`)
+    el.style.setProperty('--np-vpx', `${Math.round(vpxOf(view.vw, swingOf(spec.cards)))}px`)
     return [{ spec, el, write: spec.set.bind(el, spec.input), follower: null, shown: null }]
   })
 }
@@ -178,7 +185,7 @@ export function CorridorWorld({ specs, scenes, children, className, style }: Cor
 
   const refs = useRef<Refs>({ root: null, heroInner: null, fog: null, dark: null, rails: null, railPath: null, figure: null, runner: null, planes: new Map(), sparks: [] }).current
   const measured = useRef<Measured | null>(null)
-  const drawn = useRef<Drawn>({ era: '', fog: -1, runner: null }).current
+  const drawn = useRef<Drawn>({ era: '', fog: -1, runner: null, vpx: -1 }).current
   const bound = useRef<BoundScene[]>([])
 
   const onPlane = useCallback(
@@ -208,25 +215,40 @@ export function CorridorWorld({ specs, scenes, children, className, style }: Cor
       const spans = [heroSpan(hero.offsetHeight, view.vh, view.phone), ...marks.map((mark, r) => roomSpan(mark, page, { phone: view.phone, last: r === marks.length - 1 }))]
       measured.current = { view, ...path, spans }
       refs.rails?.setAttribute('viewBox', `0 0 ${view.vw} ${view.vh}`)
-      refs.railPath?.setAttribute('d', railsPath(view, corridor.tw))
+      drawn.vpx = -1
       // Where his feet stand on screen, for the wardrobe plate under him in the hero.
       const foot = { x: view.vpx, y: view.vpy + FLOOR * scaleAt(view, DF) }
-      root.style.setProperty('--np-vpx', `${Math.round(view.vpx)}px`)
       root.style.setProperty('--np-vpy', `${Math.round(view.vpy)}px`)
       root.style.setProperty('--np-foot-y', `${Math.round(foot.y)}px`)
       bound.current = bindScenes(root, scenes, view, foot)
     },
-    [corridor, scenes, refs],
+    [corridor, scenes, refs, drawn],
   )
 
-  const setEra = useCallback(
-    (era: Era) => {
+  const setRoom = useCallback(
+    (room: RoomGeometry | null) => {
+      const era = room ? room.era : HUB_ERA
       if (era === drawn.era) return
       drawn.era = era
       refs.root!.style.setProperty('--a1', ERAS[era].a1)
       refs.root!.style.setProperty('--a2', ERAS[era].a2)
+      refs.root!.dataset.npCards = room ? room.cards : 'left'
     },
     [refs, drawn],
+  )
+
+  /** The view with the vanishing point where the passage has swung it; the rails and the fog follow it. */
+  const swungView = useCallback(
+    (view: View, camZ: number): View => {
+      const vpx = Math.round(vpxOf(view.vw, reduced ? swingOf(roomAt(corridor.rooms, camZ)?.cards ?? 'left') : swingAt(corridor.rooms, camZ)))
+      if (vpx !== drawn.vpx) {
+        drawn.vpx = vpx
+        refs.root!.style.setProperty('--np-vpx', `${vpx}px`)
+        refs.railPath?.setAttribute('d', railsPath({ ...view, vpx }, corridor.tw))
+      }
+      return { ...view, vpx }
+    },
+    [corridor, reduced, refs, drawn],
   )
 
   /** Draws every scene at `position`; true while the one in view still plays toward the scroll. */
@@ -272,7 +294,8 @@ export function CorridorWorld({ specs, scenes, children, className, style }: Cor
       if (!m || !refs.root || !refs.runner) return false
       const camZ = reduced ? settledCam(corridor, m.roomTops, position) : camAt(m.keyframes, position)
       const room = roomAt(corridor.rooms, camZ)
-      setEra(room ? room.era : HUB_ERA)
+      setRoom(room)
+      const view = swungView(m.view, camZ)
       const trough = reduced ? 0 : troughAt(corridor.rooms, camZ)
       const fog = round2(1 - trough)
       if (fog !== drawn.fog) {
@@ -293,17 +316,17 @@ export function CorridorWorld({ specs, scenes, children, className, style }: Cor
       drawn.runner = true
       for (const plane of corridor.planes) drawPlane(plane, camZ)
       sparks.forEach((spark, i) => {
-        const { transform, opacity } = sparkView(spark, m.view, camZ, trough)
+        const { transform, opacity } = sparkView(spark, view, camZ, trough)
         refs.sparks[i].style.transform = transform
         refs.sparks[i].style.opacity = String(opacity)
       })
-      placeRunner(refs, m.view, tunnelRunner(room, camZ))
+      placeRunner(refs, view, tunnelRunner(room, camZ))
       return playing
 
       function drawPlane(plane: Plane, z: number) {
         const el = refs.planes.get(plane.key)
         if (!el) return
-        const { transform, opacity } = planeView(plane, m!.view, z)
+        const { transform, opacity } = planeView(plane, view, z)
         const shown = opacity > 0.01
         el.style.visibility = shown ? 'visible' : 'hidden'
         if (!shown) return
@@ -311,7 +334,7 @@ export function CorridorWorld({ specs, scenes, children, className, style }: Cor
         el.style.opacity = String(opacity)
       }
     },
-    [corridor, sparks, reduced, refs, drawn, setEra, drawScenes],
+    [corridor, sparks, reduced, refs, drawn, setRoom, swungView, drawScenes],
   )
 
   const mainRef = useScrollStage<HTMLDivElement>({ enabled: true, measure, draw, tauMs: reduced ? 0 : undefined, content: scenes })

@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { SceneId } from './plan'
+import type { CardSide, SceneId } from './plan'
 import type { SetInput, SetPiece } from './sets/kit'
 import css from './corridor.module.css'
 
@@ -12,14 +12,16 @@ export interface SceneSpec {
   id: SceneId
   set: SetPiece
   input: SetInput
+  /** Where its section's cards sit: the scene takes the other half. */
+  cards: CardSide
 }
 
 /** One scene's picture. */
 export const SceneView = memo(function SceneView({ spec, first }: { spec: SceneSpec; first: boolean }) {
-  const { id, set, input } = spec
+  const { id, set, input, cards } = spec
   const sky = `np-sky-${id}`
   return (
-    <div data-np-scene={id} className={`${css.scene} ${first ? css.sceneFirst : ''}`}>
+    <div data-np-scene={id} data-cards={cards} className={`${css.scene} ${first ? css.sceneFirst : ''}`}>
       <svg className={css.sceneArt} focusable="false">
         <defs>
           <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">

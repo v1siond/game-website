@@ -104,6 +104,16 @@
     inset: 0;
     background: linear-gradient(90deg, rgb(7 4 24 / 0.5) 0%, rgb(7 4 24 / 0.3) 38%, rgb(7 4 24 / 0) 50%);
   }
+
+  /* A room whose cards sit on the right dims the right, its scene on the left; the passage's scrim follows
+     the room the camera is in (data-np-cards on the world root). */
+  .scene[data-cards='right']::after {
+    background: linear-gradient(270deg, rgb(7 4 24 / 0.5) 0%, rgb(7 4 24 / 0.3) 38%, rgb(7 4 24 / 0) 50%);
+  }
+
+  [data-np-cards='right'] .scrim {
+    background: linear-gradient(270deg, rgb(7 4 24 / 0.94) 0%, rgb(7 4 24 / 0.9) 40%, rgb(7 4 24 / 0) 58%);
+  }
 }
 
 /* His chrono pack glows in the era's colour. */

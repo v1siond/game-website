@@ -1,195 +1,218 @@
-import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { bell, fadeTo, lerp, transformTo } from '../../shared/stageNodes'
-import { sideOn } from '../motion'
-import { AIR, land, LANDED, READY, run as sideRun, SLAM, spin, type SidePose } from '../sidePose'
-import { INK, PortalRing } from './cast'
-import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
+import { bell, fadeTo, lerp, r1, transformTo } from '../../shared/stageNodes'
+import { fromBehind, fromFront, GUARD, IDLE, mixPose, runPose, sideOn, spinning, tucked, YAW, type Move } from '../motion'
+import { run as sideRun } from '../sidePose'
+import { FurnaceBrute, INK, Shard } from './cast'
+import { along, Glow, Guardian, guardOf, Hero, heroOf, Hourglass, part, placeTo, Puffs, puffsTo, shoulder, type SetPiece } from './kit'
 
-// Projects, the boss behind the chamber's last portal (research notes: five portals done, the boss portal
-// opens; three hits; the power he gives [1] [3] [44]): a stone arena in the round, the chamber's portals
-// glowing on its rim, and a hulking guard of our own with a war hammer who leaps round the arena and slams
-// it down, open when it sticks in the floor. 1 dodge: he jumps clear of the guard's leap. 2 spin: the
-// hammer sticks in the floor and he spins into the guard, three times. 3 slam: the guard drops a glowing
-// token; he takes it and lands his first body slam, cracking the floor. The end frame: the guard sitting
-// dazed, the floor cracked, him in the dust.
+// Projects, the second room's boss (research notes: the flamethrower hybrid stands in a ring of crystals with
+// his flame and a bombardment, smashing the crystals round him; the hero circles to dodge, dashes through a
+// gap to spin him and gets out before the blast; three hits win the double jump [4]), seen from behind him
+// as the game frames that fight (footage f27, f28): a cave of ice, and in it the furnace brute of our own in
+// his ring of blue glass shards. 1 the brute sweeps his flame across the floor; he runs aside, his side to
+// us, and the brute's bomb shatters the shards on that side. 2 he runs up through the gap, his back to us,
+// spins the brute round in depth, then runs back out at us, his face to us, as the ring blows behind him.
+// 3 the brute sits down dazed, a core rises out of the smoke and goes into him, and he double jumps with it,
+// twice up into the air. The end frame: him landed facing us, the brute sat dazed in his broken ring.
 
-const FLOOR = 400
-const GUARD_FROM = 500
-const GUARD_LAND = 400
-const GUARD_SIT = 505
-const START = 220
-const DODGE = 120
-const CLOSE = 300
-const SLAM_AT = 290
-const TOKEN = { x: 360, y: FLOOR - 8 }
+const FLOOR = { vx: 320, vy: 190, near: 450 }
+const RING = { z: 300, rx: 190, rz: 110 }
+// The brute drawn this much over the floor's scale at his depth, so he looms.
+const BRUTE_SIZE = 1.9
+const SHARD_SIZE = 1.6
+// The shards round the ring, from the front one round to the right; the two the bomb takes are on his left.
+const SHARDS = Array.from({ length: 10 }, (_, i) => -90 + 36 * i)
+const GAP = [8, 9]
+const BOMB_FROM = { z: RING.z, x: 30 }
+// Where he stands, dodges to, comes through the gap, spins the brute, and lands, as [z into the floor, x across].
+const START = [0, 60] as const
+const ASIDE = [0, -170] as const
+const THROUGH = [236, -150] as const
+const CLOSE = [286, -78] as const
+const OUT = [16, -160] as const
 
-/** The guard's place and lean at `u`: the crouch and leap, the tug at his stuck hammer, the hits, the sit. */
-function guardAt(u: number): { x: number; y: number; lean: number; sit: number } {
-  const leap = ramp(u, 0.2, 0.6)
-  if (u < 1) return { x: lerp(GUARD_FROM, GUARD_LAND, leap), y: FLOOR - 170 * Math.sin(Math.PI * leap) + 12 * bell(u, 0, 0.2), lean: -10 * bell(u, 0.05, 0.25), sit: 0 }
-  if (u < 2) {
-    const hits = bell(u, 1.3, 1.45) + bell(u, 1.55, 1.7) + bell(u, 1.8, 1.95)
-    return { x: GUARD_LAND + 10 * hits, y: FLOOR, lean: 14 * hits + 6 * Math.sin(u * 30) * ramp(u, 1.15, 1.25), sit: 0 }
-  }
-  const back = ramp(u, 2, 2.3)
-  return { x: lerp(GUARD_LAND, GUARD_SIT, back), y: FLOOR, lean: 10 * (1 - back), sit: back }
+/** Where a shard of the ring stands on the floor, z and x. */
+const shardAt = (angle: number): readonly [number, number] => {
+  const a = (angle * Math.PI) / 180
+  return [RING.z + RING.rz * Math.sin(a), RING.rx * Math.cos(a)]
 }
 
-/** The hammer's turn at his grip: raised for the leap, swung down into the floor and stuck there, let fall as he sits. */
-const hammerAt = (u: number): number => (u < 1 ? 40 * bell(u, 0, 0.6) : u < 2 ? lerp(40, -125, ramp(u, 1, 1.15)) : lerp(-125, -150, ramp(u, 2, 2.3)))
-
-/** His frame at `u`. */
-function heroAt(u: number): HeroAt {
-  if (u < 1) {
-    const jump = ramp(u, 0.32, 0.62)
-    if (jump <= 0) return { x: START, y: FLOOR, move: sideOn(READY, 1) }
-    if (jump < 1) return { x: lerp(START, DODGE, jump), y: FLOOR - 120 * Math.sin(Math.PI * jump), move: sideOn(AIR, 1) }
-    return { x: DODGE, y: FLOOR, move: sideOn(land(ramp(u, 0.62, 0.95), READY), 1) }
-  }
-  if (u < 2) {
-    const dash = ramp(u, 1.1, 1.3)
-    if (dash < 1) return { x: lerp(DODGE, CLOSE, dash), y: FLOOR, move: sideOn(sideRun(u * 6), 1) }
-    // three spins, one per hit
-    const t = (u - 1.3) / 0.7
-    const k = Math.min(2, Math.floor(t * 3))
-    const local = ramp(t * 3 - k, 0, 1)
-    return { x: CLOSE + 8 * Math.sin(Math.PI * local), y: FLOOR, move: sideOn(spin(local), Math.cos(4 * Math.PI * local), -10 * Math.sin(Math.PI * local)) }
-  }
-  // the token, the leap and the slam into the floor, the dust
-  if (u < 2.5) {
-    const walk = ramp(u, 2.25, 2.45)
-    return { x: lerp(CLOSE, TOKEN.x - 30, walk), y: FLOOR, move: sideOn(walk > 0 && walk < 1 ? sideRun(u * 6) : READY, 1) }
-  }
-  const up = ramp(u, 2.5, 2.74)
-  const down = ramp(u, 2.74, 2.84)
-  if (down <= 0) return { x: lerp(TOKEN.x - 30, SLAM_AT, up), y: FLOOR - 200 * Math.sin((Math.PI / 2) * up), move: sideOn(mix(AIR, SLAM, ramp(up, 0.5, 1)), 1) }
-  if (down < 1) return { x: SLAM_AT, y: FLOOR - 200 * (1 - down), move: sideOn(SLAM, 1) }
-  const settle: SidePose = mix({ ...SLAM, stretch: -0.2 }, LANDED, ramp(u, 2.86, 3))
-  return { x: SLAM_AT, y: FLOOR, move: sideOn({ ...settle, dust: 1 }, 1) }
+/** A point along a path of floor points, `t` 0 to 1, each leg as long as its share. */
+const via = (points: readonly (readonly [number, number])[], t: number): readonly [number, number] => {
+  const legs = points.length - 1
+  const leg = Math.min(legs - 1, Math.floor(t * legs))
+  const local = t * legs - leg
+  return [lerp(points[leg][0], points[leg + 1][0], local), lerp(points[leg][1], points[leg + 1][1], local)]
 }
 
-function Arena() {
-  const rim = [-260, -150, 90, 200, 310]
+/** His place on the floor at `u`. */
+function floorAt(u: number): readonly [number, number] {
+  if (u < 1) return via([START, ASIDE], ramp(u, 0.3, 0.6))
+  if (u < 1.35) return via([ASIDE, THROUGH, CLOSE], ramp(u, 1, 1.35))
+  if (u < 2) return via([CLOSE, THROUGH, OUT], ramp(u, 1.6, 2))
+  return OUT
+}
+
+/** His height over the floor: the double jump. */
+const hopAt = (u: number): number => 90 * bell(u, 2.5, 2.75) + 150 * bell(u, 2.75, 2.96)
+
+/** His move at `u`: his back watching the brute, his side running aside, his back running in, the spin,
+ *  his front running out, the double jump and the landing, facing us. */
+function moveAt(u: number, phase: number): Move {
+  if (u < 0.3) return fromBehind(GUARD)
+  if (u < 0.6) return sideOn(sideRun(phase / Math.PI), YAW.left)
+  if (u < 1) return fromBehind(GUARD)
+  if (u < 1.35) return fromBehind(runPose(phase))
+  if (u < 1.6) return spinning(ramp(u, 1.35, 1.6), 1, YAW.back, 10)
+  if (u < 2) return { ...fromFront(runPose(phase)), yaw: lerp(YAW.back, YAW.front, ramp(u, 1.6, 1.7)) }
+  if (u < 2.5) return fromFront(mixPose(GUARD, IDLE, ramp(u, 2.3, 2.45)))
+  if (u < 2.96) return fromFront(tucked(0))
+  return fromFront(mixPose(tucked(0), GUARD, ramp(u, 2.96, 3)))
+}
+
+/** The flame's sweep at `u`, degrees: from his right across toward his left, then off. */
+const sweepAt = (u: number): number => lerp(-50, 58, ramp(u, 0.12, 0.9))
+
+/** The ice cave: a dark blue vault, icicles, the floor of packed snow into the screen. */
+function Cave() {
   return (
     <>
-      <path d="M-1500 330 V120 Q320 40 2100 120 V330 Z" fill="#6a5a4a" />
-      {[150, 200, 250, 300].map((y) => (
-        <path key={y} d={`M-1500 ${y} Q320 ${y - 70} 2100 ${y}`} fill="none" stroke="#4a3e32" strokeWidth={6} />
+      <path d="M-1500 -400 H2100 V190 H-1500 Z" fill="#14244a" />
+      <path d="M-1500 190 Q-200 60 320 40 Q840 60 2100 190 Z" fill="#1d3a6a" />
+      {[-120, 0, 90, 200, 300, 420, 520, 640, 760].map((x, i) => (
+        <path key={x} d={`M${x - 26} 40 L${x} ${110 + (i % 3) * 30} L${x + 26} 40 Z`} fill="#a8d0ff" opacity={0.55} />
       ))}
-      {rim.map((x, i) => (
-        <g key={x} transform={`translate(${x + 30} ${86 - (i === 2 ? 0 : 6)})`}>
-          <PortalRing r={22} color="#43f5e4" />
-        </g>
-      ))}
-      <g transform="translate(320 70)">
-        <PortalRing r={42} color="#ffd166" />
-      </g>
-      <path d="M-1500 330 Q320 300 2100 330 V2000 H-1500 Z" fill="#c8a46a" />
-      <ellipse cx={320} cy={410} rx={340} ry={70} fill="#d8b47a" />
-      <ellipse cx={320} cy={410} rx={340} ry={70} fill="none" stroke="#a8844a" strokeWidth={5} />
+      <path d="M-1500 190 H2100 V2000 H-1500 Z" fill="#cfe2f4" />
+      <path d="M-1500 190 H2100" stroke="#8ab0d8" strokeWidth={4} />
+      <ellipse cx={FLOOR.vx} cy={along(RING.z, 0, FLOOR).y} rx={RING.rx * 0.62} ry={RING.rz * 0.26} fill="#a8c4e0" />
     </>
   )
 }
 
-function HammerGuard() {
+/** The ring's shards behind the brute or in front of him, each a stub that stays and the shard over it that
+ *  flies ([data-np="shard-{i}"]). */
+function Shards({ behind }: { behind: boolean }) {
   return (
-    <g>
-      <g data-np="brute-legs">
-        <rect x={-46} y={-80} width={34} height={80} rx={10} fill="#5a3a5a" stroke={INK} strokeWidth={4} />
-        <rect x={6} y={-80} width={34} height={80} rx={10} fill="#4a2e4a" stroke={INK} strokeWidth={4} />
-        <path d="M-52 -4 h46 M0 -4 h46" stroke={INK} strokeWidth={10} strokeLinecap="round" />
-      </g>
-      <g data-np="brute-body">
-        <path d="M-70 -80 Q-84 -190 -10 -206 Q66 -200 64 -80 Z" fill="#8a4a3a" stroke={INK} strokeWidth={5} />
-        <rect x={-66} y={-100} width={130} height={20} fill="#3a2a1a" stroke={INK} strokeWidth={4} />
-        <rect x={-14} y={-102} width={24} height={24} fill="#ffd166" stroke={INK} strokeWidth={3} />
-        <path d="M-50 -190 Q-60 -250 -10 -256 Q34 -250 30 -196 Z" fill="#8a8a9a" stroke={INK} strokeWidth={5} />
-        <path d="M-60 -214 L-80 -240 L-54 -228 M24 -214 L40 -244 L18 -230" fill="#e8e0c8" stroke={INK} strokeWidth={4} strokeLinejoin="round" />
-        <rect x={-52} y={-226} width={42} height={10} fill={INK} />
-        <circle cx={-40} cy={-221} r={4} fill="#ff4a3d" />
-        <path d="M-58 -150 Q-90 -110 -96 -86" stroke="#8a4a3a" strokeWidth={26} strokeLinecap="round" fill="none" />
-        <g data-np="hammer">
-          <rect x={-8} y={-190} width={16} height={150} rx={6} fill="#6a4a2a" stroke={INK} strokeWidth={4} />
-          <rect x={-46} y={-230} width={92} height={56} rx={10} fill="#7a8a9a" stroke={INK} strokeWidth={5} />
-          <path d="M-46 -214 H46" stroke="#4a5a6a" strokeWidth={5} />
-        </g>
-        <g data-np="stars" opacity={0}>
-          {[0, 1, 2].map((i) => (
-            <path key={i} d="M0 -9 L3 -3 L9 -3 L4 1 L6 8 L0 4 L-6 8 L-4 1 L-9 -3 L-3 -3 Z" fill="#ffd34d" stroke={INK} strokeWidth={2} transform={`translate(${-20 + 30 * Math.cos((i * 2 * Math.PI) / 3)} ${-280 + 10 * Math.sin((i * 2 * Math.PI) / 3)})`} />
-          ))}
-        </g>
-      </g>
-    </g>
+    <>
+      {SHARDS.map((angle, i) => {
+        const [z, x] = shardAt(angle)
+        if (z > RING.z !== behind) return null
+        const p = along(z, x, FLOOR)
+        return (
+          <g key={angle} transform={`translate(${r1(p.x)} ${r1(p.y)}) scale(${(p.s * SHARD_SIZE).toFixed(3)})`}>
+            <Shard tall={26} />
+            <g data-np={`shard-${i}`}>
+              <Shard tall={70 + (i % 3) * 20} />
+            </g>
+          </g>
+        )
+      })}
+    </>
   )
 }
 
 export const projects: SetPiece = {
-  script: [1500, 2000, 1500],
-  sky: ['#2a3a6a', '#c88a5a'],
+  script: [1600, 2000, 1600],
+  sky: ['#0a1430', '#1d3a6a'],
+  focus: 300,
   art: () => (
     <>
-      <g data-np="quake">
-        <Arena />
-        <path data-np="cracks" d={`M${SLAM_AT} ${FLOOR + 4} l-40 10 l-30 -6 l-40 14 M${SLAM_AT} ${FLOOR + 4} l36 12 l30 -8 l46 16 M${SLAM_AT} ${FLOOR + 4} l-6 22 l10 18`} fill="none" stroke="#5a3a1a" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" opacity={0} />
-      </g>
+      <Cave />
+      <Shards behind />
       <g data-np="brute">
-        <HammerGuard />
+        <FurnaceBrute />
       </g>
-      <g data-np="token" opacity={0}>
-        <Glow r={40} color="#ffd34d" />
-        <circle r={14} fill="#fff2a8" stroke="#c88a1a" strokeWidth={4} />
-        <path d="M0 -8 L2 -2 L8 -2 L3 2 L5 8 L0 4 L-5 8 L-3 2 L-8 -2 L-2 -2 Z" fill="#c88a1a" />
+      <Shards behind={false} />
+      <g data-np="flame" opacity={0}>
+        <path d="M0 0 L-46 230 Q0 280 46 230 Z" fill="#ff6a2a" opacity={0.85} />
+        <path d="M0 0 L-24 180 Q0 210 24 180 Z" fill="#ffd34d" />
       </g>
-      <g data-np="power" opacity={0}>
-        <Glow r={120} color="#ffd34d" y={-90} />
+      <g data-np="bomb" opacity={0}>
+        <circle r={16} fill="#2a2a34" stroke={INK} strokeWidth={4} />
+        <path d="M8 -12 Q14 -24 22 -22" fill="none" stroke="#c9a04a" strokeWidth={4} />
+      </g>
+      <g data-np="boom" opacity={0}>
+        <Glow r={110} color="#ffb03a" />
+      </g>
+      <g data-np="blast" opacity={0}>
+        <Glow r={260} color="#bfe0ff" />
+      </g>
+      <Puffs name="smoke" color="#8a96b0" n={5} />
+      <g data-np="core" opacity={0}>
+        <Hourglass size={0.8} />
       </g>
       <Hero />
       <Guardian />
-      <Puffs name="dust" color="#e8d0a0" n={6} />
-      <Puffs name="thud" color="#e8d0a0" n={4} />
     </>
   ),
   bind: (root) => {
     const pose = heroOf(root)
     const guard = guardOf(root)
-    const quake = part(root, 'quake')
-    const body = part(root, 'brute')
-    const torso = part(root, 'brute-body')
-    const legs = part(root, 'brute-legs')
-    const hammer = part(root, 'hammer')
-    const stars = part(root, 'stars')
-    const token = part(root, 'token')
-    const power = part(root, 'power')
-    const cracks = part(root, 'cracks')
+    const brute = part(root, 'brute')
+    const top = part(root, 'furnace-top')
+    const gun = part(root, 'furnace-gun')
+    const stars = part(root, 'furnace-stars')
+    const flame = part(root, 'flame')
+    const bomb = part(root, 'bomb')
+    const boom = part(root, 'boom')
+    const blast = part(root, 'blast')
+    const core = part(root, 'core')
+    const shards = SHARDS.map((_, i) => part(root, `shard-${i}`))
+    const b = along(RING.z, 0, FLOOR)
+    const size = b.s * BRUTE_SIZE
+    // the gun's muzzle on the screen, its fists at (0, -110) of him
+    const fists = { x: b.x, y: b.y - 110 * size }
     return (u) => {
-      const g = guardAt(u)
-      // he faces left, toward him; sitting, his hips drop to the floor and his legs stick out in front
-      transformTo(body, `translate(${g.x.toFixed(1)} ${g.y.toFixed(1)})`)
-      transformTo(torso, `translate(0 ${(70 * g.sit).toFixed(1)}) rotate(${(g.lean + 8 * g.sit).toFixed(1)} 0 -80)`)
-      transformTo(legs, `translate(0 ${(70 * g.sit).toFixed(1)}) rotate(${(80 * g.sit).toFixed(1)} -10 -80)`)
-      // the hammer, turned at his grip: up for the leap, then down and stuck in the floor
-      transformTo(hammer, `rotate(${hammerAt(u).toFixed(1)} -84 -96)`)
-      fadeTo(stars, ramp(u, 2.25, 2.4))
-      transformTo(stars, `rotate(${(u * 160).toFixed(1)} -20 -280)`)
-      const slam = bell(u, 0.58, 0.75) + bell(u, 1.1, 1.22) + bell(u, 2.82, 2.98) * 1.6
-      transformTo(quake, `translate(0 ${(5 * slam * Math.sin(u * 80)).toFixed(1)})`)
-      puffsTo(root, 'thud', g.x, FLOOR, ramp(u, 0.58, 0.95), 90, 4)
+      // the brute: reeling from the spin, sitting down once the ring has blown, the stars round his head
+      const reel = bell(u, 1.45, 1.75)
+      const sit = ramp(u, 2, 2.3)
+      transformTo(brute, `translate(${r1(b.x)} ${r1(b.y)}) scale(${size.toFixed(3)}) rotate(${r1(10 * reel)} 0 -80)`)
+      transformTo(top, `translate(0 ${r1(46 * sit)})`)
+      fadeTo(stars, ramp(u, 2.2, 2.35))
+      transformTo(stars, `rotate(${r1(u * 160)} 0 -290)`)
 
-      // the token drops from him, lies glowing, and goes into him
-      const fall = ramp(u, 2.1, 2.3)
-      const taken = ramp(u, 2.42, 2.5)
-      fadeTo(token, fall > 0 ? 1 - taken : 0)
-      placeTo(token, lerp(GUARD_SIT - 40, TOKEN.x, fall), lerp(FLOOR - 160, TOKEN.y, fall) - 40 * Math.sin(Math.PI * fall))
+      // 1 the flame sweeps the floor from his right across to where he stood, the gun turning with it
+      const sweep = sweepAt(u)
+      transformTo(gun, `rotate(${r1(sweep * 0.4)} 0 -110)`)
+      fadeTo(flame, u > 0.12 && u < 0.9 ? 1 : 0)
+      transformTo(flame, `translate(${r1(fists.x)} ${r1(fists.y + 70 * size)}) rotate(${r1(sweep)}) scale(${(size * 0.9 * (0.9 + 0.1 * Math.sin(u * 60))).toFixed(3)})`)
 
-      const at = heroAt(u)
+      // the bomb, lobbed onto the two shards on his left, and their burst
+      const lob = ramp(u, 0.55, 0.8)
+      const [gz, gx] = shardAt((SHARDS[GAP[0]] + SHARDS[GAP[1]]) / 2)
+      const from = along(BOMB_FROM.z, BOMB_FROM.x, FLOOR)
+      const to = along(gz, gx, FLOOR)
+      fadeTo(bomb, lob > 0 && lob < 1 ? 1 : 0)
+      placeTo(bomb, lerp(from.x, to.x, lob), lerp(from.y - 200 * size, to.y, lob) - 120 * Math.sin(Math.PI * lob), lerp(from.s, to.s, lob) * 1.4)
+      fadeTo(boom, bell(u, 0.78, 1.05))
+      placeTo(boom, to.x, to.y - 30)
+
+      // the shards: the two on his left fly off at the bomb, the rest when the ring blows
+      const blown = ramp(u, 1.8, 2)
+      fadeTo(blast, bell(u, 1.78, 2.1))
+      placeTo(blast, b.x, b.y - 40)
+      shards.forEach((shard, i) => {
+        const angle = (SHARDS[i] * Math.PI) / 180
+        const fly = GAP.includes(i) ? ramp(u, 0.8, 1) : blown
+        transformTo(shard, `translate(${r1(Math.cos(angle) * 120 * fly)} ${r1(-140 * Math.sin(Math.PI * fly) + 30 * fly)}) rotate(${r1(Math.cos(angle) * 120 * fly)})`)
+        fadeTo(shard, 1 - ramp(fly, 0.6, 1))
+      })
+      puffsTo(root, 'smoke', b.x, b.y - 30, ramp(u, 1.85, 2.6), 160)
+
+      // 3 the core rises out of the smoke and flies into him
+      const rise = ramp(u, 2.1, 2.3)
+      const take = ramp(u, 2.3, 2.48)
+      const [hz, hx] = floorAt(u)
+      const h = along(hz, hx, FLOOR)
+      fadeTo(core, rise > 0 && take < 1 ? 1 : 0)
+      placeTo(core, lerp(b.x, h.x, take), lerp(b.y - 120 * rise, h.y - 120 * h.s, take), lerp(0.6, 1, take))
+
+      // him
+      const phase = u * 16
+      const at = { x: h.x, y: h.y - hopAt(u) * h.s, s: h.s, move: moveAt(u, phase) }
       pose(at)
-      fadeTo(power, bell(u, 2.45, 2.8))
-      placeTo(power, at.x, at.y)
-      fadeTo(cracks, ramp(u, 2.82, 2.9))
-      puffsTo(root, 'dust', SLAM_AT, FLOOR, ramp(u, 2.83, 3), 110, 6)
-      const [gx, gy] = shoulder(at.x, at.y, at.s, 1)
-      guard(gx, gy, u)
+      const [sx, sy] = shoulder(at.x, at.y, at.s, u >= 0.3 && u < 0.6 ? -1 : 1)
+      guard(sx, sy, u)
     }
   },
 }

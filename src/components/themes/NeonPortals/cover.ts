@@ -1,6 +1,7 @@
 import { ramp } from '@/lib/scroll/stage'
 import { easeInOut } from '@/lib/scroll/player'
 import { lerp } from '../shared/stageNodes'
+import type { CardSide } from './plan'
 import type { RoomMarks } from './world'
 
 // When each era's set piece (sets/) covers the machine's passage, and where its box sits on the screen. The
@@ -103,17 +104,22 @@ export interface Box {
 
 // The engine's phone line (useScrollStage): under 768 px wide.
 const PHONE_MAX = 768
+// On a phone, the share of the width the middle of a scene's action is moved to, on its named side.
+const PHONE_SIDE: Record<CardSide, number> = { left: 0.6, right: 0.4 }
+// On a desktop, the share of the width the box is centred on, beside the cards.
+const DESK_SIDE: Record<CardSide, number> = { left: 0.74, right: 0.26 }
 
 /**
- * The box on a screen. A desktop puts it right of the text column, its ground low; a phone scales it past
- * the screen's width (the middle 560 units fill it), so he and the one he meets read at a phone's size, and
- * sits it high, the cards coming up under it. The hero's box stands where he starts on `foot` (the wardrobe
- * plate is under him there).
+ * The box on a screen for a room whose cards sit on `cards`. A desktop puts it beside the text column, in the
+ * other half, its ground low; a phone scales it past the screen's width (the middle 560 units fill it), so he
+ * and the one he meets read at a phone's size, sits it high, the cards coming up under it, and moves the
+ * middle of its action (`focus`, in box units) toward the half the zigzag names, so it still reads with the
+ * cards stacked. The hero's box stands where he starts on `foot` (the wardrobe plate is under him there).
  */
-export function boxOf(vw: number, vh: number, foot: { x: number; y: number } | null): Box {
+export function boxOf(vw: number, vh: number, foot: { x: number; y: number } | null, cards: CardSide = 'left', focus: number = BOX.w / 2): Box {
   const phone = vw < PHONE_MAX
   const k = phone ? vw / (foot ? BOX.w : 560) : Math.min((vw * 0.48) / BOX.w, (vh * 0.62) / BOX.h)
   if (foot) return { x: foot.x - BOX.heroStart * k, y: foot.y - BOX.ground * k, k }
-  if (phone) return { x: vw / 2 - (BOX.w / 2) * k, y: vh * 0.3, k }
-  return { x: vw * 0.74 - (BOX.w / 2) * k, y: vh * 0.86 - BOX.ground * k, k }
+  if (phone) return { x: vw * PHONE_SIDE[cards] - focus * k, y: vh * 0.3, k }
+  return { x: vw * DESK_SIDE[cards] - (BOX.w / 2) * k, y: vh * 0.86 - BOX.ground * k, k }
 }

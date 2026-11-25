@@ -1,160 +1,176 @@
 import { ramp } from '@/lib/scroll/stage'
-import { bell, fadeTo, lerp } from '../../shared/stageNodes'
-import { CHEER, fromBehind, IDLE, mixPose, runPose, sideOn } from '../motion'
-import { spin, spinTurns } from '../sidePose'
-import { INK } from './cast'
-import { along, Crate, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Planks, throwPlanks, type HeroAt, type SetPiece } from './kit'
-import { ROAD, streamVillage, Village } from './village'
+import { bell, fadeTo, lerp, r1, transformTo } from '../../shared/stageNodes'
+import { sideOn, spinning, YAW, type Move } from '../motion'
+import { AIR, land, READY, run as sideRun } from '../sidePose'
+import { seeded } from '../world'
+import { Bob, INK, PendulumMan } from './cast'
+import { Glow, Guardian, guardOf, Hero, heroOf, Hourglass, part, placeTo, shoulder, type SetPiece } from './kit'
 
-// Ventures, the time trial (research notes: a floating stopwatch starts the clock, crates numbered 1, 2 and 3
-// freeze it for that many seconds, and the time earns a relic tier [1] [43]): the village road of the first
-// era again, a clock running in the sky. 1 start: he touches the stopwatch and the clock starts. 2 smash: he
-// spins through the three numbered crates, the clock freezing 1, 2 and 3 seconds. 3 finish: he crosses the
-// line and a trophy lights in the tier his time earned, gold. The end frame: him holding the trophy up, the
-// frozen clock above.
+// Ventures, the third room's boss (research notes: the time traveller stands on platforms that rise and fall
+// at random, fires a guided missile and red beams to double jump; when he tires the path appears and the
+// hero spins him; three hits win the tornado spin, which also glides [5]; footage f43): the top of a clock
+// tower over a drop in the dark, the pendulum man of our own on the far ledge, stone platforms floating
+// between. Side on, the fight going across the drop. 1 the platforms rise and fall; the pendulum man swings
+// his staff and its weight flies at him; he double jumps it, the double jump he won from the furnace brute.
+// 2 the platforms line up into a path; he runs across and spins into the pendulum man, a turn round in
+// depth, and the pendulum man drops his staff and falls to his knees. 3 a core rises out of him; he takes it,
+// the tornado spin, and spins up and glides back over the drop as the platforms fall away. The end frame:
+// him landed on the near ledge facing the pendulum man, who kneels on the far ledge, his staff dropped.
 
-const X = ROAD.vx
-const FEET = ROAD.near
-const WATCH_Z = 150
-const CRATES = [330, 500, 670] as const
-const LINE_Z = 900
-// How far he has run: to the stopwatch, through the crates, over the line.
-const travelAt = (u: number): number => WATCH_Z * ramp(u, 0, 0.6) + (CRATES[2] - WATCH_Z + 20) * ramp(u, 1, 2) + (LINE_Z - CRATES[2] - 20) * ramp(u, 2, 2.55)
-// Where each crate meets him, in u.
-const SMASH = [1.25, 1.55, 1.85] as const
-// The clock's seconds at `u`: still until the watch is touched, then running, held as each crate freezes it.
-const RUN_RATE = 9
-const FREEZE = 0.16
-const clockAt = (u: number): number => {
-  const running = Math.max(0, Math.min(u, 2.55) - 0.6)
-  const frozen = SMASH.reduce((sum, at, i) => sum + Math.max(0, Math.min(u, at + FREEZE * (i + 1)) - at), 0)
-  return 7.2 + RUN_RATE * (running - frozen)
+const LEDGE = { near: 170, far: 470, y: 400, farY: 380 }
+const PLATFORMS = [218, 302, 386] as const
+const PLATFORM_W = 72
+const MAN = { x: 525, y: LEDGE.farY }
+const START = 130
+const STOP = 436
+// Where the weight leaves his hand, and where it passes under him.
+const HAND = { x: MAN.x - 30, y: MAN.y - 60 }
+const UNDER = { x: START - 20, y: LEDGE.y - 30 }
+
+const stars = (() => {
+  const rand = seeded(23)
+  return Array.from({ length: 30 }, () => ({ x: -400 + rand() * 1400, y: -380 + rand() * 520, r: 1 + rand() * 2, o: 0.3 + rand() * 0.6 }))
+})()
+
+/** A platform's top at `u`: bobbing out of step, lined up into the path, falling away once he is back. */
+function platformY(i: number, u: number): number {
+  const bob = 46 * Math.sin(u * 3.2 + i * 2.1) * (1 - ramp(u, 1, 1.15))
+  return LEDGE.y + bob + 340 * ramp(u, 2.4, 2.85) ** 2
 }
-const frozenAt = (u: number): boolean => SMASH.some((at, i) => u >= at && u < at + FREEZE * (i + 1))
 
-/** The clock's readout: minutes, seconds and hundredths. */
-const readout = (seconds: number): string => {
-  const whole = Math.floor(seconds)
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}.${String(Math.floor((seconds - whole) * 100)).padStart(2, '0')}`
-}
-
-/** His frame at `u`, the stride at `phase`. */
-function heroAt(u: number, phase: number): HeroAt {
-  if (u < 1) return { x: X, y: FEET, move: fromBehind(mixPose(runPose(phase), { ...IDLE, aR: -150, fR: -10, look: 0 }, bell(u, 0.5, 0.8))) }
-  if (u < 2) {
-    const hit = SMASH.findIndex((at) => u >= at - 0.1 && u < at + 0.12)
-    if (hit < 0) return { x: X, y: FEET, move: fromBehind(runPose(phase)) }
-    const t = ramp(u, SMASH[hit] - 0.1, SMASH[hit] + 0.12)
-    return { x: X, y: FEET, move: sideOn(spin(t), Math.cos(2 * Math.PI * spinTurns(t)), -10 * bell(t, 0, 1)) }
+/** His place at `u`: the double jump over the weight, the run across the path, the spin, the glide back. */
+function heroAt(u: number): { x: number; y: number; move: Move } {
+  if (u < 1) {
+    const hops = 90 * bell(u, 0.38, 0.58) + 130 * bell(u, 0.56, 0.8)
+    return { x: START, y: LEDGE.y - hops, move: sideOn(hops > 6 ? AIR : READY, YAW.right) }
   }
-  if (u < 2.55) return { x: X, y: FEET, move: fromBehind(runPose(phase)) }
-  return { x: X, y: FEET, move: fromBehind(mixPose(IDLE, CHEER, ramp(u, 2.6, 2.85))) }
+  if (u < 1.6) {
+    const go = ramp(u, 1.15, 1.6)
+    return { x: lerp(START, STOP, go), y: LEDGE.y, move: sideOn(go > 0 && go < 1 ? sideRun(u * 7) : READY, YAW.right) }
+  }
+  if (u < 2.45) {
+    if (u < 1.85) return { x: STOP, y: LEDGE.y, move: spinning(ramp(u, 1.6, 1.85), 1, YAW.right, 10) }
+    return { x: STOP, y: LEDGE.y, move: sideOn(READY, YAW.right) }
+  }
+  const glide = ramp(u, 2.45, 2.92)
+  if (glide < 1) return { x: lerp(STOP, START, glide), y: LEDGE.y - 150 * Math.sin(Math.PI * glide), move: spinning(glide, 3, YAW.right, 0, AIR) }
+  return { x: START, y: LEDGE.y, move: sideOn(land(ramp(u, 2.92, 3), READY), YAW.right) }
 }
 
-function Stopwatch() {
+/** The weight's flight: out of his hand low across the drop, under his feet, and back up to the staff. */
+function bobAt(u: number): { x: number; y: number; shown: number } {
+  const out = ramp(u, 0.3, 0.68)
+  const back = ramp(u, 0.68, 0.95)
+  if (back <= 0) return { x: lerp(HAND.x, UNDER.x, out), y: lerp(HAND.y, UNDER.y, out) - 40 * Math.sin(Math.PI * out), shown: out > 0 ? 1 : 0 }
+  return { x: lerp(UNDER.x, HAND.x, back), y: lerp(UNDER.y, HAND.y, back) - 120 * Math.sin(Math.PI * back), shown: back < 1 ? 1 : 0 }
+}
+
+function Tower() {
   return (
-    <g>
-      <Glow r={50} color="#6cf0ff" />
-      <rect x={-6} y={-46} width={12} height={10} rx={3} fill="#c0c8d0" stroke={INK} strokeWidth={3} />
-      <circle r={34} fill="#e8f4ff" stroke={INK} strokeWidth={5} />
-      <circle r={26} fill="none" stroke="#6cf0ff" strokeWidth={4} />
-      <path d="M0 0 V-20 M0 0 L12 8" stroke={INK} strokeWidth={4} strokeLinecap="round" />
-    </g>
+    <>
+      {stars.map((star) => (
+        <circle key={`${star.x}${star.y}`} cx={star.x} cy={star.y} r={star.r} fill="#e8fff8" opacity={star.o} />
+      ))}
+      {/* far gears turning in the dark */}
+      <g data-np="gear-a" transform="translate(140 120)">
+        <circle r={120} fill="none" stroke="#1d4a48" strokeWidth={26} strokeDasharray="22 16" />
+        <circle r={60} fill="none" stroke="#1d4a48" strokeWidth={10} />
+      </g>
+      <g data-np="gear-b" transform="translate(470 60)">
+        <circle r={80} fill="none" stroke="#1a3e3c" strokeWidth={20} strokeDasharray="18 14" />
+      </g>
+      {/* the drop: a dark shaft between the ledges */}
+      <rect x={LEDGE.near} y={LEDGE.y} width={LEDGE.far - LEDGE.near} height={1600} fill="#040c10" />
+      {/* the near ledge and the far one, stone with a teal rim */}
+      <path d={`M-1500 ${LEDGE.y} H${LEDGE.near} V2000 H-1500 Z`} fill="#3a4a52" />
+      <path d={`M-1500 ${LEDGE.y} H${LEDGE.near}`} stroke="#5ff0c8" strokeWidth={5} opacity={0.7} />
+      <path d={`M${LEDGE.far} ${LEDGE.farY} H2100 V2000 H${LEDGE.far} Z`} fill="#34444c" />
+      <path d={`M${LEDGE.far} ${LEDGE.farY} H2100`} stroke="#5ff0c8" strokeWidth={5} opacity={0.7} />
+    </>
   )
 }
 
-function Trophy() {
+function Platform() {
   return (
     <g>
-      <Glow r={70} color="#ffd34d" y={-50} />
-      <path d="M-30 -100 H30 Q30 -40 0 -36 Q-30 -40 -30 -100 Z" fill="#ffc83a" stroke={INK} strokeWidth={4} />
-      <path d="M-30 -90 Q-52 -86 -44 -64 Q-38 -54 -24 -56 M30 -90 Q52 -86 44 -64 Q38 -54 24 -56" fill="none" stroke={INK} strokeWidth={5} />
-      <rect x={-6} y={-38} width={12} height={20} fill="#e0a82a" stroke={INK} strokeWidth={3} />
-      <rect x={-24} y={-20} width={48} height={18} rx={4} fill="#7a4cff" stroke={INK} strokeWidth={4} />
-      <path d="M0 -84 L4 -74 L14 -74 L6 -68 L9 -58 L0 -64 L-9 -58 L-6 -68 L-14 -74 L-4 -74 Z" fill="#fff6c8" />
+      <path d={`M${-PLATFORM_W / 2} 0 H${PLATFORM_W / 2} L${PLATFORM_W / 2 - 12} 34 L0 52 L${-PLATFORM_W / 2 + 12} 34 Z`} fill="#4a5a62" stroke={INK} strokeWidth={4} strokeLinejoin="round" />
+      <path d={`M${-PLATFORM_W / 2} 0 H${PLATFORM_W / 2}`} stroke="#5ff0c8" strokeWidth={5} />
     </g>
   )
 }
 
 export const ventures: SetPiece = {
-  script: [1200, 2000, 1500],
-  sky: ['#78c8f0', '#ffe8c0'],
+  script: [1500, 1800, 1700],
+  sky: ['#04141a', '#0e3034'],
+  focus: 290,
   art: () => (
     <>
-      <Village />
-      <g transform="translate(320 40)">
-        <rect x={-132} y={-44} width={264} height={88} rx={16} fill="#120b26" stroke="#6cf0ff" strokeWidth={6} />
-        <text data-np="clock" x={0} y={20} textAnchor="middle" fontSize={56} fontWeight={700} fontFamily="ui-monospace, monospace" fill="#6cf0ff">
-          {readout(7.2)}
-        </text>
-      </g>
-      <g data-np="line">
-        <rect x={-320} y={-12} width={640} height={16} fill="#f4f4f4" stroke={INK} strokeWidth={3} />
-        <rect x={-320} y={-12} width={640} height={8} fill="#1a1a22" opacity={0.6} />
-      </g>
-      {CRATES.map((_, i) => (
-        <g key={i} data-np={`crate-${i}`}>
-          <Crate w={70} mark={i + 1} />
+      <Tower />
+      {PLATFORMS.map((x, i) => (
+        <g key={x} data-np={`platform-${i}`}>
+          <Platform />
         </g>
       ))}
-      {CRATES.map((_, i) => (
-        <Planks key={i} name={`plank-${i}`} w={70} />
-      ))}
-      <g data-np="watch">
-        <Stopwatch />
+      <g data-np="man">
+        <PendulumMan />
+      </g>
+      <g data-np="bob" opacity={0}>
+        <Bob />
+      </g>
+      <g data-np="hit" opacity={0}>
+        <Glow r={60} color="#fff6c8" />
+      </g>
+      <g data-np="core" opacity={0}>
+        <Hourglass size={0.8} />
       </g>
       <Hero />
-      <g data-np="trophy" opacity={0}>
-        <Trophy />
-      </g>
       <Guardian />
     </>
   ),
   bind: (root) => {
     const pose = heroOf(root)
     const guard = guardOf(root)
-    const clock = part(root, 'clock')
-    const watch = part(root, 'watch')
-    const line = part(root, 'line')
-    const trophy = part(root, 'trophy')
-    const crates = CRATES.map((_, i) => part(root, `crate-${i}`))
-    let shown = ''
+    const man = part(root, 'man')
+    const body = part(root, 'pend-body')
+    const staff = part(root, 'pend-staff')
+    const bob = part(root, 'bob')
+    const hit = part(root, 'hit')
+    const core = part(root, 'core')
+    const gearA = part(root, 'gear-a')
+    const gearB = part(root, 'gear-b')
+    const platforms = PLATFORMS.map((_, i) => part(root, `platform-${i}`))
     return (u) => {
-      const travel = travelAt(u)
-      streamVillage(root, travel)
-
-      // the clock, still, running, ice blue while a crate holds it, gold once over the line
-      const text = readout(clockAt(u))
-      if (clock && text !== shown) {
-        shown = text
-        clock.textContent = text
-      }
-      clock?.setAttribute('fill', u >= 2.55 ? '#ffd34d' : frozenAt(u) ? '#e8fbff' : '#6cf0ff')
-
-      // 1 the stopwatch floats in the road and goes off as he touches it
-      const w = along(WATCH_Z - travel, 40, ROAD)
-      placeTo(watch, w.x, w.y - 120 * w.s + 6 * Math.sin(u * 6), w.s)
-      fadeTo(watch, 1 - ramp(u, 0.6, 0.75))
-
-      // 2 the crates come to him and break one by one
-      CRATES.forEach((z, i) => {
-        const c = along(z - travel, 0, ROAD)
-        const broken = ramp(u, SMASH[i], SMASH[i] + 0.3)
-        placeTo(crates[i], c.x, c.y, c.s)
-        fadeTo(crates[i], u < SMASH[i] ? 1 : 0)
-        throwPlanks(root, `plank-${i}`, c.x, c.y - 30 * c.s, broken, c.s)
+      transformTo(gearA, `translate(140 120) rotate(${r1(u * 40)})`)
+      transformTo(gearB, `translate(470 60) rotate(${r1(-u * 60)})`)
+      platforms.forEach((platform, i) => {
+        placeTo(platform, PLATFORMS[i], platformY(i, u))
+        fadeTo(platform, 1 - ramp(u, 2.6, 2.85))
       })
 
-      // 3 the line, and the trophy rising into his raised gloves
-      const l = along(LINE_Z - travel, 0, ROAD)
-      placeTo(line, l.x, l.y, l.s)
-      fadeTo(line, LINE_Z - travel > -50 ? 1 : 0)
-      const at = heroAt(u, travel / 26)
+      // the pendulum man: the staff swung back and flung, held, then dropped as he falls to his knees
+      const reel = bell(u, 1.75, 1.95)
+      const kneel = ramp(u, 1.85, 2.05)
+      transformTo(man, `translate(${r1(MAN.x + 14 * reel)} ${r1(MAN.y)})`)
+      transformTo(body, `translate(0 ${r1(48 * kneel)}) rotate(${r1(14 * reel + 12 * kneel)} 0 -60)`)
+      const swing = -40 * bell(u, 0.05, 0.3) + 30 * bell(u, 0.25, 0.4)
+      transformTo(staff, kneel > 0 ? `translate(${r1(-30 * kneel)} ${r1(30 * kneel)}) rotate(${r1(-80 * kneel)} -30 -120)` : `rotate(${r1(swing)} -30 -120)`)
+      fadeTo(hit, bell(u, 1.72, 1.95))
+      placeTo(hit, STOP + 40, LEDGE.y - 110)
+
+      const w = bobAt(u)
+      fadeTo(bob, w.shown)
+      placeTo(bob, w.x, w.y, 1, u * 400)
+
+      // 3 the core rises out of him and goes into him: the tornado spin
+      const rise = ramp(u, 2.05, 2.25)
+      const take = ramp(u, 2.25, 2.42)
+      fadeTo(core, rise > 0 && take < 1 ? 1 : 0)
+      placeTo(core, lerp(MAN.x - 10, STOP, take), lerp(MAN.y - 120 - 60 * rise, LEDGE.y - 110, take))
+
+      const at = heroAt(u)
       pose(at)
-      const lift = ramp(u, 2.6, 2.85)
-      fadeTo(trophy, ramp(u, 2.55, 2.65))
-      placeTo(trophy, X, lerp(FEET - 60, FEET - 250, lift), 1.1)
-      guard(X - 70, FEET - 186, u)
+      const [sx, sy] = shoulder(at.x, at.y, 1, 1)
+      guard(sx, sy, u)
     }
   },
 }

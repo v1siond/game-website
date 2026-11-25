@@ -1,16 +1,17 @@
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp, transformTo } from '../../shared/stageNodes'
-import { sideOn } from '../motion'
-import { AIR, land, READY, run as sideRun, spin, type SidePose } from '../sidePose'
+import { sideOn, spinning, YAW } from '../motion'
+import { AIR, land, READY, run as sideRun, type SidePose } from '../sidePose'
 import { Clockmaker, Spirit, Storm } from './cast'
 import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Muay Thai, the last villain (research notes, the final boss: the villain flanked by two clashing spirits whose
+// Muay Thai, the last room's boss, the last villain (research notes, the final boss: the villain flanked by two clashing spirits whose
 // beams cross over the floor, the hero spinning him into the central pit three times [7], the tornado spin
 // [5]): the machine's core, a pit in the middle of a round floor. The clockmaker stands by it between the
 // living storm and the firefly spirit, their beams crossing low over the floor. 1 leap: he double jumps the
-// crossing beams. 2 tornado: he spins into a whirl and drives the clockmaker to the pit's edge. 3 knee: a
+// crossing beams. 2 tornado: he spins into a whirl, three turns round in depth, and drives the clockmaker to
+// the pit's edge. 3 knee: a
 // flying knee, his own fighter's finish, knocks him into the pit. The end frame: the clockmaker falling into
 // the pit, him landing in his fighter stance.
 
@@ -33,17 +34,17 @@ function heroAt(u: number): HeroAt {
   if (u < 1) {
     const x = lerp(START, AFTER_LEAPS, ramp(u, 0, 1))
     const hops = 90 * bell(u, 0.2, 0.5) + 120 * bell(u, 0.55, 0.9)
-    return { x, y: FLOOR - hops, move: sideOn(hops > 8 ? AIR : sideRun(u * 6), -1) }
+    return { x, y: FLOOR - hops, move: sideOn(hops > 8 ? AIR : sideRun(u * 6), YAW.left) }
   }
   if (u < 2) {
     const t = ramp(u, 1.05, 1.95)
-    return { x: lerp(AFTER_LEAPS, WHIRL_TO, t), y: FLOOR, move: sideOn({ ...spin(t), whirl: bell(t, 0, 1) }, -Math.cos(6 * Math.PI * t), -8 * bell(t, 0, 1)) }
+    return { x: lerp(AFTER_LEAPS, WHIRL_TO, t), y: FLOOR, move: spinning(t, 3, YAW.left, 8) }
   }
   const fly = ramp(u, 2.1, 2.45)
-  if (u < 2.1) return { x: WHIRL_TO, y: FLOOR, move: sideOn(mix(READY, { ...READY, rise: 12, stretch: -0.12 }, ramp(u, 2, 2.1)), -1) }
-  if (fly < 1) return { x: lerp(WHIRL_TO, LAND_AT, fly), y: FLOOR - 110 * Math.sin(Math.PI * Math.min(1, fly * 0.8 + 0.1)), move: sideOn(mix(AIR, KNEE, ramp(fly, 0, 0.5)), -1) }
+  if (u < 2.1) return { x: WHIRL_TO, y: FLOOR, move: sideOn(mix(READY, { ...READY, rise: 12, stretch: -0.12 }, ramp(u, 2, 2.1)), YAW.left) }
+  if (fly < 1) return { x: lerp(WHIRL_TO, LAND_AT, fly), y: FLOOR - 110 * Math.sin(Math.PI * Math.min(1, fly * 0.8 + 0.1)), move: sideOn(mix(AIR, KNEE, ramp(fly, 0, 0.5)), YAW.left) }
   const down = ramp(u, 2.45, 2.62)
-  return { x: LAND_AT, y: FLOOR - 40 * (1 - down), move: sideOn(down < 1 ? KNEE : land(ramp(u, 2.62, 3), READY), -1) }
+  return { x: LAND_AT, y: FLOOR - 40 * (1 - down), move: sideOn(down < 1 ? KNEE : land(ramp(u, 2.62, 3), READY), YAW.left) }
 }
 
 /** The clockmaker at `u`: holding his place, driven to the edge, knocked over the pit and down into it. */
@@ -79,6 +80,7 @@ function Core() {
 
 export const muayThai: SetPiece = {
   script: [1400, 1800, 1600],
+  focus: 380,
   sky: ['#120624', '#2a0c3a'],
   art: () => (
     <>

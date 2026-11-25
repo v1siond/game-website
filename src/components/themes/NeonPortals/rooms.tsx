@@ -23,7 +23,7 @@ import type { SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import type { Profession } from '@/lib/cv/professions'
 import { BUTTON_LINE, BUTTON_SMALL, CARD, CARD_TITLE, CARD_TITLE_BIG, CARD_WIDE, CONTACT_LOOK, FACE, FACTS, MUTED, POINTS, TAGS, TINT } from './cards'
 import { ERA_TINT_SHARE, ERAS, OUTFIT_LOOK, PORTAL, type Era } from './palette'
-import { HUB_ERA, ROOM_ERA, roomAnchor, type RoomId } from './plan'
+import { HUB_ERA, ROOM_ERA, roomAnchor, type CardSide, type RoomId } from './plan'
 import { relicOf } from './relics'
 
 // The text layer: plain HTML in normal flow over the fixed tunnel and its set pieces, never scaled by the
@@ -31,7 +31,8 @@ import { relicOf } from './relics'
 // wings (the shared switch). Each room is a transit spacer (the flight down the passage to the next portal,
 // [data-transit]), the gate plate with the room's title ([data-gate]; on a phone it holds the room alone
 // while its set piece plays above the cards), one card per item ([data-item], each a mark the camera holds
-// at) and a tail. The stage measures these marks.
+// at) and a tail. The stage measures these marks. From the desktop line up the rooms zigzag: a room's plate
+// and cards sit on the left or on the right (plan.ts cardSideOf), its scene in the other half.
 
 /** A room's colours as the CSS variables its text reads: its edge and its tint. */
 export const eraVars = (era: Era) => cssVars({ '--ra1': ERAS[era].a1, '--ra-text': mix(ERAS[era].a1, PORTAL.WHITE, ERA_TINT_SHARE) })
@@ -42,7 +43,14 @@ const Item = ({ children, wide = false }: { children: ReactNode; wide?: boolean 
   </article>
 )
 
-const ITEMS_LIST = 'flex flex-col items-start gap-[26vh] max-md:gap-[22vh]'
+// The cards of a room one under the other, 24 px apart as in the other worlds, on the room's side.
+const ITEMS_LIST: Record<CardSide, string> = { left: 'flex flex-col items-start gap-6', right: 'flex flex-col items-start gap-6 md:items-end' }
+
+// A card's row in a list that draws its own rows (projects, ventures, bands), on the room's side.
+const ITEM_ROW: Record<CardSide, string> = { left: 'w-full', right: 'w-full md:flex md:justify-end' }
+
+// The gate plate's row, on the room's side.
+const GATE_ROW: Record<CardSide, string> = { left: 'flex', right: 'flex md:justify-end' }
 
 function ContactActions({ actions, small = false }: { actions: readonly HeroActionSlot[]; small?: boolean }) {
   const { cv, engine } = useSiteLinks('engine')
@@ -138,13 +146,13 @@ function ServiceItems({ slot }: { slot: SlotOf<'services'> }) {
   )
 }
 
-function ProjectItems({ slot }: { slot: SlotOf<'projects'> }) {
+function ProjectItems({ slot, side }: { slot: SlotOf<'projects'>; side: CardSide }) {
   const { cards } = useLabels()
   return (
     <ProjectList
       projects={slot.projects}
-      className={ITEMS_LIST}
-      itemClassName="w-full"
+      className={ITEMS_LIST[side]}
+      itemClassName={ITEM_ROW[side]}
       renderProject={({ project, years, links, noLink }) => (
         <Item wide>
           {years && <p className={`tabular-nums ${TINT}`}>{years}</p>}
@@ -173,13 +181,13 @@ function ProjectItems({ slot }: { slot: SlotOf<'projects'> }) {
   )
 }
 
-function VentureItems({ slot }: { slot: SlotOf<'ventures'> }) {
+function VentureItems({ slot, side }: { slot: SlotOf<'ventures'>; side: CardSide }) {
   const { cards, sections } = useLabels()
   return (
     <VentureList
       companies={slot.companies}
-      className={ITEMS_LIST}
-      itemClassName="w-full"
+      className={ITEMS_LIST[side]}
+      itemClassName={ITEM_ROW[side]}
       renderVenture={({ venture, linkProps, nameFor }) => (
         <Item wide>
           {venture.featured && <p className="inline-block bg-[color:var(--np-gold)] px-2.5 py-0.5 text-[0.9rem] font-bold text-[color:var(--np-panel)]">{cards.ownProduct}</p>}
@@ -205,7 +213,7 @@ function VentureItems({ slot }: { slot: SlotOf<'ventures'> }) {
   )
 }
 
-function BandItems({ slot }: { slot: SlotOf<'bands'> }) {
+function BandItems({ slot, side }: { slot: SlotOf<'bands'>; side: CardSide }) {
   const { years, links } = useLabels()
   const { musician } = slot
   return (
@@ -217,8 +225,8 @@ function BandItems({ slot }: { slot: SlotOf<'bands'> }) {
       </Item>
       <BandList
         bands={slot.bands}
-        className={ITEMS_LIST}
-        itemClassName="w-full"
+        className={ITEMS_LIST[side]}
+        itemClassName={ITEM_ROW[side]}
         renderBand={({ band, years: span, linkProps, nameFor, release }) => (
           <Item>
             {span && <p className={`tabular-nums ${TINT}`}>{span}</p>}
@@ -281,17 +289,17 @@ function ContactItem() {
   )
 }
 
-/** A room's cards; roomCount counts the same. */
-function RoomItems({ slot }: { slot: SectionSlot | null }) {
+/** A room's cards, on its side; roomCount counts the same. */
+function RoomItems({ slot, side }: { slot: SectionSlot | null; side: CardSide }) {
   if (!slot) return <ContactItem />
   const ITEMS: { [Id in SectionSlot['id']]: (slot: SlotOf<Id>) => ReactNode } = {
     about: () => <AboutItems />,
     work: (s) => <WorkItems slot={s} />,
     tech: (s) => <TechItems slot={s} />,
     services: (s) => <ServiceItems slot={s} />,
-    projects: (s) => <ProjectItems slot={s} />,
-    ventures: (s) => <VentureItems slot={s} />,
-    bands: (s) => <BandItems slot={s} />,
+    projects: (s) => <ProjectItems slot={s} side={side} />,
+    ventures: (s) => <VentureItems slot={s} side={side} />,
+    bands: (s) => <BandItems slot={s} side={side} />,
     muayThai: (s) => <MuayThaiItems slot={s} />,
   }
   // The map is keyed by the same id that narrows `slot`, so this renderer takes this slot.
@@ -321,26 +329,28 @@ interface RoomProps {
   /** The profession wing this room opens, shown over the first room's title. */
   wing: string | null
   last: boolean
+  /** Where its plate and cards sit from the desktop line up. */
+  side: CardSide
 }
 
-export function Room({ id, slot, title, wing, last }: RoomProps) {
+export function Room({ id, slot, title, wing, last, side }: RoomProps) {
   const era = ROOM_ERA[id]
   const flat = slot?.id === 'projects' || slot?.id === 'ventures'
   return (
     <section data-room="" id={roomAnchor(id)} aria-labelledby={`${roomAnchor(id)}-title`} style={eraVars(era)} className="px-[max(16px,6vw)]">
       <div data-transit="" className="h-[95vh] max-md:h-[80vh]" aria-hidden="true" />
-      <div data-gate="" className="min-h-[62vh] max-md:min-h-[90vh]">
-        <div className="inline-block max-w-[35rem] border-t-4 border-[color:var(--ra1)] bg-[color:var(--np-panel)] px-[1.6rem] pb-[1.4rem] pt-5 max-md:w-full max-md:px-5 max-md:pb-5 max-md:pt-4">
+      <div data-gate="" className={`min-h-[62vh] max-md:min-h-[90vh] ${GATE_ROW[side]}`}>
+        <div className="h-fit max-w-[35rem] border-t-4 border-[color:var(--ra1)] bg-[color:var(--np-panel)] px-[1.6rem] pb-[1.4rem] pt-5 max-md:w-full max-md:px-5 max-md:pb-5 max-md:pt-4">
           {wing && <p className={TINT}>{wing}</p>}
           <h2 id={`${roomAnchor(id)}-title`} className={`${FACE} mb-1.5 mt-0.5 text-[clamp(2.2rem,5vw,4.25rem)] leading-none text-[color:var(--np-white)]`}>
             {title}
           </h2>
         </div>
       </div>
-      {flat && <RoomItems slot={slot} />}
+      {flat && <RoomItems slot={slot} side={side} />}
       {!flat && (
-        <div className={ITEMS_LIST}>
-          <RoomItems slot={slot} />
+        <div className={ITEMS_LIST[side]}>
+          <RoomItems slot={slot} side={side} />
         </div>
       )}
       <div className={last ? 'h-[75vh]' : 'h-[34vh]'} aria-hidden="true" />

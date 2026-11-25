@@ -4,15 +4,16 @@ import { bell } from '../shared/stageNodes'
 
 // The runner side on (side.tsx), posed for the moves that show him whole, on the shared rig (rigPose): his limbs as the rig's
 // numbers, plus his own on top: the head's nod in degrees (positive looks down), the cartoon squash and stretch
-// (`stretch` above 0 tall and thin, below 0 short and wide, from his soles) and what shows round him, each 0 to 1
-// (the whirl of the spin, the dust of a landing). His near side is the rig's right, his far side its left; he
+// (`stretch` above 0 tall and thin, below 0 short and wide, from his soles), the whirl of the spin (0 to 1, drawn
+// round him whichever way he faces, runner.tsx) and what shows round him side on, each 0 to 1 (the dust of a
+// landing). His near side is the rig's right, his far side its left; he
 // faces right, so a negative turn swings a limb ahead.
 
-/** What a pose shows round him, each a group `data-part="{name}"` faded in. */
-export const PARTS = ['whirl', 'dust'] as const
+/** What a pose shows round him side on, each a group `data-part="{name}"` faded in. */
+export const PARTS = ['dust'] as const
 export type Part = (typeof PARTS)[number]
 
-export type SidePose = RigPose & { head: number; stretch: number } & Record<Part, number>
+export type SidePose = RigPose & { head: number; stretch: number; whirl: number } & Record<Part, number>
 
 const STAND: SidePose = { ...RIG_STAND, head: 0, stretch: 0, whirl: 0, dust: 0 }
 
@@ -36,12 +37,10 @@ export function land(t: number, to: SidePose = REST): SidePose {
   return { ...mix(LANDED, to, ramp(t, 0.3, 1)), dust: 1 - ramp(t, 0.3, 0.8) }
 }
 
-/** The tornado spin: the arms flung out, the whirl round him, `t` of the way (the scene turns him). */
+/** The tornado spin side on: the arms flung out, the whirl round him, `t` of the way (motion.ts spinning turns
+ *  him round). */
 const SPUN = pose({ armRight: -95, foreRight: -5, armLeft: 95, foreLeft: 5, thighRight: -10, thighLeft: 10, stretch: 0.06 })
 export const spin = (t: number, from: SidePose = READY): SidePose => ({ ...mix(from, SPUN, bell(t, 0, 1)), whirl: bell(t, 0.05, 0.95) })
-
-/** How far round the spin has turned him at `t`, in turns (two whole turns). */
-export const spinTurns = (t: number): number => 2 * t
 
 /** The run at `phase` (one stride per unit): long strides leant hard forward, the gloves pumping. */
 export function run(phase: number): SidePose {

@@ -4,8 +4,8 @@ import { Glow } from './kit'
 // The run's cast and its machines, our own, drawn in code in the box's units, each standing on 0,0 (or
 // centred on it where it flies), facing right unless said, in the same thick ink line as his runner.
 // Moving parts are [data-np] groups the set's writer turns about a stated point. Nothing here is a character,
-// creature or object of the game it evokes: the clockmaker, the living storm, the firefly spirit, the knight,
-// the horned beast, the hammer guard and the rest are drawn new.
+// creature or object of the game it evokes: the clockmaker, the pendulum man, the living storm, the firefly
+// spirit, the knight, the horned beast, the hammer guard, the furnace brute and the rest are drawn new.
 
 export const INK = '#120c1e'
 
@@ -110,6 +110,108 @@ export function Spirit() {
   )
 }
 
+const PENDULUM = { coat: '#1f6a66', coatShade: '#134744', skin: '#e2d8c8', hat: '#16202a', band: '#5ff0c8', rod: '#c9a04a', bob: '#ffd34d', boot: '#1a1210' }
+
+/** The pendulum man, our own: a gaunt figure in a long teal coat and a tall hat, a long nose and a thin
+ *  moustache, facing left, his pendulum staff upright in his near hand. [data-np="pend-body"] is all of him
+ *  above the knees (bent at -60 to kneel), [data-np="pend-staff"] the staff, turned at his grip (-30, -120);
+ *  its bob is the scene's own, so it can fly. About 210 tall. */
+export function PendulumMan() {
+  return (
+    <g>
+      <path d="M-10 -2 V-60 M12 -2 V-60" stroke={INK} strokeWidth={9} strokeLinecap="round" />
+      <path d="M-26 0 H-4 M2 0 H24" stroke={PENDULUM.boot} strokeWidth={10} strokeLinecap="round" />
+      <g data-np="pend-body">
+        <path d="M-30 -50 L-20 -150 Q0 -160 20 -150 L32 -50 Q0 -40 -30 -50 Z" fill={PENDULUM.coat} stroke={INK} strokeWidth={3.5} strokeLinejoin="round" />
+        <path d="M-2 -150 L-6 -52 M-22 -100 H22" stroke={PENDULUM.coatShade} strokeWidth={4} />
+        <path d="M14 -146 L30 -96 L24 -70" fill="none" stroke={PENDULUM.coat} strokeWidth={12} strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M-6 -152 Q-4 -160 -2 -166" stroke={PENDULUM.skin} strokeWidth={10} strokeLinecap="round" />
+        <ellipse cx={-2} cy={-180} rx={16} ry={20} fill={PENDULUM.skin} stroke={INK} strokeWidth={3} />
+        <path d="M-16 -184 L-38 -176 L-16 -172 Z" fill={PENDULUM.skin} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+        <path d="M-20 -168 Q-28 -160 -34 -164 M-16 -168 Q-8 -160 -2 -164" fill="none" stroke={INK} strokeWidth={2.5} strokeLinecap="round" />
+        <circle cx={-8} cy={-188} r={3} fill={INK} />
+        <path d="M-20 -194 L-2 -192" stroke={INK} strokeWidth={3} strokeLinecap="round" />
+        <rect x={-24} y={-200} width={44} height={8} rx={3} fill={PENDULUM.hat} stroke={INK} strokeWidth={2.5} />
+        <rect x={-16} y={-246} width={28} height={48} rx={3} fill={PENDULUM.hat} stroke={INK} strokeWidth={2.5} />
+        <rect x={-16} y={-214} width={28} height={7} fill={PENDULUM.band} />
+        <g data-np="pend-staff">
+          <path d="M-30 -230 V-40" stroke={PENDULUM.rod} strokeWidth={7} strokeLinecap="round" />
+          <circle cx={-30} cy={-234} r={8} fill={PENDULUM.bob} stroke={INK} strokeWidth={3} />
+        </g>
+        <path d="M-12 -144 L-28 -118" stroke={PENDULUM.coat} strokeWidth={12} strokeLinecap="round" />
+        <circle cx={-30} cy={-120} r={8} fill={PENDULUM.skin} stroke={INK} strokeWidth={2.5} />
+      </g>
+    </g>
+  )
+}
+
+/** The pendulum's bob, the weight the pendulum man flies at him: a heavy brass disc with a glowing rim,
+ *  centred. */
+export function Bob() {
+  return (
+    <g>
+      <Glow r={44} color={PENDULUM.band} strength={0.8} />
+      <circle r={22} fill={PENDULUM.bob} stroke={INK} strokeWidth={4} />
+      <circle r={12} fill="none" stroke="#c88a1a" strokeWidth={4} />
+    </g>
+  )
+}
+
+// ---- the bosses' muscle ----
+
+const FURNACE = { suit: '#b8642c', suitShade: '#7a3e1a', rivet: '#ffd08a', tank: '#5a5a6a', tankLit: '#8a8a9a', skin: '#d8a07a', visor: '#1a1a22', glow: '#ff8a3d', nozzle: '#3a3a44' }
+
+/** The furnace brute, our own: a squat wide stoker in a riveted boiler suit, two fuel tanks on his back
+ *  over his shoulders, a welder's helmet with a glowing slit, his flame gun held low in both fists, seen
+ *  from the front. [data-np="furnace-top"] is all of him above the hips (let down to sit), [data-np="furnace-gun"]
+ *  the gun, turned at his fists (0, -110) to sweep; its muzzle is at (0, -40) of the gun turned to 0. About
+ *  230 tall. */
+export function FurnaceBrute() {
+  return (
+    <g>
+      <rect x={-62} y={-80} width={46} height={80} rx={12} fill={FURNACE.suitShade} stroke={INK} strokeWidth={5} />
+      <rect x={16} y={-80} width={46} height={80} rx={12} fill={FURNACE.suitShade} stroke={INK} strokeWidth={5} />
+      <path d="M-70 -6 h58 M12 -6 h58" stroke={INK} strokeWidth={14} strokeLinecap="round" />
+      <g data-np="furnace-top">
+        <rect x={-110} y={-236} width={44} height={120} rx={20} fill={FURNACE.tank} stroke={INK} strokeWidth={5} />
+        <rect x={66} y={-236} width={44} height={120} rx={20} fill={FURNACE.tank} stroke={INK} strokeWidth={5} />
+        <path d="M-96 -228 V-130 M80 -228 V-130" stroke={FURNACE.tankLit} strokeWidth={6} strokeLinecap="round" />
+        <path d="M-84 -90 Q-96 -200 0 -210 Q96 -200 84 -90 Q60 -66 0 -64 Q-60 -66 -84 -90 Z" fill={FURNACE.suit} stroke={INK} strokeWidth={5} />
+        <path d="M-40 -200 V-80 M40 -200 V-80" stroke={FURNACE.suitShade} strokeWidth={6} />
+        {[-60, -20, 20, 60].map((x) => (
+          <circle key={x} cx={x} cy={-150} r={5} fill={FURNACE.rivet} stroke={INK} strokeWidth={2} />
+        ))}
+        <path d="M-44 -206 Q-50 -262 0 -266 Q50 -262 44 -206 Q22 -196 0 -196 Q-22 -196 -44 -206 Z" fill={FURNACE.tank} stroke={INK} strokeWidth={5} />
+        <rect x={-30} y={-242} width={60} height={14} rx={6} fill={FURNACE.visor} stroke={INK} strokeWidth={3} />
+        <rect data-np="furnace-eyes" x={-24} y={-238} width={48} height={6} rx={3} fill={FURNACE.glow} />
+        <path d="M-80 -170 Q-104 -130 -40 -112 M80 -170 Q104 -130 40 -112" fill="none" stroke={FURNACE.suit} strokeWidth={28} strokeLinecap="round" />
+        <g data-np="furnace-gun">
+          <rect x={-14} y={-118} width={28} height={78} rx={8} fill={FURNACE.nozzle} stroke={INK} strokeWidth={4} />
+          <rect x={-20} y={-52} width={40} height={14} rx={5} fill={FURNACE.tank} stroke={INK} strokeWidth={4} />
+          <path d="M0 -118 Q60 -160 96 -200" fill="none" stroke={INK} strokeWidth={8} strokeLinecap="round" />
+        </g>
+        <circle cx={-26} cy={-112} r={18} fill={FURNACE.skin} stroke={INK} strokeWidth={4} />
+        <circle cx={26} cy={-112} r={18} fill={FURNACE.skin} stroke={INK} strokeWidth={4} />
+        <g data-np="furnace-stars" opacity={0}>
+          {[0, 1, 2].map((i) => (
+            <path key={i} d="M0 -9 L3 -3 L9 -3 L4 1 L6 8 L0 4 L-6 8 L-4 1 L-9 -3 L-3 -3 Z" fill="#ffd34d" stroke={INK} strokeWidth={2} transform={`translate(${36 * Math.cos((i * 2 * Math.PI) / 3)} ${-290 + 10 * Math.sin((i * 2 * Math.PI) / 3)})`} />
+          ))}
+        </g>
+      </g>
+    </g>
+  )
+}
+
+/** A shard of blue glass in the furnace brute's ring, about 90 tall, standing on 0,0. */
+export function Shard({ tall = 90 }: { tall?: number }) {
+  return (
+    <g>
+      <path d={`M-22 0 L-16 ${-tall * 0.7} L2 ${-tall} L20 ${-tall * 0.6} L24 0 Z`} fill="#3a6ad8" stroke="#0e1a4a" strokeWidth={4} strokeLinejoin="round" />
+      <path d={`M-10 -6 L-6 ${-tall * 0.66} L2 ${-tall * 0.9}`} fill="none" stroke="#b8d8ff" strokeWidth={4} strokeLinecap="round" opacity={0.8} />
+    </g>
+  )
+}
+
 // ---- the portals ----
 
 /** One of the machine's portals: a neon ring `r` wide, its inside the colour `fill`; [data-np] `name` is its
@@ -133,7 +235,8 @@ export function PortalRing({ r, color, name, fill = '#0b0626' }: { r: number; co
 const KNIGHT = { steel: '#b9c4d6', shade: '#7c879a', tabard: '#c0392b', plume: '#ffd34d', blade: '#eef3fa' }
 
 /** A village knight seen from the front, a long sword held high in his right hand: the sword arm turns at
- *  the shoulder (-34, -112) as [data-np="knight-arm"]; about 170 tall. */
+ *  the shoulder (-34, -112) as [data-np="knight-arm"]; [data-np="knight-back"] covers his visor and tabard
+ *  with plain steel, the back of him, for a writer that turns him round; about 170 tall. */
 export function Knight() {
   return (
     <g>
@@ -146,6 +249,11 @@ export function Knight() {
       <path d="M-26 -126 Q-28 -176 0 -176 Q28 -176 26 -126 Z" fill={KNIGHT.steel} stroke={INK} strokeWidth={3.5} />
       <path d="M-18 -148 H18" stroke={INK} strokeWidth={5} strokeLinecap="round" />
       <path d="M0 -176 Q-6 -200 14 -206 Q8 -190 22 -186" fill={KNIGHT.plume} stroke={INK} strokeWidth={2.5} />
+      <g data-np="knight-back" opacity={0}>
+        <path d="M-36 -124 H36 L32 -50 H-32 Z" fill={KNIGHT.shade} stroke={INK} strokeWidth={3.5} strokeLinejoin="round" />
+        <path d="M0 -120 V-54" stroke={KNIGHT.steel} strokeWidth={4} />
+        <path d="M-26 -126 Q-28 -176 0 -176 Q28 -176 26 -126 Z" fill={KNIGHT.shade} stroke={INK} strokeWidth={3.5} />
+      </g>
       <g data-np="knight-arm">
         <rect x={-50} y={-120} width={14} height={46} rx={6} fill={KNIGHT.steel} stroke={INK} strokeWidth={3} />
         <circle cx={-43} cy={-72} r={9} fill={KNIGHT.shade} stroke={INK} strokeWidth={3} />

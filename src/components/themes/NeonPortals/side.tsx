@@ -5,8 +5,8 @@ import { FIGURE as F } from './palette'
 import { PARTS, type Part, type SidePose } from './sidePose'
 import s from './side.module.css'
 
-// The runner side on, for the moves that show him whole (the spin, the slam, the run from the boulder): the
-// same hero the corridor shows from behind (runner.tsx), facing right, drawn as the time travelling cartoon
+// The runner side on, for the moves seen from the side (a run across the screen, the slam, the kick): the
+// same hero the corridor shows from behind and from the front (runner.tsx), facing right, drawn as the time travelling cartoon
 // platformer draws its hero: a big neckless head with a long muzzle, upright pointed ears, a lean furred body,
 // long legs, big gloves and big sneakers, all in a thick ink line. Orange fur with the light chest; on the
 // muzzle his own skin with the big black nose, his short dark beard on the jaw, his thick brows and his dark
@@ -14,8 +14,8 @@ import s from './side.module.css'
 //
 // The parts are groups that turn round their own joints (side.module.css), posed on the shared rig
 // (sidePose.ts, setSidePose below). The whole figure squashes and stretches from his soles
-// ([data-part="squash"]); the head nods at the neck; the whirl of his spin and the dust of a landing rest
-// hidden until a pose shows them. Transform and opacity only.
+// ([data-part="squash"]); the head nods at the neck; the dust of a landing rests hidden until a pose shows it
+// (the whirl of his spin is the runner's, round him whichever way he faces). Transform and opacity only.
 
 // ---- shapes (viewBox 132 by 200, facing right, soles on y 192; the ears rise above the box) ----
 
@@ -132,10 +132,6 @@ export function SideFigure({ scale }: { scale: number }) {
             <Arm side="front" />
           </g>
         </g>
-        <Shown name="whirl">
-          <ellipse cx={66} cy={110} rx={70} ry={86} fill={F.fur} opacity={0.35} />
-          <path d="M-6 70 Q66 40 138 70 M-10 110 Q66 80 142 110 M-6 150 Q66 120 138 150" fill="none" stroke={F.furLit} strokeWidth={6} strokeLinecap="round" />
-        </Shown>
       </g>
     </svg>
   )

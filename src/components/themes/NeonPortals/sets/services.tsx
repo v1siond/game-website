@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, lerp, transformTo } from '../../shared/stageNodes'
-import { fromBehind, IDLE, mixPose, RIDE, tucked } from '../motion'
+import { fromBehind, mixPose, RIDE, sideOn, YAW } from '../motion'
+import { AIR, READY } from '../sidePose'
 import { INK } from './cast'
 import { along, Guardian, guardOf, Hero, heroOf, Hourglass, part, placeTo, Puffs, puffsTo, type SetPiece } from './kit'
 
 // Services, the race (research notes, the road levels: a motorbike race where only first place earns the
 // crystal, with green boost plates, rival riders and police cars to swerve round [15] [21] [29]; the camera
-// rides behind the vehicle [1]): a desert highway at neon dusk. 1 kick-start: he jumps on the bike and it
-// roars off. 2 boost: he rides over a green plate and shoots forward past the rival riders. 3 overtake: he
+// rides behind the vehicle [1]): a desert highway at neon dusk. 1 kick-start: he hops onto the bike from
+// its side (his side to us) and, seated, turns to ride it into the screen (his back), and it roars off. 2 boost: he rides over a green plate and shoots forward past the rival riders. 3 overtake: he
 // swerves round the police car and takes the lead under the finish arch. The end frame: him first over the
 // line, the core floating up from the arch.
 
@@ -120,6 +121,7 @@ function Highway() {
 
 export const services: SetPiece = {
   script: [1300, 1500, 1800],
+  focus: BIKE_X,
   sky: ['#2a0a4a', '#ff8a5a'],
   art: () => (
     <>
@@ -197,19 +199,20 @@ export const services: SetPiece = {
       fadeTo(cop, Math.max(0, Math.min(1, (COP_Z - travel + 30) / 60)))
       const a = along(Math.max(-20, ARCH_Z - travel), 0, ROAD)
       placeTo(arch, a.x, a.y, a.s)
-      transformTo(core, `translate(0 ${(-350 - 200 * ramp(u, 2.75, 3)).toFixed(1)})`)
+      transformTo(core, `translate(0 ${(-360 - 40 * ramp(u, 2.75, 3)).toFixed(1)})`)
       fadeTo(core, ramp(u, 2.75, 2.85))
 
-      // him: beside the bike, the hop on, the ride, leaning into the swerve
+      // him: beside the bike side on, the hop on across it, then seated, turned to ride it away from us
       const hop = ramp(u, 0.1, 0.45)
       const on = hop >= 1
+      const seated = ramp(u, 0.45, 0.6)
       const lean = -14 * swerve + 10 * bell(u, 1.3, 1.8)
       transformTo(ride, `translate(${(on ? x : BIKE_X).toFixed(1)} ${(ROAD.near + 2 * Math.sin(u * 24) * (on ? 1 : 0)).toFixed(1)}) rotate(${lean.toFixed(1)})`)
-        if (!on) {
+      if (!on) {
         const fromX = -100
-        pose({ x: lerp(fromX, 0, hop), y: lerp(0, -SEAT, hop) - 70 * Math.sin(Math.PI * hop), move: fromBehind(hop > 0 ? tucked(0) : IDLE) })
+        pose({ x: lerp(fromX, 0, hop), y: lerp(0, -SEAT, hop) - 70 * Math.sin(Math.PI * hop), move: sideOn(hop > 0 ? AIR : READY, YAW.right) })
       } else {
-        pose({ x: 0, y: -SEAT, move: fromBehind(mixPose(RIDE, { ...RIDE, jump: -14 }, bell(u, 1.3, 1.6))) })
+        pose({ x: 0, y: -SEAT, move: { ...fromBehind(mixPose(RIDE, { ...RIDE, jump: -14 }, bell(u, 1.3, 1.6))), side: READY, yaw: lerp(YAW.right, YAW.back, seated) } })
       }
       guard(-58, -SEAT - 176, u)
       puffsTo(root, 'exhaust', x - 40, ROAD.near - 20, ramp(u, 0.45, 0.95), 40, 4)

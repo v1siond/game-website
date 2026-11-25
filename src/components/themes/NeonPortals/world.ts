@@ -1,6 +1,7 @@
 import { clamp01 } from '@/lib/scroll/progress'
 import type { Era } from './palette'
-import { HUB_ERA, type RoomId } from './plan'
+import { lerp } from '../shared/stageNodes'
+import { HUB_ERA, type CardSide, type RoomId } from './plan'
 
 // The corridor: the time machine's passage between eras, one tunnel along z, seen head on from a camera at
 // camZ. Every plane (a rib, a gate, a turning decor ring) sits at a fixed world position, and its screen scale is focal / depth, so
@@ -44,6 +45,8 @@ export interface RoomSpec {
   era: Era
   /** How many cards the room's section shows. */
   items: number
+  /** Where its cards sit; its portal and its scene take the other half. */
+  cards: CardSide
 }
 
 export interface Plane {
@@ -76,6 +79,7 @@ export interface RoomGeometry {
   vista: number
   /** Where the room before ended: the hub ring or its far end. */
   from: number
+  cards: CardSide
 }
 
 export interface Corridor {
@@ -89,7 +93,7 @@ export interface Corridor {
 export const DECOR: Partial<Record<Era, { y: number; spin: number; sway: number }>> = {
   hub: { y: CY, spin: 0.06, sway: 0 },
   village: { y: CY, spin: 0.03, sway: 0 },
-  trial: { y: -TH * 0.125, spin: -0.05, sway: 0 },
+  tower: { y: -TH * 0.125, spin: -0.05, sway: 0 },
   sky: { y: FLOOR - TH * 0.42, spin: 0, sway: 18 },
   saved: { y: CY, spin: 0.04, sway: 0 },
 }
@@ -135,7 +139,7 @@ export function layoutCorridor(specs: readonly RoomSpec[], phone: boolean): Corr
     const items = Array.from({ length: Math.max(1, spec.items) }, (_, i): ItemSpot => ({ z: gate + LEAD + i * STEP }))
     const vista = items[items.length - 1].z + TAIL
     planes.push(...ribs(spec.era, gate + RIB / 2, vista, 1, `${spec.id}-rib`), ...decorPlane(spec.era, vista - 14))
-    rooms.push({ id: spec.id, era: spec.era, gate, items, vista, from: behind })
+    rooms.push({ id: spec.id, era: spec.era, gate, items, vista, from: behind, cards: spec.cards })
     return vista
   }, HUB_RING)
 
@@ -247,6 +251,13 @@ export function troughAt(rooms: readonly RoomGeometry[], camZ: number): number {
   }, 0)
 }
 
+/** How far the passage has swung its vanishing point over to the left, 0 to 1: a room whose cards sit on the
+ *  right opens its portal on the left of the screen. The swing happens in the dark between eras, from the end
+ *  of the room left behind to just before the next gate comes up, so every gate is framed where its scene
+ *  will stand. The hub's is 0, its cards on the left. */
+export const swingAt = (rooms: readonly RoomGeometry[], camZ: number): number =>
+  rooms.reduce((swing, room) => lerp(swing, room.cards === 'right' ? 1 : 0, smooth(room.from + DIP_IN[1], room.gate + DIP_OUT[0], camZ)), 0)
+
 /** The room the camera is in: past the darkest point of the gap before its gate; null in the hub. */
 export const roomAt = (rooms: readonly RoomGeometry[], camZ: number): RoomGeometry | null =>
   rooms.findLast((room) => camZ >= eraSwitchAt(room)) ?? null
@@ -266,10 +277,21 @@ export interface View {
 // The engine's phone line (useScrollStage): under 768 px wide.
 const PHONE_MAX = 768
 
-/** The screen's view: a phone centres the vanishing point, a desktop moves it right of the text column. */
+// The vanishing point's share of the width on a desktop, with the cards on the left and on the right.
+const VP_SHARE: Record<CardSide, number> = { left: 0.64, right: 0.36 }
+
+/** Where the vanishing point stands across the screen for a swing (swingAt) or a room's own side: a phone
+ *  centres it, its cards stacked under the scene; a desktop puts it beside the text column. */
+export const vpxOf = (vw: number, swing: number): number => (vw < PHONE_MAX ? vw * 0.5 : vw * lerp(VP_SHARE.left, VP_SHARE.right, swing))
+
+/** The share of the swing a room's own side stands at. */
+export const swingOf = (cards: CardSide): number => (cards === 'right' ? 1 : 0)
+
+/** The screen's view with the cards on the left (the hub's): a phone centres the vanishing point, a desktop
+ *  moves it right of the text column. */
 export function viewOf(vw: number, vh: number): View & { phone: boolean } {
   const phone = vw < PHONE_MAX
-  return { vw, vh, phone, vpx: vw * (phone ? 0.5 : 0.64), vpy: vh * (phone ? 0.4 : 0.42), unit: vh / 1000 }
+  return { vw, vh, phone, vpx: vpxOf(vw, 0), vpy: vh * (phone ? 0.4 : 0.42), unit: vh / 1000 }
 }
 
 /** The screen scale of a world point at depth d. */

@@ -1,7 +1,6 @@
 import { ramp } from '@/lib/scroll/stage'
-import { bell, fadeTo, lerp } from '../../shared/stageNodes'
-import { fromBehind, IDLE, mixPose, runPose, sideOn, tucked } from '../motion'
-import { spin, spinTurns } from '../sidePose'
+import { bell, fadeTo, lerp, r1, transformTo } from '../../shared/stageNodes'
+import { fromBehind, IDLE, mixPose, runPose, spinning, tucked, YAW } from '../motion'
 import { Knight } from './cast'
 import { along, Crate, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Planks, throwPlanks, type HeroAt, type SetPiece } from './kit'
 import { ROAD, streamVillage, Village } from './village'
@@ -9,7 +8,8 @@ import { ROAD, streamVillage, Village } from './village'
 // About, the first era (research notes, the medieval village [8], the camera behind him into the screen
 // [35]): the one gentle run of the page. 1 run: he runs into the screen down the village road and a firefly
 // floating over it comes to his shoulder, the guardian from now on. 2 spin: a knight in the road swings his
-// long sword; he spins and sends him tumbling off the road. 3 bounce: two stacked crates; he jumps onto the
+// long sword; he spins round in depth (back, side, front, side, back) and sends him turning off the road,
+// the knight showing his back as he goes round. 3 bounce: two stacked crates; he jumps onto the
 // top one, which breaks, bounces on the lower one, which breaks, and its checkpoint ring lights round him.
 // The end frame: him on the road from behind, the ring lit round him, the road ahead.
 
@@ -25,10 +25,7 @@ const FIREFLY_Z = 520
 /** His frame at `u`, the stride at `phase`, the crates at `c` on the road. */
 function heroAt(u: number, phase: number, c: { x: number; y: number; s: number }): HeroAt {
   if (u < 1.2) return { x: X, y: FEET, move: fromBehind(mixPose(runPose(phase), IDLE, ramp(u, 0.95, 1.15))) }
-  if (u < 2) {
-    const t = ramp(u, 1.3, 1.8)
-    return { x: X, y: FEET, move: sideOn(spin(t), Math.cos(2 * Math.PI * spinTurns(t)), -14 * bell(t, 0, 1)) }
-  }
+  if (u < 2) return { x: X, y: FEET, move: spinning(ramp(u, 1.3, 1.8), 2, YAW.back, 14) }
   if (u < 2.32) return { x: X, y: FEET, move: fromBehind(runPose(phase)) }
   const into = ramp(u, 2.32, 2.5)
   const drop = ramp(u, 2.5, 2.7)
@@ -43,8 +40,15 @@ function heroAt(u: number, phase: number, c: { x: number; y: number; s: number }
 /** Where a thing laid `z` down the road from the start is once he has run `travel`. */
 const onRoad = (z: number, travel: number, x = 0) => along(z - travel, x, ROAD)
 
+// The knight's turns round himself as he is flung off the road, how far he tips over into the grass, and how
+// far he is thrown, up the road and across into the grass beside it.
+const KNIGHT_TURNS = 2
+const KNIGHT_FALL = 80
+const KNIGHT_THROW = { z: 260, x: 300 }
+
 export const about: SetPiece = {
   script: [1500, 1500, 1500],
+  focus: X,
   sky: ['#6cc4f4', '#fff0c4'],
   art: () => (
     <>
@@ -74,6 +78,7 @@ export const about: SetPiece = {
     const guard = guardOf(root)
     const knight = part(root, 'knight')
     const knightArm = part(root, 'knight-arm')
+    const knightBack = part(root, 'knight-back')
     const low = part(root, 'crate-low')
     const top = part(root, 'crate-top')
     const ring = part(root, 'ring')
@@ -81,12 +86,14 @@ export const about: SetPiece = {
       const travel = travelAt(u)
       streamVillage(root, travel)
 
-      // the knight waits in the road, swings, and is spun off it, tumbling into the grass
-      const k = onRoad(KNIGHT_Z, travel, 20)
+      // the knight waits in the road, swings, and is spun off it: flung into the grass turning round himself
+      // in depth (as wide as the cosine of his turn, his back showing while it is below 0), tipping over
       const hit = ramp(u, 1.55, 2)
-      const tumbleX = 330 * hit
+      const k = onRoad(KNIGHT_Z + KNIGHT_THROW.z * hit, travel, 20 + KNIGHT_THROW.x * hit)
       const tumbleY = -150 * Math.sin(Math.PI * Math.min(1, hit * 1.2)) + 30 * hit
-      placeTo(knight, k.x + tumbleX * k.s, k.y + tumbleY * k.s, k.s, 400 * hit)
+      const across = Math.cos(2 * Math.PI * KNIGHT_TURNS * hit)
+      transformTo(knight, `translate(${r1(k.x)} ${r1(k.y + tumbleY * k.s)}) rotate(${r1(KNIGHT_FALL * hit ** 2)} 0 -90) scale(${(k.s * across).toFixed(3)} ${k.s.toFixed(3)})`)
+      fadeTo(knightBack, across < 0 ? 1 : 0)
       knightArm?.setAttribute('transform', `rotate(${(80 * bell(u, 1.05, 1.6)).toFixed(1)} -43 -112)`)
 
       // the crates come up the road; the top one breaks under him, then the lower one, and its ring lights
