@@ -20,7 +20,6 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { COLORS as C, PALETTE_VARS, TONE_VARS } from './TropicalPlatformer/palette'
 import { JungleLinks } from './TropicalPlatformer/buttons'
 import { Canopy } from './TropicalPlatformer/canopy'
-import { HeroCharacter } from './TropicalPlatformer/character'
 import { SceneryDefs } from './TropicalPlatformer/scenery'
 import { scenesOf, type Scene } from './TropicalPlatformer/scenes'
 import { PostsBoard, SceneSection } from './TropicalPlatformer/sections'
@@ -46,17 +45,18 @@ const CONTACT_SITE_LINKS = ['cv'] as const
 // fern under each level's sign, the canopy).
 const ROOT_VARS = { ...PALETTE_VARS, ...TONE_VARS.jungle }
 
-// Tropical Platformer, a jungle platformer from sunset to night: the page composition. Its palette, the
-// scenery's shapes, the boards, his drawing, the scenes and the per profession levels live in
-// ./TropicalPlatformer.
+// Tropical Platformer, one run of a jungle barrel platformer from the stormy night of the theft to the
+// pirate ship and home: the page composition. Its palette, the scenery's shapes, the boards, his drawing, his
+// partner, the places of the run and the per profession levels live in ./TropicalPlatformer.
 //
-// The hero is his name on a plank over the sunset by his stilt hut, a frond swaying once. Then every
-// section of the active profession is one full screen level of the jungle run (./TropicalPlatformer/scenes)
-// that rises from dark, holds while its sign and boards scroll over it, and sinks back into dark while the
-// next one rises; he makes one of the genre's moves per card and its stop answers it. Contact is his ride
-// down the zip line to the beach camp at night. Every motion is a function of the scroll position, on the
-// shared theatre (./shared/theatre) and its settle: scroll up and it plays back. Under reduced motion there
-// is no theatre: each section carries its own picture, still, at its settled frame.
+// The hero is his name on a plank over the treehouse on the night the store is stolen; he bursts out in the
+// morning to the empty cave. Then every section of the active profession is one full screen place of the run
+// (./TropicalPlatformer/places) that rises from dark, holds while its sign and boards scroll over it, and sinks
+// back into dark while the next one rises, its one to three actions played by the scroll on the shared scene
+// player. Contact is home: the store full again and the run saved in the barrel by the hut. Every motion is a
+// function of the scroll position, on the shared theatre (./shared/theatre) and its settle: scroll up and it
+// plays back. Under reduced motion there is no theatre: each section carries its own picture, still, at its
+// end frame.
 //
 // The root carries the palette as --tp-* variables and the day tone as --tone-* (the one inline style,
 // variables only), the pointer as --mx and --my, and clips sideways overflow with overflow-x: clip, not
@@ -104,17 +104,14 @@ export default function TropicalPlatformerTheme() {
       <Canopy />
 
       <div ref={textRef} className="relative z-20">
-        {/* On a phone the name and card start most of a screen down, so the blast barrel firing him onto the trail
-            plays in view first (the reduced motion still shows there), and the outfit fan below the card keeps
-            its room clear of the profession plates. */}
+        {/* On a phone the name and card start most of a screen down, so the theft and his burst out of the
+            treehouse play in view first (the reduced motion still shows there), and the outfit fan below the card
+            keeps its room clear of the profession plates. */}
         <header data-scene="hero" data-worlds-hero="" className="relative min-h-[100svh] px-4 pb-16 pt-10 max-md:pb-48 max-md:pt-[62svh] sm:px-8 sm:pt-16 md:px-20">
           {reduced && <JungleStage scene={scenes[0]} settled />}
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
               <div className="relative mx-auto max-w-3xl text-center">
-                <div data-worlds-figure="" className="pointer-events-none absolute -bottom-4 -left-16 hidden h-40 w-24 lg:block" aria-hidden="true">
-                  <HeroCharacter profession={active} className="h-full w-full" />
-                </div>
                 <h1 className={`inline-block rounded-2xl px-6 pb-4 pt-6 text-[clamp(1.5rem,7.5vw,3rem)] uppercase text-[color:var(--tp-sun-gold)] ${look.board} ${look.display} ${look.outlined}`}>
                   {name}
                 </h1>
@@ -145,9 +142,10 @@ export default function TropicalPlatformerTheme() {
             ))}
           </ProfessionRegion>
 
-          {/* The space under the contact card lets its scene, the jump for the last letter and the four lighting, play
-            out before the page ends. */}
-          <section data-scene={contact.id} className="relative mx-auto max-w-3xl px-4 pb-[70svh] pt-[60svh] motion-reduce:pb-8 motion-reduce:pt-16" aria-labelledby={CONTACT_HEADING}>
+          {/* The space over and under the contact card lets its scene, the store filled and the run saved in the
+            barrel, play out before the page ends; on a phone the space over it is taller, so the posts board and
+            the card come up only once the barrel has shut. */}
+          <section data-scene={contact.id} className="relative mx-auto max-w-3xl px-4 pb-[70svh] pt-[60svh] max-md:motion-safe:pt-[110svh] motion-reduce:pb-8 motion-reduce:pt-16" aria-labelledby={CONTACT_HEADING}>
             {reduced && <JungleStage scene={contact} settled />}
             <PostsGate>
               <div className="relative">

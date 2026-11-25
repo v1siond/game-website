@@ -88,7 +88,7 @@ export interface ToneColors {
   bloom: string
 }
 
-export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'night'
+export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'night' | 'mine' | 'lake' | 'cave' | 'factory' | 'deck'
 
 export const TONES: Record<Tone, ToneColors> = {
   // the sunset's planes are its dusk and orange and the black shapes in front of the light
@@ -152,6 +152,16 @@ export const TONES: Record<Tone, ToneColors> = {
     trunk: '#14262c',
     bloom: '#7a2a4a',
   },
+  // the mine under the island: dark rock, timber and lamp light
+  mine: { skyHigh: '#120c08', skyLow: '#3a2618', farLit: '#4a3220', far: '#2a1c12', leafLit: '#6a4a2a', leaf: '#4a3220', leafShade: '#1a100a', rim: '#ffb347', trunk: '#5a3a22', bloom: '#ffb347' },
+  // under the ice of the cold lake: blue and quiet
+  lake: { skyHigh: '#0a2a4a', skyLow: '#1d6a8a', farLit: '#3a8aa8', far: '#145070', leafLit: '#4ab0a0', leaf: '#2a7a7a', leafShade: '#0a2a3a', rim: '#bff0ff', trunk: '#1a3a4a', bloom: '#7fe3d0' },
+  // the pitch dark cave in the glacier
+  cave: { skyHigh: '#05070c', skyLow: '#0c1420', farLit: '#1a2a3a', far: '#0c1622', leafLit: '#2a3a4a', leaf: '#16222e', leafShade: '#05080c', rim: '#7fa8c8', trunk: '#101820', bloom: '#3a4a5a' },
+  // the rusty factory of oil drums
+  factory: { skyHigh: '#2a1a1a', skyLow: '#8a4a2a', farLit: '#5a3a2a', far: '#3a2418', leafLit: '#7a5a3a', leaf: '#4a3424', leafShade: '#1a100c', rim: '#ff9a3a', trunk: '#3a2a20', bloom: '#ff6a2a' },
+  // the captain's ship at sunset
+  deck: { skyHigh: '#5a2a6a', skyLow: '#ffb04a', farLit: '#2a5a8a', far: '#1a3a6a', leafLit: '#c98d4a', leaf: '#8a5a2a', leafShade: '#3a2210', rim: '#ffe08a', trunk: '#4a2a12', bloom: '#cf3b26' },
 }
 
 /** Each tone's colours as --tone-<name>, set on the scene that holds the shapes. */

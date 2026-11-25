@@ -3,7 +3,7 @@ import { COLORS as C } from './palette'
 
 // The barrel platformer's things on the stages, drawn the way its rendered sprites look: round volumes in
 // soft gradients lit from the upper right, a dark edge, a bright rim. Each is drawn round its own origin (its
-// foot on the ground at 0 0 unless said) and placed by its scene (scenes.tsx). The gradients are drawn once
+// foot on the ground at 0 0 unless said) and placed by its place (places/). The gradients are drawn once
 // for the page (PropShading, inside the world's SceneryDefs) and read by id.
 
 const EDGE = C.shadow
@@ -12,13 +12,9 @@ const EDGE = C.shadow
 const GRADIENTS: ReadonlyArray<readonly [id: string, glint: string, light: string, mid: string, dark: string]> = [
   ['tp-wood', '#ffd59a', '#e8a35c', '#a8642a', '#3a1a06'],
   ['tp-hoop', '#ffffff', '#d6dde4', '#7d8690', '#262b30'],
-  ['tp-gold', '#ffffff', '#fff3a0', '#ffc93c', '#9a5c08'],
-  ['tp-banana', '#fffbe0', '#fff08a', '#f0c82e', '#946a0c'],
   ['tp-beetle', '#e6f4ff', '#7fbfff', '#2f6fbf', '#0a1c40'],
-  ['tp-shell', '#fff0d8', '#e0bf92', '#9a704a', '#3a2412'],
   ['tp-boar', '#d6b8a0', '#a7826a', '#6b4a36', '#1e120a'],
   ['tp-iron', '#ffffff', '#b9c0c8', '#5b636c', '#181c20'],
-  ['tp-rope', '#fff4d6', '#e8cf9a', '#b8955a', '#5a4220'],
 ]
 
 /** Every prop's gradient, lit from the top and front down to its shaded underside, and the soft contact
@@ -70,52 +66,18 @@ export function Barrel({ blast = false, mouth = true }: { blast?: boolean; mouth
 }
 
 /** A barrel standing on its end, its head up, the drum he plays: 72 wide, 96 tall, its foot at 0 0. */
-export function StandingBarrel({ bonus = false }: { bonus?: boolean }) {
+export function StandingBarrel() {
   return (
     <g>
       <Shadow width={110} />
       <path d="M-34 0 Q-42 -48 -34 -96 L34 -96 Q42 -48 34 0 Z" fill="url(#tp-wood)" {...LINE} />
       <path d="M-38 -24 Q0 -18 38 -24 M-38 -72 Q0 -66 38 -72" fill="none" stroke="url(#tp-hoop)" strokeWidth={8} />
       <ellipse cx={0} cy={-96} rx={34} ry={9} fill="#d9a35f" {...LINE} />
-      {bonus && <path d="M0 -62 L6 -50 L19 -50 L9 -42 L13 -29 L0 -37 L-13 -29 L-9 -42 L-19 -50 L-6 -50 Z" fill="url(#tp-gold)" stroke={EDGE} strokeWidth={2} />}
     </g>
   )
 }
 
-/** A bunch of bananas hanging from its stem at 0 0, four fingers curving out and down. */
-export function BananaBunch() {
-  return (
-    <g>
-      <path d="M0 0 V10" stroke={C.woodDark} strokeWidth={5} strokeLinecap="round" />
-      {[-34, -12, 12, 34].map((angle) => (
-        <path key={angle} transform={`translate(0 10) rotate(${angle})`} d="M-6 0 Q-14 22 -4 42 Q2 46 6 40 Q-2 22 6 0 Z" fill="url(#tp-banana)" stroke={EDGE} strokeWidth={2} />
-      ))}
-    </g>
-  )
-}
-
-/** A single banana for a ring of them, round its middle. */
-export function Banana() {
-  return <path d="M-14 -4 Q0 12 14 -4 Q16 2 12 6 Q0 16 -12 6 Q-16 2 -14 -4 Z" fill="url(#tp-banana)" stroke={EDGE} strokeWidth={2} />
-}
-
-// The block letters of his first name, each drawn as one shape 36 wide and 56 tall round its middle.
-const LETTERS: Readonly<Record<string, string>> = {
-  A: 'M-20 28 L-5 -28 H5 L20 28 H8 L5 16 H-5 L-8 28 Z M-2 5 H2 L0 -6 Z',
-  L: 'M-16 -28 H-3 V16 H16 V28 H-16 Z',
-  E: 'M-16 -28 H16 V-16 H-3 V-6 H12 V6 H-3 V16 H16 V28 H-16 Z',
-  X: 'M-18 -28 H-5 L0 -14 L5 -28 H18 L7 0 L18 28 H5 L0 14 L-5 28 H-18 L-7 0 Z',
-}
-
-/** The gold letters he collects, the four of his first name. */
-export const NAME_LETTERS = ['A', 'L', 'E', 'X'] as const
-
-/** A gold letter token round its middle: the letter cut in a thick gold face with a dark edge. */
-export function GoldLetter({ letter }: { letter: (typeof NAME_LETTERS)[number] }) {
-  return <path d={LETTERS[letter]} fill="url(#tp-gold)" fillRule="evenodd" stroke={EDGE} strokeWidth={3} strokeLinejoin="round" />
-}
-
-/** The beetle he rolls into: a round blue shell on six legs, its horn forward (left, at him), 70 long. */
+/** A beetle of the captain's crew: a round blue shell on six legs, its horn forward (left, at him), 70 long. */
 export function Beetle() {
   return (
     <g>
@@ -129,32 +91,6 @@ export function Beetle() {
       <path d="M-42 -26 Q-56 -34 -54 -48" fill="none" stroke={EDGE} strokeWidth={5} strokeLinecap="round" />
       <circle cx={-38} cy={-22} r={3} fill={C.parchment} />
       <path d="M-20 -40 Q0 -48 22 -38" fill="none" stroke="#e6f4ff" strokeWidth={3} strokeLinecap="round" opacity={0.7} />
-    </g>
-  )
-}
-
-/** The armadillo, round its middle 40 above the ground: up on its legs, its snout at him (`armadillo-walk`),
- *  and rolled into a banded ball (`armadillo-ball`); its scene shows one or the other and turns the ball. */
-export function Armadillo() {
-  return (
-    <g>
-      <g transform="translate(0 38)">
-        <Shadow width={96} />
-      </g>
-      <g data-fx="armadillo-walk" opacity={0} transform="translate(0 22)">
-        <path d="M-44 4 Q-40 -40 4 -42 Q44 -38 46 4 Z" fill="url(#tp-shell)" {...LINE} />
-        {[-24, -8, 8, 24].map((x) => (
-          <path key={x} d={`M${x} -38 Q${x + 4} -16 ${x} 4`} fill="none" stroke="#4a301a" strokeWidth={2.4} />
-        ))}
-        <path d="M-44 -6 Q-62 -10 -66 0 Q-58 6 -44 4 Z" fill="url(#tp-shell)" {...LINE} />
-        <circle cx={-52} cy={-4} r={2.4} fill={EDGE} />
-        <path d="M-30 2 V18 M-10 2 V18 M14 2 V18 M32 2 V18" stroke={EDGE} strokeWidth={6} strokeLinecap="round" />
-      </g>
-      <g data-fx="armadillo-ball">
-        <circle r={40} fill="url(#tp-shell)" {...LINE} />
-        <path d="M-30 -26 Q-6 0 -30 26 M-10 -38 Q14 0 -10 38 M12 -38 Q34 0 12 38" fill="none" stroke="#4a301a" strokeWidth={2.4} />
-        <path d="M-22 -30 Q0 -42 26 -28" fill="none" stroke={C.parchment} strokeWidth={3} strokeLinecap="round" opacity={0.6} />
-      </g>
     </g>
   )
 }
@@ -267,17 +203,6 @@ export function Rails({ from, to }: { from: number; to: number }) {
   )
 }
 
-/** A rope hanging from the boughs, swung `angle` degrees about its top at 0 0, `length` long, its knot end. */
-export function Rope({ length, angle }: { length: number; angle: number }) {
-  return (
-    <g transform={`rotate(${angle.toFixed(1)})`}>
-      <path d={`M0 0 V${length}`} stroke={EDGE} strokeWidth={10} strokeLinecap="round" />
-      <path d={`M0 0 V${length}`} stroke="url(#tp-rope)" strokeWidth={6} strokeDasharray="6 4" />
-      <circle cy={length + 6} r={9} fill="url(#tp-rope)" stroke={EDGE} strokeWidth={2.4} />
-    </g>
-  )
-}
-
 /** A raised plank deck on two posts, its top at 0 0, `width` wide, `height` up from the ground. */
 export function Deck({ width, height }: { width: number; height: number }) {
   return (
@@ -295,7 +220,7 @@ export function Pit({ from, to }: { from: number; to: number }) {
   return <rect x={from} y={-4} width={to - from} height={600} fill={C.jungleDeep} />
 }
 
-/** A burst of light round 0 0 at `size`, where a pickup is taken or a barrel fires. */
+/** A burst of light round 0 0 at `size`, where a thing bursts, lands or fires. */
 export function Burst({ size }: { size: number }): ReactNode {
   return <circle r={size} fill="url(#tp-burst)" />
 }
