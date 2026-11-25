@@ -9,6 +9,7 @@ import { MASTERS, ScrubFighter, type Rival } from './fighter'
 import { PlaneShape } from './flight'
 import { FS } from './palette'
 import { headingTo, type Pin } from './route'
+import type { SceneSide } from './theatre'
 import { HOME, MapLand } from './worldMap'
 import look from './world.module.css'
 
@@ -285,13 +286,19 @@ const PIP = { size: 24, step: 30, y: 84 }
 const PIPS_X = 300 - (PIP.step * (MASTERS.length - 1) + PIP.size) / 2
 const PLATE = { x: PIPS_X - 15, w: PIP.step * (MASTERS.length - 1) + PIP.size + 30, y: 74, h: 44 }
 
+// From lg the run's screen stands over the half its scene plays in (theatre.tsx sideOf), clear of the card: the
+// HUD and the slot at that half's outer edge, the calls and the credits centred on it.
+const HUD_SIDE: Record<SceneSide, string> = { right: 'lg:left-auto lg:right-[3vw]', left: 'lg:left-[3vw]' }
+const SLOT_SIDE: Record<SceneSide, string> = { right: 'lg:left-auto lg:right-[4vw]', left: 'lg:left-[4vw]' }
+const CENTRE_SIDE: Record<SceneSide, string> = { right: 'lg:left-[70%]', left: 'lg:left-[30%]' }
+
 /** The HUD over a fight: both life bars, the round clock between them, two round orbs each and, on the
  *  ladder, the four masters crossed off under the clock. The scrap yard's clock is its own. */
-export function Hud({ rival = 'RIVAL', ladder = false }: { rival?: string; ladder?: boolean }) {
+export function Hud({ rival = 'RIVAL', ladder = false, side }: { rival?: string; ladder?: boolean; side: SceneSide }) {
   return (
     <svg
       viewBox={`0 0 600 ${ladder ? PLATE.y + PLATE.h + 4 : PLATE.y}`}
-      className="absolute left-1/2 top-[64px] w-[min(94vw,580px)] -translate-x-1/2 lg:left-auto lg:right-[3vw] lg:translate-x-0"
+      className={`absolute left-1/2 top-[64px] w-[min(94vw,580px)] -translate-x-1/2 lg:translate-x-0 ${HUD_SIDE[side]}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -355,9 +362,9 @@ function Call({ id }: { id: CallId }) {
 }
 
 /** The calls a scene makes, over the fight on a wide screen and in the middle on a phone. */
-export function Calls({ calls }: { calls: readonly CallId[] }) {
+export function Calls({ calls, side }: { calls: readonly CallId[]; side: SceneSide }) {
   return (
-    <svg viewBox="-400 -150 800 300" className="absolute left-1/2 top-[26%] w-[min(94vw,760px)] -translate-x-1/2 lg:left-[70%]" aria-hidden="true" focusable="false">
+    <svg viewBox="-400 -150 800 300" className={`absolute left-1/2 top-[26%] w-[min(94vw,760px)] -translate-x-1/2 ${CENTRE_SIDE[side]}`} aria-hidden="true" focusable="false">
       {calls.map((id) => (
         <Call key={id} id={id} />
       ))}
@@ -396,9 +403,9 @@ export interface Staff {
 }
 
 /** His ending's credits: his roles as the staff lines, each beside a small photo frame, rising up the sky. */
-export function Credits({ staff }: { staff: Staff }) {
+export function Credits({ staff, side }: { staff: Staff; side: SceneSide }) {
   return (
-    <svg viewBox="-300 -40 600 300" className="absolute left-1/2 top-[14%] w-[min(92vw,600px)] -translate-x-1/2 lg:left-[70%]" aria-hidden="true" focusable="false">
+    <svg viewBox="-300 -40 600 300" className={`absolute left-1/2 top-[14%] w-[min(92vw,600px)] -translate-x-1/2 ${CENTRE_SIDE[side]}`} aria-hidden="true" focusable="false">
       <g data-fx="credits" opacity="0">
         <text y={0} textAnchor="middle" fontSize={34} fill={FS.flash} stroke={FS.ink} strokeWidth={4} paintOrder="stroke" className={look.face}>
           STAFF
@@ -421,9 +428,9 @@ export function Credits({ staff }: { staff: Staff }) {
 }
 
 /** The 2P side lit for the visitor: a coin slot and the count clock. */
-export function OpenSlot() {
+export function OpenSlot({ side }: { side: SceneSide }) {
   return (
-    <svg viewBox="0 0 300 114" className="absolute bottom-[8%] left-1/2 w-[min(80vw,340px)] -translate-x-1/2 lg:left-auto lg:right-[4vw] lg:translate-x-0" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 300 114" className={`absolute bottom-[8%] left-1/2 w-[min(80vw,340px)] -translate-x-1/2 lg:translate-x-0 ${SLOT_SIDE[side]}`} aria-hidden="true" focusable="false">
       <g data-fx="slot" opacity="0">
         <rect x={4} y={4} width={292} height={106} rx={8} fill={FS.navy} stroke={FS.p2} strokeWidth={5} />
         <text x={150} y={40} textAnchor="middle" fontSize={18} fill={FS.p2} className={look.display}>

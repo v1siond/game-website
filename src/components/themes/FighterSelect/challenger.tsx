@@ -45,11 +45,12 @@ function ChallengeClock() {
   )
 }
 
-export function ChallengerScene({ profession }: { profession: Profession }) {
+/** The win screen; `className` places it beside the ending (FighterSelectTheme.tsx). */
+export function ChallengerScene({ profession, className }: { profession: Profession; className: string }) {
   const { sections } = useLabels()
 
   return (
-    <section aria-labelledby={CONTACT_HEADING} className="relative z-20 mx-auto mb-10 max-w-6xl px-4 sm:px-6">
+    <section aria-labelledby={CONTACT_HEADING} className={`relative z-20 mb-10 ${className}`}>
       <Cue>
         <RecruiterHero
           render={({ name, line, actions }) => (

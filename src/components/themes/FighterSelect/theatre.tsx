@@ -66,8 +66,20 @@ import look from './world.module.css'
 //   Contact, his ending on the rooftop at sunrise: leave (the ceremony set, his rival by the trophy, his own
 //     spot empty, him already walking off and the rival raising a hand); roll (the credits rise); wait (the 2P
 //     side lights, the coin slot and the clock).
+//
+// The sections alternate sides down the page: the first after the hero fights on the right half of a wide
+// screen beside its card on the left, the next on the left half beside its card on the right, and so on to the
+// contact (sideOf). A scene on the left has its camera aim at the left half (FOLLOW), its stage recomposed
+// round it (backdrop.tsx) and its HUD, calls, credits and slot over that half (run.tsx). Below lg, where card
+// and stage are stacked, the pair leans to the half the section names.
 
 export type SceneId = 'hero' | SectionId | 'contact'
+
+/** The half of a wide screen a scene fights in; its card reads on the other half. */
+export type SceneSide = 'right' | 'left'
+
+/** The side of the scene at `index` among the sections after the hero, the contact last: right, left, right... */
+const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left')
 
 /** The stage pushes in across its scene, the fighters a little more than the stage behind them. */
 export const TOUR_MOTION: LayerMotions = {
@@ -86,9 +98,17 @@ const GAP = { clinch: 70, close: 110, mid: 220, range: 330 } as const
 const KNOCK = 22
 // The fight camera: like the arcade's, it follows the pair, so both stand whole however far a throw, a charge or
 // a rush takes them. It keeps their middle at the centre of the part of the canvas the screen shows beside the
-// cards: x 1170 of the band right of them on a wide screen, and on a phone, under the troupe's shrink
-// (world.module.css, the same 1023.98 px breakpoint), x 1150, the middle of the window x 803 to 1497.
-const FOLLOW = { wide: 1170, narrow: 1150, query: '(max-width: 1023.98px)' } as const
+// cards: on a wide screen x 1170 of the band right of them, or x 430, its mirror about the canvas middle, of
+// the band left of them; on a phone, under the troupe's shrink (world.module.css, the same 1023.98 px
+// breakpoint), 40 either side of x 1150, the middle of the window x 803 to 1497, so the pair leans to the half
+// its section names. A scene with no fight to follow (the scrap yard, the ending) is moved on a wide screen by
+// the distance its side's aim lies from the middle it was drawn round (home); on a phone its car or its pair
+// by the trophy fill the window, so it keeps its place there.
+const FOLLOW = {
+  wide: { right: 1170, left: 430, home: 1170 },
+  narrow: { right: 1190, left: 1110, home: 1150 },
+  query: '(max-width: 1023.98px)',
+} as const
 
 // Points of a fighter's own 160 by 170 cell: the hands where a wave leaves, the chest where it lands, the
 // middle of the body the cell's mirror turns about.
@@ -161,6 +181,10 @@ interface SceneSpec {
   steps?: (m: Moment) => Partial<Steps>
   /** How far the camera pushes in on the pair. */
   zoom?: (m: Moment) => number
+  /** A scene with no fight to follow that is wider than the left half of a wide screen (the scrap yard's walk
+   *  up to the car, the ending's rival and his walk away): when it plays there, the camera draws it `fit` times
+   *  smaller about the middle it was drawn round (FOLLOW home) and puts that middle at canvas x `at`. */
+  onLeft?: { fit: number; at: number }
   /** Drawn behind the fighters, and in front of them. */
   props?: () => ReactNode
   front?: () => ReactNode
@@ -588,6 +612,8 @@ const services: SceneSpec = {
   beat: 'bonus',
   zone: 'lot',
   gap: GAP.close,
+  // his walk from x 740 and the car to x 1540, 600 wide at three quarters, from x 103 to 703
+  onLeft: { fit: 0.75, at: 426 },
   actions: [
     { ms: 1500, beats: [{ hero: 'walk', partner: 'stance', share: 0.8 }, { hero: 'roundhouse', partner: 'stance', mark: 'hit' }, { hero: 'stance', partner: 'stance', share: 0.6 }] },
     { ms: 1700, beats: [{ hero: 'strong', partner: 'stance', mark: 'hit' }, { hero: 'jump', partner: 'stance', mark: 'hit', share: 1.4 }, { hero: 'stance', partner: 'stance', share: 0.6 }] },
@@ -822,6 +848,8 @@ const contact: SceneSpec = {
   rival: 'school',
   rivalAlong: true,
   gap: -180,
+  // the rival from x 711 and his walk off to x 1372, at four fifths from x 163 to 692
+  onLeft: { fit: 0.8, at: 530 },
   actions: [
     { ms: 1800, beats: [{ hero: 'walk', partner: 'stance' }, { hero: 'walk', partner: 'win' }] },
     { ms: 1600, beats: [{ hero: 'stance', partner: 'win' }] },
@@ -841,6 +869,7 @@ export interface TourScene extends TheatreScene {
   id: SceneId
   slot: SectionSlot | null
   script: SceneScript
+  side: SceneSide
 }
 
 /** The fight's own playhead: before its first frame while the intro plays. */
@@ -855,6 +884,7 @@ const WARN = { below: 0.25, everyMs: 260 }
 
 /** The scene's writer: where it is in its run, both fighters posed and placed, the camera, its props and screen. */
 function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, 'bind'>, profession: Profession): StageWriter {
+  const { side } = scene
   const heroNode = fx(stage, 'hero')
   const rivalNode = fx(stage, 'partner')
   const camera = fx(stage, 'camera')
@@ -866,7 +896,8 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
   const intro = spec.intro?.kind === 'hop' ? hopWriter(stage, spec.intro.from, spec.intro.to) : spec.intro ? ladderWriter(stage, spec.intro.climb) : null
   const screen = screenWriter(stage, spec.calls ?? [])
   const rivalSize = spec.rivalSize ?? SIZE
-  const narrow = spec.beat === 'fight' ? window.matchMedia(FOLLOW.query) : null
+  const follows = spec.beat === 'fight'
+  const narrow = window.matchMedia(FOLLOW.query)
   const facing = spec.rivalAlong ? '' : ` translate(${CELL.width} 0) scale(-1 1)`
   return (_progress, _reached, play = sceneEnd(scene.script)) => {
     const { fight, intro: introT } = fightPlay(spec, play)
@@ -887,8 +918,12 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
     transformTo(rivalShadow, `translate(0 ${r1(steps.lift / rivalSize)})${facing}`)
     // the middle of the pair, each cell's middle by its own size (the warlord stands bigger)
     const focus = (x.hero + (CELL.width * steps.heroSize) / 2 + x.rival + (CELL.width * rivalSize) / 2) / 2
-    const pan = narrow ? (narrow.matches ? FOLLOW.narrow : FOLLOW.wide) - focus : 0
-    transformTo(camera, `translate(${r1(pan)} 0) ${focusOn(focus, FLOOR - 150, spec.zoom?.(m) ?? 1)}`)
+    const aim = narrow.matches ? FOLLOW.narrow : FOLLOW.wide
+    const left = side === 'left' && !narrow.matches
+    const pan = follows ? aim[side] - focus : narrow.matches ? 0 : (left ? spec.onLeft?.at ?? aim.left : aim.right) - aim.home
+    const fit = left ? spec.onLeft?.fit ?? 1 : 1
+    const middle = follows ? focus : aim.home
+    transformTo(camera, `translate(${r1(pan)} 0) ${focusOn(middle, FLOOR - 150, (spec.zoom?.(m) ?? 1) * fit)}`)
     const shown = spec.callAt?.(m) ?? {}
     props?.(m, x)
     const life = lifeOf(spec.actions, fight)
@@ -906,12 +941,13 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
   }
 }
 
-/** The page's scenes in order: the hero, the profession's sections, the contact. */
+/** The page's scenes in order: the hero (on its own layout), the profession's sections, the contact, sides alternating. */
 export function scenesOf(slots: readonly SectionSlot[], profession: Profession): TourScene[] {
   const ids: SceneId[] = ['hero', ...slots.map((slot) => slot.id), 'contact']
-  return ids.map((id) => {
+  return ids.map((id, i) => {
     const spec = SCENES[id]
-    const base = { id, slot: slots.find((slot) => slot.id === id) ?? null, count: 0, script: scriptOf(spec) }
+    const side = id === 'hero' ? 'right' : sideOf(i - 1)
+    const base = { id, slot: slots.find((slot) => slot.id === id) ?? null, count: 0, script: scriptOf(spec), side }
     return { ...base, bind: (stage: HTMLElement) => bindScene(stage, spec, base, profession) }
   })
 }
@@ -934,7 +970,7 @@ export function TourStage({ scene, profession, staff, settled = false }: { scene
         {
           name: 'sky',
           node: (
-            <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+            <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className={scene.side === 'left' ? look.sceneLeft : undefined} aria-hidden="true" focusable="false">
               {ZONE_ART[spec.zone]}
               {spec.beat === 'select' && (
                 <g data-fx="dusk" opacity="0">
@@ -968,13 +1004,13 @@ export function TourStage({ scene, profession, staff, settled = false }: { scene
           node: (
             // in a box of its own, so the layer's rule that stretches a stage's svg over it leaves these be
             <div className="absolute inset-0">
-              {fights && <Hud rival={spec.beat === 'bonus' ? 'CAR' : undefined} ladder={spec.masters !== undefined} />}
-              <Calls calls={spec.calls ?? []} />
+              {fights && <Hud rival={spec.beat === 'bonus' ? 'CAR' : undefined} ladder={spec.masters !== undefined} side={scene.side} />}
+              <Calls calls={spec.calls ?? []} side={scene.side} />
               {spec.beat === 'select' && <SelectBoard profession={profession} />}
               {spec.beat === 'ending' && (
                 <>
-                  <Credits staff={staff} />
-                  <OpenSlot />
+                  <Credits staff={staff} side={scene.side} />
+                  <OpenSlot side={scene.side} />
                 </>
               )}
               {spec.intro?.kind === 'hop' && <MapHop from={spec.intro.from} to={spec.intro.to} />}

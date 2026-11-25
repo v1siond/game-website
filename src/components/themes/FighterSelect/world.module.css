@@ -198,3 +198,17 @@
     transform: translate(-320px, -230px) scale(0.6);
   }
 }
+
+/* A stage whose fight plays on the left half of a wide screen (backdrop.tsx): from lg its set pieces move to the
+   left half with the fight and the pieces that made room for them move to the right half, behind the card. On
+   a narrower screen the stage keeps its composition, as the card reads below the picture there. SVG user units,
+   so the stage's 740 is the distance the fight camera moves the pair (theatre.tsx FOLLOW). */
+@media (min-width: 1024px) {
+  .sceneLeft .setPiece {
+    transform: translateX(-740px);
+  }
+
+  .sceneLeft .asidePiece {
+    transform: translateX(740px);
+  }
+}

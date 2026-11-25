@@ -19,7 +19,7 @@ import { SelectScreen } from './FighterSelect/selector'
 import { ChallengerScene } from './FighterSelect/challenger'
 import { ControlPanel } from './FighterSelect/footer'
 import { CARDS } from './FighterSelect/sections'
-import { TOUR_MOTION, TourStage, scenesOf, type TourScene } from './FighterSelect/theatre'
+import { TOUR_MOTION, TourStage, scenesOf, type SceneSide, type TourScene } from './FighterSelect/theatre'
 import type { Staff } from './FighterSelect/run'
 import look from './FighterSelect/world.module.css'
 
@@ -62,10 +62,15 @@ const SCREENS: Record<SectionId, { accent: Accent; id: string }> = {
   muayThai: { accent: 'p2', id: 'muay-thai-heading' },
 }
 
-// The column a screen reads in: beside the stage from lg, the fighters on its right; below lg the whole width,
-// the stage showing in the screens of picture alone above and below it.
-const COLUMN = 'mx-auto max-w-6xl lg:mx-0 lg:w-[min(46rem,52vw)]'
-const SIDE = 'px-4 sm:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
+// The column a screen reads in: from lg beside the stage, on the half its fight leaves free (a fight on the
+// right reads its screen on the left, and the other way round); below lg the whole width, the stage showing in
+// the screens of picture alone above and below it.
+const COLUMN = 'mx-auto max-w-6xl lg:w-[min(46rem,52vw)]'
+const GUTTER = 'px-4 sm:px-6'
+const READS_BESIDE: Record<SceneSide, { column: string; gutter: string }> = {
+  right: { column: `${COLUMN} lg:mx-0`, gutter: `${GUTTER} lg:pl-[clamp(1.5rem,4vw,4rem)]` },
+  left: { column: `${COLUMN} lg:mr-0 lg:ml-auto`, gutter: `${GUTTER} lg:pr-[clamp(1.5rem,4vw,4rem)]` },
+}
 
 // The stages the theatre builds either side of the one the page is in.
 const REACH = 1
@@ -82,11 +87,12 @@ interface SectionProps {
 function TourSection({ scene, profession, labels, staff, still }: SectionProps) {
   const Cards = CARDS[scene.slot.id] as ComponentType<{ slot: SectionSlot }>
   const { accent, id } = SCREENS[scene.slot.id]
+  const { column, gutter } = READS_BESIDE[scene.side]
   return (
-    <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
+    <div data-scene={scene.id} className={`relative pb-[70svh] ${gutter}`}>
       {still && <TourStage scene={scene} profession={profession} staff={staff} settled />}
       <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
-      <div className={COLUMN}>
+      <div className={column}>
         <ArcadePanel accent={accent} title={labels.sections[scene.slot.titleKey]} id={id}>
           <Cards slot={scene.slot} />
         </ArcadePanel>
@@ -142,9 +148,9 @@ export default function FighterSelectTheme() {
             ))}
           </ProfessionRegion>
 
-          <div data-scene="contact" className="relative pb-[30svh] pt-[100svh] max-lg:pt-[130svh]">
+          <div data-scene="contact" className={`relative pb-[30svh] pt-[100svh] max-lg:pt-[130svh] ${READS_BESIDE[contact.side].gutter}`}>
             {reduced && <TourStage scene={contact} profession={active} staff={staff} settled />}
-            <ChallengerScene profession={active} />
+            <ChallengerScene profession={active} className={READS_BESIDE[contact.side].column} />
           </div>
         </main>
 
