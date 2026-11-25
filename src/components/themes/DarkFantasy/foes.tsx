@@ -511,7 +511,7 @@ export function FirePillar({ name }: { name: string }) {
 
 /** The light, a great radiant shape 360 tall hanging in the air round its middle: a pale body under a halo,
  *  wide wings of light, two burning eyes. */
-export function Radiance() {
+export function DoorLight() {
   return (
     <g>
       <circle r={260} fill={P.white} opacity={0.35} />

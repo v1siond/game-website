@@ -38,7 +38,7 @@ import {
   Needle,
   Orb,
   PoleWall,
-  Radiance,
+  DoorLight,
   ShellGuard,
   Shockwave,
   Smoke,
@@ -373,7 +373,7 @@ const WORK = { bench: 1210, fell: 1440, duel: 1660, lunge: 1500, cut: 1330, need
 const SEAT_LIFT = 52 - (WANDERER.soleY - 95 - SIT.rise) * SCALE
 
 const work: SceneSpec = {
-  area: 'greenpath',
+  area: 'overgrowth',
   phoneX: 1465,
   phoneZoom: 0.72,
   script: [2000, 1400, 1600],
@@ -752,7 +752,7 @@ const DEEP = { from: 1220, bench: 1450, web: 1380, webLift: 430, kneel: 1500, sl
 const DEEP_SEAT = 52 - (WANDERER.soleY - 95 - SIT.rise) * SCALE
 
 const ventures: SceneSpec = {
-  area: 'deepnest',
+  area: 'nest',
   phoneX: 1570,
   phoneZoom: 0.66,
   script: [1500, 1800, 1700],
@@ -1034,8 +1034,8 @@ const contact: SceneSpec = {
   // follows him up and the top ledge ends low, in the band under the card.
   figure: (narrow) => (
     <g data-fx="camera" data-narrow={narrow ? '' : undefined}>
-      <g data-fx="radiance" transform={`translate(${LIGHT.door - 60} 330) scale(0.6)`}>
-        <Radiance />
+      <g data-fx="door-light" transform={`translate(${LIGHT.door - 60} 330) scale(0.6)`}>
+        <DoorLight />
       </g>
       {LEDGES.slice(0, -1).map(({ x, lift }) => (
         <g key={x + lift} transform={at(x, lift)}>
@@ -1076,7 +1076,7 @@ const contact: SceneSpec = {
     const leafL = fx(stage, 'door-leaf-l')
     const leafR = fx(stage, 'door-leaf-r')
     const beams = [fx(stage, 'beam-0'), fx(stage, 'beam-1')]
-    const radiance = fx(stage, 'radiance')
+    const doorLight = fx(stage, 'door-light')
     const flare = fx(stage, 'flare')
     const swallow = fx(stage, 'swallow')
     return (play) => {
@@ -1099,7 +1099,7 @@ const contact: SceneSpec = {
       })
       // one blow: the light flares, fades, and the dark rises up behind him and takes it
       burstAt(flare, LIGHT.strike - 60, 360, bell(ended, 0.28, 0.5))
-      fadeTo(radiance, 1 - ramp(ended, 0.4, 0.7))
+      fadeTo(doorLight, 1 - ramp(ended, 0.4, 0.7))
       transformTo(swallow, `translate(0 ${r1(lerp(CANVAS_H + 200, 0, ramp(ended, 0.42, 0.92)))})`)
       transformTo(camera, `translate(0 ${follows ? r1(CAMERA_DROP * Math.max(climbed, ended > 0 ? 1 : 0)) : 0})`)
       if (ended > 0) {

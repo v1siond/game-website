@@ -7,7 +7,7 @@ import { DARK_FANTASY as P } from './palette'
 // look (research/2026-11-24-deep-hollow-knight/notes.md L240 to L266): the fading town above the well, the
 // stone crossroads with the sealed door far back, the green overgrowth over pools of acid, the ochre wastes and
 // the village of blades on its poles, the blue city in the rain, the spire above it, the black tunnels of the
-// deep nest, the abyss under everything, the temple round the door, and the light behind it. Each is drawn on
+// nest, the abyss under everything, the temple round the door, and the light behind it. Each is drawn on
 // one 1920 by 1080 canvas split into the theatre's layers: the sky and what stands far off (sky), the middle
 // distance (mid), the ground he stands on (near) and the dark shapes in front (fg). The infection's orange
 // rises area by area: none in the town, a glow in the crossroads, the temple floor cracked with it.
@@ -20,7 +20,7 @@ export const CANVAS_H = 1080
 /** The ground line his soles stand on. */
 export const FLOOR_Y = 990
 
-export type AreaName = 'town' | 'crossroads' | 'greenpath' | 'village' | 'city' | 'spire' | 'deepnest' | 'abyss' | 'temple' | 'light'
+export type AreaName = 'town' | 'crossroads' | 'overgrowth' | 'village' | 'city' | 'spire' | 'nest' | 'abyss' | 'temple' | 'light'
 
 /** How a scene is cut on a narrow screen: there, the canvas x the cut is centred on. */
 export const Framing = createContext<{ narrow: boolean; centerX: number }>({ narrow: false, centerX: CANVAS_W / 2 })
@@ -49,11 +49,11 @@ interface Tint {
 const TINTS: Record<AreaName, Tint> = {
   town: { top: '#2a3142', low: '#8b94a6', far: '#5b6476', mid: '#323847', ground: '#15171f', light: P.spiritGold },
   crossroads: { top: '#141c30', low: '#4f6288', far: '#3a4a6c', mid: '#202a42', ground: '#0e1220', light: P.infectedGlow },
-  greenpath: { top: '#0f2416', low: '#4f8f5a', far: '#326040', mid: '#1c3a24', ground: '#0b170e', light: P.acid },
+  overgrowth: { top: '#0f2416', low: '#4f8f5a', far: '#326040', mid: '#1c3a24', ground: '#0b170e', light: P.acid },
   village: { top: '#241a0c', low: '#a6874c', far: '#6c5630', mid: '#3a2c16', ground: '#160f07', light: P.spore },
   city: { top: '#0c1834', low: '#4069b0', far: '#2a4888', mid: '#16285a', ground: '#0a1226', light: P.rain },
   spire: { top: '#13224a', low: '#7397d8', far: '#44649f', mid: '#22336a', ground: '#0d1630', light: P.rain },
-  deepnest: { top: '#08080b', low: '#2c2834', far: '#1c1a24', mid: '#100f15', ground: '#050507', light: P.lantern },
+  nest: { top: '#08080b', low: '#2c2834', far: '#1c1a24', mid: '#100f15', ground: '#050507', light: P.lantern },
   abyss: { top: '#000000', low: '#16161c', far: '#0c0c10', mid: '#060608', ground: '#000000', light: P.white },
   temple: { top: '#120806', low: '#5a2814', far: '#3c1a10', mid: '#200c08', ground: '#100606', light: P.infected },
   light: { top: '#e9dcc0', low: '#fff6e2', far: '#f3e4c4', mid: '#e2cfa6', ground: '#cdb88c', light: P.white },
@@ -99,7 +99,7 @@ function CrossroadsFar({ t }: { t: Tint }) {
 }
 
 /** Hanging leaves and vines over the overgrowth, the light coming down through them in shafts. */
-function GreenFar({ t }: { t: Tint }) {
+function OvergrowthFar({ t }: { t: Tint }) {
   return (
     <g>
       {range(5).map((i) => (
@@ -162,8 +162,8 @@ function CityFar({ t, high = false }: { t: Tint; high?: boolean }) {
   )
 }
 
-/** The black tunnels of the deep nest: thick roots and old webs, a few lanterns' glow far off. */
-function DeepFar({ t }: { t: Tint }) {
+/** The black tunnels of the nest: thick roots and old webs, a few lanterns' glow far off. */
+function NestFar({ t }: { t: Tint }) {
   return (
     <g>
       {range(9).map((i) => {
@@ -216,11 +216,11 @@ function LightFar({ t }: { t: Tint }) {
 const FAR: Record<AreaName, (props: { t: Tint }) => ReactNode> = {
   town: TownFar,
   crossroads: CrossroadsFar,
-  greenpath: GreenFar,
+  overgrowth: OvergrowthFar,
   village: VillageFar,
   city: CityFar,
   spire: ({ t }) => <CityFar t={t} high />,
-  deepnest: DeepFar,
+  nest: NestFar,
   abyss: AbyssFar,
   temple: TempleFar,
   light: LightFar,
@@ -282,7 +282,7 @@ const MID: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
       <path d="M1920 990 V300 Q1800 260 1740 330 V990 Z" />
     </g>
   ),
-  greenpath: ({ t }) => (
+  overgrowth: ({ t }) => (
     <g fill={t.mid}>
       <path d="M0 0 H700 Q560 120 380 90 Q200 60 0 160 Z" />
       <path d="M1920 0 H1300 Q1460 140 1660 100 Q1820 70 1920 180 Z" />
@@ -312,7 +312,7 @@ const MID: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
       <rect x={1080} y={0} width={50} height={1080} fill={t.mid} />
     </g>
   ),
-  deepnest: ({ t }) => (
+  nest: ({ t }) => (
     <g fill={t.mid}>
       <path d="M0 0 H1920 V120 Q1500 240 1200 150 Q900 60 600 200 Q300 320 0 180 Z" />
       <path d="M0 1080 V560 Q140 520 220 640 Q260 820 300 1080 Z" />
@@ -335,7 +335,7 @@ export const AreaMid = memo(function AreaMid({ area }: { area: AreaName }) {
 // ---- the ground and the dark in front ----
 
 const GROUND_TOP: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
-  greenpath: ({ t }) => (
+  overgrowth: ({ t }) => (
     <g>
       <rect x={560} y={992} width={260} height={18} rx={9} fill={t.light} opacity={0.55} />
       <rect x={1760} y={992} width={180} height={18} rx={9} fill={t.light} opacity={0.55} />
