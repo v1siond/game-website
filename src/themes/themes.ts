@@ -129,7 +129,7 @@ export const themes: Theme[] = [
   {
     id: 'soul-map',
     name: 'Soul Map',
-    description: 'A ruined shrine at dusk and a lift down through the jobs',
+    description: "A knight's way through a ruined kingdom at dusk, from fire to fire",
     colors: {
       background: SOUL.abyss,
       backgroundGradient: `linear-gradient(to bottom, ${SOUL.deep}, ${SOUL.abyss})`,
