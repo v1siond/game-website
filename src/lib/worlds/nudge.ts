@@ -47,6 +47,11 @@ export const HINT_MIN_MS = 20000
 /** How long the open hint keeps checking that nothing slid or faded in under it, the QA window. */
 export const HINT_WATCH_MS = 3000
 
+/** How often the open hint checks inside HINT_WATCH_MS. A check walks every text node and control of the page,
+ *  so it runs on this clock and not every frame; a reveal that brings text under the card stays there, so a
+ *  sample this often still catches it. HINT_WATCH_MS is a whole number of these, so the last one ends the watch. */
+export const HINT_WATCH_EVERY_MS = 150
+
 const AAA_TEXT = 7
 const BLACK = '#000000'
 const WHITE = '#ffffff'
@@ -196,8 +201,8 @@ export function isVisuallyHidden({ width, height, overflow, position, clip, clip
 export type WatchVerdict = 'watch' | 'close' | 'done'
 
 /**
- * The open hint's check, once per frame: done once HINT_WATCH_MS have passed since it opened, closed when
- * text or a control is under it before then, else watched another frame.
+ * The open hint's check, once every HINT_WATCH_EVERY_MS: done once HINT_WATCH_MS have passed since it opened, closed when
+ * text or a control is under it before then, else checked again on the next tick.
  */
 export function hintWatch({ openedAtMs, nowMs, covered }: { openedAtMs: number; nowMs: number; covered: boolean }): WatchVerdict {
   if (nowMs - openedAtMs >= HINT_WATCH_MS) return 'done'

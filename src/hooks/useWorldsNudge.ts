@@ -8,6 +8,7 @@ import { WORLD_IDS } from '@/lib/worlds/registry'
 import {
   HINT_OFFERED_KEY,
   HINT_MIN_MS,
+  HINT_WATCH_EVERY_MS,
   SEEN_STORAGE_KEY,
   VISIT_STORAGE_KEY,
   coversNothing,
@@ -254,21 +255,20 @@ export function useWorldsNudge() {
     }
   }, [hint])
 
-  // Once open, the card is measured every frame for HINT_WATCH_MS and closes this visit if a reveal that
-  // began after the opening measure brings text or a control under it.
+  // Once open, the card is measured every HINT_WATCH_EVERY_MS for HINT_WATCH_MS and closes this visit if a
+  // reveal that began after the opening measure brings text or a control under it.
   useEffect(() => {
     if (hint !== 'open') return
     const openedAtMs = performance.now()
-    let frame = 0
     const watch = () => {
       const card = hintRef.current
-      if (!card) return
-      const verdict = hintWatch({ openedAtMs, nowMs: performance.now(), covered: covered(card) })
+      const verdict = card ? hintWatch({ openedAtMs, nowMs: performance.now(), covered: covered(card) }) : 'done'
+      if (verdict === 'watch') return
+      window.clearInterval(timer)
       if (verdict === 'close') setHint('closed')
-      if (verdict === 'watch') frame = window.requestAnimationFrame(watch)
     }
-    frame = window.requestAnimationFrame(watch)
-    return () => window.cancelAnimationFrame(frame)
+    const timer = window.setInterval(watch, HINT_WATCH_EVERY_MS)
+    return () => window.clearInterval(timer)
   }, [hint])
 
   const nextId = nextInTour(theme.id, seen)

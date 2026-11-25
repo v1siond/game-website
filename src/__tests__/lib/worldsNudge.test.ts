@@ -1,6 +1,7 @@
 import {
   HINT_MIN_MS,
   HINT_WATCH_MS,
+  HINT_WATCH_EVERY_MS,
   SEEN_STORAGE_KEY,
   TOUR_ORDER,
   VISIT_STORAGE_KEY,
@@ -281,6 +282,14 @@ describe('hintWatch', () => {
 
   it('closes the card when text comes under it inside the window', () => {
     expect(hintWatch({ openedAtMs: 1000, nowMs: 1300, covered: true })).toBe('close')
+  })
+
+  it('samples the open card every 150 ms, so the window ends on a sample', () => {
+    expect(HINT_WATCH_EVERY_MS).toBe(150)
+    expect(HINT_WATCH_MS % HINT_WATCH_EVERY_MS).toBe(0)
+    const last = 1000 + (HINT_WATCH_MS / HINT_WATCH_EVERY_MS) * HINT_WATCH_EVERY_MS
+    expect(hintWatch({ openedAtMs: 1000, nowMs: last - HINT_WATCH_EVERY_MS, covered: true })).toBe('close')
+    expect(hintWatch({ openedAtMs: 1000, nowMs: last, covered: true })).toBe('done')
   })
 
   it('stops watching once the window has passed', () => {
