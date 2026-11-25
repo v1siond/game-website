@@ -5,8 +5,9 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { stretchesOf } from '@/lib/motion/sideScroll'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import { Back, Canvas, Far, Fog, Front, Ground, Mid, Mist, PHONE_TOP, PhoneTop, Sky, framingOf, type Region, type Run } from './forest'
+import { Back, Canvas, Far, Fog, Front, Ground, Mid, Mist, PHONE_TOP, PhoneTop, Sky, framingOf, holdOf, type Region, type Run, type Side } from './forest'
 import { LIGHTS, type LightName } from './palette'
+import page from './page.module.css'
 import { Stretch, bindStretch, type Place, type PlaceInput } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
@@ -32,6 +33,12 @@ import { work } from './places/work'
 // lies in planes: the far trunks out of focus, a fog band, a grey plane, the mid trunks, the low mist.
 // Each scene names its stretch, its anchor, its script of one to three actions the scroll plays, and how
 // many cards its section counts (stageItems) for the theatre's reading line.
+//
+// From lg the sections take turns down the page: the first after the hero plays right of its cards, the next
+// left of them, and so on up to the contact. He still runs right through the one level; each stretch starts
+// where the last one held him on screen, and over his first steps the camera swings past him so he holds in
+// the stretch's own half, everything he meets ahead of him on his right before the cards. On a phone the
+// band stays stacked and he holds in the half the section names; between the two every stretch plays right.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -55,6 +62,8 @@ const PROFESSION_LIGHT: Record<Profession, LightName> = { engineer: 'dawn', drum
 export interface ShadeScene extends TheatreScene {
   id: SceneId
   anchor: string
+  /** The side it plays on: its section's cards stand on the other. */
+  side: Side
   layers: StageLayer[]
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
@@ -89,34 +98,59 @@ interface Planned {
   id: SceneId
   slot: SectionSlot | null
   count: number
+  side: Side
 }
 
-/** Every scene of the page in order, each its stretch of the one level and what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): ShadeScene[] {
+/** The side of the section at `index` of the page (0 the first after the hero): right, then left, in turn. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
+
+/** Each side's class on the page's css: where the cards' column stands from lg. */
+export const SIDE_CLASS: Record<Side, string> = { right: '', left: page.cardsRight }
+
+/** Each stretch's framing: the hero's from where he wakes, every other from where the one before held him
+ *  to its own side's hold, the camera's swing between the two its turn. */
+function framingsOf(planned: readonly Planned[], phone: boolean) {
+  const hero = framingOf(true, phone)
+  return planned.reduce<{ start: number; hold: number; turn: number }[]>((framings, { side }, i) => {
+    if (i === 0) return [{ ...hero, turn: 0 }]
+    const start = framings[i - 1].hold
+    const hold = holdOf(side, phone)
+    return [...framings, { start, hold, turn: start - hold }]
+  }, [])
+}
+
+/**
+ * Every scene of the page in order, each its stretch of the one level and what its picture is built from.
+ * With the cards beside the scene (`split`, from lg) or on a phone the sections take turns, right of their
+ * cards then left; a screen between the two keeps every stretch on the right. The hero keeps its own place.
+ */
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean, split: boolean): ShadeScene[] {
+  const side = (index: number): Side => (phone || split ? sideOf(index) : 'right')
   const planned: Planned[] = [
-    { id: 'hero', slot: null, count: 0 },
-    ...slots.map((slot) => {
+    { id: 'hero', slot: null, count: 0, side: 'right' },
+    ...slots.map((slot, i) => {
       const { lead, count } = stageItems(slot, labels, highlights)
-      return { id: slot.id, slot, count: lead + count }
+      return { id: slot.id, slot, count: lead + count, side: side(i) }
     }),
-    { id: 'contact', slot: null, count: 0 },
+    { id: 'contact', slot: null, count: 0, side: side(slots.length) },
   ]
+  const framings = framingsOf(planned, phone)
   // the hero's run also crosses the screen from where he wakes to the hold
-  const framings = planned.map(({ id }) => framingOf(id === 'hero', phone))
-  const lengths = planned.map(({ id }, i) => PLACES[id].length + framings[i].hold - framings[i].start)
+  const lengths = planned.map(({ id }, i) => PLACES[id].length + (i === 0 ? framings[0].hold - framings[0].start : 0))
   const stretches = stretchesOf(lengths)
   const regionAt = (x: number): Region => {
     const at = stretches.findIndex(({ to }) => x < to)
     return PLACES[planned[at === -1 ? planned.length - 1 : at].id].region
   }
-  return planned.map(({ id, slot, count }, i) => {
+  return planned.map(({ id, slot, count, side }, i) => {
     const place = PLACES[id]
     const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
-    const input = { profession, light: LIGHTS[light] }
-    const run: Run = { ...framings[i], from: stretches[i].from, length: lengths[i], region: place.region, regionAt }
+    const input = { profession, light: LIGHTS[light], phone, side }
+    const run: Run = { ...framings[i], side, from: stretches[i].from, length: lengths[i], region: place.region, regionAt }
     return {
       id,
       anchor: ANCHORS[id],
+      side,
       slot,
       count,
       script: place.script,

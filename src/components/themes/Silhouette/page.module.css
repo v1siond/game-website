@@ -171,6 +171,18 @@
   width: min(640px, 100%);
 }
 
+/* From lg every other place (.cardsRight) keeps its title and cards to the right, where he runs on the left. */
+@media (min-width: 1024px) {
+  .cardsRight .head {
+    align-items: flex-end;
+  }
+
+  .cardsRight .body,
+  .cardsRight .goalCopy {
+    margin-left: auto;
+  }
+}
+
 .footer {
   position: relative;
   z-index: 1;

@@ -6,7 +6,8 @@ import type { Playhead, SceneScript } from '@/lib/scroll/player'
 import { setRigPose } from '../shared/rig'
 import { fx, lerp, transformTo, translateTo } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
-import { FLOOR, Figure, PAN, figureAt, type Gap, type Region, type Run } from './forest'
+import { ramp } from '@/lib/scroll/stage'
+import { FLOOR, Figure, PAN, figureAt, type Gap, type Region, type Run, type Side } from './forest'
 import type { Light } from './palette'
 import { rest, run, shadeJoints } from './pose'
 
@@ -24,6 +25,10 @@ import { rest, run, shadeJoints } from './pose'
 export interface PlaceInput {
   profession: Profession
   light: Light
+  /** Whether the canvas is framed for a phone. */
+  phone: boolean
+  /** The side the stretch plays on: beside the cards from lg, the half of a phone's band it names. */
+  side: Side
 }
 
 /** His frame in a move: his pose, how far along the stretch he is, how high above the ground, how far he
@@ -55,9 +60,10 @@ export interface Place {
   distant?: (input: PlaceInput) => ReactNode
   /** His move `t` of the way over a stretch `length` long; t 1 is the move's held pose. */
   move: (profession: Profession, t: number, length: number) => Frame
-  /** How far past him the camera looks at t, in run units, to bring a threat ahead of him into the frame;
-   *  0 at the move's start and end, so the scene starts and ends where the camera follows him. */
-  lead?: (t: number) => number
+  /** How far past him the camera looks at t, in run units, to bring a threat ahead of him into the frame on
+   *  the stretch's side; 0 at the move's start and end, so the scene starts and ends where the camera
+   *  follows him. */
+  lead?: (t: number, input: PlaceInput) => number
   /** Binds the world's reply and returns its writer over the move's t. */
   reply?: (stage: ParentNode, input: PlaceInput) => (t: number) => void
 }
@@ -87,6 +93,15 @@ export const runFrame = (profession: Profession, from: number, to: number, u: nu
 
 const PANNED = Object.entries(PAN) as [keyof typeof PAN, number][]
 
+/** The share of the move over which the camera swings him to the stretch's side. */
+const TURN = 0.1
+
+/** How far the camera has swung at t, eased out of rest and into it. */
+const turnAt = (t: number): number => {
+  const u = ramp(t, 0, TURN)
+  return u * u * (3 - 2 * u)
+}
+
 /** The stretch's figure layer: its obstacle and him, at his start. */
 export function Stretch({ place, input, run, marked = false }: { place: Place; input: PlaceInput; run: Run; marked?: boolean }) {
   return (
@@ -97,8 +112,8 @@ export function Stretch({ place, input, run, marked = false }: { place: Place; i
   )
 }
 
-/** The writer of a stretch: the camera follows him along it, each layer moved by its share of the camera's
- *  travel, the world replies, and he is posed and placed. */
+/** The writer of a stretch: the camera follows him along it and swings him to its side, each layer moved by
+ *  its share of the camera's travel, the world replies, and he is posed and placed. */
 export function bindStretch(place: Place, run: Run, stage: ParentNode, input: PlaceInput): StageWriter {
   const layers = PANNED.map(([name, share]) => [fx(stage, `pan-${name}`), share] as const)
   const root = fx(stage, 'figure')
@@ -107,7 +122,9 @@ export function bindStretch(place: Place, run: Run, stage: ParentNode, input: Pl
   return (_progress, _reached, play = START) => {
     const t = moveAt(place.ends, play)
     const frame = place.move(input.profession, t, run.length)
-    const camera = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, run) + (place.lead?.(t) ?? 0)
+    // the camera follows him, and over his first steps swings him across to the stretch's side
+    const follow = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, { start: run.start - run.turn, hold: run.hold })
+    const camera = follow + run.turn * turnAt(t) + (place.lead?.(t, input) ?? 0)
     for (const [node, share] of layers) translateTo(node, -share * camera, 0)
     reply?.(t)
     transformTo(root, figureAt(run.start + frame.ahead, frame.lift, frame.over, frame.back))

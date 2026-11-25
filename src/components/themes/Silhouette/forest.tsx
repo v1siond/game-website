@@ -9,7 +9,7 @@ import { LIGHTS, SHADE, type Light, type LightName } from './palette'
 // ground line in a wide frame. Every scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its
 // bottom (xMidYMax slice); a phone (PhoneView) frames a 460 wide slice round him with the ground a third of
 // the way down its screen. The ground's top edge sits at 68% of the frame and he stands 11% of its height
-// tall, held well right of the middle so the cards' column on the left never covers where he goes.
+// tall, held in the half of the frame his section's cards leave free (holdOf), so they never cover where he goes.
 //
 // The camera follows him along the level (src/lib/motion/sideScroll.ts): each layer is one group, data-fx
 // pan-<layer>, that the scene's writer moves by its share of the camera's travel, the far trees least and
@@ -28,8 +28,8 @@ export const FLOOR = 680
 /** His drawn height on the canvas: about 11% of the frame, the game's scale. */
 export const FIGURE_H = 110
 const FIGURE_W = (FIGURE_H * FIGURE_VIEW.width) / FIGURE_VIEW.height
-/** Where the camera holds him on the canvas when it has caught up: well right of the cards' column, so the
- *  obstacle he has just crossed stays in the clear part of the screen behind him. */
+/** Where the camera holds him on the canvas when it has caught up on the right: well right of the cards'
+ *  column, so the obstacle he has just crossed stays in the clear part of the screen behind him. */
 export const HOLD = 1150
 /** Where he lies in the grass when the page opens, left of the hero's panel; on a phone the hold. */
 const WAKE_X = 360
@@ -37,7 +37,21 @@ const WAKE_X = 360
 /** Whether the canvas is drawn for a phone's narrow, tall screen. */
 export const PhoneView = createContext(false)
 
-/** Where a scene starts him on screen and where the camera holds him at its end. */
+/** The half of the screen a stretch plays on: right of its section's cards, or left of them. */
+export type Side = 'right' | 'left'
+
+// Where the camera holds him on each side. From lg the cards stand on the other side, so on the left he holds
+// as far into the free half (canvas 0 to about 790 from 1024 to 1440 wide) as he holds into the right one,
+// and what he meets ahead of him still fits before the cards. A phone keeps its one slice round HOLD and
+// holds him in the half the section names: on the right at HOLD, a little right of its middle, where what
+// he crosses still has room ahead of him, on the left near its left edge.
+const WIDE_HOLD: Record<Side, number> = { right: HOLD, left: 420 }
+const PHONE_HOLD: Record<Side, number> = { right: HOLD, left: HOLD - 130 }
+
+/** Where the camera holds him at a stretch's end on its side. */
+export const holdOf = (side: Side, phone: boolean): number => (phone ? PHONE_HOLD : WIDE_HOLD)[side]
+
+/** Where the hero starts him on screen and where the camera holds him at its end. */
 export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: wakes && !phone ? WAKE_X : HOLD, hold: HOLD })
 
 // The phone's slice: 460 wide round the hold, him a little right of its middle so what he has just crossed
@@ -67,6 +81,11 @@ export type Region = 'forest' | 'city' | 'machine'
 export interface Run extends Framing {
   from: number
   length: number
+  /** The side it plays on: the masses that frame the view stand on its outer edge. */
+  side: Side
+  /** How far the camera swings over the stretch's first steps, from the side the stretch before held him on
+   *  to this one's: `start` less `hold` when the side changes, 0 when it does not or he wakes (the hero). */
+  turn: number
   /** The region the scene's own stretch is in: it picks what stands in the layers behind and in front. */
   region: Region
   /** The region of each point of the level: it picks what grows on the ground, which meets the next
@@ -445,16 +464,28 @@ function useView(): { x: number; y: number; width: number; height: number } {
 }
 
 /** The dark masses at the view's own edges, which stay as the camera moves, so the bright opening is always
- *  framed. */
-function Edges({ region }: { region: Region }) {
-  return <Soft d={EDGE_SHAPE[region](useView())} />
+ *  framed. From lg a stretch on the left has them the other way round: the near trunk on the screen's left
+ *  edge, where its open half ends, and the overhang at the top right over the cards. */
+function Edges({ region, side }: { region: Region; side: Side }) {
+  const view = useView()
+  const phone = useContext(PhoneView)
+  const d = EDGE_SHAPE[region](view)
+  if (phone || side === 'right') return <Soft d={d} />
+  return (
+    <g transform={`translate(${2 * view.x + view.width} 0) scale(-1 1)`}>
+      <Soft d={d} />
+    </g>
+  )
 }
 
 /** The heavy round vignette over the view the canvas shows: dark at every corner and edge, the bright
  *  opening a soft oval in the middle. */
-function Vignette() {
-  return <rect {...useView()} fill="url(#sh-vignette)" />
+function Vignette({ side }: { side: Side }) {
+  return <rect {...useView()} fill={`url(#sh-vignette-${side})`} />
 }
+
+// The bright oval leans a little toward the half the stretch plays on.
+const VIGNETTE_X: Record<Side, number> = { right: 0.52, left: 0.48 }
 
 /** In front, out of focus: the region's soft masses along the top, the masses that frame the view's sides,
  *  and the heavy vignette the game's camera sees every place through. */
@@ -462,7 +493,7 @@ export function Front({ run }: { run: Run }) {
   return (
     <Canvas>
       <defs>
-        <radialGradient id="sh-vignette" cx="0.52" cy="0.42" r="0.6">
+        <radialGradient id={`sh-vignette-${run.side}`} cx={VIGNETTE_X[run.side]} cy="0.42" r="0.6">
           <stop offset="0.34" stopColor={SHADE.black} stopOpacity="0" />
           <stop offset="0.66" stopColor={SHADE.black} stopOpacity="0.7" />
           <stop offset="0.92" stopColor={SHADE.black} stopOpacity="1" />
@@ -471,8 +502,8 @@ export function Front({ run }: { run: Run }) {
       <g data-fx="pan-fg">
         <Scattered run={run} layer="fg" spacing={700} seed={5} draw={(x, s, region) => FRONT_SHAPE[region](x, s)} />
       </g>
-      <Edges region={run.region} />
-      <Vignette />
+      <Edges region={run.region} side={run.side} />
+      <Vignette side={run.side} />
     </Canvas>
   )
 }

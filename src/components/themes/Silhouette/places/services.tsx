@@ -6,6 +6,7 @@ import { Boy, BOY_STAND, bindBoy, boyRun, type BoyFrame, type Weapon } from '../
 import { SHADE, type Light } from '../palette'
 import { runFrame, type Frame, type Place } from '../place'
 import { DUCK, rest } from '../pose'
+import type { Side } from '../forest'
 
 // Services, the ambush turned back: the hostile boys' ground (research notes L51 to L65, [2] [5] [9] [1]).
 // Three boys of our own stand on a rise ahead of him, one with a spear, two with blowpipes raised. The one
@@ -24,7 +25,8 @@ const DIP = 14
 const OPEN = -240
 const BLOCK = 33
 const RIDGE = { from: 630, h: 50 }
-const LOOK_AHEAD = 280
+// how far the camera looks past him on each side: less on the left, where he already holds near the edge
+const LOOK_AHEAD: Record<Side, number> = { right: 280, left: 150 }
 
 interface Hunter {
   weapon: Weapon
@@ -103,7 +105,7 @@ export const services: Place = {
   script: [1600, 1700, 1500],
   ends: [0.34, 0.7, 1],
   gaps: [HOLLOW],
-  lead: (t) => LOOK_AHEAD * (ramp(t, 0.04, 0.14) - ramp(t, 0.6, 0.8)),
+  lead: (t, { side }) => LOOK_AHEAD[side] * (ramp(t, 0.04, 0.14) - ramp(t, 0.6, 0.8)),
   obstacle: ({ light }: { light: Light }) => (
     <>
       <rect x={HOLLOW[0]} y={DIP} width={HOLLOW[1] - HOLLOW[0]} height={1000} fill={SHADE.black} />

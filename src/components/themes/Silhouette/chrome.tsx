@@ -6,7 +6,7 @@ import { initialsOf } from '@/lib/cv/nameWords'
 import { Stage } from '../shared/theatre/Stage'
 import { ContactButtons } from './actions'
 import { TYPEWRITER } from './palette'
-import { LAYER_MOTION, type ShadeScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type ShadeScene } from './scenes'
 import { SectionTitle } from './sections'
 import page from './page.module.css'
 
@@ -35,7 +35,7 @@ export function ClearingContact({ scene, still }: { scene: ShadeScene; still: bo
   const { sections } = useLabels()
   const { contact } = useCVData()
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="sh-contact" className={page.goal}>
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="sh-contact" className={`${page.goal} ${SIDE_CLASS[scene.side]}`}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled />}
       <div className={page.goalCopy}>
         <SectionTitle id="sh-contact" title={sections.contact} />

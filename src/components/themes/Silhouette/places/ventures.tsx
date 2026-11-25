@@ -5,6 +5,7 @@ import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, STRIKE, TUCK, rest } from '../pose'
+import type { Side } from '../forest'
 
 // Ventures, the sign that kills: on the crumbling city's roofs a great sign stands on its scaffold along his
 // way, five tall panels of bulbs with no letters on them, and the lit panel kills whatever stands in front of
@@ -20,7 +21,8 @@ const CABLE = PANEL.from + PANEL.w * 2 + 6
 const EDGE = PANEL.from + PANEL.w * PANEL.count + 40
 const DOME = { x: EDGE + 130, r: 130, top: 60 }
 const FALL = 230
-const LOOK_ALONG = 130
+// how far the camera looks along the sign on each side: less on the left, where he already holds near the edge
+const LOOK_ALONG: Record<Side, number> = { right: 130, left: 40 }
 
 /** The middle of panel `i`. */
 const panelX = (i: number): number => PANEL.from + PANEL.w * (i + 0.5)
@@ -86,7 +88,7 @@ export const ventures: Place = {
   ends: [0.34, 0.66, 1],
   gaps: [[EDGE, EDGE + 500]],
   // the camera looks along the sign while the light walks it and he cuts it, so on a phone it is whole in frame
-  lead: (t) => LOOK_ALONG * (ramp(t, 0.02, 0.1) - ramp(t, 0.66, 0.8)),
+  lead: (t, { side }) => LOOK_ALONG[side] * (ramp(t, 0.02, 0.1) - ramp(t, 0.66, 0.8)),
   phoneTop: 600,
   obstacle: ({ light }: { light: Light }) => (
     <>

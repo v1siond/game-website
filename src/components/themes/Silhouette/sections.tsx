@@ -12,7 +12,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { BandPlate, CARD_BODY, CARD_META, DASH_LIST, JobSlab, ProjectSlab, ServiceSlab, Slab, TechCrate, VentureSign } from './cards'
 import { TYPEWRITER } from './palette'
-import { LAYER_MOTION, type ShadeScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type ShadeScene } from './scenes'
 import page from './page.module.css'
 
 // One section per place of the forest: a tall head that first shows the place alone and then brings up
@@ -172,7 +172,7 @@ export function PlaceSection({ scene, still }: { scene: ShadeScene & { slot: Sec
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `sh-${scene.id}`
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${SIDE_CLASS[scene.side]}`}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled />}
       <header className={page.head}>
         <SectionTitle id={headingId} title={sections[scene.slot.titleKey]} />

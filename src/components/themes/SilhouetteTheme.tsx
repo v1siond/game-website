@@ -28,12 +28,15 @@ import page from './Silhouette/page.module.css'
 // to the city wall, the crusher, the wall gun, the turning gear, the gravity room and its saw, and the
 // trunk before the clearing. The shared scene player plays each stretch's one to three actions at their own
 // pace as the section arrives: scroll up and it plays back. The text is plain HTML in the page flow over the
-// fixed theatre of pictures, opaque from its first frame, in the left column while he runs on the right.
+// fixed theatre of pictures, opaque from its first frame; from lg the sections take turns, the cards on the
+// left while he runs on the right, then the other way round, the camera swinging him across as he goes.
 //
 // Under reduced motion there is no theatre: each section carries its own picture, still, at its end frame.
 
 // A phone frames the forest from higher up (Silhouette/forest PhoneView).
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the level sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 const hasSlot = (scene: ShadeScene): scene is ShadeScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -44,9 +47,10 @@ export default function SilhouetteTheme() {
   const labels = useLabels()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
-    [view, cv, labels, active, phone],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split),
+    [view, cv, labels, active, phone, split],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
