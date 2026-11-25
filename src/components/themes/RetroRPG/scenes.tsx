@@ -26,7 +26,7 @@ import { GROUND, PX, type Zone } from './zones'
 // and in the heat he pours a cup of water on her. Ventures: he buys a charm at the weaver's stall, his heart
 // rides her threads, and the charm he holds up lets him through her web. Bands: he drums a fill on the
 // showman's stage, his heart shoots up at the speakers, and the meter fills until the showman bows. Muay
-// Thai: the old champion shatters the mercy button, he raises his guard in the storm, calls his friends'
+// Thai: the old champion shatters the spare button, he raises his guard in the storm, calls his friends'
 // lights, and reaches out until the champion is a kid again. Contact: he climbs out onto the cliff at sunset
 // with the friends of this page behind him and touches the save star.
 //
@@ -316,14 +316,14 @@ const boxOf = ({ phone, cx }: Layout) => (phone ? { bx: cx, w: 120, top: 560, bo
 /** The foe's size over the box: smaller on a phone, so it stands in the strip above the box. */
 const foeSize = ({ phone }: Layout): number => (phone ? 0.75 : 1)
 
-const BUTTONS = ['fight', 'act', 'item', 'mercy'] as const
+const BUTTONS = ['blade', 'speech', 'bag', 'spare'] as const
 
 /** A command button's icon, plain shapes: a blade, a speech mark, a bag, a cross. */
 const ICONS: Record<(typeof BUTTONS)[number], ReactNode> = {
-  fight: <path d="M-1 -6 h2 v8 h2 v2 h-6 v-2 h2 Z" />,
-  act: <path d="M-5 -5 h10 v7 h-6 l-3 3 v-3 h-1 Z" />,
-  item: <path d="M-4 -3 h8 v7 h-8 Z M-2 -5 h4 v2 h-4 Z" />,
-  mercy: <path d="M-5 -5 L5 5 M5 -5 L-5 5" strokeWidth={2} />,
+  blade: <path d="M-1 -6 h2 v8 h2 v2 h-6 v-2 h2 Z" />,
+  speech: <path d="M-5 -5 h10 v7 h-6 l-3 3 v-3 h-1 Z" />,
+  bag: <path d="M-4 -3 h8 v7 h-8 Z M-2 -5 h4 v2 h-4 Z" />,
+  spare: <path d="M-5 -5 L5 5 M5 -5 L-5 5" strokeWidth={2} />,
 }
 
 /** His heart in the battle box, in the colour of its mode. */
@@ -515,7 +515,7 @@ const about: SceneDef = {
 
 // Work, the basement corridor of the ruins: the caretaker stands before the tall door out. The screen cuts to
 // the battle: her fire sweeps across the box in waves and his heart weaves the gaps; he spares her again and
-// again, the mercy button lighting each time, and her fire bends further away from his heart. Back in the
+// again, the spare button lighting each time, and her fire bends further away from his heart. Back in the
 // corridor she kneels and holds him, the door swings open, and she waves him on.
 const WORK = { from: -60, hug: 110, carer: 170, door: 280 }
 const FLAMES = 9
@@ -551,7 +551,7 @@ const work: SceneDef = {
     const cut = battleCut(stage)
     const box = boxNodes(stage, layout)
     const flames = Array.from({ length: FLAMES }, (_, i) => fx(stage, `flame-${i}`))
-    const mercy = fx(stage, 'button-mercy')
+    const spareButton = fx(stage, 'button-spare')
     const carer = fx(stage, 'carer')
     const door = fx(stage, 'door')
     const light = fx(stage, 'door-light')
@@ -574,7 +574,7 @@ const work: SceneDef = {
         translateTo(flame, x, Math.min(box.bottom - 12, Math.max(box.top + 12, lane + away)))
         fadeTo(flame, shown > 0.5 && fought > 0.3 ? 1 : 0)
       })
-      mercy?.setAttribute('stroke', spared > 0 && spared < 1 && Math.sin(spared * Math.PI * 6) > 0 ? RPG.gold : RPG.wraps)
+      spareButton?.setAttribute('stroke', spared > 0 && spared < 1 && Math.sin(spared * Math.PI * 6) > 0 ? RPG.gold : RPG.wraps)
       const knelt = bell(held, 0.1, 0.6)
       placeTo(carer, carerX, GROUND + 40 * knelt - hop(ramp(held, 0.75, 1), 14))
       const open = ramp(held, 0.4, 0.7)
@@ -1021,7 +1021,7 @@ const bands: SceneDef = {
 }
 
 // Muay Thai, the grey royal city at the barrier: the screen cuts to the battle and the old champion smashes
-// the mercy button, its pieces flying; back in the hall he raises his guard as the champion's storm comes
+// the spare button, its pieces flying; back in the hall he raises his guard as the champion's storm comes
 // down. He calls out, and one by one the lights of the friends he spared answer and the storm softens; then he
 // reaches out, the champion shrinks back into the scared kid he was, and the barrier cracks open with light
 // from above.
@@ -1064,11 +1064,11 @@ const muayThai: SceneDef = {
   },
   screen: (layout) => {
     const { bx, w, bottom } = boxOf(layout)
-    const mercyX = bx - w + ((2 * w) / 4) * 3.5
+    const spareX = bx - w + ((2 * w) / 4) * 3.5
     return (
         <Battle layout={layout} foe={CHAMPION} heart={RPG.red}>
           {Array.from({ length: SHARDS }, (_, i) => (
-            <rect key={i} data-fx={`shard-${i}`} x={-10} y={-10} width={20} height={20} fill={RPG.wraps} opacity={0} transform={`translate(${r1(mercyX)} ${bottom + 70})`} />
+            <rect key={i} data-fx={`shard-${i}`} x={-10} y={-10} width={20} height={20} fill={RPG.wraps} opacity={0} transform={`translate(${r1(spareX)} ${bottom + 70})`} />
           ))}
         </Battle>
     )
@@ -1076,8 +1076,8 @@ const muayThai: SceneDef = {
   bind: (stage, layout) => {
     const cut = battleCut(stage)
     const box = boxNodes(stage, layout)
-    const mercy = fx(stage, 'button-mercy')
-    const mercyIcon = fx(stage, 'icon-mercy')
+    const spareButton = fx(stage, 'button-spare')
+    const spareIcon = fx(stage, 'icon-spare')
     const shards = Array.from({ length: SHARDS }, (_, i) => fx(stage, `shard-${i}`))
     const champion = fx(stage, 'champion')
     const kid = fx(stage, 'kid')
@@ -1086,7 +1086,7 @@ const muayThai: SceneDef = {
     const crack = fx(stage, 'crack')
     const skylight = fx(stage, 'skylight')
     const [from, guardX, reachX, championX] = [MUAY_THAI.from, MUAY_THAI.guard, MUAY_THAI.reach, MUAY_THAI.champion].map((dx) => roomX(layout, dx))
-    const mercyX = box.bx - box.w + ((2 * box.w) / 4) * 3.5
+    const spareX = box.bx - box.w + ((2 * box.w) / 4) * 3.5
     return (_p, _f, play = START) => {
       const guarded = share(play, 0)
       const called = share(play, 1)
@@ -1094,11 +1094,11 @@ const muayThai: SceneDef = {
       const shown = cut(ramp(guarded, 0, 0.5), ramp(guarded, 0.5, 1))
       translateTo(box.heart, box.bx, box.mid)
       const broke = ramp(guarded, 0.3, 0.5)
-      fadeTo(mercy, 1 - broke)
-      fadeTo(mercyIcon, 1 - broke)
+      fadeTo(spareButton, 1 - broke)
+      fadeTo(spareIcon, 1 - broke)
       shards.forEach((shard, i) => {
         const a = (i / SHARDS) * Math.PI * 2 + 0.6
-        translateTo(shard, mercyX + 90 * broke * Math.cos(a), box.bottom + 70 + 90 * broke * Math.sin(a))
+        translateTo(shard, spareX + 90 * broke * Math.cos(a), box.bottom + 70 + 90 * broke * Math.sin(a))
         fadeTo(shard, broke > 0 && broke < 1 ? 1 : 0)
       })
       const storm = ramp(guarded, 0.75, 0.9) * (1 - ramp(called, 0.2, 1))
