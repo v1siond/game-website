@@ -181,7 +181,7 @@ const poseHero = (nodes: HeroNodes, { x, y = FLOOR, lift = 0, face = 1, lean = 0
 }
 
 /** Him, the hero unit, and his ring under him. */
-function HeroUnit({ x, y = FLOOR, scene, ring = true }: { x: number; y?: number; scene: RealmScene; ring?: boolean }) {
+function HeroUnit({ x, y = FLOOR, face = 1, scene, ring = true }: { x: number; y?: number; face?: 1 | -1; scene: RealmScene; ring?: boolean }) {
   return (
     <>
       {ring && (
@@ -189,7 +189,7 @@ function HeroUnit({ x, y = FLOOR, scene, ring = true }: { x: number; y?: number;
           <SelectRing name="hero-ring-mark" rx={64} />
         </g>
       )}
-      <g data-fx="hero" transform={heroAt(x, y)}>
+      <g data-fx="hero" transform={heroAt(x, y, 0, face)}>
         <Commander profession={scene.profession} figure={scene.figure} />
       </g>
     </>
@@ -230,6 +230,8 @@ type SceneWriter = (play: Playhead) => void
 interface SceneSpec {
   /** Where his action is in the scene's frame: the point a stacked screen keeps on the half the section names. */
   lead: number
+  /** The lead on a phone, where the scene stands its cast another way round for the narrow screen. */
+  phoneLead?: number
   land: () => ReactNode
   script: SceneScript
   figure: (scene: RealmScene) => ReactNode
@@ -335,9 +337,15 @@ const ABOUT = {
   raiders: [{ x: 40, y: 870 }, { x: 140, y: 930 }, { x: 200, y: 840 }, { x: 270, y: 970 }],
   footmen: [{ x: -300, y: 880 }, { x: -260, y: 950 }, { x: -320, y: 1010 }],
   runners: [{ x: -60, y: 760 }, { x: 10, y: 800 }],
-  him: { x: -200, y: 960, to: 60 },
   advance: 230,
 }
+// His charge: on a phone he waits at the head of his line right of the screen's middle, the half the section
+// names, so the raid plays beside him and the charge is short.
+const ABOUT_HIM = {
+  field: { x: -200, y: 960, to: 60 },
+  phone: { x: -40, y: 960, to: 60 },
+}
+const aboutHimOf = ({ phone }: RealmScene) => ABOUT_HIM[phone ? 'phone' : 'field']
 
 /** A farmstead from above at an angle: walls, a thatched roof, the fire on it in `${name}-fire`. */
 function Farmstead({ name }: { name: string }) {
@@ -389,10 +397,11 @@ const about: SceneSpec = {
           <Footman name={`footman-body-${i}`} />
         </g>
       ))}
-      <HeroUnit x={ABOUT.him.x} y={ABOUT.him.y} scene={scene} />
+      <HeroUnit x={aboutHimOf(scene).x} y={aboutHimOf(scene).y} scene={scene} />
     </>
   ),
-  bind: (stage) => {
+  bind: (stage, scene) => {
+    const charge = aboutHimOf(scene)
     const him = heroNodes(stage)
     const fires = ABOUT.houses.map((_, i) => fx(stage, `house-${i}-fire`))
     const raiders = unitsOf(stage, 'raider', ABOUT.raiders.length)
@@ -429,8 +438,8 @@ const about: SceneSpec = {
       })
       const chop = ramp(charged, 0.35, 0.75)
       poseHero(him, {
-        x: lerp(ABOUT.him.x, ABOUT.him.to, ran),
-        y: ABOUT.him.y,
+        x: lerp(charge.x, charge.to, ran),
+        y: charge.y,
         step: ran > 0 && ran < 1 ? ran * 6 : 0,
         sword: ARM.up * ramp(charged, 0, 0.35) * (1 - chop) + lerp(ARM.up, 20, chop) * (chop > 0 ? 1 : 0) * (1 - ramp(charged, 0.85, 1)),
         shield: ARM.guard * ramp(charged, 0, 0.3),
@@ -562,8 +571,14 @@ const TECH = {
   soldiers: [{ x: -80, y: 850 }, { x: -10, y: 900 }, { x: 60, y: 840 }, { x: 110, y: 890 }],
   townsfolk: [{ x: 120, y: 700 }, { x: 200, y: 720 }],
   knights: [{ x: -230, y: 920 }, { x: -110, y: 1010 }],
-  him: { x: -170, y: 960, away: -300, awayY: 1010 },
 }
+// His road away: on a phone it starts nearer the gate and ends sooner, so the band can stand far enough left
+// that the prince at the gate is whole on the screen while he ends right of its middle.
+const TECH_HIM = {
+  field: { x: -170, y: 960, away: -300, awayY: 1010 },
+  phone: { x: -100, y: 960, away: -180, awayY: 1010 },
+}
+const techHimOf = ({ phone }: RealmScene) => TECH_HIM[phone ? 'phone' : 'field']
 
 function CityWall() {
   const { x, y } = TECH.gate
@@ -592,6 +607,7 @@ function CityWall() {
 
 const tech: SceneSpec = {
   lead: -260,
+  phoneLead: -160,
   land: () => <CityLand />,
   script: [1700, 1500, 1700],
   figure: (scene) => (
@@ -620,10 +636,11 @@ const tech: SceneSpec = {
           <Footman name={`knight-body-${i}`} />
         </g>
       ))}
-      <HeroUnit x={TECH.him.x} y={TECH.him.y} scene={scene} />
+      <HeroUnit x={techHimOf(scene).x} y={techHimOf(scene).y} scene={scene} />
     </>
   ),
-  bind: (stage) => {
+  bind: (stage, scene) => {
+    const road = techHimOf(scene)
     const him = heroNodes(stage)
     const prince = kingNodes(stage, 'prince')
     const soldiers = unitsOf(stage, 'soldier', TECH.soldiers.length)
@@ -664,8 +681,8 @@ const tech: SceneSpec = {
         transformTo(node, `${place(kx, y + 10 * walk, turned > 0.5 ? -1 : 1, FOLK)} translate(0 ${r1(walk > 0 && walk < 1 ? hop(kx) : 0)})`)
       })
       poseHero(him, {
-        x: lerp(TECH.him.x, TECH.him.away, walk),
-        y: lerp(TECH.him.y, TECH.him.awayY, walk),
+        x: lerp(road.x, road.away, walk),
+        y: lerp(road.y, road.awayY, walk),
         face: turned > 0.5 ? -1 : 1,
         step: walk > 0 && walk < 1 ? walk * 5 : 0,
         sword: 40 * ramp(refused, 0, 0.3) * (1 - ramp(left, 0, 0.2)),
@@ -830,105 +847,137 @@ const services: SceneSpec = {
 // ranks; he sweeps the blade, a ring of frost rolls out and the footmen with the knight commander freeze and
 // shatter while he holds behind his shield; then the frost king climbs into his throne and its crown lights. The
 // end frame is the frost king on the throne, the steed at its foot, the dead in ranks, him alone before them.
-const PROJECTS = {
-  throne: { x: 150, y: 760, size: 0.56 },
-  seat: { x: 150, y: 680 },
-  king: { x: 40, y: 880 },
-  steed: { x: 290, y: 930, size: 0.62 },
-  dead: [
-    { x: -40, y: 900 },
-    { x: 40, y: 960 },
-    { x: 120, y: 930 },
-    { x: 200, y: 990 },
-    { x: -10, y: 1020 },
-    { x: 110, y: 1030 },
-  ],
-  footmen: [{ x: -300, y: 910 }, { x: -160, y: 1030 }],
-  him: { x: -230, y: 975 },
-}
+// From the left the field is too wide for half a phone, so there the realm stands the other way round: the
+// throne deep in the middle with the steed at its left foot, the dead coming up toward him, and him with his
+// footmen on the right half, facing them; `face` is the way he and his footmen face, `deadFace` the dead's.
+const PROJECTS_AT = {
+  field: {
+    throne: { x: 150, y: 760, size: 0.56 },
+    seat: { x: 150, y: 680 },
+    king: { x: 40, y: 880 },
+    steed: { x: 290, y: 930, size: 0.62 },
+    dead: [
+      { x: -40, y: 900 },
+      { x: 40, y: 960 },
+      { x: 120, y: 930 },
+      { x: 200, y: 990 },
+      { x: -10, y: 1020 },
+      { x: 110, y: 1030 },
+    ],
+    footmen: [{ x: -300, y: 910 }, { x: -160, y: 1030 }],
+    him: { x: -230, y: 975 },
+    face: 1,
+    deadFace: -1,
+  },
+  phone: {
+    throne: { x: -60, y: 760, size: 0.56 },
+    seat: { x: -60, y: 680 },
+    king: { x: 40, y: 880 },
+    steed: { x: -200, y: 930, size: 0.62 },
+    dead: [
+      { x: 110, y: 900 },
+      { x: 30, y: 960 },
+      { x: -40, y: 930 },
+      { x: -120, y: 990 },
+      { x: 80, y: 1020 },
+      { x: -30, y: 1030 },
+    ],
+    footmen: [{ x: 330, y: 910 }, { x: 190, y: 1030 }],
+    him: { x: 250, y: 975 },
+    face: -1,
+    deadFace: 1,
+  },
+} as const
+const projectsOf = ({ phone }: RealmScene) => PROJECTS_AT[phone ? 'phone' : 'field']
 
 const projects: SceneSpec = {
   lead: -200,
+  phoneLead: 176,
   land: () => <FrozenLand />,
   script: [1600, 1700, 1700],
-  figure: (scene) => (
-    <>
-      <g transform={`translate(${PROJECTS.throne.x} ${PROJECTS.throne.y}) scale(${PROJECTS.throne.size})`}>
-        <IceThrone name="throne" />
-      </g>
-      <g transform={`translate(${PROJECTS.steed.x} ${PROJECTS.steed.y}) scale(${PROJECTS.steed.size})`}>
-        <DeathSteed name="steed" />
-      </g>
-      <g data-fx="nova" opacity="0" transform={`translate(${PROJECTS.king.x} ${PROJECTS.king.y})`}>
-        <ellipse rx="300" ry="90" fill="none" stroke={REALM.frostIceBright} strokeWidth="18" />
-        <ellipse rx="300" ry="90" fill={REALM.frostIceMid} opacity="0.25" />
-      </g>
-      {PROJECTS.dead.map(({ x, y }, i) => (
-        <g key={x + y} data-fx={`dead-${i}`} transform={place(x, y + 90, -1, FOLK)} opacity="0">
-          {i % 2 ? <BoneSoldier name={`dead-body-${i}`} /> : <Risen name={`dead-body-${i}`} />}
+  figure: (scene) => {
+    const at = projectsOf(scene)
+    return (
+      <>
+        <g transform={`translate(${at.throne.x} ${at.throne.y}) scale(${at.throne.size})`}>
+          <IceThrone name="throne" />
         </g>
-      ))}
-      <g data-fx="king-at" transform={kingAt(PROJECTS.king.x, PROJECTS.king.y, 0.66 * depth(PROJECTS.king.y))}>
-        <FrostKing name="king" />
-      </g>
-      {PROJECTS.footmen.map(({ x, y }, i) => (
-        <g key={x} data-fx={`footman-${i}`} transform={place(x, y, 1, FOLK)}>
-          <Footman name={`footman-body-${i}`} />
-          <g data-fx={`ice-${i}`} opacity="0">
-            <path d="M-26,0 L-30,-80 L-10,-104 L20,-100 L30,-60 L26,0 Z" fill={REALM.frostIceMid} opacity="0.7" stroke={REALM.frostIceBright} strokeWidth="3" />
+        <g transform={`translate(${at.steed.x} ${at.steed.y}) scale(${at.steed.size})`}>
+          <DeathSteed name="steed" />
+        </g>
+        <g data-fx="nova" opacity="0" transform={`translate(${at.king.x} ${at.king.y})`}>
+          <ellipse rx="300" ry="90" fill="none" stroke={REALM.frostIceBright} strokeWidth="18" />
+          <ellipse rx="300" ry="90" fill={REALM.frostIceMid} opacity="0.25" />
+        </g>
+        {at.dead.map(({ x, y }, i) => (
+          <g key={x + y} data-fx={`dead-${i}`} transform={place(x, y + 90, at.deadFace, FOLK)} opacity="0">
+            {i % 2 ? <BoneSoldier name={`dead-body-${i}`} /> : <Risen name={`dead-body-${i}`} />}
           </g>
+        ))}
+        <g data-fx="king-at" transform={kingAt(at.king.x, at.king.y, 0.66 * depth(at.king.y))}>
+          <FrostKing name="king" />
         </g>
-      ))}
-      <HeroUnit x={PROJECTS.him.x} y={PROJECTS.him.y} scene={scene} />
-    </>
-  ),
-  bind: (stage) => {
+        {at.footmen.map(({ x, y }, i) => (
+          <g key={x} data-fx={`footman-${i}`} transform={place(x, y, at.face, FOLK)}>
+            <Footman name={`footman-body-${i}`} />
+            <g data-fx={`ice-${i}`} opacity="0">
+              <path d="M-26,0 L-30,-80 L-10,-104 L20,-100 L30,-60 L26,0 Z" fill={REALM.frostIceMid} opacity="0.7" stroke={REALM.frostIceBright} strokeWidth="3" />
+            </g>
+          </g>
+        ))}
+        <HeroUnit x={at.him.x} y={at.him.y} face={at.face} scene={scene} />
+      </>
+    )
+  },
+  bind: (stage, scene) => {
+    const at = projectsOf(scene)
     const him = heroNodes(stage)
     const king = kingNodes(stage, 'king')
     const crown = fx(stage, 'throne-crown')
     const nova = fx(stage, 'nova')
-    const dead = unitsOf(stage, 'dead', PROJECTS.dead.length)
-    const footmen = unitsOf(stage, 'footman', PROJECTS.footmen.length)
-    const ice = unitsOf(stage, 'ice', PROJECTS.footmen.length)
+    const dead = unitsOf(stage, 'dead', at.dead.length)
+    const footmen = unitsOf(stage, 'footman', at.footmen.length)
+    const ice = unitsOf(stage, 'ice', at.footmen.length)
     return (play) => {
       const raised = share(play, 0)
       const swept = share(play, 1)
       const throned = share(play, 2)
       // the dead come up out of the snow, rank by rank
       dead.forEach((node, i) => {
-        const { x, y } = PROJECTS.dead[i]
+        const { x, y } = at.dead[i]
         const up = ramp(raised, 0.25 + i * 0.07, 0.6 + i * 0.07)
-        transformTo(node, `${place(x, y + 90 * (1 - up), -1, FOLK)} rotate(${r1(-20 * (1 - up))})`)
+        transformTo(node, `${place(x, y + 90 * (1 - up), at.deadFace, FOLK)} rotate(${r1(-20 * (1 - up))})`)
         fadeTo(node, ramp(up, 0, 0.25))
       })
       // the nova rolls out and the footmen freeze, then shatter
       const roll = ramp(swept, 0.2, 0.7)
-      transformTo(nova, `translate(${PROJECTS.king.x} ${PROJECTS.king.y}) scale(${(0.1 + 1.3 * roll).toFixed(3)})`)
+      transformTo(nova, `translate(${at.king.x} ${at.king.y}) scale(${(0.1 + 1.3 * roll).toFixed(3)})`)
       fadeTo(nova, roll > 0 ? 1 - ramp(roll, 0.6, 1) : 0)
       footmen.forEach((node, i) => {
         const frozen = ramp(swept, 0.4 + i * 0.08, 0.55 + i * 0.08)
         fadeTo(ice[i], frozen)
         fadeTo(node, 1 - ramp(swept, 0.75 + i * 0.05, 0.95))
-        const { x, y } = PROJECTS.footmen[i]
-        transformTo(node, `${place(x, y, 1, FOLK)} scale(${(1 + 0.3 * ramp(swept, 0.8, 1)).toFixed(3)})`)
+        const { x, y } = at.footmen[i]
+        transformTo(node, `${place(x, y, at.face, FOLK)} scale(${(1 + 0.3 * ramp(swept, 0.8, 1)).toFixed(3)})`)
       })
       // up into the throne
       const climb = ramp(throned, 0, 0.8)
-      const kx = lerp(PROJECTS.king.x, PROJECTS.seat.x, climb)
-      const ky = lerp(PROJECTS.king.y, PROJECTS.seat.y, climb)
+      const kx = lerp(at.king.x, at.seat.x, climb)
+      const ky = lerp(at.king.y, at.seat.y, climb)
       const sweep = -160 * ramp(raised, 0, 0.4) * (1 - ramp(swept, 0, 0.3)) + lerp(-160, -30, ramp(swept, 0, 0.3)) * (swept > 0 ? 1 : 0) * (1 - ramp(throned, 0.5, 1))
       poseKing(king, {
         x: kx,
         y: ky + 6 * Math.sin(climb * Math.PI * 6) * (climb < 1 ? 1 : 0),
-        size: 0.66 * lerp(depth(PROJECTS.king.y), 0.82, climb),
+        size: 0.66 * lerp(depth(at.king.y), 0.82, climb),
         blade: sweep,
         hand: 50 * bell(swept, 0, 0.6) + 20 * ramp(throned, 0.8, 1),
         glow: 0.15 + 0.7 * ramp(raised, 0, 0.4) * (1 - 0.6 * ramp(throned, 0, 1)),
       })
       fadeTo(crown, 0.4 + 0.6 * ramp(throned, 0.6, 1))
       poseHero(him, {
-        x: PROJECTS.him.x - 14 * bell(swept, 0.4, 0.9),
-        y: PROJECTS.him.y,
+        x: at.him.x - at.face * 14 * bell(swept, 0.4, 0.9),
+        y: at.him.y,
+        face: at.face,
         shield: ARM.guard * ramp(swept, 0.2, 0.4),
         sword: ARM.forward * 0.5 * ramp(throned, 0.4, 1),
         lean: -10 * bell(swept, 0.4, 0.9),
@@ -1369,9 +1418,11 @@ export interface RealmScene extends TheatreScene {
   /** This stage's hero is the world's figure (data-worlds-figure): the hero's only, the one on screen at first
    *  paint at every width. */
   figure: boolean
+  /** Whether the page is read on a phone, where a scene too wide for half of it stands its cast another way. */
+  phone: boolean
 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, side: Side | 'hero', count: number, profession: Profession): RealmScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, side: Side | 'hero', count: number, profession: Profession, phone: boolean): RealmScene => {
   const spec = SCENES[id]
   const end = sceneEnd(spec.script)
   const scene: RealmScene = {
@@ -1381,6 +1432,7 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, side: Side | 'hero', cou
     profession,
     count,
     figure: id === 'hero',
+    phone,
     script: spec.script,
     bind: (stage) => {
       const write = spec.bind(stage, scene)
@@ -1395,13 +1447,16 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, side: Side | 'hero', cou
 export const sideAt = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
 
 /** The page's scenes in order: the hero, the profession's sections, the contact. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[], profession: Profession): RealmScene[] {
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[], profession: Profession, phone: boolean): RealmScene[] {
   return [
-    sceneOf('hero', null, 'hero', 0, profession),
-    ...slots.map((slot, i) => sceneOf(slot.id, slot, sideAt(i), countOf(slot, labels, highlights), profession)),
-    sceneOf('contact', null, sideAt(slots.length), 0, profession),
+    sceneOf('hero', null, 'hero', 0, profession, phone),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, sideAt(i), countOf(slot, labels, highlights), profession, phone)),
+    sceneOf('contact', null, sideAt(slots.length), 0, profession, phone),
   ]
 }
+
+/** The lead a scene's band stands on: its phone lead on a phone, where it has one. */
+const leadOf = ({ lead, phoneLead = lead }: SceneSpec, phone: boolean): number => (phone ? phoneLead : lead)
 
 /** The band a scene's cast stands in (world.module.css), by its side. */
 const BAND: Record<Side | 'hero', string> = { right: look.bandRight, left: look.bandLeft, hero: look.bandHero }
@@ -1410,7 +1465,7 @@ const BAND: Record<Side | 'hero', string> = { right: look.bandRight, left: look.
 function Field({ scene }: { scene: RealmScene }) {
   return (
     <svg className="block h-full w-full" viewBox={`0 0 ${FIELD.width} ${FIELD.height}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-      <g className={BAND[scene.side]} style={{ '--lead': SCENES[scene.id].lead } as CSSProperties}>
+      <g className={BAND[scene.side]} style={{ '--lead': leadOf(SCENES[scene.id], scene.phone) } as CSSProperties}>
         <g transform={`translate(${ANCHOR[scene.side]} 0)`}>{SCENES[scene.id].figure(scene)}</g>
       </g>
     </svg>

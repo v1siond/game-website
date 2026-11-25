@@ -11,6 +11,7 @@ import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { NameWords } from '@/components/cv/NameWords'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { REALM, REALM_FACE, REALM_VARS } from './MedievalFantasy/palette'
@@ -61,6 +62,10 @@ const LAYOUT: Record<'large' | 'small', SectionLayout> = {
 // the window and lay the page out for its height at once, with no shift after mount.
 const isLargeWindow = (): boolean => window.innerHeight >= LARGE_SCREEN_HEIGHT
 
+// Below the md line the scenes' bands stand for a phone (MedievalFantasy/world.module.css), and a scene too wide
+// for half of a phone stands its cast another way round there (scenes.tsx).
+const PHONE_QUERY = '(max-width: 767.98px)'
+
 // The root's palette variables and base look, built once instead of on every render.
 const ROOT_STYLE: CSSProperties = { ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: REALM_FACE, color: REALM.textBright }
 
@@ -105,9 +110,10 @@ export default function MedievalFantasyTheme() {
   const reduced = useReducedMotion()
   const [isLargeScreen, setIsLargeScreen] = useState(isLargeWindow)
 
+  const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
-    [view.sections, professionalSummary.bio, labels, highlights, active],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active, phone),
+    [view.sections, professionalSummary.bio, labels, highlights, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, REALM_MOTION, reduced)
   const realms = scenes.filter((scene): scene is RealmScene & { slot: SectionSlot; side: Side } => scene.slot !== null)
