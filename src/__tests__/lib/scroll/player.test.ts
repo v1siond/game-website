@@ -7,14 +7,15 @@ import {
   elapsedOf,
   follow,
   playheadAt,
-  headingOf,
   pacedMoves,
   restAt,
   restingPlay,
   sceneEnd,
   sceneLength,
   stagePlay,
+  wayOf,
   type Follower,
+  type Way,
 } from '@/lib/scroll/player'
 import { FIRST_FRAME_MS } from '@/lib/scroll/stage'
 
@@ -295,17 +296,29 @@ describe('restAt', () => {
   })
 })
 
-describe('headingOf', () => {
-  it('reads the way the page goes from the lag behind the scroll, and keeps it while the page rests', () => {
-    expect(headingOf(40, 'up')).toBe('down')
-    expect(headingOf(-40, 'down')).toBe('up')
-    expect(headingOf(0.3, 'up')).toBe('up')
+describe('wayOf', () => {
+  /** The way after the scroll passes each position in turn. */
+  const through = (positions: readonly number[], from: Way | null = null): Way => positions.reduce<Way | null>((was, at) => wayOf(at, was), from) as Way
+
+  it('starts going down, and keeps its way while the page rests', () => {
+    expect(wayOf(500, null).heading).toBe('down')
+    expect(through([500, 500, 500]).heading).toBe('down')
   })
 
-  it('keeps the way through a small reversal, a touch rubber band or a 2 px wheel, and turns once the lag passes 8 px', () => {
-    expect(headingOf(-2, 'down')).toBe('down')
-    expect(headingOf(6, 'up')).toBe('up')
-    expect(headingOf(-9, 'down')).toBe('up')
-    expect(headingOf(9, 'up')).toBe('down')
+  it('turns up on a slow climb once the scroll has travelled 8 px back, however slow, with no lag needed', () => {
+    const climb = Array.from({ length: 12 }, (_, i) => 1000 - i)
+    expect(through(climb.slice(0, 8)).heading).toBe('down')
+    expect(through(climb).heading).toBe('up')
+  })
+
+  it('keeps the way through a small reversal, a touch rubber band or a 2 px wheel', () => {
+    expect(through([1000, 1100, 1098, 1101]).heading).toBe('down')
+    const up = through([1000, 900])
+    expect(through([903, 899], up).heading).toBe('up')
+  })
+
+  it('measures the travel back from the furthest point reached, so a long way down then 9 px up turns', () => {
+    expect(through([0, 400, 800, 791]).heading).toBe('up')
+    expect(through([800, 400, 409]).heading).toBe('down')
   })
 })

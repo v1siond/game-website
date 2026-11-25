@@ -92,15 +92,26 @@ export interface Cross {
 /** Which way the page is going: down the page plays the scenes on, up plays them back. */
 export type Heading = 'down' | 'up'
 
-// Under this many px of lag the page keeps the way it was going, so a touch rubber band or a 2 px wheel
-// reversal in the middle of a dissolve does not cut the stage coming in.
-const HEADING_PX = 8
+// The page turns once the scroll has travelled this many px back from the furthest point it reached, so a
+// touch rubber band or a 2 px wheel reversal in the middle of a dissolve does not cut the stage coming in,
+// and a slow climb, however slow, turns all the same.
+const TURN_PX = 8
 
-/** The way the page is going from the drawn position's lag behind the scroll (positive on the way down), or
- *  `was` while it rests. */
-export function headingOf(lag: number, was: Heading): Heading {
-  if (lag > HEADING_PX) return 'down'
-  if (lag < -HEADING_PX) return 'up'
+/** The way the page is going and the furthest point the scroll has reached going that way. */
+export interface Way {
+  heading: Heading
+  mark: number
+}
+
+/** The way the page is going once the scroll is at `position`: from the scroll's travel since its last turn,
+ *  not from how far the drawing lags behind, so a scroll up too slow to build a lag still cuts on the way back.
+ *  The page starts going down. */
+export function wayOf(position: number, was: Way | null): Way {
+  if (!was) return { heading: 'down', mark: position }
+  const down = was.heading === 'down'
+  const further = down ? position > was.mark : position < was.mark
+  if (further) return { heading: was.heading, mark: position }
+  if (Math.abs(position - was.mark) > TURN_PX) return { heading: down ? 'up' : 'down', mark: position }
   return was
 }
 

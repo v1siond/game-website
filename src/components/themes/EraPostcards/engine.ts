@@ -2,7 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { crossOf, headingOf, stagePlay, type Follower, type Heading } from '@/lib/scroll/player'
+import { crossOf, stagePlay, wayOf, type Follower, type Way } from '@/lib/scroll/player'
 import { heroState, layerTransform, stageState, type StageSpan, type StageState } from '@/lib/scroll/stage'
 import { LAYER_MOTION, type Scene } from './scenes'
 import type { EraWriter, Layer } from './eras/era'
@@ -41,7 +41,7 @@ interface Bound {
   section: HTMLElement | null
   rail: Element | null
   span: StageSpan
-  shown: boolean
+  shown: boolean | null
   follower: Follower | null
 }
 
@@ -56,8 +56,9 @@ const bind = (theatre: HTMLElement, scene: Scene): Bound | null => {
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     rail: document.querySelector(`[data-rail="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
-    // a stage bound again keeps the visibility the page shows, so the first draw hides it if it must
-    shown: stage.style.visibility === 'visible',
+    // unknown until the first draw writes it: the CSS shows the first stage by itself and a stage bound again
+    // keeps what it showed, so the first draw always writes, whatever the page restored
+    shown: null,
     follower: null,
   }
 }
@@ -78,7 +79,7 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
   const lead = useRef('')
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
-  const heading = useRef<Heading>('down')
+  const way = useRef<Way | null>(null)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -117,10 +118,11 @@ export function useEraEngine(scenes: readonly Scene[], reduced: boolean) {
       const all = bound.current
       const now = performance.now()
       const states = all.map((each, i) => stateOf(each, position, viewport, i === all.length - 1, phone))
-      heading.current = headingOf(lag, heading.current)
+      // the way the page goes, from the scroll's own travel (where the drawing is plus its lag)
+      way.current = wayOf(position + lag, way.current)
       const cross = crossOf(
         states.map((state) => state.vis),
-        heading.current,
+        way.current.heading,
       )
       let playing = false
       all.forEach((each, i) => {

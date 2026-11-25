@@ -2,7 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useScrollStage, type StageMetrics } from '@/hooks/useScrollStage'
-import { crossOf, headingOf, stagePlay, type Follower, type Heading, type Playhead, type SceneScript } from '@/lib/scroll/player'
+import { crossOf, stagePlay, wayOf, type Follower, type Way, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { heroState, itemsReached, layerTransform, stageState, type LayerMotion, type StageSpan } from '@/lib/scroll/stage'
 
 // A world's theatre on the shared scroll stage engine (src/hooks/useScrollStage.ts): one fixed full screen
@@ -64,7 +64,7 @@ interface Bound {
   section: HTMLElement | null
   span: StageSpan
   triggers: number[]
-  shown: boolean
+  shown: boolean | null
   script: SceneScript | undefined
   follower: Follower | null
 }
@@ -85,8 +85,9 @@ const bind = (theatre: HTMLElement, scene: TheatreScene, index: number, motion: 
     section: document.querySelector<HTMLElement>(`[data-scene="${scene.id}"]`),
     span: { top: 0, bottom: 0 },
     triggers: [],
-    // a stage bound again keeps the visibility the page shows, so the first draw hides it if it must
-    shown: stage.style.visibility === 'visible',
+    // unknown until the first draw writes it: the CSS shows the first stage by itself and a stage bound again
+    // keeps what it showed, so the first draw always writes, whatever the page restored
+    shown: null,
     script: scene.script,
     follower: null,
   }
@@ -104,7 +105,7 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
   const bound = useRef<Bound[]>([])
   const text = useRef<HTMLElement | null>(null)
   const lagNow = useRef(0)
-  const heading = useRef<Heading>('down')
+  const way = useRef<Way | null>(null)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -137,10 +138,11 @@ export function useTheatre(scenes: readonly TheatreScene[], motion: LayerMotions
       const all = bound.current
       const now = performance.now()
       const states = all.map((each, i) => (each.hero ? heroState(position, viewport, { phone }) : stageState(each.span, position, viewport, { last: i === all.length - 1, phone })))
-      heading.current = headingOf(lag, heading.current)
+      // the way the page goes, from the scroll's own travel (where the drawing is plus its lag)
+      way.current = wayOf(position + lag, way.current)
       const { layers, lead } = crossOf(
         states.map((state) => state.vis),
-        heading.current,
+        way.current.heading,
       )
       let playing = false
       all.forEach((each, i) => {
