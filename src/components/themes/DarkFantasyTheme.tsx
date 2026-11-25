@@ -27,7 +27,7 @@ import { Theatre } from '@/components/themes/shared/theatre/Stage'
 import { useTheatre } from '@/components/themes/shared/theatre/useTheatre'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { SpiritWisp } from './DarkFantasy/relics'
-import { AREA_MOTION, DarkStage, scenesOf, type DarkScene } from './DarkFantasy/scenes'
+import { AREA_MOTION, DarkStage, scenesOf, type DarkScene, type SceneSide } from './DarkFantasy/scenes'
 import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
@@ -993,24 +993,29 @@ const CARDS: SectionFrames = {
   },
 }
 
-// The column a frame reads in: beside the scene from lg, the wanderer and what he meets on its right; below lg the
-// whole width, the scene showing in the screens of picture alone above and below it.
-// Below lg the cards take the whole width and the scene is cut round its action.
+// The column a frame reads in: from lg beside the scene, on the half the scene leaves free (a scene on the right
+// reads its frame on the left, and the other way round); below lg the whole width, the scene showing in the
+// screens of picture alone above and below it, cut round its action.
 const NARROW_QUERY = '(max-width: 1023.98px)'
 
-const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(42rem,46vw)]'
-const SIDE = 'px-4 md:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
+const COLUMN_WIDTH = 'relative mx-auto lg:w-[min(42rem,46vw)]'
+const GUTTER = 'px-4 md:px-6'
+const READS_BESIDE: Record<SceneSide, { column: string; gutter: string }> = {
+  right: { column: `${COLUMN_WIDTH} lg:mx-0`, gutter: `${GUTTER} lg:pl-[clamp(1.5rem,4vw,4rem)]` },
+  left: { column: `${COLUMN_WIDTH} lg:mr-0 lg:ml-auto`, gutter: `${GUTTER} lg:pr-[clamp(1.5rem,4vw,4rem)]` },
+}
 
 /** One section: a screen of its scene alone, then its frame over the held scene, then the scene again
  *  before it sinks. Under reduced motion its own scene sits still behind the first screen. */
 function SceneSection({ scene, narrow, still }: { scene: DarkScene & { slot: SectionSlot }; narrow: boolean; still: boolean }) {
   const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as ComponentType<{ slot: SectionSlot }>
+  const { column, gutter } = READS_BESIDE[scene.side]
   return (
-    <div data-scene={scene.id} className={`relative z-20 pb-[70svh] ${SIDE}`}>
+    <div data-scene={scene.id} className={`relative z-20 pb-[70svh] ${gutter}`}>
       {still && <DarkStage scene={scene} narrow={narrow} settled />}
       <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
-      <div className={COLUMN}>
+      <div className={`${column} max-w-4xl`}>
         <VoidFrame title={sections[scene.slot.titleKey]}>
           <Cards slot={scene.slot} />
         </VoidFrame>
@@ -1175,10 +1180,10 @@ export default function DarkFantasyTheme() {
           ))}
         </ProfessionRegion>
 
-        {/* Contact: the sealed door breaks open on the light in the scene behind it */}
-        <div data-scene="contact" className={`relative z-20 pt-[60svh] pb-[40svh] ${SIDE}`}>
+        {/* Contact: the sealed door breaks open on the light in the scene behind it, its card on the other half */}
+        <div data-scene="contact" className={`relative z-20 pt-[60svh] pb-[40svh] ${READS_BESIDE[contact.side].gutter}`}>
           {reduced && <DarkStage scene={contact} narrow={narrow} settled />}
-          <section className="df-panel relative mx-auto max-w-2xl bg-[color:var(--df-panel)] px-6 py-10" aria-label={sections.contact}>
+          <section className={`df-panel ${READS_BESIDE[contact.side].column} max-w-2xl bg-[color:var(--df-panel)] px-6 py-10`} aria-label={sections.contact}>
             <RecruiterHero
               render={({ line, actions }) => (
                 <div className="text-center">

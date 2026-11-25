@@ -92,8 +92,29 @@ import world from './world.module.css'
 // Every scene is its own area (areas.tsx) with its own threat and his answer in one to three actions, played by
 // the shared scene player (src/lib/scroll/player.ts) at its own pace, back on the way up, the end frame held.
 // He is the rigged side on figure (wanderer.tsx, posed by pose.ts), drawn once per scene.
+//
+// The sections alternate sides down the page: the first after the hero plays on the right half beside its frame
+// on the left, the next on the left half beside its frame on the right, and so on to the contact (sideOf). Each
+// scene's coordinates are written for the right half; one on the left is drawn PAN further left with its
+// area's set pieces (areas.tsx SetPiece), so he still runs the way the scene means. Below lg, where frame and
+// scene are stacked, the cut is centred LEAN off the spot he ends on, so he ends on the half the section names.
 
 export type SceneId = 'hero' | SectionId | 'contact'
+
+/** The half of a wide screen a scene plays in; its frame reads on the other half. */
+export type SceneSide = 'right' | 'left'
+
+/** The side of the scene at `index` among the sections after the hero, the contact last: right, left, right... */
+const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left')
+
+// A 16:10 screen shows the canvas from x 96 to 1824, a half each side of x 960: a scene played on the left
+// half is drawn this far left of where its right half coordinates put it.
+const PAN = -864
+// Below lg the cut is centred this far off the spot he ends on (about a sixth of a phone's cut), toward the
+// other half, so he ends on the half his section names.
+const LEAN = 80
+// The full canvas covers (the veils, the dark round the door) reach past both sides of a panned scene.
+const BLEED = { x: -1600, width: CANVAS_W + 3200 }
 
 /** Each layer's push in across its scene: the sky moves least, the dark in front most, for the depth. */
 export const AREA_MOTION: LayerMotions = {
@@ -176,7 +197,7 @@ const burstAt = (node: Element | null, x: number, y: number, shown: number): voi
 
 /** A full canvas of one colour over the scene, hidden until a scene fades it in ([data-fx="{name}"]). */
 function Veil({ name, color = P.black }: { name: string; color?: string }) {
-  return <rect data-fx={name} x={-600} y={0} width={CANVAS_W + 1200} height={CANVAS_H} fill={color} opacity="0" />
+  return <rect data-fx={name} x={BLEED.x} y={0} width={BLEED.width} height={CANVAS_H} fill={color} opacity="0" />
 }
 
 /** How far down the canvas the far door's small frame hangs: clear of the bars and notices along the top. */
@@ -189,8 +210,12 @@ const marksTo = (stage: ParentNode, name: string, lit: readonly number[]): void 
 
 interface SceneSpec {
   area: AreaName
-  /** The canvas x a narrow screen centres on: where the scene plays. */
+  /** The canvas x a narrow screen's zoom is about: where the scene plays. */
   phoneX: number
+  /** The canvas x his soles end the scene on, which a narrow screen puts on the half the section names; left
+   *  out, the narrow cut stays centred on phoneX (the hero's own, and About's, whose giant needs the right of
+   *  a phone's cut, so he ends just left of its middle there). */
+  endX?: number
   /** How much smaller what stands in the scene is drawn on a narrow screen, about the floor at phoneX, so he
    *  and the one he meets are whole there; none keeps the wide screen's size. */
   phoneZoom?: number
@@ -375,6 +400,7 @@ const SEAT_LIFT = 52 - (WANDERER.soleY - 95 - SIT.rise) * SCALE
 const work: SceneSpec = {
   area: 'overgrowth',
   phoneX: 1465,
+  endX: WORK.land,
   phoneZoom: 0.72,
   script: [2000, 1400, 1600],
   figure: () => (
@@ -474,6 +500,7 @@ const CLING_LIFT = 210
 const tech: SceneSpec = {
   area: 'village',
   phoneX: 1520,
+  endX: TECH.aside,
   phoneZoom: 0.7,
   script: [1800, 1700, 1500],
   figure: () => (
@@ -559,6 +586,7 @@ const ORBS = [0, 1]
 const services: SceneSpec = {
   area: 'city',
   phoneX: 1460,
+  endX: CITY.dive,
   script: [1900, 1600, 1500],
   figure: () => (
     <>
@@ -660,6 +688,7 @@ const spireLift = (x: number): number => SPIRE.top * Math.min(1, Math.max(0, (x 
 const projects: SceneSpec = {
   area: 'spire',
   phoneX: 1580,
+  endX: SPIRE.past,
   phoneZoom: 0.64,
   script: [1800, 1400, 1800],
   figure: () => (
@@ -754,6 +783,7 @@ const DEEP_SEAT = 52 - (WANDERER.soleY - 95 - SIT.rise) * SCALE
 const ventures: SceneSpec = {
   area: 'nest',
   phoneX: 1570,
+  endX: DEEP.kneel,
   phoneZoom: 0.66,
   script: [1500, 1800, 1700],
   figure: () => (
@@ -844,6 +874,7 @@ const HEAP = [
 const bands: SceneSpec = {
   area: 'abyss',
   phoneX: 1420,
+  endX: ABYSS.fountain + 50,
   script: [1700, 1700, 1600],
   figure: () => (
     <>
@@ -937,6 +968,7 @@ const PILLARS = [
 const muayThai: SceneSpec = {
   area: 'temple',
   phoneX: 1460,
+  endX: TEMPLE.right + 50,
   script: [1500, 1900, 1600],
   figure: () => (
     <>
@@ -1029,6 +1061,7 @@ const CAMERA_DROP = TOP.lift + 40
 const contact: SceneSpec = {
   area: 'light',
   phoneX: 1560,
+  endX: TOP.x,
   script: [1600, 1900, 1500],
   // On a narrow screen the contact card stands over most of the screen by the climb's end, so the camera
   // follows him up and the top ledge ends low, in the band under the card.
@@ -1050,7 +1083,7 @@ const contact: SceneSpec = {
       </g>
       {/* the temple's dark round the door, until the door breaks on the light */}
       <g data-fx="shut">
-        <rect x={-600} width={CANVAS_W + 1200} height={CANVAS_H} fill={P.void} />
+        <rect x={BLEED.x} width={BLEED.width} height={CANVAS_H} fill={P.void} />
       </g>
       <g data-fx="door" transform={`${at(LIGHT.door)} scale(1.1)`}>
         <Door name="door" />
@@ -1058,8 +1091,8 @@ const contact: SceneSpec = {
       <Burst name="flare" color={P.white} />
       {/* the dark rising behind him and swallowing the light */}
       <g data-fx="swallow">
-        <rect x={-600} y={0} width={CANVAS_W + 1200} height={CANVAS_H + 200} fill={P.void} />
-        <rect x={-600} y={-160} width={CANVAS_W + 1200} height={160} fill={P.void} opacity="0.6" />
+        <rect x={BLEED.x} y={0} width={BLEED.width} height={CANVAS_H + 200} fill={P.void} />
+        <rect x={BLEED.x} y={-160} width={BLEED.width} height={160} fill={P.void} opacity="0.6" />
       </g>
       <g transform={at(TOP.x, TOP.lift)}>
         <Ledge />
@@ -1136,18 +1169,20 @@ const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[
 export interface DarkScene extends TheatreScene {
   id: SceneId
   slot: SectionSlot | null
+  side: SceneSide
 }
 
 // The motes rise this far over a scene; the rain falls this far.
 const MOTE_DRIFT = { motes: -80, rain: 160 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number): DarkScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, side: SceneSide): DarkScene => {
   const spec = SCENES[id]
   const drift = spec.area === 'city' || spec.area === 'spire' ? MOTE_DRIFT.rain : MOTE_DRIFT.motes
   return {
     id,
     slot,
     count,
+    side,
     script: spec.script,
     bind: (stage): StageWriter => {
       const motes = fx(stage, 'motes')
@@ -1161,17 +1196,26 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number): DarkScen
   }
 }
 
-/** The page's scenes in order: the hero, the profession's sections, the contact. */
+/** The page's scenes in order: the hero (on its own layout), the profession's sections, the contact, sides alternating. */
 export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: readonly string[]): DarkScene[] {
-  return [sceneOf('hero', null, 0), ...slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, labels, highlights))), sceneOf('contact', null, 0)]
+  return [
+    sceneOf('hero', null, 0, 'right'),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, countOf(slot, labels, highlights), sideOf(i))),
+    sceneOf('contact', null, 0, sideOf(slots.length)),
+  ]
 }
 
 // Scales about his floor point at x, so everyone scaled still stands on the ground line the near layer draws.
 const zoomAbout = (x: number, zoom: number): string => `translate(${x} ${FLOOR_Y}) scale(${zoom}) translate(${-x} ${-FLOOR_Y})`
 
-/** A scene's picture in its area's layers; `narrow` centres a screen narrower than lg on where it plays. */
+/** A scene's picture in its area's layers, on its side; `narrow` centres a screen narrower than lg on where it plays. */
 export function DarkStage({ scene, narrow, settled = false }: { scene: DarkScene; narrow: boolean; settled?: boolean }) {
   const spec = SCENES[scene.id]
+  const left = scene.side === 'left'
+  const pan = left && !narrow ? PAN : 0
+  // a section's cut is centred LEAN off where he ends, as its zoom draws it
+  const ends = spec.endX === undefined ? undefined : spec.phoneX + (spec.endX - spec.phoneX) * (spec.phoneZoom ?? 1)
+  const centerX = ends === undefined ? spec.phoneX : ends + (left ? LEAN : -LEAN)
   const layers: StageLayer[] = [
     { name: 'sky', node: <AreaSky area={spec.area} /> },
     { name: 'mid', node: <AreaMid area={spec.area} /> },
@@ -1180,14 +1224,16 @@ export function DarkStage({ scene, narrow, settled = false }: { scene: DarkScene
       name: 'figure',
       node: (
         <AreaLayer>
-          <g transform={narrow && spec.phoneZoom ? zoomAbout(spec.phoneX, spec.phoneZoom) : undefined}>{spec.figure(narrow)}</g>
+          <g transform={pan ? `translate(${pan} 0)` : undefined}>
+            <g transform={narrow && spec.phoneZoom ? zoomAbout(spec.phoneX, spec.phoneZoom) : undefined}>{spec.figure(narrow)}</g>
+          </g>
         </AreaLayer>
       ),
     },
     { name: 'fg', node: <AreaFront area={spec.area} /> },
   ]
   return (
-    <Framing.Provider value={{ narrow, centerX: spec.phoneX }}>
+    <Framing.Provider value={{ narrow, centerX, pan }}>
       <Stage scene={scene} layers={layers} motion={AREA_MOTION} settled={settled} className={world.stage} />
     </Framing.Provider>
   )

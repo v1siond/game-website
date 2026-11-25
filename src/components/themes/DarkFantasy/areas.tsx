@@ -13,7 +13,10 @@ import { DARK_FANTASY as P } from './palette'
 // rises area by area: none in the town, a glow in the crossroads, the temple floor cracked with it.
 //
 // A layer is cut from the canvas bottom anchored; on a screen narrower than lg the framing (Framing) centres
-// the cut on the scene's action, so a phone shows the half of the canvas the scene plays in.
+// the cut on the scene's action, so a phone shows the half of the canvas the scene plays in. The sections
+// alternate sides from lg: a scene that plays on the left half is drawn `pan` further left, and the pieces of
+// its area that frame the action (SetPiece: an arch, the pillars, the pools) move with it while the rest of the
+// place stays where it stands.
 
 export const CANVAS_W = 1920
 export const CANVAS_H = 1080
@@ -22,8 +25,9 @@ export const FLOOR_Y = 990
 
 export type AreaName = 'town' | 'crossroads' | 'overgrowth' | 'village' | 'city' | 'spire' | 'nest' | 'abyss' | 'temple' | 'light'
 
-/** How a scene is cut on a narrow screen: there, the canvas x the cut is centred on. */
-export const Framing = createContext<{ narrow: boolean; centerX: number }>({ narrow: false, centerX: CANVAS_W / 2 })
+/** How a scene is cut: on a narrow screen the canvas x the cut is centred on; from lg how far left its action
+ *  and its set pieces are drawn (0 when it plays on the right half). */
+export const Framing = createContext<{ narrow: boolean; centerX: number; pan: number }>({ narrow: false, centerX: CANVAS_W / 2, pan: 0 })
 
 /** One layer's canvas: bottom anchored, cut at the sides, centred on the scene's action on a narrow screen. */
 export function AreaLayer({ children }: { children: ReactNode }) {
@@ -34,6 +38,12 @@ export function AreaLayer({ children }: { children: ReactNode }) {
       {children}
     </svg>
   )
+}
+
+/** A piece of an area that frames where the scene plays, drawn with the action when it plays on the left. */
+function SetPiece({ children }: { children: ReactNode }) {
+  const { pan } = useContext(Framing)
+  return <g transform={pan ? `translate(${pan} 0)` : undefined}>{children}</g>
 }
 
 /** An area's colours: the sky from its top to its low haze, the far and middle shapes, the ground, and its light. */
@@ -93,7 +103,9 @@ function CrossroadsFar({ t }: { t: Tint }) {
         const h = 80 + scatter(i + 3) * 140
         return <path key={i} d={`M${x - 26} 180 L${x} ${180 + h} L${x + 26} 180 Z`} fill={t.mid} />
       })}
-      <path d="M1290 990 L1290 520 Q1290 380 1450 380 Q1610 380 1610 520 L1610 990 Z" fill={t.far} />
+      <SetPiece>
+        <path d="M1290 990 L1290 520 Q1290 380 1450 380 Q1610 380 1610 520 L1610 990 Z" fill={t.far} />
+      </SetPiece>
     </g>
   )
 }
@@ -230,6 +242,7 @@ const FAR: Record<AreaName, (props: { t: Tint }) => ReactNode> = {
  *  ([data-fx="motes"], moved by the scroll). */
 export const AreaSky = memo(function AreaSky({ area }: { area: AreaName }) {
   const id = useId()
+  const { pan } = useContext(Framing)
   const t = TINTS[area]
   const Far = FAR[area]
   const rain = area === 'city' || area === 'spire'
@@ -241,7 +254,7 @@ export const AreaSky = memo(function AreaSky({ area }: { area: AreaName }) {
           <stop offset="0.75" stopColor={t.low} />
           <stop offset="1" stopColor={t.low} />
         </linearGradient>
-        <radialGradient id={`${id}glow`} cx="0.72" cy="0.55" r="0.5">
+        <radialGradient id={`${id}glow`} cx={(0.72 + pan / CANVAS_W).toFixed(3)} cy="0.55" r="0.5">
           <stop offset="0" stopColor={t.light} stopOpacity="0.16" />
           <stop offset="1" stopColor={t.light} stopOpacity="0" />
         </radialGradient>
@@ -286,31 +299,37 @@ const MID: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
     <g fill={t.mid}>
       <path d="M0 0 H700 Q560 120 380 90 Q200 60 0 160 Z" />
       <path d="M1920 0 H1300 Q1460 140 1660 100 Q1820 70 1920 180 Z" />
-      {range(6).map((i) => (
-        <path key={i} d={`M${980 + i * 170} 990 Q${960 + i * 170} 860 ${1010 + i * 170} 800 Q${1030 + i * 170} 900 ${1020 + i * 170} 990 Z`} />
-      ))}
+      <SetPiece>
+        {range(6).map((i) => (
+          <path key={i} d={`M${980 + i * 170} 990 Q${960 + i * 170} 860 ${1010 + i * 170} 800 Q${1030 + i * 170} 900 ${1020 + i * 170} 990 Z`} />
+        ))}
+      </SetPiece>
     </g>
   ),
   village: ({ t }) => (
-    <g fill={t.mid}>
-      <rect x={1000} y={260} width={26} height={730} />
-      <rect x={1880} y={200} width={40} height={790} />
-    </g>
+    <SetPiece>
+      <g fill={t.mid}>
+        <rect x={1000} y={260} width={26} height={730} />
+        <rect x={1880} y={200} width={40} height={790} />
+      </g>
+    </SetPiece>
   ),
   city: ({ t }) => (
-    <g fill={t.mid}>
-      <rect x={1860} y={0} width={60} height={1080} />
-      <rect x={960} y={0} width={60} height={1080} />
-      <path d="M960 0 H1920 V90 Q1440 30 960 90 Z" />
-    </g>
+    <SetPiece>
+      <g fill={t.mid}>
+        <rect x={1860} y={0} width={60} height={1080} />
+        <rect x={960} y={0} width={60} height={1080} />
+        <path d="M960 0 H1920 V90 Q1440 30 960 90 Z" />
+      </g>
+    </SetPiece>
   ),
   spire: ({ t }) => (
-    <g>
+    <SetPiece>
       <circle cx={1730} cy={430} r={150} fill={t.low} opacity={0.5} />
       <circle cx={1730} cy={430} r={150} fill="none" stroke={t.mid} strokeWidth={26} />
       <path d="M1730 280 V580 M1580 430 H1880" stroke={t.mid} strokeWidth={10} />
       <rect x={1080} y={0} width={50} height={1080} fill={t.mid} />
-    </g>
+    </SetPiece>
   ),
   nest: ({ t }) => (
     <g fill={t.mid}>
@@ -319,10 +338,12 @@ const MID: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
     </g>
   ),
   temple: ({ t }) => (
-    <g fill={t.mid}>
-      <rect x={1040} y={0} width={70} height={1080} />
-      <rect x={1830} y={0} width={70} height={1080} />
-    </g>
+    <SetPiece>
+      <g fill={t.mid}>
+        <rect x={1040} y={0} width={70} height={1080} />
+        <rect x={1830} y={0} width={70} height={1080} />
+      </g>
+    </SetPiece>
   ),
 }
 
@@ -336,18 +357,20 @@ export const AreaMid = memo(function AreaMid({ area }: { area: AreaName }) {
 
 const GROUND_TOP: Partial<Record<AreaName, (props: { t: Tint }) => ReactNode>> = {
   overgrowth: ({ t }) => (
-    <g>
+    <SetPiece>
       <rect x={560} y={992} width={260} height={18} rx={9} fill={t.light} opacity={0.55} />
       <rect x={1760} y={992} width={180} height={18} rx={9} fill={t.light} opacity={0.55} />
-    </g>
+    </SetPiece>
   ),
   temple: ({ t }) => (
-    <g stroke={t.light} strokeWidth={3} fill="none" opacity={0.8}>
+    <SetPiece>
+      <g stroke={t.light} strokeWidth={3} fill="none" opacity={0.8}>
       {range(8).map((i) => {
         const x = 900 + i * 130 + scatter(i) * 40
         return <path key={i} d={`M${x} 994 l20 18 l-12 20 l26 24`} />
       })}
-    </g>
+      </g>
+    </SetPiece>
   ),
 }
 
