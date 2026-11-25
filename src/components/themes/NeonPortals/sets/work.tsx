@@ -5,7 +5,7 @@ import { AIR, land, READY, run as sideRun } from '../sidePose'
 import { INK } from './cast'
 import { along, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Work, the chase (Crash 3 notes, the prehistoric levels where a giant beast chases him over lava and
+// Work, the chase (research notes, the prehistoric levels where a giant beast chases him over lava and
 // fallen trees [11] [18]; the series' signature run reversed, at the viewer [35]): a swamp under a smoking
 // volcano, giant ferns, a pool of lava across the near ground. 1 turn: he runs into the screen, the ground
 // shakes, a horned beast the size of a house bursts out of the ferns ahead, and he skids and turns. 2 flee:

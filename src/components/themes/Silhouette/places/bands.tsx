@@ -8,7 +8,7 @@ import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, TUCK, rest } from '../pose'
 
 // Bands, the drummer's middle section, the foundry's beat: a machine hall where presses pound in a steady
-// beat and a great gear turns at the far end under a gantry (Limbo notes L75 to L79, [2]; the foundry
+// beat and a great gear turns at the far end under a gantry (research notes L75 to L79, [2]; the foundry
 // "sounds almost like a continuous explosion", L169 to L170, [12]). He stands still at the first press and
 // nods with its beat, once, twice; on the off beat he runs under the presses as they rise; he jumps onto a
 // tooth of the gear, which carries him up and over to the gantry, the presses still beating below.

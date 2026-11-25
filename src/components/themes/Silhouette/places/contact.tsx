@@ -8,7 +8,7 @@ import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, KNOCK, TUCK, rest } from '../pose'
 
 // Contact, back where it began: the last pane of glass gives way and throws him out into the grass at the
-// forest's edge where he woke (Limbo notes L86 to L87, [1] [2]). The small shape on posts with the one lit
+// forest's edge where he woke (research notes L86 to L87, [1] [2]). The small shape on posts with the one lit
 // window, far off in the hero, stands close now. He walks to its foot, slow, and stops; he knocks, and the
 // door opens and warm light falls on him, no one shown, only the light coming out (L88 to L89: where the
 // search ends). The game's cut to black is left out, so the end frame stays readable under the contact card; on a phone the stretch is framed low, so

@@ -8,7 +8,7 @@ import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, TUCK, rest } from '../pose'
 
 // Work, what hunts in the trees: under a black canopy a long straight point lowers out of the dark, follows
-// his head and stabs straight down where he stands (Limbo notes L45 to L47, [2]); an open iron trap lies on
+// his head and stabs straight down where he stands (research notes L45 to L47, [2]); an open iron trap lies on
 // the path. The first time he walks under it, it stabs and the frame cuts to black: he is back a few steps
 // earlier, the game's trial and death (L124 to L126, [1]), with nothing shown but the cut. The second time
 // he stands still at the open trap while the point tracks him; it stabs, he leaps back, and the jaws snap

@@ -5,7 +5,7 @@ import { Shadow } from './props'
 
 // His partner, our own: a small quick lemur in a red scarf, grey fur, a pale face with big round eyes and a
 // long ringed tail curled up behind, drawn as the props are, rendered volumes lit from the upper right. The
-// pair is the game's own idea (Donkey Kong Country notes, the buddy system [19]): one leads, the other
+// pair is the game's own idea (research notes, the buddy system [19]): one leads, the other
 // follows; when the leader is hit the other springs ahead. He is drawn once per scene, from About on (on the
 // drummer and fighter pages he joins in the hero scene), side on, facing right, his feet at 0 0, about 110
 // tall with his tail. His legs, arms and tail turn at their joints; the scene's partner frame sets them.

@@ -9,7 +9,7 @@ import { STRIKE, TUCK, rest } from '../pose'
 
 // Muay Thai, the fighter's middle section, turn the guns on each other: the gravity room, two wall guns
 // facing each other high across it, a curtain of light in front of each that fires its gun when broken, a
-// saw on the floor's rail and a gravity switch (Limbo notes L82 to L83, L153, [2]: machine guns set off by
+// saw on the floor's rail and a gravity switch (research notes L82 to L83, L153, [2]: machine guns set off by
 // light beams, made to shoot each other). He feints into the near curtain and back out: the near gun fires
 // across the room over his head into the far gun, which falls silent. He strikes the switch and falls up to
 // the ceiling as the saw passes under; gravity flips back and he lands in guard past the saw.

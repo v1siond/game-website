@@ -8,7 +8,7 @@ import { runFrame, type Frame, type Place } from '../place'
 import { REACH, march, rest } from '../pose'
 
 // Projects, the light and pulled away: the forest's last stretch, the lit window close now just across a
-// ravine. A small pale glow drops onto his head and his steps go where it wants, away from the window (Limbo
+// ravine. A small pale glow drops onto his head and his steps go where it wants, away from the window (research
 // notes L66 to L68, [2] [11] [1]); this is the game's false ending, the one he searches for seen and out of
 // reach (L69 to L71, [1] [18] [19]). He is marched back the way he came; the lamp's light swings him round;
 // he steps under the low overhang, reaches up, and the dark shapes hanging from it close on the glow and

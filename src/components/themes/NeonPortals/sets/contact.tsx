@@ -5,7 +5,7 @@ import { dance, READY, run as sideRun } from '../sidePose'
 import { INK, PortalRing } from './cast'
 import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Contact, the ending (Crash 3 notes: with every core back the machine implodes and traps the villains,
+// Contact, the ending (research notes: with every core back the machine implodes and traps the villains,
 // shrunk to infants, in a prison outside of time; the hub's save screen [1] [45]; his victory dance, C44 r4):
 // the machine's hub, its ring of portals going dark one by one, and the save monitor glowing. 1 escape: the
 // passage collapses behind him and he outruns it into the hub. 2 dance: at the save monitor he does his

@@ -4,7 +4,7 @@ import { createContext, memo, useContext, useId, type ReactNode } from 'react'
 import { DARK_FANTASY as P } from './palette'
 
 // The places of the descent, one per scene, each its own area of the fallen kingdom in the game's order and
-// look (research/2026-11-24-deep-hollow-knight/notes.md L240 to L266): the fading town above the well, the
+// look (the C62 research notes, L240 to L266): the fading town above the well, the
 // stone crossroads with the sealed door far back, the green overgrowth over pools of acid, the ochre wastes and
 // the village of blades on its poles, the blue city in the rain, the spire above it, the black tunnels of the
 // nest, the abyss under everything, the temple round the door, and the light behind it. Each is drawn on

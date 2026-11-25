@@ -6,7 +6,7 @@ import { Knight } from './cast'
 import { along, Crate, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Planks, throwPlanks, type HeroAt, type SetPiece } from './kit'
 import { ROAD, streamVillage, Village } from './village'
 
-// About, the first era (Crash 3 notes, the medieval village [8], the camera behind him into the screen
+// About, the first era (research notes, the medieval village [8], the camera behind him into the screen
 // [35]): the one gentle run of the page. 1 run: he runs into the screen down the village road and a firefly
 // floating over it comes to his shoulder, the guardian from now on. 2 spin: a knight in the road swings his
 // long sword; he spins and sends him tumbling off the road. 3 bounce: two stacked crates; he jumps onto the

@@ -8,7 +8,7 @@ import { CROUCH, STRIKE, TUCK, rest } from '../pose'
 
 // Ventures, the sign that kills: on the crumbling city's roofs a great sign of plain panels, no letters, lies
 // along his way, and the lit panel kills whatever stands on it; the light walks along the sign toward him
-// (Limbo notes L72 to L74, [2] [1]). He crouches low on a dark panel as the light passes one panel away; he
+// (research notes L72 to L74, [2] [1]). He crouches low on a dark panel as the light passes one panel away; he
 // yanks the cable hanging over the sign and it dies panel by panel; he runs over the dead sign and drops
 // onto the glass dome below the roof's edge, and the glass gives under him.
 

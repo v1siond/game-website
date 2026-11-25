@@ -6,7 +6,7 @@ import { AIR, land, LANDED, READY, run as sideRun, SLAM, spin, type SidePose } f
 import { INK, PortalRing } from './cast'
 import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Projects, the boss behind the chamber's last portal (Crash 3 notes: five portals done, the boss portal
+// Projects, the boss behind the chamber's last portal (research notes: five portals done, the boss portal
 // opens; three hits; the power he gives [1] [3] [44]): a stone arena in the round, the chamber's portals
 // glowing on its rim, and a hulking guard of our own with a war hammer who leaps round the arena and slams
 // it down, open when it sticks in the floor. 1 dodge: he jumps clear of the guard's leap. 2 spin: the

@@ -7,7 +7,7 @@ import { arc, runFrame, type Frame, type Place } from '../place'
 import { CLIMB, CROUCH, HAUL, TUCK, rest } from '../pose'
 
 // About, the forest's first puzzle: a black pool in the trees he cannot swim, a raft half hidden in the
-// reeds on the water, and a steep bank on the far side (Limbo notes L40, [2]; the game teaches pulling before
+// reeds on the water, and a steep bank on the far side (research notes L40, [2]; the game teaches pulling before
 // it asks for it at the water, L130, [1]). The water does not chase; it waits. He leans back and hauls the
 // raft out of the reeds to the edge; he steps on and drifts over, crouching through a wobble in the middle;
 // the raft knocks the far wall and he hauls himself up onto the bank.

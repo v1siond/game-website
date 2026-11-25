@@ -77,8 +77,8 @@ import {
 import { WANDERER, WandererSprite } from './wanderer'
 import world from './world.module.css'
 
-// The wanderer's descent, one scene per part of the page, told in the game's order as his own (research
-// 2026-11-24-deep-hollow-knight/notes.md; the concept, score/C62/dark-fantasy-concept.md): he crosses into a
+// The wanderer's descent, one scene per part of the page, told in the game's order as his own (the C62
+// research notes; the concept, score/C62/dark-fantasy-concept.md): he crosses into a
 // fading town and drops down its well (hero); in the stone crossroads a giant in stolen armour falls on him,
 // breaks through the floor, and across the hall he sees the great door sealed by three marks (About); a
 // duelist in the overgrowth kills him once, and he must cut the dark copy he left where he fell before he can

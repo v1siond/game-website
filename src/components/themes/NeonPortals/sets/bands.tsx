@@ -5,7 +5,7 @@ import { READY } from '../sidePose'
 import { INK } from './cast'
 import { Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, type SetPiece } from './kit'
 
-// Bands, the sky (Crash 3 notes, the plane levels: a biplane brings the blimps down one by one, enemy planes
+// Bands, the sky (research notes, the plane levels: a biplane brings the blimps down one by one, enemy planes
 // coming at it from the front [24] [31] [1]): an old country of patchwork fields under a sky of clouds, our
 // own era with no markings. 1 take off: he climbs into the biplane on the strip and lifts off. 2 fire: he
 // shoots the blimps down one by one on a drum fill, the bursts coming closer and closer together. 3 loop: he

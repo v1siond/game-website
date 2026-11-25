@@ -6,7 +6,7 @@ import { AIR, land, READY, run as sideRun, spin, type SidePose } from '../sidePo
 import { Clockmaker, Spirit, Storm } from './cast'
 import { Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, shoulder, type HeroAt, type SetPiece } from './kit'
 
-// Muay Thai, the last villain (Crash 3 notes, the final boss: the villain flanked by two clashing spirits whose
+// Muay Thai, the last villain (research notes, the final boss: the villain flanked by two clashing spirits whose
 // beams cross over the floor, the hero spinning him into the central pit three times [7], the tornado spin
 // [5]): the machine's core, a pit in the middle of a round floor. The clockmaker stands by it between the
 // living storm and the firefly spirit, their beams crossing low over the floor. 1 leap: he double jumps the

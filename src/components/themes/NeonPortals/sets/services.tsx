@@ -5,7 +5,7 @@ import { fromBehind, IDLE, mixPose, RIDE, tucked } from '../motion'
 import { INK } from './cast'
 import { along, Guardian, guardOf, Hero, heroOf, Hourglass, part, placeTo, Puffs, puffsTo, type SetPiece } from './kit'
 
-// Services, the race (Crash 3 notes, the road levels: a motorbike race where only first place earns the
+// Services, the race (research notes, the road levels: a motorbike race where only first place earns the
 // crystal, with green boost plates, rival riders and police cars to swerve round [15] [21] [29]; the camera
 // rides behind the vehicle [1]): a desert highway at neon dusk. 1 kick-start: he jumps on the bike and it
 // roars off. 2 boost: he rides over a green plate and shoots forward past the rival riders. 3 overtake: he

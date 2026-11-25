@@ -3,7 +3,7 @@
 
    Tailwind utilities handle most styling in the components. This file holds
    the reusable, multi-property gothic SURFACES that don't belong inline:
-     COMPONENTS: Hollow-Knight dialogue panels and selector cards
+     COMPONENTS: the gothic dialogue panels and selector cards
    The colours are the --df-* variables the world's root sets from its palette
    (DarkFantasy/palette.ts). Imported once from globals.css. Never style these
    surfaces inline. (Plain classes, not @layer: the file is processed as its

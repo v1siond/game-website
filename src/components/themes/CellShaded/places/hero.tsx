@@ -6,7 +6,7 @@ import { HOURS } from '../desert'
 import { stopsPlace } from '../place'
 import { SQUINT, rest, stride } from '../pose'
 
-// The hero, off the bus at noon (Borderlands notes L35 to L37, [1] [5]): the bus stops at a lone stop on the
+// The hero, off the bus at noon (research notes L35 to L37, [1] [5]): the bus stops at a lone stop on the
 // desert road and he steps down with nothing but what he wears; it pulls away in its dust. He shades his eyes
 // and looks down the empty road. Our small robot guide rolls up, waves an arm and rolls off toward town, and
 // he goes after it.

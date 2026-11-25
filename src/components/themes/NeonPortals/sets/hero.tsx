@@ -7,7 +7,7 @@ import { seeded } from '../world'
 import { Fortress, FlameTrail, PortalRing, Storm } from './cast'
 import { Glow, Hero, heroOf, part, placeTo, type SetPiece } from './kit'
 
-// The hero, the fall that starts the run (Crash 3 notes, the story [1] [39], the hub [45]): night over a
+// The hero, the fall that starts the run (research notes, the story [1] [39], the hub [45]): night over a
 // jungle coast, and on the beach the round pad of the time machine with its first portal dark. 1 the
 // clockmaker's sky fortress streaks down in flames and crashes beyond the surf; the living storm it held
 // rises out of the wreck and dives into the portal. 2 he looks up at the trail it burned across the sky.

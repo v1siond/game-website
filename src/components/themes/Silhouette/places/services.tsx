@@ -7,7 +7,7 @@ import { runFrame, type Frame, type Place } from '../place'
 import { DUCK, rest } from '../pose'
 
 // Services, the ambush turned back: on the hostiles' ground a burning wheel is rolled down at him by hands
-// never seen (Limbo notes L53, [2] [5]), and from the dark across the way darts fly at him; he leads them back
+// never seen (research notes L53, [2] [5]), and from the dark across the way darts fly at him; he leads them back
 // under two crushers built into the path, where they die in their own traps (L61 to L65, [2] [9] [1]). They
 // flee when seen (L110), so only their wheel, their darts and the traps show. He drops flat in a hollow as
 // the wheel bounds over him; he runs back the way he came under the open crushers, darts striking at his

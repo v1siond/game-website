@@ -10,7 +10,7 @@ import { BOUND, CROUCH, TUCK, rest } from '../pose'
 // Tech Stack, caught and away: the hunter gets its revenge and a grey wrapping drops over him from above and
 // binds him; he wriggles free enough to hop in short bursts to a boulder at the hill's lip, lands on it as
 // it rolls, keeps his footing on it down the slope, and is thrown off at the foot, rolling, the wrapping
-// torn away (Limbo notes L48 to L50, [2] [1]). Behind him the dark between the trunks follows him down.
+// torn away (research notes L48 to L50, [2] [1]). Behind him the dark between the trunks follows him down.
 
 // The hill: flat on top, then a slope down to the floor.
 const HILL = { h: 120, lip: 200, foot: 540 }

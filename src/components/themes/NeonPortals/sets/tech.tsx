@@ -6,7 +6,7 @@ import { AIR, READY } from '../sidePose'
 import { INK } from './cast'
 import { Crate, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Puffs, puffsTo, type SetPiece } from './kit'
 
-// Tech Stack, under the sea (Crash 3 notes, the underwater levels: a mini sub with torpedoes breaks the
+// Tech Stack, under the sea (research notes, the underwater levels: a mini sub with torpedoes breaks the
 // coral that hides the crates, past sharks on fixed lines, mines that lean toward him and turbines that pull
 // him in [9] [19]): a deep sea base of tanks and pipes, red coral on the sea floor, a turbine turning in
 // the way. 1 dive: he drops into a little round sub. 2 fire: a torpedo cracks the red coral and the crates

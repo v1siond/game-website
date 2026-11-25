@@ -6,7 +6,7 @@ import { INK } from './cast'
 import { along, Crate, Glow, Guardian, guardOf, Hero, heroOf, part, placeTo, Planks, throwPlanks, type HeroAt, type SetPiece } from './kit'
 import { ROAD, streamVillage, Village } from './village'
 
-// Ventures, the time trial (Crash 3 notes: a floating stopwatch starts the clock, crates numbered 1, 2 and 3
+// Ventures, the time trial (research notes: a floating stopwatch starts the clock, crates numbered 1, 2 and 3
 // freeze it for that many seconds, and the time earns a relic tier [1] [43]): the village road of the first
 // era again, a clock running in the sky. 1 start: he touches the stopwatch and the clock starts. 2 smash: he
 // spins through the three numbered crates, the clock freezing 1, 2 and 3 seconds. 3 finish: he crosses the
