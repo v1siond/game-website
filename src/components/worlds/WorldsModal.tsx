@@ -5,7 +5,7 @@ import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { loadSeenWorlds } from '@/hooks/useWorldsNudge'
 import { fillLabel } from '@/lib/cv/labels'
-import { TOUR_ORDER, countTemplate, markSeen, orderForPicker } from '@/lib/worlds/nudge'
+import { TOUR_ORDER, markSeen, orderForPicker } from '@/lib/worlds/nudge'
 import WorldsGrid from './WorldsGrid'
 import { launcherVars } from './WorldsLauncher'
 import { useWorldsLabels } from './WorldsLabels'
@@ -102,7 +102,7 @@ export default function WorldsModal() {
             {labels.pickerTitle}
           </h2>
           <p className="c-worlds-picker__title text-base text-center">
-            {fillLabel(countTemplate(seen.length, { one: labels.pickerProgressOne, many: labels.pickerProgress }), { seen: seen.length, total })}
+            {fillLabel(labels.pickerProgress, { seen: seen.length, total })}
           </p>
           <div aria-hidden="true" className="mt-2 mb-4 flex flex-wrap justify-center gap-1.5">
             {TOUR_ORDER.map((id, index) => (

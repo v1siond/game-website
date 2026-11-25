@@ -2,8 +2,6 @@
 // count, the one time turn, or him in the next world), and where the lens finds its still and his figure in
 // it. No DOM here; the useWorldsNudge hook and WorldLens are the thin adapters over storage, observers and
 // pointer events.
-import { hintBelongsOn } from './nudge'
-
 /** The face turn: 0.3 s over, 2 s lifted, 0.3 s settled, once per visit. Every moment ends inside 5 s. */
 export const FACE_TURN_MS = 2600
 
@@ -30,7 +28,6 @@ export type HeroView = 'in' | 'out' | 'unknown'
 export type LauncherFace = 'count' | 'turn' | 'face'
 
 export interface FaceMoment {
-  pathname: string
   hero: HeroView
   /** The C31 hint card is open under the launcher; the first turn waits for it to close, so the two never meet. */
   hintOpen: boolean
@@ -40,11 +37,10 @@ export interface FaceMoment {
 }
 
 /**
- * The launcher's face: the world count on the CV pages and while the hero is in view (or not yet known),
- * the turn the first time the hero leaves the screen with the hint not open, and him in the next world after.
+ * The launcher's face: the world count while the hero is in view (or not yet known), the turn the first time
+ * the hero leaves the screen with the hint not open, and him in the next world after.
  */
 export function launcherFace(moment: FaceMoment): LauncherFace {
-  if (!hintBelongsOn(moment.pathname)) return 'count'
   if (moment.hero !== 'out') return 'count'
   if (moment.turning) return 'turn'
   if (moment.turnedThisVisit) return 'face'

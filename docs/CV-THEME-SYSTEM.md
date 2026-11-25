@@ -50,10 +50,8 @@ Artistic.
   `portfolio-worlds-hint-offered`), only after `HINT_MIN_MS` (20000, 20 s) and one scrolled screen, never to
   a visitor who opened the picker or has seen two worlds. A page too short to scroll a screen (shorter than
   two screens) counts as scrolled once `HINT_MIN_MS` has passed, so the hint can still offer itself on
-  `/blog`. It never offers itself on the CV pages, `/cv`, `/es/cv` and `/it/cv` (`hintBelongsOn` reads them
-  from `CV_PATHS` in `src/i18n/config`). It then waits, rendered hidden and inert so its real box can be
-  measured, and opens only where that box covers no text and no control (`coversNothing`); if no such place
-  comes before the end of the page it stays closed that visit. Each measure runs only after the reveals
+  `/blog`. It then waits, rendered hidden and inert so its real box can be measured, and opens only where
+  that box covers no text and no control (`coversNothing`); if no such place comes before the end of the page it stays closed that visit. Each measure runs only after the reveals
   running then have ended, held at most `SETTLE_CAP_MS` (1000, 1 s) so a long reveal cannot stall it, and
   text still waiting for its reveal (at opacity 0) counts as covered. Text kept for screen readers only
   (`isVisuallyHidden`) is never drawn and does not count. Once open, the
@@ -69,9 +67,7 @@ Artistic.
   every world seen it offers the one after the current world.
 - Seen worlds are kept in localStorage under `portfolio-worlds-seen` and this visit's in sessionStorage
   under `portfolio-worlds-visit` (a world counts after 1.5 s on screen).
-- The picker (`WorldsModal`) remembers them: "You have seen n of 18 worlds" over 18 dots (at 1 the singular label `pickerProgressOne`, and the hint's
-  count likewise `hintBodyOne`, picked by `countTemplate`; only Italian has them, English and Spanish read
-  the plural at 1 too), then the worlds in
+- The picker (`WorldsModal`) remembers them: "You have seen n of 18 worlds" over 18 dots, then the worlds in
   `orderForPicker` order: the next unseen world first as the wide up next card (`WorldCard`), then the
   other unseen worlds, the seen ones in grey and the current one, "You are here". On open the focus goes
   to the up next "Enter <name>" button, Tab stays inside, and on close it goes back to the control that
@@ -114,8 +110,6 @@ Artistic.
   on the launcher opens the picker as before. The lens fades and grows in for 0.18 s (no growth under
   reduced motion). It reads the 1440 still on a screen 640 px wide or more and the 390 one below. The still
   and `focus.json` load on the first opening only, never with the page.
-- Neither the face nor the lens ever shows on the CV pages (`hintBelongsOn`): there the launcher reads "18
-  worlds" and opens the picker, nothing else.
 - The previews in `public/world-previews/`, all made by `node scripts/capture-world-previews.mjs [base]`
   (default `http://localhost:4100`, the site running; `npm run capture:previews`) with the project's
   Playwright, one fresh page per world and width with the launcher hidden: `<id>.webp` the picker card
@@ -148,9 +142,9 @@ Artistic.
   content: it fails the build and names the world whose hash is missing or differs, or that has no
   `<id>-1440.webp` still. It reads files only, so any clone or copy (Netlify) reads the same, and it never
   launches a browser.
-- Every launcher, hint and picker word is Site text in Decap (`content/cv/labels.json` `labels.worlds`, in
-  English, Spanish and Italian). `RootShell` reads it with `getLabels` (`src/lib/cv-data.ts`) on the server
-  and hands it down through `WorldsLabelsProvider` (`src/components/worlds/WorldsLabels.tsx`), since the
+- Every launcher, hint and picker word is Site text in Decap (`content/cv/labels.json` `labels.worlds`), in
+  English only, since no Spanish or Italian page carries the launcher. `RootShell` reads it with `getLabels`
+  (`src/lib/cv-data.ts`) on the server and hands it down through `WorldsLabelsProvider` (`src/components/worlds/WorldsLabels.tsx`), since the
   launcher renders above the CV data provider.
 
 ## Where the CV content comes from

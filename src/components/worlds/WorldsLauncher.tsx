@@ -74,7 +74,7 @@ export default function WorldsLauncher() {
   const button = useRef<HTMLButtonElement>(null)
   const pickerWasOpen = useRef(false)
   const hidden = isWorldsOpen || isTransitioning
-  const lens = useLensTrigger(nudge.lensAllowed && !hidden, button)
+  const lens = useLensTrigger(!hidden, button)
   const nextName = getThemeById(nudge.nextId).name
 
   useEffect(() => {

@@ -21,6 +21,8 @@ i18n:
   default_locale: en
 
 x-text: &text { widget: string, i18n: true, required: false }
+# A text that only English has: the default locale's editor shows it, the others leave it out.
+x-english: &english { widget: string, required: false }
 x-prose: &prose { widget: text, i18n: true, required: false }
 x-fixed: &fixed { widget: string, i18n: duplicate, required: false }
 x-year: &whole { widget: number, value_type: int, i18n: duplicate, required: false }
@@ -616,44 +618,45 @@ collections:
                   - { <<: *text, label: "No post at this address", name: notFound }
                   - { <<: *text, label: "Code example (the name a screen reader gives each code block)", name: codeExample }
               # {count} and {total} are the number of worlds, {seen} how many the visitor has seen, {world} a world's name.
-              - label: Worlds launcher, hint and picker
+              # English only: the launcher, hint and picker show on the homepage and the blog, never on a CV page.
+              - label: Worlds launcher, hint and picker (English only)
                 name: worlds
                 widget: object
-                i18n: true
+                i18n: false
                 fields:
-                  - { <<: *text, label: "Launcher (the number goes in bold, the rest beside it)", name: launcher }
-                  - { <<: *text, label: "Launcher name for a screen reader", name: launcherAria }
-                  - { <<: *text, label: "Launcher tooltip", name: launcherTitle }
-                  - { <<: *text, label: "Hint title, naming the next world", name: hintNextTitle }
-                  - { <<: *text, label: "Hint line under the title when the visitor has seen one world (only where it differs from the line below)", name: hintBodyOne, required: false }
-                  - { <<: *text, label: "Hint line under the title, two or more worlds seen", name: hintBody }
-                  - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
-                  - { <<: *text, label: "World switch overlay line, {world} is the world being entered", name: portalLine }
-                  - { <<: *text, label: "Hint button opening the picker", name: hintAll }
-                  - { <<: *text, label: "Hint close button for a screen reader", name: hintClose }
-                  - { <<: *text, label: "Picker title", name: pickerTitle }
-                  - { <<: *text, label: "Picker subtitle", name: pickerSubtitle }
-                  - { <<: *text, label: "Picker close button for a screen reader", name: pickerClose }
-                  - { <<: *text, label: "Picker count when the visitor has seen one world (only where it differs from the line below)", name: pickerProgressOne, required: false }
-                  - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
-                  - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
-                  - { <<: *text, label: "Picker filter chip showing every world", name: pickerFilterAll }
-                  - { <<: *text, label: "Picker filter chip of the Fantasy worlds", name: pickerFilterFantasy }
-                  - { <<: *text, label: "Picker filter chip of the Retro worlds", name: pickerFilterRetro }
-                  - { <<: *text, label: "Picker filter chip of the Neon worlds", name: pickerFilterNeon }
-                  - { <<: *text, label: "Picker filter chip of the Action worlds", name: pickerFilterAction }
-                  - { <<: *text, label: "Picker filter chip of the Artistic worlds", name: pickerFilterArtistic }
-                  - { <<: *text, label: "Up next card heading", name: pickerUpNext }
-                  - { <<: *text, label: "Up next card button", name: pickerEnter }
-                  - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }
-                  - { <<: *text, label: "Mark on a world seen", name: pickerSeenMark }
-                  - { <<: *text, label: "Mark on the world the visitor is in", name: pickerHere }
-                  - { <<: *text, label: "Wardrobe previous arrow for a screen reader, {name} is the world", name: wardrobePrev }
-                  - { <<: *text, label: "Wardrobe next arrow for a screen reader, {name} is the world", name: wardrobeNext }
-                  - { <<: *text, label: "Lens caption, {name} is the next world", name: lensCaption }
-                  - { <<: *text, label: "Lens button going to the next world", name: lensGo }
-                  - { <<: *text, label: "Lens name for a screen reader", name: lensAria }
-                  - { <<: *text, label: "Launcher name for a screen reader once it shows the next world", name: faceAria }
+                  - { <<: *english, label: "Launcher (the number goes in bold, the rest beside it)", name: launcher }
+                  - { <<: *english, label: "Launcher name for a screen reader", name: launcherAria }
+                  - { <<: *english, label: "Launcher tooltip", name: launcherTitle }
+                  - { <<: *english, label: "Hint title, naming the next world", name: hintNextTitle }
+                  - { <<: *english, label: "Hint line under the title", name: hintBody }
+                  - { <<: *english, label: "Hint button entering the next world", name: hintEnter }
+                  - { <<: *english, label: "World switch overlay line, {world} is the world being entered", name: portalLine }
+                  - { <<: *english, label: "Hint button opening the picker", name: hintAll }
+                  - { <<: *english, label: "Hint close button for a screen reader", name: hintClose }
+                  - { <<: *english, label: "Picker title", name: pickerTitle }
+                  - { <<: *english, label: "Picker close button for a screen reader", name: pickerClose }
+                  - { <<: *english, label: "Picker count of worlds seen", name: pickerProgress }
+                  - { <<: *english, label: "Picker category filters for a screen reader", name: pickerFilterAria }
+                  - { <<: *english, label: "Picker filter chip showing every world", name: pickerFilterAll }
+                  - { <<: *english, label: "Picker filter chip of the Fantasy worlds", name: pickerFilterFantasy }
+                  - { <<: *english, label: "Picker filter chip of the Retro worlds", name: pickerFilterRetro }
+                  - { <<: *english, label: "Picker filter chip of the Neon worlds", name: pickerFilterNeon }
+                  - { <<: *english, label: "Picker filter chip of the Action worlds", name: pickerFilterAction }
+                  - { <<: *english, label: "Picker filter chip of the Artistic worlds", name: pickerFilterArtistic }
+                  - { <<: *english, label: "Up next card heading", name: pickerUpNext }
+                  - { <<: *english, label: "Up next card button", name: pickerEnter }
+                  - { <<: *english, label: "Mark on a world not seen yet", name: pickerNotSeen }
+                  - { <<: *english, label: "Mark on a world seen", name: pickerSeenMark }
+                  - { <<: *english, label: "Mark on the world the visitor is in", name: pickerHere }
+                  - { <<: *english, label: "Wardrobe previous arrow for a screen reader, {name} is the world", name: wardrobePrev }
+                  - { <<: *english, label: "Wardrobe next arrow for a screen reader, {name} is the world", name: wardrobeNext }
+                  - { <<: *english, label: "Wardrobe count, {n} is the outfit shown and {count} the number of outfits", name: wardrobeCount }
+                  - { <<: *english, label: "Lens caption, {name} is the next world", name: lensCaption }
+                  - { <<: *english, label: "Lens button going to the next world", name: lensGo }
+                  - { <<: *english, label: "Lens name for a screen reader", name: lensAria }
+                  - { <<: *english, label: "Lens hint for a mouse", name: lensClick }
+                  - { <<: *english, label: "Lens hint for a finger held on the launcher", name: lensHold }
+                  - { <<: *english, label: "Launcher name for a screen reader once it shows the next world", name: faceAria }
               # The error pages, in the language of the address (/es/..., /it/...); {status} is the HTTP status number.
               - label: Error pages
                 name: errors

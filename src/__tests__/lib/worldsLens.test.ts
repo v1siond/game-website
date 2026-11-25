@@ -9,7 +9,6 @@ import {
 } from '@/lib/worlds/lens'
 
 const scrolledOnHome: FaceMoment = {
-  pathname: '/',
   hero: 'out',
   hintOpen: false,
   turnedThisVisit: false,
@@ -41,14 +40,6 @@ describe('launcherFace', () => {
   it('waits for the open hint to close before the first turn', () => {
     expect(launcherFace({ ...scrolledOnHome, hintOpen: true })).toBe('count')
     expect(launcherFace({ ...scrolledOnHome, hintOpen: false })).toBe('turn')
-  })
-
-  it('never turns or shows the face on the CV pages of any language', () => {
-    for (const pathname of ['/cv', '/es/cv', '/it/cv', '/cv/']) {
-      expect(launcherFace({ ...scrolledOnHome, pathname })).toBe('count')
-      expect(launcherFace({ ...scrolledOnHome, pathname, turnedThisVisit: true })).toBe('count')
-    }
-    expect(launcherFace({ ...scrolledOnHome, pathname: '/blog' })).toBe('turn')
   })
 
   it('keeps the turn inside the 5 s every moment ends in', () => {

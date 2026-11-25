@@ -2,7 +2,6 @@
 
 import { useEffect, type CSSProperties, type RefObject } from 'react'
 import { fillLabel } from '@/lib/cv/labels'
-import { countTemplate } from '@/lib/worlds/nudge'
 import { useWorldsLabels } from './WorldsLabels'
 
 interface WorldsHintProps {
@@ -69,7 +68,7 @@ export default function WorldsHint({ cardRef, open, style, worldName, nextName, 
         ✕
       </button>
       <p id="worlds-hint-body" className="c-worlds-hint__body mb-2 mt-1 text-sm leading-snug">
-        {fillLabel(countTemplate(seen, { one: labels.hintBodyOne, many: labels.hintBody }), { world: worldName, seen, total })}
+        {fillLabel(labels.hintBody, { world: worldName, seen, total })}
       </p>
       {/* A long world name wraps inside its own button, and on a narrow card the row breaks rather than
           squeeze the label past the button's fill, where it would be the fill colour on the fill. */}

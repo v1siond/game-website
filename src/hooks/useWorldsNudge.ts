@@ -11,7 +11,6 @@ import {
   SEEN_STORAGE_KEY,
   VISIT_STORAGE_KEY,
   coversNothing,
-  hintBelongsOn,
   hintWatch,
   isVisuallyHidden,
   mayOfferHint,
@@ -155,8 +154,8 @@ export type HintState = 'closed' | 'waiting' | 'open'
 
 /**
  * The worlds nudge state: the seen worlds (localStorage) and the worlds entered this visit (sessionStorage),
- * the one time hint (offered after HINT_MIN_MS and one scrolled screen, never on a CV page, opened only
- * where its card covers no text and no control, else closed that visit), the next world in the tour it names,
+ * the one time hint (offered after HINT_MIN_MS and one scrolled screen, opened only where its card covers no
+ * text and no control, else closed that visit), the next world in the tour it names,
  * and the launcher's face (launcherFace: the count at the hero, him in that next world once the hero is gone).
  * Used once, by WorldsLauncher.
  */
@@ -169,12 +168,6 @@ export function useWorldsNudge() {
   const pickerOpened = useRef(false)
   // usePathname is null only outside the app router, which this site does not use.
   const pathname = usePathname() ?? ''
-  const pathnameRef = useRef(pathname)
-
-  useEffect(() => {
-    pathnameRef.current = pathname
-    if (!hintBelongsOn(pathname)) setHint('closed')
-  }, [pathname])
 
   useEffect(() => {
     setSeen(loadSeenWorlds())
@@ -203,7 +196,6 @@ export function useWorldsNudge() {
       deepest = Math.max(deepest, window.scrollY)
       if (done) return
       const offer = mayOfferHint({
-        pathname: pathnameRef.current,
         elapsedMs: performance.now() - startedAt,
         scrolledPx: deepest,
         viewportPx: window.innerHeight,
@@ -291,7 +283,7 @@ export function useWorldsNudge() {
     setTurnedThisVisit(readStored('session', FACE_TURNED_KEY) !== null)
   }, [])
 
-  const face = launcherFace({ pathname, hero, hintOpen: hint === 'open', turnedThisVisit, turning })
+  const face = launcherFace({ hero, hintOpen: hint === 'open', turnedThisVisit, turning })
 
   useEffect(() => {
     if (face !== 'turn' || turning) return
@@ -326,8 +318,6 @@ export function useWorldsNudge() {
     seenCount: seen.length,
     nextId,
     face,
-    /** The lens and the face belong on this page (never on a CV page). */
-    lensAllowed: hintBelongsOn(pathname),
     hint: isWorldsOpen || isTransitioning ? 'closed' : hint,
     hintRef,
     closeHint,

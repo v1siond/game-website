@@ -3,7 +3,6 @@
 // the worlds in, and which palette tokens the launcher reads in. No DOM here; the useWorldsNudge hook is
 // the thin adapter over storage, timers and scroll.
 import { contrastRatio } from '@/lib/contrast'
-import { CV_PATHS } from '@/i18n/config'
 import type { ThemeColors } from '@/themes/themes'
 
 export const SEEN_STORAGE_KEY = 'portfolio-worlds-seen'
@@ -76,15 +75,7 @@ export function markSeen(seen: string[], id: string): string[] {
   return [...seen, id]
 }
 
-const CV_PAGES: readonly string[] = Object.values(CV_PATHS)
-
-/** False on the CV pages of every language: the CV is just the CV, so the hint never offers itself there. */
-export function hintBelongsOn(pathname: string): boolean {
-  return !CV_PAGES.includes(pathname.replace(/(.)\/+$/, '$1'))
-}
-
 export interface HintMoment {
-  pathname: string
   elapsedMs: number
   scrolledPx: number
   viewportPx: number
@@ -104,7 +95,6 @@ const scrollMet = ({ scrolledPx, viewportPx, pageHeightPx }: HintMoment): boolea
  * scroll one), and never twice in a visit.
  */
 export function mayOfferHint(moment: HintMoment): boolean {
-  if (!hintBelongsOn(moment.pathname)) return false
   if (moment.offeredThisVisit || moment.pickerOpened) return false
   if (moment.seenCount > 1) return false
   if (moment.elapsedMs < HINT_MIN_MS) return false
@@ -138,19 +128,6 @@ export const followingInTour = (currentId: string): string => tourStep(currentId
 
 /** The world before the current one in TOUR_ORDER, wrapping at the start: the wardrobe's previous outfit. */
 export const previousInTour = (currentId: string): string => tourStep(currentId, -1)
-
-export interface CountTemplates {
-  /** The singular, only in a language whose plural reads wrong at one (Italian). */
-  one?: string
-  many: string
-}
-
-/** The wording of a count of worlds: the singular for exactly one where the language has one, the plural
- *  for any other count. */
-export function countTemplate(count: number, templates: CountTemplates): string {
-  if (count === 1 && templates.one !== undefined) return templates.one
-  return templates.many
-}
 
 export type PickerMark = 'next' | 'unseen' | 'seen' | 'here'
 

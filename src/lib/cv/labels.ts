@@ -3,17 +3,9 @@ import type labelsFile from '../../../content/cv/labels.json'
 
 // The interface text of the site and /cv (section titles, buttons, accessible names, the phrases around
 // the CV facts), as content/cv/labels.json holds it. The type is read off the English block, so the file
-// is the one list of keys (but the optional worlds singulars); nothing reads the JSON here at run time, the loader does (src/lib/cv-data.ts).
+// is the one list of keys; nothing reads the JSON here at run time, the loader does (src/lib/cv-data.ts).
 
-type EnglishLabels = (typeof labelsFile)['en']['labels']
-
-/** The worlds counts' singulars. English and Spanish say one and many alike and leave them out, so the count
- *  reads the plural (countTemplate); a locale whose plural reads wrong at one (Italian) adds them. */
-export const WORLDS_SINGULARS = ['hintBodyOne', 'pickerProgressOne'] as const
-
-type WorldsSingulars = Partial<Record<(typeof WORLDS_SINGULARS)[number], string>>
-
-export type Labels = Omit<EnglishLabels, 'worlds'> & { worlds: EnglishLabels['worlds'] & WorldsSingulars }
+export type Labels = (typeof labelsFile)['en']['labels']
 
 export type LabelGroup = keyof Labels
 

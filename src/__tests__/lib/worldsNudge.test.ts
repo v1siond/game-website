@@ -5,7 +5,6 @@ import {
   TOUR_ORDER,
   VISIT_STORAGE_KEY,
   coversNothing,
-  hintBelongsOn,
   hintWatch,
   isVisuallyHidden,
   launcherColors,
@@ -15,7 +14,6 @@ import {
   followingInTour,
   previousInTour,
   orderForPicker,
-  countTemplate,
   readSeen,
   recordWorld,
 } from '@/lib/worlds/nudge'
@@ -47,7 +45,6 @@ describe('markSeen', () => {
 
 describe('mayOfferHint', () => {
   const ready = {
-    pathname: '/',
     elapsedMs: HINT_MIN_MS,
     scrolledPx: 900,
     viewportPx: 800,
@@ -82,51 +79,16 @@ describe('mayOfferHint', () => {
     expect(mayOfferHint({ ...ready, seenCount: 2 })).toBe(false)
   })
 
-  it.each([['/cv'], ['/es/cv'], ['/it/cv']])('never offers it on the CV page %s', (pathname) => {
-    expect(mayOfferHint({ ...ready, pathname })).toBe(false)
-  })
-
-  it('offers it on a world page and on the blog', () => {
-    expect(mayOfferHint({ ...ready, pathname: '/' })).toBe(true)
-    expect(mayOfferHint({ ...ready, pathname: '/blog' })).toBe(true)
-  })
-
   it('counts the scroll as met on a page that cannot scroll a screen, once the read time has passed', () => {
-    const blog = { ...ready, pathname: '/blog', scrolledPx: 0, viewportPx: 844, pageHeightPx: 844 }
+    const blog = { ...ready, scrolledPx: 0, viewportPx: 844, pageHeightPx: 844 }
     expect(mayOfferHint(blog)).toBe(true)
     expect(mayOfferHint({ ...blog, elapsedMs: HINT_MIN_MS - 1 })).toBe(false)
   })
 
   it('still waits for a real scroll on a page that can scroll a screen', () => {
-    const post = { ...ready, pathname: '/blog/css-page-transition-portals', viewportPx: 844, pageHeightPx: 2087 }
+    const post = { ...ready, viewportPx: 844, pageHeightPx: 2087 }
     expect(mayOfferHint({ ...post, scrolledPx: 0 })).toBe(false)
     expect(mayOfferHint({ ...post, scrolledPx: 844 })).toBe(true)
-  })
-})
-
-describe('hintBelongsOn', () => {
-  it.each([['/cv'], ['/es/cv'], ['/it/cv'], ['/cv/'], ['/it/cv/']])('keeps the hint off the CV page %s', (pathname) => {
-    expect(hintBelongsOn(pathname)).toBe(false)
-  })
-
-  it.each([['/'], ['/blog'], ['/blog/some-post'], ['/cvs'], ['/fr/cv']])('lets the hint offer itself on %s', (pathname) => {
-    expect(hintBelongsOn(pathname)).toBe(true)
-  })
-})
-
-describe('countTemplate', () => {
-  const templates = { one: 'one {seen}', many: 'many {seen}' }
-
-  it('words the count in the singular for exactly one world', () => {
-    expect(countTemplate(1, templates)).toBe('one {seen}')
-  })
-
-  it.each([[0], [2], [17]])('words the count in the plural for %p worlds', (count) => {
-    expect(countTemplate(count, templates)).toBe('many {seen}')
-  })
-
-  it('words one world in the plural when the language has no singular of its own', () => {
-    expect(countTemplate(1, { many: 'many {seen}' })).toBe('many {seen}')
   })
 })
 

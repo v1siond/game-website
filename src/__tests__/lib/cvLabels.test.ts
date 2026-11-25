@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { cvDataFrom, CV_CONTENT_FILES, type CVContentFiles } from '@/lib/cv/content'
-import { fillLabel, labelsFor, WORLDS_SINGULARS, type Labels, type LabelsFile } from '@/lib/cv/labels'
+import { fillLabel, labelsFor, type Labels, type LabelsFile } from '@/lib/cv/labels'
 import { localeFrom, locales } from '@/i18n/config'
 
 // The real Decap files, read the way src/lib/cv-data.ts reads them.
@@ -20,24 +20,18 @@ describe('labels.json', () => {
   const file = readFiles().labels
   const englishKeys = keysOf(file.en.labels)
 
-  // The worlds singulars are a locale's own: English has none, a locale adds them where its plural reads
-  // wrong at one.
-  const singularKeys = WORLDS_SINGULARS.map((key) => `worlds.${key}`)
+  // The worlds group is English only: the launcher, hint and picker show on the homepage and the blog, which
+  // are English, and never on a CV page, the one page each language has.
+  const translatedKeys = englishKeys.filter((key) => !key.startsWith('worlds.'))
 
-  it.each(locales.filter((locale) => locale !== 'en'))('translates every English key in %s', (locale) => {
+  it.each(locales.filter((locale) => locale !== 'en'))('translates every English key but the worlds in %s', (locale) => {
     const translated = file[locale]?.labels as Labels
-    expect(keysOf(translated).filter((key) => !singularKeys.includes(key)).sort()).toEqual([...englishKeys].sort())
+    expect(keysOf(translated).sort()).toEqual([...translatedKeys].sort())
   })
 
-  it('keeps the {slots} of the plural in every worlds singular', () => {
-    const slots = (text: string | undefined) => (text?.match(/\{\w+\}/g) ?? []).sort()
-    const plurals = { hintBodyOne: 'hintBody', pickerProgressOne: 'pickerProgress' } as const
-    locales.forEach((locale) => {
-      const worlds = labelsFor(file, locale).worlds
-      WORLDS_SINGULARS.filter((key) => worlds[key] !== undefined).forEach((key) => {
-        expect([locale, key, slots(worlds[key])]).toEqual([locale, key, slots(worlds[plurals[key]])])
-      })
-    })
+  it.each(locales.filter((locale) => locale !== 'en'))('keeps no worlds text in %s', (locale) => {
+    expect(file[locale]?.labels).not.toHaveProperty('worlds')
+    expect(file.en.labels).toHaveProperty('worlds.launcher')
   })
 
   it('has no empty label in any locale', () => {
