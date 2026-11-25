@@ -61,7 +61,21 @@ export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: 
 export const PHONE_TOP = 550
 export const PhoneTop = createContext(PHONE_TOP)
 const PHONE_W = 460
-const phoneView = (top: number): string => `${HOLD - 260} ${FLOOR - top} ${PHONE_W} ${H}`
+const PHONE_LEFT = HOLD - 260
+const phoneView = (top: number): string => `${PHONE_LEFT} ${FLOOR - top} ${PHONE_W} ${H}`
+const PHONE_MID = PHONE_LEFT + PHONE_W / 2
+
+// Where his centre may stand in the phone's slice while a stretch plays, on each side: in the half the
+// section names and a figure's width in from the slice's edge. The camera's ease trails him while he runs
+// and its look ahead pans past him, which alone would carry him across the middle in mid action; the camera
+// keeps him inside this window instead, the way a side scroller's camera window does.
+const PHONE_WINDOW: Record<Side, readonly [number, number]> = {
+  right: [PHONE_MID + 20, PHONE_LEFT + PHONE_W - FIGURE_W],
+  left: [PHONE_LEFT + FIGURE_W, PHONE_MID - FIGURE_W / 2],
+}
+
+/** The window his centre stays in on a phone, on the stretch's side. */
+export const phoneWindowOf = (side: Side): readonly [number, number] => PHONE_WINDOW[side]
 
 export function Canvas({ children }: { children: ReactNode }) {
   const phone = useContext(PhoneView)
@@ -148,13 +162,13 @@ function trunkPath(x: number, width: number, y: number, lean = 0): string {
 // A second and third share from one, so a shape's width, shade and lean do not rise together.
 const shareOf = (s: number, k: number): number => (s * k) % 1
 
-/** A gear outline: `teeth` square teeth round a ring of radius r, turned `turn` radians, with a hub hole. A
- *  turning gear is drawn anew turned each frame, so its box stays the gear's own. */
-export function gearPath(cx: number, cy: number, r: number, teeth: number, turn = 0): string {
+/** A gear outline: `teeth` square teeth round a ring of radius r, with a hub hole. A turning gear is drawn
+ *  once and turned by a transform. */
+export function gearPath(cx: number, cy: number, r: number, teeth: number): string {
   const step = (Math.PI * 2) / teeth
   const outer = r * 1.16
   const points = Array.from({ length: teeth }, (_, index) => {
-    const a = index * step + turn
+    const a = index * step
     const corners = [
       [a - step * 0.25, r],
       [a - step * 0.16, outer],

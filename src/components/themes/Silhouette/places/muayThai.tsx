@@ -4,7 +4,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, lerp, transformTo, translateTo } from '../../shared/stageNodes'
 import { FIGURE_H } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { outline, runFrame, type Frame, type Place } from '../place'
+import { runFrame, type Frame, type Place } from '../place'
 import { STRIKE, TUCK, rest } from '../pose'
 
 // Muay Thai, the fighter's middle section, turn the guns on each other: the gravity room, two wall guns
@@ -28,14 +28,14 @@ const LOOK_ACROSS = 150
 const SAW = { r: 58, from: 560, to: 260 }
 const FIRE = { from: 0.18, to: 0.26 }
 
-/** A saw blade standing on the floor at x, turned `turn` radians: `teeth` hooked teeth round a disc with a
- *  hub hole, drawn anew each frame so its box stays the blade's own. */
-function sawPath(x: number, r: number, teeth: number, turn: number): string {
+/** A saw blade standing on the floor at x 0: `teeth` hooked teeth round a disc with a hub hole. It is
+ *  drawn once and run and turned along the rail by a transform. */
+function sawPath(r: number, teeth: number): string {
   const step = (Math.PI * 2) / teeth
-  const at = (angle: number, radius: number) => `${(x + Math.cos(angle + turn) * radius).toFixed(1)} ${(-r + Math.sin(angle + turn) * radius).toFixed(1)}`
+  const at = (angle: number, radius: number) => `${(Math.cos(angle) * radius).toFixed(1)} ${(-r + Math.sin(angle) * radius).toFixed(1)}`
   const rim = Array.from({ length: teeth }, (_, i) => `L${at(i * step, r * 0.86)} L${at(i * step + step * 0.15, r * 1.12)} L${at(i * step + step, r * 0.86)}`).join(' ')
   const hub = r * 0.2
-  return `M${at(0, r * 0.86)} ${rim} Z M${x - hub} ${-r} a${hub} ${hub} 0 1 0 ${hub * 2} 0 a${hub} ${hub} 0 1 0 ${-hub * 2} 0 Z`
+  return `M${at(0, r * 0.86)} ${rim} Z M${-hub} ${-r} a${hub} ${hub} 0 1 0 ${hub * 2} 0 a${hub} ${hub} 0 1 0 ${-hub * 2} 0 Z`
 }
 
 function move(profession: Profession, t: number): Frame {
@@ -117,7 +117,7 @@ export const muayThai: Place = {
       <path data-fx="arrow" d={`M${SWITCH} -112 l-11 14 h6 v10 h10 v-10 h6 Z`} fill={SHADE.glow} />
       {/* the saw on its rail: a great toothed blade that runs the floor, sparks off its edge */}
       <rect x={-500} y={-6} width={1500} height={6} fill={SHADE.black} />
-      <path data-fx="saw" d={sawPath(SAW.from, SAW.r, 24, 0)} fill={SHADE.black} fillRule="evenodd" />
+      <path data-fx="saw" d={sawPath(SAW.r, 24)} transform={`translate(${SAW.from} 0)`} fill={SHADE.black} fillRule="evenodd" />
       <path data-fx="sparks" d={`M${SAW.r * 0.7} -6 l26 -16 M${SAW.r * 0.6} -4 l30 -4 M${SAW.r * 0.8} -10 l14 -26`} stroke={SHADE.glow} strokeWidth={2} />
     </>
   ),
@@ -143,7 +143,7 @@ export const muayThai: Place = {
       // the saw waits at the room's far end until he falls up, then runs the rail under him, sparking
       const run = ramp(t, 0.5, 0.74)
       const x = lerp(SAW.from, SAW.to, run)
-      outline(saw, sawPath(x, SAW.r, 24, (-x * 1.7 * Math.PI) / 180))
+      transformTo(saw, `translate(${x.toFixed(1)} 0) rotate(${(-x * 1.7).toFixed(1)} 0 ${-SAW.r})`)
       translateTo(sparks, x, 0)
       fadeTo(sparks, run > 0 && run < 1 ? 1 : 0)
       fadeTo(flash, fire > 0 && fire < 1 ? 1 : 0)

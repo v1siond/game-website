@@ -4,7 +4,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { gearPath } from '../forest'
-import { arc, outline, runFrame, type Frame, type Place } from '../place'
+import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, TUCK, rest } from '../pose'
 
 // Bands, the drummer's middle section, the foundry's beat: a machine hall where presses pound in a steady
@@ -109,7 +109,7 @@ export const bands: Place = {
     const presses = PRESSES.map((_, i) => fx(stage, `press-${i}`))
     const dusts = PRESSES.map((_, i) => fx(stage, `dust-${i}`))
     return (t) => {
-      outline(gear, gearPath(GEAR.x, GEAR.y, GEAR.r, 16, (turnAt(t) * Math.PI) / 180))
+      transformTo(gear, `rotate(${turnAt(t).toFixed(1)} ${GEAR.x} ${GEAR.y})`)
       presses.forEach((node, i) => {
         const down = pressAt(Math.max(0, t - 0.04 * i))
         transformTo(node, `translate(0 ${(-PRESS.up * down).toFixed(1)})`)

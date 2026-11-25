@@ -7,7 +7,7 @@ import { setRigPose } from '../shared/rig'
 import { fx, lerp, transformTo, translateTo } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
 import { ramp } from '@/lib/scroll/stage'
-import { FLOOR, Figure, PAN, figureAt, type Gap, type Region, type Run, type Side } from './forest'
+import { FLOOR, Figure, PAN, figureAt, phoneWindowOf, type Gap, type Region, type Run, type Side } from './forest'
 import type { Light } from './palette'
 import { rest, run, shadeJoints } from './pose'
 
@@ -102,6 +102,12 @@ const turnAt = (t: number): number => {
   return u * u * (3 - 2 * u)
 }
 
+/** The camera at `camera` moved just enough that his centre at `x` stands in the phone's window on `side`. */
+const keptInWindow = (camera: number, x: number, side: Side): number => {
+  const [low, high] = phoneWindowOf(side)
+  return Math.min(x - low, Math.max(x - high, camera))
+}
+
 /** The stretch's figure layer: its obstacle and him, at his start. */
 export function Stretch({ place, input, run, marked = false }: { place: Place; input: PlaceInput; run: Run; marked?: boolean }) {
   return (
@@ -124,10 +130,13 @@ export function bindStretch(place: Place, run: Run, stage: ParentNode, input: Pl
     const frame = place.move(input.profession, t, run.length)
     // the camera follows him, and over his first steps swings him across to the stretch's side
     const follow = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, { start: run.start - run.turn, hold: run.hold })
-    const camera = follow + run.turn * turnAt(t) + (place.lead?.(t, input) ?? 0)
+    const eased = follow + run.turn * turnAt(t) + (place.lead?.(t, input) ?? 0)
+    // on a phone, once the swing to the stretch's side is under way, the camera keeps him in its window
+    const x = run.start + frame.ahead
+    const camera = input.phone ? lerp(eased, keptInWindow(eased, x, input.side), turnAt(t)) : eased
     for (const [node, share] of layers) translateTo(node, -share * camera, 0)
     reply?.(t)
-    transformTo(root, figureAt(run.start + frame.ahead, frame.lift, frame.over, frame.back))
+    transformTo(root, figureAt(x, frame.lift, frame.over, frame.back))
     if (joints) setRigPose(joints, frame.pose)
   }
 }
