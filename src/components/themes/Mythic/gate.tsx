@@ -6,7 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { RealmDoors } from './realmDoors'
 import { ContactActions, SlabButton } from './buttons'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { SectionTitle, ZONE_OF, mythHeadingId, useColumn, type Zone } from './stage'
+import { HANDOVER_ROOM, SectionTitle, ZONE_OF, mythHeadingId, useColumn, type Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -27,7 +27,7 @@ export function LastGate({ still }: { still?: ReactNode }) {
   const column = useColumn('contact')
 
   return (
-    <section ref={ref} data-scene="contact" data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative z-20 mx-auto min-h-[130svh] max-w-6xl scroll-mt-8 px-4 pb-24 sm:px-6">
+    <section ref={ref} data-scene="contact" data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className={`relative z-20 mx-auto min-h-[130svh] max-w-6xl scroll-mt-8 px-4 pb-24 sm:px-6 ${HANDOVER_ROOM}`}>
       {still}
       {/* tall enough that its scene fully rises over the one before it, even at the page's end */}
       <div className={column}>

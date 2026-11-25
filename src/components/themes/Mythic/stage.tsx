@@ -44,9 +44,20 @@ export const SceneSides = SidesContext.Provider
 /** The column a section's title and cards read in: the whole width on a phone; from lg the half away from its
  *  scene, a scene on the right putting the cards on the left. */
 const COLUMN: Record<Side, string> = {
-  right: 'lg:mr-auto lg:w-[min(46rem,52vw)]',
-  left: 'lg:ml-auto lg:w-[min(46rem,52vw)]',
+  right: 'lg:mr-auto lg:w-[min(42rem,46vw)]',
+  left: 'lg:ml-auto lg:w-[min(42rem,46vw)]',
 }
+
+/**
+ * The room a section keeps from lg so no card ever crosses a scene: its title starts a screen below its top,
+ * where the shared theatre has its stage whole (src/lib/scroll/stage.ts HANDOVER, whole when the section's top
+ * reaches the screen's top), so the next section's cards, which read on the side the scene before them plays
+ * on, only come up once that scene has gone; and a quarter screen under it, so its last card has left the
+ * screen when the next scene starts to play (PLAY_FROM, a quarter screen before the top). The scene plays
+ * alone at the start of its section and ends beside its own cards (its play runs to 0.95 of a screen past
+ * the top).
+ */
+export const HANDOVER_ROOM = 'lg:mb-[25svh] lg:pt-[100svh]'
 
 /** The column of the part `id` on the page being read. */
 export function useColumn(id: SectionId | 'contact'): string {
@@ -102,12 +113,11 @@ export function Stage({ id, title, children }: { id: SectionId; title: string; c
   const column = useColumn(id)
 
   return (
-    <section ref={ref} data-scene={id} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative mb-28 scroll-mt-8 lg:min-h-[110svh]">
+    <section ref={ref} data-scene={id} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className={`relative mb-28 scroll-mt-8 ${HANDOVER_ROOM}`}>
       {still(id)}
       <div className={column}>
         <SectionTitle title={title} />
-        {/* from lg the section stands at least a screen tall so its scene has its time beside a short list of
-            cards; under lg the cards take the whole width, so the section's scene plays and holds in this gap first,
+        {/* under lg the cards take the whole width, so the section's scene plays and holds in this gap first,
             the title at its top and the floor clear of the cards (the head about 130svh with the title) */}
         <div className="max-lg:min-h-[115svh]" aria-hidden="true" />
         {children}

@@ -4,7 +4,7 @@ import { memo } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import type { Band, Musician } from '@/lib/cv/content'
 import u from './underworld.module.css'
 
@@ -48,13 +48,13 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
   const { years } = useLabels()
 
   return (
-    <div className="grid gap-8">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
       <div className={`p-5 ${u.panel} ${u.reveal}`}>
         <p className={`text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
       </div>
       <div data-stage-items="">
-        <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard slot={slot} />} />
+        <BandList bands={bands} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard slot={slot} />} />
       </div>
     </div>
   )

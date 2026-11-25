@@ -6,7 +6,7 @@ import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectCard } from '@/lib/cv/cvView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import type { Project } from '@/lib/cv/content'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, IRON_TAGS } from './stage'
@@ -57,7 +57,7 @@ function LabourCard({ slot }: { slot: ProjectSlot }) {
 export function Labours({ projects }: { projects: Project[] }) {
   return (
     <div data-stage-items="">
-      <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <LabourCard slot={slot} />} />
+      <ProjectList projects={projects} className={MASONRY_COLUMN_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <LabourCard slot={slot} />} />
     </div>
   )
 }

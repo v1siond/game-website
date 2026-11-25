@@ -3,7 +3,7 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, Stage } from './stage'
 import { Trials } from './trials'
@@ -67,7 +67,7 @@ const FRAMES: SectionFrames = {
     const titles = useLabels().sections
     return (
       <Stage id={slot.id} title={titles.services}>
-        <ul className={MASONRY_LIST} data-stage-items="">
+        <ul className={MASONRY_COLUMN_LIST} data-stage-items="">
           {slot.services.map((service) => (
             <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
               <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>

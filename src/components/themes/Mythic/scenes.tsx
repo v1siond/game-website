@@ -286,7 +286,7 @@ interface SceneSpec {
 // fitted by `fit`, its feet at PHONE.floor (two thirds down, above the cards), and the middle of his action
 // PHONE.offset into the half his side names. The hero stands higher, under the outfit switcher, above his
 // name and lines at the foot of the first screen.
-const PHONE = { middle: FIELD.width / 2, offset: 120, floor: 720, heroFloor: 440 } as const
+const PHONE = { middle: FIELD.width / 2, offset: 120, floor: 720, heroFloor: 388 } as const
 
 /** The variables sprite.module.css places a scene's band with: from lg its middle at its side's BAND_X; on a
  *  phone fitted and its action set in its half. */
@@ -534,14 +534,16 @@ const about: SceneSpec = {
 // Work, the desert of lost souls in a sandstorm, the band on the left. He sets the great horn to his mouth and
 // blows; the chained Titan crawls up out of the sand on the cards' side, a whole temple strapped on his back,
 // and his hand comes down beside him; he climbs the chain from the wrist up the arm to the temple gate.
-const WORK = { hero: -220, hand: -120, size: 0.72, under: 760 }
-// His climb: from the sand up the chain to the wrist, the arm, and the gate on the Titan's back.
-const CLIMB = [
-  { x: -220, lift: 0 },
-  { x: -170, lift: 220 },
-  { x: -100, lift: 460 },
-  { x: -10, lift: 700 },
+// The Titan's hand is his anchor; at 0.55 of his drawn size his head, the furthest of him from the hand, stays
+// inside the free half, short of the cards.
+const WORK = { hero: -300, hand: -215, size: 0.55, under: 760 }
+// His climb, held in the Titan's own units from the hand: the wrist, the arm, and the gate on his back.
+const HOLDS = [
+  [-70, 306],
+  [28, 639],
+  [153, 972],
 ] as const
+const CLIMB = [{ x: WORK.hero, lift: 0 }, ...HOLDS.map(([x, lift]) => ({ x: WORK.hand + WORK.size * x, lift: WORK.size * lift }))]
 
 /** Where he is a share `t` of the way up the climb. */
 const climbAt = (t: number) => {
@@ -555,7 +557,7 @@ function Dunes() {
     <>
       <path d={`M-900 ${FLOOR - 20} Q-400 ${FLOOR - 70} 0 ${FLOOR - 20} T900 ${FLOOR - 30} V${FIELD.height} H-900 Z`} fill={MYTH.sand} stroke={MYTH.inkLine} strokeWidth="4" />
       <path d={`M-900 ${FLOOR + 30} Q-300 ${FLOOR} 200 ${FLOOR + 30} T900 ${FLOOR + 24}`} fill="none" stroke={MYTH.sandHigh} strokeWidth="5" />
-      <g transform={`translate(${WORK.hero - 70} ${FLOOR})`}>
+      <g transform={`translate(${WORK.hero - 50} ${FLOOR})`}>
         <path d="M-8 0 L-6 -150 L6 -150 L8 0 Z" fill={MYTH.deck} stroke={MYTH.inkLine} strokeWidth="3" />
         <path d="M-30 -150 H30" stroke={MYTH.bronze} strokeWidth="8" />
       </g>
@@ -565,7 +567,7 @@ function Dunes() {
 
 const work: SceneSpec = {
   script: [1400, 1800, 1800],
-  phone: { focus: -130, fit: 0.55 },
+  phone: { focus: -190, fit: 0.55 },
   figure: (scene) => (
     <>
       <g data-fx="titan" transform={`translate(${WORK.hand} ${FLOOR + WORK.under}) scale(${WORK.size})`}>
@@ -703,7 +705,9 @@ const tech: SceneSpec = {
 // plinth; its light bursts and he grows to the war god's height, the giant sword in his hand; the god's bladed
 // legs come down on him and he takes them on the sword; the ring closes over the god's chest and he drives
 // the sword through him, and the god bursts into light.
-const SERVICES = { hero: -250, box: -170, god: 170, grown: 2.0 }
+// The god stands just right of the band's middle at 0.88 of his drawn size, so his raised sword arm and his
+// shoulder keep inside the free half while the sword goes through his chest.
+const SERVICES = { hero: -225, box: -150, god: -40, godSize: 0.88, grown: 2.0 }
 
 function Box() {
   return (
@@ -724,7 +728,7 @@ const services: SceneSpec = {
   figure: (scene) => (
     <>
       <path d={`M-900 ${FLOOR} H900 V${FIELD.height} H-900 Z`} fill={MYTH.stormLow} stroke={MYTH.inkLine} strokeWidth="4" />
-      <g data-fx="duel-god" transform={`translate(${SERVICES.god} ${FLOOR}) scale(1.05)`}>
+      <g data-fx="duel-god" transform={`translate(${SERVICES.god} ${FLOOR}) scale(${SERVICES.godSize})`}>
         <WarGod />
       </g>
       <Box />
@@ -759,10 +763,10 @@ const services: SceneSpec = {
       // the finisher: the ring closes over his chest, the sword goes through, he bursts into light
       const through = ramp(finish, 0.55, 0.75)
       const gone = ramp(finish, 0.7, 1)
-      transformTo(god, `translate(${r1(SERVICES.god + 40 * through)} ${FLOOR}) rotate(${r1(8 * gone)}) scale(1.05)`)
+      transformTo(god, `translate(${r1(SERVICES.god + 40 * through)} ${FLOOR}) rotate(${r1(8 * gone)}) scale(${SERVICES.godSize})`)
       fadeTo(god, 1 - 0.85 * gone)
-      prompt(SERVICES.god - 20, FLOOR - 420, finish, ramp(finish, 0.55, 0.6))
-      godBurst(SERVICES.god, FLOOR - 400, 0.6 + 2.2 * gone, gone * (1 - 0.4 * ramp(finish, 0.9, 1)))
+      prompt(SERVICES.god - 20, FLOOR - 400 * SERVICES.godSize, finish, ramp(finish, 0.55, 0.6))
+      godBurst(SERVICES.god, FLOOR - 380 * SERVICES.godSize, 0.6 + 2.2 * gone, gone * (1 - 0.4 * ramp(finish, 0.9, 1)))
       byAction(play, [
         () => poseHero(him, SERVICES.hero, at('open', open), open > 0.55 ? 'sword' : 'blades', { size }),
         () => poseHero(him, SERVICES.hero, at('guard', clash), 'sword', { size }),
@@ -876,7 +880,7 @@ const projects: SceneSpec = {
 // Ventures, the bright sky over the island of creation, the band on the left. He comes in on the winged horse
 // and a griffin rider dives at him; his blades cut it down in flames; landed on the island he turns the
 // great windlass; the two stone steeds rear on their chains and pull, and the island moves.
-const VENTURES = { from: -420, rideTo: -200, ride: 430, windlass: -40, griffin: [-20, 620] as const, steeds: [-520, -40] as const, steedSize: 0.62 }
+const VENTURES = { from: -420, rideTo: -200, ride: 430, windlass: -40, griffin: [-20, 620] as const, steeds: [-560, -80] as const, steedSize: 0.62 }
 const HORSE_SIZE = 0.55
 
 function Island() {
@@ -976,7 +980,7 @@ const ventures: SceneSpec = {
 // hammer as long as a mast; it comes down beat after beat and each beat the ring of firm ground shrinks while
 // he rolls between them; his blades bite the hammer arm and the king staggers; the ring closes over the
 // king's wrist, he tears the hammer from the grip and lays it on his shoulder as the king sinks into the mist.
-const BANDS = { hero: -60, rolled: -200, king: 130, kingDeep: 260, size: 0.9 }
+const BANDS = { hero: -60, rolled: -200, king: 180, kingDeep: 260, size: 0.9 }
 
 const bands: SceneSpec = {
   script: [1900, 1400, 1700],
@@ -1123,7 +1127,8 @@ const muayThai: SceneSpec = {
 // Contact, the mountain of the gods in gold light, the temple on its top. He raises his blades and the
 // mountain shakes; the earth Titan's hand rises out of the cloud under him; it lifts him up the mountain
 // towards the temple. The same picture on either side: he faces right, the hand under him.
-const CONTACT = { hero: -60, under: 560, rise: 360, drift: 140 }
+// The hand at 0.85 of its drawn size and its drift short, so on either side it keeps inside the free half.
+const CONTACT = { hero: -60, under: 560, rise: 360, drift: 50, size: 0.85, palm: 90 }
 
 function Mountain() {
   return (
@@ -1147,7 +1152,7 @@ const contact: SceneSpec = {
   figure: (scene) => (
     <>
       <Mountain />
-      <g data-fx="earth-hand" transform={`translate(${CONTACT.hero + 30} ${FLOOR + CONTACT.under})`}>
+      <g data-fx="earth-hand" transform={`translate(${CONTACT.hero + 30} ${FLOOR + CONTACT.under}) scale(${CONTACT.size})`}>
         <EarthHand />
       </g>
       <path d={`M-900 ${FLOOR - 30} Q-450 ${FLOOR - 90} 0 ${FLOOR - 30} T900 ${FLOOR - 40} V${FIELD.height} H-900 Z`} fill={MYTH.cloud} stroke={MYTH.inkLine} strokeWidth="4" />
@@ -1162,11 +1167,12 @@ const contact: SceneSpec = {
       // the hand rises under him to the cloud's top, then carries him up towards the temple
       const risen = ramp(call, 0.35, 1)
       const shake = 6 * Math.sin(Math.PI * 16 * call) * bell(call, 0.2, 0.8)
-      const handY = FLOOR + CONTACT.under * (1 - risen) + 90 * risen - CONTACT.rise * carry
+      const palm = CONTACT.palm * CONTACT.size
+      const handY = FLOOR + CONTACT.under * (1 - risen) + palm * risen - CONTACT.rise * carry
       const handX = CONTACT.hero + 30 + shake + CONTACT.drift * carry
-      transformTo(hand, `translate(${r1(handX)} ${r1(handY)})`)
-      // he stands on the palm once it has come up under his feet, its top 90 above the hand's anchor
-      const palmTop = handY - 90
+      transformTo(hand, `translate(${r1(handX)} ${r1(handY)}) scale(${CONTACT.size})`)
+      // he stands on the palm once it has come up under his feet, its top `palm` above the hand's anchor
+      const palmTop = handY - palm
       poseHero(him, handX - 30, at('raise', call < 1 ? ramp(call, 0, 0.5) : 1 - 0.5 * ramp(carry, 0.6, 1)), 'blades', { lift: Math.max(0, FLOOR - palmTop) })
     }
   },

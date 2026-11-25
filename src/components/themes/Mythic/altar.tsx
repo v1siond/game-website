@@ -71,8 +71,10 @@ export function Altar() {
   const { navigation } = useLabels()
   const { ref } = useZoneStage<Zone>(ZONE_OF.hero)
 
+  // from lg the altar comes up only once the hero's scene has played (its first 0.6 of a screen of scroll,
+  // src/lib/scroll/stage.ts), so the serpent's end frame is whole when the page first rests on it
   return (
-    <section ref={ref} className="relative z-20 px-4 py-12 sm:px-6" aria-label={navigation.professionSelection}>
+    <section ref={ref} className="relative z-20 px-4 py-12 sm:px-6 lg:mt-[60svh]" aria-label={navigation.professionSelection}>
       <div className={`mx-auto max-w-5xl p-5 sm:p-8 ${u.panel}`}>
         <h2 className="sr-only">{navigation.selectYourProfession}</h2>
         <ProfessionSwitch className="grid gap-3 sm:grid-cols-3" label={navigation.profession} renderOption={(option) => <TalentPlate {...option} />} />
