@@ -190,4 +190,11 @@
     transform: translate(-350px, -80px) scale(0.6);
     transform-origin: 1150px 860px;
   }
+
+  /* The ending's contact card covers the screen from just under the rooftop's parapet down, so on a phone
+     its pair stands on the parapet, 150 units further up, and 30 units further right to keep the rival by the
+     trophy inside the left edge. */
+  .troupe.ending {
+    transform: translate(-320px, -230px) scale(0.6);
+  }
 }

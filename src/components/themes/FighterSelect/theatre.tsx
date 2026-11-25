@@ -451,8 +451,8 @@ const about: SceneSpec = {
   steps: (m) => {
     if (m.play.action !== 1) return {}
     const close = { hero: 200 * (m.index === 0 ? m.t : 1) }
-    if (m.index === 1) return { ...close, rival: -60 + 300 * ramp(m.t, 0.4, 1), lift: hop(ramp(m.t, 0.4, 1), 170) }
-    if (m.index === 2) return { ...close, rival: 240 }
+    if (m.index === 1) return { ...close, rival: -60 + 220 * ramp(m.t, 0.4, 1), lift: hop(ramp(m.t, 0.4, 1), 170) }
+    if (m.index === 2) return { ...close, rival: 160 }
     return close
   },
   calls: ['round'],
@@ -488,7 +488,7 @@ const about: SceneSpec = {
 
 // The heavyweight's charge: in from the right, again after a step back, and under his jump to the far side.
 const CHARGE = 520
-const PASS = -230
+const PASS = -170
 
 const work: SceneSpec = {
   beat: 'fight',
@@ -649,7 +649,7 @@ const projects: SceneSpec = {
     if (play.action === 0 && index === 0) return { rival: 200 * (1 - t) }
     if (play.action === 0 && index === 2) return { rival: 30 * t, lift: hop(t, 60) }
     if (play.action === 0) return {}
-    if (index === 5) return { rival: 30 + 120 * ramp(t, 0, 0.5) }
+    if (index === 5) return { rival: 30 + 80 * ramp(t, 0, 0.5) }
     return { rival: 30 }
   },
   calls: ['ko'],
@@ -718,8 +718,8 @@ const ventures: SceneSpec = {
     const rush = (share: number) => RUSH * (1 - share) - 70 * share
     if (play.action === 0) return { rival: index % 2 ? lerp(-70, RUSH, t) : rush(t), hero: -24 * (index % 2 ? 1 : t) - (index > 1 ? 24 : 0) }
     if (index === 0) return { rival: rush(t) + 70 * t, hero: -48 }
-    if (index === 1) return { rival: 40 * t, lift: hop(t, 220), hero: -48 }
-    return { rival: 40 + 60 * ramp(t, 0, 0.5), hero: -48 }
+    if (index === 1) return { rival: 40 * t, lift: hop(t, 220), hero: lerp(-48, 60, t) }
+    return { rival: 40 + 10 * ramp(t, 0, 0.5), hero: 60 }
   },
   calls: ['ko'],
   callAt: koFrom(1, 1),
@@ -829,7 +829,7 @@ const contact: SceneSpec = {
   ],
   steps: ({ play, index, t }) => {
     const away = play.action === 0 ? (index + t) / 2 : 1
-    return { hero: 320 + 130 * away, heroSize: lerp(1.5, 1.1, away), heroLift: 120 * away, far: true }
+    return { hero: 260 + 130 * away, heroSize: lerp(1.5, 1.1, away), heroLift: 120 * away, far: true }
   },
   props: () => <Ceremony />,
   frame: ({ play }) => ({ credits: shareOf(play, 1), slot: ramp(shareOf(play, 2), 0, 0.3), slotSeconds: 9 - 3 * shareOf(play, 2) }),
@@ -916,6 +916,9 @@ export function scenesOf(slots: readonly SectionSlot[], profession: Profession):
   })
 }
 
+// The troupe's own phone framing where a beat's card leaves it less room (world.module.css).
+const TROUPE: Partial<Record<RunBeat, string>> = { ending: look.ending }
+
 /** A scene's picture: its stage of the run, the two fighters and the round's props, then the run's screen:
  *  the select board, the map hop or the ladder, the HUD, the calls and the ending's credits and slot. */
 export function TourStage({ scene, profession, staff, settled = false }: { scene: TourScene; profession: Profession; staff: Staff; settled?: boolean }) {
@@ -945,7 +948,7 @@ export function TourStage({ scene, profession, staff, settled = false }: { scene
           name: 'figure',
           node: (
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-              <g className={look.troupe}>
+              <g className={`${look.troupe} ${TROUPE[spec.beat] ?? ''}`}>
                 <g data-fx="camera">
                   {spec.props?.()}
                   <g data-fx="partner" transform={standAt(HERO_X + spec.gap, 0, spec.rivalSize ?? SIZE)} visibility={spec.rival ? undefined : 'hidden'}>
