@@ -160,6 +160,18 @@
   font-size: 0.875rem;
 }
 
+/* From lg every other place (.cardsRight) keeps its title and cards to the right, its place on the left. */
+@media (min-width: 1024px) {
+  .cardsRight .head {
+    align-items: flex-end;
+  }
+
+  .cardsRight .body,
+  .cardsRight .goalCopy {
+    margin-left: auto;
+  }
+}
+
 @media (max-width: 767.98px) {
   .hud {
     min-height: 48px;
@@ -178,6 +190,11 @@
 
   .body {
     width: 100%;
+  }
+
+  /* The last fire plays and holds for most of a screen before the contact comes up over it. */
+  .goal {
+    padding-top: 130svh;
   }
 }
 

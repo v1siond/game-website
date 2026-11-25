@@ -44,6 +44,8 @@ const soulCarved = Marcellus({
 // A phone frames the ruins from higher up (SoulMap/ruins PhoneView).
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the place sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 const hasSlot = (scene: SoulScene): scene is SoulScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -54,9 +56,10 @@ export default function SoulMapTheme() {
   const labels = useLabels()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split),
+    [view, cv, labels, active, phone, split],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]

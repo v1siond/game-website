@@ -6,7 +6,7 @@ import { initialsOf } from '@/lib/cv/nameWords'
 import { Stage } from '../shared/theatre/Stage'
 import { ContactButtons } from './links'
 import { CARVED } from './palette'
-import { LAYER_MOTION, type SoulScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type SoulScene } from './scenes'
 import { SectionTitle } from './sections'
 import page from './page.module.css'
 
@@ -32,7 +32,7 @@ export function LastFireContact({ scene, still }: { scene: SoulScene; still: boo
   const { sections } = useLabels()
   const { contact } = useCVData()
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="soul-contact" className={page.goal}>
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="soul-contact" className={`${page.goal} ${SIDE_CLASS[scene.side]}`}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled />}
       <div className={page.goalCopy}>
         <SectionTitle id="soul-contact" title={sections.contact} />

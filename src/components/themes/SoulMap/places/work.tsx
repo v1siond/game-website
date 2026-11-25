@@ -44,6 +44,7 @@ function Ledge() {
 }
 
 export const work: Place = {
+  travel: LANDED,
   script: [1800, 2200],
   ends: [0.4, 1],
   ahead: () => (

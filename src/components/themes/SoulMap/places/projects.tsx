@@ -43,6 +43,7 @@ function Impact() {
 }
 
 export const projects: Place = {
+  travel: ROLLED,
   script: [2400, 1800],
   ends: [0.5, 1],
   ahead: () => (

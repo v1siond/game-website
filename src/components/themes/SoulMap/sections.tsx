@@ -12,7 +12,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { BandPanel, CARD_BODY, CARD_META, EMBER_LIST, JobPanel, Panel, ProjectPanel, ServicePanel, TechPanel, VenturePanel } from './cards'
 import { CARVED } from './palette'
-import { LAYER_MOTION, type SoulScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type SoulScene } from './scenes'
 import page from './page.module.css'
 
 // One section per place of the ruins: a tall head that first shows the place alone and then brings up
@@ -170,7 +170,7 @@ export function PlaceSection({ scene, still }: { scene: SoulScene & { slot: Sect
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `soul-${scene.id}`
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${SIDE_CLASS[scene.side]}`}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled />}
       <header className={page.head}>
         <SectionTitle id={headingId} title={sections[scene.slot.titleKey]} />

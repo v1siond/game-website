@@ -50,6 +50,7 @@ function FogWall() {
 }
 
 export const services: Place = {
+  travel: INSIDE,
   script: [2400, 1600],
   ends: [0.6, 1],
   ahead: () => <Arch />,

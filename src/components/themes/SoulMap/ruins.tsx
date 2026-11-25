@@ -131,17 +131,20 @@ const SOLES: Point = [31, KNIGHT_VIEW.soles]
 
 /** His group's transform: his centre at `x`, his soles `lift` above the floor, and `roll` degrees turned
  *  round the middle of him, the dodge roll (a full turn is 360). */
-export const figureAt = (x: number, lift = 0, roll = 0): string => {
+export const figureAt = (x: number, lift = 0, roll = 0, dir: 1 | -1 = 1): string => {
   const left = x - FIGURE_W / 2
   const top = FLOOR - lift - FIGURE_H * (KNIGHT_VIEW.soles / KNIGHT_VIEW.height)
+  // facing left he is turned round his own middle, and a roll then turns the way he faces
+  const face = dir === 1 ? '' : ` translate(${FIGURE_W.toFixed(1)} 0) scale(-1 1)`
   const turn = roll ? ` rotate(${roll.toFixed(1)} ${BALL[0] * UNIT} ${BALL[1] * UNIT})` : ''
-  return `translate(${left.toFixed(1)} ${top.toFixed(1)})${turn}`
+  return `translate(${left.toFixed(1)} ${top.toFixed(1)})${face}${turn}`
 }
 
-/** Him on the floor at `x` (his centre), in a profession's gear; the scene's writer moves and poses him. */
-export function Figure({ x, profession }: { x: number; profession: Profession }) {
+/** Him on the floor at `x` (his centre), in a profession's gear, facing right (`dir` 1) or left; the scene's
+ *  writer moves and poses him. */
+export function Figure({ x, profession, dir = 1 }: { x: number; profession: Profession; dir?: 1 | -1 }) {
   return (
-    <g data-fx="figure" transform={figureAt(x)}>
+    <g data-fx="figure" transform={figureAt(x, 0, 0, dir)}>
       <Knight profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
     </g>
   )
