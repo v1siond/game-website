@@ -580,6 +580,31 @@
   }
 }
 
+/* From lg the sections take turns: the title and the cards on the left with his era on the right, then the
+   other way round (.cardsRight), up to the contact, whose plate keeps to the cards' width on its side. */
+@media (min-width: 1024px) {
+  .cardsRight .head {
+    align-items: flex-end;
+    margin-left: auto;
+  }
+
+  .cardsRight .body {
+    margin-left: auto;
+  }
+
+  .cardsLeft.beacon {
+    justify-content: flex-start;
+  }
+
+  .cardsRight.beacon {
+    justify-content: flex-end;
+  }
+
+  .beacon .beaconCopy {
+    max-width: min(600px, 44vw);
+  }
+}
+
 /* Phone: full width cards, the rail folds away (the ledger and the sections stay). */
 @media (max-width: 767.98px) {
   .root {
@@ -622,14 +647,20 @@
     padding: 0 16px 60svh;
   }
 
-  /* the era's scene plays and holds for most of a screen before the title and the cards come up over it */
+  /* the era's scene plays out and holds before the title and the cards come up under it: the title reaches
+     the screen only once his scene has ended (src/lib/scroll/player.ts, a phone's play ends 0.3 screens in) */
   .head {
-    min-height: 130svh;
+    min-height: 160svh;
     padding-bottom: 10svh;
   }
 
   .body {
     width: 100%;
+  }
+
+  /* the contact's plate comes up under him once he has raised the beacon, not over him */
+  .beacon {
+    padding-top: 130svh;
   }
 
   .card {

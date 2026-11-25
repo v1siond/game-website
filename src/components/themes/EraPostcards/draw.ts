@@ -20,6 +20,9 @@ type Stop = readonly [offset: number, color: string, opacity?: number]
 const stopsOf = (stops: readonly Stop[]): string =>
   stops.map(([offset, color, opacity = 1]) => `<stop offset="${offset}" stop-color="${color}" stop-opacity="${opacity}"/>`).join('')
 
+/** A layer's picture with its art in a group of `className`, which moves it across the canvas. */
+export const inGroup = (layer: string, className: string): string => layer.replace(/^(<svg[^>]*>)([\s\S]*)(<\/svg>)$/, `$1<g class="${className}">$2</g>$3`)
+
 export const linear = (id: string, stops: readonly Stop[], [x1, y1, x2, y2]: readonly number[] = [0, 0, 0, 1]): string =>
   `<linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stopsOf(stops)}</linearGradient>`
 

@@ -53,6 +53,7 @@ const screenLit = (play: Playhead, i: number, count: number): number => Math.min
 const cymbalTilt = (play: Playhead): number => crashOf(share(play, 1)) * 10
 
 export const arena: Era = {
+  place: SEAT.x,
   script: [1600, 2400],
   build: ({ count }) => {
     const screens = spread(count, 560, 1040)

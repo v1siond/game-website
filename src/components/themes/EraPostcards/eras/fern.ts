@@ -60,6 +60,7 @@ const photoAt = (t: number): string => {
 const ROCK = `<path d="M${AT.x - 70},${AT.y + 26} Q${AT.x - 60},${AT.y - 6} ${AT.x},${AT.y - 4} Q${AT.x + 62},${AT.y - 8} ${AT.x + 76},${AT.y + 26} Z" fill="${FERN.rock}" stroke="${FERN.rockEdge}" stroke-width="3"/>`
 
 export const fern: Era = {
+  place: AT.x,
   script: [1800, 2200],
   build: () => {
     const smoke = Array.from({ length: 9 }, (_, i) => `<circle cx="${r1(330 + Math.sin(i) * 30 + i * 12)}" cy="${330 - i * 42}" r="${30 + i * 9}" fill="${FERN.smoke}" opacity="${r1(0.55 - i * 0.04)}"/>`).join('')

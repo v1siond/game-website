@@ -70,3 +70,17 @@
     background: linear-gradient(to top, color-mix(in srgb, var(--ep-scrim) 85%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 55%);
   }
 }
+
+/* The layers that hold him move across the canvas to the side his section names (scenes.ts SHIFT): beside
+   the cards from lg, in the stacked band on a phone; between the two he keeps his own place. */
+@media (min-width: 1024px) {
+  .shifted {
+    transform: translateX(var(--era-shift-wide));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .shifted {
+    transform: translateX(var(--era-shift-phone));
+  }
+}

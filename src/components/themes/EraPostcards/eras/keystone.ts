@@ -44,6 +44,7 @@ const shardAt = (sockets: readonly number[], i: number, p: number, play: Playhea
 }
 
 export const keystone: Era = {
+  place: DISC_X,
   script: [2000, 2200],
   build: ({ count, featured }) => {
     const sockets = socketsAt(count)

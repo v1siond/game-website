@@ -4,6 +4,7 @@ import { everySection, type SectionId, type SectionSlot, type SlotOf } from '@/l
 import { muayThaiFacts } from '@/lib/cv/sectionText'
 import type { LayerMotion } from '@/lib/scroll/stage'
 import { LOOK, type EraLook } from './palette'
+import page from './page.module.css'
 import type { Era, EraInput, Layer } from './eras/era'
 import { beacon, hero } from './eras/hub'
 import { fern } from './eras/fern'
@@ -59,17 +60,57 @@ const INPUT_FOR: { [Id in SectionId]: (slot: SlotOf<Id>, cv: WorldCV, labels: La
 const inputOf = (slot: SectionSlot, cv: WorldCV, labels: Labels): EraInput =>
   (INPUT_FOR[slot.id] as (slot: SectionSlot, cv: WorldCV, labels: Labels) => EraInput)(slot, cv, labels)
 
+/** The half of the screen a scene plays on: right of its section's cards, or left of them. */
+export type Side = 'right' | 'left'
+
+/** How far his layers move across the canvas: beside the cards from lg, and in a phone's stacked band. */
+export interface Shift {
+  wide: number
+  phone: number
+}
+
 export interface Scene extends SceneDef {
   id: SceneId
+  /** The side it plays on: its section's cards sit on the other. */
+  side: Side
+  shift: Shift
   input: EraInput
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
 }
 
-/** Every scene of the page in order, each with what its picture is built from. */
+// Where he stands once his era moves to its side. From lg, right of the cards he keeps his own place, or is
+// moved right to RIGHT_FROM when it would sit under them; left of them he stands at LEFT_AT, his era's order
+// of things unchanged and clear of the cards. In a phone's stacked band he stands in the half the section
+// names: right of PHONE_RIGHT_FROM or at PHONE_LEFT_AT.
+const RIGHT_FROM = 930
+const LEFT_AT = 330
+const PHONE_RIGHT_FROM = 860
+const PHONE_LEFT_AT = 740
+
+const SHIFT: Record<Side, (place: number) => Shift> = {
+  right: (place) => ({ wide: Math.max(0, RIGHT_FROM - place), phone: Math.max(0, PHONE_RIGHT_FROM - place) }),
+  left: (place) => ({ wide: LEFT_AT - place, phone: Math.min(0, PHONE_LEFT_AT - place) }),
+}
+
+const STAY: Shift = { wide: 0, phone: 0 }
+
+/** The side of the section at `index` of the page (0 the first after the hero): the first plays right of its
+ *  cards, the next left of them, and so on up to the contact. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
+
+const placed = (def: SceneDef, index: number): Pick<Scene, 'side' | 'shift'> => ({ side: sideOf(index), shift: SHIFT[sideOf(index)](def.era.place) })
+
+/** Every scene of the page in order, each with what its picture is built from and the side it plays on; the
+ *  hero keeps its own place. */
 export function scenesOf(cv: WorldCV, labels: Labels, year: number): Scene[] {
-  const sections = everySection(cv, year).map((slot): Scene => ({ ...SCENE_DEFS[slot.id], id: slot.id, input: inputOf(slot, cv, labels), slot }))
-  return [{ ...SCENE_DEFS.hero, id: 'hero', input: NOTHING, slot: null }, ...sections, { ...SCENE_DEFS.contact, id: 'contact', input: NOTHING, slot: null }]
+  const slots = everySection(cv, year)
+  const sections = slots.map((slot, i): Scene => ({ ...SCENE_DEFS[slot.id], ...placed(SCENE_DEFS[slot.id], i), id: slot.id, input: inputOf(slot, cv, labels), slot }))
+  return [
+    { ...SCENE_DEFS.hero, side: 'right', shift: STAY, id: 'hero', input: NOTHING, slot: null },
+    ...sections,
+    { ...SCENE_DEFS.contact, ...placed(SCENE_DEFS.contact, slots.length), id: 'contact', input: NOTHING, slot: null },
+  ]
 }
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
@@ -84,3 +125,9 @@ export const LAYER_MOTION: Record<Layer, LayerMotion> = {
 
 /** A scene's card look as the CSS variables its stage and section read. */
 export const lookVars = ({ accent, rim, card }: EraLook): Record<string, string> => ({ '--era-accent': accent, '--era-rim': rim, '--era-card': card })
+
+/** Each side's class on the page's css: the cards' column and the contact's plate from lg. */
+export const SIDE_CLASS: Record<Side, string> = { right: page.cardsLeft, left: page.cardsRight }
+
+/** How far its stage's moving layers shift, as the CSS variables eras.module.css reads per screen. */
+export const shiftVars = ({ wide, phone }: Shift): Record<string, string> => ({ '--era-shift-wide': `${wide}px`, '--era-shift-phone': `${phone}px` })

@@ -10,6 +10,8 @@ import { END, share, type Era } from './era'
 // The bag hangs at his hip height, its near side (x 1030) where the instep of a full kick lands (about 1040, 685).
 
 const BAG_PIVOT = [1060, 470] as const
+// Where he stands to the bag.
+const STAND_X = 960
 
 // The kick rises and returns over the second action.
 const kickOf = (play: Playhead): number => (play.action === 1 ? Math.sin(play.t * Math.PI) : 0)
@@ -21,7 +23,7 @@ const kickPose = (play: Playhead): Partial<Pose> => {
   const kick = kickOf(play)
   const guard = guardOf(play)
   return {
-    x: 960,
+    x: STAND_X,
     y: 900,
     scale: 1.25,
     lean: -kick * 34,
@@ -49,6 +51,7 @@ const bagSwing = (play: Playhead): number => {
 const torchLit = (play: Playhead, i: number, count: number): number => Math.min(1, Math.max(0, share(play, 2) * (count + 1) - i))
 
 export const jungle: Era = {
+  place: STAND_X,
   script: [1300, 1600, 2000],
   build: ({ count }) => {
     const torches = spread(count, 480, 1120)

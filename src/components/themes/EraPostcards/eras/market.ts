@@ -36,13 +36,17 @@ const swingAngle = (play: Playhead): number => Math.sin(swingPhase(play) * Math.
 /** How lit lantern i of `count` is: they light left to right over the second action. */
 const litOf = (play: Playhead, i: number, count: number): number => Math.min(1, Math.max(0, share(play, 1) * (count + 1) - i))
 
+// Where the swing hangs across the canvas, him on it.
+const SWING_X = 820
+
 const swingPose = (play: Playhead): Partial<Pose> => {
   const angle = swingAngle(play)
   const kick = Math.cos(swingPhase(play) * Math.PI)
-  return { x: 820, y: 560, scale: 1.2, shF: 172, shB: 168, elF: 4, elB: 6, hipF: 20 + kick * 25, hipB: -10 - kick * 20, kneeF: -30, kneeB: -50, lean: -angle * 0.3, head: -10, scarf: -angle * 0.8 }
+  return { x: SWING_X, y: 560, scale: 1.2, shF: 172, shB: 168, elF: 4, elB: 6, hipF: 20 + kick * 25, hipB: -10 - kick * 20, kneeF: -30, kneeB: -50, lean: -angle * 0.3, head: -10, scarf: -angle * 0.8 }
 }
 
 export const market: Era = {
+  place: SWING_X,
   script: [2000, 2000],
   build: ({ count }) => {
     const xs = lanternsAt(count)

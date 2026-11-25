@@ -14,7 +14,7 @@ import { cssVars } from '@/lib/cssVars'
 import { jobCard } from '@/lib/cv/cvView'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince, shownUrl, yearCount } from '@/lib/cv/sectionText'
-import { lookVars, type Scene } from './scenes'
+import { SIDE_CLASS, lookVars, type Scene } from './scenes'
 import { Stage } from './stage'
 import css from './page.module.css'
 
@@ -252,7 +252,7 @@ export function EraSection({ scene, still }: EraSectionProps) {
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `era-${scene.id}`
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={css.era} style={cssVars(lookVars(scene.look))}>
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${css.era} ${SIDE_CLASS[scene.side]}`} style={cssVars(lookVars(scene.look))}>
       {still && <Stage scene={scene} settled />}
       <header className={css.head}>
         <h2 id={headingId} className={`${css.display} ${css.title}`}>

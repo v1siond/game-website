@@ -66,6 +66,7 @@ const heroPose = (t: number): Partial<Pose> => ({ x: 800, y: 878, scale: 1.4, he
 const bobOf = (i: number, t: number): string => `translate(${CRATES[i].x} ${CRATES[i].y}) translate(0 ${r1(-t * (60 + i * 40))}) rotate(${r1(t * (i % 2 ? 30 : -24))})`
 
 export const hero: Era = {
+  place: 800,
   script: [1600, 2000],
   build: () => ({
     sky: svg(`${defs(linear('h-sky', [[0, HUB.skyTop], [0.45, HUB.skyMid], [0.75, HUB.skyLow], [1, HUB.skyHorizon]]))}${rect('url(#h-sky)')}${stars(11, 160, 520, HUB.star)}
@@ -100,6 +101,9 @@ const beamOf = (t: number): string => `translate(800 880) scale(${r1(0.4 + t * 0
 const beaconAt = (play: Playhead): { beam: number; raise: number } => ({ beam: share(play, 0), raise: share(play, 1) })
 
 export const beacon: Era = {
+  place: 800,
+  // he signals from the middle of the ring, under the beam it sends up: the three move together
+  moves: ['mid', 'near', 'figure'],
   script: [1800, 1600],
   build: () => ({
     sky: svg(`${defs(linear('bc-sky', [[0, HUB.nightTop], [0.6, HUB.nightMid], [1, HUB.nightLow]]), linear('bc-aur', [[0, HUB.aurora, 0], [0.5, HUB.aurora, 0.32], [1, HUB.ringCyan, 0]], [0, 0, 1, 0]))}${rect('url(#bc-sky)')}${stars(91, 300, 700, HUB.nightStar)}

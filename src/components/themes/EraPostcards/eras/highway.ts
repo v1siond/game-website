@@ -38,7 +38,10 @@ export const bike = `<g data-fx="bike-hull">
   <path d="M780,812 L900,806" stroke="${HIGHWAY.bikeShine}" stroke-width="4" stroke-linecap="round"/>
   <ellipse cx="760" cy="872" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/><ellipse cx="960" cy="868" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/></g>`
 
-export const RIDE: Partial<Pose> = { x: 850, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
+// Where the bike holds across the canvas, him in its saddle.
+const RIDE_X = 850
+
+export const RIDE: Partial<Pose> = { x: RIDE_X, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
 
 // How far the road has run: the launch speeds it up, the jump keeps it going.
 const travelOf = (play: Playhead): number => share(play, 0) ** 2 * 0.7 + share(play, 1) * 0.6
@@ -52,6 +55,7 @@ const ridePose = (play: Playhead): Partial<Pose> => ({ ...RIDE, y: 870 + liftOf(
 const signX = (play: Playhead): number => 2000 - share(play, 0) * 2600
 
 export const highway: Era = {
+  place: RIDE_X,
   script: [2200, 1800],
   build: ({ years }) => {
     const first = years.length > 0 ? Math.min(...years) : null

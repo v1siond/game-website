@@ -51,7 +51,8 @@ const STAND_X = 880
 const FLOOR_Y = 905
 const TABLET = { x: 1020, y: 700 } as const
 
-// The glyph tablet on the wall beside him, its glyphs dim until the torch wakes them.
+// The glyph tablet on the wall beside him, its glyphs dim until the torch wakes them. It is drawn on his layer,
+// behind him, so it keeps its place at his torch when his era moves to its side (scenes.ts SHIFT).
 const TABLET_ART = `<g transform="translate(${TABLET.x} ${TABLET.y}) scale(1.3)">
   <g data-fx="tglow" opacity="0">${defs(radial('tc-g', [[0, TOMB.glyph, 0.8], [1, TOMB.glyph, 0]]))}<circle cy="-40" r="90" fill="url(#tc-g)"/></g>
   <rect x="-28" y="-86" width="56" height="92" rx="6" fill="${TOMB.tablet}" stroke="${TOMB.goldDim}" stroke-width="3"/>
@@ -75,6 +76,7 @@ const torchPose = (play: Playhead): Partial<Pose> => (play.action === 0 ? blend(
 const bandLit = (t: number, d: number): number => Math.min(1, Math.max(0, t * 5 - d * 1.1))
 
 export const tomb: Era = {
+  place: STAND_X,
   script: [1800, 2400],
   build: () => {
     const back = [3, 2, 1, 0]
@@ -93,9 +95,9 @@ export const tomb: Era = {
         ${glow('tc-door-g', 800, 520, 360, TOMB.doorGlow, 0.75)}<path d="M740,600 L740,420 Q800,380 860,420 L860,600 Z" fill="url(#tc-door)"/>
         <g data-fx="beams" opacity="0.4"><path d="M760,430 L380,1000 L560,1000 L800,430 Z" fill="url(#tc-beam)"/><path d="M820,430 L1220,1000 L1060,1000 L840,430 Z" fill="url(#tc-beam)"/></g>`),
       far: svg(`<path d="M-200,1000 L800,600 L1800,1000 Z" fill="${TOMB.floor}"/>${floorLines}${back}${DEPTHS.map(bandLight).join('')}<rect x="-200" y="160" width="2000" height="40" fill="${TOMB.lintel}"/><rect x="-200" y="198" width="2000" height="6" fill="${TOMB.gold}"/>`),
-      mid: svg(`${[-1, 1].map((side) => column(800 + side * 560, 1000, 760, 120, TOMB.columnNear, TOMB.goldBright) + column(800 + side * 430, 900, 520, 74, TOMB.columnMid, TOMB.goldDim)).join('')}${TABLET_ART}`),
+      mid: svg(`${[-1, 1].map((side) => column(800 + side * 560, 1000, 760, 120, TOMB.columnNear, TOMB.goldBright) + column(800 + side * 430, 900, 520, 74, TOMB.columnMid, TOMB.goldDim)).join('')}`),
       near: svg(`<g data-fx="motes" fill="${TOMB.mote}">${Array.from({ length: 40 }, (_, i) => `<circle cx="${(i * 137) % 1600}" cy="${(i * 263) % 1000}" r="${1 + (i % 3)}" opacity="${r1(0.3 + (i % 4) * 0.15)}"/>`).join('')}</g>`),
-      figure: svg(`<g transform="translate(${STAND_X + 30} ${FLOOR_Y})">${glow('tc-torch', 0, -150, 260, TOMB.torchGlow, 0.55)}</g>${courier(torchPose(END), { held: torch })}`),
+      figure: svg(`${TABLET_ART}<g transform="translate(${STAND_X + 30} ${FLOOR_Y})">${glow('tc-torch', 0, -150, 260, TOMB.torchGlow, 0.55)}</g>${courier(torchPose(END), { held: torch })}`),
       fg: svg(`<rect x="-200" y="-20" width="400" height="1040" fill="${TOMB.frame}"/><rect x="190" y="-20" width="14" height="1040" fill="${TOMB.goldBright}"/>
         <rect x="1400" y="-20" width="400" height="1040" fill="${TOMB.frame}"/><rect x="1396" y="-20" width="14" height="1040" fill="${TOMB.goldBright}"/>
         <g data-fx="sand" fill="${TOMB.sand}" opacity="0.6"><rect x="520" y="-600" width="3" height="700"/><rect x="1090" y="-800" width="2" height="900"/><rect x="300" y="-500" width="2" height="600"/></g>`),

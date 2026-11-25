@@ -4,7 +4,7 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import { cssVars } from '@/lib/cssVars'
-import { SCENE_DEFS, lookVars, type Scene } from './scenes'
+import { SCENE_DEFS, SIDE_CLASS, lookVars, type Scene } from './scenes'
 import { ACTION_CLASS } from './hero'
 import { Stage } from './stage'
 import css from './page.module.css'
@@ -57,7 +57,7 @@ export function Beacon({ scene, still }: { scene: Scene; still: boolean }) {
   const { sections } = useLabels()
   const { cv } = useSiteLinks()
   return (
-    <section id={scene.anchor} data-scene="contact" aria-labelledby="era-contact" className={css.beacon} style={cssVars(lookVars(scene.look))}>
+    <section id={scene.anchor} data-scene="contact" aria-labelledby="era-contact" className={`${css.beacon} ${SIDE_CLASS[scene.side]}`} style={cssVars(lookVars(scene.look))}>
       {still && <Stage scene={scene} settled />}
       <RecruiterHero
         render={({ name, line, actions }) => (

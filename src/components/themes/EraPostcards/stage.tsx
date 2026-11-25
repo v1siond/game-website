@@ -4,7 +4,8 @@ import { useLayoutEffect, useMemo, useRef, type Ref } from 'react'
 import { cssVars } from '@/lib/cssVars'
 import { layerTransform } from '@/lib/scroll/stage'
 import { END, LAYERS, type Layer } from './eras/era'
-import { LAYER_MOTION, lookVars, type Scene } from './scenes'
+import { LAYER_MOTION, lookVars, shiftVars, type Scene } from './scenes'
+import { inGroup } from './draw'
 import css from './eras.module.css'
 
 // One era picture: its six layers, each an SVG built once from code (eras/*), which the engine dissolves
@@ -17,9 +18,14 @@ const SETTLED_PROGRESS = 0.5
 
 // React 19 sets innerHTML again whenever the dangerouslySetInnerHTML object is a new one, which would swap
 // out the nodes the engine has bound; so each layer's object is built once per scene and kept.
+// His own layer, and in some eras what he acts on, moves with him to his side (scenes.ts SHIFT).
+const MOVES: readonly Layer[] = ['figure']
+
 const htmlOf = (scene: Scene): Record<Layer, { __html: string }> => {
   const layers = scene.era.build(scene.input)
-  return Object.fromEntries(LAYERS.map((name) => [name, { __html: layers[name] }])) as Record<Layer, { __html: string }>
+  const moves = scene.era.moves ?? MOVES
+  const html = (name: Layer): string => (moves.includes(name) ? inGroup(layers[name], css.shifted) : layers[name])
+  return Object.fromEntries(LAYERS.map((name) => [name, { __html: html(name) }])) as Record<Layer, { __html: string }>
 }
 
 export function Stage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
@@ -36,7 +42,7 @@ export function Stage({ scene, settled = false }: { scene: Scene; settled?: bool
   }, [scene, settled])
 
   return (
-    <div ref={ref} data-stage={scene.id} className={settled ? css.settled : css.stage} style={cssVars(lookVars(scene.look))} aria-hidden="true">
+    <div ref={ref} data-stage={scene.id} className={settled ? css.settled : css.stage} style={cssVars({ ...lookVars(scene.look), ...shiftVars(scene.shift) })} aria-hidden="true">
       {LAYERS.map((name) => (
         <div key={name} data-layer={name} className={css.layer} dangerouslySetInnerHTML={html[name]} />
       ))}

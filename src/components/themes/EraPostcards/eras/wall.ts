@@ -64,6 +64,7 @@ const END_HAND = handOf(END_POSE)
 const END_KITE = kiteAt(END, END_HAND)
 
 export const wall: Era = {
+  place: AT.x,
   script: [2000, 2400],
   build: () => {
     const towers = [300, 700, 1100, 1500]

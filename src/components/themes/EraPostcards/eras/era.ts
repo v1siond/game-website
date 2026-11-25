@@ -26,6 +26,10 @@ export interface EraInput {
 export type EraWriter = (p: number, play: Playhead) => void
 
 export interface Era {
+  /** Where he stands across the canvas, the x his side's shift is worked out from. */
+  place: number
+  /** The layers that hold him and what he acts on, moved with him to his side; his own layer when none. */
+  moves?: readonly Layer[]
   script: SceneScript
   build: (input: EraInput) => Layers
   bind: (stage: Element, input: EraInput) => EraWriter
