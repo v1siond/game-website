@@ -57,12 +57,6 @@
         "readFile": "Read file",
         "closeFile": "Close file",
         "streamLink": "Stream link",
-        "again": "Again",
-        "run": "Run",
-        "spin": "Spin",
-        "hit": "Hit",
-        "collect": "Collect {name}",
-        "next": "Next",
         "save": "Save"
       },
       "links": {
@@ -207,7 +201,6 @@
         "playerOne": "1P",
         "hp": "HP",
         "parryMeter": "{parried} of {total} parried",
-        "parry": "Parry {name}",
         "wristTerminal": "Wrist terminal",
         "dialHint": "Change profession",
         "sectionTabs": "Sections",
@@ -358,12 +351,6 @@
         "readFile": "Leer archivo",
         "closeFile": "Cerrar archivo",
         "streamLink": "Enlace para escuchar",
-        "again": "Otra vez",
-        "run": "Correr",
-        "spin": "Girar",
-        "hit": "Golpear",
-        "collect": "Recoger {name}",
-        "next": "Siguiente",
         "save": "Guardar"
       },
       "links": {
@@ -508,7 +495,6 @@
         "playerOne": "1J",
         "hp": "PV",
         "parryMeter": "{parried} de {total} desviados",
-        "parry": "Desviar {name}",
         "wristTerminal": "Terminal de muñeca",
         "dialHint": "Cambiar de profesión",
         "sectionTabs": "Secciones",
@@ -624,12 +610,6 @@
         "readFile": "Leggi il file",
         "closeFile": "Chiudi il file",
         "streamLink": "Link per ascoltare",
-        "again": "Ancora",
-        "run": "Corri",
-        "spin": "Gira",
-        "hit": "Colpisci",
-        "collect": "Raccogli {name}",
-        "next": "Avanti",
         "save": "Salva"
       },
       "links": {
@@ -774,7 +754,6 @@
         "playerOne": "1G",
         "hp": "PV",
         "parryMeter": "{parried} di {total} parati",
-        "parry": "Para {name}",
         "wristTerminal": "Terminale da polso",
         "dialHint": "Cambia professione",
         "sectionTabs": "Sezioni",

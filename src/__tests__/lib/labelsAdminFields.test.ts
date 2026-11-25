@@ -46,18 +46,6 @@ const fileKeys = (labels: Labels): string[] =>
     .flatMap(([group, entries]) => Object.keys(entries).map((key) => `${group}.${key}`))
     .sort()
 
-// Keys the file holds that no code reads, so the admin offers no field for them; whether they leave the
-// file is the owner's call.
-const UNREAD_FILE_KEYS = [
-  'actions.again',
-  'actions.collect',
-  'actions.hit',
-  'actions.next',
-  'actions.run',
-  'actions.spin',
-  'hud.parry',
-]
-
 describe('the admin fields of labels.json', () => {
   it('reads the label groups of the admin', () => {
     expect(groups.map((group) => group.name)).toContain('actions')
@@ -65,15 +53,6 @@ describe('the admin fields of labels.json', () => {
   })
 
   it.each(locales)('lists exactly the keys the file holds in %s', (locale) => {
-    const file = fileKeys(labelsFile[locale]?.labels as Labels)
-    expect(adminKeys(locale)).toEqual(file.filter((key) => !UNREAD_FILE_KEYS.includes(key)))
-  })
-
-  it.each(locales)('keeps each unread key in the file and out of the admin in %s', (locale) => {
-    const file = fileKeys(labelsFile[locale]?.labels as Labels)
-    UNREAD_FILE_KEYS.forEach((key) => {
-      expect(file).toContain(key)
-      expect(adminKeys(locale)).not.toContain(key)
-    })
+    expect(adminKeys(locale)).toEqual(fileKeys(labelsFile[locale]?.labels as Labels))
   })
 })
