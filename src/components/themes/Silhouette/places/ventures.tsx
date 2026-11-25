@@ -1,75 +1,99 @@
 import { mix } from '@/lib/motion/rigPose'
 import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { bell, fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, STRIKE, TUCK, rest } from '../pose'
 
-// Beat 7, the machine yard: a gun on the far wall rakes the floor in bursts, a crate stands in the open, and
-// a switch on a post stands under the gun. He runs in and ducks behind the crate as a burst rakes the floor
-// past it; between bursts he vaults the crate and runs for the post; he pulls the switch and the gun's eye
-// goes dark.
+// Ventures, the sign that kills: on the crumbling city's roofs a great sign of plain panels, no letters, lies
+// along his way, and the lit panel kills whatever stands on it; the light walks along the sign toward him
+// (Limbo notes L72 to L74, [2] [1]). He crouches low on a dark panel as the light passes one panel away; he
+// yanks the cable hanging over the sign and it dies panel by panel; he runs over the dead sign and drops
+// onto the glass dome below the roof's edge, and the glass gives under him.
 
-const CRATE = { from: 260, size: 50 }
-const DUCK = CRATE.from - 26
-const POST = 540
-const GUN = { x: 620, y: -330 }
-// The floor a burst rakes, from the gun's side back toward the crate.
-const RAKE = [CRATE.from + CRATE.size + 10, POST - 30] as const
+const PANEL = { from: 60, w: 64, count: 5, h: 6 }
+const WAIT_ON = 1
+const CABLE = PANEL.from + PANEL.w * 2 + 10
+const EDGE = PANEL.from + PANEL.w * PANEL.count + 40
+const DOME = { x: EDGE + 120, r: 110, top: 70 }
+const FALL = 230
 
-function move(profession: Profession, t: number, length: number): Frame {
-  if (t < 0.35) {
-    const run = ramp(t, 0, 0.16)
-    if (run < 1) return runFrame(profession, 0, DUCK, run)
-    return { pose: mix(rest(profession), CROUCH, ramp(t, 0.16, 0.2)), ahead: DUCK, lift: 0, over: 0 }
-  }
-  if (t < 0.7) {
-    const vault = ramp(t, 0.38, 0.5)
-    if (vault < 1) return { pose: TUCK, ahead: lerp(DUCK, CRATE.from + CRATE.size + 30, vault), lift: arc(vault, CRATE.size + 26), over: 0 }
-    return runFrame(profession, CRATE.from + CRATE.size + 30, length, ramp(t, 0.5, 0.68))
-  }
-  const reach = ramp(t, 0.7, 0.8)
-  return { pose: mix(rest(profession), STRIKE, reach), ahead: length, lift: 0, over: 0 }
+/** The middle of panel `i`. */
+const panelX = (i: number): number => PANEL.from + PANEL.w * (i + 0.5)
+
+/** Which panel the light is on at t, as a float: walking in from the far end, one short of him, back. */
+const litAt = (t: number): number => {
+  const u = ramp(t, 0.04, 0.32)
+  return PANEL.count - 1 - (PANEL.count - 2 - WAIT_ON) * Math.sin(u * Math.PI)
 }
 
-/** The burst's glare at t: two bursts while he is behind the crate, none once he runs. */
-const burstAt = (t: number): number => Math.max(bell(t, 0.18, 0.26), bell(t, 0.27, 0.35))
+function move(profession: Profession, t: number, length: number): Frame {
+  if (t < 0.34) {
+    const walk = ramp(t, 0, 0.08)
+    if (walk < 1) return runFrame(profession, 0, panelX(WAIT_ON), walk)
+    return { pose: mix(rest(profession), CROUCH, ramp(t, 0.08, 0.12) - ramp(t, 0.3, 0.34)), ahead: panelX(WAIT_ON), lift: 0, over: 0 }
+  }
+  if (t < 0.66) {
+    const step = ramp(t, 0.34, 0.42)
+    if (step < 1) return runFrame(profession, panelX(WAIT_ON), CABLE - 18, step)
+    const pull = ramp(t, 0.44, 0.5) - ramp(t, 0.54, 0.62)
+    return { pose: mix(rest(profession), STRIKE, pull), ahead: CABLE - 18, lift: 0, over: 0 }
+  }
+  const run = ramp(t, 0.66, 0.8)
+  if (run < 1) return runFrame(profession, CABLE - 18, EDGE, run)
+  const fall = ramp(t, 0.8, 1)
+  return { pose: mix(TUCK, CROUCH, ramp(fall, 0.6, 1)), ahead: lerp(EDGE, length, fall), lift: arc(fall, 20, -FALL), over: 0 }
+}
 
 export const ventures: Place = {
-  region: 'machine',
-  // he ends at the post, his hand on the switch
-  length: POST - 26,
-  script: [1500, 1500, 1200],
-  ends: [0.35, 0.7, 1],
+  region: 'city',
+  length: DOME.x,
+  script: [1600, 1500, 1500],
+  ends: [0.34, 0.66, 1],
+  gaps: [[EDGE, EDGE + 500]],
   obstacle: ({ light }: { light: Light }) => (
     <>
-      <rect x={CRATE.from} y={-CRATE.size} width={CRATE.size} height={CRATE.size} fill={SHADE.black} />
-      {/* the gun on its bracket off the wall, its eye lit */}
-      <rect x={GUN.x + 30} y={GUN.y - 200} width={300} height={200 - GUN.y} fill={SHADE.black} />
-      <path d={`M${GUN.x + 30} ${GUN.y - 10} H${GUN.x - 10} V${GUN.y + 26} H${GUN.x + 30} Z M${GUN.x - 10} ${GUN.y + 6} L${GUN.x - 80} ${GUN.y + 40} L${GUN.x - 76} ${GUN.y + 50} L${GUN.x - 6} ${GUN.y + 20} Z`} fill={SHADE.black} />
-      <circle data-fx="gun-eye" cx={GUN.x + 8} cy={GUN.y + 8} r={6} fill={light.rim} />
-      {/* the burst: its line from the muzzle to the floor, and the sparks along the floor it rakes */}
-      <g data-fx="burst" opacity="0">
-        <path d={`M${GUN.x - 78} ${GUN.y + 46} L${RAKE[0] + 40} -2`} stroke={SHADE.glow} strokeWidth={2} strokeDasharray="10 8" />
-        <path d={`M${RAKE[0]} -2 H${RAKE[1]}`} stroke={SHADE.glow} strokeWidth={3} strokeDasharray="4 14" />
+      {Array.from({ length: PANEL.count }, (_, i) => (
+        <g key={i}>
+          <rect x={PANEL.from + PANEL.w * i + 2} y={-PANEL.h} width={PANEL.w - 4} height={PANEL.h} fill={SHADE.black} stroke={SHADE.edge} strokeWidth={1.5} />
+          <g data-fx={`panel-${i}`} opacity="0">
+            <rect x={PANEL.from + PANEL.w * i + 4} y={-PANEL.h + 2} width={PANEL.w - 8} height={PANEL.h - 4} fill={SHADE.glow} />
+            <rect x={PANEL.from + PANEL.w * i - 6} y={-PANEL.h - 40} width={PANEL.w + 12} height={44} fill={SHADE.glow} opacity={0.18} />
+          </g>
+        </g>
+      ))}
+      {/* the cable hanging from a pole over the sign */}
+      <path d={`M${CABLE + 40} 0 V-300 H${CABLE}`} stroke={SHADE.black} strokeWidth={6} fill="none" />
+      <g data-fx="cable">
+        <path d={`M${CABLE} -300 V-80 l-6 10 h12 Z`} stroke={SHADE.black} strokeWidth={3} fill={SHADE.black} />
       </g>
-      {/* the switch on its post */}
-      <rect x={POST - 4} y={-70} width={8} height={70} fill={SHADE.black} />
-      <rect x={POST - 12} y={-86} width={24} height={18} fill={SHADE.black} />
-      <line data-fx="lever" x1={POST} y1={-77} x2={POST - 16} y2={-100} stroke={SHADE.black} strokeWidth={5} strokeLinecap="round" />
+      {/* the roof's edge and the glass dome below it */}
+      <rect x={EDGE - 6} y={-4} width={10} height={60} fill={SHADE.black} />
+      <path d={`M${DOME.x - DOME.r} ${DOME.top + DOME.r} A${DOME.r} ${DOME.r} 0 0 1 ${DOME.x + DOME.r} ${DOME.top + DOME.r}`} fill={light.far} fillOpacity={0.2} stroke={light.rim} strokeOpacity={0.5} strokeWidth={2} />
+      <rect x={DOME.x - DOME.r - 30} y={DOME.top + DOME.r} width={DOME.r * 2 + 60} height={400} fill={SHADE.black} />
+      <g data-fx="glass" opacity="0" fill={light.rim} fillOpacity={0.6}>
+        {[-50, -20, 12, 40, 66].map((dx, i) => (
+          <path key={dx} d={`M${DOME.x + dx} ${DOME.top + 10 + (i % 3) * 18} l10 -14 l6 16 Z`} />
+        ))}
+      </g>
     </>
   ),
   move,
   reply: (stage) => {
-    const eye = fx(stage, 'gun-eye')
-    const burst = fx(stage, 'burst')
-    const lever = fx(stage, 'lever')
+    const panels = Array.from({ length: PANEL.count }, (_, i) => fx(stage, `panel-${i}`))
+    const cable = fx(stage, 'cable')
+    const glass = fx(stage, 'glass')
     return (t) => {
-      const thrown = ramp(t, 0.78, 0.86)
-      fadeTo(burst, burstAt(t))
-      fadeTo(eye, 1 - ramp(t, 0.86, 0.95))
-      transformTo(lever, `rotate(${(70 * thrown).toFixed(1)} ${POST} -77)`)
+      const lit = litAt(t)
+      // after the yank the sign dies panel by panel from the far end
+      const dead = ramp(t, 0.5, 0.62) * PANEL.count
+      panels.forEach((node, i) => fadeTo(node, (Math.abs(i - lit) < 0.5 ? 1 : 0) * (i >= PANEL.count - dead ? 0 : 1)))
+      transformTo(cable, `translate(0 ${(26 * (ramp(t, 0.46, 0.5) - ramp(t, 0.56, 0.62))).toFixed(1)})`)
+      // the glass bursts as he goes through the dome, its shards falling with him
+      const burst = ramp(t, 0.86, 1)
+      fadeTo(glass, burst > 0 ? 1 : 0)
+      transformTo(glass, `translate(0 ${(140 * burst).toFixed(1)})`)
     }
   },
 }

@@ -15,7 +15,8 @@ import { LIGHTS, SHADE, type Light, type LightName } from './palette'
 // pan-<layer>, that the scene's writer moves by its share of the camera's travel, the far trees least and
 // the soft black shapes in front most. What stands in a layer is scattered by its place on the level, not by
 // scene, so where one scene ends the next one starts on the same trees. The region of the level a shape
-// stands in (the forest, the decayed city, the machines, the clearing) picks what it is.
+// stands in (the forest, the decayed city, the machines) picks what it is. The lit window he searches for
+// (Hut) stands far off on a hill in the hero, across a ravine in Projects and close by in the contact.
 
 const W = 1600
 export const H = 1000
@@ -37,21 +38,25 @@ export const PhoneView = createContext(false)
 export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: wakes && !phone ? WAKE_X : HOLD, hold: HOLD })
 
 // The phone's slice: 460 wide round the hold, him a little right of its middle so what he has just crossed
-// shows behind him, and its top 550 above the ground, so the ground sits a little below the middle of the
-// screen, clear of the shared bars and notices along its top.
-const PHONE_VIEW = `${HOLD - 260} ${FLOOR - 550} 460 1000`
+// shows behind him, and by default its top 550 above the ground, so the ground sits a little below the middle
+// of the screen, clear of the shared bars and notices along its top. A stretch whose end frame plays under a
+// card standing high on the phone sets its top further up (PhoneTop), which brings the ground down.
+export const PHONE_TOP = 550
+export const PhoneTop = createContext(PHONE_TOP)
+const phoneView = (top: number): string => `${HOLD - 260} ${FLOOR - top} 460 1000`
 
 export function Canvas({ children }: { children: ReactNode }) {
   const phone = useContext(PhoneView)
+  const top = useContext(PhoneTop)
   return (
-    <svg viewBox={phone ? PHONE_VIEW : `0 0 ${W} ${H}`} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} aria-hidden="true" focusable="false">
+    <svg viewBox={phone ? phoneView(top) : `0 0 ${W} ${H}`} preserveAspectRatio={phone ? 'xMidYMin slice' : 'xMidYMax slice'} aria-hidden="true" focusable="false">
       {children}
     </svg>
   )
 }
 
 /** The parts of the level the page runs through, in order. */
-export type Region = 'forest' | 'city' | 'machine' | 'clearing'
+export type Region = 'forest' | 'city' | 'machine'
 
 /** One scene's stretch as its layers draw it: where on the level he starts, how far he goes, where on
  *  screen the scene starts and holds him, and the region of every point of the level. */
@@ -142,7 +147,6 @@ const FAR_GROUND = FLOOR - 30
 // tapered chimneys. Nothing with a bare bar or a crossbar, which reads as hard blocks through the fog.
 const FAR_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
   forest: (x, s) => <path d={pinePath(x, 240 + s * 260, FAR_GROUND)} />,
-  clearing: (x, s) => (s < 0.55 ? null : <path d={pinePath(x, 160 + s * 140, FAR_GROUND)} />),
   city: (x, s) => {
     const w = 70 + s * 90
     const h = 180 + s * 260
@@ -156,15 +160,38 @@ const FAR_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
     ),
 }
 
-/** The far layer, pale with fog: a low ridge and the region's far shapes on it. */
-export function Far({ run, light }: { run: Run; light: Light }) {
+/** The far layer, pale with fog: a low ridge and the region's far shapes on it, and whatever the scene sets
+ *  far off (`distant`, drawn in the canvas's own units where the camera starts). */
+export function Far({ run, light, distant }: { run: Run; light: Light; distant?: ReactNode }) {
   return (
     <Canvas>
-      <g data-fx="pan-far" fill={light.far} opacity={0.75}>
-        <Scattered run={run} layer="far" spacing={150} seed={1} draw={(x, s, region) => FAR_SHAPE[region](x, s)} />
-        <path d={`M${-W} ${FAR_GROUND + 10} Q${W} ${FAR_GROUND - 30} ${W * 3} ${FAR_GROUND} T${W * 7} ${FAR_GROUND} V${H * 2} H${-W} Z`} />
+      <g data-fx="pan-far">
+        <g fill={light.far} opacity={0.75}>
+          <Scattered run={run} layer="far" spacing={150} seed={1} draw={(x, s, region) => FAR_SHAPE[region](x, s)} />
+          <path d={`M${-W} ${FAR_GROUND + 10} Q${W} ${FAR_GROUND - 30} ${W * 3} ${FAR_GROUND} T${W * 7} ${FAR_GROUND} V${H * 2} H${-W} Z`} />
+        </g>
+        {distant}
       </g>
     </Canvas>
+  )
+}
+
+/** The small shape on posts with one window, the place he searches for: drawn round the foot of its posts,
+ *  `w` wide, black, its window in the warm light (data-fx `{name}-window`, its door `{name}-door` swinging
+ *  open on the light inside, `{name}-inside`). */
+export function Hut({ name, w = 90, fill = SHADE.black }: { name: string; w?: number; fill?: string }) {
+  const post = w * 0.36
+  const body = w * 0.8
+  const top = -post - body
+  return (
+    <g fill={fill}>
+      <path d={`M${-w * 0.34} 0 V${-post} H${-w * 0.28} V0 Z M${w * 0.28} 0 V${-post} H${w * 0.34} V0 Z`} />
+      <rect x={-w / 2} y={top} width={w} height={body} />
+      <path d={`M${-w * 0.62} ${top + 4} L0 ${top - w * 0.46} L${w * 0.62} ${top + 4} Z`} />
+      <rect data-fx={`${name}-window`} x={w * 0.08} y={top + body * 0.22} width={w * 0.26} height={w * 0.24} fill={SHADE.sun} />
+      <rect data-fx={`${name}-inside`} x={-w * 0.4} y={top + body * 0.2} width={w * 0.34} height={body * 0.8} fill={SHADE.sun} opacity={0} />
+      <rect data-fx={`${name}-door`} x={-w * 0.4} y={top + body * 0.2} width={w * 0.34} height={body * 0.8} fill={fill} stroke={SHADE.edge} strokeWidth={1.5} />
+    </g>
   )
 }
 
@@ -197,7 +224,6 @@ const MID_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
     const w = 18 + s * 30
     return <path d={`M${x} 0 H${x + w} V${FLOOR} H${x - 6} Q${x + w * 0.3} ${FLOOR * 0.55} ${x} 0 Z M${x + w * 0.5} ${200 + s * 120} Q${x + w + 60} ${240 + s * 120} ${x + w + 90} ${320 + s * 120} L${x + w + 82} ${324 + s * 120} Q${x + w + 50} ${260 + s * 120} ${x + w * 0.5} ${226 + s * 120} Z`} />
   },
-  clearing: (x, s) => (s < 0.7 ? null : <path d={`M${x} 0 H${x + 20} V${FLOOR} H${x - 4} Z`} />),
   city: (x, s) => <path d={`M${x - 5} ${FLOOR} V${FLOOR - 380 - s * 80} H${x + 60} V${FLOOR - 370 - s * 80} H${x + 5} V${FLOOR} Z M${x + 48} ${FLOOR - 370 - s * 80} h16 v14 h-16 Z`} />,
   machine: (x, s) =>
     s < 0.5 ? (
@@ -221,7 +247,7 @@ export function Mid({ run, light }: { run: Run; light: Light }) {
 /** A stretch of the ground's run that is open, from its start: a gap he must cross. */
 export type Gap = readonly [number, number]
 
-const BLADES = (region: Region) => region === 'forest' || region === 'clearing'
+const BLADES = (region: Region) => region === 'forest'
 
 /** The black ground he runs on, open where the scene's gaps are, its edge in a rim of light, grass along
  *  it in the forest. Drawn in the scene's own units: x 0 is where he starts. */
@@ -266,7 +292,6 @@ function Soft({ d }: { d: string }) {
 // pipes and a hanging chain end in the city and the machines. Nothing in front ever reaches his ground.
 const FRONT_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
   forest: (x, s) => <Soft d={`M${x - 160} 0 H${x + 200} Q${x + 90} ${70 + s * 60} ${x + 10} ${150 + s * 80} Q${x - 70} ${190 + s * 60} ${x - 160} ${170 + s * 50} Z`} />,
-  clearing: (x, s) => (s < 0.5 ? null : <Soft d={`M${x - 120} 0 H${x + 120} Q${x + 40} ${60 + s * 40} ${x - 120} ${110 + s * 40} Z`} />),
   city: (x, s) => <Soft d={`M${x - 30} 0 H${x + 30} V${120 + s * 110} H${x - 30} Z`} />,
   machine: (x, s) => <Soft d={`M${x - 260} ${40 + s * 40} H${x + 260} V${96 + s * 40} H${x - 260} Z M${x + 120} 0 H${x + 150} V${200 + s * 60} H${x + 120} Z`} />,
 }
@@ -291,12 +316,14 @@ export function Front({ run }: { run: Run }) {
 }
 
 /** His group's transform: his centre at `x`, his soles `lift` above the floor, turned `over` of a head over
- *  heels flip round his middle seen side on (1 upside down on a ceiling, still facing the way he goes). */
-export const figureAt = (x: number, lift = 0, over = 0): string => {
+ *  heels flip round his middle seen side on (1 upside down on a ceiling, still facing the way he goes), and
+ *  mirrored to face left when he goes `back`. */
+export const figureAt = (x: number, lift = 0, over = 0, back = false): string => {
   const top = FLOOR - lift - FIGURE_H * (FIGURE_VIEW.soles / FIGURE_VIEW.height)
   const mid = FIGURE_H / 2
   const turn = over ? ` translate(0 ${mid}) scale(1 ${Math.cos(Math.PI * over).toFixed(3)}) translate(0 ${-mid})` : ''
-  return `translate(${(x - FIGURE_W / 2).toFixed(1)} ${top.toFixed(1)})${turn}`
+  const facing = back ? ` translate(${FIGURE_W.toFixed(1)} 0) scale(-1 1)` : ''
+  return `translate(${(x - FIGURE_W / 2).toFixed(1)} ${top.toFixed(1)})${turn}${facing}`
 }
 
 /** Him on the ground at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. In

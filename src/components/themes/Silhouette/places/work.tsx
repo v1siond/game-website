@@ -1,79 +1,105 @@
 import { mix } from '@/lib/motion/rigPose'
 import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
+import { FIGURE_H } from '../forest'
 import { SHADE } from '../palette'
 import { arc, runFrame, type Frame, type Place } from '../place'
-import { CLIMB, CROUCH, HANG, TUCK } from '../pose'
+import { CROUCH, TUCK, rest } from '../pose'
 
-// Beat 3, deeper in the forest: two bear traps lie open on the path, and past them a high bank of earth. He
-// runs and hops the first trap, which snaps shut under him, and hops the second; he jumps at the bank, hangs
-// from its edge and hauls himself up; he runs over its top and drops down the far side, and runs on.
+// Work, what hunts in the trees: under a black canopy a long straight point lowers out of the dark, follows
+// his head and stabs straight down where he stands (Limbo notes L45 to L47, [2]); an open iron trap lies on
+// the path. The first time he walks under it, it stabs and the frame cuts to black: he is back a few steps
+// earlier, the game's trial and death (L124 to L126, [1]), with nothing shown but the cut. The second time
+// he stands still at the open trap while the point tracks him; it stabs, he leaps back, and the jaws snap
+// on its tip, which tears off as the point pulls up into the dark: the threat turned on itself (L133, [2]).
 
-const TRAPS = [260, 350] as const
-const BANK = { from: 450, to: 540, h: 76 }
-const HANG_AT = BANK.from - 12
+const TRAP = 300
+const DEATH_AT = 250
+const CHECKPOINT = 110
+const CLEAR = 220
+// The point's tip: hovering over his head, and stabbed down to the ground.
+const HOVER = -FIGURE_H - 70
+const DOWN = -2
+const TOP = -900
 
-/** A hop over the trap at `x`, `u` of the way. */
-const hopOver = (x: number, u: number): Frame => ({ pose: TUCK, ahead: lerp(x - 40, x + 40, u), lift: arc(u, 40), over: 0 })
+// The point's two stabs on the move's t: down, held, pulled up.
+const STAB_1 = { down: 0.22, up: 0.27 }
+const STAB_2 = { down: 0.78, snap: 0.8 }
 
-function move(profession: Profession, t: number, length: number): Frame {
-  if (t < 0.4) {
-    const u = ramp(t, 0, 0.4)
-    const [first, second] = TRAPS
-    if (u < 0.3) return runFrame(profession, 0, first - 40, ramp(u, 0, 0.3))
-    if (u < 0.45) return hopOver(first, ramp(u, 0.3, 0.45))
-    if (u < 0.6) return runFrame(profession, first + 40, second - 40, ramp(u, 0.45, 0.6))
-    if (u < 0.75) return hopOver(second, ramp(u, 0.6, 0.75))
-    return runFrame(profession, second + 40, HANG_AT - 30, ramp(u, 0.75, 1))
+function move(profession: Profession, t: number): Frame {
+  if (t < 0.33) {
+    if (t < STAB_1.down) return runFrame(profession, 0, DEATH_AT, ramp(t, 0, 0.2))
+    return { pose: rest(profession), ahead: CHECKPOINT, lift: 0, over: 0 }
   }
-  if (t < 0.7) {
-    const jump = ramp(t, 0.4, 0.5)
-    const pull = ramp(t, 0.55, 0.7)
-    if (pull === 0) return { pose: HANG, ahead: lerp(HANG_AT - 30, HANG_AT, jump), lift: (BANK.h - 70) * jump + arc(jump, 30), over: 0 }
-    return { pose: mix(CLIMB, CROUCH, ramp(pull, 0.6, 1)), ahead: lerp(HANG_AT, BANK.from + 30, pull), lift: lerp(BANK.h - 70, BANK.h, ramp(pull, 0, 0.6)), over: 0 }
+  if (t < 0.66) {
+    const walk = ramp(t, 0.36, 0.56)
+    if (walk < 1) return runFrame(profession, CHECKPOINT, TRAP, walk)
+    return { pose: rest(profession), ahead: TRAP, lift: 0, over: 0 }
   }
-  const over = ramp(t, 0.7, 0.82)
-  if (over < 1) return { ...runFrame(profession, BANK.from + 30, BANK.to - 10, over), lift: BANK.h }
-  const drop = ramp(t, 0.82, 0.88)
-  if (drop < 1) return { pose: mix(TUCK, CROUCH, drop), ahead: lerp(BANK.to - 10, BANK.to + 40, drop), lift: arc(drop, 14, -BANK.h) + BANK.h, over: 0 }
-  return runFrame(profession, BANK.to + 40, length, ramp(t, 0.88, 1))
+  const leap = ramp(t, 0.74, 0.86)
+  if (leap === 0) return { pose: mix(rest(profession), CROUCH, ramp(t, 0.66, 0.74)), ahead: TRAP, lift: 0, over: 0 }
+  if (leap < 1) return { pose: mix(TUCK, CROUCH, ramp(leap, 0.7, 1)), ahead: lerp(TRAP, CLEAR, leap), lift: arc(leap, 40), over: 0 }
+  return { pose: CROUCH, ahead: CLEAR, lift: 0, over: 0 }
 }
 
-/** A bear trap, open (data-fx trap-<i>-open) or sprung shut (trap-<i>-shut). */
-function Trap({ x, index }: { x: number; index: number }) {
-  return (
-    <g transform={`translate(${x} 0)`} fill={SHADE.black}>
-      <rect x={-18} y={-4} width={36} height={4} />
-      <path data-fx={`trap-${index}-open`} d="M-18 -4 Q-27 -21 -11 -25 L-8 -21 Q-18 -18 -14 -4 Z M18 -4 Q27 -21 11 -25 L8 -21 Q18 -18 14 -4 Z" />
-      <path data-fx={`trap-${index}-shut`} d="M-10 -4 Q-11 -25 0 -28 Q11 -25 10 -4 Z" opacity="0" />
-    </g>
-  )
+/** Where the point's tip is at t: lowering out of the canopy, tracking him, the two stabs, then gone. */
+function pointAt(t: number): { x: number; y: number } {
+  if (t < 0.3) {
+    const lower = ramp(t, 0.04, 0.16)
+    const x = lerp(0, DEATH_AT, ramp(t, 0, 0.2))
+    const stab = ramp(t, STAB_1.down - 0.02, STAB_1.down) - ramp(t, STAB_1.up, 0.3)
+    return { x: x + 20 * (1 - ramp(t, 0, 0.2)), y: lerp(lerp(TOP, HOVER, lower), DOWN, stab) }
+  }
+  if (t < STAB_2.snap) {
+    const lower = ramp(t, 0.36, 0.5)
+    const follow = lerp(CHECKPOINT, TRAP, ramp(t, 0.36, 0.56))
+    const sway = 14 * Math.sin(ramp(t, 0.56, 0.76) * Math.PI * 2)
+    const stab = ramp(t, STAB_2.down - 0.02, STAB_2.down)
+    return { x: follow + sway, y: lerp(lerp(TOP, HOVER, lower), DOWN, stab) }
+  }
+  return { x: TRAP, y: lerp(DOWN, TOP, ramp(t, STAB_2.snap + 0.02, 0.96)) }
 }
 
 export const work: Place = {
   region: 'forest',
-  length: 620,
-  script: [1700, 1500, 1300],
-  ends: [0.4, 0.7, 1],
+  length: TRAP,
+  script: [1700, 1600, 1500],
+  ends: [0.33, 0.66, 1],
   obstacle: () => (
     <>
-      {TRAPS.map((x, index) => (
-        <Trap key={x} x={x} index={index} />
-      ))}
-      <path d={`M${BANK.from} 4 V${-BANK.h + 8} Q${BANK.from + 6} ${-BANK.h} ${BANK.from + 20} ${-BANK.h} H${BANK.to - 16} Q${BANK.to} ${-BANK.h + 4} ${BANK.to + 6} 4 Z`} fill={SHADE.black} />
-      <path d={`M${BANK.from + 40} ${-BANK.h} l-4 -18 l8 0 Z M${BANK.from + 70} ${-BANK.h} l-3 -12 l6 0 Z`} fill={SHADE.black} />
+      {/* the canopy: a black mass across the top of the frame the point comes out of */}
+      <path d={`M-700 -1200 H1300 V-560 Q900 -470 500 -540 Q120 -600 -300 -500 Q-520 -470 -700 -520 Z`} fill={SHADE.black} />
+      <g data-fx="point">
+        <path d={`M-5 -900 H5 L1 -10 L0 0 L-1 -10 Z`} fill={SHADE.black} />
+      </g>
+      <g transform={`translate(${TRAP} 0)`} fill={SHADE.black}>
+        <rect x={-20} y={-4} width={40} height={4} />
+        <path data-fx="jaws-open" d="M-20 -4 Q-30 -22 -12 -27 L-9 -23 Q-20 -20 -16 -4 Z M20 -4 Q30 -22 12 -27 L9 -23 Q20 -20 16 -4 Z" />
+        <g data-fx="jaws-shut" opacity="0">
+          <path d="M-11 -4 Q-12 -27 0 -30 Q12 -27 11 -4 Z" />
+          {/* the broken tip caught in the jaws */}
+          <path d="M-2 -30 L2 -30 L0.6 -52 L0 -60 L-0.6 -52 Z" />
+        </g>
+      </g>
+      {/* the cut to black of the death */}
+      <rect data-fx="cut" x={-2000} y={-1600} width={5000} height={3000} fill={SHADE.black} opacity="0" />
     </>
   ),
   move,
   reply: (stage) => {
-    const open = fx(stage, 'trap-0-open')
-    const shut = fx(stage, 'trap-0-shut')
-    // the first trap snaps shut as he clears it
+    const point = fx(stage, 'point')
+    const open = fx(stage, 'jaws-open')
+    const shut = fx(stage, 'jaws-shut')
+    const cut = fx(stage, 'cut')
     return (t) => {
-      const sprung = ramp(t, 0.15, 0.17)
-      fadeTo(open, 1 - sprung)
-      fadeTo(shut, sprung)
+      const { x, y } = pointAt(t)
+      transformTo(point, `translate(${x.toFixed(1)} ${(y + 900).toFixed(1)})`)
+      const snap = ramp(t, STAB_2.snap - 0.01, STAB_2.snap)
+      fadeTo(open, 1 - snap)
+      fadeTo(shut, snap)
+      // the death: a hard cut to black, then the checkpoint fades back in
+      fadeTo(cut, ramp(t, STAB_1.down, STAB_1.down + 0.005) * (1 - ramp(t, 0.25, 0.31)))
     }
   },
 }

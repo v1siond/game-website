@@ -1,52 +1,90 @@
+import { mix } from '@/lib/motion/rigPose'
 import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { fx, translateTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
+import { FIGURE_H, Hut } from '../forest'
 import { SHADE, type Light } from '../palette'
 import { runFrame, type Frame, type Place } from '../place'
+import { REACH, march, rest } from '../pose'
 
-// Beat 6, inside the machines: a corridor where a hydraulic crusher pounds the floor. He runs up to it and
-// stops short as it slams down; as it lifts he runs under it; it slams down again behind him as he clears
-// it, and he runs on down the corridor.
+// Projects, the light and pulled away: the forest's last stretch, the lit window close now just across a
+// ravine. A small pale glow drops onto his head and his steps go where it wants, away from the window (Limbo
+// notes L66 to L68, [2] [11] [1]); this is the game's false ending, the one he searches for seen and out of
+// reach (L69 to L71, [1] [18] [19]). He is marched back the way he came; the lamp's light swings him round;
+// he steps under the low overhang, reaches up, and the dark shapes hanging from it close on the glow and
+// take it. Across the ravine the window has gone dark.
 
-const PRESS = { from: 270, to: 380, h: 90 }
-const WAIT = PRESS.from - 50
-const CLEAR = PRESS.to + 40
-// How high the press's face hangs when it is raised, above the floor.
-const RAISED = 300
+const LAMP = 30
+const RAVINE = [240, 300] as const
+const HUT = 335
+const EDGE = 220
+const UP_AT = 110
+const OVERHANG = FIGURE_H + 60
 
-/** The press's face above the floor at t: it slams down as he arrives, lifts slowly, and slams down again
- *  behind him once he is through. */
-const pressAt = (t: number): number => RAISED * (1 - ramp(t, 0.18, 0.24) + ramp(t, 0.36, 0.5) - ramp(t, 0.68, 0.72))
+function move(profession: Profession, t: number): Frame {
+  if (t < 0.36) {
+    const walk = ramp(t, 0, 0.12)
+    if (walk < 1) return runFrame(profession, 0, EDGE, walk)
+    if (t < 0.16) return { pose: rest(profession), ahead: EDGE, lift: 0, over: 0 }
+    const u = ramp(t, 0.16, 0.36)
+    return { pose: u < 1 ? march(lerp(EDGE, LAMP, u) / 26) : rest(profession), ahead: lerp(EDGE, LAMP, u), lift: 0, over: 0, back: true }
+  }
+  if (t < 0.6) {
+    const turn = ramp(t, 0.4, 0.46)
+    if (turn < 1) return { pose: rest(profession), ahead: LAMP, lift: 0, over: 0, back: turn < 0.5 }
+    return runFrame(profession, LAMP, UP_AT, ramp(t, 0.46, 0.6))
+  }
+  const reach = ramp(t, 0.66, 0.76) - ramp(t, 0.9, 0.96)
+  return { pose: mix(rest(profession), REACH, reach), ahead: UP_AT, lift: 0, over: 0 }
+}
 
-function move(profession: Profession, t: number, length: number): Frame {
-  if (t < 0.48) return runFrame(profession, 0, WAIT, ramp(t, 0, 0.2))
-  if (t < 0.75) return runFrame(profession, WAIT, CLEAR, ramp(t, 0.48, 0.66))
-  return runFrame(profession, CLEAR, length, ramp(t, 0.75, 1))
+/** The glow's place at t: dropping onto his head, riding it, taken up into the overhang. */
+function glowAt(t: number, frame: Frame): { x: number; y: number } {
+  const head = { x: frame.ahead, y: -frame.lift - FIGURE_H - 4 }
+  const drop = ramp(t, 0.12, 0.16)
+  if (t < 0.16) return { x: EDGE, y: lerp(-700, head.y, drop) }
+  return { x: head.x, y: lerp(head.y, -OVERHANG + 10, ramp(t, 0.84, 0.9)) }
 }
 
 export const projects: Place = {
-  region: 'machine',
-  length: 480,
-  script: [1500, 1300, 1500],
-  ends: [0.35, 0.62, 1],
+  region: 'forest',
+  length: EDGE,
+  script: [1700, 1500, 1700],
+  ends: [0.36, 0.6, 1],
+  gaps: [RAVINE],
   obstacle: ({ light }: { light: Light }) => (
     <>
-      {/* the corridor's ceiling and the press's housing in it */}
-      <rect x={PRESS.from - 400} y={-RAISED - PRESS.h - 500} width={PRESS.to - PRESS.from + 800} height={500} fill={SHADE.black} />
-      <rect x={PRESS.from - 30} y={-RAISED - PRESS.h - 40} width={PRESS.to - PRESS.from + 60} height={60} fill={SHADE.black} />
-      <g data-fx="press">
-        <rect x={(PRESS.from + PRESS.to) / 2 - 12} y={-RAISED - 600} width={24} height={600 - PRESS.h} fill={SHADE.black} />
-        <rect x={PRESS.from} y={-PRESS.h} width={PRESS.to - PRESS.from} height={PRESS.h} fill={SHADE.black} />
-        <path d={`M${PRESS.from} 0 ${Array.from({ length: 6 }, (_, i) => `L${PRESS.from + (i + 0.5) * ((PRESS.to - PRESS.from) / 6)} 10 L${PRESS.from + (i + 1) * ((PRESS.to - PRESS.from) / 6)} 0`).join(' ')} Z`} fill={SHADE.black} />
-        <rect x={PRESS.from + 6} y={-PRESS.h + 10} width={PRESS.to - PRESS.from - 12} height={4} fill={light.far} opacity={0.3} />
+      {/* the lamp on its post, its cone of light on the ground */}
+      <path d={`M${LAMP - 70} 0 L${LAMP - 8} -150 H${LAMP + 8} L${LAMP + 70} 0 Z`} fill={SHADE.glow} opacity={0.16} />
+      <path d={`M${LAMP - 3} 0 V-160 H${LAMP + 16} V-152 H${LAMP + 3} V0 Z`} fill={SHADE.black} />
+      <circle cx={LAMP + 12} cy={-148} r={5} fill={SHADE.glow} />
+      {/* the low overhang with its dark hanging shapes */}
+      <path d={`M${UP_AT - 90} -900 V${-OVERHANG - 20} Q${UP_AT} ${-OVERHANG + 20} ${UP_AT + 80} ${-OVERHANG - 30} V-900 Z`} fill={SHADE.black} />
+      <g data-fx="hangers" fill={SHADE.black}>
+        {[-30, -6, 18, 40].map((dx, i) => (
+          <path key={dx} d={`M${UP_AT + dx - 6} ${-OVERHANG - 6} Q${UP_AT + dx} ${-OVERHANG + 30 + (i % 2) * 14} ${UP_AT + dx + 6} ${-OVERHANG - 6} Z`} />
+        ))}
       </g>
-      {/* the plate it strikes, and the dents round it */}
-      <rect x={PRESS.from - 10} y={-3} width={PRESS.to - PRESS.from + 20} height={3} fill={light.rim} opacity={0.25} />
+      <rect x={RAVINE[0]} y={0} width={RAVINE[1] - RAVINE[0]} height={400} fill={light.mid} opacity={0.5} />
+      <g transform={`translate(${HUT} 0)`}>
+        <Hut name="near-hut" w={50} />
+      </g>
+      <circle data-fx="glow" r={6} fill={SHADE.glow} opacity="0" />
     </>
   ),
   move,
-  reply: (stage) => {
-    const press = fx(stage, 'press')
-    return (t) => translateTo(press, 0, -pressAt(t))
+  reply: (stage, { profession }) => {
+    const glow = fx(stage, 'glow')
+    const hangers = fx(stage, 'hangers')
+    const window = fx(stage, 'near-hut-window')
+    return (t) => {
+      const { x, y } = glowAt(t, move(profession, t))
+      transformTo(glow, `translate(${x.toFixed(1)} ${y.toFixed(1)})`)
+      fadeTo(glow, ramp(t, 0.1, 0.12) * (1 - ramp(t, 0.88, 0.9)))
+      // the hanging shapes reach down onto the glow and draw back up with it
+      transformTo(hangers, `translate(0 ${(24 * (ramp(t, 0.78, 0.84) - ramp(t, 0.86, 0.9))).toFixed(1)})`)
+      // across the ravine the window goes dark
+      fadeTo(window, 1 - ramp(t, 0.9, 0.98))
+    }
   },
 }

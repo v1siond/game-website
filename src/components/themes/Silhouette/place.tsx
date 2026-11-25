@@ -10,12 +10,12 @@ import { FLOOR, Figure, PAN, figureAt, type Gap, type Region, type Run } from '.
 import type { Light } from './palette'
 import { rest, run, shadeJoints } from './pose'
 
-// What every stretch of the level is, played the way the side scroller plays: he runs right along one
-// level, the camera follows him (src/lib/motion/sideScroll.ts), and each stretch puts one obstacle in his
-// way that he crosses with one to three of the game's moves (run, jump a gap, climb a ledge, push a crate,
-// swing on a rope, time a run under a trap). The shared scene player moves the stretch through its script
-// (src/lib/scroll/player.ts); every frame is a function of the playhead alone, so it reads the same played
-// backward, and the last action's end is the frame reduced motion shows.
+// What every stretch of the level is, played the way the side scroller plays: he goes along one level, the
+// camera follows him (src/lib/motion/sideScroll.ts) whichever way he goes, and each stretch is one of the
+// game's trials, a threat that moves on its own and his answer to it in one to three actions. The shared
+// scene player moves the stretch through its script (src/lib/scroll/player.ts); every frame is a function of
+// the playhead alone, so it reads the same played backward, and the last action's end is the frame reduced
+// motion shows.
 //
 // A stretch is drawn in its own run units: x 0 is where he starts it, y 0 the top of the ground, up
 // negative. Its obstacle and any gaps in the ground are placed in those units; his move gives how far he has
@@ -26,13 +26,14 @@ export interface PlaceInput {
   light: Light
 }
 
-/** His frame in a move: his pose, how far along the stretch he is, how high above the ground, and how far
- *  he has turned over (1 upside down on a ceiling). */
+/** His frame in a move: his pose, how far along the stretch he is, how high above the ground, how far he
+ *  has turned over (1 upside down on a ceiling), and whether he faces back the way he came. */
 export interface Frame {
   pose: RigPose
   ahead: number
   lift: number
   over: number
+  back?: boolean
 }
 
 export interface Place {
@@ -44,10 +45,14 @@ export interface Place {
   script: SceneScript
   /** Where each action ends on the move's t, one per action, the last 1. */
   ends: readonly number[]
+  /** On a phone, how far above the ground the view's top sits (forest PHONE_TOP when unset). */
+  phoneTop?: number
   /** Where the ground is open, in run units. */
   gaps?: readonly Gap[]
   /** The obstacle and whatever else stands on the stretch, in run units. */
   obstacle: (input: PlaceInput) => ReactNode
+  /** What stands far off in the fog, in the canvas's units where the camera starts. */
+  distant?: (input: PlaceInput) => ReactNode
   /** His move `t` of the way over a stretch `length` long; t 1 is the move's held pose. */
   move: (profession: Profession, t: number, length: number) => Frame
   /** Binds the world's reply and returns its writer over the move's t. */
@@ -99,7 +104,7 @@ export function bindStretch(place: Place, run: Run, stage: ParentNode, input: Pl
     const camera = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, run)
     for (const [node, share] of layers) translateTo(node, -share * camera, 0)
     reply?.(t)
-    transformTo(root, figureAt(run.start + frame.ahead, frame.lift, frame.over))
+    transformTo(root, figureAt(run.start + frame.ahead, frame.lift, frame.over, frame.back))
     if (joints) setRigPose(joints, frame.pose)
   }
 }

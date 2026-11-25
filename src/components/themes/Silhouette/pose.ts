@@ -3,8 +3,8 @@ import { STAND, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
 import { rigJoints, type RigJoints } from '../shared/rig'
 import s from './figure.module.css'
 
-// His figure posed by the scene player through the game's verbs (run, jump, hang, climb, shove,
-// strike, sit), on the shared rig (rigPose, ../shared/rig). He is seen from the side, facing right, so a limb
+// His figure posed by the scene player through the game's verbs (run, jump, hang, climb, haul, duck,
+// march, reach, strike, knock), on the shared rig (rigPose, ../shared/rig). He is seen from the side, facing right, so a limb
 // swung ahead of him turns negative (counterclockwise on screen), a shin folding back turns positive, and a
 // positive lean tips him forward. He runs with the rig's profile stride.
 
@@ -44,16 +44,34 @@ export const CLIMB = pose({ armRight: -30, foreRight: -70, armLeft: -25, foreLef
 /** Crouched on what he has just climbed or landed on, ready to go on. */
 export const CROUCH = pose({ thighRight: -45, shinRight: 75, thighLeft: -30, shinLeft: 70, lean: 12, rise: 4, armRight: -40, armLeft: -25 })
 
-/** Both hands up on a rope, hanging his weight off it, his legs trailing. */
-export const HANG = pose({ armRight: -170, foreRight: -5, armLeft: -165, foreLeft: -5, thighRight: -10, shinRight: 20, thighLeft: 8, shinLeft: 25 })
-
-/** Shoving low along the ground: bent over what sits at his feet, both hands on it, his legs driving. */
-export const SHOVE = pose({ armRight: -45, foreRight: -20, armLeft: -40, foreLeft: -25, lean: 32, rise: 6, thighRight: -45, shinRight: 50, thighLeft: 25, shinLeft: 20 })
 
 
 /** His hand driven out flat at what stands at head height ahead of him: a switch struck. */
 export const STRIKE = pose({ armRight: -100, foreRight: -5, lean: 6, thighRight: -25, shinRight: 15, thighLeft: 15, shinLeft: 5 })
 
+/** Stood still, his weight back a little, looking ahead at something far off. */
+export const LOOK = pose({ lean: -6, armRight: 8, armLeft: 6 })
+
+/** Leaning back with both hands out low ahead of him, hauling what floats at his feet in to the edge. */
+export const HAUL = pose({ lean: -20, armRight: -60, foreRight: -15, armLeft: -55, foreLeft: -15, thighRight: -35, shinRight: 30, thighLeft: 25, shinLeft: 15 })
+
+/** Flat on his front in a hollow, his arms over his head, as something bounds over him. */
+export const DUCK = pose({ lean: 84, armRight: -170, foreRight: 0, armLeft: -165, foreLeft: 0, thighRight: 6, thighLeft: -4 })
+
+/** Bound in the wrapping: his arms pinned at his sides, his legs together. */
+export const BOUND = pose({ armRight: 2, foreRight: 0, armLeft: 2, foreLeft: 0, thighRight: 0, shinRight: 0, thighLeft: 0, shinLeft: 0 })
+
+/** Both arms straight up over his head, reaching for what hangs above. */
+export const REACH = pose({ armRight: -172, foreRight: 0, armLeft: -160, foreLeft: -6, lean: -4 })
+
+/** His near hand up at a door at chest height, knuckles to it. */
+export const KNOCK = pose({ armRight: -78, foreRight: -70, lean: 4 })
+
+/** A stiff, driven walk at `phase`, his arms hanging dead at his sides: he is being walked. */
+export function march(phase: number): RigPose {
+  const stride = rigWalk(phase, 1)
+  return { ...stride, thighRight: stride.thighRight * 0.6, thighLeft: stride.thighLeft * 0.6, armRight: 0, foreRight: 0, armLeft: 0, foreLeft: 0, lean: -4 }
+}
 
 /** Lying on his back in the grass, the way he wakes: his body laid down flat behind his feet. */
 export const LYING = pose({ lean: -86 })
@@ -64,8 +82,6 @@ export const SITTING_UP = pose({ lean: -40, rise: 6, thighRight: -70, shinRight:
 /** His feet under him, pushing up to stand, his weight forward. */
 export const RISING = pose({ lean: 14, rise: 8, thighRight: -50, shinRight: 80, thighLeft: -50, shinLeft: 80, armRight: -20, armLeft: -10 })
 
-/** Sat in the grass, his knees up and his hands on them, looking ahead. */
-export const SIT = pose({ rise: 20, lean: -4, thighRight: -80, shinRight: 100, thighLeft: -72, shinLeft: 104, armRight: -50, foreRight: -40, armLeft: -40, foreLeft: -45 })
 
 // ---- his joints: the shared rig's writer (setRigPose) poses them ----
 

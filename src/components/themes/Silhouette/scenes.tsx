@@ -5,7 +5,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { stretchesOf } from '@/lib/motion/sideScroll'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import { Canvas, Far, Fog, Front, Ground, Mid, Sky, framingOf, type Region, type Run } from './forest'
+import { Canvas, Far, Fog, Front, Ground, Mid, PHONE_TOP, PhoneTop, Sky, framingOf, type Region, type Run } from './forest'
 import { LIGHTS, type LightName } from './palette'
 import { Stretch, bindStretch, type Place, type PlaceInput } from './place'
 import { about } from './places/about'
@@ -19,10 +19,12 @@ import { tech } from './places/tech'
 import { ventures } from './places/ventures'
 import { work } from './places/work'
 
-// The page as one run through one level of the side scroller, its story told in order: he wakes in the
-// grass at the forest's edge (hero), crosses the forest and its traps, reaches the decayed city at its end
-// and the machines inside it, the gear hall and the gravity room, and comes out of the last door into the
-// quiet light past the trees (contact). Each section of the shown profession is the next stretch of the
+// The page as one run through one level of the side scroller, its story told in the game's order as his own
+// search: he wakes in the grass at the forest's edge and sees one lit window far off (hero), crosses the
+// water, turns the hunter's trap on it, rides away from the snare, leads the ambush into its own crushers, is
+// marched away from the window just as he nears it, cuts the sign that kills in the dead city, crosses the
+// foundry's beat and the gravity room, and breaks through the glass back to the forest's edge, where the
+// window is near and its door opens (contact). Each section of the shown profession is the next stretch of the
 // level, laid right after the one before, so the camera that follows him through one scene starts the next
 // where it left him. Every stretch past the hero stands in the profession's own light: a cold grey dawn for
 // the System Engineer, a warm grey for the Musician, a red grey dusk for the Martial Artist.
@@ -56,9 +58,15 @@ export interface ShadeScene extends TheatreScene {
   slot: SectionSlot | null
 }
 
-const layersOf = (id: SceneId, place: Place, input: PlaceInput, run: Run, light: LightName): StageLayer[] => [
+const layersOf = (id: SceneId, place: Place, input: PlaceInput, run: Run, light: LightName): StageLayer[] =>
+  layerNodes(id, place, input, run, light).map(({ name, node }) => ({
+    name,
+    node: <PhoneTop.Provider value={place.phoneTop ?? PHONE_TOP}>{node}</PhoneTop.Provider>,
+  }))
+
+const layerNodes = (id: SceneId, place: Place, input: PlaceInput, run: Run, light: LightName): StageLayer[] => [
   { name: 'sky', node: <Sky light={light} /> },
-  { name: 'far', node: <Far run={run} light={input.light} /> },
+  { name: 'far', node: <Far run={run} light={input.light} distant={place.distant?.(input)} /> },
   { name: 'fog', node: <Fog run={run} light={input.light} /> },
   { name: 'mid', node: <Mid run={run} light={input.light} /> },
   { name: 'near', node: <Ground run={run} light={input.light} gaps={place.gaps} /> },
