@@ -99,8 +99,8 @@ export default function FighterSelectTheme() {
   const reduced = useReducedMotion()
 
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, active),
-    [view.sections, professionalSummary.bio, labels, active],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active),
+    [view.sections, professionalSummary.bio, active],
   )
   const staff = useMemo<Staff>(() => ({ name: view.hero.name, roles: PROFESSION_ORDER.map((id) => labels.professions[id]) }), [view.hero.name, labels])
   const { theatreRef, textRef } = useTheatre(scenes, TOUR_MOTION, reduced)

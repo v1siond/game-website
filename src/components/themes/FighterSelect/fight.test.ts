@@ -1,4 +1,4 @@
-import { beatIn, hitsUpTo, lifeOf, runOf, scoreText, type Action } from './fight'
+import { beatIn, hitsUpTo, lifeOf, type Action } from './fight'
 
 // A fight action is a run of beats, each over its share of the action; the scene asks where the action is.
 const COMBO: Action = {
@@ -53,29 +53,5 @@ describe('the life bars', () => {
   it('leaves a bar full in a round with no hits', () => {
     const still: Action = { ms: 1200, beats: [{ hero: 'stance', partner: 'stance' }] }
     expect(lifeOf([still], { action: 0, t: 1, done: true })).toEqual({ hero: 1, rival: 1 })
-  })
-})
-
-describe('one credit of the run', () => {
-  it('numbers the fights in page order, calls the last one final and names the bonus and the ending', () => {
-    const run = runOf(['select', 'fight', 'fight', 'fight', 'bonus', 'fight', 'fight', 'ending'])
-    expect(run.map((stop) => stop.stage)).toEqual(['STAGE 1', 'STAGE 1', 'STAGE 2', 'STAGE 3', 'SCRAP YARD', 'STAGE 4', 'FINAL STAGE', 'ALL CLEAR'])
-  })
-
-  it('keeps a short path in order: the first fight, then the final one', () => {
-    expect(runOf(['select', 'fight', 'fight', 'ending']).map((stop) => stop.stage)).toEqual(['STAGE 1', 'STAGE 1', 'FINAL STAGE', 'ALL CLEAR'])
-  })
-
-  it('carries the score from stage to stage: each starts where the one before ended, and the ending shows the total', () => {
-    const run = runOf(['select', 'fight', 'bonus', 'fight', 'ending'])
-    expect(run[0]).toMatchObject({ before: 0, award: 0 })
-    run.slice(1).forEach((stop, i) => expect(stop.before).toBe(run[i].before + run[i].award))
-    expect(run[2].award).toBeGreaterThan(run[1].award)
-    expect(run[4].award).toBe(0)
-  })
-
-  it('writes the score the way the cabinet shows it, seven digits', () => {
-    expect(scoreText(32400)).toBe('0032400')
-    expect(scoreText(12345.6)).toBe('0012345')
   })
 })

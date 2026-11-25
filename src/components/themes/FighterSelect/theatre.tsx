@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { hop } from '@/lib/motion/arc'
@@ -11,7 +10,7 @@ import { bell, fadeTo, focusOn, frames, fx, lerp, r1, transformTo } from '@/comp
 import { Stage } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { DUSK_ART, H, Mesh, W, ZONE_ART, type Zone } from './backdrop'
-import { beatIn, hitsUpTo, lifeOf, runOf, type Action, type Beat, type RunBeat, type RunStop } from './fight'
+import { beatIn, hitsUpTo, lifeOf, type Action, type Beat, type RunBeat } from './fight'
 import { KiBall, ScrubFighter, scrubWriter, type Rival } from './fighter'
 import { CELL, type FighterPose, type Pt } from './poses'
 import { FS } from './palette'
@@ -37,24 +36,24 @@ import look from './world.module.css'
 
 // One credit of the arcade fighter as the page's scenes, in the cabinet's order (score/C62/fighter-select-concept.md,
 // from research/2026-11-24-deep-sf2/notes.md): two strangers brawl in the street before the title, the select
-// board picks him and gives his reason, he flies to the dojo of his own school, tours the towns whose place
-// tells the rival at a glance, plays the scrap yard, climbs the ladder of the four masters to the leader whose
-// emblem hung on every stage, and his ending answers the reason he gave. One HUD carries the stage, both life
-// bars, the round clock, the orbs and the score through the run (fight.ts runOf, lifeOf). Each scene is one to
+// board picks him, he flies to the dojo of his own school, tours the towns whose place tells the rival at a
+// glance, plays the scrap yard, climbs the ladder of the four masters to the leader whose emblem hung on every
+// stage, and his ending sends him off. One HUD carries both life bars, the round clock and
+// the orbs through the run (fight.ts lifeOf); no caption narrates a place or a count. Each scene is one to
 // three actions played by the shared scene player at their own pace (src/lib/scroll/player.ts): forward on the
 // way down, back on the way up; reduced motion and a settled stage hold the last frame.
 //   Hero, the night street then his rooftop at dusk: brawl (the strangers trade a kick and a punch and the
 //     frame freezes on the hit); pick (the board comes up, the cursor roams and stops on him, his slot
-//     flashes); declare (his card types his reason, the first route lights on the map).
+//     flashes); declare (the small map comes up and the first route lights).
 //   About, stage 1, the dojo: fly (the plane to the dojo); clash (both throw the wave and the two burst to
 //     nothing); throw (he steps through the smoke, grabs the school rival and tosses him across the floor).
 //   Work, stage 2, the harbour town: block (the heavyweight's charge lands on his guard and costs a sliver);
 //     vault (he jumps the next charge); stamp (he turns and kicks the heavyweight's back onto the crates).
 //   Tech Stack, stage 3, the factory: fire (his wave, and the rival walks straight through it); wait (he holds
 //     still, the rival's small steps go back and forth); chain (the rival commits; the jab cancels into the
-//     rising strike and the hit count climbs).
+//     rising strike).
 //   Services, the scrap yard, the car park: kick (the door), smash (the bonnet, the roof, the glass), tally
-//     (the clock stops with time left, WRECKED and the points).
+//     (the clock stops with time left, and WRECKED).
 //   Projects, the neon town: climb (the ladder of shadows, his marker to the first); sweep (under the boxer's
 //     dash punch); dizzy (three heavy hits, the stars, a special and the special knockout's flash).
 //   Ventures, the temple court: rise (past the second and third masters to the top, where the leader turns
@@ -66,7 +65,7 @@ import look from './world.module.css'
 //     (inside the reach, the neck taken); knee (two knees and the last, and the old champion goes down).
 //   Contact, his ending on the rooftop at sunrise: leave (the ceremony set, his rival by the trophy, his own
 //     spot empty, him already walking off and the rival raising a hand); roll (the credits rise); wait (the 2P
-//     side lights, CHALLENGER WANTED, the coin slot and the clock).
+//     side lights, the coin slot and the clock).
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -162,8 +161,6 @@ interface SceneSpec {
   steps?: (m: Moment) => Partial<Steps>
   /** How far the camera pushes in on the pair. */
   zoom?: (m: Moment) => number
-  /** The hit counter shown over the rival. */
-  counter?: boolean
   /** Drawn behind the fighters, and in front of them. */
   props?: () => ReactNode
   front?: () => ReactNode
@@ -239,33 +236,6 @@ const Screen = ({ name, fill }: { name: string; fill: string }) => <rect data-fx
 
 /** A wave's flight over a beat: it leaves the hand at `from`, lands at `to`. */
 const WAVE = { from: 0.3, to: 0.62 } as const
-
-// ---- the hit counter: "3 hits" on a dark plate over the rival ----
-
-function Counter({ label }: { label: string }) {
-  return (
-    <g data-fx="counter" opacity="0">
-      <rect x={-20} y={-62} width={250} height={80} rx={8} fill={FS.night} stroke={FS.gold} strokeWidth={4} />
-      <text data-fx="counter-text" x={105} y={-8} textAnchor="middle" fontSize={50} fontWeight={800} fill={FS.gold} className={look.display}>
-        {`0 ${label}`}
-      </text>
-    </g>
-  )
-}
-
-function counterWriter(stage: HTMLElement, label: string): (hits: number, rivalX: number, clear: number) => void {
-  const group = fx(stage, 'counter')
-  const text = fx(stage, 'counter-text')
-  let shown = -1
-  // `clear` is how far the knockout call is in: the count gives way to it, so the two never sit on each other
-  return (hits, rivalX, clear) => {
-    transformTo(group, `translate(${r1(rivalX + 40)} ${FLOOR - 420})`)
-    fadeTo(group, hits >= 2 ? 1 - clear : 0)
-    if (hits === shown || !text) return
-    shown = hits
-    text.textContent = `${hits} ${label}`
-  }
-}
 
 // ---- the scrap yard's car: whole, then the door off, the bonnet in, the roof flat ----
 
@@ -564,7 +534,6 @@ const tech: SceneSpec = {
   zone: 'factory',
   rival: 'reader',
   gap: GAP.range,
-  counter: true,
   clock: [99, 77],
   actions: [
     { ms: 1700, beats: [{ hero: 'fireball', partner: 'walk' }] },
@@ -872,10 +841,6 @@ export interface TourScene extends TheatreScene {
   id: SceneId
   slot: SectionSlot | null
   script: SceneScript
-  /** The hit counter's word ("hits"). */
-  hits: string
-  /** Its place in the run: the stage the HUD names and the score. */
-  stop: RunStop
 }
 
 /** The fight's own playhead: before its first frame while the intro plays. */
@@ -897,11 +862,9 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
   const rivalShadow = rivalNode?.querySelector('[data-shadow]') ?? null
   const poseHero = scrubWriter(heroNode, profession, posesOf(spec.actions, 'hero'))
   const poseRival = scrubWriter(rivalNode, profession, posesOf(spec.actions, 'partner'))
-  const counter = spec.counter ? counterWriter(stage, scene.hits) : null
   const props = spec.write?.(stage)
   const intro = spec.intro?.kind === 'hop' ? hopWriter(stage, spec.intro.from, spec.intro.to) : spec.intro ? ladderWriter(stage, spec.intro.climb) : null
   const screen = screenWriter(stage, spec.calls ?? [])
-  const last = spec.actions.length - 1
   const rivalSize = spec.rivalSize ?? SIZE
   const narrow = spec.beat === 'fight' ? window.matchMedia(FOLLOW.query) : null
   const facing = spec.rivalAlong ? '' : ` translate(${CELL.width} 0) scale(-1 1)`
@@ -927,13 +890,11 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
     const pan = narrow ? (narrow.matches ? FOLLOW.narrow : FOLLOW.wide) - focus : 0
     transformTo(camera, `translate(${r1(pan)} 0) ${focusOn(focus, FLOOR - 150, spec.zoom?.(m) ?? 1)}`)
     const shown = spec.callAt?.(m) ?? {}
-    counter?.(m.hits, x.rival, shown.ko ?? 0)
     props?.(m, x)
     const life = lifeOf(spec.actions, fight)
     const elapsed = elapsedOf(scene.script, play)
     const won = spec.rival && spec.beat === 'fight' && life.rival <= 0 ? 1 : 0
     screen({
-      points: scene.stop.before + scene.stop.award * shareOf(fight, last),
       seconds: spec.beat === 'bonus' ? CLOCK.from - CLOCK.used * Math.min(1, (fight.action + fight.t) / 2) : spec.clock && lerp(spec.clock[0], spec.clock[1], (fight.action + fight.t) / spec.actions.length),
       life,
       warn: life.hero < WARN.below && Math.floor(elapsed / WARN.everyMs) % 2 === 0 ? 0.85 : 0,
@@ -945,13 +906,12 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
   }
 }
 
-/** The page's scenes in order: the hero, the profession's sections, the contact, each with its place in the run. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, profession: Profession): TourScene[] {
+/** The page's scenes in order: the hero, the profession's sections, the contact. */
+export function scenesOf(slots: readonly SectionSlot[], profession: Profession): TourScene[] {
   const ids: SceneId[] = ['hero', ...slots.map((slot) => slot.id), 'contact']
-  const stops = runOf(ids.map((id) => SCENES[id].beat))
-  return ids.map((id, i) => {
+  return ids.map((id) => {
     const spec = SCENES[id]
-    const base = { id, slot: slots.find((slot) => slot.id === id) ?? null, count: 0, script: scriptOf(spec), hits: labels.hud.hits, stop: stops[i] }
+    const base = { id, slot: slots.find((slot) => slot.id === id) ?? null, count: 0, script: scriptOf(spec) }
     return { ...base, bind: (stage: HTMLElement) => bindScene(stage, spec, base, profession) }
   })
 }
@@ -994,7 +954,6 @@ export function TourStage({ scene, profession, staff, settled = false }: { scene
                   <g data-fx="hero" transform={standAt(HERO_X)}>
                     <ScrubFighter profession={profession} rival={spec.stand} poses={posesOf(spec.actions, 'hero')} />
                   </g>
-                  {spec.counter && <Counter label={scene.hits} />}
                   {spec.front?.()}
                 </g>
               </g>
@@ -1006,7 +965,7 @@ export function TourStage({ scene, profession, staff, settled = false }: { scene
           node: (
             // in a box of its own, so the layer's rule that stretches a stage's svg over it leaves these be
             <div className="absolute inset-0">
-              {fights && <Hud stop={scene.stop} rival={spec.beat === 'bonus' ? 'CAR' : undefined} ladder={spec.masters !== undefined} />}
+              {fights && <Hud rival={spec.beat === 'bonus' ? 'CAR' : undefined} ladder={spec.masters !== undefined} />}
               <Calls calls={spec.calls ?? []} />
               {spec.beat === 'select' && <SelectBoard profession={profession} />}
               {spec.beat === 'ending' && (

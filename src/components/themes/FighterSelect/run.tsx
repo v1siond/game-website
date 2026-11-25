@@ -5,7 +5,6 @@ import type { Profession } from '@/lib/cv/professions'
 import { easeInOut } from '@/lib/scroll/player'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '@/components/themes/shared/stageNodes'
-import { scoreText, type RunStop } from './fight'
 import { MASTERS, ScrubFighter, type Rival } from './fighter'
 import { PlaneShape } from './flight'
 import { FS } from './palette'
@@ -16,16 +15,17 @@ import look from './world.module.css'
 // The screen of the arcade run over every scene (theatre.tsx), the parts that carry the story from section
 // to section:
 // - the select board of the hero: eight portraits, the 1P cursor roaming and stopping on him, his slot
-//   flashing, his profile card typing out his reason and the small map with the first route lit;
+//   flashing and the small map with the first route lit;
 // - the map hop: the world map, the plane flying the dotted route from his home pin to the dojo, then the map
 //   zooming into the pin as the stage opens;
 // - the ladder: the four masters in a column, their faces hidden as shadows of our own, the ones beaten
 //   crossed out as his marker climbs past them, and the last one turning round when the marker reaches him;
-// - the HUD: both life bars, the round clock, the round orbs, the stage, the score carried over and the
-//   masters crossed off, one HUD for the whole run; his bar pulses red when it is nearly gone;
+// - the HUD: both life bars, the round clock, the round orbs and the masters crossed off, one HUD for the
+//   whole run; his bar pulses red when it is nearly gone;
 // - the calls, each on a navy plate so it reads over any stage, in our own words;
 // - his ending's credits rising up the dawn sky with his roles as the staff lines, and the 2P panel that
-//   waits for the visitor, CHALLENGER WANTED, a coin slot and a count clock.
+//   waits for the visitor, a coin slot and a count clock.
+// No caption narrates: no place names, titles or counts, only the fight's own voice (1P, the calls).
 // Everything here is written by the scene's writer from its playhead, so it plays back on the way up.
 
 /** The screen overlay's own units: the map's 400 by 160 with room above and below. */
@@ -80,8 +80,6 @@ const useFilterId = (): string => `fs-shadow-${useId().replace(/:/g, '')}`
 
 // ---- the select board ----
 
-/** His reason for entering, in our own words, the way the profile card under a portrait gives one. */
-const REASON = 'FIGHTS TO FIND THE NEXT CHALLENGE'
 // The roster's eight slots, four by two: the cast as shadows and him in the slot the cursor stops on.
 const ROSTER: readonly (Rival | null)[] = ['strangerA', 'school', 'heavy', 'reader', 'strangerB', null, 'acrobat', 'boxer']
 const HIS_SLOT = ROSTER.indexOf(null)
@@ -89,8 +87,8 @@ const SLOT = { x: 18, y: 44, w: 50, h: 56, gap: 4 }
 const slotAt = (i: number): Pin => [SLOT.x + (i % 4) * (SLOT.w + SLOT.gap), SLOT.y + Math.floor(i / 4) * (SLOT.h + SLOT.gap)]
 // The slots the cursor roams before it stops on him.
 const ROAM = [0, 1, 2, 6, HIS_SLOT] as const
-const CARD = { x: 238, y: 44, w: 146 }
-const MINI = { x: 238, y: 122, w: 146, h: 58 }
+// The small map, beside the roster and centred on its height.
+const MINI = { x: 238, y: 73, w: 146, h: 58 }
 
 export function SelectBoard({ profession }: { profession: Profession }) {
   const shadow = useFilterId()
@@ -111,9 +109,6 @@ export function SelectBoard({ profession }: { profession: Profession }) {
       </defs>
       <g data-fx="board" opacity="0">
         <rect x={8} y={14} width={384} height={178} rx={4} fill={FS.selectDeep} opacity={0.82} stroke={FS.p1Light} strokeWidth={1.5} />
-        <text x={200} y={34} textAnchor="middle" fontSize={15} fill={FS.gold} stroke={FS.ink} strokeWidth={1} paintOrder="stroke" className={look.face}>
-          THE ENTRANTS
-        </text>
         {ROSTER.map((rival, i) => {
           const [x, y] = slotAt(i)
           return (
@@ -131,17 +126,6 @@ export function SelectBoard({ profession }: { profession: Profession }) {
             1P
           </text>
         </g>
-        <g data-fx="board-card" opacity="0">
-          <rect x={CARD.x} y={CARD.y} width={CARD.w} height={68} fill={FS.night} stroke={FS.gold} strokeWidth={1.5} />
-          <text x={CARD.x + 8} y={CARD.y + 16} fontSize={9} fill={FS.p1Light} className={look.display}>
-            1P PROFILE
-          </text>
-          <text x={CARD.x + 8} y={CARD.y + 30} fontSize={8} fill={FS.chrome} className={look.display}>
-            A WANDERER WHO
-          </text>
-          <text data-fx="board-reason" x={CARD.x + 8} y={CARD.y + 44} fontSize={8.6} fill={FS.flash} className={look.display} />
-          <text data-fx="board-reason-2" x={CARD.x + 8} y={CARD.y + 57} fontSize={8.6} fill={FS.flash} className={look.display} />
-        </g>
         <g data-fx="board-map" opacity="0">
           <rect x={MINI.x} y={MINI.y} width={MINI.w} height={MINI.h} fill={FS.select} stroke={FS.flash} strokeWidth={1.2} />
           <svg x={MINI.x} y={MINI.y} width={MINI.w} height={MINI.h} viewBox={`0 ${MAP_TOP} ${SCREEN.w} 160`} preserveAspectRatio="xMidYMid slice">
@@ -152,45 +136,26 @@ export function SelectBoard({ profession }: { profession: Profession }) {
             <circle cx={hx} cy={hy} r={8} fill={FS.p1} stroke={FS.ink} strokeWidth={2} />
             <circle cx={dx} cy={dy} r={9} fill={FS.gold} stroke={FS.ink} strokeWidth={2} />
           </svg>
-          <text x={MINI.x + 4} y={MINI.y + MINI.h + 10} fontSize={7.5} fill={FS.gold} className={look.display}>
-            NEXT: THE DOJO
-          </text>
         </g>
       </g>
     </svg>
   )
 }
 
-// The reason splits over the card's two lines at its last space before this many letters.
-const LINE_LETTERS = 18
-
 /** The board at its pick (0 to 1: in, the cursor roaming to him, the flash) and its declaration (0 to 1: the
- *  card typing his reason, the route lighting up). */
+ *  small map coming up and the route lighting). */
 export function boardWriter(stage: HTMLElement): (pick: number, declare: number) => void {
   const board = fx(stage, 'board')
   const cursor = fx(stage, 'board-cursor')
   const flash = fx(stage, 'board-flash')
-  const card = fx(stage, 'board-card')
-  const lines = [fx(stage, 'board-reason'), fx(stage, 'board-reason-2')]
   const map = fx(stage, 'board-map')
   const route = fx(stage, 'board-route')
-  const split = REASON.lastIndexOf(' ', LINE_LETTERS)
-  const halves = [REASON.slice(0, split), REASON.slice(split + 1)]
-  let typed = -1
   return (pick, declare) => {
     fadeTo(board, ramp(pick, 0, 0.2))
     const roam = ramp(pick, 0.2, 0.8) * (ROAM.length - 1)
     const [x, y] = slotAt(ROAM[Math.min(ROAM.length - 1, Math.round(roam))])
     transformTo(cursor, `translate(${x} ${y})`)
     fadeTo(flash, 0.9 * bell(pick, 0.8, 1))
-    fadeTo(card, ramp(declare, 0, 0.15))
-    const letters = Math.round(ramp(declare, 0.1, 0.7) * REASON.length)
-    if (letters !== typed) {
-      typed = letters
-      const first = Math.min(letters, halves[0].length)
-      if (lines[0]) lines[0].textContent = halves[0].slice(0, first)
-      if (lines[1]) lines[1].textContent = halves[1].slice(0, Math.max(0, letters - halves[0].length - 1))
-    }
     fadeTo(map, ramp(declare, 0.35, 0.5))
     route?.setAttribute('stroke-dashoffset', (1 - ramp(declare, 0.45, 1)).toFixed(3))
   }
@@ -259,9 +224,6 @@ export function Ladder({ profession, climb }: { profession: Profession; climb: C
       <defs>
         <ShadowFilter id={shadow} />
       </defs>
-      <text x={200} y={22} textAnchor="middle" fontSize={15} fill={FS.gold} className={look.face}>
-        THE FOUR MASTERS
-      </text>
       {MASTERS.map((rival, i) => (
         <g key={rival} transform={`translate(${ROW.x} ${rowY(i)})`}>
           <rect width={ROW.w} height={ROW.h} fill={FS.panel} stroke={i === climb.to ? FS.gold : FS.chrome} strokeWidth={2} />
@@ -273,9 +235,6 @@ export function Ladder({ profession, climb }: { profession: Profession; climb: C
               <Portrait x={4} y={1} w={36} h={38} profession={profession} rival={rival} />
             </g>
           )}
-          <text x={50} y={26} fontSize={15} fill={FS.flash} className={look.display}>
-            {i === LAST ? '? ? ?' : `MASTER ${i + 1}`}
-          </text>
           <path
             data-fx={`ladder-x-${i}`}
             opacity={i < climb.from ? 1 : 0}
@@ -321,12 +280,17 @@ const BAR = { w: 236, h: 18, y: 26 }
 const P1_X = 12
 const P2_X = 600 - 12 - BAR.w
 
-/** The HUD over a fight: both life bars, the round clock between them, two round orbs each, the stage and
- *  the score under them and, on the ladder, the four masters crossed off. The scrap yard's clock is its own. */
-export function Hud({ stop, rival = 'RIVAL', ladder = false }: { stop: RunStop; rival?: string; ladder?: boolean }) {
+// The masters' plate under the clock on the ladder: four boxes centred on the HUD, a plate round them.
+const PIP = { size: 24, step: 30, y: 84 }
+const PIPS_X = 300 - (PIP.step * (MASTERS.length - 1) + PIP.size) / 2
+const PLATE = { x: PIPS_X - 15, w: PIP.step * (MASTERS.length - 1) + PIP.size + 30, y: 74, h: 44 }
+
+/** The HUD over a fight: both life bars, the round clock between them, two round orbs each and, on the
+ *  ladder, the four masters crossed off under the clock. The scrap yard's clock is its own. */
+export function Hud({ rival = 'RIVAL', ladder = false }: { rival?: string; ladder?: boolean }) {
   return (
     <svg
-      viewBox="0 0 600 122"
+      viewBox={`0 0 600 ${ladder ? PLATE.y + PLATE.h + 4 : PLATE.y}`}
       className="absolute left-1/2 top-[64px] w-[min(94vw,580px)] -translate-x-1/2 lg:left-auto lg:right-[3vw] lg:translate-x-0"
       aria-hidden="true"
       focusable="false"
@@ -349,20 +313,17 @@ export function Hud({ stop, rival = 'RIVAL', ladder = false }: { stop: RunStop; 
       <text data-fx="hud-clock" x={300} y={45} textAnchor="middle" fontSize={34} fill={FS.gold} className={look.face}>
         99
       </text>
-      <rect x={2} y={74} width={596} height={44} rx={6} fill={FS.night} stroke={FS.gold} strokeWidth={3} />
-      <text x={20} y={105} fontSize={26} fill={FS.gold} className={look.display}>
-        {stop.stage}
-      </text>
-      {ladder &&
-        MASTERS.map((rival, i) => (
-          <g key={rival} transform={`translate(${250 + i * 30} 84)`}>
-            <rect width={24} height={24} fill={FS.panel} stroke={FS.chrome} strokeWidth={2} />
-            <path data-fx={`pip-${i}`} opacity="0" d="M4 4 L20 20 M20 4 L4 20" stroke={FS.p2} strokeWidth={4} strokeLinecap="round" />
-          </g>
-        ))}
-      <text data-fx="hud-score" x={580} y={105} textAnchor="end" fontSize={26} fill={FS.flash} className={look.display}>
-        {scoreText(stop.before)}
-      </text>
+      {ladder && (
+        <>
+          <rect x={PLATE.x} y={PLATE.y} width={PLATE.w} height={PLATE.h} rx={6} fill={FS.night} stroke={FS.gold} strokeWidth={3} />
+          {MASTERS.map((master, i) => (
+            <g key={master} transform={`translate(${PIPS_X + i * PIP.step} ${PIP.y})`}>
+              <rect width={PIP.size} height={PIP.size} fill={FS.panel} stroke={FS.chrome} strokeWidth={2} />
+              <path data-fx={`pip-${i}`} opacity="0" d="M4 4 L20 20 M20 4 L4 20" stroke={FS.p2} strokeWidth={4} strokeLinecap="round" />
+            </g>
+          ))}
+        </>
+      )}
     </svg>
   )
 }
@@ -459,22 +420,19 @@ export function Credits({ staff }: { staff: Staff }) {
   )
 }
 
-/** The 2P side lit for the visitor: CHALLENGER WANTED, a coin slot and the count clock. */
+/** The 2P side lit for the visitor: a coin slot and the count clock. */
 export function OpenSlot() {
   return (
-    <svg viewBox="0 0 300 150" className="absolute bottom-[8%] left-1/2 w-[min(80vw,340px)] -translate-x-1/2 lg:left-auto lg:right-[4vw] lg:translate-x-0" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 300 114" className="absolute bottom-[8%] left-1/2 w-[min(80vw,340px)] -translate-x-1/2 lg:left-auto lg:right-[4vw] lg:translate-x-0" aria-hidden="true" focusable="false">
       <g data-fx="slot" opacity="0">
-        <rect x={4} y={4} width={292} height={142} rx={8} fill={FS.navy} stroke={FS.p2} strokeWidth={5} />
+        <rect x={4} y={4} width={292} height={106} rx={8} fill={FS.navy} stroke={FS.p2} strokeWidth={5} />
         <text x={150} y={40} textAnchor="middle" fontSize={18} fill={FS.p2} className={look.display}>
           2P
         </text>
-        <text x={150} y={70} textAnchor="middle" fontSize={24} textLength={256} lengthAdjust="spacingAndGlyphs" fill={FS.gold} stroke={FS.ink} strokeWidth={3} paintOrder="stroke" className={look.face}>
-          CHALLENGER WANTED
-        </text>
-        <rect x={60} y={88} width={44} height={46} rx={4} fill={FS.panel} stroke={FS.chrome} strokeWidth={3} />
-        <rect x={78} y={96} width={8} height={30} rx={2} fill={FS.ink} stroke={FS.gold} strokeWidth={2} />
-        <rect x={180} y={86} width={60} height={50} rx={4} fill={FS.night} stroke={FS.gold} strokeWidth={3} />
-        <text data-fx="slot-clock" x={210} y={124} textAnchor="middle" fontSize={36} fill={FS.gold} className={look.face}>
+        <rect x={60} y={52} width={44} height={46} rx={4} fill={FS.panel} stroke={FS.chrome} strokeWidth={3} />
+        <rect x={78} y={60} width={8} height={30} rx={2} fill={FS.ink} stroke={FS.gold} strokeWidth={2} />
+        <rect x={180} y={50} width={60} height={50} rx={4} fill={FS.night} stroke={FS.gold} strokeWidth={3} />
+        <text data-fx="slot-clock" x={210} y={88} textAnchor="middle" fontSize={36} fill={FS.gold} className={look.face}>
           9
         </text>
       </g>
@@ -484,7 +442,6 @@ export function OpenSlot() {
 
 /** What the screen shows at a moment of a scene. */
 export interface ScreenFrame {
-  points: number
   /** The round clock, or the scrap yard's; none hides nothing, it holds. */
   seconds?: number
   /** Both life bars, 0 to 1. */
@@ -505,7 +462,6 @@ export interface ScreenFrame {
 /** The writer of the HUD, the calls, the credits and the 2P slot: each call's share shown (0 to 1) slams in
  *  from a little larger; the credits rise into place. */
 export function screenWriter(stage: HTMLElement, calls: readonly CallId[]) {
-  const score = fx(stage, 'hud-score')
   const clock = fx(stage, 'hud-clock')
   const bars = [fx(stage, 'life-0'), fx(stage, 'life-1')]
   const warnBar = fx(stage, 'life-warn')
@@ -515,14 +471,13 @@ export function screenWriter(stage: HTMLElement, calls: readonly CallId[]) {
   const slot = fx(stage, 'slot')
   const slotClock = fx(stage, 'slot-clock')
   const nodes = new Map(calls.map((id) => [id, fx(stage, `call-${id}`)]))
-  const shown = { score: '', clock: '', slot: '' }
+  const shown = { clock: '', slot: '' }
   const text = (node: Element | null, key: keyof typeof shown, value: string) => {
     if (!node || shown[key] === value) return
     shown[key] = value
     node.textContent = value
   }
   return (frame: ScreenFrame) => {
-    text(score, 'score', scoreText(frame.points))
     if (frame.seconds !== undefined) text(clock, 'clock', String(Math.max(0, Math.ceil(frame.seconds))).padStart(2, '0'))
     const life = frame.life ?? { hero: 1, rival: 1 }
     bars[0]?.setAttribute('width', r1(BAR.w * life.hero).toString())
