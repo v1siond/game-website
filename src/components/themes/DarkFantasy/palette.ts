@@ -1,8 +1,9 @@
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { paletteVars } from '../shared/paletteVars'
 
 // Dark Fantasy's palette, every colour of the world once: the void of the caverns, the ethereal soul light,
 // the spirit gold and brass of the old kingdom, forest, stone and bone, the bug's shell and its infection,
-// the knight's cloak, blade and beard, and the fire and pool sparks of a battle. The SVG art and inline styles
+// his face, cloak and blade, each area's own light, and the fire and pool sparks of a battle. The SVG art and inline styles
 // read DARK_FANTASY; DARK_FANTASY_VARS puts the same values on the world's root as --df-* variables, which
 // the Tailwind arbitrary values (ring-[color:var(--df-spirit-gold)]) read, so no colour is written twice.
 
@@ -60,13 +61,31 @@ export const DARK_FANTASY = {
   infectedDark: '#cc4420',
   infectedGlow: '#ff8833',
 
-  // The knight: mask shade, cloak, blade and beard
-  maskShade: '#e8e8e8',
+  // Him: his own face (heroIdentity), his cloak and his blade
+  skin: HERO_IDENTITY.skin,
+  skinShade: HERO_IDENTITY.skinShade,
+  hair: HERO_IDENTITY.hair,
+  beard: HERO_IDENTITY.beard,
+  eyes: HERO_IDENTITY.eyes,
   cloak: '#3d4a5c',
   cloakDark: '#2a3545',
   blade: '#c8c8c8',
-  beard: '#4a3c2e',
-  beardDark: '#3a2c1e',
+
+  // The areas' own lights and what lives in them: the acid of the overgrowth, the spores of the wastes, the
+  // rain of the city, the lanterns of the deep, the duelist's moss green, the blade fighters' ochre, the mage's
+  // robe, the sleepers' dream and the champion's torn cloak
+  acid: '#9be04a',
+  spore: '#d8b060',
+  rain: '#8fb4ff',
+  lantern: '#ffcf7a',
+  moss: '#6f8f62',
+  mossDark: '#3f5a38',
+  ochre: '#a8823c',
+  ochreDark: '#5e4620',
+  robe: '#2b3a6a',
+  robeDark: '#18224a',
+  dream: '#e6dcff',
+  torn: '#3a2e2a',
 
   // Battle: dust, fire, blood and the pool sparks
   dustLight: '#bbbbbb',

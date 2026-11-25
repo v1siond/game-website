@@ -81,13 +81,3 @@
 .stage {
   background: var(--df-void);
 }
-
-/* Under 1024 px the screen shows only the middle of the arena, so the knight and what he meets (the troupe,
-   drawn between x 1000 and 1800) shrink to two thirds about its middle and move to the arena's centre, the
-   part a narrow screen shows. */
-@media (max-width: 1023.98px) {
-  .troupe {
-    transform: translateX(-390px) scale(0.66);
-    transform-origin: 1350px 1000px;
-  }
-}

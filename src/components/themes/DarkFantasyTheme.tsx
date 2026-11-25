@@ -19,6 +19,7 @@ import type { CVData, Job, Service } from '@/lib/cv/content'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import type { SectionFrames } from '@/components/cv/SectionPlanView'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
@@ -26,7 +27,7 @@ import { Theatre } from '@/components/themes/shared/theatre/Stage'
 import { useTheatre } from '@/components/themes/shared/theatre/useTheatre'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { SpiritWisp } from './DarkFantasy/relics'
-import { DarkStage, HALL_MOTION, scenesOf, type DarkScene } from './DarkFantasy/scenes'
+import { AREA_MOTION, DarkStage, scenesOf, type DarkScene } from './DarkFantasy/scenes'
 import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
@@ -994,17 +995,20 @@ const CARDS: SectionFrames = {
 
 // The column a frame reads in: beside the scene from lg, the wanderer and what he meets on its right; below lg the
 // whole width, the scene showing in the screens of picture alone above and below it.
+// Below lg the cards take the whole width and the scene is cut round its action.
+const NARROW_QUERY = '(max-width: 1023.98px)'
+
 const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(42rem,46vw)]'
 const SIDE = 'px-4 md:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
 
 /** One section: a screen of its scene alone, then its frame over the held scene, then the scene again
  *  before it sinks. Under reduced motion its own scene sits still behind the first screen. */
-function SceneSection({ scene, profession, still }: { scene: DarkScene & { slot: SectionSlot }; profession: Profession; still: boolean }) {
+function SceneSection({ scene, narrow, still }: { scene: DarkScene & { slot: SectionSlot }; narrow: boolean; still: boolean }) {
   const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as ComponentType<{ slot: SectionSlot }>
   return (
     <div data-scene={scene.id} className={`relative z-20 pb-[70svh] ${SIDE}`}>
-      {still && <DarkStage scene={scene} profession={profession} settled />}
+      {still && <DarkStage scene={scene} narrow={narrow} settled />}
       <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
       <div className={COLUMN}>
         <VoidFrame title={sections[scene.slot.titleKey]}>
@@ -1015,13 +1019,13 @@ function SceneSection({ scene, profession, still }: { scene: DarkScene & { slot:
   )
 }
 
-// Dark Fantasy: his CV as a masked wanderer's descent through the caverns of a fallen bug kingdom, drawn
-// from the hand drawn adventure it evokes. The hero shows the arena and the profession's boss stage; then
-// every section is a full screen scene that rises from the dark, holds while its frame scrolls over it and
-// sinks as the next rises (the shared theatre on the scroll stage engine), each playing a few of the game's
-// moves (scenes.tsx); below lg the scene's own screen is 130svh, so its floor plays clear of the cards. At
-// the contact he rests at the bench. Under reduced motion every section carries its own scene, still, at
-// its end frame.
+// Dark Fantasy: his CV as his own descent through a fallen kingdom, drawn from the hand drawn adventure it
+// evokes and told in its order (DarkFantasy/scenes.tsx): the hero is the town above and its well; then every
+// section is the next area down, a full screen scene that rises from the dark, holds while its frame scrolls
+// over it and sinks as the next rises (the shared theatre on the scroll stage engine), its threat and his
+// answer in one to three actions; below lg the scene's own screen is 130svh and its picture is cut round
+// where it plays. At the contact the sealed door breaks open on the light. Under reduced motion every section
+// carries its own scene, still, at its end frame.
 export default function DarkFantasyTheme() {
   const view = useWorldView()
   const labels = useLabels()
@@ -1035,13 +1039,15 @@ export default function DarkFantasyTheme() {
   const [mounted, setMounted] = useState(false)
   // The cursor trail and the parallax follow the pointer, motion a reduced motion visitor asked not to get.
   const reduced = useReducedMotion()
+  // Below lg each scene is cut round where it plays (DarkFantasy/areas Framing).
+  const narrow = useMediaQuery(NARROW_QUERY)
   const pointerMotion = mounted && !reduced
 
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights),
     [view.sections, professionalSummary.bio, labels, highlights],
   )
-  const { theatreRef, textRef } = useTheatre(scenes, HALL_MOTION, reduced)
+  const { theatreRef, textRef } = useTheatre(scenes, AREA_MOTION, reduced)
   const gates = scenes.filter((scene): scene is DarkScene & { slot: SectionSlot } => scene.slot !== null)
   const contact = scenes[scenes.length - 1]
 
@@ -1059,7 +1065,7 @@ export default function DarkFantasyTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef}>
           {scenes.map((scene) => (
-            <DarkStage key={scene.id} scene={scene} profession={active} />
+            <DarkStage key={scene.id} scene={scene} narrow={narrow} />
           ))}
         </Theatre>
       )}
@@ -1076,7 +1082,7 @@ export default function DarkFantasyTheme() {
         className="fixed inset-0 pointer-events-none z-[8]"
         style={{
           background: `
-            radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 30%, rgba(15,10,26,0.4) 60%, rgba(15,10,26,0.8) 100%),
+            radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 40%, rgba(15,10,26,0.25) 70%, rgba(15,10,26,0.55) 100%),
             linear-gradient(180deg, transparent 60%, ${DARK_FANTASY.void}90 100%)
           `,
         }}
@@ -1127,11 +1133,11 @@ export default function DarkFantasyTheme() {
       {/* Hero Section - below fixed nav, the recruiter first screen */}
       {/* one step over the next section below lg, so the plate hanging into its top padding takes the clicks */}
       <header data-worlds-hero="" className="relative z-20 max-lg:z-[21] pt-20 md:pt-24 pb-6 px-4 md:px-6">
-        {reduced && <DarkStage scene={scenes[0]} profession={active} settled />}
+        {reduced && <DarkStage scene={scenes[0]} narrow={narrow} settled />}
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="max-w-4xl mx-auto text-center">
-              {/* The lines sit on a void plate, its edge feathered into the hall, so the lamps lit behind them never
+              {/* The lines sit on a void plate, its edge feathered into the scene, so the light behind them never
                   take the words under AAA. */}
               <div className="mx-auto w-fit max-w-full rounded-lg bg-[color-mix(in_srgb,var(--df-void)_90%,transparent)] px-4 py-3 shadow-[0_0_48px_24px_color-mix(in_srgb,var(--df-void)_90%,transparent)] md:px-8">
                 <h1 className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3 text-[color:var(--df-bone)] [text-shadow:0_0_20px_color-mix(in_srgb,var(--df-ethereal)_19%,transparent)]">
@@ -1165,13 +1171,13 @@ export default function DarkFantasyTheme() {
 
         <ProfessionRegion>
           {gates.map((scene) => (
-            <SceneSection key={scene.id} scene={scene} profession={active} still={reduced} />
+            <SceneSection key={scene.id} scene={scene} narrow={narrow} still={reduced} />
           ))}
         </ProfessionRegion>
 
-        {/* Contact: the wanderer rests at the bench on the scene behind it */}
+        {/* Contact: the sealed door breaks open on the light in the scene behind it */}
         <div data-scene="contact" className={`relative z-20 pt-[60svh] pb-[40svh] ${SIDE}`}>
-          {reduced && <DarkStage scene={contact} profession={active} settled />}
+          {reduced && <DarkStage scene={contact} narrow={narrow} settled />}
           <section className="df-panel relative mx-auto max-w-2xl bg-[color:var(--df-panel)] px-6 py-10" aria-label={sections.contact}>
             <RecruiterHero
               render={({ line, actions }) => (
