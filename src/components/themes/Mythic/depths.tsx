@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { cssVars } from '@/lib/cssVars'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
@@ -11,7 +12,8 @@ import u from './underworld.module.css'
 // player (scenes.tsx writes --era-t on its data-era layer): the snow falling on the wood, the leaves along the
 // road, the mist over the lake, the light breathing in the ring, the smoke rolling off the mountain, the fog on
 // the dead sea, the drift along the shore and the wind at the peak, back on the way up and again every pass.
-// Each place drifts against the pointer (--mx, --my).
+// Each place drifts against the pointer (--mx, --my), written on the painting's own box (the theme's pointer ref),
+// so a pointer move restyles the painting alone.
 
 const INK = MYTH.inkLine
 
@@ -184,7 +186,7 @@ function PeakArt() {
   )
 }
 
-export function Depths() {
+export function Depths({ pointerRef }: { pointerRef: Ref<HTMLDivElement> }) {
   const places = [
     ['wood', u.zoneWood, <WoodArt key="wood" />],
     ['road', u.zoneRoad, <RoadArt key="road" />],
@@ -196,7 +198,7 @@ export function Depths() {
     ['peak', u.zonePeak, <PeakArt key="peak" />],
   ] as const
   return (
-    <div className={u.depths} aria-hidden="true">
+    <div ref={pointerRef} className={u.depths} aria-hidden="true">
       {places.map(([zone, look, art]) => (
         <div key={zone} className={`${u.zone} ${look}`} data-era={zone}>
           {art}

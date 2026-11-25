@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { Cinzel } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -55,9 +55,11 @@ export default function MythicTheme() {
   const labels = useLabels()
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
+  // the pointer drifts the painting only (Depths), so its writes restyle that box and not the page
   const pointerRef = usePointerVars(!reduced)
+  const rootRef = useRef<HTMLDivElement>(null)
   const { zones, stage } = useZoneStore<Zone>('wood', reduced)
-  useZoneAttribute(zones, pointerRef)
+  useZoneAttribute(zones, rootRef)
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
     [view.sections, professionalSummary.bio, labels, highlights, active],
@@ -72,9 +74,9 @@ export default function MythicTheme() {
   )
 
   return (
-    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip [--theatre-ground:transparent] ${u.root} ${mythDisplay.variable}`}>
+    <div ref={rootRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip [--theatre-ground:transparent] ${u.root} ${mythDisplay.variable}`}>
       <SkipLink />
-      <Depths />
+      <Depths pointerRef={pointerRef} />
       {!reduced && (
         <Theatre theatreRef={theatreRef}>
           {scenes.map((scene) => (
