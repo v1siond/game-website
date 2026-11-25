@@ -1,6 +1,6 @@
 import type { Profession } from '@/lib/cv/professions'
 
-// His fighter's frames as joint tables (the arcade karate hero parody: white gi, red headband, bare feet).
+// His fighter's frames as joint tables (our own arcade karate fighter: white gi, deep teal headband, bare feet).
 // Every frame is a skeleton in one 160 x 170 cell facing right; a planted foot has its ankle at y 160 and
 // its toe at y 163, over the shadow at CELL.ground (166). The renderer in fighter.tsx dresses the same
 // skeleton in each profession's costume, so a move is drawn once.
@@ -31,7 +31,6 @@ export type Fx =
   | { kind: 'spark'; at: Pt; r: number }
   | { kind: 'spin'; phase: number }
   | { kind: 'kit'; swing: number }
-  | { kind: 'parry'; at: Pt }
   | { kind: 'guard'; at: Pt }
   | { kind: 'stars'; at: Pt; phase: number }
 
@@ -53,8 +52,8 @@ export interface Frame {
 }
 
 export const FIGHTER_POSES = [
-  'stance', 'walk', 'walkBack', 'fireball', 'uppercut', 'spinKick', 'win', 'punch', 'hurt', 'parry', 'down', 'act',
-  'guard', 'strong', 'roundhouse', 'throw', 'knee', 'jump', 'juggle', 'dizzy', 'splat',
+  'stance', 'walk', 'walkBack', 'fireball', 'uppercut', 'spinKick', 'win', 'punch', 'hurt', 'down', 'act',
+  'guard', 'strong', 'roundhouse', 'throw', 'knee', 'jump', 'juggle', 'dizzy', 'bow', 'crouch', 'sweep', 'climb',
 ] as const
 
 export type FighterPose = (typeof FIGHTER_POSES)[number]
@@ -461,22 +460,6 @@ const HURT_FRAMES: Frame[] = [
   { ...shift(STANCE, -2, 1), wind: 0 },
 ]
 
-// The parry: he steps into the attack with the lead palm open and turns it
-// aside, the body lit in a blue flash for the frames of the parry.
-const PARRY_PUSH: Frame = {
-  head: [72, 48],
-  neck: [68, 58],
-  hip: [62, 103],
-  back: { s: [61, 65], e: [68, 82], h: [80, 72], hand: 'fist' },
-  front: { s: [74, 64], e: [90, 69], h: [104, 58], hand: 'palm' },
-  backLeg: { k: [46, 132], a: [34, 160], toe: [43, 163] },
-  frontLeg: { k: [86, 130], a: [96, 160], toe: [106, 163] },
-  wind: 1,
-  fx: [{ kind: 'parry', at: [108, 57] }],
-}
-
-const PARRY_FRAMES: Frame[] = [{ ...shift(STANCE, 2, 0), wind: 0 }, PARRY_PUSH, { ...PARRY_PUSH, wind: 2 }, { ...shift(STANCE, 1, 1), wind: 3 }]
-
 // The knockdown: thrown back off his feet, falling on his back, then flat on the floor, face up, the
 // last frame held as he lies there.
 const FLOORED: Frame = {
@@ -684,47 +667,92 @@ const DIZZY_FRAMES: Frame[] = [0, 1, 2, 3].map((phase) => ({
   fx: [{ kind: 'stars', at: [60, 26], phase }],
 }))
 
-// The wall splat: thrown back flat against the edge of the arena behind him, arms spread, then sliding
-// down it to sit slumped at its foot.
-const SPLAT: Frame = {
-  head: [30, 44],
-  tilt: -10,
-  neck: [32, 55],
-  hip: [32, 102],
-  back: { s: [28, 62], e: [14, 52], h: [8, 38], hand: 'palm' },
-  front: { s: [38, 62], e: [48, 48], h: [46, 32], hand: 'palm' },
-  backLeg: { k: [30, 132], a: [26, 160], toe: [35, 163] },
-  frontLeg: { k: [40, 132], a: [44, 160], toe: [53, 163] },
+// The bow at the end of the run: feet together, the hands at his sides, bending from the hips and back up
+// a little at the bottom of it.
+const UPRIGHT: Frame = {
+  head: [62, 44],
+  neck: [61, 56],
+  hip: [58, 102],
+  back: { s: [55, 64], e: [53, 84], h: [55, 102], hand: 'fist' },
+  front: { s: [67, 63], e: [68, 84], h: [68, 102], hand: 'fist' },
+  backLeg: { k: [54, 132], a: [52, 160], toe: [61, 163] },
+  frontLeg: { k: [64, 132], a: [64, 160], toe: [73, 163] },
   wind: 0,
-  stream: true,
 }
 
-const SPLAT_FRAMES: Frame[] = [
-  { ...SPLAT, fx: [{ kind: 'spark', at: [22, 70], r: 14 }] },
-  { ...SPLAT, wind: 1, fx: [{ kind: 'spark', at: [22, 70], r: 10 }] },
-  {
-    ...SPLAT,
-    head: [32, 72],
-    neck: [33, 83],
-    hip: [34, 128],
-    back: { s: [29, 90], e: [16, 98], h: [12, 112], hand: 'palm' },
-    front: { s: [39, 90], e: [48, 102], h: [52, 116], hand: 'palm' },
-    backLeg: { k: [52, 140], a: [40, 160], toe: [49, 163] },
-    frontLeg: { k: [58, 138], a: [56, 160], toe: [65, 163] },
-    wind: 2,
-  },
-  {
-    ...SPLAT,
-    head: [34, 100],
-    tilt: 16,
-    neck: [34, 110],
-    hip: [36, 150],
-    back: { s: [30, 118], e: [22, 134], h: [20, 150], hand: 'palm' },
-    front: { s: [40, 118], e: [50, 134], h: [56, 148], hand: 'palm' },
-    backLeg: { k: [60, 140], a: [76, 158], toe: [84, 160] },
-    frontLeg: { k: [64, 136], a: [82, 156], toe: [90, 158] },
-    wind: 3,
-  },
+/** Him bent forward from the hips by `lean` (0 upright to 1 the deep bow). */
+function bowed(lean: number, wind: number): Frame {
+  const dx = 22 * lean
+  const dy = 16 * lean
+  return {
+    ...UPRIGHT,
+    head: at(UPRIGHT.head, dx, dy),
+    tilt: 40 * lean,
+    neck: at(UPRIGHT.neck, dx * 0.8, dy * 0.8),
+    back: { ...shiftArm(UPRIGHT.back, dx * 0.6, dy * 0.6), h: at(UPRIGHT.back.h, dx * 0.4, dy * 0.2) },
+    front: { ...shiftArm(UPRIGHT.front, dx * 0.6, dy * 0.6), h: at(UPRIGHT.front.h, dx * 0.4, dy * 0.2) },
+    wind,
+  }
+}
+
+const BOW_FRAMES: Frame[] = [bowed(0, 0), bowed(0.5, 1), bowed(1, 2), bowed(0.85, 3)]
+
+// The duck: dropped low on bent knees under a high blow, the guard kept up by the face, bobbing a little.
+const CROUCH: Frame = {
+  head: [70, 84],
+  tilt: 6,
+  neck: [66, 94],
+  hip: [54, 130],
+  back: { s: [58, 100], e: [70, 112], h: [80, 92], hand: 'fist' },
+  front: { s: [70, 99], e: [86, 106], h: [90, 88], hand: 'fist' },
+  backLeg: { k: [36, 142], a: [30, 160], toe: [39, 163] },
+  frontLeg: { k: [84, 136], a: [86, 160], toe: [96, 163] },
+  wind: 0,
+}
+
+const CROUCH_FRAMES: Frame[] = [0, 1, 2, 1].map((d, wind) => ({ ...shift(CROUCH, 0, d), wind }))
+
+// The sweep: down into the crouch, a hand to the floor, the lead leg swung out low along the floor into
+// the shins, then back up into the crouch.
+const SWEEP_OUT: Frame = {
+  head: [44, 100],
+  tilt: -18,
+  neck: [48, 110],
+  hip: [60, 134],
+  back: { s: [44, 116], e: [34, 136], h: [30, 158], hand: 'palm' },
+  front: { s: [54, 114], e: [64, 124], h: [70, 112], hand: 'fist' },
+  backLeg: { k: [40, 146], a: [46, 160], toe: [55, 163] },
+  frontLeg: { k: [96, 152], a: [128, 160], toe: [138, 156] },
+  wind: 2,
+  stream: true,
+  fx: [{ kind: 'spark', at: [138, 154], r: 10 }],
+}
+
+const SWEEP_FRAMES: Frame[] = [
+  { ...CROUCH, wind: 0 },
+  { ...SWEEP_OUT, frontLeg: { k: [84, 150], a: [108, 162], toe: [116, 158] }, wind: 1, fx: [] },
+  SWEEP_OUT,
+  { ...shift(CROUCH, 0, 2), wind: 3 },
+]
+
+// The climb: hanging on the cage's mesh above the floor, hand over hand, one knee drawn up.
+const CLIMB: Frame = {
+  head: [66, 40],
+  tilt: -6,
+  neck: [63, 51],
+  hip: [60, 96],
+  back: { s: [56, 58], e: [56, 32], h: [62, 10], hand: 'fist' },
+  front: { s: [68, 57], e: [76, 30], h: [80, 6], hand: 'fist' },
+  backLeg: { k: [52, 122], a: [46, 146], toe: [55, 150] },
+  frontLeg: { k: [84, 110], a: [80, 134], toe: [90, 136] },
+  wind: 0,
+}
+
+const CLIMB_FRAMES: Frame[] = [
+  CLIMB,
+  { ...shift(CLIMB, 0, -3), back: { s: [56, 55], e: [52, 30], h: [56, 4], hand: 'fist' }, wind: 1 },
+  { ...shift(CLIMB, 0, -5), backLeg: { k: [70, 112], a: [64, 136], toe: [73, 140] }, frontLeg: { k: [76, 124], a: [72, 148], toe: [81, 151] }, wind: 2 },
+  { ...shift(CLIMB, 0, -2), front: { s: [68, 55], e: [80, 28], h: [86, 2], hand: 'fist' }, wind: 3 },
 ]
 
 const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
@@ -737,7 +765,6 @@ const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
   win: WIN_FRAMES,
   punch: PUNCH_FRAMES,
   hurt: HURT_FRAMES,
-  parry: PARRY_FRAMES,
   down: DOWN_FRAMES,
   guard: GUARD_FRAMES,
   strong: STRONG_FRAMES,
@@ -747,7 +774,10 @@ const POSE_FRAMES: Record<Exclude<FighterPose, 'act'>, Frame[]> = {
   jump: JUMP_FRAMES,
   juggle: JUGGLE_FRAMES,
   dizzy: DIZZY_FRAMES,
-  splat: SPLAT_FRAMES,
+  bow: BOW_FRAMES,
+  crouch: CROUCH_FRAMES,
+  sweep: SWEEP_FRAMES,
+  climb: CLIMB_FRAMES,
 }
 
 // Each profession's action, done the way this hero would: the System Engineer throws the ki blast

@@ -7,7 +7,7 @@ import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvid
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan, type SectionId, type SectionSlot } from '@/lib/cv/sectionPlan'
-import type { Profession } from '@/lib/cv/professions'
+import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
 import type { Labels } from '@/lib/cv/labels'
 import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { Theatre } from '@/components/themes/shared/theatre/Stage'
@@ -20,6 +20,7 @@ import { ChallengerScene } from './FighterSelect/challenger'
 import { ControlPanel } from './FighterSelect/footer'
 import { CARDS } from './FighterSelect/sections'
 import { TOUR_MOTION, TourStage, scenesOf, type TourScene } from './FighterSelect/theatre'
+import type { Staff } from './FighterSelect/run'
 import look from './FighterSelect/world.module.css'
 
 // The world's slab lettering for the round calls: the root carries its --fs-face variable and the
@@ -33,13 +34,16 @@ const fsFace = Alfa_Slab_One({
 
 // Fighter Select, an early 90s arcade fighting game's select screen and its matches: the page composition. The
 // hero is the versus splash (./FighterSelect/versus) and the select grid with the player one cursor
-// (./selector) on the castle rooftop. Then each section is a full screen stage of the arcade tour that rises
-// from the dark, holds while its arcade screen scrolls over it and sinks as the next rises (the shared
-// theatre on the scroll stage engine), and on it he fights that round's rival on that round's stage, one kind
-// of the genre's moves per round, played by the shared scene player at its own pace (./FighterSelect/theatre);
-// below lg a section's own screen is 130svh, so the round plays clear of its cards. Contact is the win quote
-// over the castle rooftop (./challenger). Under reduced motion every section carries its own stage, still at
-// its last frame.
+// (./selector) on the castle rooftop. Then the sections play one credit of the arcade run in the cabinet's
+// order (./FighterSelect/theatre): each a full screen stage that rises from the dark, holds while its arcade
+// screen scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine). Each
+// fight opens with the plane's hop on the world map to its stage, one HUD carries the stage and the score
+// through the run, and the run goes through the rivals of the tour, the bonus stage, the ladder of the four
+// masters and the warlord, every scene played by the shared scene player at its own pace; below lg a
+// section's own screen is 130svh, so the round plays clear of its cards. Contact is his ending on the rooftop
+// at sunrise, a screen of it alone (his bow with his rival) before the win quote and the continue clock come
+// up over it (./challenger). Under reduced motion every section
+// carries its own stage, still at its last frame.
 //
 // The page stands on the select screen's deep blue under CRT scanlines. The root carries the palette as
 // --fs-* variables (the one inline style, variables only) and clips sideways overflow with overflow-x:
@@ -66,16 +70,17 @@ interface SectionProps {
   scene: TourScene & { slot: SectionSlot }
   profession: Profession
   labels: Labels
+  staff: Staff
   still: boolean
 }
 
 /** One section: a screen of its stage alone, then its arcade screen over the held stage, then the stage again. */
-function TourSection({ scene, profession, labels, still }: SectionProps) {
+function TourSection({ scene, profession, labels, staff, still }: SectionProps) {
   const Cards = CARDS[scene.slot.id] as ComponentType<{ slot: SectionSlot }>
   const { accent, id } = SCREENS[scene.slot.id]
   return (
     <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
-      {still && <TourStage scene={scene} profession={profession} settled />}
+      {still && <TourStage scene={scene} profession={profession} staff={staff} settled />}
       <div className="min-h-[100svh] max-lg:min-h-[130svh]" />
       <div className={COLUMN}>
         <ArcadePanel accent={accent} title={labels.sections[scene.slot.titleKey]} id={id}>
@@ -97,6 +102,7 @@ export default function FighterSelectTheme() {
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, active),
     [view.sections, professionalSummary.bio, labels, active],
   )
+  const staff = useMemo<Staff>(() => ({ name: view.hero.name, roles: PROFESSION_ORDER.map((id) => labels.professions[id]) }), [view.hero.name, labels])
   const { theatreRef, textRef } = useTheatre(scenes, TOUR_MOTION, reduced)
   const gates = scenes.filter((scene): scene is TourScene & { slot: SectionSlot } => scene.slot !== null)
   const contact = scenes[scenes.length - 1]
@@ -107,7 +113,7 @@ export default function FighterSelectTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef}>
           {scenes.map((scene) => (
-            <TourStage key={scene.id} scene={scene} profession={active} />
+            <TourStage key={scene.id} scene={scene} profession={active} staff={staff} />
           ))}
         </Theatre>
       )}
@@ -115,9 +121,11 @@ export default function FighterSelectTheme() {
 
       <div ref={textRef} className="relative z-10">
         <header className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          {reduced && <TourStage scene={scenes[0]} profession={active} settled />}
+          {reduced && <TourStage scene={scenes[0]} profession={active} staff={staff} settled />}
           <HeroSplash profession={active} />
         </header>
+        {/* a screen of the hero's stage alone under the title: the street demo, the pick and his reason */}
+        <div className="min-h-[100svh] max-lg:min-h-[80svh]" aria-hidden="true" />
 
         <main id="main-content">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -128,12 +136,12 @@ export default function FighterSelectTheme() {
 
           <ProfessionRegion>
             {gates.map((scene) => (
-              <TourSection key={scene.id} scene={scene} profession={active} labels={labels} still={reduced} />
+              <TourSection key={scene.id} scene={scene} profession={active} labels={labels} staff={staff} still={reduced} />
             ))}
           </ProfessionRegion>
 
-          <div data-scene="contact" className="relative pb-[30svh] pt-[60svh]">
-            {reduced && <TourStage scene={contact} profession={active} settled />}
+          <div data-scene="contact" className="relative pb-[30svh] pt-[100svh] max-lg:pt-[130svh]">
+            {reduced && <TourStage scene={contact} profession={active} staff={staff} settled />}
             <ChallengerScene profession={active} />
           </div>
         </main>

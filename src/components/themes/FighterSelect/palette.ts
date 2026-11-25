@@ -14,6 +14,9 @@ export const FS = {
   p1Light: '#6aa6ff',
   p2: '#ff2e4d',
   p2Dark: '#a3122a',
+  // his own headband, a deep teal: not the 2P red, not the rival's gold
+  headband: '#0f8a8a',
+  headbandDark: '#075252',
   gold: '#ffd23f',
   orange: '#ff8a1f',
   health: '#3ddc6a',
@@ -43,15 +46,21 @@ export const FS = {
   giDeep: '#7d84a6',
   belt: '#17171f',
   skinDeep: '#5e3219',
-  // The parry's cold blue flash
-  parry: '#4fb4ff',
-  // His sparring partner: the red gi in its two cel shades, the fairer skin, the blond hair
-  rivalGi: '#e0262f',
-  rivalGiShade: '#a3141e',
-  rivalGiDeep: '#6a0c14',
-  rivalSkin: '#f2c49b',
-  rivalSkinShade: '#c98f66',
-  rivalHair: '#f6c945',
+  // The dark power of the leader behind the tournament, lit and deep
+  power: '#8a3ae0',
+  powerDeep: '#4a1488',
+  // The sponsor's emblem that hangs on every stage
+  emblem: '#7a0c1e',
+  // His rival of the same school: the forest green gi in its two cel shades, the tan skin, the dark hair
+  rivalGi: '#2f7a4a',
+  rivalGiShade: '#1e5634',
+  rivalGiDeep: '#0f3420',
+  rivalSkin: '#d9a27a',
+  rivalSkinShade: '#a8704c',
+  rivalHair: '#2a1a12',
+  // His rival's sash, tied where a belt would be
+  rivalSash: '#e0a530',
+  rivalSashShade: '#9a6a14',
 } as const
 
 export const FS_VARS = paletteVars('fs', FS)

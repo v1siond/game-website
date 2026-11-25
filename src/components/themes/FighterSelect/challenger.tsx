@@ -12,8 +12,8 @@ import { Cue, HudCentre, LifeBar } from './hud'
 import look from './world.module.css'
 import fight from './fight.module.css'
 
-// Contact as the win quote screen after a match, over the temple scene where he stands in his win pose and
-// his partner lies flat (theatre.tsx): the quote panel, his face in its frame and his line as the winner's
+// Contact as the win quote screen at the end of the run, over his ending on the rooftop at sunrise, where he
+// and his school rival bow and the credits rise (theatre.tsx): the quote panel, his face in its frame and his line as the winner's
 // quote, the buttons under it. Meanwhile the clock on player two's side counts down nine to zero like
 // the arcade's continue clock, waiting for the visitor to step in as the next challenger. CSS keyframes
 // chained by delay under a Cue, played once: 520ms the heading slams in, 760ms the quote and the

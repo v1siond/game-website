@@ -30,18 +30,27 @@ export function FlightStop({ index, children }: { index: number; children: React
   return <div ref={ref}>{children}</div>
 }
 
+/** The plane seen from above, nose to the east, about 24 map units across. */
+export function PlaneShape() {
+  return (
+    <>
+      <path
+        d="M9 0 L-7 -2 L-9 -7 L-11 -7 L-10 -1.5 L-12 0 L-10 1.5 L-11 7 L-9 7 L-7 2 Z"
+        fill={FS.flash}
+        stroke={FS.ink}
+        strokeWidth={1.2}
+        strokeLinejoin="round"
+      />
+      <path d="M2 -1 L-3 -9 L-5 -9 L-3 -1 M2 1 L-3 9 L-5 9 L-3 1" fill={FS.flash} stroke={FS.ink} strokeWidth={1} />
+    </>
+  )
+}
+
 function Plane({ at, heading }: { at: Pin; heading: number }) {
   return (
     <g className={plane.plane} style={cssVars({ '--px': `${at[0]}px`, '--py': `${at[1]}px` })}>
       <g transform={`rotate(${heading})`}>
-        <path
-          d="M9 0 L-7 -2 L-9 -7 L-11 -7 L-10 -1.5 L-12 0 L-10 1.5 L-11 7 L-9 7 L-7 2 Z"
-          fill={FS.flash}
-          stroke={FS.ink}
-          strokeWidth={1.2}
-          strokeLinejoin="round"
-        />
-        <path d="M2 -1 L-3 -9 L-5 -9 L-3 -1 M2 1 L-3 9 L-5 9 L-3 1" fill={FS.flash} stroke={FS.ink} strokeWidth={1} />
+        <PlaneShape />
       </g>
     </g>
   )

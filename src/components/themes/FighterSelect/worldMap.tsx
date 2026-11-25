@@ -15,12 +15,12 @@ const CONTINENTS = [
 ]
 
 // Lima on the map's west coast of the southern land.
-const HOME = { x: 96, y: 118 }
+export const HOME = { x: 96, y: 118 }
 
-// Whatever flies over the map (the plane between his jobs) is drawn on top in the map's coordinates.
-export function WorldMap({ children }: { children?: ReactNode }) {
+/** The map's sea, its ruled lines and the continents, in its own 400 by 160 units. */
+export function MapLand() {
   return (
-    <svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+    <>
       <rect width={400} height={160} fill={FS.select} />
       {[40, 80, 120].map((y) => (
         <line key={y} x1={0} y1={y} x2={400} y2={y} stroke={FS.selectDeep} strokeWidth={1} opacity={0.6} />
@@ -28,6 +28,15 @@ export function WorldMap({ children }: { children?: ReactNode }) {
       {CONTINENTS.map((d) => (
         <path key={d} d={d} fill={FS.land} stroke={FS.coast} strokeWidth={2} strokeLinejoin="round" />
       ))}
+    </>
+  )
+}
+
+// Whatever flies over the map (the plane between his jobs) is drawn on top in the map's coordinates.
+export function WorldMap({ children }: { children?: ReactNode }) {
+  return (
+    <svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+      <MapLand />
       <line x1={HOME.x} y1={HOME.y} x2={HOME.x} y2={HOME.y - 22} stroke={FS.flash} strokeWidth={2} />
       <path d={`M${HOME.x} ${HOME.y - 22} h16 v10 h-16 Z`} fill={FS.p1} stroke={FS.ink} strokeWidth={1.2} />
       <circle cx={HOME.x} cy={HOME.y} r={4} fill={FS.p2} stroke={FS.flash} strokeWidth={1.5} />

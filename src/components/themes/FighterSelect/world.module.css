@@ -183,10 +183,11 @@
 
 /* Under 1024 px the screen shows only the middle of the arena, so the fighters and the section's props
    (the troupe, drawn between x 900 and 1400 on the 860 floor) shrink to just over half about the floor and
-   move to the arena's centre, the part a narrow screen shows. */
+   move to the arena's centre, the part a narrow screen shows. They stand 80 units further up the floor, so a
+   fallen rival still lies clear of the section card as it rises from the foot of the screen. */
 @media (max-width: 1023.98px) {
   .troupe {
-    transform: translateX(-350px) scale(0.6);
+    transform: translate(-350px, -80px) scale(0.6);
     transform-origin: 1150px 860px;
   }
 }
