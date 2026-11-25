@@ -1,68 +1,72 @@
-import { hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
+import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
 import { fx, lerp, transformTo } from '../../shared/stageNodes'
-import { FIGURE_H, gearPath } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { AT, type Frame, type Place } from '../place'
-import { CLIMB, CROUCH, HANG, rest, walk } from '../pose'
+import { gearPath } from '../forest'
+import { arc, runFrame, type Frame, type Place } from '../place'
+import { CROUCH, TUCK } from '../pose'
 
-// Bands in the gear hall: a great gear turns slowly beside him, a gantry high on its far side. He jumps
-// and takes hold of a tooth on its rising side; the gear carries him up and over its top, where he climbs
-// onto it and steps off onto the gantry.
+// Beat 8, the gear hall: a great gear turns half sunk in the floor before a wall of machinery. He jumps onto
+// a tooth on its rising side; it carries him up and over its top; he jumps off onto the wall's top, runs
+// along it and drops down the far side.
 
-const GEAR = { x: 230, y: -150, r: 180 }
-const GANTRY = { x: GEAR.x + 120, h: GEAR.r - GEAR.y }
-// Where he takes hold, in degrees round the gear (180 its near side, 270 its top), and where he lets go.
-const TAKE = 212
-const TOP = 270
-const STEP = 55
-const rad = (deg: number): number => (deg * Math.PI) / 180
+const GEAR = { x: 330, y: 40, r: 150 }
+// Where on the gear's rim he rides, in degrees, y down: 200 a little below its left side, 270 its top.
+const BOARD = 205
+const OFF = 290
+const WALL = { from: 470, to: 580, h: 170 }
 
-/** A point on the gear's rim at `deg`, from the obstacle's foot. */
-const rimAt = (deg: number): { x: number; y: number } => ({ x: GEAR.x + GEAR.r * Math.cos(rad(deg)), y: GEAR.y + GEAR.r * Math.sin(rad(deg)) })
+/** A point on the gear's rim at `deg`, as his feet stand on it. */
+const rimAt = (deg: number) => {
+  const a = (deg * Math.PI) / 180
+  const r = GEAR.r * 1.16
+  return { x: GEAR.x + r * Math.cos(a), lift: -(GEAR.y + r * Math.sin(a)) }
+}
 
-/** How far round the gear has carried his hold at t. */
-const heldAt = (t: number): number => lerp(TAKE, TOP, ramp(t, 0.4, 0.72))
+/** How far the gear has turned at t, in degrees: it carries him from where he boards to where he jumps. */
+const turnAt = (t: number): number => (OFF - BOARD) * ramp(t, 0.3, 0.7) + 20 * ramp(t, 0, 0.3) + 20 * ramp(t, 0.7, 1)
 
-function move(profession: Parameters<typeof rest>[0], t: number): Frame {
-  const take = rimAt(TAKE)
-  const takeAhead = AT + take.x
-  const takeLift = -take.y - FIGURE_H * 0.95
-  if (t < 0.4) {
-    const along = ramp(t, 0.05, 0.28)
-    const jump = ramp(t, 0.28, 0.4)
-    const pose = jump > 0 ? mix(rest(profession), HANG, jump) : along > 0 && along < 1 ? walk(profession, (takeAhead * along) / STEP) : rest(profession)
-    return { pose, ahead: (takeAhead - 20) * along + 20 * jump, lift: (takeLift + hop(jump, 20)) * jump, over: 0 }
+function move(profession: Profession, t: number, length: number): Frame {
+  const board = rimAt(BOARD + 20)
+  if (t < 0.3) {
+    const run = ramp(t, 0, 0.16)
+    if (run < 1) return runFrame(profession, 0, board.x - 90, run)
+    const u = ramp(t, 0.16, 0.3)
+    return { pose: mix(TUCK, CROUCH, ramp(u, 0.7, 1)), ahead: lerp(board.x - 90, board.x, u), lift: arc(u, 40, board.lift), over: 0 }
   }
-  if (t < 0.72) {
-    const held = rimAt(heldAt(t))
-    return { pose: HANG, ahead: AT + held.x, lift: -held.y - FIGURE_H * 0.95, over: 0 }
+  if (t < 0.7) {
+    const on = rimAt(BOARD + 20 + (OFF - BOARD) * ramp(t, 0.3, 0.7))
+    return { pose: CROUCH, ahead: on.x, lift: on.lift, over: 0 }
   }
-  const top = rimAt(TOP)
-  const over = ramp(t, 0.72, 0.84)
-  const off = ramp(t, 0.86, 1)
-  const pose = t < 0.84 ? mix(HANG, CLIMB, over) : mix(CLIMB, CROUCH, ramp(t, 0.84, 0.92))
-  return { pose, ahead: AT + top.x + (GANTRY.x + 70 - top.x) * off, lift: lerp(-top.y - FIGURE_H * 0.95, GANTRY.h, over) + hop(off, 24), over: 0 }
+  const off = rimAt(OFF + 20)
+  const jump = ramp(t, 0.7, 0.8)
+  if (jump < 1) return { pose: mix(TUCK, CROUCH, ramp(jump, 0.7, 1)), ahead: lerp(off.x, WALL.from + 24, jump), lift: off.lift + arc(jump, 30, WALL.h - off.lift), over: 0 }
+  const across = ramp(t, 0.8, 0.88)
+  if (across < 1) return { ...runFrame(profession, WALL.from + 24, WALL.to - 10, across), lift: WALL.h }
+  const drop = ramp(t, 0.88, 0.94)
+  if (drop < 1) return { pose: mix(TUCK, CROUCH, drop), ahead: lerp(WALL.to - 10, WALL.to + 50, drop), lift: WALL.h + arc(drop, 10, -WALL.h), over: 0 }
+  return runFrame(profession, WALL.to + 50, length, ramp(t, 0.94, 1))
 }
 
 export const bands: Place = {
-  script: [1800, 1600, 1400],
-  ends: [0.4, 0.72, 1],
+  region: 'machine',
+  length: 660,
+  script: [1500, 1800, 1500],
+  ends: [0.3, 0.7, 1],
   obstacle: ({ light }: { light: Light }) => (
     <>
-      <rect x={GANTRY.x} y={-GANTRY.h} width={700} height={14} fill={SHADE.black} />
-      <path d={`M${GANTRY.x + 40} ${-GANTRY.h} V0 M${GANTRY.x + 300} ${-GANTRY.h} V0`} stroke={SHADE.black} strokeWidth={12} />
-      <rect x={GEAR.x - 14} y={GEAR.y} width={28} height={-GEAR.y} fill={SHADE.black} />
       <g data-fx="gear">
-        <path d={gearPath(GEAR.x, GEAR.y, GEAR.r - 14, 18)} fill={SHADE.black} fillRule="evenodd" />
-        <circle cx={GEAR.x} cy={GEAR.y} r={GEAR.r * 0.32} fill="none" stroke={light.mid} strokeWidth={4} />
+        <path d={gearPath(GEAR.x, GEAR.y, GEAR.r, 16)} fill={SHADE.black} fillRule="evenodd" />
       </g>
+      <circle cx={GEAR.x} cy={GEAR.y} r={GEAR.r * 0.32} fill={light.far} opacity={0.4} />
+      <rect x={WALL.from} y={-WALL.h} width={WALL.to - WALL.from} height={WALL.h + 4} fill={SHADE.black} />
+      <path d={`M${WALL.from + 20} ${-WALL.h} V${-WALL.h - 40} M${WALL.from + 20} ${-WALL.h - 40} h40`} stroke={SHADE.black} strokeWidth={6} />
     </>
   ),
   move,
   reply: (stage) => {
     const gear = fx(stage, 'gear')
-    return (t) => transformTo(gear, `rotate(${(heldAt(t) - TAKE + 30 * ramp(t, 0, 0.4) + 30 * ramp(t, 0.72, 1)).toFixed(1)} ${GEAR.x} ${GEAR.y})`)
+    return (t) => transformTo(gear, `rotate(${turnAt(t).toFixed(1)} ${GEAR.x} ${GEAR.y})`)
   },
 }

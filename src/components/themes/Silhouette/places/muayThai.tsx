@@ -1,79 +1,69 @@
-import { drop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
+import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
-import { Canvas, FIGURE_H, FLOOR, W } from '../forest'
+import { fx, lerp, transformTo } from '../../shared/stageNodes'
+import { FIGURE_H, gearPath } from '../forest'
 import { SHADE, type Light } from '../palette'
-import { type Frame, type Place } from '../place'
-import { CROUCH, STRIKE, rest } from '../pose'
+import { runFrame, type Frame, type Place } from '../place'
+import { STRIKE, TUCK, rest } from '../pose'
 
-// Muay Thai in the gravity room: a machine room with a ceiling, a gravity switch on the wall at his hand,
-// and a saw blade running along a rail on the floor toward him. He strikes the switch and falls up to the
-// ceiling, landing on it upside down, as the saw runs by under him; then gravity flips back, he drops to
-// the floor and lands in his guard, the saw gone past.
+// Beat 9, the gravity room: a low room with a switch on a post, and a saw blade running along a rail in the
+// floor toward him. He strikes the switch and falls up to the ceiling as gravity turns over; he runs right
+// along the ceiling, upside down, as the saw runs by under him; gravity turns back and he lands in his guard
+// past it, and walks on.
 
-// Low enough that a phone's view, its top at y 134 under the page's bar, shows the ceiling and him on it.
-const CEILING = 330
-// Standing on the ceiling upside down, his soles are on it: the lift that puts the top of his box there.
-const UP = FLOOR - CEILING - FIGURE_H
-const SWITCH = { x: -20, y: -170 }
-const SAW = { r: 64, from: 700, to: -900 }
+const SWITCH = 80
+const CEILING = 300
+// Upside down on the ceiling: his soles on it, his head toward the floor.
+const ON_CEILING = CEILING - FIGURE_H
+const BACK = 440
+const SAW = { r: 34, from: 760, to: 200 }
 
-/** The ceiling and its girder over the room. */
-function Ceiling({ light }: { light: Light }) {
-  return (
-    <Canvas>
-      <rect width={W} height={CEILING} fill={SHADE.black} />
-      <path d={`M0 ${CEILING} H${W}`} stroke={light.rim} strokeOpacity={0.3} strokeWidth={3} />
-    </Canvas>
-  )
-}
-
-function move(profession: Parameters<typeof rest>[0], t: number): Frame {
-  if (t < 0.36) {
-    const struck = ramp(t, 0, 0.1)
-    const fall = ramp(t, 0.12, 0.33)
-    return { pose: fall > 0 ? mix(STRIKE, CROUCH, ramp(t, 0.12, 0.2)) : mix(rest(profession), STRIKE, struck), ahead: 0, lift: drop(fall, UP), over: ramp(t, 0.12, 0.3) }
+function move(profession: Profession, t: number, length: number): Frame {
+  if (t < 0.3) {
+    const walk = ramp(t, 0, 0.12)
+    if (walk < 1) return runFrame(profession, 0, SWITCH - 20, walk)
+    const strike = ramp(t, 0.12, 0.18)
+    const fall = ramp(t, 0.2, 0.3)
+    return { pose: fall > 0 ? TUCK : mix(rest(profession), STRIKE, strike), ahead: SWITCH - 20, lift: ON_CEILING * fall * fall, over: fall }
   }
-  if (t < 0.68) return { pose: CROUCH, ahead: 0, lift: UP, over: 1 }
-  const fall = ramp(t, 0.68, 0.9)
-  return { pose: mix(CROUCH, rest(profession), ramp(t, 0.88, 1)), ahead: 0, lift: UP - drop(fall, UP), over: 1 - ramp(t, 0.68, 0.82) }
+  if (t < 0.68) return { ...runFrame(profession, SWITCH - 20, BACK, ramp(t, 0.3, 0.66)), lift: ON_CEILING, over: 1 }
+  const back = ramp(t, 0.68, 0.78)
+  if (back < 1) return { pose: TUCK, ahead: lerp(BACK, BACK + 40, back), lift: ON_CEILING * (1 - back * back), over: 1 - back }
+  return runFrame(profession, BACK + 40, length, ramp(t, 0.8, 1))
 }
 
 export const muayThai: Place = {
-  script: [1600, 1600, 1400],
-  ends: [0.36, 0.68, 1],
-  mid: ({ light }) => <Ceiling light={light} />,
-  obstacle: ({ light }) => (
+  region: 'machine',
+  length: 540,
+  script: [1400, 1800, 1400],
+  ends: [0.3, 0.68, 1],
+  obstacle: ({ light }: { light: Light }) => (
     <>
-      <rect x={-1200} y={-14} width={2400} height={14} fill={SHADE.black} />
-      <path d="M-1200 -14 H1200" stroke={light.rim} strokeOpacity={0.3} strokeWidth={2} />
-      <rect x={SWITCH.x - 16} y={SWITCH.y - 30} width={32} height={60} fill={light.mid} />
-      <g data-fx="lever" transform={`rotate(-30 ${SWITCH.x} ${SWITCH.y + 10})`}>
-        <rect x={SWITCH.x - 4} y={SWITCH.y - 24} width={8} height={34} fill={SHADE.black} />
+      {/* the room's ceiling, the rail in the floor and its lamp */}
+      <rect x={-500} y={-CEILING - 600} width={1500} height={600} fill={SHADE.black} />
+      <rect x={-500} y={-4} width={1500} height={4} fill={light.rim} opacity={0.2} />
+      <g data-fx="room-light">
+        <path d={`M${SWITCH + 200} ${-CEILING} l-60 ${CEILING - 10} h120 Z`} fill={SHADE.glow} opacity={0.12} />
       </g>
-      <g data-fx="saw" transform={`translate(${SAW.from} ${-SAW.r - 14})`}>
-        <circle r={SAW.r} fill={SHADE.black} />
-        <g data-fx="teeth">
-          {Array.from({ length: 16 }, (_, i) => (
-            <path key={i} d={`M${-8} ${-SAW.r + 2} L0 ${-SAW.r - 14} L8 ${-SAW.r + 2} Z`} transform={`rotate(${i * 22.5})`} fill={SHADE.black} />
-          ))}
-        </g>
-        <circle r={10} fill={light.mid} />
+      {/* the gravity switch on its post, an arrow plate over it */}
+      <rect x={SWITCH - 3} y={-80} width={6} height={80} fill={SHADE.black} />
+      <rect x={SWITCH - 12} y={-104} width={24} height={26} fill={SHADE.black} />
+      <path data-fx="arrow" d={`M${SWITCH} -100 l-7 10 h4 v8 h6 v-8 h4 Z`} fill={light.rim} />
+      <g data-fx="saw">
+        <path d={gearPath(0, -SAW.r, SAW.r, 18)} fill={SHADE.black} fillRule="evenodd" />
       </g>
     </>
   ),
   move,
   reply: (stage) => {
-    const lever = fx(stage, 'lever')
     const saw = fx(stage, 'saw')
+    const arrow = fx(stage, 'arrow')
     return (t) => {
-      const thrown = ramp(t, 0.06, 0.1) - ramp(t, 0.7, 0.74)
-      transformTo(lever, `rotate(${(-30 + 60 * thrown).toFixed(1)} ${SWITCH.x} ${SWITCH.y + 10})`)
-      const run = ramp(t, 0.3, 0.7)
-      const x = lerp(SAW.from, SAW.to, run)
-      transformTo(saw, `translate(${x.toFixed(1)} ${-SAW.r - 14}) rotate(${(-x * 1.2).toFixed(1)})`)
-      fadeTo(saw, 1 - ramp(run, 0.9, 1))
+      const x = lerp(SAW.from, SAW.to, ramp(t, 0.25, 0.75))
+      transformTo(saw, `translate(${x.toFixed(1)} 0) rotate(${(-x * 1.7).toFixed(1)} 0 ${-SAW.r})`)
+      // the arrow turns over with gravity, and back
+      transformTo(arrow, `rotate(${(180 * (ramp(t, 0.18, 0.22) - ramp(t, 0.66, 0.7))).toFixed(1)} ${SWITCH} -91)`)
     }
   },
 }

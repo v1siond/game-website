@@ -19,20 +19,18 @@ import { LAYER_MOTION, scenesOf, type ShadeScene } from './Silhouette/scenes'
 import { PlaceSection } from './Silhouette/sections'
 import page from './Silhouette/page.module.css'
 
-// Silhouette: his CV as one way through a black forest in the fog and on into a city of machines, black
-// shapes against a lit sky, the way the monochrome puzzle platformer it comes from is drawn. A big hero (the
-// forest's edge at dawn, where he wakes in the grass, his name as a silent film intertitle, the levers that
-// change his profession), then every section of the shown profession is one full screen place that rises
-// from dark, holds while its cards scroll over it, and goes dark while the next one rises. Each place is
-// one of the game's set pieces, a different trap or machine every time: the boulder on the slope, the
-// trap that cuts the rope, the flooded hold, the conveyor to the hook, the crusher, the wall gun, the
-// turning gear, the gravity room and its saw, and the quiet clearing at the end. The shared scene player
-// plays each place's one to three actions at their own pace as the section arrives: scroll up and it plays
-// back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first
-// frame.
+// Silhouette: his CV as one run through one level of the monochrome side scrolling puzzle platformer it
+// comes from, its story told in order: he wakes in the grass at the forest's edge (the hero), runs right
+// through the forest and its traps, the decayed city at its end and the machines inside it, and comes out
+// into the quiet light past the trees (the contact). Each section of the shown profession is the next
+// stretch of that level, with its own obstacle crossed by the game's moves, the camera following him small
+// on a low ground line: the spike gap, the bear traps and the bank, the rope over the lake, the crate pushed
+// to the city wall, the crusher, the wall gun, the turning gear, the gravity room and its saw, and the
+// trunk before the clearing. The shared scene player plays each stretch's one to three actions at their own
+// pace as the section arrives: scroll up and it plays back. The text is plain HTML in the page flow over the
+// fixed theatre of pictures, opaque from its first frame, in the left column while he runs on the right.
 //
-// Under reduced motion there is no theatre: each section carries its own picture, still, at its end frame,
-// and he stands awake in the hero.
+// Under reduced motion there is no theatre: each section carries its own picture, still, at its end frame.
 
 // A phone frames the forest from higher up (Silhouette/forest PhoneView).
 const PHONE_QUERY = '(max-width: 767.98px)'
@@ -47,8 +45,8 @@ export default function SilhouetteTheme() {
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active),
-    [view, cv, labels, active],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
+    [view, cv, labels, active, phone],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]

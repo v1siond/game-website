@@ -3,7 +3,7 @@ import { STAND, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
 import { rigJoints, type RigJoints } from '../shared/rig'
 import s from './figure.module.css'
 
-// His figure posed by the scene player through the game's verbs (walk, run, jump, hang, climb, shove, dive,
+// His figure posed by the scene player through the game's verbs (run, jump, hang, climb, shove,
 // strike, sit), on the shared rig (rigPose, ../shared/rig). He is seen from the side, facing right, so a limb
 // swung ahead of him turns negative (counterclockwise on screen), a shin folding back turns positive, and a
 // positive lean tips him forward. He runs with the rig's profile stride.
@@ -22,7 +22,7 @@ export const rest = (profession: Profession): RigPose => KIT[profession]
 
 /** His stride at `phase` (rising as he goes on), in profile; only the coat swings its arms, the sticks
  *  and the guard stay up. */
-export function walk(profession: Profession, phase: number): RigPose {
+function walk(profession: Profession, phase: number): RigPose {
   const stride = rigWalk(phase, 1)
   const kit = KIT[profession]
   const swing = profession === 'engineer' ? 1 : 0.2
@@ -50,14 +50,10 @@ export const HANG = pose({ armRight: -170, foreRight: -5, armLeft: -165, foreLef
 /** Shoving low along the ground: bent over what sits at his feet, both hands on it, his legs driving. */
 export const SHOVE = pose({ armRight: -45, foreRight: -20, armLeft: -40, foreLeft: -25, lean: 32, rise: 6, thighRight: -45, shinRight: 50, thighLeft: 25, shinLeft: 20 })
 
-/** Diving flat under what is about to come down: stretched out low, arms ahead, his weight thrown forward. */
-export const DIVE = pose({ armRight: -100, foreRight: -5, armLeft: -95, foreLeft: -5, lean: 62, rise: 14, thighRight: -20, shinRight: 30, thighLeft: 25, shinLeft: 20 })
 
 /** His hand driven out flat at what stands at head height ahead of him: a switch struck. */
 export const STRIKE = pose({ armRight: -100, foreRight: -5, lean: 6, thighRight: -25, shinRight: 15, thighLeft: 15, shinLeft: 5 })
 
-/** Both hands on a wheel at his chest, ahead of him. */
-export const TURN = pose({ armRight: -80, foreRight: -40, armLeft: -70, foreLeft: -45, lean: 4 })
 
 /** Lying on his back in the grass, the way he wakes: his body laid down flat behind his feet. */
 export const LYING = pose({ lean: -86 })

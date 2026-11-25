@@ -1,8 +1,8 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Silhouette's palette: black shapes against a lit sky, depth by fog. The page is near black with fog
-// grey text; each profession's level is lit by its own sky, cold dawn for the System Engineer, an ember
-// sunset for the Musician and a crimson dusk for the Martial Artist, with every shape in front of it a
+// Silhouette's palette: black shapes against a pale grey glow, depth by fog, as the game is drawn. The page
+// is near black with fog grey text; each profession's level keeps the grey and only tints it, a cold grey
+// for the System Engineer, a warm grey for the Musician and a red grey for the Martial Artist, with every shape in front of it a
 // shade darker the nearer it stands, and a rim of light on the edges that face the sky.
 //
 // This is the one source of the world's colours: SVG fills read the constants, class strings read the
@@ -35,22 +35,22 @@ export const SHADE = {
   glove: '#3a0d0d',
   // The three skies, top to horizon, and the fog layers in front of each, far to near; the fog band
   // over the ground carries its own transparency.
-  dawnTop: '#1b2329',
-  dawnLow: '#8fa3a8',
-  dawnFar: '#5d6d72',
-  dawnMid: '#2c3438',
-  dawnFog: '#cfe0e34d',
+  dawnTop: '#2a2e30',
+  dawnLow: '#b4bcbe',
+  dawnFar: '#7d8587',
+  dawnMid: '#3a3f41',
+  dawnFog: '#d6dcdd4d',
   dawnRim: '#cfe0e3',
-  emberTop: '#1d1310',
-  emberLow: '#e3893a',
-  emberFar: '#8a4a26',
-  emberMid: '#3a1e12',
-  emberFog: '#f2c98a33',
-  crimsonTop: '#1a0c0f',
-  crimsonLow: '#c24a36',
-  crimsonFar: '#7a2a22',
-  crimsonMid: '#2f1012',
-  crimsonFog: '#e3893a33',
+  emberTop: '#2e2925',
+  emberLow: '#c2b2a2',
+  emberFar: '#86796d',
+  emberMid: '#3f3832',
+  emberFog: '#ddd3c94d',
+  crimsonTop: '#2e2526',
+  crimsonLow: '#bfa7a3',
+  crimsonFar: '#85716e',
+  crimsonMid: '#3f3434',
+  crimsonFog: '#dccfcd4d',
 } as const
 
 // One light of the forest: the sky top to horizon, the far and mid layers in front of it, the fog band

@@ -5,17 +5,17 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { Stage } from '../shared/theatre/Stage'
 import { ContactButtons } from './actions'
-import { ShadeFigure } from './figure'
 import { SHADE, TYPEWRITER } from './palette'
 import { LAYER_MOTION, type ShadeScene } from './scenes'
 import page from './page.module.css'
 
-// The first screen, the edge of the forest at dawn: him standing on his mound of grass in the fog (the
-// outfit plate over him), and his name and title as a silent film intertitle on its black panel, his
-// headline, tagline, line and actions under it. Then the three levers he pulls to change profession.
+// The first screen, the edge of the forest at first light: the outfit plate and the three levers he pulls
+// to change profession high on the left, his name and title as a silent film intertitle on its black panel
+// on the right, his headline, tagline, line and actions under it. He is not drawn here: he lies small in
+// the grass on the ground line below them, in the hero's own scene (places/hero.tsx), and wakes as the page
+// scrolls. On a phone the plate sits at the top and the ground shows in the gap under it, before the panel.
 // Under reduced motion the forest's picture sits still behind the hero.
 
 // Under his waking line: the hero's actions, the CV, and Enter into the engine.
@@ -46,26 +46,19 @@ function Lever({ label, selected, optionProps }: ProfessionOption) {
 
 export function WakeHero({ scene, still }: { scene: ShadeScene; still: boolean }) {
   const { navigation } = useLabels()
-  const { active } = useProfession()
 
   return (
     <section id={scene.anchor} data-scene={scene.id} data-worlds-hero="" aria-labelledby="sh-hero" className={page.hero}>
       {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled />}
-      <div className="relative mx-auto grid max-w-6xl items-end gap-6 px-4 pb-12 pt-32 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center md:pt-24">
-        {/* his box on its mound, with the outfit plate over him */}
-        <div className="relative flex flex-col items-center">
-          <div data-worlds-figure="" className="relative mx-auto h-56 w-36 sm:h-72 sm:w-44" aria-hidden="true">
-            <ShadeFigure profession={active} className="h-full w-full" />
-          </div>
-          <svg viewBox="0 0 200 24" className="-mt-2 h-6 w-48" aria-hidden="true" focusable="false">
-            <path d="M0 24 Q20 2 70 4 H130 Q180 2 200 24 Z" fill={SHADE.black} />
-          </svg>
-          <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--fan-down-below-md absolute inset-x-0 bottom-[calc(100%_+_1rem)] z-10 md:bottom-auto md:top-[calc(100%_+_1rem)] ${TYPEWRITER}`} />
+      <div className="relative mx-auto grid max-w-6xl gap-6 px-4 pb-12 pt-16 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:grid-rows-[auto_1fr] md:pt-24">
+        {/* the outfit plate high on the left; on a phone the ground and him show in the gap under it */}
+        <div className="relative z-10 flex flex-col items-start max-md:mb-[52svh]">
+          <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--fan-down-below-md ${TYPEWRITER}`} />
         </div>
 
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
-            <div className={`relative min-w-0 border-l-4 border-[color:var(--sh-black)] p-5 text-center sm:p-8 ${page.panel}`}>
+            <div className={`relative min-w-0 border-l-4 border-[color:var(--sh-black)] p-5 text-center sm:p-8 md:col-start-2 md:row-span-2 md:row-start-1 ${page.panel}`}>
               <div className="mx-auto mb-4 h-px w-24 bg-[color:var(--sh-fog)]" aria-hidden="true" />
               <h1 id="sh-hero" className={`text-[clamp(1.5rem,6vw,2.75rem)] font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] sm:tracking-[0.4em] ${TYPEWRITER}`}>
                 <NameWords name={name} />
@@ -80,14 +73,15 @@ export function WakeHero({ scene, still }: { scene: ShadeScene; still: boolean }
             </div>
           )}
         />
-      </div>
 
-      <section className="relative px-4 pb-16 sm:px-6" aria-label={navigation.professionSelection}>
-        <div className={`mx-auto w-fit max-w-full border-l-4 border-[color:var(--sh-black)] px-4 py-3 ${page.panel}`}>
-          <h2 className="sr-only">{navigation.selectYourProfession}</h2>
-          <ProfessionSwitch className="flex flex-wrap justify-center gap-x-6 gap-y-3" label={navigation.profession} renderOption={(option) => <Lever {...option} />} />
-        </div>
-      </section>
+        {/* the levers, under the plate on the left from md, clear of the ground he wakes on */}
+        <section className="relative md:col-start-1 md:row-start-2 md:self-start" aria-label={navigation.professionSelection}>
+          <div className={`w-fit max-w-full border-l-4 border-[color:var(--sh-black)] px-4 py-3 max-md:mx-auto ${page.panel}`}>
+            <h2 className="sr-only">{navigation.selectYourProfession}</h2>
+            <ProfessionSwitch className="flex flex-wrap justify-center gap-x-6 gap-y-3 md:justify-start" label={navigation.profession} renderOption={(option) => <Lever {...option} />} />
+          </div>
+        </section>
+      </div>
     </section>
   )
 }

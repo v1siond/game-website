@@ -1,53 +1,56 @@
-import { hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
+import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, lerp } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
-import { AT, type Frame, type Place } from '../place'
-import { CLIMB, SIT, rest, walk } from '../pose'
+import { arc, runFrame, type Frame, type Place } from '../place'
+import { CLIMB, SIT, rest } from '../pose'
 
-// Contact in the quiet clearing past the last trees: a fallen trunk lies across the way out of the dark.
-// He climbs over it; then he walks out into the clearing as the light comes up, and sits down in the grass
-// facing it, the end of the way.
+// Beat 10, out of the machines into the quiet light past the trees, the end of the run: the machines' last
+// wall with a dark door in it behind him, a fallen trunk across the way, and the light coming up ahead. He
+// steps out of the door and runs on; he climbs over the trunk; he walks into the light and sits down in the
+// grass facing it.
 
-const LOG = { from: -30, to: 110, h: 70 }
-const OVER = AT + LOG.to + 50
-const SAT = OVER + 130
-const STEP = 55
+const DOOR = { from: -90, to: -30, h: 150 }
+const LOG = { from: 230, to: 300, h: 40 }
+const SAT_AT = 0.86
 
-function move(profession: Parameters<typeof rest>[0], t: number): Frame {
-  if (t < 0.5) {
-    const up = ramp(t, 0.12, 0.3)
-    const across = ramp(t, 0.3, 0.48)
-    const ahead = lerp(0, AT + LOG.from - 10, ramp(t, 0, 0.12)) + (AT + LOG.from + 40 - (AT + LOG.from - 10)) * up + (OVER - (AT + LOG.from + 40)) * across
-    const lift = LOG.h * up * (1 - across) + hop(across, 30)
-    const pose = t < 0.12 ? walk(profession, ahead / STEP) : mix(CLIMB, rest(profession), across)
-    return { pose, ahead, lift, over: 0 }
+function move(profession: Profession, t: number, length: number): Frame {
+  if (t < 0.3) return runFrame(profession, 0, LOG.from - 30, ramp(t, 0, 0.3))
+  if (t < 0.6) {
+    const up = ramp(t, 0.32, 0.46)
+    const over = ramp(t, 0.46, 0.58)
+    return { pose: mix(CLIMB, rest(profession), over), ahead: lerp(LOG.from - 30, LOG.from + 20, up) + (LOG.to + 30 - (LOG.from + 20)) * over, lift: LOG.h * up * (1 - over) + arc(over, 16, 0), over: 0 }
   }
-  const along = ramp(t, 0.5, 0.78)
-  const sit = ramp(t, 0.8, 0.95)
-  return { pose: sit > 0 ? mix(rest(profession), SIT, sit) : along > 0 && along < 1 ? walk(profession, (OVER + (SAT - OVER) * along) / STEP) : rest(profession), ahead: OVER + (SAT - OVER) * along, lift: 0, over: 0 }
+  const sit = ramp(t, SAT_AT, 1)
+  if (sit > 0) return { pose: mix(rest(profession), SIT, sit), ahead: length, lift: 0, over: 0 }
+  return runFrame(profession, LOG.to + 30, length, ramp(t, 0.6, SAT_AT))
 }
 
 export const contact: Place = {
-  script: [1800, 2200],
-  ends: [0.5, 1],
+  region: 'clearing',
+  length: 560,
+  script: [1300, 1400, 1700],
+  ends: [0.3, 0.6, 1],
   obstacle: ({ light }: { light: Light }) => (
     <>
       <defs>
         <radialGradient id="sh-clearing-light">
-          <stop offset="0" stopColor={light.rim} stopOpacity="1" />
-          <stop offset="1" stopColor={light.rim} stopOpacity="0" />
+          <stop offset="0" stopColor={SHADE.glow} stopOpacity="0.9" />
+          <stop offset="1" stopColor={SHADE.glow} stopOpacity="0" />
         </radialGradient>
       </defs>
-      <circle data-fx="light" cx={520} cy={-300} r={420} fill="url(#sh-clearing-light)" opacity="0" />
-      <path d={`M${LOG.from} 0 V${-LOG.h + 10} Q${LOG.from} ${-LOG.h} ${LOG.from + 14} ${-LOG.h} H${LOG.to} Q${LOG.to + 20} ${-LOG.h / 2} ${LOG.to} 0 Z`} fill={SHADE.black} />
-      <path d={`M${LOG.from + 30} ${-LOG.h} L${LOG.from + 10} ${-LOG.h - 40} M${LOG.from + 80} ${-LOG.h} L${LOG.from + 100} ${-LOG.h - 30}`} stroke={SHADE.black} strokeWidth={6} />
+      <circle data-fx="light" cx={760} cy={-260} r={460} fill="url(#sh-clearing-light)" opacity="0" />
+      {/* the last wall of the machines and its door, dark, behind him */}
+      <rect x={DOOR.from - 600} y={-DOOR.h - 400} width={600 + DOOR.to - DOOR.from + 40} height={DOOR.h + 404} fill={SHADE.black} />
+      <rect x={DOOR.from} y={-DOOR.h} width={DOOR.to - DOOR.from} height={DOOR.h} fill={light.far} opacity={0.25} />
+      <path d={`M${LOG.from} 0 V${-LOG.h + 10} Q${LOG.from} ${-LOG.h} ${LOG.from + 12} ${-LOG.h} H${LOG.to} Q${LOG.to + 14} ${-LOG.h / 2} ${LOG.to} 0 Z`} fill={SHADE.black} />
+      <path d={`M${LOG.from + 20} ${-LOG.h} l-12 -24 M${LOG.from + 50} ${-LOG.h} l10 -18`} stroke={SHADE.black} strokeWidth={4} />
     </>
   ),
   move,
   reply: (stage) => {
     const glow = fx(stage, 'light')
-    return (t) => fadeTo(glow, 0.6 * ramp(t, 0.5, 0.9))
+    return (t) => fadeTo(glow, 0.7 * ramp(t, 0.4, 0.95))
   },
 }

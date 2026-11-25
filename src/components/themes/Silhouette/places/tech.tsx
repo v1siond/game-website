@@ -1,84 +1,88 @@
-import { hop } from '@/lib/motion/arc'
 import { mix } from '@/lib/motion/rigPose'
+import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { fx, lerp, transformTo, translateTo } from '../../shared/stageNodes'
-import { Canvas, gearPath } from '../forest'
+import { fx, lerp, transformTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
-import { AT, type Frame, type Place } from '../place'
-import { CLIMB, CROUCH, TURN, rest } from '../pose'
+import { arc, runFrame, type Frame, type Place } from '../place'
+import { CROUCH, HANG, TUCK, rest } from '../pose'
 
-// Tech in the flooded hold of the machine hall: a tank sunk in the floor with a crate floating low in its
-// water, a valve wheel at its edge and a high ledge past it. He turns the wheel and the water rises, lifting
-// the crate up to the floor; then he hops onto the floating crate and climbs from it up onto the ledge.
+// Beat 4, the lake at the forest's end: open water where the ground stops, a rope hanging from a bough over
+// it. He runs and jumps for the rope and catches it; he swings out over the water and back and out again;
+// he lets go at the top of the swing and lands on the far bank, and the rope swings on empty behind him.
 
-const TANK = { from: 10, to: 330 }
-const CRATE = { x: 70, w: 120, h: 80 }
-const LEDGE = { x: 330, h: 210 }
-// The water's surface, from the floor: low in the tank, then up to just under the floor.
-const LOW = 260
-const HIGH = -16
-const WHEEL = { x: -40, y: -150, r: 34 }
-// Where he stands on the crate and on the ledge, from his place.
-const ON_CRATE = AT + CRATE.x + CRATE.w / 2 - 20
-const ON_LEDGE = AT + LEDGE.x + 70
-const CRATE_TOP = CRATE.h - 30 - HIGH
+const WATER = [330, 590] as const
+const PIVOT = { x: 460, y: -360 }
+const ROPE = 220
+const GRAB = 0
+// The rope's swing over the middle action, in degrees off straight down: out, back, out further.
+const SWING = [GRAB, 34, -22, 42] as const
+const LAND = 650
+const SURFACE = 34
 
-const surfaceAt = (t: number): number => lerp(LOW, HIGH, ramp(t, 0.08, 0.45))
-
-function move(profession: Parameters<typeof rest>[0], t: number): Frame {
-  if (t < 0.5) {
-    // both hands on the wheel, turning it over
-    const turning = Math.sin(ramp(t, 0.08, 0.45) * Math.PI * 4)
-    return { pose: mix(rest(profession), { ...TURN, foreRight: TURN.foreRight + 30 * turning }, ramp(t, 0, 0.08)), ahead: 0, lift: 0, over: 0 }
-  }
-  const onto = ramp(t, 0.5, 0.66)
-  if (t < 0.7) return { pose: mix(rest(profession), CROUCH, onto), ahead: ON_CRATE * onto, lift: CRATE_TOP * onto + hop(onto, 50), over: 0 }
-  const up = ramp(t, 0.72, 0.92)
-  return { pose: t < 0.92 ? mix(CROUCH, CLIMB, ramp(t, 0.7, 0.78)) : mix(CLIMB, CROUCH, ramp(t, 0.92, 1)), ahead: lerp(ON_CRATE, ON_LEDGE, up), lift: lerp(CRATE_TOP, LEDGE.h, up) + hop(up, 30), over: 0 }
+/** Where the rope's end hangs at `deg` off straight down. */
+const ropeEnd = (deg: number) => {
+  const a = (deg * Math.PI) / 180
+  return { x: PIVOT.x + ROPE * Math.sin(a), y: PIVOT.y + ROPE * Math.cos(a) }
 }
 
-function Gears({ light }: { light: Light }) {
-  return (
-    <Canvas>
-      <g fill={light.far} fillRule="evenodd" opacity={0.85}>
-        <path d={gearPath(1250, 330, 170, 16)} />
-        <path d={gearPath(360, 420, 120, 13)} />
-      </g>
-    </Canvas>
-  )
+/** The swing's angle `u` of the way through the middle action: eased from one end of the swing to the next. */
+function swingAt(u: number): number {
+  const legs = SWING.length - 1
+  const at = Math.min(legs - 1, Math.floor(u * legs))
+  const v = u * legs - at
+  return lerp(SWING[at], SWING[at + 1], (1 - Math.cos(Math.PI * v)) / 2)
+}
+
+/** His feet hang this far below the rope's end, his hands on it. */
+const HANDS = 100
+
+function move(profession: Profession, t: number, length: number): Frame {
+  const grab = ropeEnd(GRAB)
+  if (t < 0.3) {
+    const run = ramp(t, 0, 0.18)
+    if (run < 1) return runFrame(profession, 0, grab.x - 120, run)
+    const u = ramp(t, 0.18, 0.3)
+    return { pose: mix(TUCK, HANG, u), ahead: lerp(grab.x - 120, grab.x, u), lift: arc(u, 40, -(grab.y + HANDS)), over: 0 }
+  }
+  if (t < 0.7) {
+    const end = ropeEnd(swingAt(ramp(t, 0.3, 0.7)))
+    return { pose: HANG, ahead: end.x, lift: -(end.y + HANDS), over: 0 }
+  }
+  const off = ropeEnd(SWING[SWING.length - 1])
+  const fly = ramp(t, 0.7, 0.86)
+  if (fly < 1) return { pose: mix(HANG, TUCK, ramp(fly, 0, 0.4)), ahead: lerp(off.x, LAND, fly), lift: -(off.y + HANDS) * (1 - fly) + arc(fly, 50), over: 0 }
+  const settle = ramp(t, 0.86, 0.9)
+  if (settle < 1) return { pose: mix(CROUCH, rest(profession), settle), ahead: LAND, lift: 0, over: 0 }
+  return runFrame(profession, LAND, length, ramp(t, 0.9, 1))
 }
 
 export const tech: Place = {
-  script: [2200, 2000],
-  ends: [0.5, 1],
-  far: ({ light }) => <Gears light={light} />,
-  obstacle: ({ light }) => (
+  region: 'forest',
+  length: 700,
+  script: [1500, 2000, 1400],
+  ends: [0.3, 0.7, 1],
+  gaps: [WATER],
+  obstacle: ({ light }: { light: Light }) => (
     <>
-      <rect x={TANK.from} y={-2} width={TANK.to - TANK.from} height={700} fill={light.mid} />
-      <rect data-fx="water" x={TANK.from} y={0} width={TANK.to - TANK.from} height={700} fill={light.far} transform={`translate(0 ${LOW})`} />
-      <g data-fx="crate" transform={`translate(0 ${LOW})`}>
-        <rect x={CRATE.x} y={30 - CRATE.h} width={CRATE.w} height={CRATE.h} fill={SHADE.black} />
-        <path d={`M${CRATE.x} ${30 - CRATE.h} L${CRATE.x + CRATE.w} 30 M${CRATE.x + CRATE.w} ${30 - CRATE.h} L${CRATE.x} 30`} stroke={SHADE.fog} strokeWidth={4} />
-      </g>
-      <rect x={LEDGE.x} y={-LEDGE.h} width={600} height={LEDGE.h + 2} fill={SHADE.black} />
-      <path d={`M${LEDGE.x} ${-LEDGE.h} H${LEDGE.x + 600}`} stroke={light.rim} strokeOpacity={0.3} strokeWidth={3} />
-      <rect x={WHEEL.x - 5} y={WHEEL.y} width={10} height={-WHEEL.y} fill={SHADE.black} />
-      <g data-fx="wheel">
-        <circle cx={WHEEL.x} cy={WHEEL.y} r={WHEEL.r} fill="none" stroke={SHADE.black} strokeWidth={8} />
-        <path d={`M${WHEEL.x - WHEEL.r} ${WHEEL.y} H${WHEEL.x + WHEEL.r} M${WHEEL.x} ${WHEEL.y - WHEEL.r} V${WHEEL.y + WHEEL.r}`} stroke={SHADE.black} strokeWidth={6} />
+      {/* the water: a dark grey sheet a step below the bank, a pale line on its surface */}
+      <rect x={WATER[0]} y={SURFACE} width={WATER[1] - WATER[0]} height={400} fill={light.mid} />
+      <line x1={WATER[0]} y1={SURFACE} x2={WATER[1]} y2={SURFACE} stroke={light.rim} strokeOpacity={0.45} strokeWidth={2} />
+      <path d={`M${WATER[0] + 60} ${SURFACE + 12} h70 M${WATER[0] + 220} ${SURFACE + 20} h50 M${WATER[0] + 320} ${SURFACE + 10} h40`} stroke={light.rim} strokeOpacity={0.2} strokeWidth={2} />
+      {/* the bough the rope hangs from, out of the top of the frame */}
+      <path d={`M${PIVOT.x - 260} ${PIVOT.y - 300} Q${PIVOT.x - 120} ${PIVOT.y - 40} ${PIVOT.x + 60} ${PIVOT.y - 14} L${PIVOT.x + 60} ${PIVOT.y + 8} Q${PIVOT.x - 140} ${PIVOT.y - 10} ${PIVOT.x - 290} ${PIVOT.y - 260} Z`} fill={SHADE.black} />
+      <g data-fx="rope">
+        <line x1={PIVOT.x} y1={PIVOT.y} x2={PIVOT.x} y2={PIVOT.y + ROPE} stroke={SHADE.black} strokeWidth={4} />
       </g>
     </>
   ),
   move,
   reply: (stage) => {
-    const water = fx(stage, 'water')
-    const crate = fx(stage, 'crate')
-    const wheel = fx(stage, 'wheel')
+    const rope = fx(stage, 'rope')
     return (t) => {
-      const surface = surfaceAt(t)
-      translateTo(water, 0, surface)
-      translateTo(crate, 0, surface)
-      transformTo(wheel, `rotate(${(540 * ramp(t, 0.08, 0.45)).toFixed(1)} ${WHEEL.x} ${WHEEL.y})`)
+      // carried by his swing, then swinging on empty after he lets go, slower each time
+      const deg = t < 0.3 ? 0 : t < 0.7 ? swingAt(ramp(t, 0.3, 0.7)) : SWING[SWING.length - 1] * Math.cos(ramp(t, 0.7, 1) * Math.PI * 1.5) * (1 - 0.6 * ramp(t, 0.7, 1))
+      // SVG turns clockwise for a positive angle, which swings a hanging rope's end to the left
+      transformTo(rope, `rotate(${(-deg).toFixed(1)} ${PIVOT.x} ${PIVOT.y})`)
     }
   },
 }

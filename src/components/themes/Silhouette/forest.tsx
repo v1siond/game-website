@@ -1,33 +1,45 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
+import { layerLeft, scatter, type Framing } from '@/lib/motion/sideScroll'
 import { FIGURE_VIEW, ShadeFigure } from './figure'
 import { LIGHTS, SHADE, type Light, type LightName } from './palette'
 
-// The drawing kit of the black forest behind the page: black shapes against a lit sky, depth by fog. Every
-// scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its bottom centre (xMidYMax slice);
-// a phone (PhoneView) frames it from higher up and right of the middle (PHONE_VIEW, x 765 to 1455),
-// so the floor sits half way down its screen with him, the obstacle and where he ends in view, and the ground
-// and the gaps run on below the canvas. The art is the same at every width: the sky in its light with a
-// glow low on the horizon, the place's far shapes pale with fog, the fog band, the mid trunks a shade
-// darker, the black ground he walks, and soft black shapes out of focus in front. Focus is faked with light,
-// not blur: the far layer is pale and low in contrast, the near one dim and soft edged. He is the figure
-// (figure.tsx) drawn into the canvas and posed by the scene's writer (pose.ts).
+// The drawing kit of the one level the page runs through, drawn the way the side scrolling puzzle
+// platformer it comes from is: black shapes on a pale grey glow, depth by fog, a small figure on a low
+// ground line in a wide frame. Every scene is a stack of SVG layers on one 1600 by 1000 canvas anchored to its
+// bottom (xMidYMax slice); a phone (PhoneView) frames a 460 wide slice round him with the ground a third of
+// the way down its screen. The ground's top edge sits at 68% of the frame and he stands 11% of its height
+// tall, held well right of the middle so the cards' column on the left never covers where he goes.
+//
+// The camera follows him along the level (src/lib/motion/sideScroll.ts): each layer is one group, data-fx
+// pan-<layer>, that the scene's writer moves by its share of the camera's travel, the far trees least and
+// the soft black shapes in front most. What stands in a layer is scattered by its place on the level, not by
+// scene, so where one scene ends the next one starts on the same trees. The region of the level a shape
+// stands in (the forest, the decayed city, the machines, the clearing) picks what it is.
 
-export const W = 1600
+const W = 1600
 export const H = 1000
 /** The top of the ground: his soles and every prop stand on it. */
-export const FLOOR = 880
-
-/** His drawn height on the canvas: small in his world, as the genre draws him. */
-export const FIGURE_H = 260
+export const FLOOR = 680
+/** His drawn height on the canvas: about 11% of the frame, the game's scale. */
+export const FIGURE_H = 110
 const FIGURE_W = (FIGURE_H * FIGURE_VIEW.width) / FIGURE_VIEW.height
+/** Where the camera holds him on the canvas when it has caught up: well right of the cards' column, so the
+ *  obstacle he has just crossed stays in the clear part of the screen behind him. */
+export const HOLD = 1150
+/** Where he lies in the grass when the page opens, left of the hero's panel; on a phone the hold. */
+const WAKE_X = 360
 
 /** Whether the canvas is drawn for a phone's narrow, tall screen. */
 export const PhoneView = createContext(false)
 
-// The phone's view of the canvas: 690 wide, so where he starts and where he lands both stay in view at the
-// scene's full push in, and its top at y 134 so the floor (880) sits half way down a phone's screen.
-const PHONE_VIEW = '765 134 690 1493'
+/** Where a scene starts him on screen and where the camera holds him at its end. */
+export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: wakes && !phone ? WAKE_X : HOLD, hold: HOLD })
+
+// The phone's slice: 460 wide round the hold, him a little right of its middle so what he has just crossed
+// shows behind him, and its top 550 above the ground, so the ground sits a little below the middle of the
+// screen, clear of the shared bars and notices along its top.
+const PHONE_VIEW = `${HOLD - 260} ${FLOOR - 550} 460 1000`
 
 export function Canvas({ children }: { children: ReactNode }) {
   const phone = useContext(PhoneView)
@@ -38,36 +50,75 @@ export function Canvas({ children }: { children: ReactNode }) {
   )
 }
 
-/** The sky in its light, top to horizon, and the glow where the light comes from. */
+/** The parts of the level the page runs through, in order. */
+export type Region = 'forest' | 'city' | 'machine' | 'clearing'
+
+/** One scene's stretch as its layers draw it: where on the level he starts, how far he goes, where on
+ *  screen the scene starts and holds him, and the region of every point of the level. */
+export interface Run extends Framing {
+  from: number
+  length: number
+  /** The region the scene's own stretch is in: it picks what stands in the layers behind and in front. */
+  region: Region
+  /** The region of each point of the level: it picks what grows on the ground, which meets the next
+   *  stretch's ground exactly. */
+  regionAt: (x: number) => Region
+}
+
+/** How far the camera travels over a scene's stretch. */
+export const travelOf = ({ start, length, hold }: Run): number => start + length - hold
+
+/** Each layer's share of the camera's travel: the further back, the less it moves. */
+export const PAN = { far: 0.3, fog: 0.5, mid: 0.72, near: 1, figure: 1, fg: 1.45 } as const
+export type PanLayer = keyof typeof PAN
+
+// The part of a layer's level a scene shows, padded either side, and the shift from level to canvas.
+function spanOf(run: Run, share: number) {
+  const left = layerLeft(share, run.from - run.start)
+  return { from: left - 400, to: left + share * travelOf(run) + W + 400, shift: left }
+}
+
+/** One layer's shapes: `draw` gets each scattered shape's canvas x, its share and the region it stands in.
+ *  A layer that moves with the ground reads the region at its own point of the level; a layer behind or in
+ *  front shows a different stretch of the level at every camera position, so it keeps the scene's region. */
+function Scattered({ run, layer, spacing, seed, draw }: { run: Run; layer: PanLayer; spacing: number; seed: number; draw: (x: number, share: number, region: Region) => ReactNode }) {
+  const share = PAN[layer]
+  const { from, to, shift } = spanOf(run, share)
+  return <>{scatter(from, to, spacing, seed).map(({ at, share: s }) => <g key={at}>{draw(at - shift, s, share === 1 ? run.regionAt(at) : run.region)}</g>)}</>
+}
+
+/** The sky: the pale glow the game's camera looks into, grey with the light's own tint, darker to the top. */
 export function Sky({ light }: { light: LightName }) {
-  const { top, low, rim } = LIGHTS[light]
+  const { top, low } = LIGHTS[light]
   const id = `sh-sky-${light}`
   return (
     <Canvas>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={top} />
-          <stop offset="0.85" stopColor={low} />
+          <stop offset="0.7" stopColor={low} />
         </linearGradient>
         <radialGradient id={`${id}-glow`}>
-          <stop offset="0" stopColor={rim} stopOpacity="0.55" />
-          <stop offset="1" stopColor={rim} stopOpacity="0" />
+          <stop offset="0" stopColor={SHADE.glow} stopOpacity="0.6" />
+          <stop offset="1" stopColor={SHADE.glow} stopOpacity="0" />
         </radialGradient>
       </defs>
       <rect width={W} height={H} fill={`url(#${id})`} />
-      <ellipse cx={1080} cy={640} rx={520} ry={260} fill={`url(#${id}-glow)`} />
+      <ellipse cx={900} cy={360} rx={760} ry={330} fill={`url(#${id}-glow)`} />
     </Canvas>
   )
 }
 
-/** A two tier pine with its foot on the ground line at y. */
-export function pinePath(x: number, height: number, y: number): string {
+/** A pine seen far off through fog: one ragged three tier outline from its tip down to the ground line at y,
+ *  no bare trunk showing, so no hard bar reads through the fog. */
+function pinePath(x: number, height: number, y: number): string {
   const top = y - height
-  const trunk = Math.max(4, height * 0.025)
-  return `M${x - trunk} ${y} H${x + trunk} V${top + height * 0.7} H${x - trunk} Z M${x - height * 0.16} ${top + height * 0.5} L${x} ${top} L${x + height * 0.16} ${top + height * 0.5} Z M${x - height * 0.24} ${top + height * 0.82} L${x} ${top + height * 0.28} L${x + height * 0.24} ${top + height * 0.82} Z`
+  const tier = (down: number, half: number) => `L${x + half} ${top + height * down} L${x + half * 0.45} ${top + height * (down - 0.02)}`
+  const back = (down: number, half: number) => `L${x - half * 0.45} ${top + height * (down - 0.02)} L${x - half} ${top + height * down}`
+  return `M${x} ${top} ${tier(0.4, height * 0.14)} ${tier(0.7, height * 0.2)} L${x + height * 0.26} ${y} L${x - height * 0.26} ${y} ${back(0.7, height * 0.2)} ${back(0.4, height * 0.14)} Z`
 }
 
-/** A gear outline for the machinery: `teeth` square teeth round a ring of radius r, with a hub hole. */
+/** A gear outline: `teeth` square teeth round a ring of radius r, with a hub hole. */
 export function gearPath(cx: number, cy: number, r: number, teeth: number): string {
   const step = (Math.PI * 2) / teeth
   const outer = r * 1.16
@@ -85,54 +136,118 @@ export function gearPath(cx: number, cy: number, r: number, teeth: number): stri
   return `M${points.join(' L')} Z M${cx - hub} ${cy} A${hub} ${hub} 0 1 0 ${cx + hub} ${cy} A${hub} ${hub} 0 1 0 ${cx - hub} ${cy} Z`
 }
 
-const FAR_PINES = [60, 170, 260, 380, 520, 610, 760, 1180, 1290, 1420, 1530]
+const FAR_GROUND = FLOOR - 30
 
-/** The far forest, pale with fog: a row of pines on a low ridge. */
-export function FarPines({ light }: { light: Light }) {
+// The far shapes of each region, pale with fog: pines, the city's broken blocks, the machines' gears and
+// tapered chimneys. Nothing with a bare bar or a crossbar, which reads as hard blocks through the fog.
+const FAR_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
+  forest: (x, s) => <path d={pinePath(x, 240 + s * 260, FAR_GROUND)} />,
+  clearing: (x, s) => (s < 0.55 ? null : <path d={pinePath(x, 160 + s * 140, FAR_GROUND)} />),
+  city: (x, s) => {
+    const w = 70 + s * 90
+    const h = 180 + s * 260
+    return <path d={`M${x} ${FAR_GROUND} V${FAR_GROUND - h} H${x + w * 0.4} L${x + w * 0.55} ${FAR_GROUND - h + 24} L${x + w * 0.7} ${FAR_GROUND - h + 6} H${x + w} V${FAR_GROUND} Z`} />
+  },
+  machine: (x, s) =>
+    s < 0.35 ? (
+      <path d={gearPath(x, FAR_GROUND - 160 - s * 200, 70 + s * 160, 12)} fillRule="evenodd" />
+    ) : (
+      <path d={`M${x - 40} ${FAR_GROUND} L${x - 16} ${FAR_GROUND - 300 - s * 160} H${x + 16} L${x + 40} ${FAR_GROUND} Z`} />
+    ),
+}
+
+/** The far layer, pale with fog: a low ridge and the region's far shapes on it. */
+export function Far({ run, light }: { run: Run; light: Light }) {
   return (
     <Canvas>
-      <g fill={light.far} opacity={0.8}>
-        {FAR_PINES.map((x, i) => (
-          <path key={x} d={pinePath(x, 260 + (i % 4) * 70, 860)} />
-        ))}
-        <path d="M0 860 Q400 820 800 850 T1600 840 V1000 H0 Z" />
+      <g data-fx="pan-far" fill={light.far} opacity={0.75}>
+        <Scattered run={run} layer="far" spacing={150} seed={1} draw={(x, s, region) => FAR_SHAPE[region](x, s)} />
+        <path d={`M${-W} ${FAR_GROUND + 10} Q${W} ${FAR_GROUND - 30} ${W * 3} ${FAR_GROUND} T${W * 7} ${FAR_GROUND} V${H * 2} H${-W} Z`} />
       </g>
     </Canvas>
   )
 }
 
-/** The fog band over the ground, in the light's own fog. */
-export function Fog({ light }: { light: Light }) {
+/** The fog over the ground: thickening from nothing down to the ground line, with soft banks drifting in it,
+ *  in the light's own fog. No hard edge anywhere. */
+export function Fog({ run, light }: { run: Run; light: Light }) {
+  // one gradient per light: the hero's dawn and a profession's light share the page
+  const fogId = `sh-fog-${light.fog.slice(1)}`
   return (
     <Canvas>
-      <rect y={700} width={W} height={220} fill={light.fog} />
-      <rect y={780} width={W} height={120} fill={light.fog} />
-    </Canvas>
-  )
-}
-
-const TRUNKS = [[90, 44], [300, 26], [1240, 30], [1500, 52]] as const
-
-/** The mid forest a shade darker: a few tall trunks out of the top of the frame, a bough off each. */
-export function Trunks({ light }: { light: Light }) {
-  return (
-    <Canvas>
-      <g fill={light.mid}>
-        {TRUNKS.map(([x, w]) => (
-          <path key={x} d={`M${x} 0 H${x + w} V${FLOOR} H${x - 6} Q${x + w * 0.3} 500 ${x} 0 Z`} />
-        ))}
-        <path d="M134 300 Q200 340 230 420 L222 424 Q190 360 130 320 Z M1262 240 Q1200 290 1180 380 L1188 384 Q1214 300 1268 262 Z" />
+      <defs>
+        <linearGradient id={fogId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={light.fog} stopOpacity="0" />
+          <stop offset="0.75" stopColor={light.fog} />
+          <stop offset="1" stopColor={light.fog} />
+        </linearGradient>
+      </defs>
+      <rect y={FLOOR - 300} width={W} height={330} fill={`url(#${fogId})`} />
+      <g data-fx="pan-fog" fill={light.fog}>
+        <Scattered run={run} layer="fog" spacing={420} seed={2} draw={(x, s) => <ellipse cx={x} cy={FLOOR - 60 - s * 140} rx={220 + s * 160} ry={40 + s * 30} />} />
       </g>
     </Canvas>
   )
 }
 
-/** The black ground he walks, a rise and a dip in it, and a rim of light along its top edge. */
-export function Ground({ light }: { light: Light }) {
+// The mid shapes of each region a shade darker: trunks out of the top of the frame, the city's lamp posts,
+// the machines' pipes and hanging chains.
+const MID_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
+  forest: (x, s) => {
+    const w = 18 + s * 30
+    return <path d={`M${x} 0 H${x + w} V${FLOOR} H${x - 6} Q${x + w * 0.3} ${FLOOR * 0.55} ${x} 0 Z M${x + w * 0.5} ${200 + s * 120} Q${x + w + 60} ${240 + s * 120} ${x + w + 90} ${320 + s * 120} L${x + w + 82} ${324 + s * 120} Q${x + w + 50} ${260 + s * 120} ${x + w * 0.5} ${226 + s * 120} Z`} />
+  },
+  clearing: (x, s) => (s < 0.7 ? null : <path d={`M${x} 0 H${x + 20} V${FLOOR} H${x - 4} Z`} />),
+  city: (x, s) => <path d={`M${x - 5} ${FLOOR} V${FLOOR - 380 - s * 80} H${x + 60} V${FLOOR - 370 - s * 80} H${x + 5} V${FLOOR} Z M${x + 48} ${FLOOR - 370 - s * 80} h16 v14 h-16 Z`} />,
+  machine: (x, s) =>
+    s < 0.5 ? (
+      <path d={`M${x} 0 H${x + 26} V${FLOOR} H${x} Z M${x - 8} ${180 + s * 200} h42 v16 h-42 Z M${x - 8} ${420 + s * 100} h42 v16 h-42 Z`} />
+    ) : (
+      <path d={`M${x} 0 V${260 + s * 200}`} stroke="currentColor" strokeWidth={6} strokeDasharray="14 6" fill="none" />
+    ),
+}
+
+/** The mid layer a shade darker. */
+export function Mid({ run, light }: { run: Run; light: Light }) {
   return (
     <Canvas>
-      <path d={`M0 ${FLOOR + 6} Q240 ${FLOOR - 8} 520 ${FLOOR} T1100 ${FLOOR - 2} T1600 ${FLOOR + 4} V${H + 600} H0 Z`} fill={SHADE.black} />
-      <path d={`M0 ${FLOOR + 6} Q240 ${FLOOR - 8} 520 ${FLOOR} T1100 ${FLOOR - 2} T1600 ${FLOOR + 4}`} fill="none" stroke={light.rim} strokeOpacity={0.25} strokeWidth={2} />
+      <g data-fx="pan-mid" fill={light.mid} color={light.mid}>
+        <Scattered run={run} layer="mid" spacing={460} seed={3} draw={(x, s, region) => MID_SHAPE[region](x, s)} />
+      </g>
+    </Canvas>
+  )
+}
+
+/** A stretch of the ground's run that is open, from its start: a gap he must cross. */
+export type Gap = readonly [number, number]
+
+const BLADES = (region: Region) => region === 'forest' || region === 'clearing'
+
+/** The black ground he runs on, open where the scene's gaps are, its edge in a rim of light, grass along
+ *  it in the forest. Drawn in the scene's own units: x 0 is where he starts. */
+export function Ground({ run, light, gaps = [] }: { run: Run; light: Light; gaps?: readonly Gap[] }) {
+  const edges = [-400, ...gaps.flatMap(([a, b]) => [run.start + a, run.start + b]), travelOf(run) + W + 400]
+  const solid = Array.from({ length: edges.length / 2 }, (_, i) => [edges[i * 2], edges[i * 2 + 1]] as const)
+  const open = (x: number) => gaps.some(([a, b]) => x > run.start + a - 6 && x < run.start + b + 6)
+  return (
+    <Canvas>
+      <g data-fx="pan-near">
+        {solid.map(([a, b]) => (
+          <g key={a}>
+            <rect x={a} y={FLOOR} width={b - a} height={H} fill={SHADE.black} />
+            <line x1={a} y1={FLOOR} x2={b} y2={FLOOR} stroke={light.rim} strokeOpacity={0.18} strokeWidth={2} />
+          </g>
+        ))}
+        <g fill={SHADE.black}>
+          <Scattered
+            run={run}
+            layer="near"
+            spacing={16}
+            seed={4}
+            draw={(x, s, region) => (BLADES(region) && !open(x) ? <path d={`M${x - 3} ${FLOOR + 1} L${x} ${FLOOR - 8 - s * 22} L${x + 3} ${FLOOR + 1} Z`} /> : null)}
+          />
+        </g>
+      </g>
     </Canvas>
   )
 }
@@ -141,27 +256,36 @@ export function Ground({ light }: { light: Light }) {
 function Soft({ d }: { d: string }) {
   return (
     <>
-      <path d={d} fill={SHADE.black} opacity={0.35} stroke={SHADE.black} strokeOpacity={0.35} strokeWidth={30} strokeLinejoin="round" />
+      <path d={d} fill={SHADE.black} opacity={0.35} stroke={SHADE.black} strokeOpacity={0.35} strokeWidth={34} strokeLinejoin="round" />
       <path d={d} fill={SHADE.black} opacity={0.85} />
     </>
   )
 }
 
-/** In front, out of focus: a bough hanging into the top corner and grass at both bottom corners, and the
- *  dark vignette the game's camera sees every place through. */
-export function Front() {
+// The soft shapes hanging into the top of the frame in front of him: boughs and grass in the forest,
+// pipes and a hanging chain end in the city and the machines. Nothing in front ever reaches his ground.
+const FRONT_SHAPE: Record<Region, (x: number, s: number) => ReactNode> = {
+  forest: (x, s) => <Soft d={`M${x - 160} 0 H${x + 200} Q${x + 90} ${70 + s * 60} ${x + 10} ${150 + s * 80} Q${x - 70} ${190 + s * 60} ${x - 160} ${170 + s * 50} Z`} />,
+  clearing: (x, s) => (s < 0.5 ? null : <Soft d={`M${x - 120} 0 H${x + 120} Q${x + 40} ${60 + s * 40} ${x - 120} ${110 + s * 40} Z`} />),
+  city: (x, s) => <Soft d={`M${x - 30} 0 H${x + 30} V${120 + s * 110} H${x - 30} Z`} />,
+  machine: (x, s) => <Soft d={`M${x - 260} ${40 + s * 40} H${x + 260} V${96 + s * 40} H${x - 260} Z M${x + 120} 0 H${x + 150} V${200 + s * 60} H${x + 120} Z`} />,
+}
+
+/** In front, out of focus: the region's soft shapes along the top, and the heavy vignette the game's
+ *  camera sees every place through. */
+export function Front({ run }: { run: Run }) {
   return (
     <Canvas>
       <defs>
-        <radialGradient id="sh-vignette" cx="0.5" cy="0.5" r="0.72">
-          <stop offset="0.55" stopColor={SHADE.black} stopOpacity="0" />
-          <stop offset="1" stopColor={SHADE.black} stopOpacity="0.75" />
+        <radialGradient id="sh-vignette" cx="0.55" cy="0.5" r="0.75">
+          <stop offset="0.5" stopColor={SHADE.black} stopOpacity="0" />
+          <stop offset="1" stopColor={SHADE.black} stopOpacity="0.85" />
         </radialGradient>
       </defs>
+      <g data-fx="pan-fg">
+        <Scattered run={run} layer="fg" spacing={1100} seed={5} draw={(x, s, region) => FRONT_SHAPE[region](x, s)} />
+      </g>
       <rect width={W} height={H} fill="url(#sh-vignette)" />
-      <Soft d="M0 0 H320 Q220 60 160 130 Q80 200 0 220 Z" />
-      <Soft d="M0 1000 L0 800 L30 920 L60 760 L90 910 L120 830 L150 950 L186 860 L204 1000 Z" />
-      <Soft d="M1600 1000 L1600 780 L1564 920 L1534 820 L1498 930 L1468 860 L1438 1000 Z" />
     </Canvas>
   )
 }
@@ -175,12 +299,12 @@ export const figureAt = (x: number, lift = 0, over = 0): string => {
   return `translate(${(x - FIGURE_W / 2).toFixed(1)} ${top.toFixed(1)})${turn}`
 }
 
-/** Him on the ground at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
-export function Figure({ x, profession }: { x: number; profession: Profession }) {
+/** Him on the ground at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. In
+ *  the hero he carries the world's figure mark, which the outfit plate's swipe and the preview read. */
+export function Figure({ x, profession, marked = false }: { x: number; profession: Profession; marked?: boolean }) {
   return (
-    <g data-fx="figure" transform={figureAt(x)}>
+    <g data-fx="figure" data-worlds-figure={marked ? '' : undefined} transform={figureAt(x)}>
       <ShadeFigure profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
     </g>
   )
 }
-

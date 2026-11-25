@@ -2,11 +2,12 @@ import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import { stageItems } from '@/lib/cv/stageItems'
+import { stretchesOf } from '@/lib/motion/sideScroll'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import { Canvas, FarPines, Fog, Front, Ground, Sky, Trunks } from './forest'
+import { Canvas, Far, Fog, Front, Ground, Mid, Sky, framingOf, type Region, type Run } from './forest'
 import { LIGHTS, type LightName } from './palette'
-import { scenePlace, type PlaceInput, type Scene } from './place'
+import { Stretch, bindStretch, type Place, type PlaceInput } from './place'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -18,29 +19,19 @@ import { tech } from './places/tech'
 import { ventures } from './places/ventures'
 import { work } from './places/work'
 
-// The page as scenes, one way through the black forest and into the machine city, the game's own set
-// pieces one per place: its edge at dawn where he wakes (hero), one place per section of the shown
-// profession in reading order, the boulder on the slope, the trap and the trunk, the flooded hold, the
-// conveyor and the hook, the crusher, the wall gun, the gear and the gravity room, and the clearing at the
-// end (contact). Every place past the hero stands in the profession's own light: cold
-// dawn for the System Engineer, an ember sunset for the Musician, a crimson dusk for the Martial Artist.
-// Each scene names its place, its anchor, its script of one to three actions the scroll plays, and how many
-// cards its section counts (stageItems) for the theatre's reading line.
+// The page as one run through one level of the side scroller, its story told in order: he wakes in the
+// grass at the forest's edge (hero), crosses the forest and its traps, reaches the decayed city at its end
+// and the machines inside it, the gear hall and the gravity room, and comes out of the last door into the
+// quiet light past the trees (contact). Each section of the shown profession is the next stretch of the
+// level, laid right after the one before, so the camera that follows him through one scene starts the next
+// where it left him. Every stretch past the hero stands in the profession's own light: a cold grey dawn for
+// the System Engineer, a warm grey for the Musician, a red grey dusk for the Martial Artist.
+// Each scene names its stretch, its anchor, its script of one to three actions the scroll plays, and how
+// many cards its section counts (stageItems) for the theatre's reading line.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-const PLACES: Record<SceneId, Scene> = {
-  hero,
-  about: scenePlace(about),
-  work: scenePlace(work),
-  tech: scenePlace(tech),
-  services: scenePlace(services),
-  projects: scenePlace(projects),
-  ventures: scenePlace(ventures),
-  bands: scenePlace(bands),
-  muayThai: scenePlace(muayThai),
-  contact: scenePlace(contact),
-}
+const PLACES: Record<SceneId, Place> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
 
 const ANCHORS: Record<SceneId, string> = {
   hero: 'top',
@@ -65,48 +56,72 @@ export interface ShadeScene extends TheatreScene {
   slot: SectionSlot | null
 }
 
-const layersOf = ({ far, mid, floor }: Scene, input: PlaceInput, light: LightName): StageLayer[] => [
+const layersOf = (id: SceneId, place: Place, input: PlaceInput, run: Run, light: LightName): StageLayer[] => [
   { name: 'sky', node: <Sky light={light} /> },
-  { name: 'far', node: far ? far(input) : <FarPines light={input.light} /> },
-  { name: 'fog', node: <Fog light={input.light} /> },
-  { name: 'mid', node: mid ? mid(input) : <Trunks light={input.light} /> },
-  { name: 'near', node: <Ground light={input.light} /> },
-  { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
-  { name: 'fg', node: <Front /> },
+  { name: 'far', node: <Far run={run} light={input.light} /> },
+  { name: 'fog', node: <Fog run={run} light={input.light} /> },
+  { name: 'mid', node: <Mid run={run} light={input.light} /> },
+  { name: 'near', node: <Ground run={run} light={input.light} gaps={place.gaps} /> },
+  {
+    name: 'figure',
+    node: (
+      <Canvas>
+        <Stretch place={place} input={input} run={run} marked={id === 'hero'} />
+      </Canvas>
+    ),
+  },
+  { name: 'fg', node: <Front run={run} /> },
 ]
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession): ShadeScene => {
-  const place = PLACES[id]
-  const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
-  const input = { profession, light: LIGHTS[light] }
-  return {
-    id,
-    anchor: ANCHORS[id],
-    slot,
-    count,
-    script: place.script,
-    layers: layersOf(place, input, light),
-    bind: (stage) => place.bind(stage, input),
+interface Planned {
+  id: SceneId
+  slot: SectionSlot | null
+  count: number
+}
+
+/** Every scene of the page in order, each its stretch of the one level and what its picture is built from. */
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): ShadeScene[] {
+  const planned: Planned[] = [
+    { id: 'hero', slot: null, count: 0 },
+    ...slots.map((slot) => {
+      const { lead, count } = stageItems(slot, labels, highlights)
+      return { id: slot.id, slot, count: lead + count }
+    }),
+    { id: 'contact', slot: null, count: 0 },
+  ]
+  // the hero's run also crosses the screen from where he wakes to the hold
+  const framings = planned.map(({ id }) => framingOf(id === 'hero', phone))
+  const lengths = planned.map(({ id }, i) => PLACES[id].length + framings[i].hold - framings[i].start)
+  const stretches = stretchesOf(lengths)
+  const regionAt = (x: number): Region => {
+    const at = stretches.findIndex(({ to }) => x < to)
+    return PLACES[planned[at === -1 ? planned.length - 1 : at].id].region
   }
-}
-
-/** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): ShadeScene[] {
-  const sections = slots.map((slot) => {
-    const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession)
+  return planned.map(({ id, slot, count }, i) => {
+    const place = PLACES[id]
+    const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
+    const input = { profession, light: LIGHTS[light] }
+    const run: Run = { ...framings[i], from: stretches[i].from, length: lengths[i], region: place.region, regionAt }
+    return {
+      id,
+      anchor: ANCHORS[id],
+      slot,
+      count,
+      script: place.script,
+      layers: layersOf(id, place, input, run, light),
+      bind: (stage) => bindStretch(place, run, stage, input),
+    }
   })
-  return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
 }
 
-/** Each layer's push in across its scene: the sky least, the soft shapes in front most, which gives the
- *  depth. The ground, what stands on it and he move together, so he always stands on it. */
+/** The camera's follow carries the depth now, so the layers only breathe: a slight push in on the sky and
+ *  the soft shapes in front, the ground, what stands on it and he held level so he always stands on it. */
 export const LAYER_MOTION: LayerMotions = {
-  sky: { zoom: [1.0, 1.03], lift: [0, 0] },
-  far: { zoom: [1.01, 1.06], lift: [0, -1] },
-  fog: { zoom: [1.02, 1.08], lift: [0, -1] },
-  mid: { zoom: [1.03, 1.1], lift: [0, -2] },
-  near: { zoom: [1.05, 1.14], lift: [0, -3] },
-  figure: { zoom: [1.05, 1.14], lift: [0, -3] },
-  fg: { zoom: [1.12, 1.3], lift: [1, -5] },
+  sky: { zoom: [1.0, 1.02], lift: [0, 0] },
+  far: { zoom: [1.0, 1.0], lift: [0, 0] },
+  fog: { zoom: [1.0, 1.0], lift: [0, 0] },
+  mid: { zoom: [1.0, 1.0], lift: [0, 0] },
+  near: { zoom: [1.0, 1.0], lift: [0, 0] },
+  figure: { zoom: [1.0, 1.0], lift: [0, 0] },
+  fg: { zoom: [1.0, 1.04], lift: [0, 0] },
 }
