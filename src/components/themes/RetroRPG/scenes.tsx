@@ -865,7 +865,18 @@ const projects: SceneDef = {
 // comes back to him. The screen cuts to the battle: his heart turns purple and is bound to her threads,
 // sliding from line to line as her shuttles fly along them. Back in her lair he holds up the charm; she knows
 // her own work, laughs, the web over her door parts, and he walks through it as she waves the charm at him.
-const VENTURES = { from: -140, buy: -60, stall: -10, show: 170, weaver: 240, door: 310 }
+// The room two ways: spread out on a wide screen; drawn close in the left half of a phone's band, where he
+// buys and holds up the charm in front of the stall, so he is never cut at the screen's edge, she stands at
+// the stall's end and her door just past her, left of the middle.
+const VENTURES_AT = {
+  spread: { from: -140, buy: -60, stall: -10, show: 170, weaver: 240, door: 310 },
+  close: { from: -140, buy: 20, stall: -10, show: 30, weaver: 100, door: 186 },
+} as const
+const VENTURES_SIDE: Record<Mode, Record<Side, keyof typeof VENTURES_AT>> = {
+  wide: { right: 'spread', left: 'spread' },
+  phone: { right: 'spread', left: 'close' },
+}
+const venturesOf = (layout: Layout) => VENTURES_AT[VENTURES_SIDE[modeOf(layout)][layout.side]]
 const THREADS = 3
 // The thread his heart rides at each sixth of the fight.
 const LANE_PATH = [1, 0, 2, 1, 2, 0] as const
@@ -875,10 +886,11 @@ const ventures: SceneDef = {
   kit: 'engineer',
   script: [1400, 1800, 1400],
   back: (layout) => {
-    const door = roomX(layout, VENTURES.door)
+    const at = venturesOf(layout)
+    const door = roomX(layout, at.door)
     return (
       <>
-        <g transform={`translate(${r1(roomX(layout, VENTURES.stall))} ${GROUND}) scale(0.6)`}>
+        <g transform={`translate(${r1(roomX(layout, at.stall))} ${GROUND}) scale(0.6)`}>
           <Swap name="stall" first={<Stall lit={false} />} second={<Stall lit />} />
         </g>
         <g transform={`translate(${r1(door)} ${GROUND})`}>
@@ -887,7 +899,7 @@ const ventures: SceneDef = {
         <g data-fx="web" transform={`translate(${r1(door)} ${GROUND})`}>
           <Web />
         </g>
-        <g data-fx="weaver" transform={`translate(${r1(roomX(layout, VENTURES.weaver))} ${GROUND})`}>
+        <g data-fx="weaver" transform={`translate(${r1(roomX(layout, at.weaver))} ${GROUND})`}>
           <Sprite sprite={WEAVER} />
         </g>
         <g data-fx="pay" opacity={0}>
@@ -922,7 +934,8 @@ const ventures: SceneDef = {
     const charm = fx(stage, 'charm')
     const web = fx(stage, 'web')
     const weaver = fx(stage, 'weaver')
-    const [from, buyX, stallX, showX, weaverX, doorX] = [VENTURES.from, VENTURES.buy, VENTURES.stall, VENTURES.show, VENTURES.weaver, VENTURES.door].map((dx) => roomX(layout, dx))
+    const at = venturesOf(layout)
+    const [from, buyX, stallX, showX, weaverX, doorX] = [at.from, at.buy, at.stall, at.show, at.weaver, at.door].map((dx) => roomX(layout, dx))
     const laneY = (i: number): number => lerp(box.top + 25, box.bottom - 25, i / (THREADS - 1))
     return (_p, _f, play = START) => {
       const bought = share(play, 0)
