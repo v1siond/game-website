@@ -11,7 +11,6 @@ import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { sectionPlan } from '@/lib/cv/sectionPlan'
 import { headingId } from '@/lib/cv/sectionText'
@@ -59,7 +58,7 @@ const ROOT_VARS = { ...PALETTE_VARS, ...TONE_VARS.jungle }
 // end frame.
 //
 // The root carries the palette as --tp-* variables and the day tone as --tone-* (the one inline style,
-// variables only), the pointer as --mx and --my, and clips sideways overflow with overflow-x: clip, not
+// variables only) and clips sideways overflow with overflow-x: clip, not
 // hidden: hidden would make the root a scroll container and break the fixed canopy.
 
 const PHONE_QUERY = '(max-width: 767.98px)'
@@ -75,7 +74,6 @@ export default function TropicalPlatformerTheme() {
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
-  const rootRef = usePointerVars(!reduced)
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
     [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
@@ -87,7 +85,6 @@ export default function TropicalPlatformerTheme() {
 
   return (
     <div
-      ref={rootRef}
       style={ROOT_VARS}
       className={`relative min-h-screen overflow-x-clip [--theatre-ground:var(--tp-jungle-deep)] ${look.root} ${paint.scene} ${jungleFace.variable}`}
     >
