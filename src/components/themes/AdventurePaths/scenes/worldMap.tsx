@@ -1,6 +1,7 @@
 import type { Profession } from '@/lib/cv/professions'
 import { fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
+import type { LevelInput } from './level'
 import { HeroRig, W, H, rigOf, runFrame } from './kit'
 
 // The world map every level opens on, the overhead screen of the 16 bit platformer: one island in a blue
@@ -42,11 +43,17 @@ const BRIDGE = [0, 1, 2, 3].map((i) => [RIVER_X - 30 + i * 20, 382 + i * 6] as c
 
 const ISLAND = 'M60 430 V300 H110 V190 H250 V130 H520 V160 H700 V110 H960 V260 H980 V480 H880 V560 H430 V530 H200 V500 H60 Z'
 
-/** Where the map box sits on the canvas: its corner and scale. */
-const placeOf = (phone: boolean): { x: number; y: number; k: number } => (phone ? { x: 575, y: 520, k: 0.45 } : { x: 300, y: 260, k: 1 })
+/** What places the map: a phone's view, or the half of a wide screen the level plays in (level.ts). */
+type MapScreen = Pick<LevelInput, 'phone' | 'left'>
 
-const onCanvas = (phone: boolean, [x, y]: readonly [number, number]): [number, number] => {
-  const { x: ox, y: oy, k } = placeOf(phone)
+/** Where the map box sits on the canvas: its corner and scale. On a wide screen it stands, seven tenths of its
+ *  size (the island 644 wide), on the half its level plays in, beside the section's cards: from x 862 to 1506
+ *  right of cards on the left, from x 142 to 786 left of cards on the right. */
+const placeOf = ({ phone, left }: MapScreen): { x: number; y: number; k: number } =>
+  phone ? { x: 575, y: 520, k: 0.45 } : { x: left ? 100 : 820, y: 330, k: 0.7 }
+
+const onCanvas = (screen: MapScreen, [x, y]: readonly [number, number]): [number, number] => {
+  const { x: ox, y: oy, k } = placeOf(screen)
   return [ox + x * k, oy + y * k]
 }
 
@@ -105,9 +112,9 @@ function Spot({ id }: { id: SpotId }) {
   return <circle cx={x} cy={y} r={16} fill={TRAIL.BLOCK} stroke={TRAIL.HUD} strokeWidth={4} />
 }
 
-/** The map over level `at`, its iris and his marker; `phone` scales it into a phone's view. */
-export function WorldMap({ phone, profession, at }: { phone: boolean; profession: Profession; at: SpotId }) {
-  const { x, y, k } = placeOf(phone)
+/** The map over level `at`, its iris and his marker, on the level's half; `phone` scales it into a phone's view. */
+export function WorldMap({ phone, left, profession, at }: MapScreen & { profession: Profession; at: SpotId }) {
+  const { x, y, k } = placeOf({ phone, left })
   // one clip per stage: every stage of the theatre is in the page at once
   const clip = `ap-iris-${at}`
   const main = ROUTE.map((id) => SPOTS[id])
@@ -184,7 +191,7 @@ export interface MapFrame {
   cheer?: boolean
 }
 
-export function mapWriter(stage: ParentNode, { phone, from, at }: { phone: boolean; from: SpotId; at: SpotId }): (frame: MapFrame) => void {
+export function mapWriter(stage: ParentNode, { phone, left, from, at }: MapScreen & { from: SpotId; at: SpotId }): (frame: MapFrame) => void {
   const map = fx(stage, 'map')
   const iris = fx(stage, 'iris')
   const marker = rigOf(stage, 'marker', 'stand')
@@ -194,7 +201,7 @@ export function mapWriter(stage: ParentNode, { phone, from, at }: { phone: boole
   const smoke = fx(stage, 'map-smoke')
   const [ax, ay] = SPOTS[from]
   const [bx, by] = SPOTS[at]
-  const [cx, cy] = onCanvas(phone, SPOTS[at])
+  const [cx, cy] = onCanvas({ phone, left }, SPOTS[at])
   return ({ walk, open, fill = 0, crumble = 0, cheer = false }) => {
     fadeTo(map, open >= 1 ? 0 : 1)
     iris?.setAttribute('d', irisPath(cx, cy, 1900 * open ** 1.5))

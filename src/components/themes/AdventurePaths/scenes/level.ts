@@ -12,6 +12,8 @@ import type { SpotId } from './worldMap'
 export interface LevelInput {
   profession: Profession
   phone: boolean
+  /** From lg the level plays on the left half, its section's cards reading on the right (scenes.ts sideOf). */
+  left: boolean
   /** The spot he walks from on the map: the one before this level in the page. */
   from: SpotId
   /** This level's spot. */
@@ -29,8 +31,9 @@ export interface Level {
 /** How far action `i` has played: 0 before it, its eased t while it plays, 1 once it is over. */
 export const phase = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action < i ? 0 : t)
 
-/** Where he starts in a level: right of the text column on a wide screen, in a phone's view (x 570 to 1030). */
-export const startX = ({ phone }: Pick<LevelInput, 'phone'>): number => (phone ? 640 : 860)
+/** Where he starts in a level: right of the text column on a wide screen, or 700 further left when the cards
+ *  read on the right, so the level fills the left half the same way; in a phone's view (x 570 to 1030). */
+export const startX = ({ phone, left }: Pick<LevelInput, 'phone' | 'left'>): number => (phone ? 640 : left ? 160 : 860)
 
 /** A level's distances on a phone, which sees less of the canvas. */
 export const reach = ({ phone }: Pick<LevelInput, 'phone'>, d: number): number => (phone ? d * 0.65 : d)

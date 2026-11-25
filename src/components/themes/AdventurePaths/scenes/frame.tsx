@@ -42,7 +42,7 @@ export function levelLayers(art: LevelArt, input: LevelInput, map = true): Stage
     },
     { name: 'fg', node: <Canvas>{art.fg}</Canvas> },
   ]
-  return map ? [...layers, { name: 'map', node: <WorldMap phone={input.phone} profession={input.profession} at={input.at} /> }] : layers
+  return map ? [...layers, { name: 'map', node: <WorldMap phone={input.phone} left={input.left} profession={input.profession} at={input.at} /> }] : layers
 }
 
 interface FoeProps {

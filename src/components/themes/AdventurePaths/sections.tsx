@@ -16,7 +16,7 @@ import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince, newTabHint } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { JOURNAL_SERIF } from './palette'
-import { LAYER_MOTION, type TrailScene } from './scenes'
+import { LAYER_MOTION, type SceneSide, type TrailScene } from './scenes'
 import page from './page.module.css'
 
 // One section per level: a tall head that first shows the level alone while it plays and then brings the
@@ -304,14 +304,21 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
   muayThai: MuayThaiCards,
 }
 
+/** From lg a section's title and cards read on the half its level leaves free, and the scrim darkens that half. */
+export const READS_BESIDE: Record<SceneSide, { reads: string; scrim: string }> = {
+  right: { reads: '', scrim: page.scrim },
+  left: { reads: page.readsRight, scrim: `${page.scrim} ${page.scrimRight}` },
+}
+
 /** One level: under reduced motion its own stage sits still behind its head. */
 export function LevelSection({ scene, still }: { scene: TrailScene & { slot: SectionSlot }; still: boolean }) {
   const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `trail-${scene.id}`
+  const { reads, scrim } = READS_BESIDE[scene.side]
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${reads}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={scrim} />}
       <header className={page.head}>
         <h2 id={headingId} className={`${page.title} ${JOURNAL_SERIF}`}>
           {sections[scene.slot.titleKey]}

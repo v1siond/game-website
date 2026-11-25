@@ -8,6 +8,7 @@ import { ContactSigns } from './actions'
 import { JOURNAL_SERIF } from './palette'
 import { LAYER_MOTION, type TrailScene } from './scenes'
 import page from './page.module.css'
+import { READS_BESIDE } from './sections'
 
 // The pieces round the levels: the HUD bar at the top of the screen (his initials, back to the top) and
 // the goal at the end, the contact, under the run through the goal gate.
@@ -27,8 +28,8 @@ export function Hud({ anchor }: { anchor: string }) {
 export function Goal({ scene, still }: { scene: TrailScene; still: boolean }) {
   const { sections } = useLabels()
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="trail-contact" className={page.goal}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="trail-contact" className={`${page.goal} ${READS_BESIDE[scene.side].reads}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={READS_BESIDE[scene.side].scrim} />}
       <RecruiterHero
         render={({ line, actions }) => (
           <div className={page.goalCopy}>

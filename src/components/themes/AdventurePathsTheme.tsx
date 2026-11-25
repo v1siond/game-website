@@ -16,7 +16,7 @@ import { Goal, Hud } from './AdventurePaths/chrome'
 import { ExpeditionHero } from './AdventurePaths/hero'
 import { TRAIL_VARS } from './AdventurePaths/palette'
 import { LAYER_MOTION, scenesOf, type TrailScene } from './AdventurePaths/scenes'
-import { LevelSection } from './AdventurePaths/sections'
+import { LevelSection, READS_BESIDE } from './AdventurePaths/sections'
 import map from './AdventurePaths/map.module.css'
 import page from './AdventurePaths/page.module.css'
 
@@ -35,6 +35,8 @@ import page from './AdventurePaths/page.module.css'
 // carries its own picture, still, at its end frame.
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the level stand side by side, the sections alternating which half each takes.
+const WIDE_QUERY = '(min-width: 1024px)'
 
 const hasSlot = (scene: TrailScene): scene is TrailScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -44,10 +46,11 @@ export default function AdventurePathsTheme() {
   const cv = useCVData()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const wide = useMediaQuery(WIDE_QUERY)
   const pointerRef = usePointerVars(!reduced)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), active, phone),
-    [view, cv, active, phone],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), active, { phone, wide }),
+    [view, cv, active, phone, wide],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
@@ -59,7 +62,7 @@ export default function AdventurePathsTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef} className={page.theatre}>
           {scenes.map((scene) => (
-            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={READS_BESIDE[scene.side].scrim} />
           ))}
         </Theatre>
       )}
