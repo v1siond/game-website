@@ -25,8 +25,13 @@ const DIP = 14
 const OPEN = -240
 const BLOCK = 33
 const RIDGE = { from: 630, h: 50 }
-// how far the camera looks past him on each side: less on the left, where he already holds near the edge
-const LOOK_AHEAD: Record<Side, number> = { right: 280, left: 150 }
+// How far the camera looks past him at t on each side: on the right the whole way ahead while the wheel and
+// the boys come; on the left as far while the wheel comes, then less, since he already holds near the edge
+// and the boys chase him toward it.
+const LOOK_AHEAD: Record<Side, (t: number) => number> = {
+  right: (t) => 280 * (ramp(t, 0.04, 0.14) - ramp(t, 0.6, 0.8)),
+  left: (t) => 280 * ramp(t, 0.04, 0.14) - 130 * ramp(t, 0.34, 0.6) - 150 * ramp(t, 0.6, 0.8),
+}
 
 interface Hunter {
   weapon: Weapon
@@ -105,7 +110,7 @@ export const services: Place = {
   script: [1600, 1700, 1500],
   ends: [0.34, 0.7, 1],
   gaps: [HOLLOW],
-  lead: (t, { side }) => LOOK_AHEAD[side] * (ramp(t, 0.04, 0.14) - ramp(t, 0.6, 0.8)),
+  lead: (t, { side }) => LOOK_AHEAD[side](t),
   obstacle: ({ light }: { light: Light }) => (
     <>
       <rect x={HOLLOW[0]} y={DIP} width={HOLLOW[1] - HOLLOW[0]} height={1000} fill={SHADE.black} />
