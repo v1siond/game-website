@@ -63,6 +63,16 @@
   fill: var(--tone-far);
 }
 
+.sea {
+  fill: var(--tone-sea);
+}
+
+.seaLit {
+  fill: none;
+  stroke: var(--tone-sea-lit);
+  stroke-linecap: round;
+}
+
 .farLit {
   fill: var(--tone-far-lit);
 }

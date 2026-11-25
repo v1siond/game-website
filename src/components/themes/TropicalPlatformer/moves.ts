@@ -19,7 +19,7 @@ export interface Frame {
   opacity?: number
 }
 
-/** His size on the stage: place units per unit of his drawing. */
+/** His size on the stage: place units per unit of his drawing (about 190 tall). */
 export const K = 1.5
 
 export const ease = (t: number): number => t * t * (3 - 2 * t)
@@ -40,27 +40,21 @@ export const TUCK = posed({ rise: 28, thighRight: -120, shinRight: 140, thighLef
 export const REACH = posed({ armRight: -168, foreRight: -6, armLeft: -150, foreLeft: -10, thighRight: -40, shinRight: 60, thighLeft: -10, shinLeft: 40 })
 /** Riding: seated with the knees forward, the hands on the rim or the boar's neck. */
 export const RIDE = posed({ rise: 12, thighRight: -80, shinRight: 75, thighLeft: -70, shinLeft: 75, armRight: -60, foreRight: -30, armLeft: -50, foreLeft: -30 })
-/** Hunched low in the cart, the head down under what passes over. */
-export const DUCK = posed({ rise: 30, lean: 30, thighRight: -100, shinRight: 110, thighLeft: -90, shinLeft: 110, armRight: -40, foreRight: -60, armLeft: -30, foreLeft: -60 })
 /** Lifting something over his head in both hands. */
 export const LIFT = posed({ armRight: -175, foreRight: -30, armLeft: -165, foreLeft: -30, thighRight: -10, thighLeft: 12 })
 /** Throwing: leant in, the near arm flung forward and down. */
 export const THROW = posed({ lean: 16, armRight: -70, foreRight: -10, armLeft: -50, foreLeft: -10, thighRight: -30, shinRight: 30, thighLeft: 20, shinLeft: 10 })
-/** Knocked back: leant away, the arms thrown up. */
-export const KNOCKED = posed({ lean: -24, armRight: -140, foreRight: -40, armLeft: -120, foreLeft: -50, thighRight: -30, shinRight: 50, thighLeft: 10, shinLeft: 30 })
 /** Angry: the heavy fists down at his sides, leant forward over the empty cave. */
 export const FISTS = posed({ rise: 6, lean: 10, armRight: 14, foreRight: -30, armLeft: 18, foreLeft: -30, thighRight: -18, shinRight: 22, thighLeft: 12, shinLeft: 14 })
-/** A stamp: the near foot raised high before it comes down. */
-export const STAMP_UP = posed({ ...FISTS, thighRight: -80, shinRight: 70, rise: 0 })
-/** Swimming: laid along the water, the arms reaching ahead, the legs trailing. */
-export const SWIM = posed({ lean: 78, armRight: -170, foreRight: 0, armLeft: -150, foreLeft: -10, thighRight: 10, shinRight: 30, thighLeft: -10, shinLeft: 20 })
 export const GUARD = posed({ armRight: -40, foreRight: -110, armLeft: -50, foreLeft: -105, thighRight: -12, thighLeft: 14 })
 /** The teep: the near foot driven straight out from the hip, leant back, the guard up. */
 export const TEEP = posed({ lean: -16, rise: 2, thighRight: -92, shinRight: -2, thighLeft: 8, shinLeft: 12, armRight: -40, foreRight: -110, armLeft: -50, foreLeft: -105 })
 /** The flying knee: the near knee driven up and forward, the far leg trailing, both hands down on the clinch. */
 export const KNEE = posed({ lean: 6, thighRight: -110, shinRight: 120, thighLeft: 30, shinLeft: 40, armRight: -70, foreRight: -60, armLeft: -60, foreLeft: -70 })
-/** Holding a big thing to his chest in both arms. */
-export const HUG = posed({ armRight: -70, foreRight: -80, armLeft: -60, foreLeft: -85 })
+/** The slam: down on his bent knees, both heavy fists driven into the ground before him. */
+export const SLAM = posed({ rise: 22, lean: 26, thighRight: -70, shinRight: 90, thighLeft: -50, shinLeft: 80, armRight: -20, foreRight: -4, armLeft: -14, foreLeft: -4 })
+/** The key turned in a lock: the near arm held out level, the far one ready at his side. */
+export const KEY = posed({ armRight: -84, foreRight: -16, armLeft: 10, foreLeft: -30, thighRight: -10, thighLeft: 10 })
 
 /** A walk step at `phase`, facing right. */
 export const stride = (phase: number): FigurePose => ({ ...FIGURE_STAND, ...walk(phase, 1) })
@@ -70,12 +64,6 @@ export const roll = (phase: number): FigurePose => {
   const near = Math.max(0, Math.sin(Math.PI * phase))
   const far = Math.max(0, -Math.sin(Math.PI * phase))
   return posed({ armRight: -45 + 25 * near, foreRight: -70 + 30 * near, armLeft: -40 + 25 * far, foreLeft: -70 + 30 * far, thighRight: -6, thighLeft: 8 })
-}
-
-/** The swim stroke at `phase`: the arms pulling in turn, the legs kicking. */
-export const stroke = (phase: number): FigurePose => {
-  const s = Math.sin(Math.PI * phase)
-  return { ...SWIM, armRight: -170 + 60 * Math.max(0, s), armLeft: -150 + 60 * Math.max(0, -s), thighRight: 10 + 18 * s, thighLeft: -10 - 18 * s }
 }
 
 /** The middle of his tucked body in his drawing, from his soles: what a tumble turns him round. */

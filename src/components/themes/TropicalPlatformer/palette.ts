@@ -69,12 +69,29 @@ export const COLORS = {
   lamp: '#ffb347',
 } as const
 
+/** The troop: him and his four friends, our own, each with his own colour (research/2026-11-25-deep-dk64 §2: one
+ *  colour per ape, his fruit, his pad, his door and his lamp in it). */
+export type Ape = 'him' | 'lemur' | 'orangutan' | 'tamarin' | 'silverback'
+
+export const TROOP: Record<Ape, string> = {
+  him: '#ffc93c',
+  lemur: '#e0382c',
+  orangutan: '#2f86e8',
+  tamarin: '#9a52e0',
+  silverback: '#3fb83a',
+}
+
+/** The troop in the order the game frees them and the order their pads, doors and lamps stand in. */
+export const TROOP_ORDER: readonly Ape[] = ['him', 'lemur', 'orangutan', 'tamarin', 'silverback']
+
 export type ColorName = keyof typeof COLORS
 
-// The light of each scene: the backlit sunset, the dusk jungle with its banded treeline, the day jungle
-// under a pale sky, the misty giant tree with its lanterns, and night. Every scenery shape reads its
-// colours from the tone it sits in (scenery.tsx sets them as --tone-* variables), so one drawing serves
-// every scene.
+// The light of each place of the run, one palette per world as the game it comes from gives each world its own
+// (research/2026-11-25-footage-dk64, Look): his isle by day after the storm, the green jungle under a blue sky,
+// the orange desert temple, the grey steel toy factory, the deep blue cove of wrecks, the mushroom forest, the
+// purple castle in the rain, the dark steel hideout, the bright ring and the sunset sea. Every scenery shape
+// reads its colours from the tone it sits in (scenery.tsx sets them as --tone-* variables), so one drawing
+// serves every place.
 export interface ToneColors {
   skyHigh: string
   skyLow: string
@@ -86,82 +103,34 @@ export interface ToneColors {
   rim: string
   trunk: string
   bloom: string
+  /** The water of a place by the sea, its deep and its lit crest. */
+  sea: string
+  seaLit: string
 }
 
-export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'night' | 'mine' | 'lake' | 'cave' | 'factory' | 'deck'
+export type Tone = 'isle' | 'jungle' | 'desert' | 'factory' | 'cove' | 'fungi' | 'castle' | 'helm' | 'ring' | 'sea'
 
 export const TONES: Record<Tone, ToneColors> = {
-  // the sunset's planes are its dusk and orange and the black shapes in front of the light
-  sunset: {
-    skyHigh: COLORS.dusk,
-    skyLow: COLORS.sunsetOrange,
-    farLit: '#5a2340',
-    far: COLORS.duskDeep,
-    leafLit: COLORS.shadowSoft,
-    leaf: '#1d0f0c',
-    leafShade: COLORS.shadow,
-    rim: COLORS.sunsetOrange,
-    trunk: '#1d0f0c',
-    bloom: '#3a1418',
-  },
-  dusk: {
-    skyHigh: '#3a1450',
-    skyLow: '#f4a23a',
-    farLit: '#3e5a2a',
-    far: '#22371c',
-    leafLit: '#3f8a2a',
-    leaf: '#1f5420',
-    leafShade: '#0a2410',
-    rim: COLORS.lamp,
-    trunk: '#3a2414',
-    bloom: '#b8323e',
-  },
-  jungle: {
-    skyHigh: '#4b4a7a',
-    skyLow: '#f3e6c0',
-    farLit: '#3a6a35',
-    far: '#1f4626',
-    leafLit: '#7cc243',
-    leaf: '#3a8a2c',
-    leafShade: '#0f3317',
-    rim: '#d9f58a',
-    trunk: '#4a2f18',
-    bloom: '#d8434f',
-  },
-  treetop: {
-    skyHigh: '#0d3a40',
-    skyLow: '#2b8a8a',
-    farLit: '#1d5f63',
-    far: '#0f3d42',
-    leafLit: '#4f9a5a',
-    leaf: '#2a6a3e',
-    leafShade: '#0c2a24',
-    rim: '#ffcf6b',
-    trunk: '#5a3a22',
-    bloom: '#ffb347',
-  },
-  night: {
-    skyHigh: COLORS.nightDeep,
-    skyLow: COLORS.nightSky,
-    farLit: '#1f5560',
-    far: '#123040',
-    leafLit: '#3aa5a0',
-    leaf: '#1d6466',
-    leafShade: '#0a2a30',
-    rim: '#8fe0d8',
-    trunk: '#14262c',
-    bloom: '#7a2a4a',
-  },
-  // the mine under the island: dark rock, timber and lamp light
-  mine: { skyHigh: '#120c08', skyLow: '#3a2618', farLit: '#4a3220', far: '#2a1c12', leafLit: '#6a4a2a', leaf: '#4a3220', leafShade: '#1a100a', rim: '#ffb347', trunk: '#5a3a22', bloom: '#ffb347' },
-  // under the ice of the cold lake: blue and quiet
-  lake: { skyHigh: '#0a2a4a', skyLow: '#1d6a8a', farLit: '#3a8aa8', far: '#145070', leafLit: '#4ab0a0', leaf: '#2a7a7a', leafShade: '#0a2a3a', rim: '#bff0ff', trunk: '#1a3a4a', bloom: '#7fe3d0' },
-  // the pitch dark cave in the glacier
-  cave: { skyHigh: '#05070c', skyLow: '#0c1420', farLit: '#1a2a3a', far: '#0c1622', leafLit: '#2a3a4a', leaf: '#16222e', leafShade: '#05080c', rim: '#7fa8c8', trunk: '#101820', bloom: '#3a4a5a' },
-  // the rusty factory of oil drums
-  factory: { skyHigh: '#2a1a1a', skyLow: '#8a4a2a', farLit: '#5a3a2a', far: '#3a2418', leafLit: '#7a5a3a', leaf: '#4a3424', leafShade: '#1a100c', rim: '#ff9a3a', trunk: '#3a2a20', bloom: '#ff6a2a' },
-  // the captain's ship at sunset
-  deck: { skyHigh: '#5a2a6a', skyLow: '#ffb04a', farLit: '#2a5a8a', far: '#1a3a6a', leafLit: '#c98d4a', leaf: '#8a5a2a', leafShade: '#3a2210', rim: '#ffe08a', trunk: '#4a2a12', bloom: '#cf3b26' },
+  // his isle the morning after the storm: green palms, a pale blue sky, the sea round it
+  isle: { skyHigh: '#3f7fc4', skyLow: '#d6eef2', farLit: '#4a9a6a', far: '#2a6a4a', leafLit: '#7cc243', leaf: '#3a8a2c', leafShade: '#0f3317', rim: '#e9ffb0', trunk: '#5a3a1e', bloom: '#d8434f', sea: '#1f6fa8', seaLit: '#7fd0e8' },
+  // the jungle: lush greens under a blue sky
+  jungle: { skyHigh: '#3a78c0', skyLow: '#d9f0d0', farLit: '#3a6a35', far: '#1f4626', leafLit: '#7cc243', leaf: '#3a8a2c', leafShade: '#0f3317', rim: '#d9f58a', trunk: '#4a2f18', bloom: '#d8434f', sea: '#1f4626', seaLit: '#3a6a35' },
+  // the desert temple: orange sand and red stone under a hot sky
+  desert: { skyHigh: '#c8562a', skyLow: '#ffd08a', farLit: '#e09a52', far: '#b0602e', leafLit: '#eab066', leaf: '#c8803e', leafShade: '#6a2e14', rim: '#fff0b0', trunk: '#9a3e24', bloom: '#3aa8a0', sea: '#c8803e', seaLit: '#eab066' },
+  // the toy factory: dark grey steel and the toys' bright colours
+  factory: { skyHigh: '#14161c', skyLow: '#343844', farLit: '#4a505c', far: '#262a32', leafLit: '#7a828e', leaf: '#4a525c', leafShade: '#121418', rim: '#ffd24a', trunk: '#3a3e46', bloom: '#e8463a', sea: '#262a32', seaLit: '#4a505c' },
+  // the cove of wrecks: deep blue water in the dark
+  cove: { skyHigh: '#040a1e', skyLow: '#103562', farLit: '#1d4a7a', far: '#0c2644', leafLit: '#2a6a8a', leaf: '#16405a', leafShade: '#051224', rim: '#8fd8ff', trunk: '#3a2a1e', bloom: '#ffd24a', sea: '#0c3a6c', seaLit: '#4a9ad0' },
+  // the mushroom forest by day (its night falls over it in its place)
+  fungi: { skyHigh: '#3a8ad0', skyLow: '#cfeccf', farLit: '#4a9a5a', far: '#2a6a3a', leafLit: '#8acb4a', leaf: '#3f8a2c', leafShade: '#0f3317', rim: '#f0ffb0', trunk: '#e2d2b2', bloom: '#d83a3a', sea: '#2a6a3a', seaLit: '#4a9a5a' },
+  // the castle in the rain: purple and black, green moss on the stones
+  castle: { skyHigh: '#0c0618', skyLow: '#3e1c50', farLit: '#3a2a4e', far: '#1c1230', leafLit: '#55703e', leaf: '#2e3a2a', leafShade: '#0a0a10', rim: '#c0b0ff', trunk: '#4c4660', bloom: '#ffb347', sea: '#2a2438', seaLit: '#5a5070' },
+  // the hideout in the fortress's head: dark steel under a red alarm
+  helm: { skyHigh: '#0a0c10', skyLow: '#20252e', farLit: '#3a424e', far: '#1a1e26', leafLit: '#5a6470', leaf: '#2e343e', leafShade: '#0a0c10', rim: '#ff5a3a', trunk: '#2a3038', bloom: '#ff3a2a', sea: '#1a1e26', seaLit: '#3a424e' },
+  // the ring under the lights: a dark crowd, the blue mat and its red stars, white ropes
+  ring: { skyHigh: '#04050c', skyLow: '#141a34', farLit: '#2a3460', far: '#10142a', leafLit: '#3a6ae0', leaf: '#2446b0', leafShade: '#0a1440', rim: '#ffffff', trunk: '#c8ccd8', bloom: '#e02a2a', sea: '#10142a', seaLit: '#2a3460' },
+  // the sunset sea on the way home: dusk and orange, the shapes black against it
+  sea: { skyHigh: COLORS.dusk, skyLow: COLORS.sunsetOrange, farLit: '#5a2340', far: COLORS.duskDeep, leafLit: COLORS.shadowSoft, leaf: '#1d0f0c', leafShade: COLORS.shadow, rim: COLORS.sunsetOrange, trunk: '#1d0f0c', bloom: '#ffc93c', sea: '#6a2a44', seaLit: '#f2a24a' },
 }
 
 /** Each tone's colours as --tone-<name>, set on the scene that holds the shapes. */

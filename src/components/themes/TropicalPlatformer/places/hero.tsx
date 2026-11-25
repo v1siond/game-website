@@ -1,26 +1,31 @@
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
 import { Carrier, Mango, Treehouse } from '../cast'
-import { CROUCH, FISTS, REACH, RIDE, STAMP_UP, STAND, TUCK, blend, ease, flight, still, type Frame } from '../moves'
+import { Fortress } from '../crocs'
+import { CROUCH, FISTS, REACH, RIDE, SLAM, STAND, TUCK, blend, ease, flight, still, type Frame } from '../moves'
 import type { SceneDef } from '../place'
-import { COVER, Dust, hopOf } from './kit'
+import { COVER, Dust } from './kit'
 
-// The hero: the theft on a stormy night, then the morning. He sleeps sitting on the edge of his treehouse
-// porch, dim under the storm, while two of the captain's beetles carry the last crates of the store out of the
-// cave under it and off in the rain, a lightning flash showing them, and drop mangoes on the way; the storm
-// clears into morning, he wakes, drops from the porch to the empty cave, stamps once and stands there with
-// his fists down. He is in view from the first frame, as the world's figure. On a page with no About his
-// partner bursts out of the door after him. The treehouse stands right of the hero card on a wide screen.
+// The hero: the invasion and the theft on his isle (research/2026-11-25-deep-dk64 §1: the crocodile fortress
+// moored off the isle, the hoard carried off while the hero sleeps, the slam he learns first). He sleeps
+// sitting on the edge of his treehouse porch, dim under the storm, while two snappers carry the last crates of
+// golden mangoes out of the cave under it and off to the shore, a lightning flash showing them and the king's
+// fortress moored on the sea, its eyes lit red; the storm clears into morning, he wakes, drops from the porch
+// to the empty cave and slams the ground, a ring running out from his fists, and stands there with his fists
+// down, the fortress across the water. He is in view from the first frame, as the world's figure. The
+// treehouse stands right of the hero card on a wide screen, the fortress left of it.
 
 // His treehouse round his spot: the door on the porch, the cave under it from x 110 to 250 (cast.tsx).
 const DOOR = { x: 133, lift: 350 }
 const LAND = 100
-const PARTNER_LAND = 10
-// The two carriers from the cave mouth out past the right edge of the view, and the mangoes they drop.
-const CARRIERS = [190, 250] as const
-const AWAY = 620
-const DROPPED = [300, 370, 450] as const
+// The two carriers from the cave mouth off to the shore on the left, and the mangoes they drop on the way.
+const CARRIERS = [190, 260] as const
+const AWAY = -560
+const DROPPED = [40, -60, -170] as const
 const RAIN = 26
+// The fortress on the horizon (the sea line is 260 above the ground), left of the hero card on a wide screen
+// and in the free left of a phone's view: [x, y, size].
+const FORTRESS = { wide: [-930, -262, 0.6], phone: [-50, -262, 0.42] } as const
 
 const STORM = '#0a1430'
 
@@ -37,58 +42,63 @@ const move = (t: number): Frame => {
     return { pose: t < 0.58 ? blend(CROUCH, REACH, t, 0.47, 0.52) : blend(REACH, TUCK, t, 0.58, 0.62), ahead, lift }
   }
   if (t < 0.7) return still(blend(CROUCH, STAND, t, 0.62, 0.7), LAND)
-  if (t < 0.8) return still(blend(STAND, STAMP_UP, t, 0.72, 0.8), LAND)
-  if (t < 0.86) return still(blend(STAMP_UP, FISTS, t, 0.8, 0.84), LAND)
-  return still(FISTS, LAND)
+  // the slam: up on his toes with his fists high, then both fists into the ground
+  if (t < 0.78) return still(blend(STAND, REACH, t, 0.72, 0.78), LAND, 30 * ramp(t, 0.72, 0.78))
+  if (t < 0.82) return still(blend(REACH, SLAM, t, 0.78, 0.81), LAND, 30 * (1 - ramp(t, 0.78, 0.81)))
+  if (t < 0.9) return still(SLAM, LAND)
+  return still(blend(SLAM, FISTS, t, 0.9, 0.97), LAND)
 }
 
 export const hero: SceneDef = {
-  zone: 'jungle',
+  zone: 'isle',
   kit: null,
   script: [1800, 1500, 1400],
   ends: [0.36, 0.7, 1],
-  shift: { wide: 300, phone: 50 },
-  back: () => (
-    <g>
-      <Treehouse />
-      {DROPPED.map((x, i) => (
-        <g key={x} data-fx={`dropped-${i}`} opacity="0" transform={`translate(${x} -14) rotate(${i * 50 - 40})`}>
-          <Mango size={0.8} />
+  span: [-200, 360],
+  spot: { wide: 1120, phone: 630 },
+  back: ({ phone }) => {
+    const [x, y, size] = FORTRESS[phone ? 'phone' : 'wide']
+    return (
+      <g>
+        <g transform={`translate(${x} ${y}) scale(${size})`}>
+          <Fortress />
         </g>
-      ))}
-      {CARRIERS.map((x, i) => (
-        <g key={x} data-fx={`carrier-${i}`} transform={`translate(${x} 0)`}>
-          <Carrier />
-        </g>
-      ))}
-      <Dust name="hero-dust" x={LAND + 30} size={90} />
-    </g>
-  ),
+        <Treehouse />
+        {DROPPED.map((at, i) => (
+          <g key={at} data-fx={`dropped-${i}`} opacity="0" transform={`translate(${at} -14) rotate(${i * 50 - 40})`}>
+            <Mango size={0.8} />
+          </g>
+        ))}
+        {CARRIERS.map((at, i) => (
+          <g key={at} data-fx={`carrier-${i}`} transform={`translate(${at} 0)`}>
+            <Carrier />
+          </g>
+        ))}
+        <ellipse data-fx="slam-ring" cx={LAND + 30} cy={0} rx={60} ry={12} fill="none" stroke="#fff4c2" strokeWidth={8} vectorEffect="non-scaling-stroke" opacity="0" />
+        <Dust name="hero-dust" x={LAND + 30} size={90} />
+      </g>
+    )
+  },
   // The storm's dark and its rain lie over the whole place and over him, the lightning over them.
   front: () => (
     <g>
       <rect data-fx="storm" {...COVER} fill={STORM} opacity="0.72" />
       <g data-fx="rain" opacity="0.8">
         {Array.from({ length: RAIN }, (_, i) => (
-          <path key={i} d={`M${(i * 97) % 1300 - 500} ${((i * 211) % 900) - 800} l-18 60`} stroke="#9fb8e8" strokeWidth={3} strokeLinecap="round" />
+          <path key={i} d={`M${((i * 97) % 1300) - 700} ${((i * 211) % 900) - 800} l-18 60`} stroke="#9fb8e8" strokeWidth={3} strokeLinecap="round" />
         ))}
       </g>
       <rect data-fx="lightning" {...COVER} fill="#e8f0ff" opacity="0" />
     </g>
   ),
   move: (_kit, t) => move(t),
-  partner: (t, { partnerJoins }) => {
-    if (!partnerJoins || t < 0.62) return null
-    if (t < 0.66) return { ahead: DOOR.x, lift: DOOR.lift, opacity: ramp(t, 0.62, 0.65) }
-    if (t < 0.8) return hopOf(t, 0.66, 0.8, DOOR.x, PARTNER_LAND, 60, DOOR.lift, 0)
-    return { ahead: PARTNER_LAND, arms: 0.3 * ease(ramp(t, 0.84, 0.92)) }
-  },
-  reply: (stage, { partnerJoins }) => {
+  reply: (stage) => {
     const storm = fx(stage, 'storm')
     const rain = fx(stage, 'rain')
     const lightning = fx(stage, 'lightning')
-    const door = fx(stage, 'door')
     const dust = fx(stage, 'hero-dust')
+    const ring = fx(stage, 'slam-ring')
+    const smoke = fx(stage, 'fortress-smoke')
     const carriers = CARRIERS.map((_, i) => fx(stage, `carrier-${i}`))
     const dropped = DROPPED.map((_, i) => fx(stage, `dropped-${i}`))
     return (t) => {
@@ -98,17 +108,19 @@ export const hero: SceneDef = {
       fadeTo(rain, 0.8 * (1 - clear))
       transformTo(rain, `translate(${r1(-((t * 900) % 60) * 0.3)} ${r1((t * 3000) % 180)})`)
       fadeTo(lightning, 0.7 * bell(t, 0.04, 0.1) + 0.5 * bell(t, 0.2, 0.25))
-      // the carriers walk off with the crates, each dropping a mango as it passes
+      transformTo(smoke, `translate(${r1(30 * t)} ${r1(-40 * t)})`)
+      // the carriers walk off to the shore with the crates, each dropping a mango as it passes
       const walked = ease(ramp(t, 0, 0.34))
       carriers.forEach((carrier, i) => {
-        const x = lerp(CARRIERS[i], AWAY + 80 * i, walked)
+        const x = lerp(CARRIERS[i], AWAY - 80 * i, walked)
         transformTo(carrier, `translate(${r1(x)} ${r1(-4 * Math.abs(Math.sin(t * 60 + i)))})`)
+        fadeTo(carrier, 1 - ramp(t, 0.32, 0.36))
       })
-      dropped.forEach((mango, i) => fadeTo(mango, ramp(lerp(CARRIERS[0], AWAY, walked), DROPPED[i] - 10, DROPPED[i] + 10)))
-      // the door bursts open on its hinge as the partner comes out
-      const open = partnerJoins ? ease(ramp(t, 0.58, 0.62)) : 0
-      transformTo(door, `translate(${r1(100 * open * 1.9)} 0) scale(${(1 - 1.9 * open).toFixed(3)} 1)`)
-      // the stamp raises a puff of dust
+      dropped.forEach((mango, i) => fadeTo(mango, ramp(-lerp(CARRIERS[0], AWAY, walked), -DROPPED[i] - 10, -DROPPED[i] + 10)))
+      // the slam rings out round his fists and raises the dust
+      const out = ramp(t, 0.8, 0.95)
+      transformTo(ring, `translate(${r1(LAND + 30)} 0) scale(${(1 + 4 * out).toFixed(3)}) translate(${-(LAND + 30)} 0)`)
+      fadeTo(ring, bell(t, 0.79, 0.96))
       fadeTo(dust, bell(t, 0.62, 0.68) * 0.8 + bell(t, 0.8, 0.94))
     }
   },

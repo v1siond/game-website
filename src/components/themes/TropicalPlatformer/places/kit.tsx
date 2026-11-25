@@ -9,8 +9,8 @@ import type { PartnerFrame } from '../partner'
 // What the places share: the cover a place lays over the whole view (the storm's dark, the cave's dark, the
 // flash), a puff of dust, and the partner's frames that follow his.
 
-/** A rect over the whole view round his spot, on a wide screen and on a phone, at any shift. */
-export const COVER = { x: -1400, y: -1300, width: 2600, height: 2400 } as const
+/** A rect over the whole view round his spot, on a wide screen and on a phone, wherever the place stands. */
+export const COVER = { x: -2400, y: -1600, width: 4800, height: 3000 } as const
 
 /** A puff of dust on the ground at `x`, `data-fx` named, its place fading it in and out. */
 export function Dust({ name, x, size = 70 }: { name: string; x: number; size?: number }): ReactNode {

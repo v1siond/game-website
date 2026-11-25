@@ -1,124 +1,165 @@
+import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
-import { mix } from '@/lib/motion/rigPose'
-import { CROUCH, HUG, LIFT, REACH, STAND, blend, ease, flight, still, stride, type Frame } from '../moves'
+import { MangoCrate } from '../cast'
+import { GentleGiant, GiantCage } from '../crocs'
+import { CROUCH, KEY, LIFT, RIDE, STAND, blend, ease, flight, still, type Frame } from '../moves'
 import type { PartnerFrame } from '../partner'
 import type { SceneDef } from '../place'
-import { Elder, Mango, SaveBarrel, SaveHut, Store, Treehouse } from '../cast'
-import { Flash, hopOf } from './kit'
+import { COLORS as C, TROOP_ORDER } from '../palette'
+import { FriendFigure, armTurn, heightOf, type FriendApe } from '../troop'
+import { Flash } from './kit'
 
-// Contact: home, and the run saved. At sunset a giant mango falls from the sky and he catches it in both
-// arms, lifts it over his head and tosses it back onto the store, and the cave under the treehouse behind
-// him is full again; his old relative waves from the porch. He walks to the save barrel by the friend's hut,
-// climbs in and the lid shuts on him with a click; the partner hops up onto the lid. The save barrel stands
-// by the hut, the full store behind.
+// Contact: the ending (research/2026-11-25-deep-dk64 §1: the last key opens the friendly giant's cage, he jumps
+// for joy, and in the longer ending the apes ride him home across the water). At sunset on the sandbar he
+// turns the key in the gentle giant's cage and the five padlocks drop one by one; the door swings open and the
+// giant wades out and jumps for joy, the troop cheering on the sand. Then they climb onto his back, the store's
+// crates with them, and he swims for the isle on the horizon. The troop rides the gentle giant across the
+// water home, the golden mangoes back.
 
-// The treehouse stands behind him to the left, its cave from x -90 to 50.
-const HOUSE = -200
-const STORE_CRATES = 3
-const CATCH = 60
-const BARREL = 300
-const HUT = 470
-const MANGO_FROM = -900
-const HELD = { x: CATCH + 40, y: -150 }
-const OVERHEAD = { x: CATCH, y: -300 }
-const IN_STORE = { x: -30, y: -70 }
-const WALK_TO = 225
-// Climbing in: up over the rim, then down inside it out of sight.
-const RIM = 150
-const PARTNER_START = -50
-const ON_LID = { x: BARREL, lift: 150 }
+const CAGE = 230
+const LOCK_AT = 0.06
+const LOCK_STEP = 0.05
+const OPEN = { from: 0.32, to: 0.4 }
+const JOY = { from: 0.4, to: 0.5 }
+// The giant: in the cage, then out on the water and swimming for the isle.
+const GIANT = { caged: CAGE, out: CAGE + 30, home: CAGE + 80, size: 0.85 }
+const SWIM = { from: 0.66, to: 1 }
+// Where each rider sits on the giant's back, from the giant's middle, and when each hops on.
+const SEATS: Record<'him' | 'lemur' | FriendApe, number> = { him: 50, lemur: -20, orangutan: -80, tamarin: 120, silverback: -150 }
+const BOARD: Record<'him' | 'lemur' | FriendApe, readonly [number, number]> = {
+  him: [0.52, 0.62],
+  lemur: [0.5, 0.58],
+  orangutan: [0.54, 0.64],
+  tamarin: [0.56, 0.64],
+  silverback: [0.58, 0.66],
+}
+// The giant's back above the water, where the riders' feet go, at his size.
+const BACK = 100
+// On the sandbar before the cage: him at the lock, the troop waiting behind him.
+const LOCK = 70
+const SHORE: Record<'lemur' | FriendApe, number> = { lemur: -30, tamarin: -70, orangutan: -130, silverback: -190 }
+const FRIENDS: readonly FriendApe[] = ['orangutan', 'tamarin', 'silverback']
+// The friends are drawn this share of their size, so the giant under them stays the biggest thing in view.
+const RIDER: Record<FriendApe, number> = { orangutan: 0.75, tamarin: 0.85, silverback: 0.68 }
+const ISLE = 520
+const SEATED = 33
+// Riding, his near arm waved high at the isle ahead.
+const WAVING = { ...RIDE, armRight: -160, foreRight: -10 }
 
-const move = (t: number): Frame => {
-  if (t < 0.24) return still(blend(STAND, REACH, t, 0.1, 0.22), CATCH)
-  if (t < 0.36) return still(mix(blend(REACH, HUG, t, 0.24, 0.29), CROUCH, 0.4 * bell(t, 0.26, 0.36)), CATCH)
-  if (t < 0.5) return still(t < 0.44 ? blend(HUG, LIFT, t, 0.36, 0.42) : blend(LIFT, STAND, t, 0.44, 0.5), CATCH)
-  if (t < 0.52) return still(STAND, CATCH)
-  if (t < 0.72) return still(stride(6 * ramp(t, 0.52, 0.72)), lerp(CATCH, WALK_TO, ramp(t, 0.52, 0.72)))
-  if (t < 0.82) {
-    const [ahead, lift] = flight(ramp(t, 0.72, 0.82), [WALK_TO, 0], [BARREL, RIM], 60)
-    return { pose: blend(CROUCH, REACH, t, 0.72, 0.76), ahead, lift }
-  }
-  if (t < 0.89) return { pose: blend(REACH, CROUCH, t, 0.82, 0.86), ahead: BARREL, lift: lerp(RIM, -70, ease(ramp(t, 0.82, 0.89))) }
-  return { pose: CROUCH, ahead: BARREL, lift: -70, opacity: 0 }
+const giantAt = (t: number): number => {
+  const out = ease(ramp(t, OPEN.to, JOY.from))
+  return lerp(lerp(GIANT.caged, GIANT.out, out), GIANT.home, ease(ramp(t, SWIM.from, SWIM.to)))
 }
 
-/** The giant mango: falls into his arms, is lifted over his head and tossed back onto the store. */
-const mangoAt = (t: number): [number, number] => {
-  if (t < 0.26) return [HELD.x, lerp(MANGO_FROM, HELD.y, ease(ramp(t, 0.06, 0.26)) ** 2)]
-  if (t < 0.36) return [HELD.x, HELD.y + 24 * bell(t, 0.26, 0.36)]
-  if (t < 0.43) return [lerp(HELD.x, OVERHEAD.x, ease(ramp(t, 0.36, 0.42))), lerp(HELD.y, OVERHEAD.y, ease(ramp(t, 0.36, 0.42)))]
-  const toss = ramp(t, 0.43, 0.5)
-  return [lerp(OVERHEAD.x, IN_STORE.x, toss), lerp(OVERHEAD.y, IN_STORE.y, toss * toss) - 60 * Math.sin(Math.PI * toss)]
+/** A rider's [x, lift] at t: on the sand at `from`, hopping on, then riding at his seat. */
+const riderAt = (who: keyof typeof SEATS, from: number, t: number): [number, number] => {
+  const [a, b] = BOARD[who]
+  if (t < a) return [from, 0]
+  if (t < b) return flight(ramp(t, a, b), [from, 0], [giantAt(b) + SEATS[who], BACK], 90)
+  return [giantAt(t) + SEATS[who], BACK + 4 * Math.sin(t * 20 + SEATS[who])]
+}
+
+const move = (t: number): Frame => {
+  if (t < 0.08) return still(blend(STAND, KEY, t, 0, 0.06), LOCK)
+  if (t < 0.32) return still(KEY, LOCK)
+  if (t < 0.5) return still(blend(KEY, LIFT, t, 0.34, 0.42), LOCK)
+  // seated on the giant's back his hips are on it, 33 above his soles
+  const [ahead, lift] = riderAt('him', LOCK, t)
+  const [a, b] = BOARD.him
+  const seated = lift - SEATED * ramp(t, b - 0.02, b)
+  if (t < b) return { pose: blend(CROUCH, RIDE, t, a, b), ahead, lift: seated }
+  return still(t < 0.9 ? RIDE : blend(RIDE, WAVING, t, 0.9, 0.97), ahead, seated)
 }
 
 const partner = (t: number): PartnerFrame => {
-  if (t < 0.56) return { ahead: PARTNER_START, arms: 0.8 * bell(t, 0.28, 0.46) }
-  if (t < 0.8) return { ahead: lerp(PARTNER_START, WALK_TO - 50, ramp(t, 0.56, 0.8)), phase: 10 * ramp(t, 0.56, 0.8) }
-  if (t < 0.9) return { ahead: WALK_TO - 50 }
-  if (t < 0.97) return hopOf(t, 0.9, 0.97, WALK_TO - 50, ON_LID.x, 80, 0, ON_LID.lift)
-  return { ahead: ON_LID.x, lift: ON_LID.lift, arms: 0.7 * ramp(t, 0.97, 1) }
+  const [ahead, lift] = riderAt('lemur', SHORE.lemur, t)
+  return { ahead, lift, air: t > BOARD.lemur[0] && t < BOARD.lemur[1] ? 1 : 0, arms: 0.8 * bell(t, JOY.from, JOY.to + 0.06) + 0.6 * bell(t, 0.86, 1.1) }
 }
 
+/** His isle on the horizon: a hump of sand and two palms, black against the sunset. */
+const Isle = () => (
+  <g fill={C.shadow}>
+    <path d="M-120 0 Q-60 -40 0 -44 Q70 -40 130 0 Z" />
+    <path d="M-20 -40 Q-24 -110 -10 -150 M30 -40 Q40 -96 60 -130" stroke={C.shadow} strokeWidth={6} fill="none" />
+    <path d="M-10 -150 q-40 -10 -60 14 M-10 -150 q40 -14 56 10 M60 -130 q-30 -16 -54 4 M60 -130 q34 -8 48 16" stroke={C.shadow} strokeWidth={8} fill="none" strokeLinecap="round" />
+  </g>
+)
+
 export const contact: SceneDef = {
-  zone: 'sunset',
+  zone: 'sea',
   kit: null,
-  script: [1700, 1700],
-  shift: { wide: -90, phone: 0 },
-  phoneSize: 0.85,
+  script: [1900, 2100],
   ends: [0.5, 1],
+  span: [-240, 570],
   back: () => (
     <g>
-      <g transform={`translate(${HOUSE} 0)`}>
-        <Treehouse>
-          <Store count={STORE_CRATES} />
-        </Treehouse>
-        <g transform="translate(150 -350)">
-          <Elder />
+      <g transform={`translate(${ISLE} -240) scale(0.7)`}>
+        <Isle />
+      </g>
+      {/* the sandbar he stands on, the cage at its end */}
+      <path d="M-380 6 Q-300 -24 -60 -26 Q240 -30 380 6 Z" fill="#e8b874" stroke={C.shadow} strokeWidth={3} />
+      <g data-fx="giant" transform={`translate(${GIANT.caged} 0) scale(${GIANT.size})`}>
+        <GentleGiant />
+        <g transform="translate(-200 -100) scale(0.6)">
+          <MangoCrate />
+        </g>
+        <g transform="translate(130 -96) scale(0.6)">
+          <MangoCrate />
         </g>
       </g>
-      <g transform={`translate(${HUT} 0) scale(0.8)`}>
-        <SaveHut />
+      <g data-fx="cage" transform={`translate(${CAGE} 0)`}>
+        <GiantCage />
       </g>
-      <Flash name="catch" x={HELD.x} y={HELD.y} size={80} />
-      <Flash name="stored" x={IN_STORE.x} y={IN_STORE.y} size={90} />
+      <Flash name="unlocked" x={CAGE} y={-140} size={120} />
     </g>
   ),
-  // The mango is in his arms in front of him; the barrel is drawn over him as he climbs down into it.
+  // The friends, on the sand and then on the giant's back, in front of him; the water over his underside.
   front: () => (
     <g>
-      <g data-fx="giant-mango" transform={`translate(${HELD.x} ${MANGO_FROM})`}>
-        <Mango size={2.6} />
-      </g>
-      <g data-fx="save" transform={`translate(${BARREL} 0)`}>
-        <SaveBarrel />
-      </g>
-      <Flash name="click" x={BARREL} y={-150} size={60} />
+      {FRIENDS.map((ape) => (
+        <g key={ape} data-fx={`rider-${ape}`} transform={`translate(${SHORE[ape]} 0) scale(${RIDER[ape]})`}>
+          <FriendFigure ape={ape} />
+        </g>
+      ))}
+      <rect data-fx="water" x={-2400} y={-2} width={4800} height={600} fill="#6a2a44" opacity="0" />
     </g>
   ),
   move: (_kit, t) => move(t),
   partner: (t) => partner(t),
   reply: (stage) => {
-    const mango = fx(stage, 'giant-mango')
-    const caught = fx(stage, 'catch')
-    const stored = fx(stage, 'stored')
-    const crates = Array.from({ length: STORE_CRATES }, (_, i) => fx(stage, `store-${i}`))
-    const arm = fx(stage, 'elder-arm')
-    const lid = fx(stage, 'save-lid')
-    const click = fx(stage, 'click')
+    const locks = TROOP_ORDER.map((_, i) => fx(stage, `lock-${i}`))
+    const door = fx(stage, 'cage-door')
+    const cage = fx(stage, 'cage')
+    const giant = fx(stage, 'giant')
+    const unlocked = fx(stage, 'unlocked')
+    const water = fx(stage, 'water')
+    const riders = FRIENDS.map((ape) => fx(stage, `rider-${ape}`))
+    const arms = FRIENDS.map((ape) => fx(stage, `${ape}-arm`))
     return (t) => {
-      const [x, y] = mangoAt(t)
-      transformTo(mango, `translate(${r1(x)} ${r1(y)}) rotate(${r1(-30 + 30 * ramp(t, 0.06, 0.26) - 200 * ramp(t, 0.43, 0.5))})`)
-      fadeTo(mango, 1 - ramp(t, 0.48, 0.5))
-      fadeTo(caught, bell(t, 0.24, 0.34))
-      fadeTo(stored, bell(t, 0.47, 0.56))
-      // the store fills crate by crate as the mango lands on it
-      crates.forEach((crate, i) => fadeTo(crate, ramp(t, 0.46 + i * 0.015, 0.48 + i * 0.015)))
-      transformTo(arm, `rotate(${r1(-40 * Math.abs(Math.sin(Math.PI * 6 * ramp(t, 0.36, 0.7))))} 10 -50)`)
-      // the lid lifts off as he climbs, and shuts on him with a click
-      const open = ramp(t, 0.72, 0.78) * (1 - ramp(t, 0.88, 0.91))
-      transformTo(lid, `translate(${r1(-50 * open)} ${r1(-30 * open)}) rotate(${r1(-70 * open)} -48 -140)`)
-      fadeTo(click, bell(t, 0.9, 0.97))
+      // the padlocks drop one by one as he turns the key, and the door swings open on its hinge
+      locks.forEach((lock, i) => {
+        const fall = ramp(t, LOCK_AT + i * LOCK_STEP, LOCK_AT + i * LOCK_STEP + 0.06)
+        transformTo(lock, `translate(${-100 + i * 50} ${r1(-132 + 140 * fall * fall)}) rotate(${r1(90 * fall)})`)
+        fadeTo(lock, 1 - ramp(fall, 0.8, 1))
+      })
+      const open = ease(ramp(t, OPEN.from, OPEN.to))
+      transformTo(door, `translate(-150 0) scale(${(1 - 0.85 * open).toFixed(3)} 1) translate(150 0)`)
+      fadeTo(unlocked, bell(t, OPEN.from - 0.04, OPEN.to + 0.04))
+      fadeTo(cage, 1 - ramp(t, SWIM.from, SWIM.from + 0.12))
+      // the giant wades out, jumps for joy, and swims for the isle with the troop on his back
+      const x = giantAt(t)
+      const joy = hop(ramp(t, JOY.from, JOY.to), 60)
+      transformTo(giant, `translate(${r1(x)} ${r1(-joy + 3 * Math.sin(t * 20) * ramp(t, SWIM.from, 1))}) scale(${GIANT.size})`)
+      fadeTo(water, 0.6 * ramp(t, SWIM.from - 0.06, SWIM.from + 0.06))
+      FRIENDS.forEach((ape, i) => {
+        const [rx, lift] = riderAt(ape, SHORE[ape], t)
+        const k = RIDER[ape]
+        // seated on the giant's back, a rider sinks into it by a quarter of his height
+        const sit = heightOf(ape) * k * 0.25 * ramp(t, BOARD[ape][1] - 0.02, BOARD[ape][1])
+        transformTo(riders[i], `translate(${r1(rx)} ${r1(-lift + sit)}) scale(${k})`)
+        transformTo(arms[i], armTurn(165 * bell(t, JOY.from, JOY.to + 0.08) + 165 * bell(t, 0.84 + i * 0.03, 1.1)))
+      })
     }
   },
 }

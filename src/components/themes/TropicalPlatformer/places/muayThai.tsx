@@ -1,66 +1,51 @@
 import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
+import { CrocKing } from '../crocs'
 import { CROUCH, GUARD, KNEE, STAND, TEEP, blend, ease, flight, still, type Frame } from '../moves'
 import type { PartnerFrame } from '../partner'
 import type { SceneDef } from '../place'
-import { Cannonball, Captain, CaptainHat } from '../cast'
-import { COVER, Flash, hopOf } from './kit'
+import { COLORS as C, TROOP, TROOP_ORDER } from '../palette'
+import { FriendFigure, Seed, armTurn } from '../troop'
+import { Flash } from './kit'
 
-// Muay Thai: the boss on the deck of his ship at sunset, with its false ending and the fighter's own finish.
-// Cannonballs roll at the pair from the rigging and they jump them; the captain throws his hat, which flies
-// over them, and while he is open a teep knocks him flat; the curtain drops as if it were over, then the
-// captain jumps back up, the curtain flies up, and a flying knee puts him down for good. The captain lies
-// flat on the deck, his hat beside him.
+// Muay Thai: the five round boxing final against the crocodile king (research/2026-11-25-deep-dk64 §1: the
+// ring under the lights, the king twice the ape's size, five rounds one per ape: the ground pound's shockwave,
+// the ring light shot down onto his head, the slip, the last round). A lamp on the corner post lights in each
+// ape's colour as his round is won. The king pounds the mat and the shockwave runs at him, and he jumps it;
+// the lemur at the ropes shoots the ring light down onto the king's head (rounds one and two). The orangutan
+// throws a mango skin onto the mat, the king charges, slips on it, and a teep knocks him back (three and
+// four). Round five is the fighter's own: a flying knee, and the king falls flat on the starred mat.
 
-const CAPTAIN = 300
-const HEAD = -236
-const START = -55
-// Where the partner cheers at the end, behind him and clear of the record cards.
-const CHEER = 130
-const STEP_IN = 120
-const KNEE_TO = 180
-// The cannonballs: where each starts, the move's t it sets off at, and how fast it rolls (place units a move).
-const BALLS = [
-  { from: 700, at: 0.02 },
-  { from: 700, at: 0.12 },
-] as const
-const ROLL = 5000
-const BALL_LIFT = 15
-// The hat's throw: off his head out over the pair, then back over them and down onto the deck by his feet.
-const HAT_OUT = { x: -120, y: -300 }
-const HAT_DOWN = { x: 280, y: -10 }
+const KING = { x: 260, size: 0.78 }
+const LIGHT = { x: KING.x - 16, from: -620 }
+const LEMUR = -150
+const ORANGUTAN = 500
+const POST = -100
+// When each round is won: its lamp lights.
+const ROUNDS = [0.2, 0.3, 0.52, 0.62, 0.92] as const
+// The ground pound: he jumps and lands, and the wave runs out along the mat at him.
+const POUND = { up: 0.04, land: 0.1 }
+const WAVE = { from: 0.1, to: 0.26 }
+const SEED = { from: 0.18, to: 0.22 }
+const SKIN = { from: 0.34, to: 0.42, at: 170 }
+const CHARGE = { from: 0.42, to: 0.5 }
+const STEP_IN = 70
+const KNEE_TO = 150
 
-/** The hat at `t`: on his head, out over the pair, back and down on the deck. */
-const hatAt = (t: number): string => {
-  if (t < 0.32) return `translate(${CAPTAIN} ${HEAD})`
-  const out = ramp(t, 0.32, 0.5)
-  const back = ramp(t, 0.5, 0.62)
-  const [x, y] =
-    t < 0.5
-      ? [lerp(CAPTAIN, HAT_OUT.x, ease(out)), lerp(HEAD, HAT_OUT.y, out) - 80 * Math.sin(Math.PI * out)]
-      : [lerp(HAT_OUT.x, HAT_DOWN.x, back), lerp(HAT_OUT.y, HAT_DOWN.y, back * back) - 120 * Math.sin(Math.PI * back)]
-  return `translate(${r1(x)} ${r1(y)}) rotate(${r1(720 * ramp(t, 0.32, 0.62))})`
-}
-
-const ballAt = (i: number, t: number): number => BALLS[i].from - ROLL * Math.max(0, t - BALLS[i].at)
-
-/** When ball `i` passes x: the moment to be in the air over it. */
-const passes = (i: number, x: number): number => BALLS[i].at + (BALLS[i].from - x) / ROLL
-
-const jumpOver = (t: number, at: number, ahead: number): Frame | null => {
-  const a = at - 0.04
-  const b = at + 0.04
-  if (t < a || t >= b) return null
-  return { pose: blend(CROUCH, GUARD, t, a, b), ahead, lift: hop(ramp(t, a, b), 120) }
-}
+/** Where the wave is along the mat at t. */
+const waveAt = (t: number): number => lerp(KING.x - 120, -200, ramp(t, WAVE.from, WAVE.to))
+const JUMP_AT = WAVE.from + ((KING.x - 120) / (KING.x + 80)) * (WAVE.to - WAVE.from)
 
 const move = (t: number): Frame => {
-  if (t < 0.3) return jumpOver(t, passes(0, 0), 0) ?? jumpOver(t, passes(1, 0), 0) ?? still(blend(STAND, GUARD, t, 0, 0.08))
-  if (t < 0.48) return still(GUARD)
-  if (t < 0.54) return still(GUARD, STEP_IN * ease(ramp(t, 0.48, 0.54)))
-  if (t < 0.62) return still(blend(GUARD, TEEP, t, 0.54, 0.57), STEP_IN)
-  if (t < 0.8) return still(blend(TEEP, GUARD, t, 0.62, 0.68), STEP_IN)
+  if (t < 0.3) {
+    if (t >= JUMP_AT - 0.03 && t < JUMP_AT + 0.03) return { pose: blend(CROUCH, GUARD, t, JUMP_AT - 0.03, JUMP_AT + 0.03), ahead: 0, lift: hop(ramp(t, JUMP_AT - 0.03, JUMP_AT + 0.03), 110) }
+    return still(blend(STAND, GUARD, t, 0, 0.06))
+  }
+  if (t < 0.5) return still(GUARD)
+  if (t < 0.54) return still(GUARD, STEP_IN * ease(ramp(t, 0.5, 0.54)))
+  if (t < 0.6) return still(blend(GUARD, TEEP, t, 0.54, 0.57), STEP_IN)
+  if (t < 0.8) return still(blend(TEEP, GUARD, t, 0.6, 0.66), STEP_IN)
   if (t < 0.9) {
     const [ahead, lift] = flight(ramp(t, 0.8, 0.9), [STEP_IN, 0], [KNEE_TO, 0], 120)
     return { pose: blend(GUARD, KNEE, t, 0.8, 0.84), ahead, lift }
@@ -68,80 +53,134 @@ const move = (t: number): Frame => {
   return still(blend(KNEE, GUARD, t, 0.9, 0.96), KNEE_TO)
 }
 
-const partner = (t: number): PartnerFrame => {
-  for (const i of [0, 1]) {
-    const at = passes(i, START)
-    if (t >= at - 0.04 && t < at + 0.04) return hopOf(t, at - 0.04, at + 0.04, START, START, 110)
-  }
-  // once the captain is down for good the partner hops up behind him and cheers
-  if (t < 0.9) return { ahead: START }
-  if (t < 0.97) return hopOf(t, 0.9, 0.97, START, CHEER, 70)
-  return { ahead: CHEER, arms: 0.8 * ramp(t, 0.97, 1) }
+const partner = (t: number): PartnerFrame => ({ ahead: LEMUR, lift: 0, arms: Math.max(0.6 * bell(t, 0.14, 0.24), 0.9 * bell(t, 0.92, 1.1)) })
+
+/** Where the king is at t: x, how high (his pound's jump), how far over on his back (0 to 1). */
+const kingAt = (t: number): { x: number; lift: number; over: number } => {
+  const charged = ease(ramp(t, CHARGE.from, CHARGE.to))
+  const slipped = ease(ramp(t, 0.5, 0.56)) * (1 - ease(ramp(t, 0.66, 0.74)))
+  const knocked = ease(ramp(t, 0.88, 0.96))
+  // flat on his back he lies to the right of his feet, so they come back toward the post as he goes over
+  const x = KING.x - 90 * charged + 40 * slipped + 30 * knocked
+  return { x, lift: hop(ramp(t, POUND.up, POUND.land), 90), over: 0.55 * slipped + knocked }
 }
 
-/** How far the captain has fallen (0 standing, 1 flat on his back): by the teep, up again, by the knee. */
-const fallen = (t: number): number => ease(ramp(t, 0.56, 0.62)) * (1 - ease(ramp(t, 0.7, 0.78))) + ease(ramp(t, 0.88, 0.95))
+// The top of the king's head in his drawing (crocs.tsx), where the light lands and stays.
+const CROWN_TOP = { x: -20, y: -420 }
 
-/** Where the captain stands: knocked back by each blow. */
-const captainX = (t: number): number => CAPTAIN + 30 * ease(ramp(t, 0.56, 0.62)) * (1 - ramp(t, 0.7, 0.78)) + 40 * ease(ramp(t, 0.88, 0.95))
+/** The ring light over the king: hanging, then shot down onto his head, where it sits as he goes over. */
+const lightAt = (t: number, king: { x: number; lift: number; over: number }): [number, number] => {
+  const turn = (84 * king.over * Math.PI) / 180
+  const hx = CROWN_TOP.x * KING.size
+  const hy = CROWN_TOP.y * KING.size
+  const onHead: [number, number] = [king.x + hx * Math.cos(turn) - hy * Math.sin(turn), -king.lift - 40 * king.over + hx * Math.sin(turn) + hy * Math.cos(turn)]
+  const fall = ramp(t, SEED.to, SEED.to + 0.06)
+  if (fall < 1) return [lerp(LIGHT.x, onHead[0], fall), lerp(LIGHT.from, onHead[1], fall * fall)]
+  return onHead
+}
+
+/** The ring light: a steel can with its lamp down. */
+const RingLight = () => (
+  <g>
+    <path d="M-30 -40 H30 L40 0 H-40 Z" fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={3} />
+    <ellipse cx={0} cy={0} rx={40} ry={8} fill="#fffbe8" stroke={C.shadow} strokeWidth={2} />
+  </g>
+)
+
+/** The mango skin on the mat. */
+const Skin = () => (
+  <g>
+    <path d="M-30 0 Q-20 -14 0 -10 Q20 -14 30 0 Q14 -4 0 2 Q-14 -4 -30 0 Z" fill={TROOP.orangutan} stroke={C.shadow} strokeWidth={2} />
+    <path d="M-20 -6 Q0 -16 20 -6" fill="none" stroke="#fffbe8" strokeWidth={3} opacity={0.6} />
+  </g>
+)
 
 export const muayThai: SceneDef = {
-  zone: 'deck',
+  zone: 'ring',
   kit: 'fighter',
-  script: [1500, 1600, 1900],
-  shift: { wide: -120, phone: 0 },
-  phoneSize: 0.85,
-  ends: [0.3, 0.62, 1],
+  script: [1700, 1700, 1600],
+  ends: [0.32, 0.68, 1],
+  span: [-190, 560],
+  size: 0.86,
   back: () => (
     <g>
-      <g data-fx="captain" transform={`translate(${CAPTAIN} 0)`}>
-        <Captain />
+      {/* the corner post and its five lamps, one per round */}
+      <g transform={`translate(${POST} 0)`}>
+        <rect x={-12} y={-300} width={24} height={300} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={3} />
+        {TROOP_ORDER.map((ape, i) => (
+          <g key={ape} transform={`translate(0 ${-270 + i * 46})`}>
+            <circle r={16} fill="#2a2e3a" stroke={C.shadow} strokeWidth={2} />
+            <circle data-fx={`lamp-${i}`} r={13} fill={TROOP[ape]} opacity="0" />
+          </g>
+        ))}
       </g>
-      {BALLS.map(({ from }, i) => (
-        <g key={i} data-fx={`ball-${i}`} transform={`translate(${from} ${-BALL_LIFT})`}>
-          <Cannonball />
-        </g>
-      ))}
-      <g data-fx="hat" transform={`translate(${CAPTAIN} ${HEAD})`}>
-        <CaptainHat />
+      {/* the orangutan at the far ropes, who throws the skin */}
+      <g transform={`translate(${ORANGUTAN} -40) scale(0.8)`}>
+        <FriendFigure ape="orangutan" />
       </g>
-      <Flash name="teep-hit" x={CAPTAIN - 60} y={-110} size={70} />
-      <Flash name="knee-hit" x={CAPTAIN - 50} y={-170} size={90} />
+      <ellipse data-fx="wave" cx={0} cy={0} rx={70} ry={14} fill="none" stroke="#fffbe8" strokeWidth={10} opacity="0" />
+      <g data-fx="skin" opacity="0">
+        <Skin />
+      </g>
+      <g data-fx="king" transform={`translate(${KING.x} 0) scale(${KING.size})`}>
+        <CrocKing boxer />
+      </g>
+      <g data-fx="light" transform={`translate(${LIGHT.x} ${LIGHT.from})`}>
+        <path d="M0 -40 V-600" stroke="#2a2e3a" strokeWidth={4} data-fx="light-cord" />
+        <RingLight />
+      </g>
+      <Flash name="teep-hit" x={KING.x - 120} y={-150} size={70} />
+      <Flash name="knee-hit" x={KING.x - 110} y={-220} size={100} />
     </g>
   ),
-  // The curtain of the false ending drops over the deck and flies up again.
+  // The ropes on the near side of the ring, low in front, and the lemur's seed in flight.
   front: () => (
-    <g data-fx="curtain" transform="translate(0 -900)">
-      <rect x={COVER.x} y={-1300} width={COVER.width} height={1060} fill="#8a1c22" />
-      {Array.from({ length: 22 }, (_, i) => (
-        <path key={i} d={`M${COVER.x + i * 120} -1300 V-240`} stroke="#5a0c12" strokeWidth={10} opacity={0.6} />
+    <g>
+      <g data-fx="seed" opacity="0">
+        <Seed />
+      </g>
+      {[-40, -80].map((y, i) => (
+        <path key={y} d={`M-2400 ${y + 120} H2400`} stroke={['#d8282a', '#ffffff'][i]} strokeWidth={8} opacity={0.5} />
       ))}
-      <path d={`M${COVER.x} -240 H${COVER.x + COVER.width}`} stroke="#ffc93c" strokeWidth={14} />
     </g>
   ),
   move: (_kit, t) => move(t),
   partner: (t) => partner(t),
   reply: (stage) => {
-    const captain = fx(stage, 'captain')
-    const balls = BALLS.map((_, i) => fx(stage, `ball-${i}`))
-    const hat = fx(stage, 'hat')
+    const king = fx(stage, 'king')
+    const kingArm = fx(stage, 'king-arm')
+    const lamps = ROUNDS.map((_, i) => fx(stage, `lamp-${i}`))
+    const wave = fx(stage, 'wave')
+    const light = fx(stage, 'light')
+    const cord = fx(stage, 'light-cord')
+    const seed = fx(stage, 'seed')
+    const skin = fx(stage, 'skin')
+    const throwArm = fx(stage, 'orangutan-arm')
     const teep = fx(stage, 'teep-hit')
     const knee = fx(stage, 'knee-hit')
-    const curtain = fx(stage, 'curtain')
     return (t) => {
-      balls.forEach((ball, i) => {
-        const x = ballAt(i, t)
-        transformTo(ball, `translate(${r1(x)} ${-BALL_LIFT}) rotate(${r1((((BALLS[i].from - x) / BALL_LIFT) * 180) / Math.PI)})`)
-      })
-      // he goes over on his back about his feet, gets up, and goes over again
-      const over = fallen(t)
-      transformTo(captain, `translate(${r1(captainX(t))} ${r1(-60 * over)}) rotate(${r1(80 * over)})`)
-      transformTo(hat, hatAt(t))
-      fadeTo(teep, bell(t, 0.55, 0.62))
+      const at = kingAt(t)
+      transformTo(king, `translate(${r1(at.x)} ${r1(-at.lift - 40 * at.over)}) rotate(${r1(84 * at.over)}) scale(${KING.size})`)
+      transformTo(kingArm, `rotate(${r1(-40 * bell(t, 0.42, 0.5) + 20 * bell(t, 0.0, 0.1))} -40 -250)`)
+      ROUNDS.forEach((round, i) => fadeTo(lamps[i], ramp(t, round, round + 0.03)))
+      // the pound's wave runs along the mat at him
+      const x = waveAt(t)
+      transformTo(wave, `translate(${r1(x)} 0) scale(${(1 + 0.6 * ramp(t, WAVE.from, WAVE.to)).toFixed(3)} 1)`)
+      fadeTo(wave, bell(t, WAVE.from, WAVE.to))
+      // the seed from the lemur's paws to the light's cord, and the light drops onto the king's head
+      const u = ramp(t, SEED.from, SEED.to)
+      transformTo(seed, `translate(${r1(lerp(LEMUR + 20, LIGHT.x, u))} ${r1(lerp(-100, -560, u))})`)
+      fadeTo(seed, t > SEED.from && t < SEED.to ? 1 : 0)
+      const [lx, ly] = lightAt(t, at)
+      transformTo(light, `translate(${r1(lx)} ${r1(ly)}) rotate(${r1(30 * at.over)})`)
+      fadeTo(cord, 1 - ramp(t, SEED.to - 0.01, SEED.to))
+      // the orangutan throws the skin, which lands on the mat in the king's way
+      transformTo(throwArm, armTurn(-120 * bell(t, SKIN.from - 0.04, SKIN.from + 0.04)))
+      const s = ramp(t, SKIN.from, SKIN.to)
+      transformTo(skin, `translate(${r1(lerp(ORANGUTAN - 40, SKIN.at, s))} ${r1(-hop(s, 200) - 120 * (1 - s) * (s < 1 ? 1 : 0))}) rotate(${r1(360 * s)})`)
+      fadeTo(skin, ramp(t, SKIN.from, SKIN.from + 0.01))
+      fadeTo(teep, bell(t, 0.55, 0.61))
       fadeTo(knee, bell(t, 0.86, 0.94))
-      // the curtain drops while he lies there, and flies up as he jumps back up
-      const down = ease(ramp(t, 0.62, 0.68)) * (1 - ease(ramp(t, 0.72, 0.76)))
-      transformTo(curtain, `translate(0 ${r1(-900 + 760 * down)})`)
     }
   },
 }

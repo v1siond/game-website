@@ -1,133 +1,167 @@
-import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
-import { CROUCH, RIDE, STAND, TUCK, blend, ease, flight, still } from '../moves'
-import type { PartnerFrame } from '../partner'
+import { LIFT, RIDE, blend, ease, still, type Frame } from '../moves'
 import type { SceneDef } from '../place'
 import { COLORS as C } from '../palette'
-import { Beetle, Boar, Crate, PLANKS, PlankWall, boardAt, plankAt } from '../props'
 import { Flash } from './kit'
 
-// Services: the buddy, a change of body. In the temple valley he rolls into the crate and it breaks apart, the
-// boar steps out and snorts; he jumps onto its back, the partner up behind him; it charges, bowls two beetles
-// of the crew over and smashes through the plank wall into the hidden room. The boar stands in the broken
-// wall, the hidden room's light behind.
+// Services: the sunken galleon's cove and its boss (research/2026-11-25-deep-dk64 §3: the giant puffer fish in
+// a dark pool, beaten by steering a boat through five stars in time, each round raising the poles that shock
+// it). In the dark cove, the wreck far off, the puffer, our own, fills the pool. He steers his half barrel boat
+// across the water through the first gold star, then the second and the third, and as each lights a pole rises
+// out of the water round the puffer; the poles spark, it swells, flashes and goes flat on the water. The puffer
+// floats flat, the three stars lit, his boat beyond it.
 
-const CRATE_X = 170
-const ROLLED = 95
-// The saddle is 100 up on the boar; seated, his hips are 33 above his soles, so this lift seats him.
-const SADDLE = 100
-const SEAT = 33
-const CHARGE_TO = 440
-const WALL_X = 480
-const BEETLES = [340, 410] as const
-const START = -70
-// The partner rides on the boar's rump behind him.
-const RUMP = { x: -50, lift: 88 }
+const FROM = -20
+const TO = 470
+const STARS = [60, 250, 440] as const
+const STAR_LIFT = 74
+const PUFFER = { x: 250, y: -150 }
+const POLES = [110, 180, 320, 390] as const
+const SAIL = { from: 0.04, to: 0.68 }
+const SHOCK = { from: 0.7, to: 0.86 }
 
-const boarAt = (t: number): number => lerp(CRATE_X, CHARGE_TO, ease(ramp(t, 0.6, 0.94)))
-const charging = (t: number): number => bell(t, 0.6, 0.94)
+/** Where the boat is at t: across the water, easing in and out. */
+const boatAt = (t: number): number => lerp(FROM, TO, ease(ramp(t, SAIL.from, SAIL.to)))
 
-// The boar's snout is this far ahead of its middle: where it meets a beetle, and how far on the beetle flies.
-const SNOUT = 125
-const BOWLED = 120
+/** When the boat's middle passes star i. */
+const passes = (i: number): number => {
+  const u = (STARS[i] - FROM) / (TO - FROM)
+  // the inverse of the smooth step over the sail's stretch, near enough by bisection
+  let lo = 0
+  let hi = 1
+  for (let k = 0; k < 20; k++) {
+    const mid = (lo + hi) / 2
+    if (ease(mid) < u) lo = mid
+    else hi = mid
+  }
+  return lerp(SAIL.from, SAIL.to, lo)
+}
 
-/** A stone column of the temple ruins, broken off at `height`, its foot at x. */
-function Column({ x, height }: { x: number; height: number }) {
+const PASSES = STARS.map((_, i) => passes(i))
+
+// Seated in the boat: his soles on its floor, a little under the water line.
+const SEAT = 4
+
+const move = (t: number): Frame => {
+  if (t < 0.9) return still({ ...RIDE, lean: 8 + 6 * Math.sin(t * 30) }, boatAt(t), SEAT + 4 * Math.sin(t * 24))
+  return still(blend(RIDE, LIFT, t, 0.9, 0.98), boatAt(t), SEAT)
+}
+
+/** A gold star ring standing on the water, its middle on 0 0. */
+const StarRing = () => {
+  const points = Array.from({ length: 10 }, (_, k) => {
+    const r = k % 2 ? 24 : 48
+    const a = (Math.PI * k) / 5 - Math.PI / 2
+    return `${r1(r * Math.cos(a))} ${r1(r * Math.sin(a))}`
+  }).join(' L')
+  return <path d={`M${points} Z`} fill="none" stroke="url(#tp-gold)" strokeWidth={9} strokeLinejoin="round" />
+}
+
+/** The giant puffer, our own, its middle on 0 0, 280 across: a round spiked body, a little mouth and fins. */
+function Puffer() {
+  const spikes = Array.from({ length: 18 }, (_, k) => {
+    const a = (Math.PI * 2 * k) / 18
+    return <path key={k} d={`M${r1(120 * Math.cos(a - 0.12))} ${r1(120 * Math.sin(a - 0.12))} L${r1(160 * Math.cos(a))} ${r1(160 * Math.sin(a))} L${r1(120 * Math.cos(a + 0.12))} ${r1(120 * Math.sin(a + 0.12))} Z`} fill="#c8a040" stroke={C.shadow} strokeWidth={2} />
+  })
   return (
-    <g transform={`translate(${x} 0)`}>
-      <rect x={-26} y={-height} width={52} height={height} fill={C.stone} stroke={C.shadow} strokeWidth={3} />
-      <path d={`M-26 ${-height} L-10 ${-height - 18} L6 ${-height - 6} L26 ${-height - 20} V${-height} Z`} fill={C.stone} stroke={C.shadow} strokeWidth={3} strokeLinejoin="round" />
-      <path d={`M-12 ${-height + 6} V-4 M10 ${-height + 6} V-4`} stroke={C.stoneDark} strokeWidth={4} />
-      <rect x={-34} y={-14} width={68} height={14} fill={C.stoneDark} stroke={C.shadow} strokeWidth={3} />
+    <g>
+      {spikes}
+      <circle r={128} fill="#e8c860" stroke={C.shadow} strokeWidth={4} />
+      <ellipse cx={20} cy={50} rx={96} ry={60} fill="#fff2c8" />
+      {[-60, -20, 30, 70].map((x, i) => (
+        <circle key={x} cx={x} cy={-60 + (i % 2) * 30} r={14} fill="#8a6a20" opacity={0.5} />
+      ))}
+      <circle cx={-64} cy={-20} r={24} fill="#ffffff" stroke={C.shadow} strokeWidth={3} />
+      <circle data-fx="puffer-pupil" cx={-72} cy={-18} r={10} fill={C.shadow} />
+      <ellipse cx={-118} cy={24} rx={14} ry={10} fill="#d84a3a" stroke={C.shadow} strokeWidth={3} />
+      <path d="M100 -10 Q160 -50 170 10 Q150 40 100 20 Z" fill="#d8a840" stroke={C.shadow} strokeWidth={3} />
     </g>
   )
 }
 
+/** His boat: half a barrel on the water, a little rudder, its rim at y -40. */
+const Boat = () => (
+  <g>
+    <path d="M-80 -40 Q-84 20 -40 30 L50 30 Q84 20 80 -40 Z" fill="url(#tp-wood)" stroke={C.shadow} strokeWidth={3} strokeLinejoin="round" />
+    <path d="M-82 -36 H82 M-76 0 H76" stroke="url(#tp-hoop)" strokeWidth={8} />
+    <path d="M-80 -18 L-100 -6 L-96 20 L-78 14" fill="url(#tp-wood)" stroke={C.shadow} strokeWidth={2} />
+  </g>
+)
+
 export const services: SceneDef = {
-  zone: 'dusk',
+  zone: 'cove',
   kit: 'engineer',
-  script: [1500, 1000, 1900],
-  shift: { wide: -110, phone: -80 },
-  ends: [0.4, 0.58, 1],
+  script: [1500, 1700, 1600],
+  ends: [0.3, 0.68, 1],
+  span: [-100, 560],
   back: () => (
     <g>
-      <Column x={-90} height={300} />
-      <Column x={560} height={420} />
-      {/* the hidden room behind the wall, dark until the wall breaks and its light comes out */}
-      <path data-fx="room" d={`M${WALL_X - 40} 0 V-220 Q${WALL_X + 20} -290 ${WALL_X + 80} -220 V0 Z`} fill={C.shadow} stroke={C.stoneDark} strokeWidth={6} />
-      <g data-fx="room-light" opacity="0">
-        <path d={`M${WALL_X - 34} 0 V-216 Q${WALL_X + 20} -282 ${WALL_X + 74} -216 V0 Z`} fill={C.sunGold} opacity={0.75} />
-        <Flash name="room-glow" x={WALL_X + 20} y={-120} size={100} />
-      </g>
-      <g data-fx="wall" transform={`translate(${WALL_X} 0)`}>
-        <PlankWall />
-      </g>
-      {BEETLES.map((x, i) => (
-        <g key={x} data-fx={`beetle-${i}`} transform={`translate(${x} 0)`}>
-          <Beetle />
+      {POLES.map((x, i) => (
+        <g key={x} data-fx={`pole-${i}`} transform={`translate(${x} 200)`}>
+          <rect x={-9} y={-300} width={18} height={300} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={2} />
+          <circle cx={0} cy={-306} r={14} fill="#bff8ff" stroke={C.shadow} strokeWidth={3} />
         </g>
       ))}
-      <g data-fx="boar" opacity="0" transform={`translate(${CRATE_X} 0)`}>
-        <Boar />
+      <g data-fx="puffer" transform={`translate(${PUFFER.x} ${PUFFER.y})`}>
+        <Puffer />
       </g>
-      <g data-fx="snort" opacity="0" transform={`translate(${CRATE_X + 110} -40)`}>
-        <ellipse rx={18} ry={9} fill="#f4f1ea" />
-        <ellipse cx={20} cy={-6} rx={12} ry={7} fill="#f4f1ea" />
+      <g data-fx="sparks" opacity="0">
+        {POLES.map((x) => (
+          <path key={x} d={`M${x} -300 L${(x + PUFFER.x) / 2 + 10} ${-260 + (x % 3) * 20} L${(x + PUFFER.x) / 2 - 10} -220 L${PUFFER.x + (x < PUFFER.x ? -60 : 60)} -170`} fill="none" stroke="#bff8ff" strokeWidth={6} strokeLinejoin="round" />
+        ))}
       </g>
-      <g data-fx="crate" transform={`translate(${CRATE_X} 0)`}>
-        <Crate />
-      </g>
+      <Flash name="zap" x={PUFFER.x} y={PUFFER.y} size={200} />
     </g>
   ),
-  move: (_kit, t) => {
-    if (t < 0.06) return still(blend(STAND, CROUCH, t, 0, 0.06))
-    if (t < 0.3) return { pose: TUCK, ahead: ROLLED * ease(ramp(t, 0.06, 0.3)), spin: 720 * ease(ramp(t, 0.06, 0.3)) }
-    if (t < 0.42) return still(blend(TUCK, STAND, t, 0.3, 0.38), ROLLED)
-    if (t < 0.56) {
-      const [ahead, lift] = flight(ramp(t, 0.42, 0.56), [ROLLED, 0], [CRATE_X - 10, SADDLE - SEAT], 80)
-      return { pose: blend(CROUCH, RIDE, t, 0.42, 0.54), ahead, lift }
-    }
-    return { pose: { ...RIDE, lean: -10 * charging(t) }, ahead: boarAt(t) - 10, lift: SADDLE - SEAT - 6 * Math.abs(Math.sin(t * 40)) * charging(t) }
-  },
-  partner: (t): PartnerFrame => {
-    if (t < 0.3) return { ahead: START + 60 * ease(ramp(t, 0.06, 0.3)), phase: 6 * ramp(t, 0.06, 0.3) }
-    if (t < 0.44) return { ahead: START + 60 }
-    if (t < 0.58) {
-      const [ahead, lift] = flight(ramp(t, 0.44, 0.58), [START + 60, 0], [CRATE_X + RUMP.x, RUMP.lift], 110)
-      return { ahead, lift, air: 1 }
-    }
-    return { ahead: boarAt(t) + RUMP.x, lift: RUMP.lift - 6 * Math.abs(Math.sin(t * 40 + 1)) * charging(t), air: 0.7, arms: 0.5 * ramp(t, 0.94, 1) }
-  },
+  // The boat over his legs, the water over the boat's hull and the puffer's underside, the stars over all.
+  front: () => (
+    <g>
+      <g data-fx="boat" transform={`translate(${FROM} 0)`}>
+        <Boat />
+      </g>
+      <rect x={-2400} y={-6} width={4800} height={600} fill="#0c3a6c" opacity={0.72} />
+      <path d="M-2400 -6 H2400" stroke="#8fd8ff" strokeWidth={4} opacity={0.6} />
+      {STARS.map((x, i) => (
+        <g key={x} transform={`translate(${x} ${-STAR_LIFT})`}>
+          <g opacity={0.45}>
+            <StarRing />
+          </g>
+          <g data-fx={`star-${i}`} opacity="0">
+            <StarRing />
+            <Flash name={`star-flash-${i}`} x={0} y={0} size={70} />
+          </g>
+        </g>
+      ))}
+    </g>
+  ),
+  move: (_kit, t) => move(t),
   reply: (stage) => {
-    const crate = fx(stage, 'crate')
-    const boards = [0, 1, 2, 3].map((i) => fx(stage, `crate-board-${i}`))
-    const boar = fx(stage, 'boar')
-    const snort = fx(stage, 'snort')
-    const wall = fx(stage, 'wall')
-    const planks = Array.from({ length: PLANKS }, (_, i) => fx(stage, `plank-${i}`))
-    const beetles = BEETLES.map((_, i) => fx(stage, `beetle-${i}`))
-    const light = fx(stage, 'room-light')
-    const glow = fx(stage, 'room-glow')
+    const boat = fx(stage, 'boat')
+    const stars = STARS.map((_, i) => fx(stage, `star-${i}`))
+    const flashes = STARS.map((_, i) => fx(stage, `star-flash-${i}`))
+    const poles = POLES.map((_, i) => fx(stage, `pole-${i}`))
+    const puffer = fx(stage, 'puffer')
+    const sparks = fx(stage, 'sparks')
+    const zap = fx(stage, 'zap')
     return (t) => {
-      // the crate's boards fly apart and the boar steps out and snorts
-      const burst = ramp(t, 0.3, 0.4)
-      boards.forEach((board, i) => transformTo(board, boardAt(i, burst)))
-      fadeTo(crate, 1 - ramp(t, 0.36, 0.42))
-      fadeTo(boar, ramp(t, 0.3, 0.36))
-      transformTo(boar, `translate(${r1(boarAt(t))} 0)`)
-      fadeTo(snort, bell(t, 0.36, 0.44))
-      // the charge bowls each beetle over as it reaches it, and smashes the wall
-      beetles.forEach((beetle, i) => {
-        const u = ramp(boarAt(t), BEETLES[i] - SNOUT, BEETLES[i] - SNOUT + BOWLED)
-        transformTo(beetle, `translate(${r1(BEETLES[i] + 260 * u)} ${r1(-hop(u, 220))}) rotate(${r1(300 * u)} 0 -24)`)
-        fadeTo(beetle, 1 - ramp(u, 0.8, 1))
+      transformTo(boat, `translate(${r1(boatAt(t))} ${r1(4 * Math.sin(t * 24))}) rotate(${r1(3 * Math.sin(t * 30))})`)
+      // each star lights as the boat passes through it, and raises a pole or two out of the water
+      PASSES.forEach((at, i) => {
+        fadeTo(stars[i], ramp(t, at - 0.01, at + 0.02))
+        fadeTo(flashes[i], bell(t, at - 0.02, at + 0.1))
       })
-      const smash = ramp(t, 0.82, 1)
-      planks.forEach((plank, i) => transformTo(plank, plankAt(i, smash)))
-      fadeTo(wall, 1 - ramp(t, 0.94, 1))
-      fadeTo(light, ramp(t, 0.84, 0.96))
-      fadeTo(glow, 0.8 * ramp(t, 0.86, 1))
+      poles.forEach((pole, i) => {
+        const at = PASSES[Math.min(2, i)]
+        const up = ease(ramp(t, at, at + 0.08))
+        transformTo(pole, `translate(${POLES[i]} ${r1(200 * (1 - up))})`)
+      })
+      // the shock: it swells and flashes, then lies flat on the water
+      const swell = bell(t, SHOCK.from, SHOCK.to)
+      const flat = ease(ramp(t, SHOCK.to - 0.04, 0.96))
+      transformTo(puffer, `translate(${PUFFER.x} ${r1(PUFFER.y + 130 * flat)}) scale(${(1 + 0.2 * swell + 0.15 * flat).toFixed(3)} ${(1 + 0.2 * swell - 0.68 * flat).toFixed(3)}) rotate(${r1(8 * Math.sin(t * 200) * swell)})`)
+      fadeTo(sparks, swell * (0.5 + 0.5 * Math.abs(Math.sin(t * 180))))
+      fadeTo(zap, bell(t, SHOCK.from + 0.04, SHOCK.to + 0.02))
     }
   },
 }

@@ -1,99 +1,127 @@
-import { hop } from '@/lib/motion/arc'
 import { ramp } from '@/lib/scroll/stage'
 import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
-import { CROUCH, KNOCKED, LIFT, STAND, THROW, blend, ease, heldIn, still, type Frame } from '../moves'
+import { LIFT, STAND, THROW, blend, flight, heldIn, still, type Frame } from '../moves'
 import type { PartnerFrame } from '../partner'
 import type { SceneDef } from '../place'
-import { Barrel, Beetle } from '../props'
+import { COLORS as C, TROOP } from '../palette'
+import { ColourMango, Coconut } from '../troop'
 import { Flash, hopOf } from './kit'
 
-// About: the partner freed, and the pair the game is built on (one leads, the other follows; when the leader
-// is hit the other springs ahead). He lifts the barrel on the path over his head and throws it; it bursts on
-// the ground and the lemur tumbles out and jumps onto his back. Then a beetle of the crew walks into him, he
-// is knocked back a step, and the partner springs off his back and comes down on the beetle, which goes flat,
-// and lands ahead of him to lead.
+// About: the jungle, and the first friend freed (research/2026-11-25-deep-dk64 §1: the small quick ape caged
+// in the mountain, freed by three switches over the cave mouths). The lemur is behind bars in the middle of
+// three cave mouths in the hillside, a switch over each. He hurls a coconut at each switch in turn and each
+// lights gold; the bars rise and the lemur springs out and lands beside him. The pair stand side by side, the
+// cage open, the three switches lit, the red mangoes the lemur gathers on the path.
 
-const BARREL = { x: 100, y: -48 }
-const BURST = 300
-// The partner rides on his back, a little behind his middle.
-const ON_BACK = { gap: 34, lift: 120 }
-const BEETLE_FROM = 560
-const BEETLE_AT = 110
-const KNOCKED_TO = -50
-const LEAD = 250
+const CAVES = [200, 330, 460] as const
+const CAGE = CAVES[1]
+const SWITCH_Y = -250
+// Each throw: the stretch of the move it takes, from his wind up to the coconut striking its switch.
+const THROWS = [
+  [0.02, 0.16],
+  [0.17, 0.31],
+  [0.32, 0.46],
+] as const
+// How far through a throw the coconut leaves his hand.
+const RELEASE = 0.4
+const BESIDE = 120
+const RED_MANGOES = [70, 175, 250] as const
 
 const move = (t: number): Frame => {
-  if (t < 0.08) return still(blend(STAND, CROUCH, t, 0, 0.08))
-  if (t < 0.2) return still(blend(CROUCH, LIFT, t, 0.08, 0.18))
-  if (t < 0.3) return still(blend(LIFT, THROW, t, 0.2, 0.26))
-  if (t < 0.6) return still(blend(THROW, STAND, t, 0.3, 0.4))
-  if (t < 0.72) {
-    const u = ease(ramp(t, 0.6, 0.72))
-    return { pose: blend(STAND, KNOCKED, t, 0.6, 0.64), ahead: lerp(0, KNOCKED_TO, u), lift: hop(u, 30) }
+  for (const [a, b] of THROWS) {
+    if (t >= a && t < b) {
+      const u = ramp(t, a, b)
+      return still(u < RELEASE ? blend(STAND, LIFT, u, 0, RELEASE) : blend(LIFT, THROW, u, RELEASE, RELEASE + 0.2))
+    }
   }
-  return still(blend(KNOCKED, STAND, t, 0.72, 0.84), KNOCKED_TO)
+  if (t < 0.8) return still(blend(THROW, STAND, t, 0.46, 0.56))
+  return still(blend(STAND, LIFT, t, 0.84, 0.94))
 }
 
-/** The barrel's middle: on the path, over his head in his hands, then thrown to where it bursts. */
-const barrelAt = (t: number): [number, number] => {
-  if (t < 0.08) return [BARREL.x, BARREL.y]
-  const [hx, hy] = heldIn(move(Math.min(t, 0.2)))
-  const held: [number, number] = [hx, hy - 40]
-  if (t < 0.2) return [lerp(BARREL.x, held[0], ease(ramp(t, 0.08, 0.18))), lerp(BARREL.y, held[1], ease(ramp(t, 0.08, 0.18)))]
-  const u = ramp(t, 0.2, 0.3)
-  return [lerp(held[0], BURST, u), lerp(held[1], -48, u * u) - hop(u, 80)]
+/** Where coconut `i` is at `t`: in his hand, then flying to its switch. */
+const coconutAt = (i: number, t: number): [number, number] => {
+  const [a, b] = THROWS[i]
+  const from = heldIn(move(a + (b - a) * RELEASE))
+  // y runs down here, so the arc rises by a negative height
+  return flight(ramp(t, a + (b - a) * RELEASE, b), from, [CAVES[i], SWITCH_Y], -80)
 }
 
-const partner = (t: number): PartnerFrame | null => {
-  if (t < 0.3) return null
-  if (t < 0.36) return { ...hopOf(t, 0.3, 0.36, BURST, BURST - 30, 60), spin: -360 * ramp(t, 0.3, 0.36), opacity: ramp(t, 0.3, 0.31) }
-  const back = move(t)
-  if (t < 0.46) return hopOf(t, 0.38, 0.46, BURST - 30, back.ahead - ON_BACK.gap, 90, 0, ON_BACK.lift)
-  if (t < 0.64) return { ahead: back.ahead - ON_BACK.gap, lift: ON_BACK.lift, air: 0.7, arms: 0.2 }
-  // off his back as he is hit, over him and down on the beetle, then ahead to lead
-  if (t < 0.78) return hopOf(t, 0.64, 0.78, -ON_BACK.gap, BEETLE_AT, 170, ON_BACK.lift, 40)
-  if (t < 0.9) return hopOf(t, 0.8, 0.9, BEETLE_AT, LEAD, 60, 40, 0)
-  return { ahead: LEAD, arms: 0.6 * bell(t, 0.9, 1) }
+const partner = (t: number): PartnerFrame => {
+  if (t < 0.6) return { ahead: CAGE, arms: 0.4 * bell(t, 0.1, 0.5) }
+  if (t < 0.8) return hopOf(t, 0.6, 0.8, CAGE, BESIDE, 140)
+  return { ahead: BESIDE, arms: 0.8 * bell(t, 0.82, 1.1) }
 }
+
+/** A cave mouth in the hillside, 110 wide and 150 high, its sill on 0 0. */
+const CaveMouth = ({ x }: { x: number }) => <path d={`M${x - 55} 0 V-90 Q${x - 55} -150 ${x} -150 Q${x + 55} -150 ${x + 55} -90 V0 Z`} fill={C.shadow} stroke="#0a1a0c" strokeWidth={4} />
 
 export const about: SceneDef = {
   zone: 'jungle',
   kit: null,
-  script: [1700, 1700],
-  shift: { wide: 60, phone: 0 },
+  script: [2000, 1700],
   ends: [0.5, 1],
+  span: [-50, 540],
   back: () => (
     <g>
-      <g data-fx="beetle" transform={`translate(${BEETLE_FROM} 0)`}>
-        <Beetle />
-      </g>
-      <Flash name="barrel-burst" x={BURST} y={-48} size={90} />
-      <Flash name="stomp" x={BEETLE_AT} y={-30} size={60} />
+      {/* the hillside, its three cave mouths, a switch over each */}
+      <path d="M110 0 Q100 -300 220 -380 Q330 -440 450 -380 Q560 -310 550 0 Z" fill="url(#tp-croc)" stroke={C.shadow} strokeWidth={4} />
+      <path d="M130 -60 Q150 -280 260 -350 M400 -380 Q520 -300 530 -80" fill="none" stroke="#3a6a2a" strokeWidth={10} strokeLinecap="round" opacity={0.6} />
+      {CAVES.map((x) => (
+        <CaveMouth key={x} x={x} />
+      ))}
+      {CAVES.map((x, i) => (
+        <g key={x} transform={`translate(${x} ${SWITCH_Y})`}>
+          <circle r={30} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={3} />
+          <g data-fx={`switch-${i}`} opacity="0">
+            <circle r={24} fill="url(#tp-gold)" />
+          </g>
+          <circle r={11} fill="none" stroke={C.shadow} strokeWidth={4} />
+          <Flash name={`hit-${i}`} x={0} y={0} size={60} />
+        </g>
+      ))}
+      {RED_MANGOES.map((x) => (
+        <g key={x} transform={`translate(${x} -14)`}>
+          <ColourMango ape="lemur" size={0.6} />
+        </g>
+      ))}
     </g>
   ),
-  // The barrel is in his hands in front of him.
+  // The bars in front of the lemur in the cage, rising into the rock; the coconuts in flight.
   front: () => (
-    <g data-fx="barrel" transform={`translate(${BARREL.x} ${BARREL.y})`}>
-      <Barrel mouth={false} />
+    <g>
+      <g data-fx="bars">
+        {[-36, -12, 12, 36].map((dx) => (
+          <rect key={dx} x={CAGE + dx - 5} y={-146} width={10} height={146} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={2} />
+        ))}
+        <rect x={CAGE - 52} y={-80} width={104} height={10} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={2} />
+        <rect x={CAGE - 14} y={-90} width={28} height={30} rx={4} fill={TROOP.lemur} stroke={C.shadow} strokeWidth={2} />
+      </g>
+      {THROWS.map((_, i) => (
+        <g key={i} data-fx={`coconut-${i}`} opacity="0">
+          <Coconut />
+        </g>
+      ))}
     </g>
   ),
   move: (_kit, t) => move(t),
   partner: (t) => partner(t),
   reply: (stage) => {
-    const barrel = fx(stage, 'barrel')
-    const burst = fx(stage, 'barrel-burst')
-    const beetle = fx(stage, 'beetle')
-    const stomp = fx(stage, 'stomp')
+    const coconuts = THROWS.map((_, i) => fx(stage, `coconut-${i}`))
+    const switches = THROWS.map((_, i) => fx(stage, `switch-${i}`))
+    const hits = THROWS.map((_, i) => fx(stage, `hit-${i}`))
+    const bars = fx(stage, 'bars')
     return (t) => {
-      const [x, y] = barrelAt(t)
-      transformTo(barrel, `translate(${r1(x)} ${r1(y)}) rotate(${r1(200 * ease(ramp(t, 0.2, 0.3)))})`)
-      fadeTo(barrel, 1 - ramp(t, 0.29, 0.31))
-      fadeTo(burst, bell(t, 0.28, 0.4))
-      // the beetle walks in at him and bumps him, and goes flat under the partner's landing
-      const walked = lerp(BEETLE_FROM, BEETLE_AT, ease(ramp(t, 0.5, 0.62)))
-      const flat = ease(ramp(t, 0.76, 0.8))
-      transformTo(beetle, `translate(${r1(walked)} 0) scale(${(1 + 0.3 * flat).toFixed(3)} ${(1 - 0.65 * flat).toFixed(3)})`)
-      fadeTo(stomp, bell(t, 0.75, 0.86))
+      THROWS.forEach(([a, b], i) => {
+        const [x, y] = coconutAt(i, t)
+        transformTo(coconuts[i], `translate(${r1(x)} ${r1(y)}) rotate(${r1(540 * ramp(t, a, b))})`)
+        fadeTo(coconuts[i], t >= a + (b - a) * RELEASE && t < b ? 1 : 0)
+        fadeTo(switches[i], ramp(t, b - 0.01, b + 0.02))
+        fadeTo(hits[i], bell(t, b - 0.02, b + 0.08))
+      })
+      // the bars rise into the rock once all three are lit
+      const up = ramp(t, 0.5, 0.62)
+      transformTo(bars, `translate(0 ${r1(lerp(0, -150, up))})`)
+      fadeTo(bars, 1 - ramp(t, 0.56, 0.64))
     }
   },
 }

@@ -8,7 +8,7 @@ import { NO_NODES, figureScene, figureTransform, type FigureRig } from '../share
 import type { RigJoints } from '../shared/rig'
 import { StageFigure, figureJoints, setFigurePose, type FigurePose } from './character'
 import { Partner, partnerTransform } from './partner'
-import { inputOf, partnerAt, placeScale, sceneSpot, sceneWriter, type Scene } from './scenes'
+import { MIRROR, inputOf, partnerAt, placeScale, placingOf, sceneSpot, sceneWriter, type Scene } from './scenes'
 import { ToneScope } from './scenery'
 import { GROUND, PHONE_VIEW, PhoneFloor, VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
@@ -17,7 +17,8 @@ import css from './stage.module.css'
 // ground he stands on, in the place's tone, then the place's things round his spot and him in the figure
 // layer. The shared engine fades each stage and pushes its layers in (the parallax of the rendered jungle);
 // the scene's writer plays the place and hands back his frame. On a phone the planes show a taller view from
-// higher up the canvas, the ground half way down the screen, and the mid plane carries it on below the canvas.
+// higher up the canvas, the ground half way down the screen, and the mid plane carries it on below the canvas;
+// a place a phone draws the other way round (scenes.tsx placingOf) is mirrored in the figure layer only.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -34,7 +35,7 @@ const FIGURE_RIG: FigureRig<RigJoints, FigurePose> = { joints: figureJoints, pos
 /** The scene as the shared theatre runs it: its script played by the scroll, him placed and posed each frame. */
 export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, (stage) => sceneWriter(scene)(stage), FIGURE_RIG, scene.def.script)
 
-/** The partner at his first frame's place, where the place has him. */
+/** The lemur at his first frame's place, where the place has him. */
 function PartnerFigure({ scene }: { scene: Scene }) {
   if (!scene.def.partner) return null
   const first = partnerAt(scene, 0)
@@ -88,12 +89,12 @@ const layersOf = (scene: Scene): StageLayer[] => {
       name: 'figure',
       node: plane(
         scene,
-        <>
+        <g transform={placingOf(scene).mirrored ? MIRROR : undefined}>
           <g transform={at}>{back(input)}</g>
           <Figure scene={scene} />
           <PartnerFigure scene={scene} />
           {front && <g transform={at}>{front(input)}</g>}
-        </>,
+        </g>,
       ),
     },
   ]
@@ -101,5 +102,5 @@ const layersOf = (scene: Scene): StageLayer[] => {
 
 /** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
 export const JungleStage = memo(function JungleStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.screen} />
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={scene.side === 'left' ? `${css.screen} ${css.screenLeft}` : css.screen} />
 })

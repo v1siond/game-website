@@ -19,7 +19,7 @@ import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { SUN_POINTS, ServiceBoard, TechBoard, VentureBoard, WOOD_TAGS } from './boards'
 import { WOOD_BUTTON, jungleButton } from './buttons'
 import { Board, LevelSign } from './levelSign'
-import type { Scene } from './scenes'
+import type { Scene, SceneSide } from './scenes'
 import { JungleStage } from './stage'
 import look from './jungle.module.css'
 
@@ -229,19 +229,27 @@ interface SceneSectionProps {
   still: boolean
 }
 
+/** The column a section's sign and cards read in: from lg on the half its scene leaves free (a scene on the
+ *  right reads its cards on the left, and the other way round), below lg the whole width over the scene. */
+const READS_BESIDE: Record<SceneSide, string> = {
+  right: 'max-w-[42rem]',
+  left: 'max-w-[42rem] lg:ml-auto',
+}
+
 /** One level of the page; under reduced motion its own stage sits still behind its head. */
 export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   const { sections } = useLabels()
   const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const title = sections[slot.titleKey]
   const id = headingId('jungle', title)
+  const column = READS_BESIDE[scene.side]
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <JungleStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-6 max-md:min-h-[130svh] motion-reduce:min-h-[70svh]">
+      <header className={`relative flex min-h-[90svh] items-end justify-center pb-6 max-md:min-h-[130svh] motion-reduce:min-h-[70svh] ${column}`}>
         <LevelSign id={id} title={title} />
       </header>
-      <div className="relative max-w-[42rem]">
+      <div className={`relative ${column}`}>
         <Cards slot={slot} />
       </div>
     </section>

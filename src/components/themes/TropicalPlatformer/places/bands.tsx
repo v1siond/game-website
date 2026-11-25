@@ -1,103 +1,157 @@
 import { ramp } from '@/lib/scroll/stage'
-import { bell, fadeTo, fx, r1, transformTo } from '../../shared/stageNodes'
-import { CROUCH, REACH, STAND, blend, flight, roll, still, type Frame } from '../moves'
+import { bell, fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
+import { LIFT, STAND, blend, roll, still, type Frame } from '../moves'
 import type { PartnerFrame } from '../partner'
 import type { SceneDef } from '../place'
-import { FireDrum } from '../cast'
-import { COLORS as C } from '../palette'
-import { Beetle, Deck, Pit, StandingBarrel } from '../props'
-import { hopOf } from './kit'
+import { COLORS as C, TROOP, TROOP_ORDER, type Ape } from '../palette'
+import { StandingBarrel } from '../props'
+import { FriendFigure, Gong, Guitar, Mallet, Pad, Panpipes, Tuba, armTurn, type FriendApe } from '../troop'
+import { COVER } from './kit'
 
-// Bands: the factory of burning oil drums whose flames die in a pattern, crossed in the moment they go out;
-// here the rhythm is the puzzle and he drums it before he crosses it. Sticks in hand he drums the pattern on
-// a drum lid and the three flames over the pit go out one by one in time with him, a beetle bouncing in the
-// pit below; then he hops drum to drum across on the beat, the partner after him. Both stand on the far
-// gantry, the drums flaring again behind.
+// Bands: the hideout in the fortress's head (research/2026-11-25-deep-dk64 §1: the ten minute clock, five
+// generator rooms opened by the music pads, each ape shutting his own generator; §2: each ape's instrument plays
+// on his own pad). Under the red alarm and the running clock five generators roar behind five pads. He drums on
+// his barrel on the gold pad and the gold generator dies; the lemur's guitar, the orangutan's tuba, the
+// tamarin's panpipes and the silverback's gong play in turn on theirs and each generator goes dark; the clock
+// stops and the alarm's red goes out. The troop stands at its five pads, the generators dark, the clock still.
 
-const LID = 80
-const PIT = { from: 130, to: 420 }
-const DRUMS = [190, 280, 365] as const
-const GANTRY = 470
-const PARTNER_GANTRY = 410
-const START = -70
-// The beat of his roll each flame goes out on, and the stretch of the move he drums over.
-const OUT_AT = [0.17, 0.29, 0.41] as const
-const ROLL = { from: 0.04, to: 0.46 }
-// His hops on the beat: off the ground to each drum head and on to the gantry, each [from, to, start, end].
-const HOPS: ReadonlyArray<readonly [number, number, number, number]> = [
-  [0, DRUMS[0], 0.52, 0.6],
-  [DRUMS[0], DRUMS[1], 0.62, 0.7],
-  [DRUMS[1], DRUMS[2], 0.72, 0.8],
-  [DRUMS[2], GANTRY, 0.82, 0.9],
-]
-const LAG = 0.06
-
-const standingAt = (t: number, hops: typeof HOPS): number => hops.reduce((at, [, to, , b]) => (b <= t ? to : at), hops[0][0])
+// Each ape's pad, along the floor in the troop's order; his drum before him on his.
+const PADS: Record<Ape, number> = { him: 0, lemur: 140, orangutan: 250, tamarin: 360, silverback: 460 }
+const DRUM = 62
+// When each one plays, the stretch of the move, and his generator dies at its end.
+const PLAYS: Record<Ape, readonly [number, number]> = {
+  him: [0.02, 0.3],
+  lemur: [0.34, 0.44],
+  orangutan: [0.44, 0.54],
+  tamarin: [0.54, 0.64],
+  silverback: [0.64, 0.76],
+}
+const STOP = { from: 0.78, to: 0.9 }
+const CLOCK = { x: 230, y: -500 }
+const GENERATOR = { y: -150, height: 300 }
+const FRIENDS: readonly FriendApe[] = ['orangutan', 'tamarin', 'silverback']
+const GONG = PADS.silverback + 96
 
 const move = (t: number): Frame => {
-  if (t < ROLL.from) return still(blend(STAND, roll(0), t, 0, ROLL.from))
-  if (t < ROLL.to) return still(roll(12 * ramp(t, ROLL.from, ROLL.to)))
-  for (const [from, to, a, b] of HOPS) {
-    if (t >= a && t < b) {
-      const [ahead, lift] = flight(ramp(t, a, b), [from, 0], [to, 0], 110)
-      return { pose: blend(CROUCH, REACH, t, a, a + 0.02), ahead, lift }
-    }
-  }
-  return still(t < 0.52 ? blend(roll(0), CROUCH, t, 0.46, 0.52) : blend(CROUCH, STAND, t, 0.9, 0.97), standingAt(t, HOPS))
+  const [a, b] = PLAYS.him
+  if (t < b) return still(blend(STAND, roll(14 * ramp(t, a, b)), t, 0, 0.03))
+  if (t < STOP.from) return still(blend(roll(0), STAND, t, b, b + 0.06))
+  return still(blend(STAND, LIFT, t, STOP.from, STOP.to))
 }
 
-// The partner takes the same hops a beat behind, from his own place, to his own place on the gantry.
-const PARTNER_HOPS = HOPS.map(([from, to, a, b], i) => [i === 0 ? START : from, i === HOPS.length - 1 ? PARTNER_GANTRY : to, a + LAG, b + LAG] as const)
+/** How hard the friend's instrument plays at t, 0 to 1. */
+const playing = (ape: Ape, t: number): number => bell(t, PLAYS[ape][0], PLAYS[ape][1])
 
-const partner = (t: number): PartnerFrame => {
-  for (const [from, to, a, b] of PARTNER_HOPS) {
-    if (t >= a && t < b) return hopOf(t, a, b, from, to, 100)
-  }
-  return { ahead: standingAt(t, PARTNER_HOPS), arms: 0.6 * bell(t, 0.94, 1.06) }
-}
+const partner = (t: number): PartnerFrame => ({ ahead: PADS.lemur, arms: 0.35 * playing('lemur', t) + 0.15 + 0.6 * bell(t, STOP.from, 1.1), phase: 0.3 * Math.sin(t * 80) * playing('lemur', t) })
 
-/** How much of flame `i` burns: out on its beat, back once both have crossed. */
-const flameAt = (i: number, t: number): number => 1 - ramp(t, OUT_AT[i], OUT_AT[i] + 0.04) + ramp(t, 0.92 + i * 0.025, 0.95 + i * 0.025)
+/** A generator: a steel drum standing on its base with a glowing core in its ape's colour (`core-<i>`). */
+const Generator = ({ ape, i }: { ape: Ape; i: number }) => (
+  <g>
+    <rect x={-42} y={-GENERATOR.height} width={84} height={GENERATOR.height} rx={10} fill="url(#tp-iron)" stroke={C.shadow} strokeWidth={3} />
+    <rect x={-50} y={-GENERATOR.height - 14} width={100} height={18} rx={4} fill="#2a2e34" stroke={C.shadow} strokeWidth={2} />
+    <rect x={-26} y={-GENERATOR.height + 40} width={52} height={GENERATOR.height - 90} rx={6} fill="#14161a" stroke={C.shadow} strokeWidth={2} />
+    <g data-fx={`core-${i}`}>
+      <rect x={-20} y={-GENERATOR.height + 48} width={40} height={GENERATOR.height - 106} rx={4} fill={TROOP[ape]} />
+      <rect x={-10} y={-GENERATOR.height + 56} width={10} height={GENERATOR.height - 122} rx={3} fill="#ffffff" opacity={0.5} />
+    </g>
+  </g>
+)
 
 export const bands: SceneDef = {
-  zone: 'factory',
+  zone: 'helm',
   kit: 'drummer',
-  script: [1900, 1800],
-  shift: { wide: -90, phone: -40 },
-  ends: [0.5, 1],
+  script: [1600, 1900, 1300],
+  ends: [0.32, 0.78, 1],
+  span: [-70, 640],
+  size: 0.9,
   back: () => (
     <g>
-      <Pit from={PIT.from} to={PIT.to} />
-      <g data-fx="pit-beetle" transform="translate(240 120)">
-        <Beetle />
+      {/* the clock on the back wall, its hand running down */}
+      <g transform={`translate(${CLOCK.x} ${CLOCK.y})`}>
+        <circle r={80} fill="#14161a" stroke="url(#tp-iron)" strokeWidth={14} />
+        {Array.from({ length: 10 }, (_, k) => (
+          <rect key={k} x={-3} y={-70} width={6} height={14} fill="#ff5a3a" transform={`rotate(${k * 36})`} />
+        ))}
+        <path data-fx="clock-hand" d="M0 10 V-62" stroke="#ff5a3a" strokeWidth={8} strokeLinecap="round" />
+        <circle r={9} fill="#ff5a3a" />
       </g>
-      {DRUMS.map((x, i) => (
-        <g key={x} transform={`translate(${x} 0)`}>
-          <FireDrum i={i} />
+      {TROOP_ORDER.map((ape, i) => (
+        <g key={ape} transform={`translate(${PADS[ape] + (ape === 'him' ? 30 : 0)} ${GENERATOR.y})`}>
+          <Generator ape={ape} i={i} />
         </g>
       ))}
-      <g transform={`translate(${LID} 0)`}>
+      {TROOP_ORDER.map((ape) => (
+        <g key={ape} transform={`translate(${PADS[ape] + (ape === 'him' ? 30 : 0)} 4)`}>
+          <Pad ape={ape} width={ape === 'him' ? 150 : 100} />
+        </g>
+      ))}
+      <g transform={`translate(${GONG} 0) scale(0.8)`}>
+        <Gong />
+      </g>
+      {FRIENDS.map((ape) => (
+        <g key={ape} transform={`translate(${PADS[ape] - 20} 0)`}>
+          <FriendFigure ape={ape}>
+            {ape === 'orangutan' && (
+              <g transform="translate(10 -60)">
+                <Tuba />
+              </g>
+            )}
+            {ape === 'tamarin' && (
+              <g transform="translate(20 -90)">
+                <Panpipes />
+              </g>
+            )}
+            {ape === 'silverback' && <Mallet />}
+          </FriendFigure>
+        </g>
+      ))}
+    </g>
+  ),
+  // His barrel drum before him, the lemur's guitar in his paws; the red alarm over the whole hideout until the
+  // clock stops.
+  front: () => (
+    <g>
+      <g data-fx="guitar" transform={`translate(${PADS.lemur + 20} -70)`}>
+        <Guitar />
+      </g>
+      <g transform={`translate(${DRUM} 0)`}>
         <StandingBarrel />
       </g>
-      <g transform={`translate(${PIT.to} 0)`}>
-        <Deck width={160} height={120} />
-        <path d="M0 -6 V-110 M160 -6 V-110 M0 -100 H160" stroke={C.stoneDark} strokeWidth={6} fill="none" />
-      </g>
+      <rect data-fx="alarm" {...COVER} fill="#ff2a1a" opacity="0.16" />
     </g>
   ),
   move: (_kit, t) => move(t),
   partner: (t) => partner(t),
   reply: (stage) => {
-    const flames = DRUMS.map((_, i) => fx(stage, `flame-${i}`))
-    const beetle = fx(stage, 'pit-beetle')
+    const cores = TROOP_ORDER.map((_, i) => fx(stage, `core-${i}`))
+    const hand = fx(stage, 'clock-hand')
+    const alarm = fx(stage, 'alarm')
+    const gong = fx(stage, 'gong-face')
+    const guitar = fx(stage, 'guitar')
+    const arms = FRIENDS.map((ape) => fx(stage, `${ape}-arm`))
+    const bodies = FRIENDS.map((ape) => fx(stage, `${ape}-body`))
     return (t) => {
-      flames.forEach((flame, i) => {
-        const burn = flameAt(i, t)
-        const flicker = 1 + 0.08 * Math.sin(t * 120 + i * 2)
-        transformTo(flame, `translate(0 ${r1(-4 * (1 - burn))}) scale(${(burn * flicker).toFixed(3)} ${Math.max(0.01, burn * flicker).toFixed(3)})`)
-        fadeTo(flame, burn)
+      // each generator dies as its ape's playing ends, flickering out
+      TROOP_ORDER.forEach((ape, i) => {
+        const [, end] = PLAYS[ape]
+        const out = ramp(t, end - 0.03, end + 0.02)
+        fadeTo(cores[i], (1 - out) * (0.85 + 0.15 * Math.sin(t * 90 + i)) + 0.1 * out)
       })
-      transformTo(beetle, `translate(240 ${r1(120 - 50 * Math.abs(Math.sin(t * 22)))})`)
+      // the clock's hand runs round until it stops
+      transformTo(hand, `rotate(${r1(-360 * 3 * Math.min(t, lerp(STOP.from, STOP.to, 0.5)))})`)
+      const calm = ramp(t, STOP.from, STOP.to)
+      fadeTo(alarm, (1 - calm) * (0.1 + 0.1 * Math.abs(Math.sin(t * 24))))
+      // the friends play in turn: the orangutan pumps his tuba, the tamarin his pipes, the silverback swings at
+      // the gong and it shivers
+      FRIENDS.forEach((ape, i) => {
+        const p = playing(ape, t)
+        const swing = ape === 'silverback' ? -70 * p * Math.abs(Math.sin(t * 60)) : -20 * p * Math.sin(t * 70)
+        transformTo(arms[i], armTurn(swing + 150 * bell(t, STOP.from + i * 0.02, 1.1)))
+        transformTo(bodies[i], `translate(0 ${r1(-6 * p * Math.abs(Math.sin(t * 70)))})`)
+      })
+      const struck = playing('silverback', t)
+      transformTo(gong, `rotate(${r1(4 * struck * Math.sin(t * 120))} 0 -150)`)
+      transformTo(guitar, `translate(${PADS.lemur + 20} ${r1(-70 - 4 * playing('lemur', t) * Math.sin(t * 90))})`)
     }
   },
 }
