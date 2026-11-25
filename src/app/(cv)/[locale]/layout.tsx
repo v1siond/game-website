@@ -16,5 +16,5 @@ export default async function TranslatedCVLayout({
   params,
 }: Readonly<{ children: React.ReactNode; params: Promise<{ locale: string }> }>) {
   const { locale } = await params
-  return <RootShell lang={isLocale(locale) ? locale : defaultLocale}>{children}</RootShell>
+  return <RootShell lang={isLocale(locale) ? locale : defaultLocale} worldsPicker={false}>{children}</RootShell>
 }

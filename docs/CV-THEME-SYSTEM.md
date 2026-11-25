@@ -35,9 +35,11 @@ Artistic.
 
 ## The worlds launcher and its hint
 
-- `WorldsLauncher` (`src/components/worlds/`) sits top right on every page, the homepage and `/cv`, and names
+- `WorldsLauncher` (`src/components/worlds/`) sits top right on the homepage and the blog, and names
   itself with the count from the registry: "18 worlds" (stacked "18" over "worlds" under 640 px, so it
   clears a world's own top bar; Dark Fantasy keeps 64 px and 144 px free for it). It opens `WorldsModal`.
+  The CV pages (`/cv`, `/es/cv`, `/it/cv`) mount neither: their layouts pass `worldsPicker={false}` to
+  `RootShell`, so the CV is just the CV.
 - Its colours come from the current world's palette through `launcherColors` (`src/lib/worlds/nudge.ts`):
   the fill is the world's background, the label the first of accent, highlight and text that reads at 7 to
   1 on it, and a black or white outer hairline keeps the button 3 to 1 apart from any page behind it.

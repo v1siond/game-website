@@ -7,7 +7,7 @@ export { metadata, viewport } from '@/components/layouts/RootShell'
 // ornaments RootShell's providers draw fixed behind every page.
 export default function BlogLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <RootShell lang="en">
+    <RootShell lang="en" worldsPicker>
       <div className="relative z-10 min-h-screen bg-white font-sans text-gray-900">{children}</div>
     </RootShell>
   )

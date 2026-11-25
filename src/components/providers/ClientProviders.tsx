@@ -20,7 +20,14 @@ function SharedProfessionStage() {
   return <GlobalProfessionStage />
 }
 
-export default function ClientProviders({ children, worldsLabels }: { children: ReactNode; worldsLabels: WorldsText }) {
+interface ClientProvidersProps {
+  children: ReactNode
+  worldsLabels: WorldsText
+  /** The worlds launcher and its picker; the CV leaves them out, so the CV is just the CV. */
+  worldsPicker: boolean
+}
+
+export default function ClientProviders({ children, worldsLabels, worldsPicker }: ClientProvidersProps) {
   return (
     <ThemeProvider>
       <ProfessionProvider>
@@ -30,8 +37,12 @@ export default function ClientProviders({ children, worldsLabels }: { children: 
             <SharedProfessionStage />
             {children}
             {/* worlds picker lives outside the page content flow, available in every world */}
-            <WorldsLauncher />
-            <WorldsModal />
+            {worldsPicker && (
+              <>
+                <WorldsLauncher />
+                <WorldsModal />
+              </>
+            )}
           </WorldTransitionProvider>
         </WorldsLabelsProvider>
       </ProfessionProvider>

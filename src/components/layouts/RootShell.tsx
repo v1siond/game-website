@@ -65,15 +65,17 @@ export const viewport: Viewport = {
 
 interface RootShellProps {
   lang: Locale;
+  /** Whether the page carries the worlds launcher and picker: every page but the CV. */
+  worldsPicker: boolean;
   children: React.ReactNode;
 }
 
 /**
  * The document every root layout renders: fonts, head and the world providers, with the worlds text in the
  * document's language. The site and the CV are separate root layouts (route groups) only so each can set its
- * own `lang`; everything else is this.
+ * own `lang` (and the CV can leave the worlds picker out); everything else is this.
  */
-export default async function RootShell({ lang, children }: Readonly<RootShellProps>) {
+export default async function RootShell({ lang, worldsPicker, children }: Readonly<RootShellProps>) {
   const labels = await getLabels(lang);
   // The home page's inline script may set data-world-pending on <html> before hydration
   // (src/themes/worldPending.ts); suppressHydrationWarning covers that one attribute level only.
@@ -85,7 +87,7 @@ export default async function RootShell({ lang, children }: Readonly<RootShellPr
       <body
         className={`${silkScreen.className} ${silkScreen.variable} ${permanentMarker.className} ${bebasNeue.variable} antialiased`}
       >
-        <ClientProviders worldsLabels={labels.worlds}>
+        <ClientProviders worldsLabels={labels.worlds} worldsPicker={worldsPicker}>
           {children}
         </ClientProviders>
       </body>
