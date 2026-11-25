@@ -943,7 +943,7 @@ const projects: SceneSpec = {
 // their craters, the towers burning, him braced before them.
 const VENTURES = {
   near: { x: 110, y: 920, size: 1.4 },
-  far: { x: 250, y: 740, size: 0.8 },
+  far: { x: 205, y: 720, size: 0.8 },
   mages: [{ x: -40, y: 760 }, { x: 30, y: 800 }],
   footman: { x: -60, y: 960 },
   him: { x: -210, y: 990 },

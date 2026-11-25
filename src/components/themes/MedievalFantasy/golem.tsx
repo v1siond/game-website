@@ -183,8 +183,6 @@ export interface Rise {
   whole: number
 }
 
-export const STOOD: Rise = { fall: 1, burst: 1, built: 1, whole: 1 }
-
 // The rocks leave the crater one after another over the first half of `built` and each takes the rest to land.
 const LEAVE_SPAN = 0.5
 
