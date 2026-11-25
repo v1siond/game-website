@@ -8,7 +8,7 @@ import { FS } from './palette'
 // the cabinet picked a country and then a fighting style for it: the night street of the attract demo and his
 // home rooftop at dusk behind the select grid (Hero); the dojo hall of his own school (About); the harbour
 // town at the waterline, ropes and crates on the quay, for the heavyweight of the docks (Work); the factory
-// floor under the gantry (Tech Stack); the car park under the overpass for the bonus stage (Services); the
+// floor under the gantry (Tech Stack); the car park under the overpass for the scrap yard (Services); the
 // neon town of gambling halls for the boxer (Projects); the temple court at night of the leader behind it all
 // (Ventures); the club inside its mesh cage, the band behind the mesh (Bands); the ring in the river town at
 // dusk, the great stone on the bank (Muay Thai); and the same rooftop at sunrise for his ending (Contact).
@@ -236,7 +236,7 @@ const FACTORY = (
   </>
 )
 
-// The bonus stage: a car park under an overpass at night, the slab on its pillars, two street lamps, the
+// The scrap yard: a car park under an overpass at night, the slab on its pillars, two street lamps, the
 // painted bay lines on the tarmac. The car itself is the scene's prop (theatre.tsx), so it can be wrecked.
 const LOT = (
   <>

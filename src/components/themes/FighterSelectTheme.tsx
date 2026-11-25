@@ -38,7 +38,7 @@ const fsFace = Alfa_Slab_One({
 // order (./FighterSelect/theatre): each a full screen stage that rises from the dark, holds while its arcade
 // screen scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine). Each
 // fight opens with the plane's hop on the world map to its stage, one HUD carries the stage and the score
-// through the run, and the run goes through the rivals of the tour, the bonus stage, the ladder of the four
+// through the run, and the run goes through the rivals of the tour, the scrap yard, the ladder of the four
 // masters and the warlord, every scene played by the shared scene player at its own pace; below lg a
 // section's own screen is 130svh, so the round plays clear of its cards. Contact is his ending on the rooftop
 // at sunrise, a screen of it alone (his bow with his rival) before the win quote and the continue clock come

@@ -70,7 +70,7 @@ export function lifeOf(actions: readonly Action[], play: Playhead): { hero: numb
   return { hero: Math.round((1 - chipped) * 1000) / 1000, rival: total ? 1 - landed / total : 1 }
 }
 
-/** What a section is in the arcade run: the select screen, a fight, the bonus stage, or the ending. */
+/** What a section is in the arcade run: the select screen, a fight, the scrap yard, or the ending. */
 export type RunBeat = 'select' | 'fight' | 'bonus' | 'ending'
 
 /** A section's place in the run: the stage the HUD calls it, the score it starts from and the points it adds. */
@@ -80,13 +80,13 @@ export interface RunStop {
   award: number
 }
 
-// A fight's points grow stage by stage; the bonus stage pays its own.
+// A fight's points grow stage by stage; the scrap yard pays its own.
 const FIGHT_POINTS = 20000
 const FIGHT_STEP = 10000
 const BONUS_POINTS = 50000
 
 const stageName = (beat: RunBeat, fight: number, last: boolean): string => {
-  if (beat === 'bonus') return 'BONUS STAGE'
+  if (beat === 'bonus') return 'SCRAP YARD'
   if (beat === 'ending') return 'ALL CLEAR'
   if (last) return 'FINAL STAGE'
   return `STAGE ${Math.max(1, fight)}`

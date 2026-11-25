@@ -1,6 +1,6 @@
 // The arcade versus palette of the early 90s fighters, for the world's SVG art and classes: the deep blue
 // of the select screen and its orange world map, player one blue (him), player two red (the challenger),
-// the yellow life bar over its red loss, the red KO badge, the orange to yellow of the round call
+// the yellow life bar over its red loss, the red VS badge, the orange to yellow of the round call
 // lettering with its navy outline, the green of a running job, and the stage colours. FS_VARS puts the same values on the world's root as --fs-* variables, which
 // world.module.css, fight.module.css and the Tailwind arbitrary values read, so no colour is written twice.
 
@@ -29,7 +29,7 @@ export const FS = {
   selectDeep: '#071463',
   land: '#e8923a',
   coast: '#ffd27a',
-  // The fight HUD: life left, life lost, the KO badge, and the navy every call letter is outlined in
+  // The fight HUD: life left, life lost, the VS badge, and the navy every call letter is outlined in
   hudYellow: '#f8e800',
   hudRed: '#e01818',
   ko: '#c8102e',

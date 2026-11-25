@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
-import { KoBadge } from './badges'
+import { VsBadge } from './badges'
 import look from './world.module.css'
 import fight from './fight.module.css'
 
@@ -13,8 +13,8 @@ import fight from './fight.module.css'
 // - LifeBar: player one's bar on the left draining toward the centre, player two's on the right; the
 //   flat yellow of what is left over the red of what is lost, in a thin black and white rule, the name
 //   or number under it on the outer edge in the HUD's condensed capitals.
-// - RoundPip: the red KO badge shape in the middle of the HUD carrying the round number.
-// - HudCentre: the KO badge with whatever stands under it (the clock), the centre of the fight HUD.
+// - RoundPip: the red VS badge shape in the middle of the HUD carrying the round number.
+// - HudCentre: the VS badge with whatever stands under it (the clock), the centre of the fight HUD.
 // - HudBar: a full life bar run out to the edge, the yellow strip a section title or a separator stretches.
 
 export function Cue({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -71,7 +71,7 @@ export function HudBar({ className = '' }: { className?: string }) {
 export function HudCentre({ children }: { children?: ReactNode }) {
   return (
     <span className="-mt-1 flex shrink-0 flex-col items-center gap-1" aria-hidden="true">
-      <KoBadge />
+      <VsBadge />
       {children}
     </span>
   )

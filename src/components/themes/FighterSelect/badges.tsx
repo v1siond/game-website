@@ -3,7 +3,7 @@ import { FS } from './palette'
 import look from './world.module.css'
 
 // The versus screen's art: the VS burst (a red jagged blast with the two letters lit yellow to orange,
-// the mark between the two portraits before a fight), the call lettering, the KO badge at the centre of
+// the mark between the two portraits before a fight), the call lettering, the VS badge at the centre of
 // the HUD, the round win orb, the round call band, the hit spark that marks a highlight on a card and the
 // impact burst of a landed hit.
 
@@ -56,11 +56,11 @@ export function ClashEmblem({ large = false }: { large?: boolean }) {
   )
 }
 
-// The KO badge at the heart of the fight HUD: red, ruled white, the two letters in white over navy.
-export function KoBadge() {
+// The VS badge at the heart of the fight HUD: red, ruled white, the two letters in white over navy.
+export function VsBadge() {
   return (
     <span className={`inline-grid h-7 w-11 place-items-center border-2 border-white bg-[color:var(--fs-ko-plate)] text-base leading-none text-white shadow-[0_0_0_2px_#000] ${look.display}`} aria-hidden="true">
-      KO
+      VS
     </span>
   )
 }

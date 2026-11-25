@@ -38,7 +38,7 @@ import look from './world.module.css'
 // One credit of the arcade fighter as the page's scenes, in the cabinet's order (score/C62/fighter-select-concept.md,
 // from research/2026-11-24-deep-sf2/notes.md): two strangers brawl in the street before the title, the select
 // board picks him and gives his reason, he flies to the dojo of his own school, tours the towns whose place
-// tells the rival at a glance, plays the bonus stage, climbs the ladder of the four masters to the leader whose
+// tells the rival at a glance, plays the scrap yard, climbs the ladder of the four masters to the leader whose
 // emblem hung on every stage, and his ending answers the reason he gave. One HUD carries the stage, both life
 // bars, the round clock, the orbs and the score through the run (fight.ts runOf, lifeOf). Each scene is one to
 // three actions played by the shared scene player at their own pace (src/lib/scroll/player.ts): forward on the
@@ -53,7 +53,7 @@ import look from './world.module.css'
 //   Tech Stack, stage 3, the factory: fire (his wave, and the rival walks straight through it); wait (he holds
 //     still, the rival's small steps go back and forth); chain (the rival commits; the jab cancels into the
 //     rising strike and the hit count climbs).
-//   Services, the bonus stage, the car park: kick (the door), smash (the bonnet, the roof, the glass), tally
+//   Services, the scrap yard, the car park: kick (the door), smash (the bonnet, the roof, the glass), tally
 //     (the clock stops with time left, WRECKED and the points).
 //   Projects, the neon town: climb (the ladder of shadows, his marker to the first); sweep (under the boxer's
 //     dash punch); dizzy (three heavy hits, the stars, a special and the special knockout's flash).
@@ -138,12 +138,12 @@ const STILL: Steps = { hero: 0, heroLift: 0, rival: 0, lift: 0, turn: false, her
 type Intro = { kind: 'hop'; from: StagePin; to: StagePin } | { kind: 'ladder'; climb: Climb }
 
 interface SceneSpec {
-  /** Its beat in the run: picked, a fight, the bonus stage or the ending. */
+  /** Its beat in the run: picked, a fight, the scrap yard or the ending. */
   beat: RunBeat
   zone: Zone
   /** Who stands in his place: the attract demo's stranger; him when left out. */
   stand?: Rival
-  /** The rival faced; the bonus stage has none. */
+  /** The rival faced; the scrap yard has none. */
   rival?: Rival
   /** The rival's size on the canvas (SIZE when left out): the big ones stand taller. */
   rivalSize?: number
@@ -267,7 +267,7 @@ function counterWriter(stage: HTMLElement, label: string): (hits: number, rivalX
   }
 }
 
-// ---- the bonus stage's car: whole, then the door off, the bonnet in, the roof flat ----
+// ---- the scrap yard's car: whole, then the door off, the bonnet in, the roof flat ----
 
 const CAR = { x: HERO_X + 200, w: 440 }
 const WRECKS = ['whole', 'door', 'bonnet', 'roof'] as const
@@ -612,7 +612,7 @@ const tech: SceneSpec = {
   },
 }
 
-// The bonus stage's clock runs from 50 while he wrecks the car and stops with time to spare.
+// The scrap yard's clock runs from 50 while he wrecks the car and stops with time to spare.
 const CLOCK = { from: 50, used: 32 }
 
 const services: SceneSpec = {

@@ -16,7 +16,7 @@ import fight from './fight.module.css'
 
 // The select screen, drawn like the early 90s arcade select: the world map with his home pin across the
 // top, square portraits in thin frames under it, each with its name on a black plate, and the preview
-// below as a fight screen with its HUD (the two life bars, the KO badge over the clock). The shared
+// below as a fight screen with its HUD (the two life bars, the VS badge over the clock). The shared
 // ProfessionSwitch owns the pick and the keys; this draws the grid.
 // The player one cursor is one frame in player one's blue, carrying its 1P tag, that snaps (steps) to
 // the slot under the pointer or focus and returns to the pick when the pointer leaves, like a cursor

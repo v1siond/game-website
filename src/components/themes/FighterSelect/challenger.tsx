@@ -24,7 +24,7 @@ const CLOCK_DIGITS = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 // The win screen offers the CV beside the hero's actions; the portfolio stays on the versus screen.
 const CONTACT_SITES = ['cv'] as const
 
-// The clock under the KO badge, two digits wide in the round call lettering: the tens stay at zero
+// The clock under the VS badge, two digits wide in the round call lettering: the tens stay at zero
 // while the units strip ticks down.
 function ChallengeClock() {
   return (

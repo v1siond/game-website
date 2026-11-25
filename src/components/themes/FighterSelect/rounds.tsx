@@ -16,7 +16,7 @@ import fight from './fight.module.css'
 
 // The fight scenes of the long lists, each a moment of a match. CSS keyframes chained by delay under a
 // Cue (played once when the entry scrolls in), except the band cards, which follow the pointer.
-// - RoundEntry, a job as a round: the round number slams onto the card in a red KO style badge (0ms, 1100ms
+// - RoundEntry, a job as a round: the round number slams onto the card in a red VS style badge (0ms, 1100ms
 //   with a hold), the card steps in from player two's side (620ms), the two life bars fill from their
 //   outer edges with the start and end years under them (900ms, 1000ms). The oldest job is round one.
 // - ResultRecord, the Muay Thai record as the result screen: the title slams, the facts rise, each

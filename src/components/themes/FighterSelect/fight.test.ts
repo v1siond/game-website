@@ -59,7 +59,7 @@ describe('the life bars', () => {
 describe('one credit of the run', () => {
   it('numbers the fights in page order, calls the last one final and names the bonus and the ending', () => {
     const run = runOf(['select', 'fight', 'fight', 'fight', 'bonus', 'fight', 'fight', 'ending'])
-    expect(run.map((stop) => stop.stage)).toEqual(['STAGE 1', 'STAGE 1', 'STAGE 2', 'STAGE 3', 'BONUS STAGE', 'STAGE 4', 'FINAL STAGE', 'ALL CLEAR'])
+    expect(run.map((stop) => stop.stage)).toEqual(['STAGE 1', 'STAGE 1', 'STAGE 2', 'STAGE 3', 'SCRAP YARD', 'STAGE 4', 'FINAL STAGE', 'ALL CLEAR'])
   })
 
   it('keeps a short path in order: the first fight, then the final one', () => {

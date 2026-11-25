@@ -322,7 +322,7 @@ const P1_X = 12
 const P2_X = 600 - 12 - BAR.w
 
 /** The HUD over a fight: both life bars, the round clock between them, two round orbs each, the stage and
- *  the score under them and, on the ladder, the four masters crossed off. The bonus stage's clock is its own. */
+ *  the score under them and, on the ladder, the four masters crossed off. The scrap yard's clock is its own. */
 export function Hud({ stop, rival = 'RIVAL', ladder = false }: { stop: RunStop; rival?: string; ladder?: boolean }) {
   return (
     <svg
@@ -373,9 +373,9 @@ export type CallId = 'round' | 'ko' | 'bonus' | 'wrecked'
 
 /** Our own words over the fights: no line of the game's. */
 const CALL_TEXT: Record<CallId, string> = {
-  round: 'ROUND 1',
-  ko: 'K.O.',
-  bonus: 'BONUS STAGE',
+  round: 'BOUT ONE',
+  ko: 'DOWN!',
+  bonus: 'SCRAP YARD',
   wrecked: 'WRECKED',
 }
 
@@ -485,7 +485,7 @@ export function OpenSlot() {
 /** What the screen shows at a moment of a scene. */
 export interface ScreenFrame {
   points: number
-  /** The round clock, or the bonus stage's; none hides nothing, it holds. */
+  /** The round clock, or the scrap yard's; none hides nothing, it holds. */
   seconds?: number
   /** Both life bars, 0 to 1. */
   life?: { hero: number; rival: number }
