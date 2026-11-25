@@ -625,7 +625,7 @@ collections:
                   - { <<: *text, label: "Launcher name for a screen reader", name: launcherAria }
                   - { <<: *text, label: "Launcher tooltip", name: launcherTitle }
                   - { <<: *text, label: "Hint title, naming the next world", name: hintNextTitle }
-                  - { <<: *text, label: "Hint line under the title when the visitor has seen one world", name: hintBodyOne }
+                  - { <<: *text, label: "Hint line under the title when the visitor has seen one world (only where it differs from the line below)", name: hintBodyOne, required: false }
                   - { <<: *text, label: "Hint line under the title, two or more worlds seen", name: hintBody }
                   - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
                   - { <<: *text, label: "World switch overlay line, {world} is the world being entered", name: portalLine }
@@ -634,7 +634,7 @@ collections:
                   - { <<: *text, label: "Picker title", name: pickerTitle }
                   - { <<: *text, label: "Picker subtitle", name: pickerSubtitle }
                   - { <<: *text, label: "Picker close button for a screen reader", name: pickerClose }
-                  - { <<: *text, label: "Picker count when the visitor has seen one world", name: pickerProgressOne }
+                  - { <<: *text, label: "Picker count when the visitor has seen one world (only where it differs from the line below)", name: pickerProgressOne, required: false }
                   - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
                   - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
                   - { <<: *text, label: "Picker filter chip showing every world", name: pickerFilterAll }

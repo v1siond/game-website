@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { cvDataFrom, CV_CONTENT_FILES, type CVContentFiles } from '@/lib/cv/content'
-import { fillLabel, labelsFor, type Labels, type LabelsFile } from '@/lib/cv/labels'
+import { fillLabel, labelsFor, WORLDS_SINGULARS, type Labels, type LabelsFile } from '@/lib/cv/labels'
 import { localeFrom, locales } from '@/i18n/config'
 
 // The real Decap files, read the way src/lib/cv-data.ts reads them.
@@ -20,9 +20,24 @@ describe('labels.json', () => {
   const file = readFiles().labels
   const englishKeys = keysOf(file.en.labels)
 
+  // The worlds singulars are a locale's own: English has none, a locale adds them where its plural reads
+  // wrong at one.
+  const singularKeys = WORLDS_SINGULARS.map((key) => `worlds.${key}`)
+
   it.each(locales.filter((locale) => locale !== 'en'))('translates every English key in %s', (locale) => {
     const translated = file[locale]?.labels as Labels
-    expect(keysOf(translated).sort()).toEqual([...englishKeys].sort())
+    expect(keysOf(translated).filter((key) => !singularKeys.includes(key)).sort()).toEqual([...englishKeys].sort())
+  })
+
+  it('keeps the {slots} of the plural in every worlds singular', () => {
+    const slots = (text: string | undefined) => (text?.match(/\{\w+\}/g) ?? []).sort()
+    const plurals = { hintBodyOne: 'hintBody', pickerProgressOne: 'pickerProgress' } as const
+    locales.forEach((locale) => {
+      const worlds = labelsFor(file, locale).worlds
+      WORLDS_SINGULARS.filter((key) => worlds[key] !== undefined).forEach((key) => {
+        expect([locale, key, slots(worlds[key])]).toEqual([locale, key, slots(worlds[plurals[key]])])
+      })
+    })
   })
 
   it('has no empty label in any locale', () => {

@@ -70,7 +70,8 @@ Artistic.
 - Seen worlds are kept in localStorage under `portfolio-worlds-seen` and this visit's in sessionStorage
   under `portfolio-worlds-visit` (a world counts after 1.5 s on screen).
 - The picker (`WorldsModal`) remembers them: "You have seen n of 18 worlds" over 18 dots (at 1 the singular label `pickerProgressOne`, and the hint's
-  count likewise `hintBodyOne`, picked by `countTemplate`), then the worlds in
+  count likewise `hintBodyOne`, picked by `countTemplate`; only Italian has them, English and Spanish read
+  the plural at 1 too), then the worlds in
   `orderForPicker` order: the next unseen world first as the wide up next card (`WorldCard`), then the
   other unseen worlds, the seen ones in grey and the current one, "You are here". On open the focus goes
   to the up next "Enter <name>" button, Tab stays inside, and on close it goes back to the control that

@@ -140,13 +140,15 @@ export const followingInTour = (currentId: string): string => tourStep(currentId
 export const previousInTour = (currentId: string): string => tourStep(currentId, -1)
 
 export interface CountTemplates {
-  one: string
+  /** The singular, only in a language whose plural reads wrong at one (Italian). */
+  one?: string
   many: string
 }
 
-/** The wording of a count of worlds: the singular one for exactly one, the plural one for any other count. */
+/** The wording of a count of worlds: the singular for exactly one where the language has one, the plural
+ *  for any other count. */
 export function countTemplate(count: number, templates: CountTemplates): string {
-  if (count === 1) return templates.one
+  if (count === 1 && templates.one !== undefined) return templates.one
   return templates.many
 }
 

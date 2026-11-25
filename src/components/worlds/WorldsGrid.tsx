@@ -10,14 +10,14 @@ import { useWorldsLabels, type WorldsText } from './WorldsLabels'
 const WORLD_BY_ID = new Map<string, World>(WORLDS.map((world) => [world.id, world]))
 
 // Each filter chip's name in the page's language (labels.json worlds); the registry's names are its keys.
-const FILTER_LABEL: Record<Filter, keyof WorldsText> = {
+const FILTER_LABEL = {
   All: 'pickerFilterAll',
   Fantasy: 'pickerFilterFantasy',
   Retro: 'pickerFilterRetro',
   Neon: 'pickerFilterNeon',
   Action: 'pickerFilterAction',
   Artistic: 'pickerFilterArtistic',
-}
+} as const satisfies Record<Filter, keyof WorldsText>
 
 // The registry is fixed for the page's life, so each chip's count is counted once, not per render.
 const CATEGORIES_WITH_COUNTS = WORLD_CATEGORIES.map((cat) => ({

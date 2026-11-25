@@ -124,6 +124,10 @@ describe('countTemplate', () => {
   it.each([[0], [2], [17]])('words the count in the plural for %p worlds', (count) => {
     expect(countTemplate(count, templates)).toBe('many {seen}')
   })
+
+  it('words one world in the plural when the language has no singular of its own', () => {
+    expect(countTemplate(1, { many: 'many {seen}' })).toBe('many {seen}')
+  })
 })
 
 describe('TOUR_ORDER', () => {
