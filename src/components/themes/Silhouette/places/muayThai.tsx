@@ -25,7 +25,7 @@ const ON_CEILING = CEILING - FIGURE_H
 const BACK = 340
 const LAND = 400
 const LOOK_ACROSS = 150
-const SAW = { r: 58, from: 800, to: 260 }
+const SAW = { r: 58, from: 560, to: 260 }
 const FIRE = { from: 0.18, to: 0.26 }
 
 /** A saw blade standing on the floor at x, turned `turn` radians: `teeth` hooked teeth round a disc with a
@@ -140,10 +140,12 @@ export const muayThai: Place = {
       fadeTo(farEye, 1 - dead)
       fadeTo(farBeam, 0.35 * (1 - dead))
       fadeTo(nearBeam, 0.35 + 0.5 * (ramp(t, 0.13, 0.14) - ramp(t, 0.16, 0.17)))
-      const x = lerp(SAW.from, SAW.to, ramp(t, 0.5, 0.74))
+      // the saw waits at the room's far end until he falls up, then runs the rail under him, sparking
+      const run = ramp(t, 0.5, 0.74)
+      const x = lerp(SAW.from, SAW.to, run)
       outline(saw, sawPath(x, SAW.r, 24, (-x * 1.7 * Math.PI) / 180))
       translateTo(sparks, x, 0)
-      fadeTo(sparks, x > SAW.to + 1 ? 1 : 0)
+      fadeTo(sparks, run > 0 && run < 1 ? 1 : 0)
       fadeTo(flash, fire > 0 && fire < 1 ? 1 : 0)
       transformTo(arrow, `rotate(${(180 * (ramp(t, 0.45, 0.47) - ramp(t, 0.68, 0.7))).toFixed(1)} ${SWITCH} -91)`)
     }

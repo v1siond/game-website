@@ -140,7 +140,7 @@ export const ventures: Place = {
       // the glass bursts as he goes through the dome, its shards falling with him
       const burst = ramp(t, 0.86, 1)
       fadeTo(glass, burst > 0 ? 1 : 0)
-      transformTo(glass, `translate(0 ${(140 * burst).toFixed(1)})`)
+      transformTo(glass, `translate(0 ${(90 * burst).toFixed(1)})`)
     }
   },
 }
