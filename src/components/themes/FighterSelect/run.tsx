@@ -336,7 +336,7 @@ export type CallId = 'round' | 'ko' | 'bonus' | 'wrecked'
 const CALL_TEXT: Record<CallId, string> = {
   round: 'BOUT ONE',
   ko: 'DOWN!',
-  bonus: 'SCRAP YARD',
+  bonus: 'SMASH IT!',
   wrecked: 'WRECKED',
 }
 
