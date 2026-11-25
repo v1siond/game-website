@@ -26,6 +26,9 @@ import { TOON_STAND, type ToonPose } from './toon'
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
+/** The half of the screen a scene plays on: right of its section's cards, or left of them. */
+export type Side = 'right' | 'left'
+
 /** Where the fighters stand: him on the left facing right, the boss on the right; their sizes. */
 export interface Layout {
   phone: boolean
@@ -35,12 +38,26 @@ export interface Layout {
   k: number
   /** The trapezes' spacing over the pit. */
   gap: number
+  /** The side the scene plays on. */
+  side: Side
+  /** The fight turned round the middle of a phone's view: the boss on the left, him on the right facing it. */
+  turned: boolean
 }
 
-const LAYOUT: Record<'wide' | 'phone', Layout> = {
-  wide: { phone: false, him: 740, boss: 1130, bossK: 1.05, k: 1.25, gap: 150 },
-  phone: { phone: true, him: 560, boss: 840, bossK: 0.78, k: 1.05, gap: 95 },
+const WIDE: Layout = { phone: false, him: 740, boss: 1130, bossK: 1.05, k: 1.25, gap: 150, side: 'right', turned: false }
+const PHONE: Layout = { phone: true, him: 560, boss: 840, bossK: 0.78, k: 1.05, gap: 95, side: 'right', turned: false }
+
+// The hero keeps its own place. A section's fight plays right of its cards, clear of their edge, or as far
+// left of them when they sit on the right, the same distance apart. A phone's view is too narrow to move the fight, so in its left
+// half he stands left facing the boss on the right, and in its right half the whole fight is turned round the
+// view's middle (PHONE_MIDDLE): the boss on the left and him on the right facing it, nothing lettered turned.
+const LAYOUTS: Record<'wide' | 'phone', Record<Side, Layout>> = {
+  wide: { right: { ...WIDE, him: 800, boss: 1190 }, left: { ...WIDE, him: 110, boss: 500, side: 'left' } },
+  phone: { right: { ...PHONE, turned: true }, left: { ...PHONE, side: 'left' } },
 }
+
+/** The middle of a phone's view of the ring, the line a turned fight is mirrored about. */
+export const PHONE_MIDDLE = 720
 
 export type ToonState = FigureState<ToonPose>
 
@@ -788,10 +805,11 @@ const contact: SceneDef = {
   kit: 'piston',
   him: true,
   back: () => null,
-  front: () => (
+  front: ({ turned }) => (
     <g data-fx="ko" opacity={0}>
       <path d="M-260 -10 L-200 -90 L-120 -60 L-60 -130 L20 -80 L90 -140 L150 -70 L240 -100 L220 -10 L280 50 L180 80 L210 150 L90 110 L20 170 L-60 110 L-150 150 L-140 70 L-250 60 Z" fill={HOSE.gold} stroke={INK} strokeWidth={8} strokeLinejoin="round" />
-      <text x={0} y={40} textAnchor="middle" fontFamily="var(--hose-lettering), serif" fontSize={140} fill={HOSE.red} stroke={INK} strokeWidth={6} paintOrder="stroke">
+      {/* in a turned fight the lettering is turned back, so it always reads */}
+      <text x={0} y={40} transform={turned ? 'scale(-1 1)' : undefined} textAnchor="middle" fontFamily="var(--hose-lettering), serif" fontSize={140} fill={HOSE.red} stroke={INK} strokeWidth={6} paintOrder="stroke">
         K.O.!
       </text>
     </g>
@@ -826,18 +844,29 @@ export interface Scene {
   slot: SectionSlot | null
 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, profession: Profession, phone: boolean): Scene => ({
+const sceneOf = (id: SceneId, slot: SectionSlot | null, profession: Profession, layout: Layout): Scene => ({
   id,
   def: SCENE_DEFS[id],
-  layout: LAYOUT[phone ? 'phone' : 'wide'],
+  layout,
   kit: profession,
   slot,
 })
 
-/** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
-export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean): Scene[] => [
-  sceneOf('hero', null, profession, phone),
-  ...slots.map((slot) => sceneOf(slot.id, slot, profession, phone)),
-  sceneOf('contact', null, profession, phone),
-]
+/** The side of the section at `index` of the page (0 the first after the hero): the first plays right of its
+ *  cards, the next left of them, and so on up to the contact. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
 
+/**
+ * The page as scenes: the hero, one per section the profession shows in reading order, the contact. With the
+ * cards beside the fight (`split`, from lg) or on a phone the sections take turns, right of their cards then
+ * left; a screen between the two keeps every fight on the right.
+ */
+export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, split: boolean): Scene[] => {
+  const mode = phone ? 'phone' : 'wide'
+  const layout = (index: number): Layout => LAYOUTS[mode][phone || split ? sideOf(index) : 'right']
+  return [
+    sceneOf('hero', null, profession, phone ? PHONE : WIDE),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, profession, layout(i))),
+    sceneOf('contact', null, profession, layout(slots.length)),
+  ]
+}

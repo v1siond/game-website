@@ -52,8 +52,8 @@ const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOS
 // of the fight, the calliope changing form as it escalates, and he shoots, jumps, dashes, slaps the pink
 // things away and fires his charged shot and his super; Contact is the knockout and his bow. Each scene's
 // one to three actions are played by the scroll, forward on the way down and back on the way up, at no more
-// than their own speed, on the shared theatre (./shared/theatre). The cards read in a column on the left from lg, so the fight plays clear of
-// them on the right. Under reduced motion there is no theatre: each section carries its own picture,
+// than their own speed, on the shared theatre (./shared/theatre). From lg the cards read in a column on the left and the fight plays clear of
+// them on the right, then the next section the other way round, up to the contact. Under reduced motion there is no theatre: each section carries its own picture,
 // still, at its end frame.
 //
 // The root carries the palette as --hose-* variables (the one inline style, variables only), the pointer
@@ -61,8 +61,13 @@ const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOS
 // overflow-x: clip, not hidden: hidden would make the root a scroll container.
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the fight sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 const CONTACT_HEADING = headingId('hose', 'Contact')
+
+/** From lg the contact card sits on the side away from the knockout, as every section's cards do. */
+const CONTACT_SIDE: Record<Scene['layout']['side'], string> = { right: 'lg:mx-0', left: 'lg:ml-auto lg:mr-0' }
 
 export default function RubberHoseTheme() {
   const { active } = useProfession()
@@ -72,10 +77,11 @@ export default function RubberHoseTheme() {
   const { cv, engine } = useSiteLinks('engine')
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const rootRef = usePointerVars(!reduced)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone),
-    [view.sections, professionalSummary.bio, active, phone],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, split),
+    [view.sections, professionalSummary.bio, active, phone, split],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)
@@ -141,11 +147,11 @@ export default function RubberHoseTheme() {
             ))}
           </ProfessionRegion>
 
-          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] max-md:pt-[100svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
+          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] max-md:pt-[130svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
             {reduced && <HoseStage scene={contact} settled />}
             <RecruiterHero
               render={({ line, actions }) => (
-                <div className={`relative mx-auto max-w-3xl p-6 text-center sm:text-left lg:mx-0 lg:max-w-[40vw] ${world.titleCard}`}>
+                <div className={`relative mx-auto max-w-3xl p-6 text-center sm:text-left lg:max-w-[40vw] ${CONTACT_SIDE[contact.layout.side]} ${world.titleCard}`}>
                   <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
                     {sections.contact}
                   </h2>

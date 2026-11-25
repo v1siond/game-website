@@ -9,12 +9,12 @@ import { fadeTo, fx, transformTo } from '../shared/stageNodes'
 import { ARENA_LAYERS, GROUND, arenaPlane } from './arena'
 import { Calliope } from './boss'
 import { sceneEnd, type Playhead } from '@/lib/scroll/player'
-import { Effects, type Scene } from './scenes'
+import { Effects, PHONE_MIDDLE, type Scene, type Side } from './scenes'
 import { StageToon, setToonPose, toonJoints } from './toon'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the big top's layers (arena.tsx), then the
-// fight in the figure layer, in one camera group the writer pushes in on at a big hit: the scene's floor,
+// fight in the figure layer (turned round on a phone's right half), in one camera group the writer pushes in on at a big hit: the scene's floor,
 // the calliope, him, the effects and the scene's own front (the map of the hero, the knockout lettering).
 // The scene's writer plays its script and hands back his place and pose.
 
@@ -56,19 +56,27 @@ function Toon({ scene }: { scene: Scene }) {
   )
 }
 
+/** A turned fight, mirrored about the middle of a phone's view. */
+const TURNED = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
+
+/** The scrim under the cards, on the side they sit (a fight on the right has them on the left). */
+const SCRIM: Record<Side, string> = { right: css.cardsLeft, left: css.cardsRight }
+
 const layersOf = (scene: Scene): StageLayer[] => [
   ...ARENA_LAYERS,
   {
     name: 'figure',
     node: arenaPlane(
-      <g data-fx="camera">
-        {scene.def.back(scene.layout, scene.kit)}
-        <g data-fx="boss" transform={`translate(${scene.layout.boss} ${GROUND}) scale(${scene.layout.bossK})`}>
-          <Calliope kit={scene.def.kit} />
+      <g transform={scene.layout.turned ? TURNED : undefined}>
+        <g data-fx="camera">
+          {scene.def.back(scene.layout, scene.kit)}
+          <g data-fx="boss" transform={`translate(${scene.layout.boss} ${GROUND}) scale(${scene.layout.bossK})`}>
+            <Calliope kit={scene.def.kit} />
+          </g>
+          {scene.def.him && <Toon scene={scene} />}
+          <Effects kit={scene.kit} />
+          {scene.def.front?.(scene.layout)}
         </g>
-        {scene.def.him && <Toon scene={scene} />}
-        <Effects kit={scene.kit} />
-        {scene.def.front?.(scene.layout)}
       </g>,
     ),
   },
@@ -76,5 +84,5 @@ const layersOf = (scene: Scene): StageLayer[] => [
 
 /** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
 export const HoseStage = memo(function HoseStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.reel} />
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={`${css.reel} ${SCRIM[scene.layout.side]}`} />
 })

@@ -160,6 +160,9 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
   muayThai: RecordCards,
 }
 
+/** From lg a section's banner and cards sit away from the fight: left of one on the right, right of one on the left. */
+const CARDS_SIDE: Record<Scene['layout']['side'], string> = { right: '', left: 'lg:ml-auto' }
+
 interface SceneSectionProps {
   scene: Scene
   slot: SectionSlot
@@ -175,10 +178,10 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <HoseStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] max-md:items-start max-md:pt-16 lg:max-w-[40vw]">
+      <header className={`relative flex min-h-[90svh] max-w-[42rem] items-end justify-center pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] max-md:items-start max-md:pt-16 lg:max-w-[40vw] ${CARDS_SIDE[scene.layout.side]}`}>
         <CurlBanner id={id}>{title}</CurlBanner>
       </header>
-      <div className="relative max-w-[42rem] lg:max-w-[40vw]">
+      <div className={`relative max-w-[42rem] lg:max-w-[40vw] ${CARDS_SIDE[scene.layout.side]}`}>
         <Cards slot={slot} />
       </div>
     </section>

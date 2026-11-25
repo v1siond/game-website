@@ -1,5 +1,5 @@
 /* Rubber Hose's look on the shared theatre's stages (../shared/theatre): a scrim of the film's dark under
-   the text column, so the paper cards' edges and the banners read on the brightest set (the meadow's pale
+   the text column, on the side the cards sit, so the paper cards' edges and the banners read on the brightest set (the meadow's pale
    sky); it fades with its stage. The theatre's ground is the film's black (--theatre-ground on the world's
    root). */
 
@@ -7,11 +7,20 @@
   content: '';
   position: absolute;
   inset: 0;
+}
+
+.cardsLeft::after {
   background: linear-gradient(to right, color-mix(in srgb, var(--hose-film) 55%, transparent), transparent 55%);
 }
 
+.cardsRight::after {
+  background: linear-gradient(to left, color-mix(in srgb, var(--hose-film) 55%, transparent), transparent 55%);
+}
+
+/* A phone stacks the cards under the fight, whichever side it plays on. */
 @media (max-width: 767.98px) {
-  .reel::after {
+  .cardsLeft::after,
+  .cardsRight::after {
     background: linear-gradient(to top, color-mix(in srgb, var(--hose-film) 55%, transparent), transparent 55%);
   }
 }
