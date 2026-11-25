@@ -134,6 +134,11 @@ export function crossOf(rises: readonly number[], heading: Heading = 'down'): Cr
   return { layers, lead: rises.reduce((top, rise, i) => (rise >= 0.5 ? i : top), 0) }
 }
 
+/** The stages a theatre keeps built, in page order: every one on screen and those within `reach` stages of the
+ *  one the page is in, so the next stage either way is built before its section arrives. */
+export const nearOf = ({ layers, lead }: Cross, reach: number): number[] =>
+  layers.flatMap((layer, i) => (layer.shown || Math.abs(i - lead) <= reach ? [i] : []))
+
 /** Where the drawn scene is (ms into it), how fast it moves (ms of scene per ms), and the time of its last frame. */
 export interface Follower {
   drawn: number

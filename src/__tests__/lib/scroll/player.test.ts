@@ -6,6 +6,7 @@ import {
   crossOf,
   elapsedOf,
   follow,
+  nearOf,
   playheadAt,
   pacedMoves,
   restAt,
@@ -122,6 +123,29 @@ describe('crossOf', () => {
 
   it('on the way back with no stage yet whole, shows the first and hides the ones rising over it', () => {
     expect(crossOf([0.4, 0.2], 'up')).toEqual({ layers: [{ shown: true, opacity: 1 }, { shown: false, opacity: 0 }], lead: 0 })
+  })
+})
+
+describe('nearOf', () => {
+  it('names the stage the page is in and its neighbours within reach', () => {
+    expect(nearOf(crossOf([1, 1, 1, 1, 0, 0, 0]), 1)).toEqual([2, 3, 4])
+    expect(nearOf(crossOf([1, 1, 1, 1, 0, 0, 0]), 2)).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it('stops at the ends of the page', () => {
+    expect(nearOf(crossOf([0, 0, 0, 0]), 1)).toEqual([0, 1])
+    expect(nearOf(crossOf([1, 1, 1, 1]), 1)).toEqual([2, 3])
+  })
+
+  it('keeps every stage on screen, the one dissolving out under a lead two stages on included', () => {
+    // a scroll far enough in one frame: two stages rise over the whole one, the lead the second
+    const cross = crossOf([1, 1, 0.7, 0.6, 0])
+    expect(cross.lead).toBe(3)
+    expect(nearOf(cross, 0)).toEqual([1, 2, 3])
+  })
+
+  it('on the way back follows the stage it returns to', () => {
+    expect(nearOf(crossOf([1, 1, 0.6, 0.1], 'up'), 1)).toEqual([0, 1, 2])
   })
 })
 

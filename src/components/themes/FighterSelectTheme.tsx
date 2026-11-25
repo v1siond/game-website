@@ -43,7 +43,8 @@ const fsFace = Alfa_Slab_One({
 // section's own screen is 130svh, so the round plays clear of its cards. Contact is his ending on the rooftop
 // at sunrise, a screen of it alone (his bow with his rival) before the win quote and the continue clock come
 // up over it (./challenger). Under reduced motion every section
-// carries its own stage, still at its last frame.
+// carries its own stage, still at its last frame. A stage is thousands of svg nodes, so the theatre builds only
+// the one the page is in and its neighbours (REACH), the next one before its section arrives.
 //
 // The page stands on the select screen's deep blue under CRT scanlines. The root carries the palette as
 // --fs-* variables (the one inline style, variables only) and clips sideways overflow with overflow-x:
@@ -65,6 +66,9 @@ const SCREENS: Record<SectionId, { accent: Accent; id: string }> = {
 // the stage showing in the screens of picture alone above and below it.
 const COLUMN = 'mx-auto max-w-6xl lg:mx-0 lg:w-[min(46rem,52vw)]'
 const SIDE = 'px-4 sm:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
+
+// The stages the theatre builds either side of the one the page is in.
+const REACH = 1
 
 interface SectionProps {
   scene: TourScene & { slot: SectionSlot }
@@ -103,7 +107,7 @@ export default function FighterSelectTheme() {
     [view.sections, professionalSummary.bio, active],
   )
   const staff = useMemo<Staff>(() => ({ name: view.hero.name, roles: PROFESSION_ORDER.map((id) => labels.professions[id]) }), [view.hero.name, labels])
-  const { theatreRef, textRef } = useTheatre(scenes, TOUR_MOTION, reduced)
+  const { theatreRef, textRef, built } = useTheatre(scenes, TOUR_MOTION, reduced, REACH)
   const gates = scenes.filter((scene): scene is TourScene & { slot: SectionSlot } => scene.slot !== null)
   const contact = scenes[scenes.length - 1]
 
@@ -112,9 +116,7 @@ export default function FighterSelectTheme() {
       <SkipLink />
       {!reduced && (
         <Theatre theatreRef={theatreRef}>
-          {scenes.map((scene) => (
-            <TourStage key={scene.id} scene={scene} profession={active} staff={staff} />
-          ))}
+          {scenes.map((scene, i) => built(i) && <TourStage key={scene.id} scene={scene} profession={active} staff={staff} />)}
         </Theatre>
       )}
       <div className={`pointer-events-none fixed inset-0 z-0 ${look.scanlines}`} aria-hidden="true" />
