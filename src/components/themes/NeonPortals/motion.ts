@@ -1,7 +1,6 @@
-import { mix as mixRig } from '@/lib/motion/rigPose'
-import { AIR, BOUNCE, READY, REST, type SidePose } from './sidePose'
+import { READY, REST, type SidePose } from './sidePose'
 import { smooth } from './world'
-import { bell, lerp } from '../shared/stageNodes'
+import { lerp } from '../shared/stageNodes'
 
 // His moves as numbers, for the runner (runner.tsx): the back view's pose, his side on pose (sidePose.ts) and
 // which way the side view faces. The tunnel between eras shows him from behind, running into the screen;
@@ -67,9 +66,6 @@ export const tucked = (height: number): Pose => ({ ...IDLE, jump: -height, liftL
 
 /** From behind, both gloves held high over his head: the trophy, the cheer. */
 export const CHEER: Pose = { ...IDLE, aL: 160, sL: 1, fL: -20, aR: -160, sR: 1, fR: 20, look: 0 }
-
-/** One hop side on, `t` of the way: squashed, stretched up through the air, squashed again as he lands. */
-export const hopSide = (t: number): SidePose => mixRig(BOUNCE, AIR, bell(t, 0, 1))
 
 /** In the hub he stands turned three quarters to the camera, then turns and breaks into a run into the
  *  screen as the camera dives through the ring. */

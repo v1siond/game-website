@@ -18,16 +18,6 @@ export function SelectRing({ name, rx }: { name: string; rx: number }) {
   )
 }
 
-/** A small four point star: a spark, a glint of light. */
-export function Glint({ name, size = 14, fill = REALM.levelGold }: { name: string; size?: number; fill?: string }) {
-  const s = size
-  return (
-    <g data-fx={name} opacity="0">
-      <path d={`M0,${-s} L${s * 0.25},${-s * 0.25} L${s},0 L${s * 0.25},${s * 0.25} L0,${s} L${-s * 0.25},${s * 0.25} L${-s},0 L${-s * 0.25},${-s * 0.25} Z`} fill={fill} />
-    </g>
-  )
-}
-
 // ---- people ----
 
 interface Look {

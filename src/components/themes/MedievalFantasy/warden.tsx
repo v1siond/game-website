@@ -14,7 +14,6 @@ import { REALM } from './palette'
 // ("warden-torch") and a horn ("warden-horn"). `figure` marks him as the world's figure, on the hero's stage
 // only, the one the preview capture reads.
 
-export const WARDEN_BOX = { width: 200, height: 320 }
 export const WARDEN_FEET = { x: 100, y: 312 }
 export const STAFF_AT = { x: 124, y: 112 }
 export const HAND_AT = { x: 80, y: 112 }
