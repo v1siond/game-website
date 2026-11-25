@@ -11,7 +11,7 @@ import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, IRON_TAGS } from './stage'
 import u from './underworld.module.css'
 
-// Work Experience on the storm deck: each job a card on the dark panel, its company in frost over its role,
+// Work Experience on the old road: each job a card on the dark panel, its company in frost over its role,
 // years, place, line, highlights and skills. His fight on the deck plays on the section's stage behind them
 // (scenes.tsx), one foe per job.
 

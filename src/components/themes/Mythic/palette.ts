@@ -1,9 +1,9 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Mythic's palette, every colour of the world once, painted in ink over colour: the crimson marble and gold
-// of the great hall, the eras behind the page (the storm sea, the magma, the harbour under the bronze giant,
-// the mountain at dawn), the parchment of the tech stack and the prophecies, and his own kit (the fur mantle,
-// leather, bronze and steel, the axe's frost). The SVG art reads MYTH; MYTH_VARS puts the same values on the
+// Mythic's palette, every colour of the world once, painted in ink over colour: the crimson and gold of the
+// great hall, the places of the northern journey behind the page (the snow wood, the lake, the ring of light,
+// the iron mountain, the sea of the dead, the frozen shore, the peak), the parchment of the codex, his wool and
+// leather kit with the axe's frost, and the apprentice's hood. The SVG art reads MYTH; MYTH_VARS puts the same values on the
 // world's root as --myth-* variables for the CSS modules and the Tailwind arbitrary values.
 
 export const MYTH = {
@@ -27,8 +27,6 @@ export const MYTH = {
   panelEdge: '#3a1a24',
   goldDeep: '#8a6420',
   goldPale: '#f7dd92',
-  // The foot of a picked talent plate, a lighter gold than goldDeep so the ink name on it reads 7:1
-  goldPlate: '#cf9630',
 
   // ---- the great hall
   hallHigh: '#12060c',
@@ -37,80 +35,33 @@ export const MYTH = {
   blood: '#c2142b',
   // The top of the blood button, a step deeper than blood so the bone words on it read 7:1
   bloodPlate: '#960f21',
-  bloodDeep: '#5c0613',
-  pool: '#9e0e1f',
-  column: '#3a1420',
-  columnLight: '#6a2434',
   fire: '#ff8a2a',
   fireCore: '#ffd36b',
 
   // ---- the soul lamps
-  soul: '#6fe0cf',
 
-  // ---- the second region: basalt and magma
-  aspHigh: '#140604',
-  aspLow: '#4a1806',
-  basalt: '#2a1410',
-  magma: '#ff6a1a',
-
-  // ---- the third region: gold light over green fields
+  // ---- the green and gold glow of the ring of light
   elyLow: '#2a5e4c',
   elyLight: '#ffe6a0',
-  elyGreen: '#7fd18a',
 
-  // ---- the red temple and the surface's dawn
+  // ---- the dark red of the gate's lintel
   styxHigh: '#160307',
-  styxLow: '#420914',
-  dawn: '#ffb27a',
-  dawnPale: '#ffeccf',
-
-
-  // ---- the storm at sea and its serpent
-  storm: '#384838',
-  stormHigh: '#0e1a1c',
-  hydra: '#5a6a52',
-  hydraShade: '#2c3628',
-  hydraEye: '#9ef06a',
-
-  // ---- the bronze giant over the harbour at night
-  giant: '#4a6a58',
-  giantEye: '#7fd8ff',
-  harbourNight: '#202838',
-
-  // ---- the mountain over the clouds at dawn
-  olympus: '#a88868',
 
 
   // ---- his kit: the ink line, the cloak's crest red, leather, bronze and steel
   inkLine: '#16090e',
   // ---- the chain of the tech stack climb
   chainSteel: '#4a4a58',
-  // ---- the eras behind the page: the storm sea with the serpent, the harbour city under the bronze giant, the mountain at dawn
-  stormLow: '#2a3a38',
-  sea: '#405050',
-  seaFoam: '#c8d8d0',
-  sail: '#a89050',
-  lightning: '#e8f4ff',
-  hydraBelly: '#7a8a5a',
-  harbourHigh: '#101828',
-  bronzeGiantLight: '#7a9a78',
-  city: '#18202c',
-  smoke: '#3a3a44',
-  olympusHigh: '#485868',
-  olympusLow: '#e3b24f',
-  olympusRock: '#6a5a50',
+  // ---- the clouds and the pyre's ash
   cloud: '#f4e6c8',
-  waterfall: '#d8ecf4',
   ash: '#e4ded4',
   crest: '#c4161c',
   rim: '#f0a070',
   leather: '#6a3e24',
   leatherShade: '#3a2014',
-  kiltShade: '#5e0d12',
   bronze: '#c08a40',
   steel: '#a4aab0',
   steelShade: '#4c5258',
-  bladeFire: '#ff8a2a',
   // ---- the frost of his axe and the fur of his mantle
   frost: '#8fd4ff',
   // ---- the carved stone, iron and wood of the realms: the title stones, the rims, the realm doors
@@ -124,6 +75,32 @@ export const MYTH = {
   fur: '#4e4034',
   furLight: '#8a7460',
   wrap: '#efe7da',
+  // ---- the north of the journey: his wool tunic, the snow, the apprentice's hood, the places in order
+  wool: '#6a5c48',
+  woolShade: '#3e3428',
+  snow: '#e6edf2',
+  snowShade: '#a9b8c4',
+  hood: '#4f6a52',
+  hoodShade: '#2e4232',
+  youthSkin: '#e2b48e',
+  woodHigh: '#1c2a36',
+  woodLow: '#6a7f8e',
+  pine: '#1e3028',
+  pineLight: '#35503e',
+  lakeHigh: '#2a3e4a',
+  lakeLow: '#8fa8b0',
+  lakeWater: '#5f7f88',
+  lightHigh: '#f4ecc8',
+  lightLow: '#c9b77a',
+  mountainHigh: '#14161c',
+  mountainLow: '#4a4842',
+  deadHigh: '#1a2024',
+  deadLow: '#5a666a',
+  shoreHigh: '#e8a070',
+  shoreLow: '#cfd8e0',
+  peakHigh: '#6f8aa6',
+  peakLow: '#e8eef2',
+  ember: '#ff9a3a',
 } as const
 
 export const MYTH_VARS = paletteVars('myth', MYTH)

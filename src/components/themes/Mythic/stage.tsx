@@ -16,21 +16,21 @@ import u from './underworld.module.css'
 // (depths.tsx) to that region. Under reduced motion the section carries its own scene drawn settled
 // (StillStages).
 
-/** The regions the page goes down, top to bottom. */
-export type Zone = 'hall' | 'storm' | 'magma' | 'harbour' | 'olympus'
+/** The places of the journey, in the order the page walks them. */
+export type Zone = 'wood' | 'road' | 'lake' | 'light' | 'mountain' | 'dead' | 'shore' | 'peak'
 
-/** The region each part of the page stands in: the hero and About in the hall down to the contact on Olympus. */
+/** The place each part of the page stands in: the cabin in the snow wood to the stair at the peak. */
 export const ZONE_OF: Record<SectionId | 'hero' | 'contact', Zone> = {
-  hero: 'hall',
-  about: 'hall',
-  work: 'storm',
-  tech: 'storm',
-  services: 'storm',
-  projects: 'magma',
-  ventures: 'magma',
-  bands: 'harbour',
-  muayThai: 'harbour',
-  contact: 'olympus',
+  hero: 'wood',
+  about: 'wood',
+  work: 'road',
+  tech: 'lake',
+  services: 'lake',
+  projects: 'light',
+  ventures: 'mountain',
+  bands: 'dead',
+  muayThai: 'shore',
+  contact: 'peak',
 }
 
 /** The column a section reads in: the whole width on a phone, the left of the screen from lg. */

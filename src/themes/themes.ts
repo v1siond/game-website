@@ -356,11 +356,11 @@ export const themes: Theme[] = [
     font: 'sans-serif',
   },
 
-  // 15. Mythic - an underworld escape painted in ink over colour, from the great hall up to the dawn
+  // 15. Mythic - a northern journey with an apprentice painted in ink over colour, from the snow wood up to the peak
   {
     id: 'mythic',
     name: 'Mythic',
-    description: 'An escape from the underworld, drawn in ink over colour',
+    description: 'A northern journey with an apprentice, drawn in ink over colour',
     colors: {
       background: MYTH.sky,
       backgroundGradient: `linear-gradient(to bottom, ${MYTH.sky}, ${MYTH.hallLow})`,

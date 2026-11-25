@@ -33,18 +33,17 @@ const mythDisplay = Cinzel({
   variable: '--myth-display',
 })
 
-// Mythic, the god of war games in their own style, painted in ink over colour: the page climbs from the
-// great hall to the gods' mountain, the Greek past of those games, and he plays their Norse moves in it. The
-// fixed depths behind the page fade to the region in view (data-zone): the great hall, the storm sea, the
-// magma, the bronze giant's harbour and the summit at dawn. Over them, on the shared theatre
-// (./shared/theatre), every part of the page has his scene (./Mythic/scenes), one to three of the games'
-// moves played by the scroll at the scene's own pace and back on the way up: the shield out of the
-// vambrace, the axe thrown and called back, the shield bash and the heavy blow, the chained blades and the
-// swing to the ledge, the frost locking a gear, Spartan Rage, the boat to the realm door, the runic ice
-// under the giant, the parry and the finisher, the realm travel light. The sections read in a column on the
-// left from lg, so the scenes play clear of them on the right; under lg each scene plays in a gap under its
-// title before the cards. Under reduced motion there is no theatre: each part carries its own scene, still,
-// at its end frame.
+// Mythic, the northern war god game of 2018 retold as his own journey, painted in ink over colour: he burns
+// his old mentor's body on a pyre in the snow wood and carries the ashes with a young apprentice to the
+// highest peak, as the mentor asked. The fixed depths behind the page fade to the place in view (data-zone),
+// in the order they walk it: the snow wood, the old road, the mirror lake, the ring of light, the iron
+// mountain, the sea of the dead, the frozen shore and the stair to the peak. Over them, on the shared theatre
+// (./shared/theatre), every part of the page has its scene (./Mythic/scenes), one to three actions played by
+// the scroll at the scene's own pace and back on the way up: the pyre, the stranger at the door, the axe and
+// the gate, the wyrm of the lake, the smith, the light, the seer, the drum of his past, the last duel and the
+// ashes on the wind. The sections read in a column on the left from lg, so the scenes play clear of them on
+// the right; under lg each scene plays in a gap under its title before the cards. Under reduced motion there
+// is no theatre: each part carries its own scene, still, at its end frame.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
 // container chain.
@@ -57,7 +56,7 @@ export default function MythicTheme() {
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
   const pointerRef = usePointerVars(!reduced)
-  const { zones, stage } = useZoneStore<Zone>('hall', reduced)
+  const { zones, stage } = useZoneStore<Zone>('wood', reduced)
   useZoneAttribute(zones, pointerRef)
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),

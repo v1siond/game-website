@@ -9,7 +9,7 @@ import { ZONE_OF, type Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
-// The profession switch as the altar of his callings in the great hall: three iron rimmed stones, each
+// The profession switch as the altar of his callings at the cabin: three iron rimmed stones, each
 // carved with that calling's kit (the axe and the round shield, the war drum, the wrapped fists under the
 // mongkhon). Picking one (click, or the arrow keys the shared switch handles) turns the stone over to its
 // frost lit face.

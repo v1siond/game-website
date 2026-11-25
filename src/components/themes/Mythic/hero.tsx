@@ -12,7 +12,7 @@ import u from './underworld.module.css'
 // His outfit plate: an iron plaque on the hall's dark panel, pale frost lettering and a frost rim.
 const OUTFIT_LOOK: WardrobeLook = { plate: MYTH.panel, text: MYTH.frostCore, ring: MYTH.frost }
 
-// The hero in the great hall: his name carved on the stone, the headline in his journal, his line and the ways
+// The hero in the snow wood: his name carved on the stone, the headline in his journal, his line and the ways
 // to reach him. He stands in the hall's left bay on the hero's stage behind it (scenes.tsx), drawing his sword
 // and raising his shield as the page starts to scroll; the bay here keeps his place clear and carries the
 // outfit plate. `still` is the stage drawn settled under reduced motion.

@@ -14,10 +14,10 @@ import { Portraits } from './portraits'
 import { Runestones } from './runestones'
 import u from './underworld.module.css'
 
-// The picked profession's sections, each a stretch of the descent: About in the great hall, the jobs on the
-// storm deck and the codex over the storm sea, the services on the journal's pages after them, the sagas of
-// his deeds and the votive tokens over the magma, the portraits and the runestone of his record under the
-// bronze giant. The realm door on the summit closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
+// The picked profession's sections, each a stretch of the journey: About at the cabin, the jobs on the old
+// road, the codex over the mirror lake, the services at the smith's hut, the sagas of his deeds in the ring of
+// light, the votive tokens on the iron mountain, the portraits on the sea of the dead and the runestone of his
+// record on the frozen shore. The gate at the stair to the peak closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
 // order; each section's scene plays behind it (scenes.tsx).
 
 // His education and languages under the highlights, each label in the frost display face.

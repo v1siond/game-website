@@ -12,9 +12,9 @@ import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, IRON_TAGS } from './stage'
 import u from './underworld.module.css'
 
-// The projects as the sagas of his deeds: each one a card on an iron rimmed board over the magma, its name,
-// role and years, line, details, impact, tools and links. Spartan Rage plays on the section's stage behind
-// them (scenes.tsx).
+// The projects as the sagas of his deeds: each one a card on an iron rimmed board in the ring of light, its name,
+// role and years, line, details, impact, tools and links. He walks into the light on the section's stage
+// behind them (scenes.tsx).
 
 function SagaCard({ slot }: { slot: ProjectSlot }) {
   const labels = useLabels()

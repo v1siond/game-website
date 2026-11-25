@@ -6,7 +6,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { MartialArts } from '@/lib/cv/content'
 import u from './underworld.module.css'
 
-// Muay Thai under the bronze giant: the record carved on a runestone of facts, his achievements as the
+// Muay Thai on the frozen shore: the record carved on a runestone of facts, his achievements as the
 // deeds cut on the stone beside it, each marked with its frost rune in turn when the stage first shows. His
 // duel plays on the section's stage behind them (scenes.tsx).
 

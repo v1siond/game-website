@@ -1,4 +1,4 @@
-import { JOINTS, MOVES, RANGE, REST, bodyTransform, plantedDrop, poseAt, resolveKeys, type Move } from './rig'
+import { JOINTS, MOVES, RANGE, REST, plantedDrop, poseAt, resolveKeys, type Move } from './rig'
 
 const MOVE_NAMES = Object.keys(MOVES) as Move[]
 
@@ -33,11 +33,6 @@ describe('his rig', () => {
     expect(plantedDrop({ ...REST, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 })).toBeGreaterThan(8)
   })
 
-  it('hangs from the hands on the climb, so the hips hold still while the knees come up', () => {
-    const hips = resolveKeys('climb').map(({ pose }) => bodyTransform(pose))
-    expect(new Set(hips)).toEqual(new Set(['translate(0 0)']))
-  })
-
   it.each(MOVE_NAMES)('poses %s at its first key at 0 and its last at 1, and past the end it holds the last', (move) => {
     const keys = resolveKeys(move)
     expect(poseAt(move, 0)).toEqual(keys[0].pose)
@@ -45,10 +40,15 @@ describe('his rig', () => {
     expect(poseAt(move, 1.5)).toEqual(keys[keys.length - 1].pose)
   })
 
+  it('has a move for every verb of the journey, the pyre to the peak', () => {
+    const journey = ['torch', 'gather', 'give', 'reel', 'shove', 'throw', 'catch', 'stoop', 'row', 'raise', 'see', 'haul', 'chop', 'heave', 'drum', 'clinch', 'knee', 'elbow', 'kneel', 'walk']
+    expect([...MOVE_NAMES].sort()).toEqual([...journey].sort())
+  })
+
   it('poses a move between two keys with every joint between their angles', () => {
-    const keys = resolveKeys('combo')
+    const keys = resolveKeys('elbow')
     const [a, b] = [keys[1], keys[2]]
-    const pose = poseAt('combo', (a.at + b.at) / 2)
+    const pose = poseAt('elbow', (a.at + b.at) / 2)
     JOINTS.forEach((joint) => {
       expect(pose[joint]).toBeGreaterThanOrEqual(Math.min(a.pose[joint], b.pose[joint]))
       expect(pose[joint]).toBeLessThanOrEqual(Math.max(a.pose[joint], b.pose[joint]))

@@ -13,8 +13,8 @@ import u from './underworld.module.css'
 // Contact at the realm door on the summit, the climb's end: the shut carved doors with the light of the
 // realm travel behind them. Open the gate drives the leaves apart and the light floods in (a second press
 // shuts it);
-// the contact panel under the gate holds the line and the four ways to reach him. Back to the great hall
-// takes the visitor to the top of the page. The realm travel light lifts him on the contact's stage behind it
+// the contact panel under the gate holds the line and the four ways to reach him. Back to the top
+// takes the visitor to the top of the page. The ashes go out on the wind on the contact's stage behind it
 // (scenes.tsx). `still` is the stage drawn settled under reduced motion.
 
 const GATE_LEAVES = { left: u.gateLeft, right: u.gateRight }
