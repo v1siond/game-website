@@ -3,8 +3,8 @@ import { test, expect, type BrowserContext, type Locator, type Page } from '@pla
 const backLink = (page: Page) => page.getByRole('link', { name: 'Back to the site' })
 const professionOption = (page: Page, name: RegExp) =>
   page.getByRole('radiogroup', { name: /profession/i }).first().getByRole('radio', { name })
-// Only the Medieval world has a mailto "Send Message" button.
-const medievalOnly = (page: Page) => page.getByRole('link', { name: 'Send Message' })
+// His outfit plate names the world he wears, so a plate named Medieval Fantasy shows only in that world.
+const medievalOnly = (page: Page) => page.getByRole('group', { name: 'Medieval Fantasy', exact: true })
 
 // The picker renders English on the server and only then reads the stored locale in an effect, so a
 // retrying assertion would pass on the server render. Wait for React to own the node, then for the
@@ -25,7 +25,11 @@ const setLocaleCookie = (context: BrowserContext, baseURL: string | undefined, v
   context.addCookies([{ name: 'locale', value, url: baseURL! }])
 
 test('from the home page to the CV and back, in the same world and profession', async ({ page }) => {
+  // Era Postcards, the default world, has no profession selector; Adventure Paths keeps the shared one. It is
+  // stored once, not on every load, so the way back has to find it on its own.
   await page.goto('/')
+  await page.evaluate(() => localStorage.setItem('portfolio-theme', 'adventure-paths'))
+  await page.reload()
   await professionOption(page, /musician/i).click()
   await expect(professionOption(page, /musician/i)).toHaveAttribute('aria-checked', 'true')
 

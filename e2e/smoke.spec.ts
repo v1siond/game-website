@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { ENGINE_URL } from '../src/lib/engineLink'
 
 test('the home page opens a world and links to the CV', async ({ page }) => {
   await page.goto('/')
@@ -12,8 +13,14 @@ test('an unknown address shows the site not-found screen with a 404', async ({ p
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
-test('the game engine route is still the framed engine page', async ({ page }) => {
-  const response = await page.goto('/personal-projects/game-engine')
-  expect(response?.status()).toBe(200)
-  await expect(page.locator('iframe')).toBeAttached()
+// The engine is no longer framed here: an old shared engine link goes to nebulith with the rest of its path.
+test('an old game engine link sends the visitor to nebulith with the rest of its path', async ({ request }) => {
+  for (const [path, rest] of [
+    ['/personal-projects/game-engine', ''],
+    ['/personal-projects/game-engine/play/forest', '/play/forest'],
+  ]) {
+    const response = await request.get(path, { maxRedirects: 0 })
+    expect(response.status(), path).toBe(308)
+    expect(response.headers().location, path).toBe(`${ENGINE_URL}${rest}`)
+  }
 })

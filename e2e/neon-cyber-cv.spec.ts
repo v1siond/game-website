@@ -71,7 +71,8 @@ for (const viewport of [
     await expect(options.nth(1)).toHaveAttribute('aria-checked', 'true')
 
     await expectInFirstScreen(page, page.getByRole('heading', { level: 1, name: hero.name }))
-    await expectInFirstScreen(page, page.getByText(hero.headline, { exact: true }))
+    // The headline is also a job title in the work list further down, so it is read inside the hero.
+    await expectInFirstScreen(page, page.locator('[data-worlds-hero]').getByText(hero.headline, { exact: true }))
     await expectInFirstScreen(page, page.getByText(hero.tagline, { exact: true }).first())
     await expectInFirstScreen(page, page.locator(`a[href="${hero.actions.email.href}"]`).first())
     await expectInFirstScreen(page, page.locator(`a[href="${hero.actions.linkedin.href}"]`).first())
@@ -111,7 +112,9 @@ test('Martial Artist shows the Muay Thai record, and no bands, projects or BJJ',
   await professionOption(page, /martial artist/i).click()
   const region = muayThaiRegion(page)
   const { primary } = fighterSections.martialArts
-  await expect(region.getByRole('heading', { name: primary.title })).toBeVisible()
+  // The section heading is Muay Thai; his title reads under it as the record's first line.
+  await expect(region.getByRole('heading', { name: 'Muay Thai', exact: true })).toBeVisible()
+  await expect(region.getByText(primary.title, { exact: true })).toBeVisible()
   await expect(region.getByText(primary.rank)).toBeVisible()
   await expect(region.getByText(primary.dojo, { exact: false }).first()).toBeVisible()
   for (const achievement of primary.achievements) {

@@ -2,6 +2,14 @@ import { test, expect, type Page } from '@playwright/test'
 
 const professionSwitch = (page: Page) => page.getByRole('radiogroup', { name: /profession/i }).first()
 
+// Era Postcards, the default world, lays every profession on one page and has no selector, so these run in
+// Adventure Paths, a world that keeps the shared ProfessionSwitch and ProfessionRegion.
+const SELECTOR_WORLD = 'adventure-paths'
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((id) => localStorage.setItem('portfolio-theme', id), SELECTOR_WORLD)
+})
+
 async function expectEngineerInTheCentre(page: Page) {
   const options = professionSwitch(page).getByRole('radio')
   await expect(options).toHaveCount(3)
