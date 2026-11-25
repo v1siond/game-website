@@ -286,7 +286,7 @@ export const ChaosArtDivider = memo(function ChaosArtDivider({ variant = 'warban
   )
 })
 
-export const FrostArtDivider = memo(function FrostArtDivider({ variant = 'crystals', scale = 1 }: { variant?: 'crystals' | 'rune' | 'throne'; scale?: number }) {
+export const FrostArtDivider = memo(function FrostArtDivider({ variant = 'crystals', scale = 1 }: { variant?: 'crystals' | 'rune'; scale?: number }) {
   return (
     <div style={{
       position: 'relative',
@@ -367,18 +367,6 @@ export const FrostArtDivider = memo(function FrostArtDivider({ variant = 'crysta
                 </g>
               ))}
               <circle cx="0" cy="0" r="6" fill={REALM.frostIceBright} opacity="0.3" />
-            </g>
-          </>
-        )}
-        {variant === 'throne' && (
-          <>
-            {/* Ice throne silhouette hint */}
-            <g transform="translate(70,55)">
-              {/* Throne base */}
-              <polygon points="-35,0 -30,-15 -15,-12 0,-35 15,-12 30,-15 35,0" fill={REALM.frostIceDark} opacity="0.6" />
-              <polygon points="-25,-5 -20,-18 -8,-15 0,-40 8,-15 20,-18 25,-5" fill={REALM.frostIceMid} opacity="0.4" />
-              {/* Central spire glow */}
-              <polygon points="-5,-20 0,-45 5,-20" fill={REALM.frostIceBright} opacity="0.3" />
             </g>
           </>
         )}

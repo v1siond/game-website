@@ -27,11 +27,12 @@ import { REALM_MOTION, RealmStage, scenesOf, type RealmScene } from './MedievalF
 import look from './MedievalFantasy/world.module.css'
 
 // Medieval Fantasy: the page composition. Its palette, lands, frames, buttons, cards, ornaments and per
-// profession sections live in ./MedievalFantasy. The hero stands on the chaos battlefield with the golem
-// whole. Then each section is a full screen stage of its realm that rises from the dark, holds while its
-// frame scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine), and on
-// it the realm acts once per card (./MedievalFantasy/scenes.tsx): the golem rises on the chaos field, the
-// frost king's spires grow on the ice. The contact stands before the ice throne. Under reduced motion every
+// profession sections live in ./MedievalFantasy. The page tells one war of the fantasy strategy game it comes
+// from, with him as the warden who warns and is not believed: the hero is the council hall that sends him
+// away, then each section is a full screen stage of the war's next place that rises from the dark, holds while
+// its frame scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine), and
+// on it the place plays its beat of the campaign once, at the shared player's own pace
+// (./MedievalFantasy/scenes.tsx). The contact is the last stand at the great tree. Under reduced motion every
 // section carries its own stage, still at its settled frame.
 
 // The realm's carved capitals, Cinzel (an inscriptional Roman face): the root carries its --realm-face
@@ -104,8 +105,8 @@ export default function MedievalFantasyTheme() {
   const [isLargeScreen, setIsLargeScreen] = useState(isLargeWindow)
 
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights),
-    [view.sections, professionalSummary.bio, labels, highlights],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
+    [view.sections, professionalSummary.bio, labels, highlights, active],
   )
   const { theatreRef, textRef } = useTheatre(scenes, REALM_MOTION, reduced)
   const realms = scenes.filter((scene): scene is RealmScene & { slot: SectionSlot } => scene.slot !== null)
@@ -217,13 +218,13 @@ export default function MedievalFantasyTheme() {
             ))}
           </ProfessionRegion>
 
-          {/* Contact: no card, the call and his line on a plate before the ice throne. */}
+          {/* Contact: no card, the call and his line on a plate before the great tree. */}
           <div data-scene="contact" className={`relative pb-[30svh] pt-[60svh] ${SIDE}`}>
             {reduced && <RealmStage scene={contact} settled />}
             <div className="relative mx-auto max-w-[900px]">
-              {/* === Frost Art Divider: Ice Throne === */}
+              {/* === Frost Art Divider: the rune === */}
               <ArtDivider layout={layout}>
-                <FrostArtDivider variant="throne" scale={layout.artDividerScale} />
+                <FrostArtDivider variant="rune" scale={layout.artDividerScale} />
               </ArtDivider>
               <section aria-label={sections.contact} className={look.plate} style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 1rem' }}>
                 <RecruiterHero

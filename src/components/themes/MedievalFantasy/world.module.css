@@ -1,7 +1,6 @@
 /* Medieval Fantasy's theatre: the realm's void behind every stage and the dark a stage fades into, the
-   vignette over each land, and where each realm's figure stands. The golem rises on the right of the chaos
-   field, clear of the text column on the left; the spires grow on the right of the frost king, who stands at
-   the left of the ice (hero.tsx), clear of the text column on the right. */
+   vignette over each land, and where each realm's units stand: on a chaos stage right of the field, clear of
+   the text column on the left; on a frost stage left of it, clear of the text column on the right. */
 
 .root {
   --theatre-ground: var(--realm-bg-void);
@@ -21,8 +20,8 @@
    units left of it (about 280 to 820). Under 1024 px the screen shows only the field's middle, so each band
    shrinks to two thirds about its own middle and moves there. On a phone each band also stands up the screen,
    its floor at about 60% of it, so the units play clear of the cards rising from below while the head holds
-   them alone; the hero's units stand low instead, the king under the middle node of the profession menu and
-   the golem under the right one, smaller, clear of the menu the hero card ends on. */
+   them alone; the hero's units stand low instead, the warden under the middle node of the profession menu and
+   the hall's council under the right one, smaller, clear of the menu the hero card ends on. */
 @media (max-width: 1023.98px) {
   .chaosBand,
   .heroBand {

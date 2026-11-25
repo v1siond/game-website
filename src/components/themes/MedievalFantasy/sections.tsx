@@ -88,7 +88,7 @@ const FRAMES: SectionFrames<FrameProps> = {
 
         {/* === Chaos Art Divider: Crossed Weapons === */}
         <ArtDivider layout={layout}>
-          <ChaosArtDivider variant="warband" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="weapons" scale={layout.artDividerScale} />
         </ArtDivider>
       </>
     )
@@ -230,7 +230,7 @@ const FRAMES: SectionFrames<FrameProps> = {
     return (
       <>
         <ArtDivider layout={layout}>
-          <ChaosArtDivider variant="warband" scale={layout.artDividerScale} />
+          <ChaosArtDivider variant="weapons" scale={layout.artDividerScale} />
         </ArtDivider>
           <SectionWithOrnament leftOrnament={<FrostOrnament side="left" type="frost" />}>
             <section style={{ marginBottom: layout.sectionSpacing }}>
