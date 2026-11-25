@@ -1,71 +1,111 @@
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, focusOn, fx, transformTo, translateTo } from '../../shared/stageNodes'
-import { Bandit, flung } from '../bandit'
-import { FLOOR, HOURS } from '../desert'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { CliffDoor, Laser, Pillar, VaultThing } from '../cast'
+import { HOURS } from '../desert'
 import { Burst } from '../ink'
 import { CEL } from '../palette'
-import { holdX, still, stopsPlace } from '../place'
-import { comeback, down, kick } from '../pose'
+import { stopsPlace } from '../place'
+import { DUCK, crouch, kick, rest, stride, uppercut } from '../pose'
 
-// Muay Thai at dusk, raiders on the sand: first a raider comes at him and he kicks it out of his guard,
-// flung back onto the sand. Then the second lands its blow: he goes down on one knee with the edges of the
-// frame in red. Then he comes back with a rising uppercut from the knee that throws the raider high, and he
-// stands in a big sun starburst as the camera pushes in on him: the second wind.
+// Muay Thai, the fighter's stretch: the thing from the vault (notes L64, L115 to L119, [1] [18]). In the stone
+// court before the open door the great one eyed thing rises; its laser sweeps the court and he drops behind a
+// pillar as it scorches the stone. He darts out and smashes the glowing weak points of a tentacle with knees
+// and kicks until it falls. The laser stops, the eye opens, and he springs up and drives the blow home; the
+// thing sinks back and the door slams shut behind it.
 
-const RAIDER = 210
-// The second raider walks in from here, and lunges this far in to land its blow.
-const FROM = 560
-const LUNGE = 70
-// The comeback pushes the camera in this far on him.
-const PUSH = 0.22
-
-/** His move over the three actions: the kick to 0.33, knocked down to 0.6, the comeback to the end. */
-function move(profession: Parameters<typeof kick>[0], t: number) {
-  if (t < 0.33) return kick(profession, t / 0.33)
-  if (t < 0.6) return mix(kick(profession, 1), down(profession, ramp(t, 0.42, 0.52)), ramp(t, 0.33, 0.4))
-  return comeback(ramp(t, 0.62, 0.78))
-}
+const PILLAR = 110
+const THING = 470
+const DOOR = 470
+const DARTS = 230
+// The eye's laser root on the canvas, relative to his place.
+const EYE = { x: THING, y: -440 }
 
 export const muayThai = stopsPlace({
   hour: HOURS.dusk,
-  script: [1400, 1600, 2000],
-  ends: [0.33, 0.6, 1],
+  // the vault thing is wider than any other stop's art: on a phone he stands further left and the court is
+  // drawn smaller, so he and the thing are whole
+  at: (phone) => (phone ? 540 : 780),
+  phoneZoom: 0.62,
+  script: [1500, 1900, 1700],
+  ends: [0.3, 0.66, 1],
   back: () => (
     <>
-      <g data-fx="rally" opacity="0">
-        <Burst x={0} y={-160} r={260} fill={CEL.sun} />
-        <Burst x={0} y={-160} r={150} fill={CEL.orange} />
+      <g data-fx="door" transform={`translate(${DOOR} 0) scale(0.9)`}>
+        <CliffDoor />
       </g>
-      <g transform={`translate(${RAIDER} 0)`}>
-        <Bandit name="first" />
+      <defs>
+        <clipPath id="cel-court">
+          <rect x={-1200} y={-1400} width={2800} height={1400} />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#cel-court)">
+        <g data-fx="thing" transform={`translate(${THING} 0)`}>
+          <VaultThing />
+        </g>
       </g>
-      <g data-fx="second-at" transform={`translate(${FROM} 0)`}>
-        <Bandit name="second" />
+      <g data-fx="laser" opacity="0" transform={`translate(${EYE.x} ${EYE.y})`}>
+        <Laser />
+      </g>
+      <g data-fx="hit" opacity="0">
+        <Burst x={THING} y={-440} r={90} fill={CEL.sun} />
+      </g>
+      <g data-fx="smash" opacity="0">
+        <Burst x={THING - 300} y={-150} r={50} fill={CEL.uncommon} />
       </g>
     </>
   ),
-  front: () => <rect data-fx="hurt" x={-1400} y={-1100} width={2800} height={1600} fill="none" stroke={CEL.crit} strokeWidth="160" opacity="0" data-bare />,
-  move: (profession, t) => still(move(profession, t)),
-  reply: (stage, { phone }) => {
-    const first = fx(stage, 'first')
-    const secondAt = fx(stage, 'second-at')
-    const second = fx(stage, 'second')
-    const rally = fx(stage, 'rally')
-    const hurt = fx(stage, 'hurt')
-    const camera = fx(stage, 'camera')
-    const x = holdX(phone)
+  front: () => (
+    <g transform={`translate(${PILLAR} 0)`}>
+      <Pillar />
+    </g>
+  ),
+  move: (profession, t) => {
+    if (t < 0.3) return { pose: mix(rest(profession), DUCK, ramp(t, 0.06, 0.14)), ahead: -40 * ramp(t, 0.02, 0.12), lift: 0 }
+    if (t < 0.66) {
+      const dart = ramp(t, 0.3, 0.4)
+      if (dart < 1) return { pose: stride(profession, 4 * dart), ahead: -40 + (DARTS + 40) * dart, lift: 0 }
+      // three blows on the weak points, then he steps back as it falls
+      const blow = Math.floor(ramp(t, 0.4, 0.62) * 3)
+      const inBlow = (ramp(t, 0.4, 0.62) * 3) % 1
+      return { pose: blow < 3 ? kick(profession, Math.sin(Math.PI * inBlow)) : rest(profession), ahead: DARTS, lift: 0 }
+    }
+    const spring = ramp(t, 0.74, 0.86)
+    const lift = 260 * Math.sin(Math.PI * spring)
+    if (spring === 0) return { pose: crouch(profession, ramp(t, 0.66, 0.74)), ahead: DARTS, lift: 0 }
+    return { pose: spring < 1 ? uppercut(profession, ramp(spring, 0, 0.5)) : rest(profession), ahead: DARTS + 40 * spring, lift }
+  },
+  reply: (stage) => {
+    const laser = fx(stage, 'laser')
+    const tentacle = fx(stage, 'tentacle')
+    const spots = [0, 1, 2].map((i) => fx(stage, `spot-${i}`))
+    const smash = fx(stage, 'smash')
+    const lid = fx(stage, 'lid')
+    const hit = fx(stage, 'hit')
+    const thing = fx(stage, 'thing')
+    const doorL = fx(stage, 'door-l')
+    const doorR = fx(stage, 'door-r')
+    const light = fx(stage, 'door-light')
     return (t) => {
-      transformTo(first, flung(ramp(t, 0.18, 0.33), 260, 140))
-      fadeTo(first, 1 - ramp(t, 0.36, 0.42))
-      const walked = ramp(t, 0.33, 0.42)
-      const lunge = ramp(t, 0.42, 0.47) - ramp(t, 0.47, 0.55)
-      translateTo(secondAt, FROM + (RAIDER - FROM) * walked - LUNGE * lunge, 0)
-      fadeTo(secondAt, walked > 0 ? 1 : 0)
-      fadeTo(hurt, 0.55 * ramp(t, 0.45, 0.5) * (1 - ramp(t, 0.62, 0.72)))
-      transformTo(second, flung(ramp(t, 0.66, 0.92), 300, 320))
-      fadeTo(rally, ramp(t, 0.7, 0.8))
-      transformTo(camera, focusOn(x, FLOOR - 160, 1 + PUSH * ramp(t, 0.62, 0.8)))
+      // the laser sweeps down across the court and over the pillar
+      const sweep = ramp(t, 0.08, 0.28)
+      transformTo(laser, `translate(${EYE.x} ${EYE.y}) rotate(${(-26 + 34 * sweep).toFixed(1)})`)
+      fadeTo(laser, sweep > 0 && sweep < 1 ? 1 : 0)
+      spots.forEach((spot, i) => fadeTo(spot, 1 - ramp(t, 0.44 + 0.07 * i, 0.46 + 0.07 * i)))
+      fadeTo(smash, Math.abs(Math.sin(Math.PI * 3 * ramp(t, 0.4, 0.62))))
+      const fall = ramp(t, 0.6, 0.66)
+      transformTo(tentacle, `translate(${(-40 * fall).toFixed(1)} ${(30 * fall).toFixed(1)}) rotate(${(-30 * fall).toFixed(1)} -280 0)`)
+      // the eye opens when the laser stops, takes the blow, and the thing sinks back
+      transformTo(lid, `scale(1 ${(1 - ramp(t, 0.66, 0.72) + ramp(t, 0.84, 0.88)).toFixed(3)})`)
+      fadeTo(hit, Math.sin(Math.PI * ramp(t, 0.8, 0.9)))
+      transformTo(thing, `translate(${THING} ${(380 * ramp(t, 0.86, 0.98)).toFixed(1)})`)
+      // sunk under the court, it is gone from the end frame
+      fadeTo(thing, 1 - ramp(t, 0.97, 1))
+      // the door stands open behind it, and slams shut as it goes
+      const shut = ramp(t, 0.9, 0.98)
+      transformTo(doorL, `translate(${(-90 * (1 - shut)).toFixed(1)} 0)`)
+      transformTo(doorR, `translate(${(90 * (1 - shut)).toFixed(1)} 0)`)
+      fadeTo(light, 1 - shut)
     }
   },
 })

@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { fx, transformTo } from '../shared/stageNodes'
+import { fadeTo, fx, transformTo } from '../shared/stageNodes'
 import { HATCH } from './ink'
 import { CEL } from './palette'
 import { CommandoSprite, SPRITE_VIEW } from './sprite'
@@ -121,7 +121,7 @@ export function Front() {
       {SCRUB.map(([x, y, size]) => (
         <path key={x} d="M0 0 L-30 -70 M0 0 L0 -90 M0 0 L34 -64 M0 0 L-50 -36 M0 0 L56 -30" transform={`translate(${x} ${y}) scale(${size})`} fill="none" stroke={CEL.scrub} strokeWidth="10" strokeLinecap="round" data-bare />
       ))}
-      <g data-fx="dust" opacity="0.5">
+      <g data-fx="drift" opacity="0">
         {[180, 520, 900, 1260].map((x, i) => (
           <circle key={x} cx={x} cy={820 + (i % 2) * 40} r={14 + (i % 3) * 6} fill={CEL.dune} />
         ))}
@@ -133,10 +133,14 @@ export function Front() {
 /** The dust drifts this far across a scene. */
 const DUST_DRIFT = 260
 
-/** Drifts the dust over the scene's script, `played` 0 to 1 of it. */
+/** Blows the dust across the scene over its script, `played` 0 to 1 of it, in and out. */
 export function dustWriter(stage: ParentNode): (played: number) => void {
-  const dust = fx(stage, 'dust')
-  return (played) => transformTo(dust, `translate(${(played * DUST_DRIFT).toFixed(1)} 0)`)
+  const dust = fx(stage, 'drift')
+  return (played) => {
+    transformTo(dust, `translate(${(played * DUST_DRIFT).toFixed(1)} 0)`)
+    // a gust that blows through and is gone, so the scene's end frame holds only the scene
+    fadeTo(dust, 0.5 * Math.sin(Math.PI * played))
+  }
 }
 
 const figureAt = (x: number, lift = 0): string =>
@@ -154,9 +158,3 @@ export function Commando({ x, profession }: { x: number; profession: Profession 
 /** Moves him to `x` on the sand, `lift` above it. */
 export const placeCommando = (node: Element | null, x: number, lift = 0): void => transformTo(node, figureAt(x, lift))
 
-/** Where his rifle's muzzle is on the canvas when he aims it level, standing at `x` and `lift` above the
- *  sand: his shoulder (60, 60 in the sprite's units) and the arm and the rifle held out along it to x 190. */
-export const muzzleAt = (x: number, lift = 0): { x: number; y: number } => {
-  const scale = FIGURE_H / SPRITE_VIEW.height
-  return { x: x - FIGURE_W / 2 + 190 * scale, y: FLOOR - lift - (SPRITE_VIEW.soles - 60) * scale }
-}

@@ -62,6 +62,15 @@ export const moveAt = (ends: readonly number[], { action, t }: Playhead): number
 export interface Stops {
   hour: Hour
   script: SceneScript
+  /** Where he stands on the sand when not at holdX: a stop whose art stands wide of him (the hero's bus, the
+   *  contact's door and pad) sets its own place, on a phone and on a wide screen. */
+  at?: (phone: boolean) => number
+  /** How far below the sand line the stop stands on a phone, so its end frame shows in the band under a
+   *  section's card (the contact's card stands over the sand line there); none keeps it on the line. */
+  phoneDrop?: number
+  /** How much smaller the stop is drawn about his soles on a phone, where its art is wider than the usual
+   *  (the vault thing); none keeps PHONE_ZOOM. */
+  phoneZoom?: number
   /** Where each action ends on the move's t, one per action, the last 1. */
   ends: readonly number[]
   back: (input: PlaceInput) => ReactNode
@@ -72,18 +81,28 @@ export interface Stops {
   reply: (stage: ParentNode, input: PlaceInput) => (t: number) => void
 }
 
+// A phone's view holds about 560 of the canvas round him, too narrow for him and what he meets at the world's
+// size, so there the whole stop is drawn smaller about his soles: he keeps his place and the stop comes in whole.
+const PHONE_ZOOM = 0.72
+const zoomAbout = (x: number, zoom: number): string => `translate(${x} ${FLOOR}) scale(${zoom}) translate(${-x} ${-FLOOR})`
+
+const placeOf = (stops: Stops, phone: boolean): number => stops.at?.(phone) ?? holdX(phone)
+
 /** A section's stop as a scene: its art behind him, him, its art in front, in one camera group a reply can
  *  push in on, played by the scene's script. */
 export const stopsPlace = (stops: Stops): Place => ({
   hour: stops.hour,
   script: stops.script,
   floor: (input) => {
-    const at = `translate(${holdX(input.phone)} ${FLOOR})`
+    const x = placeOf(stops, input.phone)
+    const at = `translate(${x} ${FLOOR})`
     return (
       <g data-fx="camera">
-        <g transform={at}>{stops.back(input)}</g>
-        <Commando x={holdX(input.phone)} profession={input.profession} />
-        {stops.front && <g transform={at}>{stops.front(input)}</g>}
+        <g transform={input.phone ? `translate(0 ${stops.phoneDrop ?? 0}) ${zoomAbout(x, stops.phoneZoom ?? PHONE_ZOOM)}` : undefined}>
+          <g transform={at}>{stops.back(input)}</g>
+          <Commando x={x} profession={input.profession} />
+          {stops.front && <g transform={at}>{stops.front(input)}</g>}
+        </g>
       </g>
     )
   },
@@ -91,7 +110,7 @@ export const stopsPlace = (stops: Stops): Place => ({
     const root = fx(stage, 'commando')
     const joints = root ? celJoints(root) : null
     const reply = stops.reply(stage, input)
-    const x = holdX(input.phone)
+    const x = placeOf(stops, input.phone)
     return (_progress, _reached, play = START) => {
       const t = moveAt(stops.ends, play)
       reply(t)

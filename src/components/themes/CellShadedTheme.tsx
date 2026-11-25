@@ -29,15 +29,17 @@ const ROOT_VARS = paletteVars('cel', CEL)
 // A phone frames the desert from higher up, so the sand stays clear of the cards (desert.tsx).
 const PHONE_QUERY = '(max-width: 767.98px)'
 
-// Cell Shaded: his CV as one day in an inked desert, drawn like a comic in flat saturated fills under one
-// black ink line. The page keeps the rhythm of the Rockstar VI site: a big hero (the intro card at noon on
-// the mesa top, his name in sun letters, the outfit lockers where he picks a profession), then every
-// section of the shown profession is one full screen place of the day that rises from dark, holds while
-// its cards scroll over it, and goes dark while the next one rises: the signposts at noon, the bounty
-// board, the relay pylons and the supply crates in the town's afternoon, the loot chests, the makers'
-// plates, the speaker stacks and the heavy bags at dusk, and the station at night that builds him at the
-// end. He is the commando in each place and does one thing per card of the section: slams a notice, works
-// a pylon from his wrist computer, kicks a crate open. Every motion is a function of the scroll position
+// Cell Shaded: his CV as one run through an inked desert, drawn like a comic in flat saturated fills under one
+// black ink line, the way its looter shooter tells its story. The page keeps the rhythm of the Rockstar VI
+// site: a big hero (the intro card, his name in sun letters, the outfit lockers where he picks a profession),
+// then every section of the shown profession is one full screen stop of the run that rises from dark, holds
+// while its cards scroll over it, and goes dark while the next one rises. He steps off the bus at noon and our
+// small robot guide leads him to the town gate as the raider cars tear past and a voice crackles at his ear;
+// he blows the gully open and guns down the first boss's beasts; one long shot drops a raider for the part a
+// station needs to build his car; he takes a second wind under the mine boss and lifts a strange relic; the
+// relic shows a door, a count and a key's three slots; two pieces click in and far off the great door opens
+// for someone else; at night the voice's satellite crosses the sky and the map lights with new doors. He is
+// side on, facing right, in every action. Every motion is a function of the scroll position
 // (the shared theatre on useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and
 // it plays back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from
 // its first frame.

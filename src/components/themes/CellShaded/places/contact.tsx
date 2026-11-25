@@ -1,48 +1,85 @@
+import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, fx } from '../../shared/stageNodes'
-import { CEL } from '../palette'
-import { START, moveAt, type Place } from '../place'
-import { Canvas, Commando, FLOOR, HOURS, placeCommando } from '../desert'
-import { build, celJoints, setCelPose } from '../pose'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { CliffDoor, PINS, Pad, Robot, Satellite, Waveform, WorldMap } from '../cast'
+import { HOURS } from '../desert'
+import { stopsPlace } from '../place'
+import { LOOK_UP, MAP, rest } from '../pose'
 
-// Contact at night: the respawn station in the desert dark. First its pad lights; then it builds him up on
-// it in its hologram light, from his feet, until he stands whole.
+// Contact, the voice's source, at night (notes L65 to L66, L79, [1] [2]): the door in the cliff behind him is
+// sealed again, the respawn pad glows nearby. The crackle comes once more and he looks up: a satellite's
+// light crosses the stars and the waveform at his ear pulses in time with it. Our small robot rolls up and
+// stops beside him with a bump. He opens a map held out before him, and point after point of new doors lights across it in orange, the rarest
+// colour: the next job, which the contact card offers.
 
-/** Where the station stands: right of the contact text on a wide screen, the middle of a phone's view. */
-const padX = (phone: boolean): number => (phone ? 760 : 1180)
-// The pad lights over the first action; the build fills the second.
-const ENDS = [0.2, 1]
+const DOOR = -160
+const PAD = 380
+const ROBOT = { from: 600, at: 390 }
+const SKY = { from: { x: 520, y: -720 }, to: { x: -200, y: -640 } }
+const EAR = { x: 70, y: -300 }
+const MAP_AT = { x: 175, y: -210 }
 
-/** The station round `x`: its frame over the pad, and the pad's rings that light as it builds him. */
-function Station({ x }: { x: number }) {
-  return (
-    <Canvas>
-      <path d={`M${x - 150} ${FLOOR} V${FLOOR - 420} L${x - 110} ${FLOOR - 460} H${x + 110} L${x + 150} ${FLOOR - 420} V${FLOOR}`} fill="none" stroke={CEL.steelDark} strokeWidth="18" />
-      <rect x={x - 40} y={FLOOR - 452} width={80} height={16} fill={CEL.holo} />
-      <ellipse cx={x} cy={FLOOR} rx={150} ry={22} fill={CEL.steelDark} />
-      <g data-fx="rings" opacity="0">
-        <path d={`M${x - 110} ${FLOOR - 400} L${x + 110} ${FLOOR - 400} L${x + 140} ${FLOOR} L${x - 140} ${FLOOR} Z`} fill={CEL.holo} opacity="0.25" data-bare />
-        <ellipse cx={x} cy={FLOOR} rx={130} ry={18} fill="none" stroke={CEL.holo} strokeWidth="6" data-bare />
-        <ellipse cx={x} cy={FLOOR - 140} rx={100} ry={14} fill="none" stroke={CEL.holo} strokeWidth="5" data-bare />
-      </g>
-    </Canvas>
-  )
-}
-
-export const contact: Place = {
+export const contact = stopsPlace({
   hour: HOURS.night,
-  script: [1400, 2200],
-  set: ({ phone }) => <Station x={padX(phone)} />,
-  floor: ({ profession, phone }) => <Commando x={padX(phone)} profession={profession} />,
-  bind: (stage, { profession, phone }) => {
-    const rings = fx(stage, 'rings')
-    const root = fx(stage, 'commando')
-    const joints = root ? celJoints(root) : null
-    placeCommando(root, padX(phone))
-    return (_progress, _reached, play = START) => {
-      const t = moveAt(ENDS, play)
-      fadeTo(rings, Math.min(ramp(t, 0, 0.2), 1 - 0.6 * ramp(t, 0.85, 1)))
-      if (joints) setCelPose(joints, build(profession, ramp(t, 0.2, 1)))
+  at: (phone) => (phone ? 700 : 1040),
+  // on a phone the contact card covers the sand line, so the stop stands low, in the band under it
+  phoneDrop: 560,
+  script: [1700, 1300, 1700],
+  ends: [0.36, 0.62, 1],
+  back: () => (
+    <>
+      <g transform={`translate(${DOOR} 0) scale(0.8)`}>
+        <CliffDoor />
+      </g>
+      <g transform={`translate(${PAD} 0)`}>
+        <Pad />
+      </g>
+      <g data-fx="satellite" opacity="0">
+        <Satellite />
+      </g>
+      <g data-fx="robot" transform={`translate(${ROBOT.from} 0) scale(0.8)`}>
+        <Robot name="robot" />
+      </g>
+    </>
+  ),
+  front: () => (
+    <>
+      <g data-fx="voice" opacity="0" transform={`translate(${EAR.x} ${EAR.y})`}>
+        <Waveform name="voice" />
+      </g>
+      <g transform={`translate(${MAP_AT.x} ${MAP_AT.y})`}>
+        <g data-fx="map-wrap" opacity="0">
+          <WorldMap />
+        </g>
+      </g>
+    </>
+  ),
+  move: (profession, t) => {
+    if (t < 0.36) return { pose: mix(rest(profession), LOOK_UP, ramp(t, 0.04, 0.14)), ahead: 0, lift: 0 }
+    if (t < 0.62) return { pose: mix(LOOK_UP, rest(profession), ramp(t, 0.36, 0.44)), ahead: -14 * Math.sin(Math.PI * ramp(t, 0.52, 0.6)), lift: 0 }
+    return { pose: mix(rest(profession), MAP, ramp(t, 0.62, 0.7)), ahead: 0, lift: 0 }
+  },
+  reply: (stage) => {
+    const satellite = fx(stage, 'satellite')
+    const voice = fx(stage, 'voice')
+    const bars = [0, 1, 2, 3, 4].map((i) => fx(stage, `voice-${i}`))
+    const robot = fx(stage, 'robot')
+    const wrap = fx(stage, 'map-wrap')
+    const map = fx(stage, 'map')
+    const pins = PINS.map((_, i) => fx(stage, `pin-${i}`))
+    return (t) => {
+      const cross = ramp(t, 0.06, 0.34)
+      transformTo(satellite, `translate(${(SKY.from.x + (SKY.to.x - SKY.from.x) * cross).toFixed(1)} ${(SKY.from.y + (SKY.to.y - SKY.from.y) * cross).toFixed(1)})`)
+      fadeTo(satellite, cross > 0 ? 1 : 0)
+      // the voice pulses in time with the satellite's light while it crosses
+      fadeTo(voice, ramp(t, 0.04, 0.08) * (1 - ramp(t, 0.36, 0.42)))
+      bars.forEach((bar, i) => transformTo(bar, `scale(1 ${(0.2 + 0.8 * Math.abs(Math.sin(t * 60 + i))).toFixed(3)})`))
+      const roll = ramp(t, 0.38, 0.52)
+      const bump = Math.sin(Math.PI * ramp(t, 0.52, 0.6))
+      transformTo(robot, `translate(${(ROBOT.from + (ROBOT.at - ROBOT.from) * roll - 20 * bump).toFixed(1)} ${(-12 * bump).toFixed(1)}) scale(0.8)`)
+      fadeTo(wrap, ramp(t, 0.64, 0.68))
+      transformTo(map, `scale(${ramp(t, 0.64, 0.76).toFixed(3)} 1)`)
+      pins.forEach((pin, i) => fadeTo(pin, ramp(t, 0.78 + 0.03 * i, 0.8 + 0.03 * i)))
     }
   },
-}
+})

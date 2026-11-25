@@ -6,16 +6,14 @@ import { HATCH } from './ink'
 import s from './sprite.module.css'
 
 // Him as this world's own sprite, a desert commando drawn the way an inked comic shooter draws its heroes:
-// plate carrier vest, one armoured shoulder pad, an assault rifle slung on his back and a deployable
-// turret as his gadget. Heroic proportions (about six heads, broad shoulders, chunky hands and boots),
+// plate carrier vest, one armoured shoulder pad and an assault rifle slung on his back. Heroic proportions (about six heads, broad shoulders, chunky hands and boots),
 // every shape outlined in a thick, uneven black ink line (a heavier ink copy sits a little down and right
 // of each shape, so the line swells on the shadow side), hard two tone cel shading (each part has its
 // shadow on its back edge, in the darker tone, with diagonal hatching over it) and gritty gear. His
 // traits come from HERO_IDENTITY: brown skin, short dark hair, the full dark beard, black oval eyes.
 //
 // Per profession: the System Engineer in the full commando kit (olive plate carrier with pouches over a
-// dark tee, cargo trousers, boots, the rifle slung), with the wrist computer's hologram and the turret
-// he deploys; the Musician in the same vest open over a red tee, jeans and boots, two sticks in his
+// dark tee, cargo trousers, boots, the rifle he shoulders in a fight); the Musician in the same vest open over a red tee, jeans and boots, two sticks in his
 // fists; the Martial Artist bare chested in red Muay Thai shorts with a sun trim, wrapped red gloves and
 // his own mongkhon (a thick red and white rope crown tied at the back with two tails). Every outfit keeps
 // the commando's shoulder pad.
@@ -168,7 +166,6 @@ const GEAR: Record<Profession, Gear> = {
       <>
         {side === 'front' && RIFLE}
         <Ink d={FIST} fill={CEL.inkSoft} />
-        {side === 'front' && <Ink d="M53 100 L67 100 L66 112 L54 112 Z" fill={CEL.holo} />}
       </>
     ),
     legs: CEL.sand,
@@ -176,29 +173,7 @@ const GEAR: Record<Profession, Gear> = {
     shorts: false,
     feet: boots(INK),
     head: null,
-    prop: (
-      <>
-        {/* the wrist computer's hologram, over the raised wrist before his face; it lights while he works it */}
-        <g className={s.sprHolo}>
-          <path d="M98 30 L116 24 L116 62 L98 68 Z" fill={CEL.holo} opacity={0.75} stroke={CEL.holoDeep} strokeWidth={1.6} />
-          <path d="M101 36 L113 32 M101 43 L111 40 M101 50 L114 46 M101 57 L108 55" stroke={CEL.night} strokeWidth={1.6} />
-        </g>
-        {/* the deployable turret before him, facing the way he does: tripod, armoured box, the shield and
-            barrel to the right, the muzzle flash */}
-        <g className={s.sprTurret}>
-          <path d="M132 150 L118 196 M132 150 L146 196 M132 150 L132 196" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-          <path d="M132 150 L118 196 M132 150 L146 196 M132 150 L132 196" stroke={CEL.steel} strokeWidth={2.4} strokeLinecap="round" />
-          <Ink d="M116 128 L148 128 L150 152 L114 152 Z" fill={CEL.orange} />
-          <Shade d="M116 128 L124 128 L122 152 L114 152 Z" fill={CEL.mesaShade} />
-          <Ink d="M146 116 L156 120 L156 158 L146 156 Z" fill={CEL.steelDark} />
-          <Ink d="M156 134 L182 134 L182 142 L156 142 Z" fill={INK} />
-          <circle cx={128} cy={140} r={4} fill={CEL.holo} stroke={INK} strokeWidth={1.6} />
-          <g className={s.sprFlash}>
-            <path d="M182 138 L194 126 L192 134 L204 132 L194 140 L206 148 L192 144 L194 152 Z" fill={CEL.sun} stroke={INK} strokeWidth={1.8} strokeLinejoin="round" />
-          </g>
-        </g>
-      </>
-    ),
+    prop: null,
   },
   drummer: {
     torso: (

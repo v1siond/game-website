@@ -1,66 +1,93 @@
-import { fadeTo, fx, translateTo } from '../../shared/stageNodes'
+import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
-import { Bandit, Shot, muzzleFromStop, shotOf } from '../bandit'
+import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { Barrel, BountyBoard, Dust, RaiderCar, Robot, TownGate, Waveform } from '../cast'
 import { HOURS } from '../desert'
-import { Burst } from '../ink'
-import { CEL } from '../palette'
-import { still, stopsPlace } from '../place'
-import { shoot } from '../pose'
+import { stopsPlace } from '../place'
+import { DUCK, LISTEN, rest, stride } from '../pose'
 
-// About at noon: a signpost before him, a raider behind the rock beyond it. First the raider pops up and he
-// brings the rifle off his back and aims; then the burst, the crit starburst pops on the hood, the raider
-// goes over and a sun starburst sticker slaps onto the sign.
+// About, at the town's gate in the afternoon (notes L37 to L39, [1] [5]): the robot fiddles with the gate
+// while two raider cars tear past along the road, and he drops behind a barrel as their dust hits him. Then a
+// crackle: he touches his ear and the voice comes, a waveform pulsing by his head, the mystery the page
+// carries to Contact. The gate grinds open and he walks into the plaza, where the bounty board waits.
 
-// The bandit stands this far right of him behind its rock, and pops up from this far down.
-const BANDIT = 330
-const HIDDEN = 120
+const GATE = 330
+const BOARD = 470
+const BARREL = 96
+const CARS = [
+  { from: -900, to: 1500, at: [0.04, 0.2] },
+  { from: -1100, to: 1500, at: [0.12, 0.3] },
+] as const
+const WALKS = 250
+// The waveform hangs by his ear.
+const EAR = { x: 70, y: -300 }
 
-function Signpost() {
-  return (
-    <g transform="translate(150 0)">
-      <rect x={-8} y={-200} width={16} height={200} fill={CEL.plank} />
-      <path d="M-70 -250 L60 -250 L80 -215 L60 -180 L-70 -180 Z" fill={CEL.notice} />
-      <path d="M-50 -228 H40 M-50 -205 H20" stroke={CEL.ink} strokeWidth="5" />
-    </g>
-  )
-}
-
-function Rock() {
-  return <path d={`M${BANDIT - 110} 0 L${BANDIT - 90} -90 L${BANDIT - 20} -120 L${BANDIT + 70} -100 L${BANDIT + 110} 0 Z`} fill={CEL.mesa} />
-}
-
-const HIT = { x: BANDIT, y: -230 }
+const bars = [0.6, 1, 0.8, 1, 0.5]
 
 export const about = stopsPlace({
-  hour: HOURS.noon,
-  script: [1600, 2000],
-  ends: [0.38, 1],
+  hour: HOURS.town,
+  script: [1600, 1400, 1800],
+  ends: [0.34, 0.62, 1],
   back: () => (
     <>
-      <Signpost />
-      <g data-fx="sticker" opacity="0">
-        <Burst x={200} y={-245} r={34} fill={CEL.sun} />
+      <g transform={`translate(${BOARD} 0)`}>
+        <BountyBoard />
       </g>
-      <g data-fx="pop" transform={`translate(${BANDIT} ${HIDDEN})`}>
-        <Bandit name="bandit" />
+      <g transform={`translate(${GATE} 0)`}>
+        <TownGate />
+      </g>
+      <g transform={`translate(${GATE - 170} 0) scale(0.8)`}>
+        <Robot name="robot" />
+      </g>
+      {CARS.map((_, i) => (
+        <g key={i} data-fx={`car-${i}`} transform={`translate(${CARS[i].from} 40)`}>
+          <RaiderCar />
+        </g>
+      ))}
+      <g data-fx="dust" opacity="0">
+        <Dust />
       </g>
     </>
   ),
   front: () => (
     <>
-      <Rock />
-      <Shot name="shot" from={muzzleFromStop()} to={HIT} />
+      <g transform={`translate(${BARREL} 0)`}>
+        <Barrel />
+      </g>
+      <g data-fx="voice" opacity="0" transform={`translate(${EAR.x} ${EAR.y})`}>
+        <Waveform name="voice" />
+      </g>
     </>
   ),
-  move: (_profession, t) => still(shoot(t)),
+  move: (profession, t) => {
+    if (t < 0.34) return { pose: mix(rest(profession), DUCK, Math.sin(Math.PI * ramp(t, 0.02, 0.33))), ahead: 0, lift: 0 }
+    if (t < 0.62) return { pose: mix(rest(profession), LISTEN, ramp(t, 0.38, 0.46) * (1 - ramp(t, 0.58, 0.62))), ahead: 0, lift: 0 }
+    const go = ramp(t, 0.72, 1)
+    return { pose: go > 0 && go < 1 ? stride(profession, 5 * go) : rest(profession), ahead: WALKS * go, lift: 0 }
+  },
   reply: (stage) => {
-    const pop = fx(stage, 'pop')
-    const shot = shotOf(stage, 'shot', 'bandit')
-    const sticker = fx(stage, 'sticker')
+    const cars = CARS.map((_, i) => fx(stage, `car-${i}`))
+    const dust = fx(stage, 'dust')
+    const voice = fx(stage, 'voice')
+    const waves = bars.map((_, i) => fx(stage, `voice-${i}`))
+    const gateL = fx(stage, 'gate-l')
+    const gateR = fx(stage, 'gate-r')
+    const arm = fx(stage, 'robot-arm')
     return (t) => {
-      translateTo(pop, BANDIT, HIDDEN * (1 - ramp(t, 0.05, 0.25)))
-      shot(t)
-      fadeTo(sticker, ramp(t, 0.8, 0.9))
+      CARS.forEach(({ from, to, at }, i) => {
+        const go = ramp(t, at[0], at[1])
+        transformTo(cars[i], `translate(${(from + (to - from) * go).toFixed(1)} 40)`)
+      })
+      fadeTo(dust, Math.sin(Math.PI * ramp(t, 0.1, 0.36)))
+      transformTo(dust, `translate(${(60 + 120 * ramp(t, 0.1, 0.36)).toFixed(1)} -120) scale(${(1.4 + ramp(t, 0.1, 0.36)).toFixed(3)})`)
+      // the voice: a crackle, then the bars pulse while he listens, and fade as he walks in
+      const on = ramp(t, 0.4, 0.45) * (1 - 0.7 * ramp(t, 0.7, 0.9))
+      fadeTo(voice, on)
+      waves.forEach((bar, i) => transformTo(bar, `scale(1 ${(0.2 + 0.8 * bars[i] * Math.abs(Math.sin(t * 70 + i))).toFixed(3)})`))
+      const open = ramp(t, 0.62, 0.78)
+      transformTo(gateL, `translate(${(-140 * open).toFixed(1)} 0)`)
+      transformTo(gateR, `translate(${(140 * open).toFixed(1)} 0)`)
+      transformTo(arm, `rotate(${(30 * Math.sin(t * 50) * (1 - ramp(t, 0.6, 0.62))).toFixed(1)} -30 -80)`)
     }
   },
 })

@@ -1,73 +1,87 @@
+import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { Boulder, Flyer, Hologram, Relic, Tent } from '../cast'
 import { HOURS } from '../desert'
-import { CEL } from '../palette'
-import { still, stopsPlace } from '../place'
-import { loot } from '../pose'
+import { flung } from '../bandit'
+import { stopsPlace } from '../place'
+import { LOOK_UP, PUSH, rest, stride, swat } from '../pose'
 
-// Projects at dusk: a loot chest before him. First he kneels at it and throws the lid off, and a column of
-// the rarity's light stands up out of it (the rarity of his first project, from its own facts, loot.ts,
-// shown by its colour only); then a weapon in the same colour floats up into the light and he springs up
-// with a fist thrown at it.
+// Projects, the dig and the door (notes L50 to L53, L125, [1] [13]): at a dig among shiny boulders a flock
+// dives out of the dusk sky at him, and he knocks them away with the rifle butt as he runs for the tent. In
+// the quiet of the tent he lays the relic on the work table, and it throws a hologram over it: a door cut in a
+// cliff, a count of two hundred, and the three empty slots of a key. No one tells it; the relic does.
 
-const CHEST = 170
-// The weapon floats up out of the chest to this height.
-const FLOAT = -360
-
-function Chest() {
-  return (
-    <g transform={`translate(${CHEST} 0)`}>
-      <rect x={-62} y={-80} width={124} height={80} fill={CEL.steelDark} />
-      <rect x={-12} y={-92} width={24} height={26} fill={CEL.sun} />
-    </g>
-  )
-}
-
-function Light({ tone }: { tone: string }) {
-  return (
-    <g transform={`translate(${CHEST} 0)`}>
-      <path d="M-40 -90 L-26 -560 L26 -560 L40 -90 Z" fill={tone} opacity="0.55" data-bare />
-      <rect x={-62} y={-84} width={124} height={8} fill={tone} />
-    </g>
-  )
-}
-
-// The weapon in the rarity's colour, drawn round its middle.
-function Weapon({ tone }: { tone: string }) {
-  return <path d="M-70 -10 L50 -10 L50 -18 L80 -18 L80 -6 L50 -2 L10 -2 L4 20 L-12 20 L-8 -2 L-54 -2 L-70 12 Z" fill={tone} />
-}
+const TENT = 300
+const TABLE = { x: TENT, y: -100 }
+const RUNS = 70
+const STANDS = TENT - 150
+// The flock: where each starts in the sky, and when it dives and is knocked away.
+const FLOCK = [
+  { from: { x: 520, y: -560 }, at: 0.06 },
+  { from: { x: 600, y: -480 }, at: 0.14 },
+  { from: { x: 460, y: -620 }, at: 0.22 },
+]
 
 export const projects = stopsPlace({
   hour: HOURS.dusk,
-  script: [1800, 2000],
-  ends: [0.5, 1],
-  back: ({ tones }) => (
+  script: [1700, 1300, 1800],
+  ends: [0.36, 0.62, 1],
+  back: () => (
     <>
-      <g data-fx="light" opacity="0">
-        <Light tone={tones[0] ?? CEL.common} />
+      <g transform="translate(-120 0)">
+        <Boulder r={70} />
       </g>
-      <Chest />
-      <g data-fx="lid" transform={`translate(${CHEST} -80)`}>
-        <path d="M-62 0 Q0 -46 62 0 Z" fill={CEL.steel} />
+      <g transform="translate(470 0)">
+        <Boulder r={90} />
       </g>
-      <g data-fx="weapon" transform={`translate(${CHEST} -60)`} opacity="0">
-        <Weapon tone={tones[0] ?? CEL.common} />
+      <g transform={`translate(${TENT} 0)`}>
+        <Tent />
       </g>
+      <g data-fx="holo" opacity="0" transform={`translate(${TABLE.x} ${TABLE.y}) scale(0)`}>
+        <Hologram />
+      </g>
+      <g data-fx="relic" opacity="0" transform={`translate(${TABLE.x} ${TABLE.y - 30})`}>
+        <g transform="scale(0.6)">
+          <Relic />
+        </g>
+      </g>
+      {FLOCK.map(({ from }, i) => (
+        <g key={i} data-fx={`flyer-${i}`} transform={`translate(${from.x} ${from.y})`}>
+          <Flyer />
+        </g>
+      ))}
     </>
   ),
-  move: (_profession, t) => still(loot(t)),
+  move: (profession, t) => {
+    if (t < 0.36) {
+      const swing = FLOCK.findIndex(({ at }) => t < at + 0.1)
+      const at = FLOCK[swing === -1 ? FLOCK.length - 1 : swing].at
+      return { pose: swat(ramp(t, at + 0.02, at + 0.1)), ahead: RUNS * ramp(t, 0, 0.34), lift: 0 }
+    }
+    if (t < 0.62) {
+      const walk = ramp(t, 0.36, 0.5)
+      return { pose: walk < 1 ? stride(profession, 3 * walk) : mix(rest(profession), PUSH, ramp(t, 0.52, 0.58)), ahead: RUNS + (STANDS - RUNS) * walk, lift: 0 }
+    }
+    return { pose: mix(PUSH, LOOK_UP, ramp(t, 0.66, 0.8)), ahead: STANDS - 30 * ramp(t, 0.66, 0.8), lift: 0 }
+  },
   reply: (stage) => {
-    const light = fx(stage, 'light')
-    const lid = fx(stage, 'lid')
-    const weapon = fx(stage, 'weapon')
+    const flyers = FLOCK.map((_, i) => fx(stage, `flyer-${i}`))
+    const relic = fx(stage, 'relic')
+    const holo = fx(stage, 'holo')
     return (t) => {
-      const open = ramp(t, 0.35, 0.5)
-      transformTo(lid, `translate(${(CHEST - 60 * open).toFixed(1)} ${(-80 - 90 * open).toFixed(1)}) rotate(${(-120 * open).toFixed(1)})`)
-      fadeTo(lid, 1 - ramp(t, 0.45, 0.55))
-      fadeTo(light, ramp(t, 0.4, 0.55))
-      const rise = ramp(t, 0.5, 0.85)
-      fadeTo(weapon, ramp(t, 0.5, 0.6))
-      transformTo(weapon, `translate(${CHEST} ${(-60 + (FLOAT + 60) * rise).toFixed(1)}) rotate(${(-12 + 12 * rise).toFixed(1)})`)
+      FLOCK.forEach(({ from, at }, i) => {
+        const dive = ramp(t, at - 0.06, at + 0.06)
+        const knocked = ramp(t, at + 0.06, at + 0.2)
+        const x = from.x + (RUNS * 0.5 + 60 - from.x) * dive
+        const y = from.y + (-260 - from.y) * dive
+        transformTo(flyers[i], `translate(${x.toFixed(1)} ${y.toFixed(1)}) ${flung(knocked, 420, 260)}`)
+        fadeTo(flyers[i], 1 - ramp(t, at + 0.16, at + 0.22))
+      })
+      fadeTo(relic, ramp(t, 0.56, 0.6))
+      const thrown = ramp(t, 0.66, 0.84)
+      transformTo(holo, `translate(${TABLE.x} ${TABLE.y}) scale(${thrown.toFixed(3)})`)
+      fadeTo(holo, thrown)
     }
   },
 })
