@@ -73,7 +73,7 @@ export const muayThai = stopsPlace({
         <Pillar />
       </g>
       <Hits name="hit" hits={HITS} />
-      <TitleCard name="card" x={CARD.x} y={CARD.y} title="THE OLD HUNGER" joke="OPENS EVERY 200 YEARS. LIKE YOUR GYM CARD." />
+      <TitleCard name="card" x={CARD.x} y={CARD.y} title="THE OLD HUNGER" joke="WAKES UP HUNGRY. LIKE YOU ON A MONDAY." />
     </>
   ),
   move: (profession, t) => {

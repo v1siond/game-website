@@ -39,7 +39,7 @@ const HOUND_FALLS = [0.2, 0.26, 0.32]
 
 export const work = stopsPlace({
   land: LANDS.badlands,
-  script: [1800, 1900, 1400],
+  script: [1800, 1800, 1400],
   ends: [0.36, 0.7, 1],
   back: () => (
     <>
