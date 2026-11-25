@@ -14,7 +14,7 @@ import { TargetingSystem } from './targeting'
 import { Radio } from './radio'
 import { BadgeChart } from './badges'
 import { PLUS_ROWS } from './controls'
-import type { Scene } from './scenes'
+import type { Scene, SceneSide } from './scenes'
 import { AtomicStage } from './stage'
 import atomic from './atomic.module.css'
 
@@ -130,18 +130,25 @@ interface SceneSectionProps {
   still: boolean
 }
 
+/** From lg a section's title and cards read on the half its scene leaves free. */
+export const READS_BESIDE: Record<SceneSide, { title: string; column: string }> = {
+  right: { title: '', column: '' },
+  left: { title: 'lg:justify-end', column: 'lg:ml-auto' },
+}
+
 /** One scene of the page; under reduced motion its own stage sits still behind its head. */
 export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   const { sections } = useLabels()
   const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const title = sections[slot.titleKey]
+  const reads = READS_BESIDE[scene.side]
   return (
     <section data-scene={scene.id} aria-labelledby={atomicId(title)} className="relative scroll-mt-24 px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <AtomicStage scene={scene} settled />}
-      <header className="flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
+      <header className={`flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] ${reads.title}`}>
         <SectionTitle title={title} />
       </header>
-      <div className="relative max-w-[42rem]">
+      <div className={`relative max-w-[42rem] ${reads.column}`}>
         <Cards slot={slot} />
       </div>
     </section>

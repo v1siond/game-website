@@ -20,3 +20,14 @@
       linear-gradient(to top, color-mix(in srgb, theme('colors.atomic.ink') 70%, transparent), color-mix(in srgb, theme('colors.atomic.ink') 0%, transparent) 55%);
   }
 }
+
+/* A section whose scene plays on the left half from lg (scenes.tsx sideOf): the vignette leans the other way
+   and the scrim darkens the right half under its cards. */
+@media (min-width: 1024px) {
+  .tube.cardsRight::after {
+    background:
+      repeating-linear-gradient(0deg, transparent 0 2px, color-mix(in srgb, black 14%, transparent) 2px 3px),
+      radial-gradient(circle at 38% 45%, transparent 50%, color-mix(in srgb, theme('colors.atomic.ink') 70%, transparent) 100%),
+      linear-gradient(to left, color-mix(in srgb, theme('colors.atomic.ink') 65%, transparent), color-mix(in srgb, theme('colors.atomic.ink') 0%, transparent) 52%);
+  }
+}

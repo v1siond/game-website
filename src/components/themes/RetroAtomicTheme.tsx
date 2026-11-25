@@ -24,6 +24,8 @@ import atomic from './RetroAtomic/atomic.module.css'
 const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--atomic-face' })
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the scene stand side by side, the sections alternating which half each takes.
+const WIDE_QUERY = '(min-width: 1024px)'
 
 // Retro Atomic: a bomb shelter of the atomic age seen through his wrist terminal, as a walk out of the
 // shelter, through the wasteland and into the town at dusk. The hero is the wrist terminal over the
@@ -52,9 +54,10 @@ export default function RetroAtomicTheme() {
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const wide = useMediaQuery(WIDE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
-    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, { phone, wide }, highlights.length, labels),
+    [view.sections, professionalSummary.bio, active, phone, wide, highlights.length, labels],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)

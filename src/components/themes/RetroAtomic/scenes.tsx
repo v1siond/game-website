@@ -87,11 +87,20 @@ import {
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-/** What a scene's art and writer read: the phone's narrower view, the kit he wears. */
+/** What a scene's art and writer read: the phone's narrower view, the side of a wide screen it plays on, the
+ *  kit he wears. */
 export interface SceneInput {
   phone: boolean
+  /** From lg the scene plays on the left half, its section's cards reading on the right (sideOf). */
+  left: boolean
   kit: Profession
 }
+
+/** The half of a wide screen a scene plays in; its cards read on the other half. */
+export type SceneSide = 'right' | 'left'
+
+/** The side of the scene at `index` among the sections after the hero, the contact last: right, left, right... */
+const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left')
 
 /** His frame in a move: his pose, how far ahead of his spot he is, and how much of him shows. */
 interface Frame {
@@ -123,10 +132,12 @@ export interface SceneDef {
 /** Him in a frame, as the shared figure scene places him. */
 export type DwellerState = FigureState<DwellerPose>
 
-// His size on the stage, and where he stands: right of the text column on a wide screen, the left of a
+// His size on the stage, and where he stands: right of the text column on a wide screen, or 600 further left
+// when the cards read on the right, so the place before him fills the left half the same way and ends left of
+// the cards (what stands furthest from him, the mutant behind the wreck, about 370 past him); the left of a
 // phone's view (about x 490 to 950) so the place before him shows whole.
 const K = 1.6
-const spotOf = (phone: boolean): number => (phone ? 560 : 860)
+const spotOf = ({ phone, left }: Pick<SceneInput, 'phone' | 'left'>): number => (phone ? 560 : left ? 260 : 860)
 
 /** On a phone's narrow view the place round his spot, and he, are drawn at this share of their size. */
 export const placeScale = (phone: boolean): number => (phone ? 0.8 : 1)
@@ -442,8 +453,9 @@ const work: SceneDef = {
     const kick = bell(t, 0.56, 0.66)
     return still({ ...aimed, armRight: aimed.armRight - 10 * kick, flash: kick })
   },
-  reply: (stage, { phone }) => {
-    const spot = spotOf(phone)
+  reply: (stage, input) => {
+    const { phone } = input
+    const spot = spotOf(input)
     const size = placeScale(phone)
     const foe = foeWriter(stage)
     const foeNode = fx(stage, 'foe')
@@ -777,8 +789,9 @@ const muayThai: SceneDef = {
     if (t < 0.55) return still(mix(guard, pose(BLOCK), bell(t, 0.32, 0.55)), ahead)
     return still(mix(guard, pose(KICK), bell(t, 0.66, 0.9)), ahead)
   },
-  reply: (stage, { phone }) => {
-    const spot = spotOf(phone)
+  reply: (stage, input) => {
+    const { phone } = input
+    const spot = spotOf(input)
     const size = placeScale(phone)
     const foe = foeWriter(stage)
     const burst = fx(stage, 'burst')
@@ -856,12 +869,16 @@ export interface Scene {
   kit: Profession
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
+  /** The half it plays in from lg, its cards on the other; the hero keeps its own layout on the right. */
+  side: SceneSide
+  /** It plays on the left half now: a left side on a screen of lg or wider. */
+  left: boolean
 }
 
 /** The scene's writer: the place's reply and his frame at the scene's playhead, him placed at his spot. */
 export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<DwellerPose> {
   const { def, kit, layout } = scene
-  const input: SceneInput = { phone: layout.phone, kit }
+  const input = inputOf(scene)
   const spot = sceneSpot(scene)
   const size = placeScale(layout.phone)
   return (stage) => {
@@ -876,10 +893,10 @@ export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<D
 }
 
 /** Where he stands in a scene: his usual spot, shifted right where the scene asks. */
-export const sceneSpot = ({ def, layout }: Scene): number => spotOf(layout.phone) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
+export const sceneSpot = ({ def, layout, left }: Scene): number => spotOf({ phone: layout.phone, left }) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
 
 /** The input the scene's art reads. */
-export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, kit: scene.kit })
+export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, left: scene.left, kit: scene.kit })
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
@@ -888,14 +905,20 @@ const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 // The theatre reads only the count of a scene's layout; its band is not drawn on.
 const BAND = [0, 0] as const
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => {
-  const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND, phone), kit: def.kit ?? profession, slot }
+/** The screen a page is drawn for: a phone (below md), or wide enough for cards and scene side by side (lg). */
+export interface Screen {
+  phone: boolean
+  wide: boolean
 }
 
-/** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
-export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, highlights: number, labels: RecordWords): Scene[] => [
-  sceneOf('hero', null, NO_ITEMS, profession, phone),
-  ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, phone)),
-  sceneOf('contact', null, NO_ITEMS, profession, phone),
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, screen: Screen, side: SceneSide): Scene => {
+  const def = SCENE_DEFS[id]
+  return { id, def, layout: propLayout(items, BAND, screen.phone), kit: def.kit ?? profession, slot, side, left: screen.wide && side === 'left' }
+}
+
+/** The page as scenes: the hero, one per section the profession shows in reading order, the contact, sides alternating. */
+export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, screen: Screen, highlights: number, labels: RecordWords): Scene[] => [
+  sceneOf('hero', null, NO_ITEMS, profession, screen, 'right'),
+  ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, screen, sideOf(i))),
+  sceneOf('contact', null, NO_ITEMS, profession, screen, sideOf(slots.length)),
 ]

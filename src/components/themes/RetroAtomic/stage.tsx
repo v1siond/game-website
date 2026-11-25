@@ -90,7 +90,9 @@ const layersOf = (scene: Scene): StageLayer[] => {
   ]
 }
 
-/** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
+/** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion; one
+ *  on the left half has its scrim under the cards on the right. */
 export const AtomicStage = memo(function AtomicStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.tube} />
+  const scrim = scene.side === 'left' ? `${css.tube} ${css.cardsRight}` : css.tube
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={scrim} />
 })

@@ -7,6 +7,7 @@ import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
 import { DwellerSprite } from './dweller'
 import { KEYS, pose } from './pose'
 import type { Scene } from './scenes'
+import { READS_BESIDE } from './sections'
 import { AtomicStage } from './stage'
 import { atomicId } from './anchors'
 import { buildBoard, hackReducer, initialHack, MAX_ATTEMPTS, type HackAction, type HackBoard, type HackCell, type HackLogEntry, type HackState } from './hacking'
@@ -163,7 +164,7 @@ export function ContactTerminal({ scene, still }: { scene: Scene; still: boolean
     <section data-scene="contact" aria-labelledby={atomicId(title)} className="relative scroll-mt-24 px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <AtomicStage scene={scene} settled />}
       <div className="min-h-[60svh] motion-reduce:min-h-[50svh]" />
-      <div className={`relative max-w-5xl p-3 sm:p-5 ${atomic.device}`} data-on="">
+      <div className={`relative max-w-5xl p-3 sm:p-5 lg:max-w-[min(56rem,62vw)] ${READS_BESIDE[scene.side].column} ${atomic.device}`} data-on="">
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
           <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
           <div className={`relative grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>
