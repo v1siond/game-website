@@ -8,6 +8,8 @@ import { MARK_BACKGROUND } from "@/lib/siteMark";
 import { getLabels } from "@/lib/cv-data";
 import type { Locale } from "@/i18n/config";
 
+// Retro RPG's pixel face. Only that world reads it (through --font-silkscreen), so it is not preloaded on
+// every page; the face downloads when that world first draws text in it.
 const silkScreen = localFont({
   src: [
     {
@@ -22,7 +24,7 @@ const silkScreen = localFont({
     },
   ],
   display: 'swap',
-  preload: true,
+  preload: false,
   variable: '--font-silkscreen',
 });
 
