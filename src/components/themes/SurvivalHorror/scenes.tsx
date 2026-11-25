@@ -396,7 +396,16 @@ function Debris({ x }: { x: number }) {
   )
 }
 
-const debrisAt = (layout: Layout): number => at(layout, 0.52)
+// On a phone's left half the run is drawn tighter than the band: the pursuer, its lunge, the cabinet and his
+// landing take more than half the screen, so he lands left of the middle with its hand just short of him and
+// its back in the dark at the screen's edge.
+const VENTURES_BAND: Record<'wide' | 'phone', Record<Side, readonly [number, number]>> = {
+  wide: BAND.wide,
+  phone: { right: BAND.phone.right, left: [108, 275] },
+}
+const venturesAt = (layout: Layout, u: number): number => at({ ...layout, band: VENTURES_BAND[layout.phone ? 'phone' : 'wide'][layout.side] }, u)
+
+const debrisAt = (layout: Layout): number => venturesAt(layout, 0.52)
 
 /** How long the pursuer's lunge over the cabinet takes. */
 const LUNGE_MS = 500
@@ -415,9 +424,9 @@ const ventures: SceneDef = {
   bind: (stage, layout) => {
     const placePursuer = pursuerWriter(stage)
     const debris = debrisAt(layout)
-    const from = at(layout, 0.15)
+    const from = venturesAt(layout, 0.15)
     const before = debris - 22
-    const after = at(layout, 0.96)
+    const after = venturesAt(layout, 0.96)
     // it rushes him the whole scene at one speed, kept behind him, and reaches the cabinet once he is over,
     // in time for its lunge to end with the scene
     const [runMs, vaultMs] = actionLengths(VENTURES_SCRIPT)
