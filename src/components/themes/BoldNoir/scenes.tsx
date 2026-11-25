@@ -5,7 +5,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import type { CaseInput, Place } from './case'
+import type { CaseInput, Hold, Place } from './case'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -22,9 +22,23 @@ import { Canvas, Front, Night, Skyline, Street, Wall, rainWriter } from './stree
 // call comes in (hero), one step of the case per section of the shown profession in reading order, the
 // captain's desk where it is closed (contact). Each scene names its place, its anchor and its place's
 // script, which the scroll plays at the scene's own pace whatever the number of its cards (stageItems still
-// counts them for the theatre's settled frame).
+// counts them for the theatre's settled frame). The sections alternate sides from lg: the first after the hero
+// plays its step on the right half beside its cards on the left, the next on the left half beside its cards
+// on the right, and so on to the contact.
+
+/** The half of a wide screen a scene plays its step in; its cards read on the other half. */
+export type SceneSide = 'right' | 'left'
+
+/** The side of the scene at `index` among the sections after the hero, the contact last: right, left, right... */
+const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left')
 
 export type SceneId = 'hero' | SectionId | 'contact'
+
+/** His spot in a scene: the hero's own, the half its step plays in from lg, the right one below lg. */
+const holdOf = (id: SceneId, side: SceneSide, wide: boolean): Hold => {
+  if (id === 'hero') return 'hero'
+  return wide ? side : 'right'
+}
 
 interface SceneDef {
   place: Place
@@ -49,6 +63,8 @@ export interface NoirScene extends TheatreScene, Omit<SceneDef, 'place'> {
   layers: StageLayer[]
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
+  /** The half its step plays in from lg; the hero keeps its own layout on the right. */
+  side: SceneSide
 }
 
 const layersOf = ({ light, set, mid, near, floor }: Place, input: CaseInput): StageLayer[] => [
@@ -61,14 +77,15 @@ const layersOf = ({ light, set, mid, near, floor }: Place, input: CaseInput): St
   { name: 'fg', node: <Front /> },
 ]
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): NoirScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, screen: Screen, side: SceneSide): NoirScene => {
   const { place, ...def } = SCENE_DEFS[id]
-  const input = { profession, phone }
+  const input = { profession, phone: screen.phone, hold: holdOf(id, side, screen.wide) }
   return {
     ...def,
     id,
     slot,
     count,
+    side,
     script: place.script,
     layers: layersOf(place, input),
     bind: (stage) => {
@@ -82,13 +99,19 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, professio
   }
 }
 
-/** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): NoirScene[] {
-  const sections = slots.map((slot) => {
+/** The screen a page is drawn for: a phone (below md), or wide enough for cards and step side by side (lg). */
+export interface Screen {
+  phone: boolean
+  wide: boolean
+}
+
+/** Every scene of the page in order, each with what its picture is built from, the sides alternating. */
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, screen: Screen): NoirScene[] {
+  const sections = slots.map((slot, i) => {
     const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession, phone)
+    return sceneOf(slot.id, slot, lead + count, profession, screen, sideOf(i))
   })
-  return [sceneOf('hero', null, 0, profession, phone), ...sections, sceneOf('contact', null, 0, profession, phone)]
+  return [sceneOf('hero', null, 0, profession, screen, 'right'), ...sections, sceneOf('contact', null, 0, profession, screen, sideOf(slots.length))]
 }
 
 /** Each layer's push in across its scene: the far skyline moves least, the rain in front most, which gives

@@ -12,7 +12,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { InkStamp } from './backdrop'
 import { BULLETS, BandPanel, CaseFile, CompanyTag, RankCard, ServiceSlab, TechSlab, crookOf } from './cards'
-import { LAYER_MOTION, type NoirScene } from './scenes'
+import { LAYER_MOTION, type NoirScene, type SceneSide } from './scenes'
 import page from './page.module.css'
 
 // One section per place of the night: a tall head that first shows the place alone and then brings up the
@@ -158,6 +158,12 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
   muayThai: MuayThaiCards,
 }
 
+/** From lg a section's title and cards read on the half its step leaves free, and the scrim darkens that half. */
+export const READS_BESIDE: Record<SceneSide, { reads: string; scrim: string }> = {
+  right: { reads: '', scrim: page.scrim },
+  left: { reads: page.readsRight, scrim: `${page.scrim} ${page.scrimRight}` },
+}
+
 /** A section's head: its title on the red panel. */
 export function SceneHead({ id, title }: { id: string; title: string }) {
   return (
@@ -174,9 +180,10 @@ export function PlaceSection({ scene, still }: { scene: NoirScene & { slot: Sect
   const { sections } = useLabels()
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `noir-${scene.id}`
+  const { reads, scrim } = READS_BESIDE[scene.side]
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${reads}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={scrim} />}
       <SceneHead id={headingId} title={sections[scene.slot.titleKey]} />
       <div className={page.body}>
         <Cards slot={scene.slot} />

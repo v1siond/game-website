@@ -309,6 +309,26 @@
   }
 }
 
+/* The sections alternate sides from lg (scenes.tsx sideOf): a section whose step plays on the left reads its
+   title and cards on the right 40%, and its scrim darkens the right half under them instead of the left. */
+@media (min-width: 1024px) {
+  .scrim.scrimRight::after {
+    background: linear-gradient(to left, color-mix(in srgb, var(--noir-ink) 55%, transparent), transparent 55%);
+  }
+
+  .readsRight .head {
+    align-items: flex-end;
+  }
+
+  .readsRight .body {
+    margin-left: auto;
+  }
+
+  .goal.readsRight {
+    justify-content: flex-end;
+  }
+}
+
 .delivered {
   transform: rotate(2deg);
 }

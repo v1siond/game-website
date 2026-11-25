@@ -9,6 +9,7 @@ import { InkStamp } from './backdrop'
 import { NoirLink } from './actions'
 import { LAYER_MOTION, type NoirScene } from './scenes'
 import page from './page.module.css'
+import { READS_BESIDE } from './sections'
 
 // The page's fixed case bar and its end. The bar is an ink strip across the top with its red rule and his
 // initials on a paper tag, the way back to the top. The end is a typed index card from the case's box, his
@@ -31,9 +32,10 @@ export function CaseBar({ anchor }: { anchor: string }) {
 export function IndexCardContact({ scene, still }: { scene: NoirScene; still: boolean }) {
   const { sections } = useLabels()
   const { cv } = useSiteLinks()
+  const { reads, scrim } = READS_BESIDE[scene.side]
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="noir-contact" className={page.goal}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="noir-contact" className={`${page.goal} ${reads}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={scrim} />}
       <div className={page.goalCopy}>
         <RecruiterHero
           render={({ line, actions }) => (

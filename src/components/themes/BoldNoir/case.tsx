@@ -14,6 +14,9 @@ export interface CaseInput {
   profession: Profession
   /** A phone sees the canvas's middle only (x 570 to 1030). */
   phone: boolean
+  /** Where he holds on a wider screen: the hero's own spot, or the half of the screen a section's step plays
+   *  in from lg (scenes.tsx sideOf). */
+  hold: Hold
 }
 
 /** A scene's picture as the theatre runs it: its light, its script, an optional set of its own between the
@@ -41,9 +44,17 @@ export const still = (pose: NoirPose): Frame => ({ pose, ahead: 0, lift: 0 })
 /** How far action `i` has played: all of it before, its eased share while it plays, none after. */
 export const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : action === i ? t : 0)
 
-/** Where he holds on the floor: right of the text column on a wider screen, at the left of a phone's view
- *  so what he works at fits right of him. */
-export const holdX = ({ phone }: Pick<CaseInput, 'phone'>): number => (phone ? 620 : 760)
+/** Which spot he holds on a wider screen: the hero's, or the half a section's step plays in. */
+export type Hold = 'hero' | 'right' | 'left'
+
+/** Where he holds on the floor of a wider screen. The hero keeps its own spot right of the text column. A step
+ *  beside cards on the left holds far enough right that his back and his arm clear them (the kneeling pose of
+ *  About reaches furthest back); beside cards on the right, 620 further left, so the step fills the left half
+ *  and what he works at (the desk and the stars up to 560 past him) still ends left of the cards. */
+const HOLD_X: Readonly<Record<Hold, number>> = { hero: 760, right: 860, left: 240 }
+
+/** Where he holds: at the left of a phone's view so what he works at fits right of him, else his spot. */
+export const holdX = ({ phone, hold }: Pick<CaseInput, 'phone' | 'hold'>): number => (phone ? 620 : HOLD_X[hold])
 
 // A phone's view is too narrow for a step at full size, so there the whole step, him with it, is drawn
 // smaller round his feet, what he works at nearer him in the same proportion.

@@ -16,7 +16,7 @@ import { IndexCardContact, CaseBar } from './BoldNoir/chrome'
 import { RooftopHero } from './BoldNoir/hero'
 import { NOIR_VARS } from './BoldNoir/palette'
 import { LAYER_MOTION, scenesOf, type NoirScene } from './BoldNoir/scenes'
-import { PlaceSection } from './BoldNoir/sections'
+import { PlaceSection, READS_BESIDE } from './BoldNoir/sections'
 import page from './BoldNoir/page.module.css'
 
 // Bold Noir: his CV as one case of the 1947 detective game the world is drawn from, in its black and white
@@ -40,8 +40,10 @@ import page from './BoldNoir/page.module.css'
 // variable and the world's css reads it.
 const noirType = Special_Elite({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--noir-type' })
 
-// A phone sees the middle of the canvas only, so the places stage their steps nearer its middle.
+// A phone sees the middle of the canvas only, so the places stage their steps nearer its middle; from lg the
+// cards and the step stand side by side, the sections alternating which half each takes.
 const PHONE_QUERY = '(max-width: 767.98px)'
+const WIDE_QUERY = '(min-width: 1024px)'
 
 const hasSlot = (scene: NoirScene): scene is NoirScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -52,9 +54,10 @@ export default function BoldNoirTheme() {
   const labels = useLabels()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const wide = useMediaQuery(WIDE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
-    [view, cv, labels, active, phone],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, { phone, wide }),
+    [view, cv, labels, active, phone, wide],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
@@ -66,7 +69,7 @@ export default function BoldNoirTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef} className={page.theatre}>
           {scenes.map((scene) => (
-            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={READS_BESIDE[scene.side].scrim} />
           ))}
         </Theatre>
       )}
