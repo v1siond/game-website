@@ -112,7 +112,7 @@ function Shards({ behind }: { behind: boolean }) {
 }
 
 export const projects: SetPiece = {
-  script: [1600, 2000, 1600],
+  script: [1600, 1800, 1600],
   sky: ['#0a1430', '#1d3a6a'],
   focus: 300,
   art: () => (

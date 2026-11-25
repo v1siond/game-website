@@ -67,9 +67,6 @@ export const RIDE: Pose = { ...IDLE, jump: -6, liftL: 30, bendL: 0.6, rotL: 14, 
 /** The knees tucked under him in the air, the arms thrown up. */
 export const tucked = (height: number): Pose => ({ ...IDLE, jump: -height, liftL: 40, bendL: 0.5, liftR: 40, bendR: 0.5, aL: 150, fL: 30, aR: -150, fR: -30 })
 
-/** Both gloves held high over his head: the trophy, the cheer. */
-export const CHEER: Pose = { ...IDLE, aL: 160, sL: 1, fL: -20, aR: -160, sR: 1, fR: 20 }
-
 /** The ready stance: knees bent (the shins shortened, the body let down onto them), the gloves up. */
 export const GUARD: Pose = { ...IDLE, jump: 10, bendL: 0.82, bendR: 0.82, rotL: 8, rotR: -8, aL: 28, fL: -115, aR: -28, fR: 115 }
 
