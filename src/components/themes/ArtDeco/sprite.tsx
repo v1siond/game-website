@@ -4,29 +4,27 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { DECO_COLORS as C } from './palette'
 import s from './sprite.module.css'
 
-// Him as this world's own figure, the plane crash survivor of the undersea city: the 1960 charcoal cable
-// knit sweater with the ribbed crew neck, cuffs and hem, dark slacks, brown shoes, the steel pipe wrench in
-// the right hand and the left hand charged with electricity, its veins glowing blue under the skin with
-// sparks crawling over the fingers. Drawn the way the genre paints its people: soft gradient fills lit from
-// above by a cold sea light, a warm brass rim on the lit edge and a thin sepia line, never a hard cartoon
-// outline. Realistic proportions (about seven heads tall).
+// Him as this world's own figure, the one passenger who came up out of the sea: a passenger's white shirt
+// with the sleeves rolled to the elbow, an open collar, dark braces, dark slacks and brown shoes. Drawn the
+// way the genre paints its people: soft gradient fills lit from above by a cold sea light, a warm brass rim
+// on the lit edge and a thin sepia line, never a hard cartoon outline. Realistic proportions (about seven
+// heads tall).
 //
 // His traits come from HERO_IDENTITY: his brown skin, short dark hair, full dark beard and dark oval eyes.
 //
-// Per profession: the System Engineer in the sweater, whose action is the electric bolt thrown from the
-// charged hand (the zap that brings a dead machine back on); the Musician in the sweater with a bow
-// tie, a brass deco snare slung at the waist, a drumstick in each hand and the charged hand's stick
-// sparking on every hit; the Martial Artist bare chested in gold Muay Thai shorts with the maroon band,
-// red prajioud on the arms, wrapped hands and his own mongkhon round the head, whose action is the knee
-// then the round kick, the charged veins still lit.
+// Per profession: the System Engineer in the shirt and braces; the Musician in the shirt under a dark
+// waistcoat with a bow tie and a drumstick in each hand; the Martial Artist bare chested in gold Muay Thai
+// shorts with the maroon band, red prajioud on the arms, wrapped hands and his own mongkhon round the head.
 //
 // The parts are groups that turn round their own joints (the origins in sprite.module.css): a scene poses
-// them from the scroll on the shared rig (pose.ts), walking him, swinging the wrench, throwing the bolt,
-// holding an audio diary up by his face, and showing the props each act needs (the bolt, the swing's arc,
-// the diary, the sparks, the revival chamber's light), all at rest hidden. Transform and opacity only.
+// them from its playhead on the shared rig (pose.ts) and shows the things his actions need, each at rest
+// hidden: the spark coil he straps over his forearm and its sparks, the plate camera, its flash and the study
+// card it gives, the radio handset, a coin, and the sticks for anyone sitting at a kit. Transform and opacity
+// only.
 
+// The shirt and braces rest with the arms hanging, the rig's own stand, so the System Engineer has no kit class.
 const KIT_CLASS: Record<Profession, string> = {
-  engineer: s.kitWrench,
+  engineer: '',
   drummer: s.kitSticks,
   fighter: s.kitGuard,
 }
@@ -35,9 +33,8 @@ const LINE = C.sepia
 
 interface Ids {
   skin: string
-  knit: string
-  steel: string
-  glow: string
+  shirt: string
+  copper: string
 }
 
 function Painted({ d, fill, className }: { d: string; fill: string; className?: string }) {
@@ -57,10 +54,15 @@ const HEAD = 'M51 28 Q51 15 62 15 Q74 15 74.5 28 L74.5 34 Q73 41 66 44 L58 44 Q5
 const HAIR = 'M50 29 Q48 12 62 12.5 Q76 13 75.5 26 Q71 19.5 63 19.5 Q56 20 53.5 30 Z'
 const BEARD = 'M51.5 31 Q52.5 44 59 48.5 Q66 51 71.5 46.5 Q75.5 41.5 75 32 Q72 36.5 68 36.5 Q63 37.5 58 34.5 Q55 33 53 31 Z'
 const NECK = 'M57 41 L67 41 L67.5 51 L56.5 51 Z'
-const SWEATER = 'M45 51 Q61 45.5 79 51 L80.5 90 Q62 93.5 43.5 90 Z'
-const SWEATER_SHADE = 'M45 51 Q50 49.5 54 48.6 Q49 70 52 92 L43.5 90 Z'
-const CABLES = 'M53 56 q3 4 0 8 q-3 4 0 8 q3 4 0 8 M62 55 q3 4 0 8 q-3 4 0 8 q3 4 0 8 M71 55 q3 4 0 8 q-3 4 0 8 q3 4 0 8'
-const RIB_HEM = 'M44 86 Q62 89.5 80.5 86'
+const SHIRT = 'M45 51 Q61 45.5 79 51 L80.5 90 Q62 93.5 43.5 90 Z'
+const SHIRT_SHADE = 'M45 51 Q50 49.5 54 48.6 Q49 70 52 92 L43.5 90 Z'
+// The open collar's two points and the placket down the front with its buttons.
+const COLLAR = 'M55 48.5 L61 55 L58 57 L53.5 50 Z M69 48.5 L63 55 L66 57 L70.5 50 Z'
+const PLACKET = 'M62 55 V89'
+const BUTTONS = [62, 70, 78, 86]
+// The braces from the shoulders to the waistband, and the Musician's waistcoat with its V.
+const BRACES = 'M52.5 50 L54.5 88 M71.5 50 L69.5 88'
+const WAISTCOAT = 'M45 53 Q50 51 55 50.5 L62 70 L69 50.5 Q74 51 79 53 L80 89 Q62 92 44 89 Z'
 const CHEST = 'M45 51 Q61 46 79 51 L79.5 88 Q62 91 44.5 88 Z'
 const CHEST_LINES = 'M51 64 Q57 68 62 64 Q67 68 74 64 M62 70 V86 M55 76 Q62 78 69 76'
 const SLACKS = 'M44 88 L80 88 L80 99 L44 99 Z'
@@ -91,12 +93,14 @@ const FOREARM = {
   back: 'M45 75 L53.5 75 L52.5 96 L46 96 Z',
   front: 'M69.5 75 L78 75 L77 96 L70.5 96 Z',
 }
-// The sweater sleeve pushed up the charged forearm so the veins show.
-const PUSHED_SLEEVE = 'M69 74.5 L78.5 74.5 L78 82 Q73.5 84 69.5 82 Z'
-const VEINS = 'M72 84 L73.5 89 L72.5 93 M75 85 L74 90 L75.5 95 M73.5 89 L75.5 91'
-const CUFF = { back: 'M45 92.5 L53 92.5', front: 'M70 92.5 L77.5 92.5' }
+// The shirt sleeve rolled up over the elbow, a fat cuff of folded cloth.
+const ROLL = {
+  back: 'M44 72 L54 72.5 L53.8 79 Q49 80.5 44.6 79 Z',
+  front: 'M68.8 72.5 L78.5 72 L78.2 79 Q73.5 80.5 69.4 79 Z',
+}
 
 const HAND_X = { back: 49.5, front: 73.8 }
+const HAND_Y = 99
 
 // ---- the parts ----
 
@@ -144,12 +148,26 @@ function Torso({ profession, ids }: { profession: Profession; ids: Ids }) {
 
   return (
     <g>
-      <Painted d={SWEATER} fill={`url(#${ids.knit})`} />
-      <path d={SWEATER_SHADE} fill={C.knitShade} opacity={0.55} />
-      <path d={CABLES} fill="none" stroke={C.knitLight} strokeWidth={1.4} opacity={0.75} />
-      <path d={RIB_HEM} fill="none" stroke={C.knitShade} strokeWidth={3.2} />
-      <path d="M54 49.5 Q62 55.5 70 49.5" fill="none" stroke={C.knitShade} strokeWidth={3} strokeLinecap="round" />
-      {profession === 'drummer' && <path d="M58 50 L62 52.5 L66 50 L66 55 L62 52.5 L58 55 Z" fill={C.abyss} stroke={LINE} strokeWidth={0.6} />}
+      <Painted d={SHIRT} fill={`url(#${ids.shirt})`} />
+      <path d={SHIRT_SHADE} fill={C.shirtShade} opacity={0.45} />
+      <path d={PLACKET} stroke={C.shirtShade} strokeWidth={0.9} />
+      {BUTTONS.map((y) => (
+        <circle key={y} cx={63.4} cy={y} r={0.75} fill={C.shirtShade} />
+      ))}
+      {profession === 'drummer' ? (
+        <>
+          <Painted d={WAISTCOAT} fill={C.waistcoat} />
+          <path d="M57.5 50 L62 53 L66.5 50 L66.5 55.5 L62 53 L57.5 55.5 Z" fill={C.blood} stroke={LINE} strokeWidth={0.6} />
+          {[74, 80, 86].map((y) => (
+            <circle key={y} cx={62.6} cy={y} r={0.9} fill={C.gold} />
+          ))}
+        </>
+      ) : (
+        <>
+          <path d={BRACES} stroke={C.braces} strokeWidth={2.6} strokeLinecap="round" />
+          <path d={COLLAR} fill={C.shirt} stroke={LINE} strokeWidth={0.6} />
+        </>
+      )}
     </g>
   )
 }
@@ -165,13 +183,7 @@ function Waist({ profession }: { profession: Profession }) {
     )
   }
 
-  return (
-    <g>
-      <Painted d={SLACKS} fill={C.slacks} />
-      <rect x={44} y={88} width={36} height={3} fill={C.shoe} />
-      <rect x={60} y={88.2} width={4} height={2.6} fill={C.brassMid} />
-    </g>
-  )
+  return <Painted d={SLACKS} fill={C.slacks} />
 }
 
 function Leg({ side, profession }: { side: 'back' | 'front'; profession: Profession }) {
@@ -199,31 +211,8 @@ function Leg({ side, profession }: { side: 'back' | 'front'; profession: Profess
   )
 }
 
-// The steel pipe wrench, gripped at the hand and hanging along the leg: the handle, the hook jaw and its
-// knurled adjusting nut, a rust bloom where the jaw meets the handle.
-function Wrench({ ids }: { ids: Ids }) {
-  return (
-    <g>
-      <Painted d="M47.6 97 L51.4 97 L51.4 128 L47.6 128 Z" fill={`url(#${ids.steel})`} />
-      <Painted d="M45 126 L53 126 L53 131 L58.5 131 L58.5 137 L50 137 L50 141 L45 141 Z" fill={`url(#${ids.steel})`} />
-      <rect x={45.4} y={130.5} width={4.4} height={4} fill={C.rust} opacity={0.8} />
-      <path d="M46 133 H50 M46 135 H50" stroke={C.steelShade} strokeWidth={0.6} />
-    </g>
-  )
-}
-
 function Stick({ x }: { x: number }) {
-  return <path d={`M${x} 99 L${x + 18} 88`} stroke={C.goldBright} strokeWidth={1.8} strokeLinecap="round" />
-}
-
-function Sparks() {
-  return (
-    <g className={s.sparks} fill="none" stroke={C.bolt} strokeWidth={0.9} strokeLinecap="round">
-      <path d="M70 98 L67 101 L69 103 L66 106" />
-      <path d="M77 97 L80 100 L78 102 L81 105" />
-      <path d="M73 102 L73 106 L75 108" stroke={C.boltCore} />
-    </g>
-  )
+  return <path className={s.sticks} d={`M${x} ${HAND_Y} L${x + 18} ${HAND_Y - 11}`} stroke={C.goldBright} strokeWidth={1.8} strokeLinecap="round" />
 }
 
 function Hand({ side, profession, ids }: { side: 'back' | 'front'; profession: Profession; ids: Ids }) {
@@ -233,10 +222,8 @@ function Hand({ side, profession, ids }: { side: 'back' | 'front'; profession: P
 
   return (
     <g>
-      {side === 'back' && profession === 'engineer' && <Wrench ids={ids} />}
-      {profession === 'drummer' && <Stick x={x} />}
-      <ellipse cx={x} cy={99} {...fist} stroke={LINE} strokeWidth={0.9} />
-      {side === 'front' && <ellipse cx={x} cy={99} rx={7} ry={7} fill={`url(#${ids.glow})`} className={s.palmGlow} />}
+      <Stick x={x} />
+      <ellipse cx={x} cy={HAND_Y} {...fist} stroke={LINE} strokeWidth={0.9} />
     </g>
   )
 }
@@ -245,82 +232,101 @@ function Arm({ side, profession, ids }: { side: 'back' | 'front'; profession: Pr
   const bare = profession === 'fighter'
   const upperClass = side === 'back' ? s.armBack : s.armFront
   const foreClass = side === 'back' ? s.foreBack : s.foreFront
-  const charged = side === 'front'
+  const front = side === 'front'
 
   return (
     <g className={upperClass}>
-      <Painted d={UPPER_ARM[side]} fill={bare ? `url(#${ids.skin})` : `url(#${ids.knit})`} />
+      <Painted d={UPPER_ARM[side]} fill={bare ? `url(#${ids.skin})` : `url(#${ids.shirt})`} />
       {bare && <path d={side === 'back' ? 'M44 60 L54.5 61' : 'M68 61 L78.5 60'} stroke={C.blood} strokeWidth={3} strokeLinecap="round" />}
       <g className={foreClass}>
-        <Painted d={FOREARM[side]} fill={bare || charged ? `url(#${ids.skin})` : `url(#${ids.knit})`} />
-        {charged && !bare && <Painted d={PUSHED_SLEEVE} fill={C.knit} />}
-        {charged && <path d={VEINS} fill="none" stroke={C.bolt} strokeWidth={0.9} strokeLinecap="round" className={s.veins} />}
-        {!charged && !bare && <path d={CUFF[side]} stroke={C.knitShade} strokeWidth={2.6} />}
+        <Painted d={FOREARM[side]} fill={`url(#${ids.skin})`} />
         {bare && <path d={side === 'back' ? 'M45.5 90 L52.5 90 M45.5 93 L52.5 93' : 'M70 90 L77 90 M70 93 L77 93'} stroke={C.ivory} strokeWidth={2} />}
+        {front && <Coil ids={ids} />}
         <Hand side={side} profession={profession} ids={ids} />
-        {charged && <Sparks />}
-        {charged && <Recorder />}
+        {front && (
+          <>
+            <Sparks />
+            <Coin />
+            <StudyCard />
+            <Handset />
+            <PlateCamera />
+          </>
+        )}
       </g>
+      {!bare && <Painted d={ROLL[side]} fill={`url(#${ids.shirt})`} />}
     </g>
   )
 }
 
 // ---- the action props ----
 
-// The audio diary in the charged hand, shown only while he holds it up as his camera. Drawn turned with the
-// forearm's raised angle undone (about 185 degrees round the hand), so it stands upright by his face.
-function Recorder() {
+// The spark coil taken off a dead machine and strapped over his forearm: a brass bracer, copper windings
+// and a small glass bulb, buckled on with two straps.
+function Coil({ ids }: { ids: Ids }) {
   return (
-    <g className={s.recorder} transform="rotate(185 73.8 99)">
-      <rect x={66} y={88} width={16} height={11} rx={1.5} fill={C.steel} stroke={LINE} strokeWidth={0.8} />
-      <rect x={67.5} y={89.5} width={7} height={6} fill={C.bronze} />
-      <circle cx={69.5} cy={92.5} r={1.4} fill={C.abyss} />
-      <circle cx={72.8} cy={92.5} r={1.4} fill={C.abyss} />
-      <path d="M76 90 V97 M78 90 V97 M80 90 V97" stroke={C.steelShade} strokeWidth={0.7} />
-      <circle cx={68.5} cy={97.3} r={0.9} fill={C.spark} />
+    <g className={s.coil}>
+      <rect x={68.6} y={80} width={10.2} height={12} rx={1.6} fill={`url(#${ids.copper})`} stroke={LINE} strokeWidth={0.8} />
+      <path d="M69 82.5 L78.4 81.5 M69 85 L78.4 84 M69 87.5 L78.4 86.5 M69 90 L78.4 89" stroke={C.copperDark} strokeWidth={0.8} />
+      <path d="M68.4 80.6 H79 M68.4 91.4 H79" stroke={C.shoe} strokeWidth={1.4} />
+      <circle cx={79.6} cy={86} r={1.8} fill={C.bolt} stroke={LINE} strokeWidth={0.5} />
     </g>
   )
 }
 
-// The bolt thrown from the charged hand, forked, with the white core inside the blue.
-function Bolt() {
+// The coil's sparks crawling over his fingers.
+function Sparks() {
   return (
-    <g className={s.bolt} fill="none" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M80 72 L92 66 L89 60 L104 54 L101 48 L118 40" stroke={C.bolt} strokeWidth={3.2} />
-      <path d="M80 72 L92 66 L89 60 L104 54 L101 48 L118 40" stroke={C.boltCore} strokeWidth={1.2} />
-      <path d="M92 66 L106 70 L104 76 L117 78" stroke={C.bolt} strokeWidth={1.8} />
+    <g className={s.sparks} fill="none" stroke={C.bolt} strokeWidth={0.9} strokeLinecap="round">
+      <path d="M70 98 L67 101 L69 103 L66 106" />
+      <path d="M77 97 L80 100 L78 102 L81 105" />
+      <path d="M73 102 L73 106 L75 108" stroke={C.boltCore} />
+      <path d="M80 86 L83 84 L82 88 L85 87" />
     </g>
   )
 }
 
-// The wrench's swing: a pale arc of the head's path, there only in the swing's hit frames.
-function SwingArc() {
-  return <path className={s.arc} d="M30 40 Q64 0 108 52 Q104 92 84 120" fill="none" stroke={C.ivory} strokeWidth={3} strokeLinecap="round" opacity={0} />
+// A coin between his fingers, fed to a machine.
+function Coin() {
+  return <circle className={s.coin} cx={76.4} cy={102.5} r={2.4} fill={C.goldBright} stroke={C.brassDark} strokeWidth={0.6} />
 }
 
-// A brass deco snare at the waist: chevron lugs, the cream head, the gold rims.
-function Snare() {
+// The study card the camera gives, filled in: cream, ruled, a sketch of what he studied in its corner.
+function StudyCard() {
   return (
-    <g>
-      <path d="M78 98 L110 98 L108 114 L80 114 Z" fill={C.brassMid} stroke={LINE} strokeWidth={0.9} />
-      <path d="M82 98 L86 114 M92 98 L94 106 L96 98 M102 98 L102 114" stroke={C.goldBright} strokeWidth={0.9} />
-      <ellipse cx={94} cy={98} rx={16} ry={3.4} fill={C.cream} stroke={C.gold} strokeWidth={1.4} />
-      <path d="M78 113 L44 92" stroke={C.shoe} strokeWidth={1.4} />
-      <g className={s.hitSpark}>
-        <path d="M90 92 L88 86 M96 91 L98 84 M93 92 V83" stroke={C.bolt} strokeWidth={1.1} strokeLinecap="round" />
+    <g className={s.card}>
+      <rect x={72} y={98} width={14} height={10} fill={C.cream} stroke={LINE} strokeWidth={0.6} />
+      <path d="M74 101 H80 M74 103.5 H84 M74 106 H82" stroke={C.sepia} strokeWidth={0.5} />
+      <circle cx={83} cy={100.6} r={1.4} fill={C.blood} />
+    </g>
+  )
+}
+
+// The radio's handset at his ear, drawn turned with the forearm's raised angle undone (about 185 degrees
+// round the hand) so it lies along his jaw.
+function Handset() {
+  return (
+    <g className={s.handset} transform={`rotate(185 ${HAND_X.front} ${HAND_Y})`}>
+      <path d="M70 84 Q73.5 82 77 84 L77 99 Q73.5 101 70 99 Z" fill={C.abyss} stroke={LINE} strokeWidth={0.7} />
+      <rect x={68.5} y={82} width={10} height={5} rx={2} fill={C.cabinetTop} stroke={C.brassMid} strokeWidth={0.6} />
+      <rect x={68.5} y={96} width={10} height={5} rx={2} fill={C.cabinetTop} stroke={C.brassMid} strokeWidth={0.6} />
+    </g>
+  )
+}
+
+// The plate camera held up to his eye: a wooden box, its folded bellows and the lens to the right, and the
+// flash pan over it. Drawn turned like the handset, so it stands upright by his face.
+function PlateCamera() {
+  return (
+    <g className={s.camera} transform={`rotate(185 ${HAND_X.front} ${HAND_Y})`}>
+      <rect x={64} y={87} width={12} height={12} rx={1} fill={C.cabinetTop} stroke={LINE} strokeWidth={0.8} />
+      <path d="M76 88.5 L82 90 L82 96 L76 97.5 Z" fill={C.sepia} stroke={LINE} strokeWidth={0.6} />
+      <path d="M78 89 V97 M80 89.5 V96.5" stroke={C.cabinetMid} strokeWidth={0.6} />
+      <circle cx={83.5} cy={93} r={2.6} fill={C.steelShade} stroke={C.brassMid} strokeWidth={0.8} />
+      <path d="M66 87 V82 M64 82 H74" stroke={C.brassMid} strokeWidth={1.2} />
+      <g className={s.flash}>
+        <circle cx={69} cy={80} r={9} fill={C.boltCore} opacity={0.85} />
+        <circle cx={69} cy={80} r={18} fill={C.ivory} opacity={0.35} />
       </g>
-    </g>
-  )
-}
-
-// The revival chamber's light: a column of sea glow with brass rings where he is put back together.
-function RevivalLight() {
-  return (
-    <g className={s.chamber}>
-      <rect x={34} y={0} width={56} height={172} fill={C.waterGlow} opacity={0.22} />
-      <rect x={52} y={0} width={20} height={172} fill={C.boltCore} opacity={0.25} />
-      <ellipse cx={62} cy={172} rx={30} ry={5} fill="none" stroke={C.gold} strokeWidth={1.6} />
-      <ellipse cx={62} cy={10} rx={30} ry={5} fill="none" stroke={C.gold} strokeWidth={1.6} />
     </g>
   )
 }
@@ -335,28 +341,23 @@ function Gradients({ ids }: { ids: Ids }) {
         <stop offset="0.92" stopColor={HERO_IDENTITY.skin} />
         <stop offset="1" stopColor={C.bronze} />
       </linearGradient>
-      <linearGradient id={ids.knit} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={C.knitLight} />
-        <stop offset="0.45" stopColor={C.knit} />
-        <stop offset="1" stopColor={C.knitShade} />
+      <linearGradient id={ids.shirt} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor={C.ivory} />
+        <stop offset="0.5" stopColor={C.shirt} />
+        <stop offset="1" stopColor={C.shirtShade} />
       </linearGradient>
-      <linearGradient id={ids.steel} x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stopColor={C.steelShade} />
-        <stop offset="0.5" stopColor={C.steel} />
-        <stop offset="1" stopColor={C.steelShade} />
+      <linearGradient id={ids.copper} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor={C.copperDark} />
+        <stop offset="0.5" stopColor={C.copper} />
+        <stop offset="1" stopColor={C.copperDark} />
       </linearGradient>
-      <radialGradient id={ids.glow}>
-        <stop offset="0" stopColor={C.boltCore} stopOpacity={0.9} />
-        <stop offset="0.5" stopColor={C.bolt} stopOpacity={0.5} />
-        <stop offset="1" stopColor={C.bolt} stopOpacity={0} />
-      </radialGradient>
     </defs>
   )
 }
 
 function useIds(): Ids {
   const base = useId().replace(/:/g, '')
-  return { skin: `${base}skin`, knit: `${base}knit`, steel: `${base}steel`, glow: `${base}glow` }
+  return { skin: `${base}skin`, shirt: `${base}shirt`, copper: `${base}copper` }
 }
 
 interface SpriteProps {
@@ -366,8 +367,8 @@ interface SpriteProps {
   className?: string
 }
 
-/** Him as the wrench and charged hand survivor of the undersea city, standing in a profession's kit; a scene
- *  poses his groups from the scroll (pose.ts). */
+/** Him as the passenger who came up out of the sea, standing in a profession's kit; a scene poses his
+ *  groups from its playhead (pose.ts). */
 export function SurvivorSprite({ profession, box, className = '' }: SpriteProps) {
   const ids = useIds()
 
@@ -375,8 +376,7 @@ export function SurvivorSprite({ profession, box, className = '' }: SpriteProps)
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
       <g className={`${s.sprite} ${KIT_CLASS[profession]}`}>
-        <RevivalLight />
-        <ellipse cx={62} cy={172.5} rx={26} ry={3.4} fill={C.abyss} opacity={0.5} />
+        <ellipse className={s.shadow} cx={62} cy={172.5} rx={26} ry={3.4} fill={C.abyss} fillOpacity={0.5} />
         <g className={s.body}>
           <Arm side="back" profession={profession} ids={ids} />
           <Leg side="back" profession={profession} />
@@ -387,11 +387,8 @@ export function SurvivorSprite({ profession, box, className = '' }: SpriteProps)
             <Torso profession={profession} ids={ids} />
             <Head profession={profession} ids={ids} />
           </g>
-          {profession === 'drummer' && <Snare />}
           <Arm side="front" profession={profession} ids={ids} />
-          <SwingArc />
         </g>
-        <Bolt />
       </g>
     </svg>
   )

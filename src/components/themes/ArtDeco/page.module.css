@@ -116,7 +116,7 @@
     justify-self: start;
   }
 
-  /* narrower than the column, against its right edge, so the lobby shows between it and his sign */
+  /* narrower than the column, against its right edge, so the sea shows between it and his sign */
   .machine {
     max-width: 560px;
     justify-self: end;
@@ -275,7 +275,7 @@
   transform: translate3d(0, -4px, 0);
 }
 
-/* ---- the end: the posts and the contact plate over the revival chamber ---- */
+/* ---- the end: the posts and the contact plate over the way back up ---- */
 .goal {
   position: relative;
   display: flex;
@@ -348,7 +348,7 @@
     width: 100%;
   }
 
-  /* The revival plays and holds for most of a screen before the posts and the contact come up over it. */
+  /* The rise to the surface plays and holds for most of a screen before the posts and the contact come up over it. */
   .goal {
     padding-top: 130svh;
   }

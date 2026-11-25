@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
@@ -5,7 +6,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import type { Chamber, ChamberInput } from './chamber'
+import type { Chamber, ChamberInput, RoomLayer } from './chamber'
 import { about } from './chambers/about'
 import { bands } from './chambers/bands'
 import { contact } from './chambers/contact'
@@ -18,10 +19,10 @@ import { ventures } from './chambers/ventures'
 import { work } from './chambers/work'
 import { Canvas, Floor, Front, Hall, Skyline, Water, bubblesWriter } from './city'
 
-// The page as scenes: the station lobby (hero), one chamber per section of the shown profession in reading
-// order, the revival chamber (contact). Each scene names its chamber, its anchor and its chamber's script,
-// which plays on time once the section arrives, whatever the number of its cards (stageItems still counts
-// them for the theatre's settled frame).
+// The page as scenes, one descent and return: the crash at sea (hero), one room of the drowned city per
+// section of the shown profession in reading order, the way back up into morning (contact). Each scene
+// names its room, its anchor and its room's script, which the shared player plays at its own pace whatever
+// the number of its cards (stageItems still counts them for the theatre's settled frame).
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -50,15 +51,23 @@ export interface DecoScene extends TheatreScene, Omit<SceneDef, 'chamber'> {
   slot: SectionSlot | null
 }
 
-const layersOf = (id: SceneId, { light, set, floor }: Chamber, input: ChamberInput): StageLayer[] => [
-  { name: 'sky', node: <Water id={`deco-${id}`} light={light} /> },
-  { name: 'far', node: <Skyline /> },
-  ...(set ? [{ name: 'set', node: set(input) }] : []),
-  { name: 'mid', node: <Hall /> },
-  { name: 'near', node: <Floor /> },
-  { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
-  { name: 'fg', node: <Front /> },
-]
+const layersOf = (id: SceneId, { light, room = {}, set, floor }: Chamber, input: ChamberInput): StageLayer[] => {
+  // the room's own layer, or the city's default one; null leaves it out
+  const layer = (name: RoomLayer, fallback: ReactNode): StageLayer[] => {
+    const own = room[name]
+    if (own === null) return []
+    return [{ name, node: own ? own(input) : fallback }]
+  }
+  return [
+    ...layer('sky', <Water id={`deco-${id}`} light={light} />),
+    ...layer('far', <Skyline />),
+    ...(set ? [{ name: 'set', node: set(input) }] : []),
+    ...layer('mid', <Hall />),
+    ...layer('near', <Floor />),
+    { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
+    ...layer('fg', <Front />),
+  ]
+}
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): DecoScene => {
   const { chamber, ...def } = SCENE_DEFS[id]

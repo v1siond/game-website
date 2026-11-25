@@ -1,8 +1,9 @@
 /*
  * His figure (sprite.tsx): every part turns round its own joint in the viewBox's units (transform-box:
  * view-box), so a forearm turns at the elbow wherever the shoulder took it. The kit classes set a
- * profession's resting pose; a scene's writer (pose.ts) overrides it with inline transforms from the
- * scroll. The bolt, the arc, the diary, the sparks and the chamber rest at opacity 0 until a pose shows them.
+ * profession's resting pose; a scene's writer (pose.ts) overrides it with inline styles from its playhead.
+ * The coil, its sparks, the coin, the study card, the handset, the camera and its flash rest at opacity 0
+ * until a pose shows them; the sticks show at rest for the Musician only.
  */
 
 .sprite * {
@@ -18,25 +19,22 @@
 .thighBack { transform-origin: 54px 96px; }
 .shinBack { transform-origin: 55px 132px; }
 .thighFront { transform-origin: 70px 96px; }
+.shadow { transform-origin: 62px 172px; }
 .shinFront { transform-origin: 69px 132px; }
 
+.coil,
 .sparks,
-.recorder,
-.bolt,
-.chamber,
-.hitSpark,
-.arc {
+.coin,
+.card,
+.handset,
+.camera,
+.flash,
+.sticks {
   opacity: 0;
 }
 
-.palmGlow,
-.veins {
-  opacity: 0.35;
-}
-
-/* ---------------------------------------------------------------- resting poses per kit */
-
-/* both sticks raised over the snare */
+/* both sticks raised */
+.kitSticks .sticks { opacity: 1; }
 .kitSticks .armFront { transform: rotate(-20deg); }
 .kitSticks .foreFront { transform: rotate(-70deg); }
 .kitSticks .armBack { transform: rotate(-25deg); }

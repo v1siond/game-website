@@ -10,8 +10,8 @@ import page from './page.module.css'
 
 // The first screen: his name as the station's gold neon sign over his headline, tagline, contact line and
 // actions on a brass panel, and the city's vending machine beside it where a profession is picked (its
-// outfit plate under his glass), all over the station lobby the bathysphere docks at. Under reduced motion
-// the lobby's picture sits still behind the hero.
+// outfit plate under his glass), all over the crash at sea and the lone tower. Under reduced motion the
+// tower's picture sits still behind the hero.
 
 export function StationHero({ scene, still }: { scene: DecoScene; still: boolean }) {
   const { navigation } = useLabels()

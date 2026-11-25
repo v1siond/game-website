@@ -22,19 +22,17 @@ import page from './ArtDeco/page.module.css'
 // The world's own lettering: the root carries its --deco-face variable and the world's css reads it.
 const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--deco-face' })
 
-// Art Deco: his CV as a descent through the 1920s city at the bottom of the sea, in brass, gold and
-// lamplight. The page keeps the rhythm of the Rockstar VI site: a big hero (the station lobby the
-// bathysphere docks at, his name in gold neon and the vending machine he picks a profession at), then every
-// section of the shown profession is one full screen chamber that rises from dark, holds while its cards
-// scroll over it, and sinks into dark while the next chamber rises: the power station, the diary archive,
-// the glass tunnel, the telekinesis hall, the pipe works, propaganda square, theatre row, the fight club, and
-// the revival chamber at the end. He is the survivor with the wrench and the charged hand, after the art
-// deco shooter the world is drawn from, and each chamber plays one to three different moves of that game
-// once its section arrives, on time and at the same speed however the page is scrolled, then holds the end
-// frame: the bathysphere docks, a bolt then the wrench, the camera flash, a turret hacked from one knee, a
-// crate flung, a ride on the overhead rail, a trap laid, the snare's spark, a knee and a kick, the revival
-// chamber. The layers' push in still follows the scroll (the shared theatre on useScrollStage). The text
-// is plain HTML in the page flow over the fixed theatre of pictures, opaque from its first frame.
+// Art Deco: his CV as one descent and return, the story of the undersea deco shooter the world is drawn
+// from, in brass, gold and lamplight. The page keeps the rhythm of the Rockstar VI site: a big hero (the crash
+// at sea and the lone tower, his name in gold neon and the vending machine he picks a profession at), then
+// every section of the shown profession is one full screen room of the drowned city that rises from dark,
+// holds while its cards scroll over it, and sinks into dark while the next room rises, in the game's order:
+// the sphere's descent, the flooded reception hall, the clinic corridor, the machine gallery, the vaulted
+// gallery, the greenhouse, the ballroom, the pump hall, and the way back up into morning at the end. He is a
+// passenger in his own shirt, and each room plays one to three different actions of its beat on the shared
+// scene player, at its own pace however the page is scrolled, then holds the end frame. The layers' push in
+// still follows the scroll (the shared theatre on useScrollStage). The text is plain HTML in the page flow
+// over the fixed theatre of pictures, opaque from its first frame.
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.

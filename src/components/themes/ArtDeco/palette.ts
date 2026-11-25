@@ -62,6 +62,9 @@ export const DECO_COLORS = {
   diaryCard: '#0d2a42',
   diaryCardDeep: '#071624',
 
+  // A machine's lamp once it is on his side
+  allClear: '#3fe0b0',
+
   // Neon and the spark of an overload
   neonPink: '#FF0066',
   spark: '#ff5a3c',
@@ -73,21 +76,57 @@ export const DECO_COLORS = {
   // valance and the board under the vending machine's thin marquee letters
   bloodDeep: '#3F0000',
 
-  // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue
-  // crackle of the electric charge in his veins
-  knit: '#7c7a74',
-  knitShade: '#4a4843',
-  knitLight: '#a3a19a',
+  // His painted costume: a passenger's white shirt with its sleeves rolled, the braces, the waistcoat the
+  // Musician wears over it, the slacks and shoes; the spark coil's copper and the blue of its spark
+  shirt: '#e9e4d8',
+  shirtShade: '#a9aab0',
+  braces: '#5a2a1c',
+  waistcoat: '#262a36',
   slacks: '#2e2b27',
   shoe: '#3a2414',
+  copper: '#b8673a',
+  copperDark: '#6e3418',
   steel: '#9aa0a4',
   steelShade: '#4f5458',
-  rust: '#8a4320',
   bolt: '#7fe0ff',
   boltCore: '#effcff',
 
-  // The revival chamber's life light
-  revival: '#3fe0b0',
+  // The night sea of the crash: the sky, the black water, the moon's path on it and the burning fuel
+  nightSky: '#081426',
+  nightHorizon: '#1a2c48',
+  nightSea: '#040b16',
+  moonPath: '#9fb6d6',
+  fire: '#ff8a1c',
+  fireCore: '#ffd75a',
+  smoke: '#1c1a1c',
+  plane: '#c9cdd2',
+  planeShade: '#7d848c',
+
+  // The rooms: the clinic's tiles, the greenhouse's leaves, the ballroom's walls and the pump hall's paint
+  tile: '#b9c9bd',
+  tileShade: '#7d9384',
+  leaf: '#2f6b4a',
+  leafDark: '#173d2b',
+  ballroom: '#3a0d14',
+  pumpWall: '#1d2a26',
+
+  // The city's people: a tenant's rags, the tonic's glow in his eyes, the little one's raincoat and her lamp,
+  // the guardian's copper, the giant's swollen glow
+  rags: '#4b4036',
+  ragsDark: '#2a231d',
+  barnacle: '#c8c0a8',
+  tonic: '#b6ff6a',
+  raincoat: '#e6b422',
+  raincoatShade: '#a57a10',
+  lamp: '#ffd98a',
+  giantGlow: '#ff5a2a',
+
+  // The morning at the surface
+  dawnSky: '#f4c890',
+  daySky: '#8cc4e8',
+  daySea: '#2e7fa6',
+  stone: '#c9a27a',
+  stoneShade: '#8e6a48',
 
   // The project photographs' paper, top to foot
   photoPaper: '#f6ecd6',

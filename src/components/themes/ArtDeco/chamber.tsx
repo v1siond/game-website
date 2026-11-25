@@ -5,10 +5,11 @@ import { fx } from '../shared/stageNodes'
 import { FLOOR, Survivor, placeSurvivor } from './city'
 import { decoJoints, setDecoPose, type DecoPose } from './pose'
 
-// What every chamber of the city is, and the fight a section plays in it: one room, its foe and its machines
-// at fixed places round the spot he holds, and a short script of one to three different actions that plays
-// on time once the section arrives (src/lib/scroll/player.ts), at the same speed however the page is
-// scrolled, then holds its end frame. Nothing steps per card and the floor never slides under him.
+// What every room of the descent is, and the beat a section plays in it: one place, who he meets there and
+// what stands in it, at fixed places round the spot he holds, and a short script of one to three different
+// actions played by the shared scene player (src/lib/scroll/player.ts) at its own pace, then its end frame
+// held. Nothing steps per card and the floor never slides under him. A room keeps the city's default layers
+// (the water, the far towers, the hall's brass frame, the marble floor and the kelp) or draws its own.
 
 export interface ChamberInput {
   profession: Profession
@@ -16,12 +17,17 @@ export interface ChamberInput {
   phone: boolean
 }
 
-/** A scene's picture as the theatre runs it: its light, its script, an optional set of its own between the
- *  hall and the floor, what stands on its floor (him among it), and the binder that finds the nodes it moves
- *  once and returns the writer for a playhead. */
+/** The theatre's layers a room can draw for itself; null leaves the layer out. */
+export type RoomLayer = 'sky' | 'far' | 'mid' | 'near' | 'fg'
+export type Room = Partial<Record<RoomLayer, ((input: ChamberInput) => ReactNode) | null>>
+
+/** A scene's picture as the theatre runs it: its light, its script, the layers of its own room, an optional
+ *  set between the far layer and the frame, what stands on its floor (him among it), and the binder that
+ *  finds the nodes it moves once and returns the writer for a playhead. */
 export interface Chamber {
   light: string
   script: SceneScript
+  room?: Room
   set?: (input: ChamberInput) => ReactNode
   floor: (input: ChamberInput) => ReactNode
   bind: (stage: ParentNode, input: ChamberInput) => (play: Playhead) => void
@@ -52,22 +58,24 @@ const fightScale = (input: ChamberInput): string | undefined => {
   return `translate(${x} ${FLOOR}) scale(${PHONE_SCALE}) translate(${-x} ${-FLOOR})`
 }
 
-/** A section's fight: its room drawn round the spot he holds (x 0 his place, y 0 the floor), behind him and
+/** A section's beat: its room drawn round the spot he holds (x 0 his place, y 0 the floor), behind him and
  *  in front of him, and the binder whose writer moves the room and returns his frame at a playhead. */
 export interface Fight {
   light: string
   script: SceneScript
+  room?: Room
   set?: (input: ChamberInput) => ReactNode
   back: (input: ChamberInput) => ReactNode
   front?: (input: ChamberInput) => ReactNode
   bind: (stage: ParentNode, input: ChamberInput) => (play: Playhead) => Frame
 }
 
-/** A section's fight as a chamber: its room behind him, him, its room in front, all in one camera group an
+/** A section's beat as a chamber: its room behind him, him, its room in front, all in one camera group an
  *  action can push in on. */
 export const fightChamber = (fight: Fight): Chamber => ({
   light: fight.light,
   script: fight.script,
+  room: fight.room,
   set: fight.set,
   floor: (input) => (
     <g transform={fightScale(input)}>

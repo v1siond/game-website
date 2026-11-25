@@ -13,9 +13,8 @@ import { LAYER_MOTION, type DecoScene } from './scenes'
 import page from './page.module.css'
 
 // The page's fixed gauge bar and its end. The bar is a brass strip across the top with his initials, back
-// to the top. The end is the revival
-// chamber: his latest posts on a brass panel, then the contact plate with his line and the ways to reach
-// him, over the chamber where he comes back.
+// to the top. The end is the way back up into morning: his latest posts on a brass panel, then the contact
+// plate with his line and the ways to reach him, over the sphere surfacing at the tower's dock.
 
 /** The gauge bar: his initials, back to the top of the page. */
 export function GaugeBar({ anchor }: { anchor: string }) {
@@ -60,7 +59,7 @@ function DecoPosts() {
   )
 }
 
-/** The end of the page: the posts, then the contact plate, over the revival chamber. */
+/** The end of the page: the posts, then the contact plate, over the sphere at the tower's dock. */
 export function RevivalContact({ scene, still }: { scene: DecoScene; still: boolean }) {
   const { sections, blog } = useLabels()
   return (

@@ -1,104 +1,98 @@
 import { ramp } from '@/lib/scroll/stage'
-import { drop, hop } from '@/lib/motion/arc'
-import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
+import { bell, fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
 import { fightChamber, share } from '../chamber'
-import { Canvas, FLOOR } from '../city'
-import { Raider, foeOf } from '../foes'
-import { hang, landed } from '../pose'
+import { Canvas } from '../city'
+import { Crawler } from '../cast'
+import { aim, study } from '../pose'
 
-// Projects: the pipe works under the research lab, a freight rail running overhead, the way the game's
-// sky rails carry its hero over a fight. A raider guards a valve; he leaps up onto the rail's hook, rides it
-// in, and drops on the raider with the wrench; the pipe glows teal past the valve, the flow reaches the
-// lab's shutter and it rolls up on the lit lab.
+// Projects: the camera. A gallery under a vaulted ceiling, crates stacked below. Something long limbed
+// clings to the ceiling over him. He raises his plate camera to it; the flash freezes it white, and a study
+// card slides out of the camera filled in; then it drops, misses him and scuttles off along the wall. The
+// end frame is the study card in his hand and the ceiling empty.
 
-const FOE = 330
-// The rail runs this high: his hands on the hook put his soles this far up.
-const RAIL = -560
-const ON_RAIL = 240
-// He rides in to here, just short of the raider.
-const RIDE = FOE - 120
-const SHUTTER = { x: 1200, width: 320, top: 260, height: 360 }
+// The crawler clings here (its ceiling point), drops to the floor here, and runs off to here.
+const CLING = { x: 300, y: -720 }
+const LAND = 360
+const GONE = 760
 
-/** The lab's shutter on the back wall over its lit window, and the pipe the flow runs along. */
-function Lab() {
+/** The vaulted ceiling: brass ribs springing from both sides into pointed deco arches over the gallery. */
+function Vault() {
   return (
     <Canvas>
-      <rect x={SHUTTER.x} y={SHUTTER.top} width={SHUTTER.width} height={SHUTTER.height} fill={C.machineGlass} stroke={C.gold} strokeWidth="5" />
-      <path d={`M${SHUTTER.x + 40} ${SHUTTER.top + SHUTTER.height} V${SHUTTER.top + 140} H${SHUTTER.x + 280} V${SHUTTER.top + SHUTTER.height}`} fill="none" stroke={C.tealLight} strokeWidth="4" opacity="0.7" />
-      <clipPath id="deco-lab-window">
-        <rect x={SHUTTER.x} y={SHUTTER.top} width={SHUTTER.width} height={SHUTTER.height} />
-      </clipPath>
-      <g clipPath="url(#deco-lab-window)">
-        <g data-fx="shutter">
-          {Array.from({ length: 12 }, (_, i) => (
-            <rect key={i} x={SHUTTER.x} y={SHUTTER.top + i * 30} width={SHUTTER.width} height={28} fill={C.brassShadow} stroke={C.brassLine} strokeWidth="2" />
-          ))}
+      <path d="M-200 0 H1800 V160 H-200 Z" fill={C.cabinetMid} />
+      {[-100, 300, 700, 1100, 1500].map((x) => (
+        <g key={x}>
+          <path d={`M${x - 200} 300 Q${x - 200} 160 ${x} 160 Q${x + 200} 160 ${x + 200} 300`} fill="none" stroke={C.brassMid} strokeWidth="10" />
+          <path d={`M${x - 200} 300 V880 M${x + 200} 300 V880`} stroke={C.brassDark} strokeWidth="14" />
+          <path d={`M${x - 140} 300 Q${x - 140} 210 ${x} 210 Q${x + 140} 210 ${x + 140} 300`} fill="none" stroke={C.brassLine} strokeWidth="5" />
         </g>
-      </g>
-      <path d={`M120 ${FLOOR - 320} H${SHUTTER.x}`} stroke={C.steelShade} strokeWidth="22" />
-      <path data-fx="flow" d={`M120 ${FLOOR - 320} H${SHUTTER.x}`} stroke={C.tealLight} strokeWidth="10" opacity="0" />
+      ))}
+      <path d="M-200 160 H1800" stroke={C.gold} strokeWidth="4" />
     </Canvas>
   )
 }
 
-// The stem runs up to the flow pipe at FLOOR - 320 whatever the row's size.
-const STEM = 320
-
-function Valve() {
+/** Two crates stacked, lettered with a stencilled number only. */
+function Crates() {
   return (
-    <g transform={`translate(${FOE + 120} 0)`}>
-      <rect x={-10} y={-STEM} width={20} height={STEM} fill={C.steelShade} />
-      <circle cx={0} cy={-170} r={40} fill="none" stroke={C.blood} strokeWidth="9" />
-      <path d="M-40 -170 H40 M0 -210 V-130" stroke={C.blood} strokeWidth="6" />
-      <circle cx={0} cy={-170} r={9} fill={C.gold} />
-    </g>
-  )
-}
-
-function Flowing() {
-  return (
-    <g transform={`translate(${FOE + 120} 0)`}>
-      <circle cx={0} cy={-170} r={80} fill={C.tealLight} opacity="0.18" />
-      <rect x={-5} y={-STEM} width={10} height={STEM} fill={C.tealLight} opacity="0.8" />
+    <g>
+      <rect x={0} y={-110} width={130} height={110} fill={C.cabinetTop} stroke={C.brassDark} strokeWidth="4" />
+      <path d="M0 -110 L130 0 M130 -110 L0 0" stroke={C.brassLine} strokeWidth="5" />
+      <rect x={30} y={-200} width={100} height={90} fill={C.cabinetTop} stroke={C.brassDark} strokeWidth="4" />
+      <path d="M50 -170 H110 M50 -140 H96" stroke={C.brassDark} strokeWidth="6" />
     </g>
   )
 }
 
 export const projects = fightChamber({
-  light: C.tealLight,
-  script: [1200, 1300, 1500],
-  set: () => <Lab />,
+  light: C.mist,
+  script: [1300, 1500, 1800],
+  room: { mid: () => <Vault /> },
   back: () => (
     <>
-      <path d={`M-260 ${RAIL} H${FOE + 260}`} stroke={C.brassDark} strokeWidth="12" />
-      <Valve />
-      <g data-fx="flowing" opacity="0">
-        <Flowing />
+      <g transform="translate(420 0)">
+        <Crates />
       </g>
-      <g transform={`translate(${FOE} 0)`}>
-        <Raider name="raider" />
+      <g data-fx="clinger" transform={`translate(${CLING.x} ${CLING.y})`}>
+        <Crawler name="crawler" />
+      </g>
+      <g data-fx="frozen" opacity="0" transform={`translate(${CLING.x} ${CLING.y})`}>
+        <ellipse cx={-10} cy={70} rx={160} ry={70} fill={C.ivory} opacity="0.5" />
       </g>
     </>
   ),
+  front: () => (
+    <g data-fx="whiteout" opacity="0">
+      <rect x={-1400} y={-1100} width={2800} height={1400} fill={C.ivory} />
+    </g>
+  ),
   bind: (stage, { profession }) => {
-    const foe = foeOf(stage, 'raider')
-    const flowing = fx(stage, 'flowing')
-    const shutter = fx(stage, 'shutter')
-    const flow = fx(stage, 'flow')
+    const clinger = fx(stage, 'clinger')
+    const frozen = fx(stage, 'frozen')
+    const whiteout = fx(stage, 'whiteout')
     return (play) => {
-      const up = share(play, 0)
-      const ride = share(play, 1)
-      const fall = share(play, 2)
-      foe(fall, null, [0.3, 0.6])
-      fadeTo(flowing, ramp(fall, 0.55, 0.8))
-      const open = ramp(fall, 0.7, 1)
-      fadeTo(flow, open)
-      transformTo(shutter, `translate(0 ${(-open * SHUTTER.height).toFixed(1)})`)
-      const dropped = ramp(fall, 0, 0.35)
-      const lift = fall > 0 ? ON_RAIL - drop(dropped, ON_RAIL) : ON_RAIL * up + hop(up, 60)
-      const pose = fall > 0 ? landed(profession, ramp(fall, 0, 0.6)) : hang(profession, ramp(up, 0, 0.6))
-      return { pose, ahead: RIDE * ride, lift }
+      const aimed = share(play, 0)
+      const flashed = share(play, 1)
+      const scattered = share(play, 2)
+      // the flash goes off and lights the thing frozen on the ceiling, then the light ebbs
+      const flash = bell(flashed, 0, 0.3)
+      fadeTo(whiteout, 0.55 * flash)
+      fadeTo(frozen, ramp(flashed, 0.05, 0.15) * (1 - ramp(flashed, 0.6, 0.9)))
+      // it drops, turned over in the fall so it lands crouched on the same limbs, then runs off along the wall
+      const fall = ramp(scattered, 0.1, 0.4)
+      const run = ramp(scattered, 0.45, 1)
+      const x = lerp(CLING.x, LAND, fall) + (GONE - LAND) * run
+      const y = lerp(CLING.y, 0, fall * fall)
+      const turn = 1 - 2 * ramp(scattered, 0.15, 0.35)
+      transformTo(clinger, `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(1 ${turn.toFixed(3)})`)
+      fadeTo(clinger, 1 - ramp(run, 0.8, 1))
+      if (flashed === 0) return { pose: aim(profession, aimed), ahead: 0, lift: 0 }
+      // the study card slides out of the camera filled in as the flash ebbs
+      if (scattered === 0) return { pose: { ...aim(profession, 1), flash, card: ramp(flashed, 0.5, 0.9) }, ahead: 0, lift: 0 }
+      // he flinches back from the drop, then reads the card
+      const flinch = bell(scattered, 0.25, 0.55)
+      return { pose: { ...study(profession, ramp(scattered, 0.3, 0.8)), card: 1, lean: -6 * flinch }, ahead: -30 * flinch, lift: 0 }
     }
   },
 })
