@@ -93,12 +93,16 @@ export function mixPose(a: PursuerPose, b: PursuerPose, t: number): PursuerPose 
   }
 }
 
+// The key of a pace's cycle at step `key`, for a pursuer left of the stage's origin too: a room on the left of
+// the cards starts its walk off the left edge, where the distance and so the step count are below 0.
+const cycle = (key: number): number => ((key % 4) + 4) % 4
+
 /** The pose `distance` stage units into a pace at stage scale `scale`: the legs keep to the floor it covers. */
 export function stride(pace: Pace, distance: number, scale: number): PursuerPose {
   const half = (distance / (pace.step * scale)) * 2
   const key = Math.floor(half)
-  const from = PURSUER_POSES[pace.keys[key % 4]]
-  const to = PURSUER_POSES[pace.keys[(key + 1) % 4]]
+  const from = PURSUER_POSES[pace.keys[cycle(key)]]
+  const to = PURSUER_POSES[pace.keys[cycle(key + 1)]]
   return mixPose(from, to, half - key)
 }
 

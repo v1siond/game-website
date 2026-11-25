@@ -26,7 +26,8 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
 const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG, scene.def.script)
+export const theatreScene = (scene: Scene): TheatreScene =>
+  figureScene(scene.id, scene.layout, (stage) => scene.def.bind(stage, scene.layout), SURVIVOR_RIG, scene.def.script)
 
 const plane = (scene: Scene, children: ReactNode): ReactNode => (
   <svg viewBox={VIEW[scene.layout.phone ? 'phone' : 'wide']} preserveAspectRatio="xMidYMax slice" focusable="false">
@@ -61,7 +62,10 @@ const layersOf = (scene: Scene): StageLayer[] => [
   },
 ]
 
+/** The vignette and the scrim under the cards, on the side they sit from lg. */
+const SCRIM: Record<Scene['layout']['side'], string> = { right: '', left: css.cardsRight }
+
 /** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
 export const SurvivorStage = memo(function SurvivorStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.camera} />
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={`${css.camera} ${SCRIM[scene.layout.side]}`} />
 })

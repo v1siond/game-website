@@ -3,7 +3,7 @@
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ContactPlates } from './actions'
-import { PANEL_HEADING, sectionHeadingId } from './panels'
+import { PANEL_HEADING, PANEL_SIDE, sectionHeadingId } from './panels'
 import type { Scene } from './scenes'
 import { SurvivorStage } from './stage'
 import look from './world.module.css'
@@ -20,8 +20,8 @@ export function Letter({ scene, still }: { scene: Scene; still: boolean }) {
   return (
     <section data-scene="contact" aria-labelledby={HEADING} className="relative px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[4vw]">
       {still && <SurvivorStage scene={scene} settled />}
-      <div className="min-h-[80svh] motion-reduce:min-h-[70svh]" aria-hidden="true" />
-      <div className={`relative p-4 sm:p-6 lg:w-[min(42rem,46vw)] ${look.panel}`}>
+      <div className="min-h-[80svh] motion-reduce:min-h-[70svh] max-md:min-h-[130svh]" aria-hidden="true" />
+      <div className={`relative p-4 sm:p-6 lg:w-[min(42rem,46vw)] ${PANEL_SIDE[scene.layout.side]} ${look.panel}`}>
         <h2 id={HEADING} className={PANEL_HEADING}>
           {sections.contact}
         </h2>

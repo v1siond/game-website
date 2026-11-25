@@ -38,7 +38,11 @@ export const GROUND = 262
  *  it and the dark floor before it, so the floor he stands on sits above the panel that scrolls up. */
 export const VIEW: Record<'wide' | 'phone', string> = { wide: '0 0 600 300', phone: '100 -160 400 640' }
 
-type Layout = PropLayout
+/** The half of the screen a scene plays on: right of its section's cards, or left of them. */
+export type Side = 'right' | 'left'
+
+/** The props' layout, the side the scene plays on and the band of the room its places are shares of. */
+type Layout = PropLayout & { side: Side; band: readonly [number, number] }
 
 export type SurvivorState = FigureState<SurvivorPose>
 
@@ -53,9 +57,17 @@ export interface SceneDef {
 }
 
 // Where the action plays: the stretch of the room right of the text column that every wide screen shows
-// beside it, the middle a phone shows. Places are given as a share u of it, 0 its left end, 1 its right.
-const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [322, 468], phone: [205, 400] }
-const at = ({ phone }: Layout, u: number): number => lerp(...BAND[phone ? 'phone' : 'wide'], u)
+// beside it, or about as wide a stretch left of it when the cards sit on the right, each kept a little in from
+// the panel's edge so what runs to the band's ends (the pursuer behind him, his flight over the cabinet) stays
+// clear of it; on a phone the middle it shows, moved toward the half its section names. Places are given as a
+// share u of it, 0 its left end, 1 its right, so every room keeps its order of places on either side. The
+// hero keeps the wide right and the phone's middle.
+const BAND: Record<'wide' | 'phone', Record<Side, readonly [number, number]>> = {
+  wide: { right: [330, 468], left: [126, 262] },
+  phone: { right: [260, 455], left: [150, 345] },
+}
+const HERO_BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [322, 468], phone: [205, 400] }
+const at = ({ band }: Layout, u: number): number => lerp(...band, u)
 
 const K = 0.72
 const NONE = (): ReactNode => null
@@ -567,19 +579,29 @@ export interface Scene {
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => ({
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean, side: Side, band: readonly [number, number]): Scene => ({
   id,
   def: SCENE_DEFS[id],
-  layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone),
+  layout: { ...propLayout(items, band, phone), side, band },
   kit: profession,
   slot,
 })
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 
+/** The side of the section at `index` of the page (0 the first after the hero): the first plays right of its
+ *  cards, the next left of them, and so on up to the contact. Below lg the cards are stacked under the room
+ *  and the side names the half of its band he acts in. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
+
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
-export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, aboutItems: number, labels: RecordWords): Scene[] => [
-  sceneOf('hero', null, NO_ITEMS, profession, phone),
-  ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, aboutItems), profession, phone)),
-  sceneOf('contact', null, NO_ITEMS, profession, phone),
-]
+export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, aboutItems: number, labels: RecordWords): Scene[] => {
+  const mode = phone ? 'phone' : 'wide'
+  const section = (id: SceneId, slot: SectionSlot | null, items: StageItems, index: number): Scene =>
+    sceneOf(id, slot, items, profession, phone, sideOf(index), BAND[mode][sideOf(index)])
+  return [
+    sceneOf('hero', null, NO_ITEMS, profession, phone, 'right', HERO_BAND[mode]),
+    ...slots.map((slot, i) => section(slot.id, slot, stageItems(slot, labels, aboutItems), i)),
+    section('contact', null, NO_ITEMS, slots.length),
+  ]
+}

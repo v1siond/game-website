@@ -14,6 +14,16 @@
     linear-gradient(to right, color-mix(in srgb, var(--sh-void) 55%, transparent), transparent 50%);
 }
 
+/* From lg every other section keeps its panel on the right, so its camera looks a little left and the
+   scrim lies under the panel there. */
+@media (min-width: 1024px) {
+  .cardsRight::after {
+    background:
+      radial-gradient(ellipse at 40% 40%, transparent 30%, color-mix(in srgb, var(--sh-void) 85%, transparent) 100%),
+      linear-gradient(to left, color-mix(in srgb, var(--sh-void) 55%, transparent), transparent 50%);
+  }
+}
+
 @media (max-width: 1023.98px) {
   .camera::after {
     background:
