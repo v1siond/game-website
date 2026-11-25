@@ -1,9 +1,9 @@
 import { clamp01 } from '@/lib/scroll/progress'
 import type { Era } from './palette'
-import { HUB_ERA, type Action, type PropKind, type RoomId } from './plan'
+import { HUB_ERA, type RoomId } from './plan'
 
-// The corridor: one tunnel along z, seen head on from a camera at camZ. Every plane (a rib, a gate, a prop,
-// a vista, a turning decor ring) sits at a fixed world position, and its screen scale is focal / depth, so
+// The corridor: the time machine's passage between eras, one tunnel along z, seen head on from a camera at
+// camZ. Every plane (a rib, a gate, a turning decor ring) sits at a fixed world position, and its screen scale is focal / depth, so
 // far planes are small at the vanishing point and grow as the camera comes. Planes far away fade up out of
 // the dark and planes passing the camera grow and fade. The planes are laid out far first, so the DOM order
 // is the depth order and no z-index ever changes. Nothing here touches the DOM: the stage (corridor.tsx)
@@ -14,49 +14,36 @@ export const FLOOR = 420
 export const TH = 1500
 /** The runner's depth in front of the camera. */
 export const DF = 520
-/** Prop to prop along the room. */
+/** Card to card along the room: the camera's travel while one card scrolls by. */
 export const STEP = 330
 
-const LEAD = 700 // gate to first prop
-const TAIL = 620 // last prop to vista
-const GAP = 2000 // vista to next gate: the dark between eras
+const LEAD = 700 // gate to the first card's mark
+const TAIL = 620 // the last card's mark to the room's end
+const GAP = 2000 // a room's end to the next gate: the dark between eras
 const HUB_RING = 1250
 const RIB = 420
 const FAR = 6200
 const FAR_FULL = 4300
 const CY = FLOOR - TH / 2 // the tunnel's centre line
 
-export type PlaneKind = 'rib' | 'gate' | 'door' | 'vista' | 'decor' | 'prop'
+export type PlaneKind = 'rib' | 'gate' | 'decor'
 
 // Raster scale per kind: a plane is laid out at world size x RASTER and scaled by 1 / RASTER on top, so a
 // huge gate is rasterised at a size the GPU keeps cheaply.
-export const RASTER: Record<PlaneKind, number> = { rib: 0.35, gate: 0.3, door: 0.3, vista: 0.32, decor: 0.35, prop: 0.6 }
+export const RASTER: Record<PlaneKind, number> = { rib: 0.35, gate: 0.3, decor: 0.35 }
 
 // Where each kind fades as it nears the camera: gone at the first depth, whole at the second.
 const NEAR: Record<PlaneKind, readonly [number, number]> = {
   rib: [60, 300],
   gate: [130, 560],
-  door: [130, 560],
-  vista: [160, 620],
   decor: [160, 600],
-  prop: [260, 430],
 }
-
-/** What a prop needs from its item: the relic tier of a job, whether a venture is his own product. */
-export interface PropMeta {
-  relic?: Relic
-  featured?: boolean
-}
-
-export type Relic = 'platinum' | 'gold' | 'sapphire'
 
 export interface RoomSpec {
   id: RoomId
   era: Era
-  prop: PropKind
-  action: Action
-  door: boolean
-  metas: PropMeta[]
+  /** How many cards the room's section shows. */
+  items: number
 }
 
 export interface Plane {
@@ -73,24 +60,21 @@ export interface Plane {
   spin: number
   /** Degrees a decor sways either way as the camera travels. */
   sway: number
-  prop: { kind: PropKind; meta: PropMeta; room: number; item: number } | null
 }
 
+/** Where the camera stands while a card is on the reading line. */
 export interface ItemSpot {
   z: number
-  side: 1 | -1
-  x: number
 }
 
 export interface RoomGeometry {
   id: RoomId
   era: Era
-  action: Action
   gate: number
   items: ItemSpot[]
+  /** The room's far end, where its set piece hands back to the passage. */
   vista: number
-  door: number | null
-  /** The last solid plane of the room before: the hub ring or its vista. */
+  /** Where the room before ended: the hub ring or its far end. */
   from: number
 }
 
@@ -104,10 +88,10 @@ export interface Corridor {
 /** A decor's place and turn per era; its art is in eras.tsx. */
 export const DECOR: Partial<Record<Era, { y: number; spin: number; sway: number }>> = {
   hub: { y: CY, spin: 0.06, sway: 0 },
-  observatory: { y: CY, spin: 0.03, sway: 0 },
-  keystone: { y: -TH * 0.125, spin: -0.05, sway: 0 },
-  arena: { y: FLOOR - TH * 0.42, spin: 0, sway: 18 },
-  beacon: { y: CY, spin: 0.04, sway: 0 },
+  village: { y: CY, spin: 0.03, sway: 0 },
+  trial: { y: -TH * 0.125, spin: -0.05, sway: 0 },
+  sky: { y: FLOOR - TH * 0.42, spin: 0, sway: 18 },
+  saved: { y: CY, spin: 0.04, sway: 0 },
 }
 
 const plane = (kind: PlaneKind, era: Era, z: number, key: string, extra: Partial<Plane> = {}): Plane => ({
@@ -121,7 +105,6 @@ const plane = (kind: PlaneKind, era: Era, z: number, key: string, extra: Partial
   dim: 1,
   spin: 0,
   sway: 0,
-  prop: null,
   ...extra,
 })
 
@@ -138,31 +121,21 @@ const ribs = (era: Era, from: number, to: number, dim: number, key: string): Pla
 }
 
 /**
- * Lays the corridor out along z: the hub, then per room its dark approach ribs, its gate, its ribs and one
- * prop per item in two lanes, the keystone door when the room has one, its decor and its vista.
+ * Lays the corridor out along z: the hub, then per room its dark approach ribs, its gate, its ribs, one mark
+ * per card where the camera stands while that card is read, and its decor at the far end.
  */
 export function layoutCorridor(specs: readonly RoomSpec[], phone: boolean): Corridor {
   const tw = phone ? 1150 : 2400
-  // Desktop keeps the left lane nearer the middle: the text column covers the left of the screen.
-  const lanes = phone ? [230, -230] : [400, -240]
   const planes: Plane[] = [plane('gate', HUB_ERA, HUB_RING, 'hub-gate'), ...decorPlane(HUB_ERA, HUB_RING - 12), ...ribs(HUB_ERA, RIB, HUB_RING, 1, 'hub-rib')]
   const rooms: RoomGeometry[] = []
 
-  specs.reduce((behind, spec, r) => {
+  specs.reduce((behind, spec) => {
     const gate = behind + GAP
     planes.push(...ribs(spec.era, behind + RIB, gate - RIB / 2, 0.4, `${spec.id}-dark`), plane('gate', spec.era, gate, `${spec.id}-gate`))
-    const items = spec.metas.map((meta, i): ItemSpot => {
-      const z = gate + LEAD + i * STEP
-      const x = lanes[i % 2]
-      planes.push(plane('prop', spec.era, z, `${spec.id}-prop-${i}`, { x, y: FLOOR, anchor: 'bottom', prop: { kind: spec.prop, meta, room: r, item: i } }))
-      return { z, side: i % 2 ? -1 : 1, x }
-    })
-    const last = items[items.length - 1].z
-    const door = spec.door ? last + TAIL * 0.55 : null
-    if (door !== null) planes.push(plane('door', spec.era, door, `${spec.id}-door`))
-    const vista = last + TAIL
-    planes.push(...ribs(spec.era, gate + RIB / 2, vista, 1, `${spec.id}-rib`), ...decorPlane(spec.era, vista - 14), plane('vista', spec.era, vista, `${spec.id}-vista`))
-    rooms.push({ id: spec.id, era: spec.era, action: spec.action, gate, items, vista, door, from: behind })
+    const items = Array.from({ length: Math.max(1, spec.items) }, (_, i): ItemSpot => ({ z: gate + LEAD + i * STEP }))
+    const vista = items[items.length - 1].z + TAIL
+    planes.push(...ribs(spec.era, gate + RIB / 2, vista, 1, `${spec.id}-rib`), ...decorPlane(spec.era, vista - 14))
+    rooms.push({ id: spec.id, era: spec.era, gate, items, vista, from: behind })
     return vista
   }, HUB_RING)
 
@@ -194,18 +167,18 @@ export interface RoomMarks {
 
 export interface PageMarks {
   heroHeight: number
-  /** How far down the screen a card's centre meets its prop (the reading line), in pixels. */
+  /** How far down the screen a card's centre is read (the reading line), in pixels. */
   reading: number
   maxScroll: number
 }
 
-/** The depth the camera leaves a room at: just past its last prop. */
+/** The depth the camera leaves a room at: just past its last card's mark. */
 const leaveDepth = (room: RoomGeometry): number => room.items[room.items.length - 1].z - DF + 230
 
 /**
- * The camera path from the page's marks: each card's centre on the reading line is the moment its prop
- * meets the runner, the gate holds framed then flies through, and the last room ends at the page's end,
- * flying into the beacon's light. `roomTops` are where each room is read from (the settled frames).
+ * The camera path from the page's marks: each card's centre on the reading line holds the camera at its
+ * mark, the gate holds framed then flies through, and the last room ends at the page's end,
+ * flying into the saved's light. `roomTops` are where each room is read from (the settled frames).
  */
 export function cameraPath(corridor: Corridor, marks: readonly RoomMarks[], page: PageMarks): { keyframes: Keyframe[]; roomTops: number[] } {
   const at = (pos: number) => pos - page.reading
@@ -258,13 +231,13 @@ export function settledCam(corridor: Corridor, roomTops: readonly number[], y: n
 
 // ---- the dip to dark between eras ----
 
-const DIP_IN = [-250, 250] as const // around the vista left behind
+const DIP_IN = [-250, 250] as const // around the end of the room left behind
 const DIP_OUT = [-1500, -1050] as const // before the next gate
 
 /** The depth where a room's colours take over: the darkest point of the gap before its gate. */
 export const eraSwitchAt = (room: RoomGeometry): number => room.from + (DIP_IN[1] + GAP + DIP_OUT[0]) / 2
 
-/** How dark the tunnel is at camZ: it dips through a vista, stays dark across the gap, and lifts before
+/** How dark the tunnel is at camZ: it dips past the end of a room, stays dark across the gap, and lifts before
  *  the next gate is framed, so the next era comes up out of the dark. */
 export function troughAt(rooms: readonly RoomGeometry[], camZ: number): number {
   return rooms.reduce((dark, room) => {

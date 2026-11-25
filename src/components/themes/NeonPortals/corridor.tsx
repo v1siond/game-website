@@ -5,13 +5,15 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrollStage } from '@/hooks/useScrollStage'
 import { cssVars } from '@/lib/cssVars'
-import { pacedMoves, type Follower } from '@/lib/scroll/player'
-import { decorArt, doorArt, gateArt, ribArt, vistaArt, type PlaneArt } from './eras'
-import { actionTarget, doorStateAt, hubRunner, inReach, propStateAt, roomRunner, SETTLED_DOOR, SETTLED_PROP, settledRunner, type RunnerState } from './motion'
+import { restingPlay, stagePlay, type Follower } from '@/lib/scroll/player'
+import { decorArt, gateArt, ribArt, type PlaneArt } from './eras'
+import { boxOf, coverAt, heroSpan, playAt, readAt, roomSpan, type SceneSpan } from './cover'
+import { hubRunner, transitRunner, type Move } from './motion'
 import { ERAS, type Era } from './palette'
 import { HUB_ERA } from './plan'
-import { partsOf, propArt, updateDoor, updateProp, type Parts } from './props'
 import { applyPose, FIGURE_BOX, FIGURE_RASTER, Runner, runnerParts, type RunnerParts } from './runner'
+import { SceneView, type SceneSpec } from './scenes'
+import { uOf } from './sets/kit'
 import {
   camAt,
   cameraPath,
@@ -32,62 +34,58 @@ import {
   type Corridor,
   type Keyframe,
   type Plane,
-  type RoomMarks,
   type RoomGeometry,
+  type RoomMarks,
   type RoomSpec,
   type View,
 } from './world'
 import css from './corridor.module.css'
 
-// The stage: one fixed layer (aria-hidden) holding the tunnel, under the text layer that scrolls in normal
-// flow and is never scaled or faded. The shared scroll stage engine (useScrollStage) measures the page on
-// mount and resize and calls draw with the settled scroll position each frame while the art catches up
-// with the scroll, then stops. draw turns that position into the camera's depth through the keyframes
-// measured from the text layer (each card's centre on the reading line is the moment its prop meets the
-// runner), and writes transforms and opacity only. Under reduced motion it draws at the scroll with no
-// settle, and the tunnel shows the settled frame of the room being read: just inside its gate, every prop
-// open, the runner holding the room's action. It changes only when the reader reaches the next room.
+// The stage: one fixed layer (aria-hidden) holding the machine's passage (the tunnel) and over it the set
+// piece of each era (scenes.tsx, sets/), under the text layer that scrolls in normal flow and is never scaled
+// or faded. The shared scroll stage engine (useScrollStage) measures the page on mount and resize and calls
+// draw with the settled scroll position each frame while the art catches up with the scroll, then stops.
 //
-// The move at each prop plays at the shared scene player's pace (src/lib/scroll/player.ts, his C55 words on
-// sped up animations): the scroll sets where the move should be, and the drawn move follows it no faster than
-// the move itself, easing out of rest and into its stop, forward or back. While a move is still catching up
-// after the scroll has settled, draw tells the shared loop to keep drawing until it rests.
+// draw turns that position into the camera's depth through the keyframes measured from the text layer, so
+// between eras the camera flies down the tunnel, the runner ahead of it from behind, the warp sparks
+// streaming past in the dark. As a room's gate plate comes up, the era's set piece zooms in out of the
+// vanishing point until it fills the screen, holds while the room is read and zooms out past the camera as
+// the section ends (cover.ts). The set piece in view plays its one to three actions at the shared scene
+// player's pace (src/lib/scroll/player.ts): the scroll sets where the scene should be and the drawn scene
+// follows it no faster than the scene itself, forward or back; while it is still catching up after the
+// scroll has settled, draw tells the shared loop to keep drawing. He is drawn once: the tunnel's runner
+// hides while a set piece is in view, which draws him itself. Under reduced motion there is no zoom and no
+// play: the scene being read shows whole at its end frame.
 
-/** Where on the screen a card's centre meets its prop. */
+/** Where on the screen a card's centre is read. */
 const READING_LINE = 0.55
 /** How far the tunnel dims in the gap between eras. */
 const DARKEST = 0.88
 const PHONE_QUERY = '(max-width: 767.98px)'
-/** One move at a prop, as the player plays it: the spin, the slam, the kick. */
-const MOVE_SCRIPT = [1600] as const
 
-/** Each of the room's moves as drawn at `now` (src/lib/scroll/player.ts pacedMoves): following where the
- *  scroll puts it while its prop is within reach, resting where the scroll puts it further off or when first
- *  seen; the moves of any other room are forgotten, so a room left in mid move rests when he comes back. */
-function roomMoves(held: ReadonlyMap<string, Follower>, r: number, room: RoomGeometry, camZ: number, now: number) {
-  const moves = room.items.map((item, i) => ({ key: `${r}:${i}`, target: actionTarget(item, camZ), near: inReach(item, camZ) }))
-  return pacedMoves(held, moves, MOVE_SCRIPT, now)
-}
-
-/** No move in view (the hub, a gap, reduced motion): none kept, none playing. */
-const NO_MOVES = { followers: new Map<string, Follower>(), phases: [], playing: false }
-
-/** The runner: held at the room's move under reduced motion, else at his room's paced moves or the hub. */
-function runnerAt(reduced: boolean, room: RoomGeometry | null, camZ: number, phases: readonly number[]): RunnerState {
-  if (reduced) return settledRunner(room)
-  return room ? roomRunner(room, camZ, phases) : hubRunner(camZ)
-}
+/** The runner in the tunnel: in the hub he waits, in the passage he runs into the screen. */
+const tunnelRunner = (room: RoomGeometry | null, camZ: number): Move => (room ? transitRunner(camZ) : hubRunner(camZ))
 
 interface Measured {
   view: View
   keyframes: Keyframe[]
   roomTops: number[]
+  spans: SceneSpan[]
 }
 
 interface Drawn {
   era: Era | ''
   fog: number
-  planes: Map<string, string>
+  runner: boolean | null
+}
+
+/** A scene bound on the page: its node, its writer and its follower on the player. */
+interface BoundScene {
+  spec: SceneSpec
+  el: HTMLElement
+  write: (u: number) => void
+  follower: Follower | null
+  shown: boolean | null
 }
 
 const docTop = (el: Element, scrollY: number): number => el.getBoundingClientRect().top + scrollY
@@ -108,15 +106,11 @@ function marksOf(section: HTMLElement, scrollY: number): RoomMarks {
   }
 }
 
-const artOf = (plane: Plane, tw: number): PlaneArt => {
-  if (plane.prop) return propArt(plane.prop.kind, plane.era, plane.prop.meta)
-  const ART: Record<Exclude<Plane['kind'], 'prop'>, (era: Era, tw: number) => PlaneArt> = { rib: ribArt, gate: gateArt, door: doorArt, vista: vistaArt, decor: decorArt }
-  return ART[plane.kind as Exclude<Plane['kind'], 'prop'>](plane.era, tw)
-}
+const ART: Record<Plane['kind'], (era: Era, tw: number) => PlaneArt> = { rib: ribArt, gate: gateArt, decor: decorArt }
 
 /** One plane, laid out at world size x its raster and placed by transform from draw. */
 const PlaneView = memo(function PlaneView({ plane, tw, onMount }: { plane: Plane; tw: number; onMount: (key: string, el: HTMLDivElement | null) => void }) {
-  const { w, h, viewBox, art } = artOf(plane, tw)
+  const { w, h, viewBox, art } = ART[plane.kind](plane.era, tw)
   const raster = RASTER[plane.kind]
   return (
     <div ref={(el) => onMount(plane.key, el)} className={css.plane}>
@@ -136,29 +130,47 @@ interface Refs {
   railPath: SVGPathElement | null
   figure: HTMLDivElement | null
   runner: RunnerParts | null
-  planes: Map<string, { el: HTMLDivElement; parts: Parts }>
+  planes: Map<string, HTMLDivElement>
   sparks: HTMLElement[]
 }
 
 interface CorridorWorldProps {
   specs: RoomSpec[]
+  /** The hero's fall, then one set piece per room, in page order. */
+  scenes: SceneSpec[]
   /** The text layer: the hero and the rooms, each room a [data-room] section. */
   children: ReactNode
   className: string
   style: CSSProperties
 }
 
-/** The runner on the floor at the runner's depth, stepped `x` across toward a prop. */
-function placeRunner(refs: Refs, view: View, runner: RunnerState) {
-  const { x } = runner
+/** The runner on the floor at the runner's depth, from behind. */
+function placeRunner(refs: Refs, view: View, move: Move) {
   const s = scaleAt(view, DF)
   const k = Math.round((s / FIGURE_RASTER) * 1000) / 1000
   const anchorY = round2((-FIGURE_BOX.y / FIGURE_BOX.h) * 100)
-  refs.figure!.style.transform = `translate3d(${Math.round(view.vpx + x * s)}px, ${Math.round(view.vpy + FLOOR * s)}px, 0) scale(${k}) translate(-50%, -${anchorY}%)`
-  applyPose(refs.runner!, runner)
+  refs.figure!.style.transform = `translate3d(${Math.round(view.vpx)}px, ${Math.round(view.vpy + FLOOR * s)}px, 0) scale(${k}) translate(-50%, -${anchorY}%)`
+  applyPose(refs.runner!, move)
 }
 
-export function CorridorWorld({ specs, children, className, style }: CorridorWorldProps) {
+/** Binds each scene's node and writer, and places its box on the screen. */
+function bindScenes(root: HTMLElement, scenes: readonly SceneSpec[], view: View, foot: { x: number; y: number }): BoundScene[] {
+  return scenes.flatMap((spec, i) => {
+    const el = root.querySelector<HTMLElement>(`[data-np-scene="${spec.id}"]`)
+    if (!el) return []
+    const box = boxOf(view.vw, view.vh, i === 0 ? foot : null)
+    el.querySelector('[data-np="box"]')?.setAttribute('transform', `translate(${round2(box.x)} ${round2(box.y)}) scale(${box.k.toFixed(4)})`)
+    return [{ spec, el, write: spec.set.bind(el, spec.input), follower: null, shown: null }]
+  })
+}
+
+const showScene = (scene: BoundScene, shown: boolean): void => {
+  if (scene.shown === shown) return
+  scene.shown = shown
+  scene.el.style.visibility = shown ? 'visible' : 'hidden'
+}
+
+export function CorridorWorld({ specs, scenes, children, className, style }: CorridorWorldProps) {
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const corridor: Corridor = useMemo(() => layoutCorridor(specs, phone), [specs, phone])
@@ -166,20 +178,18 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
 
   const refs = useRef<Refs>({ root: null, heroInner: null, fog: null, dark: null, rails: null, railPath: null, figure: null, runner: null, planes: new Map(), sparks: [] }).current
   const measured = useRef<Measured | null>(null)
-  const drawn = useRef<Drawn>({ era: '', fog: -1, planes: new Map() }).current
-  // each move as drawn, by room and item: only the moves of the room he is in
-  const followers = useRef<ReadonlyMap<string, Follower>>(new Map())
+  const drawn = useRef<Drawn>({ era: '', fog: -1, runner: null }).current
+  const bound = useRef<BoundScene[]>([])
 
   const onPlane = useCallback(
     (key: string, el: HTMLDivElement | null) => {
       if (!el) {
         refs.planes.delete(key)
-        drawn.planes.delete(key)
         return
       }
-      refs.planes.set(key, { el, parts: partsOf(el) })
+      refs.planes.set(key, el)
     },
-    [refs, drawn],
+    [refs],
   )
 
   const measure = useCallback(
@@ -191,22 +201,22 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
       if (sections.length !== corridor.rooms.length) return
       const hero = root.querySelector<HTMLElement>('[data-worlds-hero]')!
       const maxScroll = document.documentElement.scrollHeight - view.vh
-      const path = cameraPath(
-        corridor,
-        sections.map((section) => marksOf(section, scrollY)),
-        { heroHeight: hero.offsetHeight, reading: view.vh * READING_LINE, maxScroll },
-      )
-      measured.current = { view, ...path }
+      const reading = view.vh * READING_LINE
+      const marks = sections.map((section) => marksOf(section, scrollY))
+      const path = cameraPath(corridor, marks, { heroHeight: hero.offsetHeight, reading, maxScroll })
+      const page = { reading, vh: view.vh, maxScroll }
+      const spans = [heroSpan(hero.offsetHeight, view.vh, view.phone), ...marks.map((mark, r) => roomSpan(mark, page, { phone: view.phone, last: r === marks.length - 1 }))]
+      measured.current = { view, ...path, spans }
       refs.rails?.setAttribute('viewBox', `0 0 ${view.vw} ${view.vh}`)
       refs.railPath?.setAttribute('d', railsPath(view, corridor.tw))
       // Where his feet stand on screen, for the wardrobe plate under him in the hero.
-      const foot = view.vpy + FLOOR * scaleAt(view, DF)
+      const foot = { x: view.vpx, y: view.vpy + FLOOR * scaleAt(view, DF) }
       root.style.setProperty('--np-vpx', `${Math.round(view.vpx)}px`)
       root.style.setProperty('--np-vpy', `${Math.round(view.vpy)}px`)
-      root.style.setProperty('--np-foot-y', `${Math.round(foot)}px`)
-      drawn.planes.clear()
+      root.style.setProperty('--np-foot-y', `${Math.round(foot.y)}px`)
+      bound.current = bindScenes(root, scenes, view, foot)
     },
-    [corridor, refs, drawn],
+    [corridor, scenes, refs],
   )
 
   const setEra = useCallback(
@@ -217,6 +227,43 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
       refs.root!.style.setProperty('--a2', ERAS[era].a2)
     },
     [refs, drawn],
+  )
+
+  /** Draws every scene at `position`; true while the one in view still plays toward the scroll. */
+  const drawScenes = useCallback(
+    (position: number, spans: readonly SceneSpan[], view: View): { covered: boolean; playing: boolean } => {
+      const now = performance.now()
+      // the opening's radius once it reaches every corner of the screen
+      const reach = Math.hypot(view.vw, view.vh)
+      const read = reduced ? readAt(spans, position) : -1
+      let covered = false
+      let playing = false
+      bound.current.forEach((scene, i) => {
+        const span = spans[i]
+        const cover = reduced ? { opacity: i === read ? 1 : 0, zoom: 1, reveal: 1 } : coverAt(span, position)
+        const shown = cover.opacity > 0.001
+        showScene(scene, shown)
+        if (!shown) {
+          scene.follower = null
+          return
+        }
+        covered = true
+        scene.el.style.opacity = cover.opacity.toFixed(3)
+        scene.el.style.transform = cover.zoom === 1 ? '' : `scale(${cover.zoom.toFixed(4)})`
+        scene.el.style.clipPath = cover.reveal >= 1 ? '' : `circle(${Math.round(cover.reveal * reach)}px at var(--np-vpx) var(--np-vpy))`
+        const { script } = scene.spec.set
+        if (reduced) {
+          scene.write(uOf(restingPlay(script)))
+          return
+        }
+        const run = stagePlay(scene.follower, script, playAt(span, position), now, true)
+        scene.follower = run.follower
+        playing ||= run.playing
+        scene.write(uOf(run.play))
+      })
+      return { covered, playing }
+    },
+    [reduced],
   )
 
   const draw = useCallback(
@@ -233,53 +280,41 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
         refs.fog!.style.opacity = String(fog)
         refs.dark!.style.opacity = String(round2(trough * DARKEST))
       }
-      const roomIndex = room ? corridor.rooms.indexOf(room) : -1
-      const paced = room && !reduced ? roomMoves(followers.current, roomIndex, room, camZ, performance.now()) : NO_MOVES
-      followers.current = paced.followers
-      const { phases } = paced
+      const lift = reduced ? 0 : Math.min(1, Math.max(0, position / m.view.vh))
+      if (refs.heroInner) refs.heroInner.style.transform = `scale(${(1 - 0.1 * lift).toFixed(4)})`
+      const { covered, playing } = drawScenes(position, m.spans, m.view)
+      if (covered) {
+        // the set piece in view draws him: the tunnel waits under it, his runner hidden
+        if (drawn.runner !== false) refs.figure!.style.visibility = 'hidden'
+        drawn.runner = false
+        return playing
+      }
+      if (drawn.runner !== true) refs.figure!.style.visibility = 'visible'
+      drawn.runner = true
       for (const plane of corridor.planes) drawPlane(plane, camZ)
       sparks.forEach((spark, i) => {
         const { transform, opacity } = sparkView(spark, m.view, camZ, trough)
         refs.sparks[i].style.transform = transform
         refs.sparks[i].style.opacity = String(opacity)
       })
-      placeRunner(refs, m.view, runnerAt(reduced, room, camZ, phases))
-      const lift = reduced ? 0 : Math.min(1, Math.max(0, position / m.view.vh))
-      if (refs.heroInner) refs.heroInner.style.transform = `scale(${(1 - 0.1 * lift).toFixed(4)})`
-      // a move still catching up: the shared loop draws again next frame
-      return paced.playing
+      placeRunner(refs, m.view, tunnelRunner(room, camZ))
+      return playing
 
       function drawPlane(plane: Plane, z: number) {
-        const held = refs.planes.get(plane.key)
-        if (!held) return
+        const el = refs.planes.get(plane.key)
+        if (!el) return
         const { transform, opacity } = planeView(plane, m!.view, z)
         const shown = opacity > 0.01
-        held.el.style.visibility = shown ? 'visible' : 'hidden'
+        el.style.visibility = shown ? 'visible' : 'hidden'
         if (!shown) return
-        held.el.style.transform = transform
-        held.el.style.opacity = String(opacity)
-        if (plane.prop) {
-          const phase = plane.prop.room === roomIndex ? phases[plane.prop.item] : undefined
-          const state = reduced ? SETTLED_PROP : propStateAt(corridor.rooms[plane.prop.room].items[plane.prop.item], z, phase)
-          const key = `${round2(state.open)}|${round2(state.amount)}|${round2(state.beat)}|${round2(state.swing)}`
-          if (drawn.planes.get(plane.key) === key) return
-          drawn.planes.set(plane.key, key)
-          updateProp(plane.prop.kind, held.parts, state)
-          return
-        }
-        if (plane.kind !== 'door') return
-        const owner = corridor.rooms.find((r) => r.door === plane.z)!
-        const state = reduced || !room ? SETTLED_DOOR : doorStateAt(owner, plane.z, z)
-        const key = `${round2(state.slide)}|${state.lamps}`
-        if (drawn.planes.get(plane.key) === key) return
-        drawn.planes.set(plane.key, key)
-        updateDoor(held.parts, state)
+        el.style.transform = transform
+        el.style.opacity = String(opacity)
       }
     },
-    [corridor, sparks, reduced, refs, drawn, setEra],
+    [corridor, sparks, reduced, refs, drawn, setEra, drawScenes],
   )
 
-  const mainRef = useScrollStage<HTMLDivElement>({ enabled: true, measure, draw, tauMs: reduced ? 0 : undefined })
+  const mainRef = useScrollStage<HTMLDivElement>({ enabled: true, measure, draw, tauMs: reduced ? 0 : undefined, content: scenes })
 
   const setRoot = useCallback(
     (el: HTMLDivElement | null) => {
@@ -328,9 +363,12 @@ export function CorridorWorld({ specs, children, className, style }: CorridorWor
         <div className={css.scrim} />
         <div ref={(el) => {
           refs.figure = el
-        }} className={css.figure} data-worlds-figure="">
+        }} className={css.figure}>
           <Runner ref={setRunner} />
         </div>
+        {scenes.map((spec, i) => (
+          <SceneView key={spec.id} spec={spec} first={i === 0} />
+        ))}
       </div>
       {children}
     </div>

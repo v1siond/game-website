@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 import { ERAS, type Era, type EraLook, type GateShape } from './palette'
-import { FLOOR, seeded, TH } from './world'
+import { seeded, TH } from './world'
 
 // Every era of the corridor, drawn in code in world units: the shape of its gate (also the shape of its
-// tunnel ribs), the ornaments on its gate facade, the decor that turns with the scroll and the vista at
-// the far end of its room. Our own places and times; nothing here is taken from a game.
+// tunnel ribs), the ornaments on its gate facade and the decor that turns with the scroll. The place behind
+// each gate is the era's set piece (sets/). Our own places and times; nothing here is taken from a game.
 
 const r1 = (n: number): number => Math.round(n * 10) / 10
 
@@ -56,265 +56,7 @@ const shapeOf = (era: Era, w: number, h: number): string => SHAPES[ERAS[era].sha
 
 const ring = (r: number): string => `M ${r1(-r)} 0 A ${r1(r)} ${r1(r)} 0 1 1 ${r1(r)} 0 A ${r1(r)} ${r1(r)} 0 1 1 ${r1(-r)} 0`
 
-const points = (list: ReadonlyArray<readonly [number, number]>): string => list.map(([x, y]) => `${r1(x)},${r1(y)}`).join(' ')
-
-function Stars({ seed, count, w, h, color = '#fff' }: { seed: number; count: number; w: number; h: number; color?: string }) {
-  const rand = seeded(seed)
-  return (
-    <>
-      {Array.from({ length: count }, (_, i) => {
-        const r = 2 + rand() * 5
-        return <circle key={i} cx={r1((rand() - 0.5) * w)} cy={r1(-h / 2 + rand() * h * 0.55)} r={r1(r)} fill={color} opacity={r1(0.35 + rand() * 0.6)} />
-      })}
-    </>
-  )
-}
-
-function Sky({ id, w, h, stops }: { id: string; w: number; h: number; stops: ReadonlyArray<readonly [number, string]> }) {
-  return (
-    <>
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          {stops.map(([offset, color]) => (
-            <stop key={offset} offset={offset} stopColor={color} />
-          ))}
-        </linearGradient>
-      </defs>
-      <rect x={r1(-w / 2)} y={r1(-h / 2)} width={r1(w)} height={r1(h)} fill={`url(#${id})`} />
-    </>
-  )
-}
-
-/** A sun or moon cut by horizontal gaps (the retro stripes), as bands clipped to the disc. */
-function StripedDisc({ id, cx, cy, r, color, bands }: { id: string; cx: number; cy: number; r: number; color: string; bands: number }) {
-  return (
-    <>
-      <defs>
-        <clipPath id={id}>
-          <circle cx={r1(cx)} cy={r1(cy)} r={r1(r)} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${id})`} fill={color}>
-        {Array.from({ length: bands }, (_, i) => {
-          const y0 = cy - r + (i * 2 * r) / bands
-          const gap = i < bands / 2 ? 0 : (i - bands / 2 + 1) * (r / bands) * 0.35
-          const y1 = y0 + (2 * r) / bands - gap
-          return <rect key={i} x={r1(cx - r)} y={r1(y0)} width={r1(2 * r)} height={r1(Math.max(4, y1 - y0))} />
-        })}
-      </g>
-    </>
-  )
-}
-
-const Ground = ({ w, h, top, fill }: { w: number; h: number; top: number; fill: string }) => (
-  <rect x={r1(-w / 2)} y={r1(top)} width={r1(w)} height={r1(h / 2 - top)} fill={fill} />
-)
-
 type ArtOf = (w: number, h: number, e: EraLook) => ReactNode
-
-const VISTAS: Partial<Record<Era, ArtOf>> = {
-  observatory: (w, h, e) => {
-    const base = h * 0.18
-    return (
-      <>
-        <Sky id="np-sky-observatory" w={w} h={h} stops={[[0, '#04161a'], [0.55, '#0b2b2a'], [0.78, '#6b3d0c'], [1, '#2a1503']]} />
-        <Stars seed={11} count={90} w={w} h={h} />
-        {[0.42, 0.32, 0.22, 0.12].map((half, i) => (
-          <rect key={half} x={r1(-w * half)} y={r1(base - (i + 1) * h * 0.07)} width={r1(w * half * 2)} height={r1(h * 0.07 + 2)} fill="#130b03" />
-        ))}
-        <rect x={r1(-w * 0.04)} y={r1(base - h * 0.36)} width={r1(w * 0.08)} height={r1(h * 0.08)} fill="#130b03" />
-        <Neon d={`M ${r1(-w * 0.42)} ${r1(base)} H ${r1(w * 0.42)}`} color={e.a1} width={6} />
-        <Ground w={w} h={h} top={base} fill="#1a0e03" />
-      </>
-    )
-  },
-  speedway: (w, h, e) => {
-    const horizon = h * 0.08
-    return (
-      <>
-        <Sky id="np-sky-speedway" w={w} h={h} stops={[[0, '#1b0526'], [0.45, '#7a0f52'], [0.62, '#ff6a3d'], [0.66, '#2a0820'], [1, '#14040f']]} />
-        <StripedDisc id="np-sun-speedway" cx={0} cy={horizon - h * 0.12} r={h * 0.22} color="#ffb347" bands={9} />
-        <polygon points={points([[-w / 2, horizon], [-w * 0.44, horizon - h * 0.1], [-w * 0.3, horizon - h * 0.1], [-w * 0.26, horizon - h * 0.04], [-w * 0.16, horizon]])} fill="#2d0721" />
-        <polygon points={points([[w * 0.14, horizon], [w * 0.2, horizon - h * 0.07], [w * 0.36, horizon - h * 0.08], [w * 0.4, horizon - h * 0.15], [w * 0.47, horizon - h * 0.15], [w / 2, horizon]])} fill="#2d0721" />
-        <Ground w={w} h={h} top={horizon} fill="#1c0416" />
-        <polygon points={points([[-w * 0.03, horizon], [w * 0.03, horizon], [w * 0.36, h / 2], [-w * 0.36, h / 2]])} fill="#2b0a26" />
-        <Neon d={`M ${r1(-w * 0.03)} ${r1(horizon)} L ${r1(-w * 0.36)} ${r1(h / 2)} M ${r1(w * 0.03)} ${r1(horizon)} L ${r1(w * 0.36)} ${r1(h / 2)}`} color={e.a1} width={5} />
-        <Neon d={`M 0 ${r1(horizon + 20)} V ${r1(horizon + 60)} M 0 ${r1(horizon + 110)} V ${r1(horizon + 190)} M 0 ${r1(horizon + 260)} V ${r1(h / 2)}`} color={e.a2} width={6} />
-      </>
-    )
-  },
-  forge: (w, h, e) => {
-    const rand = seeded(23)
-    const ground = h * 0.16
-    return (
-      <>
-        <Sky id="np-sky-forge" w={w} h={h} stops={[[0, '#0d0302'], [0.5, '#4a0f06'], [0.72, '#c4380f'], [1, '#3a0d04']]} />
-        {Array.from({ length: 40 }, (_, i) => (
-          <circle key={i} cx={r1((rand() - 0.5) * w)} cy={r1(-h / 2 + rand() * h * 0.6)} r={r1(2 + rand() * 4)} fill={e.a1} opacity={r1(0.3 + rand() * 0.7)} />
-        ))}
-        <circle cx={r1(w * 0.28)} cy={r1(-h * 0.24)} r={r1(h * 0.08)} fill="#ffd0a0" opacity={0.9} />
-        <rect x={r1(-w * 0.42)} y={r1(ground - h * 0.12)} width={r1(w * 0.84)} height={r1(h * 0.12)} fill="#120502" />
-        {[-0.34, -0.18, 0.02, 0.2, 0.36].map((x, i) => {
-          const tw = w * (i === 2 ? 0.09 : 0.06)
-          const th = h * (i === 2 ? 0.42 : 0.28)
-          const cx = w * x
-          return (
-            <g key={x}>
-              <rect x={r1(cx - tw / 2)} y={r1(ground - th)} width={r1(tw)} height={r1(th)} fill="#120502" />
-              <polygon points={points([[cx - tw * 0.7, ground - th], [cx, ground - th - tw * 1.3], [cx + tw * 0.7, ground - th]])} fill="#120502" />
-              <rect x={r1(cx - 8)} y={r1(ground - th * 0.7)} width={16} height={34} fill={e.a1} opacity={0.9} />
-            </g>
-          )
-        })}
-        <Ground w={w} h={h} top={ground} fill="#160603" />
-        <Neon d={`M ${r1(-w * 0.42)} ${r1(ground - h * 0.12)} H ${r1(w * 0.42)}`} color={e.a2} width={5} />
-      </>
-    )
-  },
-  relay: (w, h, e) => {
-    const rand = seeded(37)
-    const ground = h * 0.2
-    const towers = Array.from({ length: 13 }, (_, i) => {
-      const cx = -w * 0.46 + (i * w * 0.92) / 12
-      const tw = w * (0.035 + rand() * 0.035)
-      const th = h * (0.2 + rand() * 0.45)
-      return (
-        <g key={i}>
-          <rect x={r1(cx - tw / 2)} y={r1(ground - th)} width={r1(tw)} height={r1(th)} fill="#041109" />
-          {Array.from({ length: 6 }, (_, k) => (
-            <rect key={k} x={r1(cx - tw * 0.3)} y={r1(ground - th + 30 + k * th * 0.15)} width={r1(tw * 0.6)} height={6} fill={k % 2 ? e.a2 : e.a1} opacity={0.7} />
-          ))}
-        </g>
-      )
-    })
-    return (
-      <>
-        <Sky id="np-sky-relay" w={w} h={h} stops={[[0, '#010806'], [0.55, '#06352b'], [0.8, '#2f6b12'], [1, '#04140a']]} />
-        <Stars seed={38} count={50} w={w} h={h} color={e.a2} />
-        <Neon d={SHAPES.ellipse(w * 0.62, h * 0.62)} color={e.a2} width={4} opacity={0.55} />
-        {towers}
-        <Neon d={`M ${r1(-w * 0.32)} ${r1(ground - h * 0.3)} H ${r1(w * 0.3)}`} color={e.a1} width={7} />
-        <Ground w={w} h={h} top={ground} fill="#03100a" />
-      </>
-    )
-  },
-  sands: (w, h, e) => {
-    const ground = h * 0.2
-    const pyramid = (cx: number, half: number, height: number) => (
-      <g key={cx}>
-        <polygon points={points([[cx - half, ground], [cx, ground - height], [cx + half, ground]])} fill="#081822" />
-        <polygon points={points([[cx, ground - height], [cx + half, ground], [cx + half * 0.15, ground]])} fill="#0f2a35" />
-        <Neon d={`M ${r1(cx - half)} ${r1(ground)} L ${r1(cx)} ${r1(ground - height)} L ${r1(cx + half)} ${r1(ground)}`} color={e.a1} width={4} opacity={0.8} />
-      </g>
-    )
-    return (
-      <>
-        <Sky id="np-sky-sands" w={w} h={h} stops={[[0, '#020611'], [0.6, '#0a2a44'], [1, '#123d4c']]} />
-        <Stars seed={41} count={80} w={w} h={h} />
-        <circle cx={r1(-w * 0.18)} cy={r1(-h * 0.2)} r={r1(h * 0.15)} fill="#f4ffe8" opacity={0.92} />
-        <circle cx={r1(-w * 0.18)} cy={r1(-h * 0.2)} r={r1(h * 0.22)} fill="#f4ffe8" opacity={0.08} />
-        {pyramid(w * 0.16, w * 0.22, h * 0.34)}
-        {pyramid(-w * 0.3, w * 0.14, h * 0.2)}
-        {pyramid(w * 0.4, w * 0.1, h * 0.13)}
-        <polygon points={points([[-w / 2, ground], [-w * 0.2, ground - 30], [w * 0.1, ground + 10], [w / 2, ground - 20], [w / 2, h / 2], [-w / 2, h / 2]])} fill="#0b2029" />
-        <Neon d={`M ${r1(-w / 2)} ${r1(ground)} Q ${r1(-w * 0.2)} ${r1(ground - 60)} ${r1(w * 0.1)} ${r1(ground + 10)} T ${r1(w / 2)} ${r1(ground - 20)}`} color={e.a2} width={4} opacity={0.7} />
-      </>
-    )
-  },
-  keystone: (w, h, e) => {
-    const ground = h * 0.22
-    const rocks: Array<readonly [number, number]> = [
-      [-w / 2, ground],
-      [-w * 0.4, ground - h * 0.2],
-      [-w * 0.3, ground - h * 0.08],
-      [-w * 0.2, ground - h * 0.26],
-      [-w * 0.08, ground],
-      [w * 0.1, ground],
-      [w * 0.22, ground - h * 0.3],
-      [w * 0.32, ground - h * 0.1],
-      [w * 0.42, ground - h * 0.22],
-      [w / 2, ground],
-      [w / 2, h / 2],
-      [-w / 2, h / 2],
-    ]
-    return (
-      <>
-        <Sky id="np-sky-keystone" w={w} h={h} stops={[[0, '#05010a'], [0.6, '#2a0517'], [1, '#4a0a22']]} />
-        <circle cx={0} cy={r1(-h * 0.1)} r={r1(h * 0.3)} fill={e.a1} opacity={0.12} />
-        <circle cx={0} cy={r1(-h * 0.1)} r={r1(h * 0.24)} fill={e.a1} opacity={0.25} />
-        <Neon d={SHAPES.ellipse(h * 0.4, h * 0.4)} color={e.a1} width={8} transform={`translate(0 ${r1(-h * 0.1)})`} />
-        <circle cx={0} cy={r1(-h * 0.1)} r={r1(h * 0.19)} fill="#05010a" />
-        <polygon points={points(rocks)} fill="#0d0207" />
-      </>
-    )
-  },
-  arena: (w, h, e) => {
-    const rand = seeded(53)
-    const ground = h * 0.18
-    return (
-      <>
-        <Sky id="np-sky-arena" w={w} h={h} stops={[[0, '#07020f'], [0.55, '#2b0a4a'], [0.85, '#7a1a8a'], [1, '#1a0526']]} />
-        <StripedDisc id="np-sun-arena" cx={0} cy={ground - h * 0.05} r={h * 0.2} color="#ff7ad9" bands={8} />
-        {Array.from({ length: 16 }, (_, i) => {
-          const cx = -w * 0.48 + (i * w * 0.96) / 15
-          const th = h * (0.1 + rand() * 0.3)
-          return (
-            <g key={i}>
-              <rect x={r1(cx - w * 0.028)} y={r1(ground - th)} width={r1(w * 0.056)} height={r1(th)} fill="#0c0318" />
-              <rect x={r1(cx - w * 0.02)} y={r1(ground - th + 20)} width={r1(w * 0.04)} height={5} fill={i % 2 ? e.a2 : e.a1} />
-            </g>
-          )
-        })}
-        <Ground w={w} h={h} top={ground} fill="#12041f" />
-        <Neon d={`M ${r1(-w / 2)} ${r1(ground)} H ${r1(w / 2)}`} color={e.a2} width={5} />
-      </>
-    )
-  },
-  pavilion: (w, h, e) => {
-    const ground = h * 0.2
-    const roof = (cx: number, half: number, tiers: number, top: number) => (
-      <g key={cx}>
-        {Array.from({ length: tiers }, (_, i) => {
-          const hw = half * (1 - i * 0.24)
-          const y = ground - top + i * -h * 0.07
-          return (
-            <g key={i}>
-              <polygon points={points([[cx - hw, y], [cx - hw * 0.7, y - h * 0.09], [cx + hw * 0.7, y - h * 0.09], [cx + hw, y]])} fill="#170a02" />
-              <Neon d={`M ${r1(cx - hw)} ${r1(y)} L ${r1(cx - hw * 1.1)} ${r1(y - h * 0.05)}`} color={e.a1} width={4} />
-              <Neon d={`M ${r1(cx + hw)} ${r1(y)} L ${r1(cx + hw * 1.1)} ${r1(y - h * 0.05)}`} color={e.a1} width={4} />
-            </g>
-          )
-        })}
-        <rect x={r1(cx - half * 0.7)} y={r1(ground - top)} width={r1(half * 1.4)} height={r1(top)} fill="#170a02" />
-      </g>
-    )
-    return (
-      <>
-        <Sky id="np-sky-pavilion" w={w} h={h} stops={[[0, '#1a0703'], [0.5, '#8a2a08'], [0.75, '#ffb03a'], [1, '#3a1704']]} />
-        <circle cx={r1(w * 0.05)} cy={r1(ground - h * 0.3)} r={r1(h * 0.2)} fill="#ffe7a3" opacity={0.95} />
-        {roof(-w * 0.26, w * 0.12, 3, h * 0.12)}
-        {roof(w * 0.24, w * 0.16, 4, h * 0.16)}
-        <Ground w={w} h={h} top={ground} fill="#1c0b03" />
-        <Neon d={`M ${r1(-w / 2)} ${r1(ground)} H ${r1(w / 2)}`} color={e.a2} width={5} />
-      </>
-    )
-  },
-  beacon: (w, h, e) => (
-    <>
-      <defs>
-        <radialGradient id="np-sky-beacon" cx=".5" cy=".42" r=".7">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset=".18" stopColor="#d9fbff" />
-          <stop offset=".5" stopColor="#2aa6c4" />
-          <stop offset="1" stopColor="#03121a" />
-        </radialGradient>
-      </defs>
-      <rect x={r1(-w / 2)} y={r1(-h / 2)} width={r1(w)} height={r1(h)} fill="url(#np-sky-beacon)" />
-      <Neon d={SHAPES.ellipse(w * 0.5, h * 0.5)} color={e.a2} width={5} opacity={0.6} />
-      <Neon d={SHAPES.ellipse(w * 0.75, h * 0.75)} color={e.a2} width={4} opacity={0.35} />
-    </>
-  ),
-}
 
 // Gate facade ornaments, drawn around the opening (w by h) on the wall.
 const ORNAMENTS: Record<Era, ArtOf> = {
@@ -332,7 +74,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       </>
     )
   },
-  observatory: (w, h, e) => (
+  village: (w, h, e) => (
     <>
       {Array.from({ length: 9 }, (_, i) => {
         const a = Math.PI + (i / 8) * Math.PI
@@ -348,7 +90,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={`M ${r1(-w * 0.62)} ${r1(h / 2)} V ${r1(-h * 0.1)} M ${r1(w * 0.62)} ${r1(h / 2)} V ${r1(-h * 0.1)}`} color={e.a2} width={8} />
     </>
   ),
-  speedway: (w, h, e) => (
+  highway: (w, h, e) => (
     <>
       <rect x={r1(-w * 0.58)} y={r1(-h / 2 - 160)} width={r1(w * 1.16)} height={140} rx={30} fill="#2a0620" />
       {Array.from({ length: 22 }, (_, i) => (
@@ -357,13 +99,13 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={`M ${r1(-w * 0.58)} ${r1(-h / 2 - 160)} h ${r1(w * 1.16)} v 140 h ${r1(-w * 1.16)} Z`} color={e.a1} width={8} />
     </>
   ),
-  forge: (w, h, e) => (
+  swamp: (w, h, e) => (
     <>
       <Neon d={`M ${r1(-w * 0.62)} ${r1(h / 2)} V ${r1(-h * 0.2)} L ${r1(-w * 0.7)} ${r1(-h * 0.34)} M ${r1(w * 0.62)} ${r1(h / 2)} V ${r1(-h * 0.2)} L ${r1(w * 0.7)} ${r1(-h * 0.34)}`} color={e.a2} width={9} />
       <Neon d={SHAPES.pointed(w * 0.36, h * 0.3).replace(/Z$/, '')} color={e.a1} width={6} transform={`translate(0 ${r1(-h * 0.6)})`} />
     </>
   ),
-  relay: (w, h, e) => (
+  deepSea: (w, h, e) => (
     <>
       {[
         [-0.56, 0.3],
@@ -378,7 +120,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={SHAPES.hex(w * 1.16, h * 1.12)} color={e.a1} width={5} opacity={0.6} />
     </>
   ),
-  sands: (w, h, e) => (
+  colosseum: (w, h, e) => (
     <>
       {Array.from({ length: 7 }, (_, i) => (
         <g key={i}>
@@ -391,7 +133,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <circle cx={0} cy={r1(-h / 2 - 110)} r={18} fill={e.a2} />
     </>
   ),
-  keystone: (w, h, e) => {
+  trial: (w, h, e) => {
     const teeth = Array.from({ length: 11 }, (_, i) => {
       const x = -w * 0.5 + (i * w) / 10
       return `M ${r1(x - 60)} ${r1(-h / 2)} L ${r1(x)} ${r1(-h / 2 + 130)} L ${r1(x + 60)} ${r1(-h / 2)}`
@@ -404,7 +146,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       </>
     )
   },
-  arena: (w, h, e) => (
+  sky: (w, h, e) => (
     <>
       {[-1, 1].flatMap((side) =>
         [0.3, 0, -0.3].map((y) => {
@@ -421,7 +163,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={SHAPES.chamfer(w * 1.08, h * 1.08)} color={e.a2} width={5} opacity={0.7} />
     </>
   ),
-  pavilion: (w, h, e) => (
+  core: (w, h, e) => (
     <>
       <Neon
         d={`M ${r1(-w * 0.62)} ${r1(-h * 0.06)} L 0 ${r1(-h * 0.62)} L ${r1(w * 0.62)} ${r1(-h * 0.06)} M ${r1(-w * 0.62)} ${r1(-h * 0.06)} L ${r1(-w * 0.72)} ${r1(-h * 0.2)} M ${r1(w * 0.62)} ${r1(-h * 0.06)} L ${r1(w * 0.72)} ${r1(-h * 0.2)} M 0 ${r1(-h * 0.62)} V ${r1(-h * 0.76)}`}
@@ -431,7 +173,7 @@ const ORNAMENTS: Record<Era, ArtOf> = {
       <Neon d={`M ${r1(-w * 0.58)} ${r1(h / 2)} V ${r1(-h * 0.06)} M ${r1(w * 0.58)} ${r1(h / 2)} V ${r1(-h * 0.06)}`} color={e.a2} width={9} />
     </>
   ),
-  beacon: (w, h, e) => (
+  saved: (w, h, e) => (
     <>
       <Neon d={SHAPES.ellipse(w * 1.2, h * 1.2)} color={e.a1} width={6} />
       <Neon d={SHAPES.ellipse(w * 1.4, h * 1.4)} color={e.a2} width={4} opacity={0.5} />
@@ -469,14 +211,8 @@ export function gateArt(era: Era, tw: number): PlaneArt {
   )
 }
 
-export function vistaArt(era: Era, tw: number): PlaneArt {
-  const w = tw * 1.25
-  const h = TH * 1.25
-  return centred(w, h, VISTAS[era]?.(w, h, ERAS[era]))
-}
-
-// The decor that turns with the scroll: the hub's time ring, the observatory's star wheel, the keystone
-// corona, the arena's laser fan, the beacon's rays. Its place and turn are in world.ts DECOR.
+// The decor that turns with the scroll: the hub's time ring, the village's star wheel, the trial
+// corona, the sky's laser fan, the saved's rays. Its place and turn are in world.ts DECOR.
 const DECOR_ART: Partial<Record<Era, (tw: number) => PlaneArt>> = {
   hub: (tw) => {
     const r = Math.min(tw, TH) * 0.42
@@ -495,7 +231,7 @@ const DECOR_ART: Partial<Record<Era, (tw: number) => PlaneArt>> = {
       </>,
     )
   },
-  observatory: () => {
+  village: () => {
     const r = TH * 0.34
     const rand = seeded(7)
     const stars = Array.from({ length: 9 }, () => [(rand() - 0.5) * r * 1.6, (rand() - 0.5) * r * 1.6] as const)
@@ -507,36 +243,36 @@ const DECOR_ART: Partial<Record<Era, (tw: number) => PlaneArt>> = {
       r * 2.4,
       r * 2.4,
       <>
-        <Neon d={ring(r)} color={ERAS.observatory.a1} width={4} opacity={0.6} />
-        <Neon d={lines} color={ERAS.observatory.a2} width={3} />
+        <Neon d={ring(r)} color={ERAS.village.a1} width={4} opacity={0.6} />
+        <Neon d={lines} color={ERAS.village.a2} width={3} />
         {stars.map(([x, y]) => (
           <circle key={`${x}${y}`} cx={r1(x)} cy={r1(y)} r={12} fill="#fff" />
         ))}
       </>,
     )
   },
-  keystone: () => {
+  trial: () => {
     const r = TH * 0.2
     const rays = Array.from({ length: 16 }, (_, i) => {
       const a = (i / 16) * Math.PI * 2
       const out = r * (i % 2 ? 1.5 : 1.8)
       return `M ${r1(Math.cos(a) * r * 1.1)} ${r1(Math.sin(a) * r * 1.1)} L ${r1(Math.cos(a) * out)} ${r1(Math.sin(a) * out)}`
     }).join(' ')
-    return centred(r * 4, r * 4, <Neon d={rays} color={ERAS.keystone.a1} width={6} />)
+    return centred(r * 4, r * 4, <Neon d={rays} color={ERAS.trial.a1} width={6} />)
   },
-  arena: () => {
+  sky: () => {
     const beams = Array.from({ length: 7 }, (_, i) => {
       const a = -Math.PI / 2 + (i - 3) * 0.28
       return `M 0 0 L ${r1(Math.cos(a) * TH)} ${r1(Math.sin(a) * TH)}`
     }).join(' ')
-    return centred(TH * 2, TH * 2, <Neon d={beams} color={ERAS.arena.a1} width={5} opacity={0.75} />)
+    return centred(TH * 2, TH * 2, <Neon d={beams} color={ERAS.sky.a1} width={5} opacity={0.75} />)
   },
-  beacon: () => {
+  saved: () => {
     const rays = Array.from({ length: 24 }, (_, i) => {
       const a = (i / 24) * Math.PI * 2
       return `M ${r1(Math.cos(a) * TH * 0.2)} ${r1(Math.sin(a) * TH * 0.2)} L ${r1(Math.cos(a) * TH * 0.6)} ${r1(Math.sin(a) * TH * 0.6)}`
     }).join(' ')
-    return centred(TH * 1.3, TH * 1.3, <Neon d={rays} color={ERAS.beacon.a1} width={4} opacity={0.5} />)
+    return centred(TH * 1.3, TH * 1.3, <Neon d={rays} color={ERAS.saved.a1} width={4} opacity={0.5} />)
   },
 }
 
@@ -545,34 +281,3 @@ export function decorArt(era: Era, tw: number): PlaneArt {
   if (!make) return centred(1, 1, null)
   return make(tw)
 }
-
-/** The keystone door: two halves that slide apart, a lamp on the left half per venture. */
-export function doorArt(era: Era, tw: number): PlaneArt {
-  const e = ERAS[era]
-  const w = tw
-  const h = TH
-  const half = (side: -1 | 1) => {
-    const x0 = side < 0 ? -w / 2 : 0
-    return (
-      <g data-part={side < 0 ? 'doorL' : 'doorR'}>
-        <rect x={r1(x0)} y={r1(-h / 2)} width={r1(w / 2)} height={r1(h)} fill="#14040d" />
-        <Neon d={`M ${r1(x0 + 20)} ${r1(-h / 2 + 20)} h ${r1(w / 2 - 40)} v ${r1(h - 40)} h ${r1(-w / 2 + 40)} Z`} color={e.a1} width={6} />
-        {side < 0 &&
-          Array.from({ length: 5 }, (_, i) => (
-            <circle key={i} data-part={`lamp${i}`} cx={r1(side * w * 0.12)} cy={r1(-h * 0.32 + i * h * 0.14)} r={34} fill={e.a2} opacity={0.15} />
-          ))}
-      </g>
-    )
-  }
-  return centred(
-    w,
-    h,
-    <>
-      {half(-1)}
-      {half(1)}
-    </>,
-  )
-}
-
-/** The floor line of the tunnel, for the runner's shadow and the props' feet. */
-export const FLOOR_Y = FLOOR

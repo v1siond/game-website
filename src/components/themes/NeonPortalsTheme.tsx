@@ -5,28 +5,32 @@ import { Atkinson_Hyperlegible, Bungee } from 'next/font/google'
 import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
-import { useYearNow } from '@/hooks/useYearNow'
 import { sectionPlan, type SectionSlot } from '@/lib/cv/sectionPlan'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from './shared/SkipLink'
 import { BODY } from './NeonPortals/cards'
 import { CorridorWorld } from './NeonPortals/corridor'
 import { PORTAL_VARS } from './NeonPortals/palette'
-import { ROOM_PLAN, roomAnchor, type RoomId } from './NeonPortals/plan'
-import { HubHero, Room, roomMetas } from './NeonPortals/rooms'
+import { ROOM_ERA, roomAnchor, type RoomId } from './NeonPortals/plan'
+import { HubHero, Room, roomCount } from './NeonPortals/rooms'
+import type { SceneSpec } from './NeonPortals/scenes'
+import { SETS } from './NeonPortals/sets'
 import type { RoomSpec } from './NeonPortals/world'
 
-// Neon Portals: his CV as one neon tunnel through time, seen head on. Scrolling moves the camera forward.
-// He arrives at the Chronoport hub, the time ring turning behind him, his name and the three profession
-// wings (the shared switch) on the hub's panels. Each section of the active profession is a room of its
-// own era: the camera approaches its gate, flies through it, passes one prop per item while that item's
-// card scrolls by, and flies into the era's vista; the tunnel dips to dark with warp sparks streaming past
-// and the next era's gate comes up out of the dark. Contact is the beacon at the end. He runs ahead of the
-// camera, seen from behind, and at each prop he acts (reaches for a shard, cheers a checkpoint, spins a
-// crate open, jumps on a crate, drums, kicks a bag, waves) and turns to the camera with his own face.
+// Neon Portals: his CV as one run through time, in the order of the time travelling platformer it comes
+// from. A mad clockmaker's sky fortress breaks up and crashes, the living storm locked in it pours into the
+// clockmaker's time machine, and he jumps in after it (the hero). Each section of the shown profession is
+// one portal of the machine and the era behind it, with its own body and camera: a village run into the
+// screen past a knight and two crates, the horned beast he runs from at the camera over the lava, the
+// little sub under the sea, the motorbike race, the hammer guard in the arena, the time trial on the
+// village road, the biplane among the blimps, the clockmaker at the machine's core, and at the end the
+// machine imploding on the villains while he dances at the save screen (the contact). The firefly guardian
+// joins him in the village and rides at his shoulder from then on.
 //
-// The stage (NeonPortals/corridor.tsx) is drawn by the shared scroll stage engine with its settle; the
-// text is plain normal flow on opaque panels, readable from its first frame.
+// Between eras the camera flies down the machine's passage, the tunnel he approved, the runner ahead of it
+// from behind; each era's set piece zooms in as its gate comes up and out past the camera as its section
+// ends, and plays its one to three actions on the shared scene player (NeonPortals/corridor.tsx, sets/).
+// The text is plain normal flow on opaque panels, readable from its first frame.
 
 const face = Bungee({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--np-face' })
 const body = Atkinson_Hyperlegible({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--np-body' })
@@ -65,7 +69,6 @@ export default function NeonPortalsTheme() {
   const labels = useLabels()
   const { professionalSummary } = useCVData()
   const { highlights } = useAboutBlock()
-  const year = useYearNow()
 
   const rooms: PlannedRoom[] = useMemo(
     () => [
@@ -74,9 +77,13 @@ export default function NeonPortalsTheme() {
     ],
     [view.sections, professionalSummary.bio, labels.sections],
   )
-  const specs: RoomSpec[] = useMemo(
-    () => rooms.map(({ id, slot }) => ({ id, ...ROOM_PLAN[id], metas: roomMetas(slot, labels, year, highlights) })),
-    [rooms, labels, year, highlights],
+  const specs: RoomSpec[] = useMemo(() => rooms.map(({ id, slot }) => ({ id, era: ROOM_ERA[id], items: roomCount(slot, labels, highlights) })), [rooms, labels, highlights])
+  const scenes: SceneSpec[] = useMemo(
+    () => [
+      { id: 'hero', set: SETS.hero, input: { profession: view.profession, count: 0 } },
+      ...specs.map(({ id, items }) => ({ id, set: SETS[id], input: { profession: view.profession, count: items } })),
+    ],
+    [specs, view.profession],
   )
   const sections = rooms.slice(0, -1)
   const contact = rooms[rooms.length - 1]
@@ -84,6 +91,7 @@ export default function NeonPortalsTheme() {
   return (
     <CorridorWorld
       specs={specs}
+      scenes={scenes}
       style={PORTAL_VARS}
       className={`relative min-h-screen overflow-x-clip bg-[color:var(--np-void)] text-[1.0625rem] leading-relaxed text-[color:var(--np-ink)] [--focus-ring:var(--np-white)] [--focus-halo:var(--np-void)] ${BODY} ${face.variable} ${body.variable}`}
     >

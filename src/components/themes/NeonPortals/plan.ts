@@ -2,33 +2,24 @@ import type { SectionId } from '@/lib/cv/sectionPlan'
 import type { Era } from './palette'
 
 // The corridor's rooms: each CV section the active profession shows (the shared sectionPlan), then the
-// contact beacon. A room names its era (its look, palette.ts ERAS), the prop that stands for one of its
-// items in the tunnel (props.tsx) and what the runner does at each prop (motion.ts ACTIONS).
+// contact. A room names its era: the colours of its portal in the machine's passage (palette.ts ERAS) and the
+// place its set piece shows behind that portal (sets/).
 
 export type RoomId = SectionId | 'contact'
 
-export type PropKind = 'shard' | 'checkpoint' | 'ironCrate' | 'pylon' | 'crate' | 'socket' | 'speaker' | 'bag' | 'beacon'
+/** The page's scenes: the hero's fall, then one per room. */
+export type SceneId = 'hero' | RoomId
 
-export type Action = 'smash' | 'ride' | 'flop' | 'slide' | 'chase' | 'bounce' | 'drum' | 'boss' | 'dance'
-
-export interface RoomPlan {
-  era: Era
-  prop: PropKind
-  action: Action
-  /** The keystone door that slides open after the room's last item. */
-  door: boolean
-}
-
-export const ROOM_PLAN: Record<RoomId, RoomPlan> = {
-  about: { era: 'observatory', prop: 'shard', action: 'smash', door: false },
-  work: { era: 'speedway', prop: 'checkpoint', action: 'ride', door: false },
-  tech: { era: 'forge', prop: 'ironCrate', action: 'flop', door: false },
-  services: { era: 'relay', prop: 'pylon', action: 'slide', door: false },
-  projects: { era: 'sands', prop: 'crate', action: 'chase', door: false },
-  ventures: { era: 'keystone', prop: 'socket', action: 'bounce', door: true },
-  bands: { era: 'arena', prop: 'speaker', action: 'drum', door: false },
-  muayThai: { era: 'pavilion', prop: 'bag', action: 'boss', door: false },
-  contact: { era: 'beacon', prop: 'beacon', action: 'dance', door: false },
+export const ROOM_ERA: Record<RoomId, Era> = {
+  about: 'village',
+  work: 'swamp',
+  tech: 'deepSea',
+  services: 'highway',
+  projects: 'colosseum',
+  ventures: 'trial',
+  bands: 'sky',
+  muayThai: 'core',
+  contact: 'saved',
 }
 
 export const HUB_ERA: Era = 'hub'

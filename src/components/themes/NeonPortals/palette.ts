@@ -8,7 +8,7 @@ import { paletteVars } from '../shared/paletteVars'
 // Every text pair is on an opaque panel, never on the art. WCAG ratio, measured with contrast.py:
 // INK on PANEL 16.9:1, on RAISED 15.6:1; MUTED on PANEL 11.3:1, on RAISED 10.5:1; WHITE on PANEL 19.1:1;
 // PANEL on GOLD 13.3:1; each era's tint (ERA_TINT_SHARE of the way from a1 to white) 9.8:1 or more on
-// PANEL and 9.0:1 or more on RAISED, the keystone's the lowest, and PANEL on a tint (the lit button) the
+// PANEL and 9.0:1 or more on RAISED, the trial's the lowest, and PANEL on a tint (the lit button) the
 // same. AAA (7:1) everywhere.
 export const PORTAL = {
   VOID: '#070418',
@@ -38,18 +38,19 @@ export interface EraLook {
 
 export type GateShape = 'ellipse' | 'arch' | 'rounded' | 'pointed' | 'hex' | 'trapezoid' | 'gable' | 'chamfer'
 
-// One per room, in our own time and place, never a place from a game.
+// One per room, each the machine's portal into one of the run's places (sets/ draws the place itself), in
+// our own time and look, never a place from a game.
 export const ERAS = {
   hub: { a1: '#5cf2ff', a2: '#b88cff', wall: '#0d0828', shape: 'ellipse' },
-  observatory: { a1: '#ffc35c', a2: '#3fe0c5', wall: '#1a1006', shape: 'arch' },
-  speedway: { a1: '#ff5db8', a2: '#ffa24c', wall: '#1e0716', shape: 'rounded' },
-  forge: { a1: '#ff8a3d', a2: '#ff4a3d', wall: '#1c0a04', shape: 'pointed' },
-  relay: { a1: '#b6ff5c', a2: '#3dffd2', wall: '#08170c', shape: 'hex' },
-  sands: { a1: '#43f5e4', a2: '#ffd166', wall: '#061718', shape: 'trapezoid' },
-  keystone: { a1: '#ff4d7a', a2: '#a66bff', wall: '#1a0612', shape: 'chamfer' },
-  arena: { a1: '#ff6bf2', a2: '#5aa8ff', wall: '#160626', shape: 'chamfer' },
-  pavilion: { a1: '#ffd34d', a2: '#ff5245', wall: '#1a0c04', shape: 'gable' },
-  beacon: { a1: '#e8fbff', a2: '#5cf2ff', wall: '#071420', shape: 'ellipse' },
+  village: { a1: '#ffc35c', a2: '#8ff06a', wall: '#1a1006', shape: 'arch' },
+  swamp: { a1: '#ff8a3d', a2: '#ff4a3d', wall: '#1c0a04', shape: 'pointed' },
+  deepSea: { a1: '#4fd8ff', a2: '#3dffd2', wall: '#04121c', shape: 'hex' },
+  highway: { a1: '#ff5db8', a2: '#ffa24c', wall: '#1e0716', shape: 'rounded' },
+  colosseum: { a1: '#ffd166', a2: '#43f5e4', wall: '#171006', shape: 'trapezoid' },
+  trial: { a1: '#6cf0ff', a2: '#ffd34d', wall: '#071418', shape: 'chamfer' },
+  sky: { a1: '#9fd4ff', a2: '#ff8f5a', wall: '#0a1226', shape: 'chamfer' },
+  core: { a1: '#ff6bf2', a2: '#ffd34d', wall: '#160626', shape: 'gable' },
+  saved: { a1: '#e8fbff', a2: '#5cf2ff', wall: '#071420', shape: 'ellipse' },
 } as const satisfies Record<string, EraLook>
 
 export type Era = keyof typeof ERAS

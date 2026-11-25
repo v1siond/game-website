@@ -23,15 +23,15 @@ import type { SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import type { Profession } from '@/lib/cv/professions'
 import { BUTTON_LINE, BUTTON_SMALL, CARD, CARD_TITLE, CARD_TITLE_BIG, CARD_WIDE, CONTACT_LOOK, FACE, FACTS, MUTED, POINTS, TAGS, TINT } from './cards'
 import { ERA_TINT_SHARE, ERAS, OUTFIT_LOOK, PORTAL, type Era } from './palette'
-import { HUB_ERA, ROOM_PLAN, roomAnchor, type RoomId } from './plan'
+import { HUB_ERA, ROOM_ERA, roomAnchor, type RoomId } from './plan'
 import { relicOf } from './relics'
-import type { PropMeta } from './world'
 
-// The text layer: plain HTML in normal flow over the fixed tunnel, never scaled by the art and never faded.
-// The hero is the Chronoport hub: his name, the recruiter copy and the three profession wings (the shared
-// switch). Each room is a transit spacer (the flight through the dark to the next gate, [data-transit]),
-// the gate plate with the room's title ([data-gate]), one card per item ([data-item],
-// each the anchor of one prop in the tunnel) and a tail. The stage measures these marks.
+// The text layer: plain HTML in normal flow over the fixed tunnel and its set pieces, never scaled by the
+// art and never faded. The hero is the machine's hub: his name, the recruiter copy and the three profession
+// wings (the shared switch). Each room is a transit spacer (the flight down the passage to the next portal,
+// [data-transit]), the gate plate with the room's title ([data-gate]; on a phone it holds the room alone
+// while its set piece plays above the cards), one card per item ([data-item], each a mark the camera holds
+// at) and a tail. The stage measures these marks.
 
 /** A room's colours as the CSS variables its text reads: its edge and its tint. */
 export const eraVars = (era: Era) => cssVars({ '--ra1': ERAS[era].a1, '--ra-text': mix(ERAS[era].a1, PORTAL.WHITE, ERA_TINT_SHARE) })
@@ -281,7 +281,7 @@ function ContactItem() {
   )
 }
 
-/** A room's cards, one per prop in the tunnel; roomMetas counts the same. */
+/** A room's cards; roomCount counts the same. */
 function RoomItems({ slot }: { slot: SectionSlot | null }) {
   if (!slot) return <ContactItem />
   const ITEMS: { [Id in SectionSlot['id']]: (slot: SlotOf<Id>) => ReactNode } = {
@@ -298,22 +298,20 @@ function RoomItems({ slot }: { slot: SectionSlot | null }) {
   return (ITEMS[slot.id] as (slot: SectionSlot) => ReactNode)(slot)
 }
 
-const one = (count: number): PropMeta[] => Array.from({ length: count }, () => ({}))
-
-/** What each of a room's props needs, one per card RoomItems draws, in the same order. */
-export function roomMetas(slot: SectionSlot | null, labels: Labels, year: number, highlights: readonly string[]): PropMeta[] {
-  if (!slot) return one(1)
-  const METAS: { [Id in SectionSlot['id']]: (slot: SlotOf<Id>) => PropMeta[] } = {
-    about: () => one(1 + highlights.length),
-    work: (s) => s.jobs.map((job) => ({ relic: relicOf(job, year) })),
-    tech: (s) => one(s.categories.length),
-    services: (s) => one(s.services.length),
-    projects: (s) => one(s.projects.length),
-    ventures: (s) => s.companies.map((company) => ({ featured: Boolean(company.featured) })),
-    bands: (s) => one(1 + s.bands.length),
-    muayThai: (s) => one(2 + muayThaiFacts(s.martialArts, labels).length),
+/** How many cards RoomItems draws for a room. */
+export function roomCount(slot: SectionSlot | null, labels: Labels, highlights: readonly string[]): number {
+  if (!slot) return 1
+  const COUNTS: { [Id in SectionSlot['id']]: (slot: SlotOf<Id>) => number } = {
+    about: () => 1 + highlights.length,
+    work: (s) => s.jobs.length,
+    tech: (s) => s.categories.length,
+    services: (s) => s.services.length,
+    projects: (s) => s.projects.length,
+    ventures: (s) => s.companies.length,
+    bands: (s) => 1 + s.bands.length,
+    muayThai: (s) => 2 + muayThaiFacts(s.martialArts, labels).length,
   }
-  return (METAS[slot.id] as (slot: SectionSlot) => PropMeta[])(slot)
+  return (COUNTS[slot.id] as (slot: SectionSlot) => number)(slot)
 }
 
 interface RoomProps {
@@ -326,12 +324,12 @@ interface RoomProps {
 }
 
 export function Room({ id, slot, title, wing, last }: RoomProps) {
-  const { era } = ROOM_PLAN[id]
+  const era = ROOM_ERA[id]
   const flat = slot?.id === 'projects' || slot?.id === 'ventures'
   return (
     <section data-room="" id={roomAnchor(id)} aria-labelledby={`${roomAnchor(id)}-title`} style={eraVars(era)} className="px-[max(16px,6vw)]">
       <div data-transit="" className="h-[95vh] max-md:h-[80vh]" aria-hidden="true" />
-      <div data-gate="" className="min-h-[62vh] max-md:min-h-[50vh]">
+      <div data-gate="" className="min-h-[62vh] max-md:min-h-[90vh]">
         <div className="inline-block max-w-[35rem] border-t-4 border-[color:var(--ra1)] bg-[color:var(--np-panel)] px-[1.6rem] pb-[1.4rem] pt-5 max-md:w-full max-md:px-5 max-md:pb-5 max-md:pt-4">
           {wing && <p className={TINT}>{wing}</p>}
           <h2 id={`${roomAnchor(id)}-title`} className={`${FACE} mb-1.5 mt-0.5 text-[clamp(2.2rem,5vw,4.25rem)] leading-none text-[color:var(--np-white)]`}>
@@ -350,7 +348,7 @@ export function Room({ id, slot, title, wing, last }: RoomProps) {
   )
 }
 
-const WING_RING: Record<Profession, string> = { engineer: ERAS.hub.a1, drummer: ERAS.arena.a1, fighter: ERAS.pavilion.a1 }
+const WING_RING: Record<Profession, string> = { engineer: ERAS.hub.a1, drummer: ERAS.sky.a1, fighter: ERAS.core.a1 }
 
 function Wings() {
   const { navigation, professionFields } = useLabels()

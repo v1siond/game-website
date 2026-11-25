@@ -4,9 +4,9 @@ import { camAt, cameraPath, eraSwitchAt, layoutCorridor, planeView, settledCam, 
 // play backwards on the way up and dip to dark only between eras.
 
 const rooms: RoomSpec[] = [
-  { id: 'about', era: 'observatory', prop: 'shard', action: 'smash', door: false, metas: [{}, {}, {}] },
-  { id: 'ventures', era: 'keystone', prop: 'socket', action: 'bounce', door: true, metas: [{ featured: true }, {}] },
-  { id: 'contact', era: 'beacon', prop: 'beacon', action: 'dance', door: false, metas: [{}] },
+  { id: 'about', era: 'village', items: 3 },
+  { id: 'ventures', era: 'trial', items: 2 },
+  { id: 'contact', era: 'saved', items: 1 },
 ]
 
 const marksFor = (top: number, items: number): RoomMarks => ({
@@ -26,19 +26,12 @@ describe('layoutCorridor', () => {
     expect(depths).toEqual([...depths].sort((a, b) => b - a))
   })
 
-  it('puts one prop per item after its room gate, the lanes alternating, and the vista after the last', () => {
+  it('puts one mark per card after its room gate, and the end of the room after the last', () => {
     corridor.rooms.forEach((room, r) => {
-      expect(room.items).toHaveLength(rooms[r].metas.length)
-      room.items.forEach((item, i) => {
-        expect(item.z).toBeGreaterThan(room.gate)
-        expect(item.side).toBe(i % 2 ? -1 : 1)
-      })
+      expect(room.items).toHaveLength(rooms[r].items)
+      room.items.forEach((item) => expect(item.z).toBeGreaterThan(room.gate))
       expect(room.vista).toBeGreaterThan(room.items[room.items.length - 1].z)
     })
-  })
-
-  it('draws the keystone door only in the room that asks for it', () => {
-    expect(corridor.rooms.map((room) => room.door !== null)).toEqual([false, true, false])
   })
 
   it('narrows the tunnel on a phone', () => {
@@ -55,7 +48,7 @@ describe('cameraPath and camAt', () => {
     keyframes.slice(1).forEach(([y], i) => expect(y).toBeGreaterThan(keyframes[i][0]))
   })
 
-  it('holds the camera at each card: its prop is at the runner when the card is on the reading line', () => {
+  it('holds the camera at each card: at its mark when the card is on the reading line', () => {
     const [room] = corridor.rooms
     marks[0].items.forEach((centre, i) => expect(camAt(keyframes, centre - 400)).toBeCloseTo(room.items[i].z - 520))
   })
