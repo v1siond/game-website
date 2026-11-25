@@ -22,18 +22,19 @@ import { RealmFrame } from './MedievalFantasy/panels'
 import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
 import { FrostArtDivider } from './MedievalFantasy/ornaments'
 import { BlightPaths, ProfessionNode } from './MedievalFantasy/professions'
-import { ArtDivider, CARDS, REALM_OF, type SectionLayout } from './MedievalFantasy/sections'
-import { REALM_MOTION, RealmStage, scenesOf, type RealmScene } from './MedievalFantasy/scenes'
+import { ArtDivider, CARDS, type SectionLayout } from './MedievalFantasy/sections'
+import { REALM_MOTION, RealmStage, scenesOf, type RealmScene, type Side } from './MedievalFantasy/scenes'
 import look from './MedievalFantasy/world.module.css'
 
 // Medieval Fantasy: the page composition. Its palette, lands, frames, buttons, cards, ornaments and per
 // profession sections live in ./MedievalFantasy. The page tells one war of the fantasy strategy game it comes
-// from, with him as the warden who warns and is not believed: the hero is the council hall that sends him
-// away, then each section is a full screen stage of the war's next place that rises from the dark, holds while
-// its frame scrolls over it and sinks as the next rises (the shared theatre on the scroll stage engine), and
-// on it the place plays its beat of the campaign once, at the shared player's own pace
-// (./MedievalFantasy/scenes.tsx). The contact is the last stand at the great tree. Under reduced motion every
-// section carries its own stage, still at its settled frame.
+// from, in its campaigns' order, with him as the kingdom's knight commander who fights through it: the hero is
+// the king's hall where the seer's warning is turned away, then each section is a full screen stage of the war's
+// next place that rises from the dark, holds while its frame scrolls over it and sinks as the next rises (the
+// shared theatre on the scroll stage engine), and on it the place plays its beat of the campaign once, at the
+// shared player's own pace (./MedievalFantasy/scenes.tsx). The sections take turns from lg: the first after the
+// hero has its frame on the left and its scene on the right, the next the reverse, to the contact, the last
+// stand at the great tree. Under reduced motion every section carries its own stage, still at its settled frame.
 
 // The realm's carved capitals, Cinzel (an inscriptional Roman face): the root carries its --realm-face
 // variable and every text style reads it through REALM_FACE.
@@ -63,15 +64,15 @@ const isLargeWindow = (): boolean => window.innerHeight >= LARGE_SCREEN_HEIGHT
 // The root's palette variables and base look, built once instead of on every render.
 const ROOT_STYLE: CSSProperties = { ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: REALM_FACE, color: REALM.textBright }
 
-// The column a frame reads in: beside the stage from lg, on the left of a chaos stage (the golem on its right)
-// and on the right of a frost stage (the frost king on its left), there held 9.5rem in from the side so the
-// worlds launcher fixed in the top right corner never sits over its text; below lg the whole width, the stage
-// showing in the screens of picture alone above and below it.
-const COLUMN = { chaos: 'mx-auto max-w-[900px] lg:mx-0 lg:w-[min(42rem,46vw)]', frost: 'mx-auto max-w-[900px] lg:mr-[9.5rem] lg:w-[min(42rem,46vw)]' }
+// The column a frame reads in, on the side away from its scene: from lg on the left of a scene on the right, or
+// on the right of a scene on the left, there held 9.5rem in from the side so the worlds launcher fixed in the
+// top right corner never sits over its text; below lg the whole width, the stage showing in the screens of
+// picture alone above and below it.
+const COLUMN: Record<Side, string> = { right: 'mx-auto max-w-[900px] lg:mx-0 lg:w-[min(42rem,46vw)]', left: 'mx-auto max-w-[900px] lg:mr-[9.5rem] lg:w-[min(42rem,46vw)]' }
 const SIDE = 'px-[clamp(1rem,4vw,2rem)] lg:px-[clamp(1.5rem,4vw,4rem)]'
 
 interface SectionProps {
-  scene: RealmScene & { slot: SectionSlot }
+  scene: RealmScene & { slot: SectionSlot; side: Side }
   layout: SectionLayout
   isLargeScreen: boolean
   still: boolean
@@ -86,7 +87,7 @@ function RealmSection({ scene, layout, isLargeScreen, still }: SectionProps) {
     <div data-scene={scene.id} className={`relative pb-[70svh] ${SIDE}`}>
       {still && <RealmStage scene={scene} settled />}
       <div className="min-h-[100svh] max-md:min-h-[130svh]" />
-      <div className={COLUMN[REALM_OF[scene.slot.id]]}>
+      <div className={COLUMN[scene.side]}>
         <Frame slot={scene.slot} layout={layout} isLargeScreen={isLargeScreen} />
       </div>
     </div>
@@ -109,8 +110,8 @@ export default function MedievalFantasyTheme() {
     [view.sections, professionalSummary.bio, labels, highlights, active],
   )
   const { theatreRef, textRef } = useTheatre(scenes, REALM_MOTION, reduced)
-  const realms = scenes.filter((scene): scene is RealmScene & { slot: SectionSlot } => scene.slot !== null)
-  const contact = scenes[scenes.length - 1]
+  const realms = scenes.filter((scene): scene is RealmScene & { slot: SectionSlot; side: Side } => scene.slot !== null)
+  const contact = scenes[scenes.length - 1] as RealmScene & { side: Side }
 
   // The spacing follows the window height; a resize re-renders the page only when it crosses 800 px.
   useEffect(() => {
@@ -218,10 +219,10 @@ export default function MedievalFantasyTheme() {
             ))}
           </ProfessionRegion>
 
-          {/* Contact: no card, the call and his line on a plate before the great tree. */}
-          <div data-scene="contact" className={`relative pb-[30svh] pt-[60svh] ${SIDE}`}>
+          {/* Contact: no card, the call and his line on a plate beside the great tree, on the side away from it. */}
+          <div data-scene="contact" className={`relative pb-[30svh] pt-[60svh] max-md:pt-[130svh] ${SIDE}`}>
             {reduced && <RealmStage scene={contact} settled />}
-            <div className="relative mx-auto max-w-[900px]">
+            <div className={`relative ${COLUMN[contact.side]}`}>
               {/* === Frost Art Divider: the rune === */}
               <ArtDivider layout={layout}>
                 <FrostArtDivider variant="rune" scale={layout.artDividerScale} />

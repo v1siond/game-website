@@ -1,6 +1,10 @@
 /* Medieval Fantasy's theatre: the realm's void behind every stage and the dark a stage fades into, the
-   vignette over each land, and where each realm's units stand: on a chaos stage right of the field, clear of
-   the text column on the left; on a frost stage left of it, clear of the text column on the right. */
+   vignette over each land, and where each scene's cast stands. From lg the cast stands on its side's half of
+   the field (scenes.tsx sets it there); under 1024 px the cards and the scene are stacked and the screen shows
+   only the field's middle, so each band shrinks about its own middle and moves there, his action a little to
+   the side it names, so it still reads on that half: on a phone the band also stands up the screen, its floor at
+   about 60% of it, so the cast plays clear of the cards rising from below while the section's head holds it
+   alone. The hero's cast stands low instead, smaller, clear of the hero card and the profession menu. */
 
 .root {
   --theatre-ground: var(--realm-bg-void);
@@ -13,45 +17,45 @@
 .vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% 50%, transparent 20%, rgb(0 0 0 / 0.7) 100%);
+  background: radial-gradient(ellipse at 50% 55%, transparent 35%, rgb(0 0 0 / 0.55) 100%);
 }
 
-/* The field's bands: chaos units play right of the text column (about x 1080 to 1660 of the 1920 field), frost
-   units left of it (about 280 to 820). Under 1024 px the screen shows only the field's middle, so each band
-   shrinks to two thirds about its own middle and moves there. On a phone each band also stands up the screen,
-   its floor at about 60% of it, so the units play clear of the cards rising from below while the head holds
-   them alone; the hero's units stand low instead, the warden under the middle node of the profession menu and
-   the hall's council under the right one, smaller, clear of the menu the hero card ends on. */
+/* Under 1024 px a band's lead, his action's place in its scene's frame (--lead, from scenes.tsx), is set a
+   little right of the screen's middle for a scene on the right and a little left for one on the left: x' =
+   target, so the translate is the target less the anchor less the scaled lead. */
 @media (max-width: 1023.98px) {
-  .chaosBand,
-  .heroBand {
-    transform: translateX(-410px) scale(0.66);
-    transform-origin: 1370px 1000px;
+  .bandRight {
+    transform: translate(calc(1060px - 1392px - 0.7px * var(--lead)), -120px) scale(0.7);
+    transform-origin: 1392px 1000px;
   }
 
-  .frostBand {
-    transform: translateX(410px) scale(0.66);
-    transform-origin: 550px 1000px;
+  .bandLeft {
+    transform: translate(calc(860px - 470px - 0.7px * var(--lead)), -120px) scale(0.7);
+    transform-origin: 470px 1000px;
+  }
+
+  .bandHero {
+    transform: translate(-150px, 40px) scale(0.7);
+    transform-origin: 1150px 1000px;
   }
 }
 
 @media (max-width: 767.98px) {
-  .chaosBand {
-    transform: translate(-410px, -350px) scale(0.66);
+  .bandRight {
+    transform: translate(calc(1010px - 1392px - 0.62px * var(--lead)), -360px) scale(0.62);
   }
 
-  .frostBand {
-    transform: translate(410px, -350px) scale(0.66);
+  .bandLeft {
+    transform: translate(calc(910px - 470px - 0.62px * var(--lead)), -360px) scale(0.62);
   }
 
-  .heroBand {
-    transform: translate(-195px, 75px) scale(0.58);
-    transform-origin: 1130px 1000px;
+  .bandHero {
+    transform: translate(-150px, 60px) scale(0.6);
   }
 }
 
-/* The contact's call and the footer stand on the frost land, no frame of their own: a plate of the realm's
-   void under them keeps the lettering at AAA over the brightest ice behind. */
+/* The contact's call and the footer stand on the last land, no frame of their own: a plate of the realm's void
+   under them keeps the lettering at AAA over the brightest ground behind. */
 .plate {
   background: color-mix(in srgb, var(--realm-bg-void) 97%, transparent);
   border-radius: 4px;

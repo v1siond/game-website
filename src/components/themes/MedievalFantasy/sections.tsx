@@ -6,7 +6,6 @@ import { BandList } from '@/components/cv/BandList'
 import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { SectionFrames } from '@/components/cv/SectionPlanView'
-import type { SectionId } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
@@ -291,16 +290,3 @@ const FRAMES: SectionFrames<FrameProps> = {
 }
 
 export const CARDS = FRAMES
-
-// The realm each section's frame and scene stand in: chaos up to the services, then frost; the Muay Thai record
-// is fought back in the chaos realm.
-export const REALM_OF: Record<SectionId, 'chaos' | 'frost'> = {
-  about: 'chaos',
-  work: 'chaos',
-  tech: 'chaos',
-  services: 'chaos',
-  projects: 'frost',
-  ventures: 'frost',
-  bands: 'frost',
-  muayThai: 'chaos',
-}
