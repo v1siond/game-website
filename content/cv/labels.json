@@ -123,18 +123,6 @@
         "standingAt": "Standing at {place}",
         "secretExit": "Secret exit"
       },
-      "arcade": {
-        "smashAgain": "Smash the car again",
-        "throwAgain": "Throw the blasts again",
-        "superAgain": "Play the super move again",
-        "parryAgain": "Play the parries again",
-        "sparAgain": "Spar the round again",
-        "bonus": "Bonus stage",
-        "perfect": "Perfect",
-        "ko": "K.O.",
-        "superMove": "Super move",
-        "continueCall": "Continue?"
-      },
       "jungle": {
         "blastAgain": "Fire the tree house barrel again",
         "blastTo": "Blast to {job}",
@@ -217,7 +205,6 @@
       },
       "hud": {
         "playerOne": "1P",
-        "hits": "hits",
         "hp": "HP",
         "parryMeter": "{parried} of {total} parried",
         "parry": "Parry {name}",
@@ -437,18 +424,6 @@
         "standingAt": "En {place}",
         "secretExit": "Salida secreta"
       },
-      "arcade": {
-        "smashAgain": "Destrozar el auto otra vez",
-        "throwAgain": "Lanzar las ráfagas otra vez",
-        "superAgain": "Repetir el súper movimiento",
-        "parryAgain": "Repetir los bloqueos",
-        "sparAgain": "Repetir el asalto",
-        "bonus": "Etapa de bonus",
-        "perfect": "Perfecto",
-        "ko": "K.O.",
-        "superMove": "Súper movimiento",
-        "continueCall": "¿Continuar?"
-      },
       "jungle": {
         "blastAgain": "Disparar otra vez el barril de la casa del árbol",
         "blastTo": "Disparar a {job}",
@@ -531,7 +506,6 @@
       },
       "hud": {
         "playerOne": "1J",
-        "hits": "golpes",
         "hp": "PV",
         "parryMeter": "{parried} de {total} desviados",
         "parry": "Desviar {name}",
@@ -716,18 +690,6 @@
         "standingAt": "A {place}",
         "secretExit": "Uscita segreta"
       },
-      "arcade": {
-        "smashAgain": "Distruggi di nuovo l'auto",
-        "throwAgain": "Lancia di nuovo le sfere",
-        "superAgain": "Rivedi la mossa super",
-        "parryAgain": "Rivedi le parate",
-        "sparAgain": "Rivedi il round",
-        "bonus": "Livello bonus",
-        "perfect": "Perfetto",
-        "ko": "K.O.",
-        "superMove": "Mossa super",
-        "continueCall": "Continui?"
-      },
       "jungle": {
         "blastAgain": "Spara di nuovo il barile della casa sull’albero",
         "blastTo": "Spara verso {job}",
@@ -810,7 +772,6 @@
       },
       "hud": {
         "playerOne": "1G",
-        "hits": "colpi",
         "hp": "PV",
         "parryMeter": "{parried} di {total} parati",
         "parry": "Para {name}",
