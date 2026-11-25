@@ -50,7 +50,7 @@ export const hero: Place = {
       <g transform={`translate(${HILL.x} ${HILL.top + 14})`}>
         <Hut name="far-hut" w={48} fill={light.mid} />
       </g>
-      <circle data-fx="far-glow" cx={HILL.x + 10} cy={HILL.top - 30} r={34} fill={SHADE.sun} opacity={0.15} />
+      <circle data-fx="far-glow" cx={HILL.x + 10} cy={HILL.top - 30} r={34} fill={SHADE.glow} opacity={0.15} />
     </g>
   ),
   move,

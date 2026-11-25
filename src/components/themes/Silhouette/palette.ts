@@ -1,9 +1,12 @@
 import { paletteVars } from '../shared/paletteVars'
 
 // Silhouette's palette: black shapes against a pale grey glow, depth by fog, as the game is drawn. The page
-// is near black with fog grey text; each profession's level keeps the grey and only tints it, a cold grey
-// for the System Engineer, a warm grey for the Musician and a red grey for the Martial Artist, with every shape in front of it a
-// shade darker the nearer it stands, and a rim of light on the edges that face the sky.
+// is near black with fog grey text. The pictures hold no colour at all, as the game's do (C59 frames): only
+// his eyes, the worm and the far window glow, white. Each profession's level keeps the grey and tints its
+// mist so slightly it reads as the hour, a cold grey for the System Engineer, a warm one for the Musician and
+// a faintly red one for the Martial Artist, with every shape in front of it a shade darker the nearer it
+// stands, and a grey rim of light on the edges that face the sky. The rim colour (rim) is the page's accent
+// for focus and the levers only.
 //
 // This is the one source of the world's colours: SVG fills read the constants, class strings read the
 // same values as CSS variables (SHADE_VARS, set once on the world's root).
@@ -27,6 +30,7 @@ export const SHADE = {
   heading: '#dddddd',
   glow: '#eeeeee',
   rim: '#f2c98a',
+  // the world card's accents (src/themes/themes.ts); no picture of the world uses them
   ember: '#e3893a',
   sun: '#f6b26b',
   // His clothes: the coat, the trousers and the gloves.
@@ -36,21 +40,23 @@ export const SHADE = {
   // The three skies, top to horizon, and the fog layers in front of each, far to near; the fog band
   // over the ground carries its own transparency.
   dawnTop: '#2a2e30',
-  dawnLow: '#b4bcbe',
+  dawnLow: '#b8bdbe',
   dawnFar: '#7d8587',
   dawnMid: '#3a3f41',
   dawnFog: '#d6dcdd4d',
-  dawnRim: '#cfe0e3',
-  emberTop: '#2e2925',
-  emberLow: '#c2b2a2',
-  emberFar: '#86796d',
-  emberMid: '#3f3832',
-  emberFog: '#ddd3c94d',
-  crimsonTop: '#2e2526',
-  crimsonLow: '#bfa7a3',
-  crimsonFar: '#85716e',
-  crimsonMid: '#3f3434',
-  crimsonFog: '#dccfcd4d',
+  dawnRim: '#d8dcdd',
+  emberTop: '#2c2a28',
+  emberLow: '#bfbab4',
+  emberFar: '#837e78',
+  emberMid: '#3d3a37',
+  emberFog: '#ddd9d44d',
+  emberRim: '#dcd8d2',
+  crimsonTop: '#2c2828',
+  crimsonLow: '#bfb6b4',
+  crimsonFar: '#847a78',
+  crimsonMid: '#3d3838',
+  crimsonFog: '#dcd6d54d',
+  crimsonRim: '#dcd5d4',
 } as const
 
 // One light of the forest: the sky top to horizon, the far and mid layers in front of it, the fog band
@@ -66,8 +72,8 @@ export interface Light {
 
 export const LIGHTS = {
   dawn: { top: SHADE.dawnTop, low: SHADE.dawnLow, far: SHADE.dawnFar, mid: SHADE.dawnMid, fog: SHADE.dawnFog, rim: SHADE.dawnRim },
-  ember: { top: SHADE.emberTop, low: SHADE.emberLow, far: SHADE.emberFar, mid: SHADE.emberMid, fog: SHADE.emberFog, rim: SHADE.rim },
-  crimson: { top: SHADE.crimsonTop, low: SHADE.crimsonLow, far: SHADE.crimsonFar, mid: SHADE.crimsonMid, fog: SHADE.crimsonFog, rim: SHADE.rim },
+  ember: { top: SHADE.emberTop, low: SHADE.emberLow, far: SHADE.emberFar, mid: SHADE.emberMid, fog: SHADE.emberFog, rim: SHADE.emberRim },
+  crimson: { top: SHADE.crimsonTop, low: SHADE.crimsonLow, far: SHADE.crimsonFar, mid: SHADE.crimsonMid, fog: SHADE.crimsonFog, rim: SHADE.crimsonRim },
 } as const satisfies Record<string, Light>
 
 export type LightName = keyof typeof LIGHTS

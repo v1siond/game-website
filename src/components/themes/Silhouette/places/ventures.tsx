@@ -6,18 +6,21 @@ import { SHADE, type Light } from '../palette'
 import { arc, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, STRIKE, TUCK, rest } from '../pose'
 
-// Ventures, the sign that kills: on the crumbling city's roofs a great sign of plain panels, no letters, lies
-// along his way, and the lit panel kills whatever stands on it; the light walks along the sign toward him
-// (research notes L72 to L74, [2] [1]). He crouches low on a dark panel as the light passes one panel away; he
-// yanks the cable hanging over the sign and it dies panel by panel; he runs over the dead sign and drops
-// onto the glass dome below the roof's edge, and the glass gives under him.
+// Ventures, the sign that kills: on the crumbling city's roofs a great sign stands on its scaffold along his
+// way, five tall panels of bulbs with no letters on them, and the lit panel kills whatever stands in front of
+// it, its glare and its arcs falling on the roof below; the light walks along the sign toward him (research
+// notes L72 to L74, [2] [1]). He crouches low in front of a dark panel as the light comes to one panel away
+// and goes back; he steps to the cable hanging from the sign's frame and yanks it, and the sign dies panel by
+// panel; he runs on to the roof's edge and drops onto the glass dome below, and the glass gives under him.
 
-const PANEL = { from: 60, w: 64, count: 5, h: 6 }
+const PANEL = { from: 40, w: 78, count: 5, low: -24, high: -210 }
+const BULBS = { cols: 3, rows: 5 }
 const WAIT_ON = 1
-const CABLE = PANEL.from + PANEL.w * 2 + 10
+const CABLE = PANEL.from + PANEL.w * 2 + 6
 const EDGE = PANEL.from + PANEL.w * PANEL.count + 40
-const DOME = { x: EDGE + 120, r: 110, top: 70 }
+const DOME = { x: EDGE + 130, r: 130, top: 60 }
 const FALL = 230
+const LOOK_ALONG = 130
 
 /** The middle of panel `i`. */
 const panelX = (i: number): number => PANEL.from + PANEL.w * (i + 0.5)
@@ -46,35 +49,79 @@ function move(profession: Profession, t: number, length: number): Frame {
   return { pose: mix(TUCK, CROUCH, ramp(fall, 0.6, 1)), ahead: lerp(EDGE, length, fall), lift: arc(fall, 20, -FALL), over: 0 }
 }
 
+/** One panel of bulbs: dead grey bulbs on a dark face, so he reads black in front of it. */
+function Panel({ i, light }: { i: number; light: Light }) {
+  const x = PANEL.from + PANEL.w * i
+  const h = PANEL.low - PANEL.high
+  const gapX = (PANEL.w - 16) / BULBS.cols
+  const gapY = (h - 16) / BULBS.rows
+  const bulbs = Array.from({ length: BULBS.cols * BULBS.rows }, (_, k) => ({ cx: x + 8 + gapX * ((k % BULBS.cols) + 0.5), cy: PANEL.high + 8 + gapY * (Math.floor(k / BULBS.cols) + 0.5) }))
+  return (
+    <g>
+      <rect x={x + 3} y={PANEL.high} width={PANEL.w - 6} height={h} fill={light.mid} />
+      <g fill={light.far} opacity={0.6}>
+        {bulbs.map(({ cx, cy }) => (
+          <circle key={`${cx} ${cy}`} cx={cx} cy={cy} r={6} />
+        ))}
+      </g>
+      <g data-fx={`panel-${i}`} opacity="0">
+        <rect x={x - 30} y={PANEL.high - 40} width={PANEL.w + 60} height={h + 70} fill="url(#sign-glare)" />
+        <path d={`M${x + 6} ${PANEL.low} L${x - 30} 0 H${x + PANEL.w + 30} L${x + PANEL.w - 6} ${PANEL.low} Z`} fill={SHADE.glow} opacity={0.45} />
+        <g fill={SHADE.glow}>
+          {bulbs.map(({ cx, cy }) => (
+            <circle key={`${cx} ${cy}`} cx={cx} cy={cy} r={7.5} />
+          ))}
+        </g>
+        {/* the arcs crackling from the panel down onto the roof */}
+        <path d={`M${x + 18} ${PANEL.low} l-10 8 l12 4 l-14 12 M${x + PANEL.w - 18} ${PANEL.low} l8 8 l-12 5 l10 11`} stroke={SHADE.glow} strokeWidth={2.5} fill="none" />
+      </g>
+    </g>
+  )
+}
+
 export const ventures: Place = {
   region: 'city',
   length: DOME.x,
   script: [1600, 1500, 1500],
   ends: [0.34, 0.66, 1],
   gaps: [[EDGE, EDGE + 500]],
+  // the camera looks along the sign while the light walks it and he cuts it, so on a phone it is whole in frame
+  lead: (t) => LOOK_ALONG * (ramp(t, 0.02, 0.1) - ramp(t, 0.66, 0.8)),
+  phoneTop: 600,
   obstacle: ({ light }: { light: Light }) => (
     <>
-      {Array.from({ length: PANEL.count }, (_, i) => (
-        <g key={i}>
-          <rect x={PANEL.from + PANEL.w * i + 2} y={-PANEL.h} width={PANEL.w - 4} height={PANEL.h} fill={SHADE.black} stroke={SHADE.edge} strokeWidth={1.5} />
-          <g data-fx={`panel-${i}`} opacity="0">
-            <rect x={PANEL.from + PANEL.w * i + 4} y={-PANEL.h + 2} width={PANEL.w - 8} height={PANEL.h - 4} fill={SHADE.glow} />
-            <rect x={PANEL.from + PANEL.w * i - 6} y={-PANEL.h - 40} width={PANEL.w + 12} height={44} fill={SHADE.glow} opacity={0.18} />
-          </g>
-        </g>
-      ))}
-      {/* the cable hanging from a pole over the sign */}
-      <path d={`M${CABLE + 40} 0 V-300 H${CABLE}`} stroke={SHADE.black} strokeWidth={6} fill="none" />
-      <g data-fx="cable">
-        <path d={`M${CABLE} -300 V-80 l-6 10 h12 Z`} stroke={SHADE.black} strokeWidth={3} fill={SHADE.black} />
+      <defs>
+        <radialGradient id="sign-glare">
+          <stop offset="0" stopColor={SHADE.glow} stopOpacity="0.85" />
+          <stop offset="1" stopColor={SHADE.glow} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <g data-fx="sign">
+        {/* the scaffold the sign stands on, its frame and the struts behind */}
+        <path
+          d={`M${PANEL.from - 10} ${PANEL.high - 18} H${PANEL.from + PANEL.w * PANEL.count + 10} M${PANEL.from - 10} ${PANEL.low + 6} H${PANEL.from + PANEL.w * PANEL.count + 10} ${Array.from({ length: PANEL.count + 1 }, (_, i) => `M${PANEL.from + PANEL.w * i} ${PANEL.high - 30} V0`).join(' ')}`}
+          stroke={SHADE.black}
+          strokeWidth={6}
+        />
+        <path d={`M${PANEL.from + 20} ${PANEL.high - 30} L${PANEL.from + 60} ${PANEL.high - 110} M${PANEL.from + PANEL.w * 4} ${PANEL.high - 30} L${PANEL.from + PANEL.w * 4 - 40} ${PANEL.high - 120}`} stroke={SHADE.black} strokeWidth={4} />
+        {Array.from({ length: PANEL.count }, (_, i) => (
+          <Panel key={i} i={i} light={light} />
+        ))}
       </g>
-      {/* the roof's edge and the glass dome below it */}
-      <rect x={EDGE - 6} y={-4} width={10} height={60} fill={SHADE.black} />
-      <path d={`M${DOME.x - DOME.r} ${DOME.top + DOME.r} A${DOME.r} ${DOME.r} 0 0 1 ${DOME.x + DOME.r} ${DOME.top + DOME.r}`} fill={light.far} fillOpacity={0.2} stroke={light.rim} strokeOpacity={0.5} strokeWidth={2} />
-      <rect x={DOME.x - DOME.r - 30} y={DOME.top + DOME.r} width={DOME.r * 2 + 60} height={400} fill={SHADE.black} />
-      <g data-fx="glass" opacity="0" fill={light.rim} fillOpacity={0.6}>
-        {[-50, -20, 12, 40, 66].map((dx, i) => (
-          <path key={dx} d={`M${DOME.x + dx} ${DOME.top + 10 + (i % 3) * 18} l10 -14 l6 16 Z`} />
+      {/* the cable hanging from the sign's frame */}
+      <g data-fx="cable">
+        <path d={`M${CABLE} ${PANEL.high - 18} Q${CABLE - 8} -120 ${CABLE} -78 l-7 12 h14 Z`} stroke={SHADE.black} strokeWidth={4} fill={SHADE.black} />
+      </g>
+      {/* the roof's edge and the glass dome below it, its ribs catching the light */}
+      <rect x={EDGE - 6} y={-6} width={12} height={70} fill={SHADE.black} />
+      <g data-fx="dome" stroke={light.rim} strokeOpacity={0.55} strokeWidth={2.5} fill="none">
+        <path d={`M${DOME.x - DOME.r} ${DOME.top + DOME.r} A${DOME.r} ${DOME.r} 0 0 1 ${DOME.x + DOME.r} ${DOME.top + DOME.r}`} fill={light.far} fillOpacity={0.25} />
+        <path d={`M${DOME.x} ${DOME.top} V${DOME.top + DOME.r} M${DOME.x - DOME.r * 0.7} ${DOME.top + DOME.r * 0.3} Q${DOME.x - DOME.r * 0.3} ${DOME.top + DOME.r * 0.6} ${DOME.x - DOME.r * 0.4} ${DOME.top + DOME.r} M${DOME.x + DOME.r * 0.7} ${DOME.top + DOME.r * 0.3} Q${DOME.x + DOME.r * 0.3} ${DOME.top + DOME.r * 0.6} ${DOME.x + DOME.r * 0.4} ${DOME.top + DOME.r}`} />
+      </g>
+      <rect x={DOME.x - DOME.r - 30} y={DOME.top + DOME.r} width={DOME.r * 2 + 60} height={1000} fill={SHADE.black} />
+      <g data-fx="glass" opacity="0" fill={light.rim} fillOpacity={0.7}>
+        {[-60, -30, 0, 26, 52, 78].map((dx, i) => (
+          <path key={dx} d={`M${DOME.x + dx} ${DOME.top + 10 + (i % 3) * 18} l12 -16 l7 18 Z`} />
         ))}
       </g>
     </>

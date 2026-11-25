@@ -55,6 +55,9 @@ export interface Place {
   distant?: (input: PlaceInput) => ReactNode
   /** His move `t` of the way over a stretch `length` long; t 1 is the move's held pose. */
   move: (profession: Profession, t: number, length: number) => Frame
+  /** How far past him the camera looks at t, in run units, to bring a threat ahead of him into the frame;
+   *  0 at the move's start and end, so the scene starts and ends where the camera follows him. */
+  lead?: (t: number) => number
   /** Binds the world's reply and returns its writer over the move's t. */
   reply?: (stage: ParentNode, input: PlaceInput) => (t: number) => void
 }
@@ -69,6 +72,9 @@ export const moveAt = (ends: readonly number[], { action, t }: Playhead): number
 /** His height off the ground over a jump `u` of the way through, peaking at `height`, landing at `land`
  *  above where he left (a ledge he jumps up onto, or below for a drop). */
 export const arc = (u: number, height: number, land = 0): number => land * u + 4 * height * u * (1 - u)
+
+/** Writes a path's outline: a creature's limb bent anew each frame. */
+export const outline = (node: Element | null, d: string): void => node?.setAttribute('d', d)
 
 /** Run units a stride of his covers: a small figure's quick steps. */
 const STRIDE = 30
@@ -101,7 +107,7 @@ export function bindStretch(place: Place, run: Run, stage: ParentNode, input: Pl
   return (_progress, _reached, play = START) => {
     const t = moveAt(place.ends, play)
     const frame = place.move(input.profession, t, run.length)
-    const camera = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, run)
+    const camera = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, run) + (place.lead?.(t) ?? 0)
     for (const [node, share] of layers) translateTo(node, -share * camera, 0)
     reply?.(t)
     transformTo(root, figureAt(run.start + frame.ahead, frame.lift, frame.over, frame.back))

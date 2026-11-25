@@ -1,10 +1,10 @@
 import { mix } from '@/lib/motion/rigPose'
 import type { Profession } from '@/lib/cv/professions'
 import { ramp } from '@/lib/scroll/stage'
-import { fx, lerp, transformTo } from '../../shared/stageNodes'
+import { fadeTo, fx, lerp, transformTo } from '../../shared/stageNodes'
 import { SHADE, type Light } from '../palette'
 import { gearPath } from '../forest'
-import { arc, runFrame, type Frame, type Place } from '../place'
+import { arc, outline, runFrame, type Frame, type Place } from '../place'
 import { CROUCH, TUCK, rest } from '../pose'
 
 // Bands, the drummer's middle section, the foundry's beat: a machine hall where presses pound in a steady
@@ -15,11 +15,12 @@ import { CROUCH, TUCK, rest } from '../pose'
 
 const PRESSES = [150, 230] as const
 const WAIT = 90
-const PRESS = { w: 52, up: -190 }
-const GEAR = { x: 470, y: 40, r: 150 }
+const PRESS = { w: 70, up: -190 }
+const GEAR = { x: 510, y: 40, r: 140 }
 const BOARD = 205
 const OFF = 290
-const GANTRY = { from: 610, to: 760, h: 170 }
+const LOOK_AHEAD = 70
+const GANTRY = { from: 650, to: 800, h: 170 }
 
 /** How far down the presses are at t, 0 up to 1 slammed: four beats over the count, then held up for the
  *  run under them, then beating on. */
@@ -67,20 +68,37 @@ export const bands: Place = {
   length: GANTRY.from + 40,
   script: [1600, 1300, 1800],
   ends: [0.32, 0.5, 1],
+  // the camera looks ahead to the presses while he counts and runs under them
+  lead: (t) => LOOK_AHEAD * (ramp(t, 0, 0.1) - ramp(t, 0.5, 0.6)),
   obstacle: ({ light }: { light: Light }) => (
     <>
+      <defs>
+        <linearGradient id="foundry-lamp" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={SHADE.glow} stopOpacity="0.5" />
+          <stop offset="1" stopColor={SHADE.glow} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* a lamp hung high over the presses, its cone of light falling through the dust */}
+      <path d={`M${PRESSES[0] + 20} -330 L${PRESSES[0] - 120} 0 H${PRESSES[1] + 120} L${PRESSES[0] + 60} -330 Z`} fill="url(#foundry-lamp)" />
+      <path d={`M${PRESSES[0] + 40} -900 V-345 M${PRESSES[0] + 18} -330 Q${PRESSES[0] + 40} -360 ${PRESSES[0] + 62} -330 Z`} stroke={SHADE.black} strokeWidth={4} fill={SHADE.black} />
       {PRESSES.map((x, i) => (
         <g key={x}>
-          <path d={`M${x - 34} -900 V0 M${x + 34} -900 V0`} stroke={SHADE.black} strokeWidth={6} />
+          <path d={`M${x - PRESS.w / 2 - 10} -900 V0 M${x + PRESS.w / 2 + 10} -900 V0`} stroke={SHADE.black} strokeWidth={8} />
           <g data-fx={`press-${i}`}>
             <rect x={x - PRESS.w / 2} y={-900} width={PRESS.w} height={900 + PRESS.up} fill={SHADE.black} />
+            <path d={`M${x - PRESS.w / 2} ${PRESS.up} h${PRESS.w} v18 h-${PRESS.w} Z`} fill={SHADE.black} />
+            <path d={`M${x - PRESS.w / 2 + 6} ${PRESS.up - 60} h${PRESS.w - 12}`} stroke={light.rim} strokeOpacity={0.3} strokeWidth={3} />
+          </g>
+          {/* the dust thrown out under the press as it lands */}
+          <g data-fx={`dust-${i}`} opacity="0" fill={light.far}>
+            <ellipse cx={x - 50} cy={-14} rx={30} ry={12} />
+            <ellipse cx={x + 50} cy={-12} rx={26} ry={10} />
           </g>
         </g>
       ))}
-      <g data-fx="gear">
-        <path d={gearPath(GEAR.x, GEAR.y, GEAR.r, 16)} fill={SHADE.black} fillRule="evenodd" />
-      </g>
+      <path data-fx="gear" d={gearPath(GEAR.x, GEAR.y, GEAR.r, 16)} fill={SHADE.black} fillRule="evenodd" />
       <circle cx={GEAR.x} cy={GEAR.y} r={GEAR.r * 0.32} fill={light.far} opacity={0.4} />
+      <path d={`M${GEAR.x - GEAR.r * 1.05} ${GEAR.y - GEAR.r * 0.4} A${GEAR.r * 1.12} ${GEAR.r * 1.12} 0 0 1 ${GEAR.x + GEAR.r * 0.4} ${GEAR.y - GEAR.r * 1.05}`} stroke={light.rim} strokeOpacity={0.35} strokeWidth={3} fill="none" />
       <rect x={GANTRY.from} y={-GANTRY.h} width={GANTRY.to - GANTRY.from} height={GANTRY.h + 4} fill={SHADE.black} />
       <path d={`M${GANTRY.from + 20} ${-GANTRY.h} V${-GANTRY.h - 40} M${GANTRY.from + 20} ${-GANTRY.h - 40} h40`} stroke={SHADE.black} strokeWidth={6} />
     </>
@@ -89,10 +107,15 @@ export const bands: Place = {
   reply: (stage) => {
     const gear = fx(stage, 'gear')
     const presses = PRESSES.map((_, i) => fx(stage, `press-${i}`))
+    const dusts = PRESSES.map((_, i) => fx(stage, `dust-${i}`))
     return (t) => {
-      transformTo(gear, `rotate(${turnAt(t).toFixed(1)} ${GEAR.x} ${GEAR.y})`)
-      const down = pressAt(t)
-      presses.forEach((node, i) => transformTo(node, `translate(0 ${(-PRESS.up * (i === 0 ? down : pressAt(Math.max(0, t - 0.04)))).toFixed(1)})`))
+      outline(gear, gearPath(GEAR.x, GEAR.y, GEAR.r, 16, (turnAt(t) * Math.PI) / 180))
+      presses.forEach((node, i) => {
+        const down = pressAt(Math.max(0, t - 0.04 * i))
+        transformTo(node, `translate(0 ${(-PRESS.up * down).toFixed(1)})`)
+        // a puff of dust at each landing, spreading as the press lifts off it
+        fadeTo(dusts[i], 0.6 * ramp(down, 0.85, 1))
+      })
     }
   },
 }
