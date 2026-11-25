@@ -10,7 +10,10 @@ import { SQUINT, rest, stride } from '../pose'
 // the lone stop and he steps down from its door with nothing but what he wears; it pulls off in its dust. He
 // shades his eyes and looks up the road past the town's welcome sign. Our little robot rolls up out of the
 // haze, waves its arm, turns and rolls off toward town, and he goes after it. The hero keeps its own place
-// under its intro card.
+// under its intro card, and he shows only where neither the card nor his portrait is: on a wide screen the
+// card stands over his place at the top, so he comes in once it has scrolled up past him; on a phone his
+// portrait fills the first screen over the stop and the card scrolls up over his place after it, so there
+// the stop plays without him.
 
 const STOP = -190
 const SIGN = 380
@@ -20,6 +23,7 @@ const FOLLOWS = 190
 export const hero = stopsPlace({
   land: LANDS.badlands,
   hold: (phone) => ({ x: phone ? 640 : 1000, dir: 1 }),
+  shown: (progress, phone) => (phone ? 0 : ramp(progress, 0.28, 0.4)),
   script: [1700, 1300, 1800],
   ends: [0.34, 0.6, 1],
   back: () => (

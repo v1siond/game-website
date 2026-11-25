@@ -18,8 +18,9 @@ import { down, fireUp, pry, secondWind, shoot, stride } from '../pose'
 
 const MINE = 300
 const BOSS = { from: 400, at: 290 }
-const CHEST = 400
-const THRONE = 520
+// The chest stands close by, so on a phone his walk to it ends in the left half the section names.
+const CHEST = 300
+const THRONE = 430
 const CARD = { x: 270, y: -580 }
 const KNOCKED = -40
 const AT_CHEST = CHEST - 120

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import type { Playhead, SceneScript } from '@/lib/scroll/player'
-import { fx, lerp } from '../shared/stageNodes'
+import { fadeTo, fx, lerp } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
 import { Commando, FLOOR, placeCommando, type Dir, type Land, type Side } from './desert'
 import { Facing } from './hud'
@@ -81,6 +81,9 @@ export interface Stops {
   /** How much smaller the stop is drawn about his soles on a phone, where its art is wider than the usual
    *  (the vault's monster); none keeps PHONE_ZOOM. */
   phoneZoom?: number
+  /** How much of him shows at the stage's scroll `progress`, where a card of the page stands over his place
+   *  for part of it (the hero's intro card); none shows him whole. */
+  shown?: (progress: number, phone: boolean) => number
   /** Where each action ends on the move's t, one per action, the last 1. */
   ends: readonly number[]
   back: (input: PlaceInput) => ReactNode
@@ -129,11 +132,12 @@ export const stopsPlace = (stops: Stops): Place => ({
     const joints = root ? celJoints(root) : null
     const reply = stops.reply(stage, input)
     const { x, dir } = holdFor(stops, input)
-    return (_progress, _reached, play = START) => {
+    return (progress, _reached, play = START) => {
       const t = moveAt(stops.ends, play)
       reply(t)
       const frame = stops.move(input.profession, t)
       placeCommando(root, x + dir * frame.ahead, frame.lift, dir)
+      if (stops.shown) fadeTo(root, stops.shown(progress, input.phone))
       if (joints) setCelPose(joints, frame.pose)
     }
   },
