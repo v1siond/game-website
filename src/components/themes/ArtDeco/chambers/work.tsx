@@ -117,6 +117,7 @@ function Glass() {
 const SHADE_SCALE = 0.85
 
 export const work = fightChamber({
+  travel: AT_DOOR,
   light: C.waterGlow,
   script: [1300, 1800, 1800],
   set: () => <Flood />,

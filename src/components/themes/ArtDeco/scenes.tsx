@@ -6,7 +6,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import type { Chamber, ChamberInput, RoomLayer } from './chamber'
+import { setShift, type Chamber, type ChamberInput, type RoomLayer, type Side } from './chamber'
 import { about } from './chambers/about'
 import { bands } from './chambers/bands'
 import { contact } from './chambers/contact'
@@ -18,6 +18,7 @@ import { tech } from './chambers/tech'
 import { ventures } from './chambers/ventures'
 import { work } from './chambers/work'
 import { Canvas, Floor, Front, Hall, Skyline, Water, bubblesWriter } from './city'
+import page from './page.module.css'
 
 // The page as scenes, one descent and return: the crash at sea (hero), one room of the drowned city per
 // section of the shown profession in reading order, the way back up into morning (contact). Each scene
@@ -46,12 +47,24 @@ const SCENE_DEFS: Record<SceneId, SceneDef> = {
 
 export interface DecoScene extends TheatreScene, Omit<SceneDef, 'chamber'> {
   id: SceneId
+  /** The side it plays on: its section's cards sit on the other. */
+  side: Side
   layers: StageLayer[]
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
 }
 
-const layersOf = (id: SceneId, { light, room = {}, set, floor }: Chamber, input: ChamberInput): StageLayer[] => {
+/** A set moved `by` along the canvas with him, so it keeps its place round him on either side. */
+const shifted = (node: ReactNode, by: number): ReactNode =>
+  by === 0 ? (
+    node
+  ) : (
+    <Canvas>
+      <g transform={`translate(${by} 0)`}>{node}</g>
+    </Canvas>
+  )
+
+const layersOf = (id: SceneId, { light, room = {}, set, floor, places }: Chamber, input: ChamberInput): StageLayer[] => {
   // the room's own layer, or the city's default one; null leaves it out
   const layer = (name: RoomLayer, fallback: ReactNode): StageLayer[] => {
     const own = room[name]
@@ -61,7 +74,7 @@ const layersOf = (id: SceneId, { light, room = {}, set, floor }: Chamber, input:
   return [
     ...layer('sky', <Water id={`deco-${id}`} light={light} />),
     ...layer('far', <Skyline />),
-    ...(set ? [{ name: 'set', node: set(input) }] : []),
+    ...(set ? [{ name: 'set', node: shifted(set(input), setShift(input, places)) }] : []),
     ...layer('mid', <Hall />),
     ...layer('near', <Floor />),
     { name: 'figure', node: <Canvas>{floor(input)}</Canvas> },
@@ -69,12 +82,13 @@ const layersOf = (id: SceneId, { light, room = {}, set, floor }: Chamber, input:
   ]
 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean): DecoScene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, phone: boolean, side: Side): DecoScene => {
   const { chamber, ...def } = SCENE_DEFS[id]
-  const input = { profession, phone }
+  const input = { profession, phone, side }
   return {
     ...def,
     id,
+    side,
     slot,
     count,
     script: chamber.script,
@@ -90,14 +104,26 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, professio
   }
 }
 
-/** Every scene of the page in order, each with what its picture is built from. */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean): DecoScene[] {
-  const sections = slots.map((slot) => {
+/** The side of the section at `index` of the page (0 the first after the hero): the first plays right of its
+ *  cards, the next left of them, and so on up to the contact. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
+
+/**
+ * Every scene of the page in order, each with what its picture is built from. With the cards beside the scene
+ * (`split`, from lg) or on a phone the sections take turns, right of their cards then left; a screen between
+ * the two keeps every scene on the right. The hero keeps its own place.
+ */
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean, split: boolean): DecoScene[] {
+  const side = (index: number): Side => (phone || split ? sideOf(index) : 'right')
+  const sections = slots.map((slot, i) => {
     const { lead, count } = stageItems(slot, labels, highlights)
-    return sceneOf(slot.id, slot, lead + count, profession, phone)
+    return sceneOf(slot.id, slot, lead + count, profession, phone, side(i))
   })
-  return [sceneOf('hero', null, 0, profession, phone), ...sections, sceneOf('contact', null, 0, profession, phone)]
+  return [sceneOf('hero', null, 0, profession, phone, 'right'), ...sections, sceneOf('contact', null, 0, profession, phone, side(slots.length))]
 }
+
+/** Each side's classes on the page's css: the scrim under the cards and the cards' column, both from lg. */
+export const SIDE_CLASS: Record<Side, string> = { right: '', left: page.cardsRight }
 
 /** Each layer's push in across its scene: the far towers move least, the kelp most, which gives the depth.
  *  The floor and what stands on it move together, so he always stands on it. */

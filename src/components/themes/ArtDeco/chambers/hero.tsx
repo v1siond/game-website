@@ -172,6 +172,9 @@ const TREAD_LIFT = { under: -260, up: -150 }
 const SWIM_LIFT = -6
 
 export const hero = fightChamber({
+  travel: STEPS_AT,
+  // the hero keeps the place it was drawn at
+  places: { right: 760 },
   light: C.lamp,
   script: [1400, 1900, 1600],
   room: { sky: () => <NightSea />, far: null, mid: null, near: null, fg: null },

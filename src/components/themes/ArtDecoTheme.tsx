@@ -15,7 +15,7 @@ import { useTheatre } from './shared/theatre/useTheatre'
 import { GaugeBar, RevivalContact } from './ArtDeco/chrome'
 import { StationHero } from './ArtDeco/hero'
 import { DECO_VARS } from './ArtDeco/palette'
-import { LAYER_MOTION, scenesOf, type DecoScene } from './ArtDeco/scenes'
+import { LAYER_MOTION, SIDE_CLASS, scenesOf, type DecoScene } from './ArtDeco/scenes'
 import { ChamberSection } from './ArtDeco/sections'
 import page from './ArtDeco/page.module.css'
 
@@ -39,6 +39,8 @@ const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap'
 
 // A phone sees the middle of the canvas only, so the chambers stage their fights nearer its middle.
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the chamber sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 const hasSlot = (scene: DecoScene): scene is DecoScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -49,9 +51,10 @@ export default function ArtDecoTheme() {
   const labels = useLabels()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
-    [view, cv, labels, active, phone],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split),
+    [view, cv, labels, active, phone, split],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
@@ -63,7 +66,7 @@ export default function ArtDecoTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef} className={page.theatre}>
           {scenes.map((scene) => (
-            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={`${page.scrim} ${SIDE_CLASS[scene.side]}`} />
           ))}
         </Theatre>
       )}

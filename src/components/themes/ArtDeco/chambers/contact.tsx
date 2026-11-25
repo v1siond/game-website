@@ -101,6 +101,7 @@ function Sphere() {
 }
 
 export const contact = fightChamber({
+  travel: STAND_AT,
   light: C.lamp,
   script: [2000, 2400],
   room: { sky: () => <Deep />, far: null, mid: null, near: null, fg: null },

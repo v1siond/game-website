@@ -91,6 +91,7 @@ function Exit() {
 }
 
 export const ventures = fightChamber({
+  travel: WALK_TO,
   light: C.waterGlow,
   script: [1300, 1500, 2100],
   set: () => <Garden />,

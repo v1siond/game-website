@@ -82,6 +82,9 @@ function WallBox() {
 }
 
 export const services = fightChamber({
+  travel: AT_BOX,
+  // he crosses to the wall box at the far end, so left of the cards he starts further left
+  places: { left: 210 },
   light: C.goldBright,
   script: [1700, 2300],
   back: () => (

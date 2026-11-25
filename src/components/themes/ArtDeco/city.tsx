@@ -185,11 +185,14 @@ export function bubblesWriter(stage: ParentNode): (progress: number) => void {
 
 const figureAt = (x: number, lift = 0): string => `translate(${(x - FIGURE_W / 2).toFixed(1)} ${(FLOOR - lift - FIGURE_H * (1 - SOLE_DROP)).toFixed(1)})`
 
-/** Him on the floor at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
-export function Survivor({ x, profession }: { x: number; profession: Profession }) {
+/** Him on the floor at `x` (his centre), in a profession's kit, facing right (`dir` 1) or left (-1, turned
+ *  round his own middle); the scene's writer moves and poses him. */
+export function Survivor({ x, profession, dir = 1 }: { x: number; profession: Profession; dir?: 1 | -1 }) {
   return (
     <g data-fx="survivor" transform={figureAt(x)}>
-      <SurvivorSprite profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
+      <g transform={dir === 1 ? undefined : `translate(${FIGURE_W} 0) scale(-1 1)`}>
+        <SurvivorSprite profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
+      </g>
     </g>
   )
 }

@@ -16,7 +16,7 @@ import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince, newTabHint } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { DepthGauge } from './gauge'
-import { LAYER_MOTION, type DecoScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type DecoScene } from './scenes'
 import page from './page.module.css'
 
 // One section per chamber: a tall head that first shows the chamber alone and then brings its ziggurat
@@ -304,8 +304,8 @@ export function ChamberSection({ scene, still }: { scene: DecoScene & { slot: Se
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `deco-${scene.id}`
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${SIDE_CLASS[scene.side]}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={`${page.scrim} ${SIDE_CLASS[scene.side]}`} />}
       <Plaque id={headingId} title={sections[scene.slot.titleKey]} depth={DEPTH[scene.slot.id]} />
       <div className={page.body}>
         <Cards slot={scene.slot} />

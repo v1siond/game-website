@@ -9,7 +9,7 @@ import { BLOG_PATH, postLinks } from '@/lib/blog/links'
 import { initialsOf } from '@/lib/cv/nameWords'
 import { Stage } from '../shared/theatre/Stage'
 import { DecoLinks, GOLD_OUTLINE } from './actions'
-import { LAYER_MOTION, type DecoScene } from './scenes'
+import { LAYER_MOTION, SIDE_CLASS, type DecoScene } from './scenes'
 import page from './page.module.css'
 
 // The page's fixed gauge bar and its end. The bar is a brass strip across the top with his initials, back
@@ -63,8 +63,8 @@ function DecoPosts() {
 export function RevivalContact({ scene, still }: { scene: DecoScene; still: boolean }) {
   const { sections, blog } = useLabels()
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="deco-contact" className={page.goal}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="deco-contact" className={`${page.goal} ${SIDE_CLASS[scene.side]}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={`${page.scrim} ${SIDE_CLASS[scene.side]}`} />}
       <div className={page.goalCopy}>
         <PostsGate>
           <div className={page.panel}>
