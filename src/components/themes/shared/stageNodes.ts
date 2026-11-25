@@ -35,10 +35,12 @@ export const translateTo = (node: Element | null, x: number, y: number): void =>
 /** The caller passes an opacity from 0 to 1. */
 export const fadeTo = (node: Element | null, opacity: number): void => node?.setAttribute('opacity', opacity.toFixed(3))
 
-/** Shows one of a node's frames (children marked data-frame) and hides the one shown before. */
+/** Shows one of a node's frames (children marked data-frame) and hides the one shown before. A node bound
+ *  again keeps the frame it last showed (React leaves the markup as it was), so the swap starts from the frame
+ *  the markup shows and `first` only when none is. */
 export function frames(node: Element | null, first: string): (frame: string) => void {
   const all = new Map(Array.from(node?.querySelectorAll('[data-frame]') ?? [], (el) => [el.getAttribute('data-frame') ?? '', el]))
-  let shown = first
+  let shown = [...all].find(([, el]) => el.getAttribute('visibility') === 'visible')?.[0] ?? first
   return (frame) => {
     if (frame === shown || !all.has(frame)) return
     all.get(shown)?.setAttribute('visibility', 'hidden')
