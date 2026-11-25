@@ -115,11 +115,11 @@ function Fish({ name, look, x, y, eye = 'open' }: { name: string; look: FishLook
         <ellipse cx={-rx * 0.1} cy={ry * 0.45} rx={rx * 0.55} ry={ry * 0.3} fill={TRAIL.PAGE} opacity={0.35} />
         <path d={`M${-rx} ${ry * 0.15} H${-rx * 0.7}`} stroke={TRAIL.HUD} strokeWidth={4} />
         <path d={`M${rx * 0.05} ${-ry * 0.5} Q${rx * 0.25} 0 ${rx * 0.05} ${ry * 0.5}`} fill="none" stroke={fin} strokeWidth={4} />
-        <g data-frame="open" visibility={eye === 'open' ? 'visible' : 'hidden'}>
+        <g data-frame="open" visibility={eye === 'open' ? undefined : 'hidden'}>
           <circle cx={eyeX} cy={eyeY} r={ry * 0.3} fill={TRAIL.PAGE} stroke={TRAIL.HUD} strokeWidth={3} />
           <rect x={eyeX - ry * 0.2} y={eyeY - ry * 0.1} width={ry * 0.2} height={ry * 0.2} fill={TRAIL.HUD} />
         </g>
-        <path data-frame="shut" visibility={eye === 'shut' ? 'visible' : 'hidden'} d={`M${eyeX - ry * 0.25} ${eyeY} H${eyeX + ry * 0.25}`} stroke={TRAIL.HUD} strokeWidth={4} />
+        <path data-frame="shut" visibility={eye === 'shut' ? undefined : 'hidden'} d={`M${eyeX - ry * 0.25} ${eyeY} H${eyeX + ry * 0.25}`} stroke={TRAIL.HUD} strokeWidth={4} />
       </g>
     </g>
   )

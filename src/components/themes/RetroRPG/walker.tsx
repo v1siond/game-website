@@ -114,7 +114,7 @@ export const StageFigure = memo(function StageFigure({ profession }: { professio
     <g transform={`translate(${-SPRITE.width / 2} ${-SPRITE.height})`}>
       <rect x={4} y={SPRITE.height - 1} width={12} height={1} fill={RPG.void} opacity={0.45} />
       {poses.map(([frame, pose]) => (
-        <g key={frame} data-frame={frame} visibility={frame === 'stand' ? 'visible' : 'hidden'}>
+        <g key={frame} data-frame={frame} visibility={frame === 'stand' ? undefined : 'hidden'}>
           <Pixels pose={pose} colours={colours} />
         </g>
       ))}

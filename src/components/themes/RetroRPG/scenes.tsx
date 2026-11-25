@@ -111,14 +111,14 @@ const placeTo = (node: Element | null, x: number, y: number, size = 1, turn = 0)
  *  every turn, so a stage bound again never keeps a stale look. */
 const Swap = ({ name, first, second }: { name: string; first: ReactNode; second: ReactNode }) => (
   <g data-fx={name}>
-    <g visibility="visible">{first}</g>
+    <g>{first}</g>
     <g visibility="hidden">{second}</g>
   </g>
 )
 
 const swap = (node: Element | null, second: boolean): void => {
-  node?.children[0]?.setAttribute('visibility', second ? 'hidden' : 'visible')
-  node?.children[1]?.setAttribute('visibility', second ? 'visible' : 'hidden')
+  node?.children[0]?.setAttribute('visibility', second ? 'hidden' : 'inherit')
+  node?.children[1]?.setAttribute('visibility', second ? 'inherit' : 'hidden')
 }
 
 // ---------------------------------------------------------------- the props

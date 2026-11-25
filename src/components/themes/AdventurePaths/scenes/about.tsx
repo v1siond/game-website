@@ -64,7 +64,7 @@ export const about: Level = {
               </g>
             </g>
             <Placed name="box" x={x + BOX_LEFT} y={GROUND - HERO_TALL - BOX_GAP - SIZE}>
-              <g data-frame="closed" visibility="visible">
+              <g data-frame="closed">
                 <ItemBox />
               </g>
               <g data-frame="open" visibility="hidden">

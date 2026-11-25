@@ -184,7 +184,7 @@ export function HeroRig({ profession, name = 'hero' }: { profession: Profession;
       <g data-fx={`${name}-face`}>
         <g transform={`scale(${PX}) translate(${-HERO.width / 2} ${-HERO.height})`} shapeRendering="crispEdges">
           {HERO_POSES.map((pose) => (
-            <g key={pose} data-frame={pose} visibility={pose === 'stand' ? 'visible' : 'hidden'}>
+            <g key={pose} data-frame={pose} visibility={pose === 'stand' ? undefined : 'hidden'}>
               <Pixels parts={heroParts(pose, headgear)} colours={colours} />
             </g>
           ))}
@@ -200,7 +200,7 @@ export function FoeRig({ name, kinds }: { name: string; kinds: readonly FoeFrame
     <g data-fx={name}>
       <g transform={`scale(${PX}) translate(${-FOE.width / 2} ${-FOE.height})`} shapeRendering="crispEdges">
         {kinds.map((frame, i) => (
-          <g key={frame} data-frame={frame} visibility={i === 0 ? 'visible' : 'hidden'}>
+          <g key={frame} data-frame={frame} visibility={i === 0 ? undefined : 'hidden'}>
             <Pixels parts={[{ rows: foeRows(frame), top: 0 }]} colours={FOE_COLOURS} />
           </g>
         ))}

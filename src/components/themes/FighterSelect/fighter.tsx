@@ -772,7 +772,7 @@ export const ScrubFighter = memo(function ScrubFighter({ profession, poses, who 
       <ellipse data-shadow="" cx={62} cy={CELL.ground} rx={34} ry={3.8} fill={INK} opacity={0.4} transform={facing} />
       <g transform={facing}>
         {poses.map((pose, i) => (
-          <g key={pose} data-frame={pose} visibility={i === 0 ? 'visible' : 'hidden'} clipPath={`url(#${clip})`}>
+          <g key={pose} data-frame={pose} visibility={i === 0 ? undefined : 'hidden'} clipPath={`url(#${clip})`}>
             <g data-strip={pose}>
               {framesFor(pose, profession).map((frame, index) => (
                 <FrameArt key={index} frame={frame} costume={costume} index={index} />

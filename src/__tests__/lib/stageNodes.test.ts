@@ -5,7 +5,7 @@ import { clamp01, fadeTo, frames, fx, fxAll, lerp, r1, reached, spread, transfor
 
 const stage = (): SVGSVGElement => {
   const holder = document.createElement('div')
-  holder.innerHTML = `<svg><g data-fx="hero"><g data-frame="stand" visibility="visible"></g><g data-frame="jump" visibility="hidden"></g></g><g data-fx="coin-0"></g><g data-fx="coin-1"></g><g data-fx="cloud"></g></svg>`
+  holder.innerHTML = `<svg><g data-fx="hero"><g data-frame="stand"></g><g data-frame="jump" visibility="hidden"></g></g><g data-fx="coin-0"></g><g data-fx="coin-1"></g><g data-fx="cloud"></g></svg>`
   return holder.querySelector('svg')!
 }
 
@@ -47,15 +47,24 @@ describe('the stage node writers', () => {
     expect(() => fadeTo(null, 1)).not.toThrow()
   })
 
+  const shownIn = (hero: Element | null) => Array.from(hero?.querySelectorAll('[data-frame]') ?? [], (el) => `${el.getAttribute('data-frame')}:${el.getAttribute('visibility')}`)
+
+  // the shown frame inherits its stage's visibility, so a hidden stage hides the frame it last showed
   it('shows one sprite frame at a time and ignores a frame it does not have', () => {
     const hero = fx(stage(), 'hero')
     const show = frames(hero, 'stand')
-    const shown = () => Array.from(hero?.querySelectorAll('[data-frame]') ?? [], (el) => `${el.getAttribute('data-frame')}:${el.getAttribute('visibility')}`)
     show('jump')
-    expect(shown()).toEqual(['stand:hidden', 'jump:visible'])
+    expect(shownIn(hero)).toEqual(['stand:hidden', 'jump:inherit'])
     show('kick')
-    expect(shown()).toEqual(['stand:hidden', 'jump:visible'])
+    expect(shownIn(hero)).toEqual(['stand:hidden', 'jump:inherit'])
     show('stand')
-    expect(shown()).toEqual(['stand:visible', 'jump:hidden'])
+    expect(shownIn(hero)).toEqual(['stand:inherit', 'jump:hidden'])
+  })
+
+  it('starts a node bound again from the frame its markup shows', () => {
+    const hero = fx(stage(), 'hero')
+    frames(hero, 'stand')('jump')
+    frames(hero, 'stand')('stand')
+    expect(shownIn(hero)).toEqual(['stand:inherit', 'jump:hidden'])
   })
 })
