@@ -9,13 +9,13 @@ import { ContactActions } from './buttons'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
-// His outfit plate: an iron plaque on the hall's dark panel, pale frost lettering and a frost rim.
-const OUTFIT_LOOK: WardrobeLook = { plate: MYTH.panel, text: MYTH.frostCore, ring: MYTH.frost }
+// His outfit plate: a bronze plaque on the dark panel, pale gold lettering and a gold rim.
+const OUTFIT_LOOK: WardrobeLook = { plate: MYTH.panel, text: MYTH.goldPale, ring: MYTH.gold }
 
-// The hero in the snow wood: his name carved on the stone, the headline in his journal, his line and the ways
-// to reach him. He stands in the hall's left bay on the hero's stage behind it (scenes.tsx), drawing his sword
-// and raising his shield as the page starts to scroll; the bay here keeps his place clear and carries the
-// outfit plate. `still` is the stage drawn settled under reduced motion.
+// The hero on the storm sea: his name carved on the stone, the headline on parchment, his line and the ways
+// to reach him. He stands on the ship's deck left of them on the hero's stage behind (scenes.tsx), where the
+// sea serpent's king head comes down on him as the page starts to scroll; the bay here keeps his place clear
+// and carries the outfit plate. `still` is the stage drawn settled under reduced motion.
 export function HallHero({ still }: { still?: ReactNode }) {
   const { navigation } = useLabels()
 
@@ -39,7 +39,7 @@ export function HallHero({ still }: { still?: ReactNode }) {
               </h1>
               <p className={`mt-5 inline-block px-5 py-2 text-lg sm:text-xl ${u.parchment}`}>{headline}</p>
               <div className={`mt-4 max-w-prose px-4 py-3 ${u.panel}`}>
-                <p className="text-lg italic text-[var(--myth-frost-core)]">{tagline}</p>
+                <p className="text-lg italic text-[var(--myth-gold-pale)]">{tagline}</p>
                 <p className="mt-2 text-base text-[var(--myth-bone)]">{line}</p>
               </div>
               <nav className="mt-6 flex flex-wrap gap-3" aria-label={navigation.contactAndCv}>

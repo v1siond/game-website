@@ -8,33 +8,50 @@ import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
 import u from './underworld.module.css'
 
-// A section in the descent: the gilded title plate over the section's cards, read in a column on the left
-// from lg so the section's scene (scenes.tsx, on the shared theatre) plays clear of it on the right; under lg
-// the scene plays in a tall gap under the title before the cards come up.
+// A section of the run: the carved title plate over the section's cards. From lg the sections take turns: the
+// first after the hero reads in a column on the left with its scene (scenes.tsx, on the shared theatre) on
+// the right, the next the other way round, up to the contact; under lg the scene plays in a tall gap under the
+// title before the cards come up.
 // useZoneStage marks it data-on once, the first time it scrolls into view, and every entrance inside starts
-// off that flag. While it is in view it hands its region to the page, which fades the fixed depths
-// (depths.tsx) to that region. Under reduced motion the section carries its own scene drawn settled
-// (StillStages).
+// off that flag. While it is in view it hands its place to the page, which fades the fixed depths (depths.tsx)
+// to that place. Under reduced motion the section carries its own scene drawn settled (StillStages).
 
-/** The places of the journey, in the order the page walks them. */
-export type Zone = 'wood' | 'road' | 'lake' | 'light' | 'mountain' | 'dead' | 'shore' | 'peak'
+/** The places of the run, in the order the page walks them: God of War, then God of War II. */
+export type Zone = 'sea' | 'athens' | 'desert' | 'temple' | 'storm' | 'rhodes' | 'sky' | 'bog' | 'chasm' | 'olympus'
 
-/** The place each part of the page stands in: the cabin in the snow wood to the stair at the peak. */
+/** The place each part of the page stands in: the storm sea of the first game to the mountain of the gods. */
 export const ZONE_OF: Record<SectionId | 'hero' | 'contact', Zone> = {
-  hero: 'wood',
-  about: 'wood',
-  work: 'road',
-  tech: 'lake',
-  services: 'lake',
-  projects: 'light',
-  ventures: 'mountain',
-  bands: 'dead',
-  muayThai: 'shore',
-  contact: 'peak',
+  hero: 'sea',
+  about: 'athens',
+  work: 'desert',
+  tech: 'temple',
+  services: 'storm',
+  projects: 'rhodes',
+  ventures: 'sky',
+  bands: 'bog',
+  muayThai: 'chasm',
+  contact: 'olympus',
 }
 
-/** The column a section reads in: the whole width on a phone, the left of the screen from lg. */
-export const COLUMN = 'lg:mr-auto lg:w-[min(46rem,52vw)]'
+/** The side a scene plays on from lg; its section's cards read on the other. */
+export type Side = 'right' | 'left'
+
+/** Each part's scene side on the page being read (scenes.tsx scenesOf), handed down from the theme. */
+const SidesContext = createContext<Partial<Record<SectionId | 'contact', Side>>>({})
+
+export const SceneSides = SidesContext.Provider
+
+/** The column a section's title and cards read in: the whole width on a phone; from lg the half away from its
+ *  scene, a scene on the right putting the cards on the left. */
+const COLUMN: Record<Side, string> = {
+  right: 'lg:mr-auto lg:w-[min(46rem,52vw)]',
+  left: 'lg:ml-auto lg:w-[min(46rem,52vw)]',
+}
+
+/** The column of the part `id` on the page being read. */
+export function useColumn(id: SectionId | 'contact'): string {
+  return COLUMN[useContext(SidesContext)[id] ?? 'right']
+}
 
 /** The scene a section draws settled under reduced motion, by its id; nothing while the theatre plays. */
 const StillStagesContext = createContext<(id: string) => ReactNode>(() => null)
@@ -43,27 +60,26 @@ export const StillStages = StillStagesContext.Provider
 
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
-/** Lines marked with the blood red diamond the trials give a job's highlights: a job's highlights, a
- *  project's details, the About highlights, under their frost heading. */
+/** Lines marked with the blood red diamond: a job's highlights, a project's details, the About highlights,
+ *  under their gold heading. */
 export const BLOOD_POINTS: MarkedLinesLook = {
-  heading: `mt-4 text-sm text-[var(--myth-frost)] ${u.display}`,
+  heading: `mt-4 text-sm text-[var(--myth-gold)] ${u.display}`,
   list: 'mt-2 space-y-1.5',
   line: 'flex gap-2 text-base',
   marker: <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />,
 }
 
-/** A card's tags on the ink, ruled in iron: a job's skills, a project's technologies, a venture's services. */
+/** A card's tags on the ink, ruled in bronze: a job's skills, a project's technologies, a venture's services. */
 export const IRON_TAGS: TagListLook = {
   list: 'mt-3 flex flex-wrap gap-1.5',
-  tag: 'border border-[var(--myth-iron)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm',
+  tag: 'border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm',
 }
 
-/** A knot cut either side of a title stone: one stave with its branches, wound through a ring of knotwork. */
-export function RuneKnot({ flip = false }: { flip?: boolean }) {
+/** The key pattern cut either side of a title stone: a Greek meander in a bronze square. */
+export function Meander({ flip = false }: { flip?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 shrink-0 ${flip ? '-scale-x-100' : ''}`} aria-hidden="true">
-      <path d="M12 3 V21 M12 9 L6 4 M12 9 L18 4 M12 15 L7 19" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-      <path d="M4 12 Q4 5 12 5 Q20 5 20 12 Q20 19 12 19 Q4 19 4 12 Z" fill="none" stroke="currentColor" strokeWidth={1.2} strokeDasharray="3 2" />
+      <path d="M3 21 V3 H21 V17 H7 V7 H17 V13 H11" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="square" />
     </svg>
   )
 }
@@ -72,9 +88,9 @@ export function SectionTitle({ title }: { title: string }) {
   return (
     <h2 id={mythHeadingId(title)} className="mb-8 text-[clamp(1.25rem,0.85rem+1.8vw,1.875rem)]">
       <span className={`${u.plate} ${u.display}`}>
-        <RuneKnot />
+        <Meander />
         <span className="min-w-0">{title}</span>
-        <RuneKnot flip />
+        <Meander flip />
       </span>
     </h2>
   )
@@ -83,13 +99,15 @@ export function SectionTitle({ title }: { title: string }) {
 export function Stage({ id, title, children }: { id: SectionId; title: string; children: ReactNode }) {
   const { ref, on } = useZoneStage<Zone>(ZONE_OF[id])
   const still = useContext(StillStagesContext)
+  const column = useColumn(id)
 
   return (
-    <section ref={ref} data-scene={id} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative mb-28 scroll-mt-8">
+    <section ref={ref} data-scene={id} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="relative mb-28 scroll-mt-8 lg:min-h-[110svh]">
       {still(id)}
-      <div className={COLUMN}>
+      <div className={column}>
         <SectionTitle title={title} />
-        {/* under lg the cards take the whole width, so the section's scene plays and holds in this gap first,
+        {/* from lg the section stands at least a screen tall so its scene has its time beside a short list of
+            cards; under lg the cards take the whole width, so the section's scene plays and holds in this gap first,
             the title at its top and the floor clear of the cards (the head about 130svh with the title) */}
         <div className="max-lg:min-h-[115svh]" aria-hidden="true" />
         {children}

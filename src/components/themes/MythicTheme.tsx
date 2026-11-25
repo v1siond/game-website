@@ -22,7 +22,7 @@ import { Altar } from './Mythic/altar'
 import { SECTION_VIEWS } from './Mythic/regions'
 import { LastGate } from './Mythic/gate'
 import { FIELD_MOTION, MythStage, scenesOf } from './Mythic/scenes'
-import { StillStages, type Zone } from './Mythic/stage'
+import { SceneSides, StillStages, type Side, type Zone } from './Mythic/stage'
 import u from './Mythic/underworld.module.css'
 
 // The carved inscriptional capitals, Cinzel: the root carries its --myth-display variable and the world's css
@@ -33,16 +33,17 @@ const mythDisplay = Cinzel({
   variable: '--myth-display',
 })
 
-// Mythic, the northern war god game of 2018 retold as his own journey, painted in ink over colour: he burns
-// his old mentor's body on a pyre in the snow wood and carries the ashes with a young apprentice to the
-// highest peak, as the mentor asked. The fixed depths behind the page fade to the place in view (data-zone),
-// in the order they walk it: the snow wood, the old road, the mirror lake, the ring of light, the iron
-// mountain, the sea of the dead, the frozen shore and the stair to the peak. Over them, on the shared theatre
-// (./shared/theatre), every part of the page has its scene (./Mythic/scenes), one to three actions played by
-// the scroll at the scene's own pace and back on the way up: the pyre, the stranger at the door, the axe and
-// the gate, the wyrm of the lake, the smith, the light, the seer, the drum of his past, the last duel and the
-// ashes on the wind. The sections read in a column on the left from lg, so the scenes play clear of them on
-// the right; under lg each scene plays in a gap under its title before the cards. Under reduced motion there
+// Mythic, the Greek war god games of 2005 and 2007 retold as his own run: the storm sea and the serpent's
+// king head, burning Athens and the seer on her ropes, the desert Titan with the temple on his back, the rings
+// of the architect's temple, the last duel with the war god, the bronze giant of the harbour, the winged horse
+// and the stone steeds, the undead king's hammer in the bog, the winged man of the great chasm and the earth
+// Titan's hand under him on the mountain of the gods (score/C75/story.md). The fixed depths behind the page
+// fade to the place in view (data-zone), in that order. Over them, on the shared theatre (./shared/theatre),
+// every part of the page has its scene (./Mythic/scenes), one to three actions played by the scroll at the
+// scene's own pace and back on the way up. From lg the sections take turns: the first after the hero reads on
+// the left with its scene on the right, the next the other way round, up to the contact (each scene's side
+// comes from scenesOf and reaches the sections through SceneSides); under lg each scene plays in a gap under
+// its title before the cards, his action in the half of the screen its side names. Under reduced motion there
 // is no theatre: each part carries its own scene, still, at its end frame.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
@@ -58,12 +59,13 @@ export default function MythicTheme() {
   // the pointer drifts the painting only (Depths), so its writes restyle that box and not the page
   const pointerRef = usePointerVars(!reduced)
   const rootRef = useRef<HTMLDivElement>(null)
-  const { zones, stage } = useZoneStore<Zone>('wood', reduced)
+  const { zones, stage } = useZoneStore<Zone>('sea', reduced)
   useZoneAttribute(zones, rootRef)
   const scenes = useMemo(
     () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), labels, highlights, active),
     [view.sections, professionalSummary.bio, labels, highlights, active],
   )
+  const sides = useMemo(() => Object.fromEntries(scenes.map((scene) => [scene.id, scene.side])) as Record<string, Side>, [scenes])
   const { theatreRef, textRef } = useTheatre(scenes, FIELD_MOTION, reduced)
   const still = useCallback(
     (id: string) => {
@@ -85,6 +87,7 @@ export default function MythicTheme() {
         </Theatre>
       )}
       <ZoneStageProvider value={stage}>
+        <SceneSides value={sides}>
         <StillStages value={still}>
           <div ref={textRef} className="relative z-20">
             <HallHero still={still('hero')} />
@@ -99,6 +102,7 @@ export default function MythicTheme() {
             <LastGate still={still('contact')} />
           </div>
         </StillStages>
+        </SceneSides>
       </ZoneStageProvider>
 
       <footer className="relative z-20 py-8 text-center">

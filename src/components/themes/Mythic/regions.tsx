@@ -8,23 +8,24 @@ import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BLOOD_POINTS, Stage } from './stage'
 import { Trials } from './trials'
 import { Codex } from './codex'
-import { Sagas } from './sagas'
+import { Labours } from './labours'
 import { Votives } from './votives'
 import { Portraits } from './portraits'
-import { Runestones } from './runestones'
+import { Prophecies } from './prophecies'
 import u from './underworld.module.css'
 
-// The picked profession's sections, each a stretch of the journey: About at the cabin, the jobs on the old
-// road, the codex over the mirror lake, the services at the smith's hut, the sagas of his deeds in the ring of
-// light, the votive tokens on the iron mountain, the portraits on the sea of the dead and the runestone of his
-// record on the frozen shore. The gate at the stair to the peak closes the page (gate.tsx). The shared section plan picks which a profession shows and in which
-// order; each section's scene plays behind it (scenes.tsx).
+// The picked profession's sections, each a stretch of the run in the games' order: About in burning Athens,
+// the jobs in the desert of the chained Titan, the codex in the architect's temple, the services at the last
+// duel with the war god, his labours in the harbour under the bronze giant, the votive tokens on the island of
+// the stone steeds, the portraits in the bog, and the prophecies fulfilled by the great chasm. The gate on the
+// mountain of the gods closes the page (gate.tsx). The shared section plan picks which a profession shows and
+// in which order; each section's scene plays beside it (scenes.tsx).
 
-// His education and languages under the highlights, each label in the frost display face.
-const FROST_FACTS: AboutFactsLook = {
+// His education and languages under the highlights, each label in the gold display face.
+const GOLD_FACTS: AboutFactsLook = {
   list: 'mt-4 space-y-1',
   fact: 'text-base',
-  term: `inline text-sm text-[var(--myth-frost)] ${u.display}`,
+  term: `inline text-sm text-[var(--myth-gold)] ${u.display}`,
   value: 'inline',
   termEnd: ': ',
 }
@@ -41,7 +42,7 @@ const FRAMES: SectionFrames = {
           <div data-stage-items="">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
           </div>
-          <AboutFacts look={FROST_FACTS} />
+          <AboutFacts look={GOLD_FACTS} />
         </div>
       </Stage>
     )
@@ -69,7 +70,7 @@ const FRAMES: SectionFrames = {
         <ul className={MASONRY_LIST} data-stage-items="">
           {slot.services.map((service) => (
             <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
-              <h3 className={`border-b-2 border-[var(--myth-iron)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
+              <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
               <p className="mt-3 text-base leading-relaxed">{service.line}</p>
             </li>
           ))}
@@ -81,7 +82,7 @@ const FRAMES: SectionFrames = {
     const titles = useLabels().sections
     return (
       <Stage id={slot.id} title={titles.projects}>
-        <Sagas projects={slot.projects} />
+        <Labours projects={slot.projects} />
       </Stage>
     )
   },
@@ -105,7 +106,7 @@ const FRAMES: SectionFrames = {
     const titles = useLabels().sections
     return (
       <Stage id={slot.id} title={titles.muayThai}>
-        <Runestones martialArts={slot.martialArts} />
+        <Prophecies martialArts={slot.martialArts} />
       </Stage>
     )
   },

@@ -6,8 +6,8 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { TechCategory } from '@/lib/cv/content'
 import u from './underworld.module.css'
 
-// The Tech Stack as the pages of the codex: each group a parchment page with its name over its tools. His
-// climb up the chain plays on the section's stage behind them (scenes.tsx), one reach per group.
+// The Tech Stack as the pages of the architect's codex: each group a parchment page with its name over its
+// tools. He turns the temple's rings on the section's stage beside them (scenes.tsx).
 
 type Category = TechCategory & { id: string }
 
@@ -17,7 +17,7 @@ const Page = memo(function Page({ category }: { category: Category }) {
 
   return (
     <li className={`p-5 ${u.parchment}`}>
-      <h3 className={`border-b-2 border-[var(--myth-iron)] pb-2 text-lg ${u.display}`}>{category.name}</h3>
+      <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{category.name}</h3>
       <ul className="mt-3 flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
         {category.items.map((item) => (
           <li key={item} className="border border-[var(--myth-ink-soft)] px-2 py-0.5 text-base">

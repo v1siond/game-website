@@ -6,24 +6,25 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { MYTH } from './palette'
 import { REST, bodyTransform, jointTransform, type Joint, type Pose } from './rig'
 
-// Him as the father of the northern journey, in three quarter profile facing right: a plain woodsman's axe in
-// the near hand, a fur mantle over the shoulders hanging behind him, a wool tunic belted in leather, wool
-// trousers with the shins wound in leather wraps, soft boots, his head bare. One dark ink line round every
-// shape over painted gradient fills, the warm rim of the fire on the lit edge. Nothing is the game's hero: no
-// runes, no shield, no armour.
+// Him as the warrior of the Greek war god games, our own, in three quarter profile facing right: bare
+// chested, a crimson cloth kilt to the knee on a bronze belt, one leather strap across the chest, bronze
+// bracers with the chains of his blades wound round them, bronze greaves and sandals, and a straight leaf
+// blade of bronze with a red hot edge in each fist, each on its chain. One dark ink line round every shape
+// over painted fills, the warm rim of fire on the lit edge. Nothing is the game's hero: no ash skin, no red
+// mark, no hooked blades, no shoulder guard.
 //
 // His traits come from HERO_IDENTITY: his skin, his dark hair, his full dark beard and dark oval eyes. The
 // Martial Artist wears his mongkhon.
 //
 // Every limb is drawn hanging straight down and rig.ts turns it: HeroFigure draws one pose as SVG
 // attributes, and a scene's writer turns its joints ([data-joint]) and moves its body ([data-body]) as the
-// page scrolls (scenes.tsx). What he holds in the near hand, the axe, the torch, the ash pouch or the mallets
-// of the drum, are groups a scene shows and hides (data-fx axe-held, held-torch, held-pouch, held-mallets).
+// page scrolls (scenes.tsx). What his hands hold, the blades, the horn, the great sword or the hammer, are
+// groups a scene shows and hides (data-fx held-blades, held-blade-far, held-horn, held-sword, held-hammer).
 
 const INK = MYTH.inkLine
 
-function Inked({ d, fill }: { d: string; fill: string }) {
-  return <path d={d} fill={fill} stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
+function Inked({ d, fill, width = 2.2 }: { d: string; fill: string; width?: number }) {
+  return <path d={d} fill={fill} stroke={INK} strokeWidth={width} strokeLinejoin="round" />
 }
 
 type Side = 'far' | 'near'
@@ -37,35 +38,54 @@ const NOSE = 'M107 37 L111 44 L107 45'
 const BEARD = 'M84 44 Q86 50 89 52 L107 46 Q111 51 108 58 Q103 69 95 71 Q85 69 83 58 Z'
 const NECK = 'M85 50 L101 50 L103 64 L83 64 Z'
 
-const MANTLE = 'M74 62 Q66 64 62 80 L58 132 Q70 140 82 132 L86 104 Q88 80 92 62 Z'
-const MANTLE_FUR = 'M70 56 Q86 46 104 54 Q112 60 110 68 Q98 62 86 64 Q76 66 70 74 Q64 66 70 56 Z'
-const TORSO = 'M76 62 Q86 54 100 58 Q111 62 113 74 Q115 90 107 104 L103 118 L76 118 Q69 100 71 84 Q71 70 76 62 Z'
-const TUNIC_SEAMS = 'M92 64 L96 84 L103 64 M84 100 Q94 104 106 100'
+// A broad bare chest, the muscle lines in the skin's shade, and the leather strap from the near shoulder to the far hip.
+const TORSO = 'M74 62 Q86 52 101 57 Q114 62 115 76 Q116 92 107 106 L103 118 L76 118 Q68 100 70 84 Q70 70 74 62 Z'
+const MUSCLE = 'M92 70 Q102 76 110 72 M90 84 Q96 88 104 86 M92 94 Q97 98 103 96 M96 76 L96 108'
+const STRAP = 'M100 58 L108 62 L82 116 L74 112 Z'
 
 const UPPER_ARM: Record<Side, string> = {
-  far: 'M76 66 Q84 58 92 66 L91 98 Q84 103 77 98 Z',
-  near: 'M89 68 Q98 60 108 70 L106 102 Q98 107 90 102 Z',
+  far: 'M75 66 Q84 57 93 66 L92 98 Q84 104 76 98 Z',
+  near: 'M88 68 Q98 59 109 70 L107 102 Q98 108 89 102 Z',
 }
 const FOREARM: Record<Side, string> = {
   far: 'M78 96 L90 96 Q91 108 88 122 L80 122 Q77 108 78 96 Z',
   near: 'M91 100 L105 100 Q106 112 103 126 L93 126 Q90 112 91 100 Z',
 }
+// The bronze bracer and the turns of chain wound over it.
 const BRACER: Record<Side, string> = {
-  far: 'M77 104 L91 104 L89 120 L79 120 Z',
-  near: 'M90 108 L106 108 L104 124 L92 124 Z',
+  far: 'M77 102 L91 102 L89 120 L79 120 Z',
+  near: 'M90 106 L106 106 L104 124 L92 124 Z',
+}
+const CHAIN_TURNS: Record<Side, string> = {
+  far: 'M78 107 L90 105 M78 112 L90 110 M79 117 L89 115',
+  near: 'M91 111 L105 109 M91 116 L105 114 M92 121 L104 119',
 }
 const FIST: Record<Side, string> = {
   far: 'M78 119 Q84 115 90 119 L90 130 Q84 134 78 130 Z',
   near: 'M91 123 Q98 119 105 123 L105 135 Q98 139 91 135 Z',
 }
-// The woodsman's axe hangs from the near fist forward and down: the haft through the fist, a plain narrow
-// head at its foot.
-const AXE_HAFT = 'M96 120 L101 119 L112 182 L107 183 Z'
-const AXE_HEAD = 'M106 166 L120 162 Q128 168 128 178 L114 182 L110 176 Z'
-const AXE_EDGE = 'M120 162 Q128 168 128 178'
-// A pine torch, its flame over the fist; a small leather pouch hanging from its cord; the drum's two mallets.
-const TORCH = 'M96 122 L101 121 L104 160 L99 161 Z'
-const POUCH = 'M92 132 Q90 146 98 150 Q106 146 104 132 Z'
+// A straight leaf blade out of the fist, forward and down; its hilt and the chain from the bracer to its pommel.
+const BLADE: Record<Side, { hilt: string; blade: string; edge: string; chain: string }> = {
+  near: {
+    hilt: 'M93 132 L104 130 L105 136 L94 138 Z',
+    blade: 'M97 137 L103 136 Q114 160 113 192 L110 198 Q103 168 97 137 Z',
+    edge: 'M103 136 Q114 160 113 192',
+    chain: 'M92 124 Q86 132 96 134',
+  },
+  far: {
+    hilt: 'M79 128 L90 126 L91 132 L80 134 Z',
+    blade: 'M83 133 L89 132 Q100 156 99 188 L96 194 Q89 164 83 133 Z',
+    edge: 'M89 132 Q100 156 99 188',
+    chain: 'M78 120 Q72 128 82 130',
+  },
+}
+// The great sword along the near forearm's line, far past the fist; the war hammer's long haft and its head.
+const SWORD = 'M95 134 L103 133 L112 330 L104 344 L96 330 Z'
+const SWORD_GUARD = 'M86 132 L112 128 L113 136 L87 140 Z'
+const HAMMER_HAFT = 'M95 100 L102 99 L108 250 L101 251 Z'
+const HAMMER_HEAD = 'M82 236 L126 230 L130 268 L86 274 Z'
+// The great horn: its mouthpiece in the fist, the bell curling forward.
+const HORN = 'M96 126 Q92 110 104 98 Q120 86 140 92 L142 108 Q124 104 114 112 Q104 120 102 132 Z'
 
 const THIGH: Record<Side, string> = {
   far: 'M72 120 L88 120 L87 158 L74 158 Z',
@@ -75,34 +95,30 @@ const SHIN: Record<Side, string> = {
   far: 'M74 156 L87 156 L85 190 L76 190 Z',
   near: 'M86 156 L99 156 L97 190 L88 190 Z',
 }
-// The leather wraps wound round the shins over the wool, and the soft boots.
-const WRAPS: Record<Side, string> = {
-  far: 'M73 160 L88 160 L86 184 L75 184 Z',
-  near: 'M85 160 L100 160 L98 184 L87 184 Z',
+// The bronze greave over the shin, and the sandal's sole and straps.
+const GREAVE: Record<Side, string> = {
+  far: 'M73 158 L88 158 L86 186 L75 186 Z',
+  near: 'M85 158 L100 158 L98 186 L87 186 Z',
 }
-const WRAP_TURNS: Record<Side, string> = {
-  far: 'M74 166 L87 162 M74 172 L87 168 M75 178 L86 174',
-  near: 'M86 166 L99 162 M86 172 L99 168 M87 178 L98 174',
-}
-const BOOT: Record<Side, string> = {
-  far: 'M74 182 L87 182 Q92 188 97 190 L97 198 L71 198 Z',
-  near: 'M86 182 L99 182 Q104 188 109 190 L109 198 L83 198 Z',
+const SANDAL: Record<Side, string> = {
+  far: 'M74 186 L87 186 Q92 190 97 192 L97 198 L71 198 Z',
+  near: 'M86 186 L99 186 Q104 190 109 192 L109 198 L83 198 Z',
 }
 
-// The tunic's skirt to the thigh, and the leather belt over it.
-const SKIRT = 'M72 112 L104 112 L110 142 Q90 148 68 142 Z'
-const SKIRT_SHADE = 'M72 112 L80 112 L77 144 Q72 144 68 142 Z'
-const BELT = 'M72 105 L104 105 L105 116 L71 116 Z'
+// The crimson kilt in folds to the knee, and the bronze belt over it.
+const KILT = 'M71 110 L105 110 L112 150 Q100 156 88 150 Q78 156 66 150 Z'
+const KILT_FOLDS = 'M80 114 L76 150 M90 114 L89 150 M99 114 L102 150'
+const KILT_SHADE = 'M71 110 L79 110 L76 151 Q70 153 66 150 Z'
+const BELT = 'M71 104 L105 104 L106 116 L70 116 Z'
 
 // ---- the parts ----
 
 interface GradientIds {
   skin: string
   skinFar: string
-  leather: string
-  wool: string
+  bronze: string
+  kilt: string
   blade: string
-  cloak: string
 }
 
 interface PartProps {
@@ -155,8 +171,10 @@ function Torso({ ids }: Pick<PartProps, 'ids'>) {
   return (
     <g>
       <Inked d={NECK} fill={`url(#${ids.skin})`} />
-      <Inked d={TORSO} fill={`url(#${ids.wool})`} />
-      <path d={TUNIC_SEAMS} fill="none" stroke={MYTH.woolShade} strokeWidth={1.6} strokeLinecap="round" />
+      <Inked d={TORSO} fill={`url(#${ids.skin})`} />
+      <path d={MUSCLE} fill="none" stroke={HERO_IDENTITY.skinShade} strokeWidth={1.6} strokeLinecap="round" />
+      <Inked d={STRAP} fill={MYTH.leather} width={1.6} />
+      <circle cx={96} cy={78} r={3.4} fill={MYTH.bronze} stroke={INK} strokeWidth={1.2} />
     </g>
   )
 }
@@ -164,10 +182,11 @@ function Torso({ ids }: Pick<PartProps, 'ids'>) {
 function Waist({ ids }: Pick<PartProps, 'ids'>) {
   return (
     <g>
-      <Inked d={SKIRT} fill={`url(#${ids.wool})`} />
-      <path d={SKIRT_SHADE} fill={MYTH.woolShade} opacity={0.7} />
-      <Inked d={BELT} fill={`url(#${ids.leather})`} />
-      <rect x={89} y={107} width={7} height={7} fill={MYTH.iron} stroke={INK} strokeWidth={1.4} />
+      <Inked d={KILT} fill={`url(#${ids.kilt})`} />
+      <path d={KILT_SHADE} fill={MYTH.kiltShade} opacity={0.7} />
+      <path d={KILT_FOLDS} fill="none" stroke={MYTH.kiltShade} strokeWidth={1.6} />
+      <Inked d={BELT} fill={`url(#${ids.bronze})`} />
+      <path d="M74 110 H102" stroke={MYTH.bronzeShade} strokeWidth={1.4} strokeDasharray="3 3" />
     </g>
   )
 }
@@ -177,45 +196,49 @@ const skinOf = (ids: GradientIds, side: Side) => `url(#${side === 'far' ? ids.sk
 function Leg({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }) {
   return (
     <JointGroup joint={side === 'far' ? 'thighFar' : 'thighNear'} pose={pose}>
-      <Inked d={THIGH[side]} fill={side === 'far' ? MYTH.woolShade : `url(#${ids.wool})`} />
+      <Inked d={THIGH[side]} fill={skinOf(ids, side)} />
       <JointGroup joint={side === 'far' ? 'shinFar' : 'shinNear'} pose={pose}>
-        <Inked d={SHIN[side]} fill={side === 'far' ? MYTH.woolShade : `url(#${ids.wool})`} />
-        <Inked d={WRAPS[side]} fill={`url(#${ids.leather})`} />
-        <path d={WRAP_TURNS[side]} stroke={MYTH.leatherShade} strokeWidth={1.4} />
-        <Inked d={BOOT[side]} fill={`url(#${ids.leather})`} />
+        <Inked d={SHIN[side]} fill={skinOf(ids, side)} />
+        <Inked d={GREAVE[side]} fill={side === 'far' ? MYTH.bronzeShade : `url(#${ids.bronze})`} />
+        <Inked d={SANDAL[side]} fill={MYTH.leather} />
+        <path d={side === 'far' ? 'M76 190 L95 194' : 'M88 190 L107 194'} stroke={MYTH.leatherShade} strokeWidth={1.4} />
       </JointGroup>
     </JointGroup>
   )
 }
 
-function Axe({ ids }: { ids: GradientIds }) {
+/** A blade in a fist on its chain; the near one is also the one a scene hides when that hand holds another thing. */
+function Blade({ side, ids }: { side: Side; ids: GradientIds }) {
+  const { hilt, blade, edge, chain } = BLADE[side]
   return (
-    <g data-fx="axe-held">
-      <Inked d={AXE_HAFT} fill={`url(#${ids.leather})`} />
-      <Inked d={AXE_HEAD} fill={`url(#${ids.blade})`} />
-      <path d={AXE_EDGE} fill="none" stroke={MYTH.bone} strokeWidth={1.8} />
+    <g data-fx={side === 'near' ? 'held-blades' : 'held-blade-far'}>
+      <path d={chain} fill="none" stroke={INK} strokeWidth={3.4} strokeLinecap="round" />
+      <path d={chain} fill="none" stroke={MYTH.chain} strokeWidth={1.8} strokeDasharray="2.4 1.6" strokeLinecap="round" />
+      <Inked d={blade} fill={`url(#${ids.blade})`} width={1.8} />
+      <path d={edge} fill="none" stroke={MYTH.fireCore} strokeWidth={1.6} />
+      <Inked d={hilt} fill={MYTH.bronzeShade} width={1.4} />
     </g>
   )
 }
 
-/** What else the near hand can hold, each hidden until a scene shows it: the torch, the pouch, the mallets. */
-function HandHeld() {
+/** What else the near hand can hold, each hidden until a scene shows it: the horn, the great sword, the hammer. */
+function HandHeld({ ids }: { ids: GradientIds }) {
   return (
     <>
-      <g data-fx="held-torch" opacity={0}>
-        <Inked d={TORCH} fill={MYTH.wood} />
-        <path d="M100 160 Q90 172 98 186 Q102 176 106 186 Q112 172 100 160 Z" fill={MYTH.fire} stroke={INK} strokeWidth={1.6} />
-        <path d="M100 166 Q96 174 99 182 Q104 174 100 166 Z" fill={MYTH.fireCore} />
+      <g data-fx="held-horn" opacity={0}>
+        <Inked d={HORN} fill={MYTH.bone} />
+        <path d="M108 104 Q116 98 126 98 M112 112 Q118 106 128 104" fill="none" stroke={MYTH.boneShade} strokeWidth={1.6} />
+        <path d="M138 92 L142 108" stroke={MYTH.bronze} strokeWidth={3} />
       </g>
-      <g data-fx="held-pouch" opacity={0}>
-        <path d="M98 128 L98 134" stroke={MYTH.leatherShade} strokeWidth={1.6} />
-        <Inked d={POUCH} fill={MYTH.leather} />
-        <path d="M93 136 Q98 139 103 136" fill="none" stroke={MYTH.leatherShade} strokeWidth={1.4} />
+      <g data-fx="held-sword" opacity={0}>
+        <Inked d={SWORD} fill={`url(#${ids.blade})`} width={2.6} />
+        <path d="M99 140 L106 334" stroke={MYTH.fireCore} strokeWidth={2} />
+        <Inked d={SWORD_GUARD} fill={`url(#${ids.bronze})`} />
       </g>
-      <g data-fx="held-mallets" opacity={0}>
-        <path d="M98 124 L112 158" stroke={INK} strokeWidth={4.4} strokeLinecap="round" />
-        <path d="M98 124 L112 158" stroke={MYTH.wood} strokeWidth={2.6} strokeLinecap="round" />
-        <circle cx={113} cy={161} r={6} fill={MYTH.wrap} stroke={INK} strokeWidth={1.6} />
+      <g data-fx="held-hammer" opacity={0}>
+        <Inked d={HAMMER_HAFT} fill={MYTH.leather} />
+        <Inked d={HAMMER_HEAD} fill={MYTH.mail} width={2.6} />
+        <path d="M88 248 L126 242 M90 260 L128 254" stroke={MYTH.rotShade} strokeWidth={2} />
       </g>
     </>
   )
@@ -227,20 +250,10 @@ function Arm({ side, ids, pose }: Omit<PartProps, 'profession'> & { side: Side }
       <Inked d={UPPER_ARM[side]} fill={skinOf(ids, side)} />
       <JointGroup joint={side === 'far' ? 'foreFar' : 'foreNear'} pose={pose}>
         <Inked d={FOREARM[side]} fill={skinOf(ids, side)} />
-        <Inked d={BRACER[side]} fill={`url(#${ids.leather})`} />
-        {side === 'near' && (
-          <>
-            <Axe ids={ids} />
-            <HandHeld />
-          </>
-        )}
-        {side === 'far' && (
-          <g data-fx="held-mallets-far" opacity={0}>
-            <path d="M84 120 L98 154" stroke={INK} strokeWidth={4.4} strokeLinecap="round" />
-            <path d="M84 120 L98 154" stroke={MYTH.wood} strokeWidth={2.6} strokeLinecap="round" />
-            <circle cx={99} cy={157} r={6} fill={MYTH.wrap} stroke={INK} strokeWidth={1.6} />
-          </g>
-        )}
+        <Blade side={side} ids={ids} />
+        {side === 'near' && <HandHeld ids={ids} />}
+        <Inked d={BRACER[side]} fill={side === 'far' ? MYTH.bronzeShade : `url(#${ids.bronze})`} />
+        <path d={CHAIN_TURNS[side]} stroke={MYTH.chain} strokeWidth={1.6} />
         <Inked d={FIST[side]} fill={skinOf(ids, side)} />
       </JointGroup>
     </JointGroup>
@@ -262,24 +275,21 @@ function Gradients({ ids }: { ids: GradientIds }) {
         <stop offset="0" stopColor={MYTH.inkSoft} />
         <stop offset="0.7" stopColor={HERO_IDENTITY.skinShade} />
       </linearGradient>
-      <linearGradient id={ids.leather} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={MYTH.leather} />
-        <stop offset="1" stopColor={MYTH.leatherShade} />
+      <linearGradient id={ids.bronze} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor={MYTH.bronzeLight} />
+        <stop offset="0.5" stopColor={MYTH.bronze} />
+        <stop offset="1" stopColor={MYTH.bronzeShade} />
       </linearGradient>
-      <linearGradient id={ids.wool} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={MYTH.furLight} />
-        <stop offset="0.45" stopColor={MYTH.wool} />
-        <stop offset="1" stopColor={MYTH.woolShade} />
+      <linearGradient id={ids.kilt} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor={MYTH.blood} />
+        <stop offset="0.55" stopColor={MYTH.kilt} />
+        <stop offset="1" stopColor={MYTH.kiltShade} />
       </linearGradient>
-      <linearGradient id={ids.blade} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor={MYTH.bone} />
-        <stop offset="0.6" stopColor={MYTH.steel} />
-        <stop offset="1" stopColor={MYTH.steelShade} />
-      </linearGradient>
-      {/* the fur of the mantle, lit at its top */}
-      <linearGradient id={ids.cloak} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor={MYTH.furLight} />
-        <stop offset="1" stopColor={MYTH.fur} />
+      {/* bronze at the spine, red hot towards the edge */}
+      <linearGradient id={ids.blade} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor={MYTH.bronzeLight} />
+        <stop offset="0.55" stopColor={MYTH.fire} />
+        <stop offset="1" stopColor={MYTH.fireRed} />
       </linearGradient>
     </defs>
   )
@@ -287,7 +297,7 @@ function Gradients({ ids }: { ids: GradientIds }) {
 
 function useGradientIds(): GradientIds {
   const base = useId().replace(/:/g, '')
-  return { skin: `${base}skin`, skinFar: `${base}skinfar`, leather: `${base}leather`, wool: `${base}wool`, blade: `${base}blade`, cloak: `${base}cloak` }
+  return { skin: `${base}skin`, skinFar: `${base}skinfar`, bronze: `${base}bronze`, kilt: `${base}kilt`, blade: `${base}blade` }
 }
 
 /** His drawing's own box: a scene scales it to the height it stands him at. */
@@ -300,10 +310,9 @@ export function HeroFigure({ profession, pose = REST }: { profession: Profession
   return (
     <g>
       <Gradients ids={ids} />
-      <ellipse cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
+      <ellipse data-fx="hero-shadow" cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
       <g data-body="" transform={bodyTransform(pose)}>
         <JointGroup joint="chest" pose={pose}>
-          <Inked d={MANTLE} fill={`url(#${ids.cloak})`} />
           <Arm side="far" {...parts} />
         </JointGroup>
         <Leg side="far" {...parts} />
@@ -311,7 +320,6 @@ export function HeroFigure({ profession, pose = REST }: { profession: Profession
         <Waist ids={ids} />
         <JointGroup joint="chest" pose={pose}>
           <Torso ids={ids} />
-          <Inked d={MANTLE_FUR} fill={`url(#${ids.cloak})`} />
           <Head profession={profession} {...parts} />
           <Arm side="near" {...parts} />
         </JointGroup>

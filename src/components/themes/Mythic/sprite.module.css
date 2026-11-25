@@ -1,27 +1,30 @@
 /*
- * The bands his scenes play in (scenes.tsx), in the 1920 by 1080 field. From lg the sections read in a
- * column on the left, so their scenes play on the right (about x 1150 to 1720) and the hero stands in the
- * hall's left bay (x 600). Under 1024 px the screen shows only the field's middle (about x 710 to 1210 on a
- * phone) and the section cards rise over the foot of the screen, so each scene's cast is framed by the scene
- * itself (scenes.tsx phoneFrame writes --phone-x, --phone-y and --phone-fit): fitted to that width, centred,
- * its feet up in the open band two thirds down the screen. From 768 the hero's bay sits a little further in,
- * where the hero's left column is. Under 768 px the hero's copy fills the foot of the first screen, so he
- * stands up in the bay under the outfit switcher, 540 field units off the floor.
+ * The bands his scenes play in (scenes.tsx), in the 1920 by 1080 field. Each section's scene is drawn round its
+ * own middle; from lg the sections take turns, cards on one side and the scene on the other, so its band's
+ * middle is set at --band-x, the middle of the free side (scenes.tsx BAND_X). Under 1024 px the screen shows
+ * only the field's middle (about x 710 to 1210 on a phone) and the cards stack under the scene, so the scene
+ * is fitted to that width and his action set in the half its side names (--phone-x, --phone-y, --phone-fit).
+ * The hero keeps its own place left of his name: from lg as drawn, from 768 a little in to the hero's left
+ * column, under 768 up in the bay under the outfit switcher, framed like a section.
  */
+.band {
+  transform: translate(calc(var(--band-x) * 1px), 0);
+}
+
 @media (max-width: 1023.98px) {
-  .rightBand {
+  .band {
     transform: translate(calc(var(--phone-x) * 1px), calc(var(--phone-y) * 1px)) scale(var(--phone-fit));
     transform-origin: 0 0;
   }
 
-  .leftBand {
-    transform: translateX(135px);
-    transform-origin: 600px 1000px;
+  .heroBand {
+    transform: translateX(230px);
   }
 }
 
 @media (max-width: 767.98px) {
-  .leftBand {
-    transform: translate(360px, -540px) scale(0.72);
+  .heroBand {
+    transform: translate(calc(var(--phone-x) * 1px), calc(var(--phone-y) * 1px)) scale(var(--phone-fit));
+    transform-origin: 0 0;
   }
 }

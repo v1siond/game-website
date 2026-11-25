@@ -40,15 +40,15 @@ describe('his rig', () => {
     expect(poseAt(move, 1.5)).toEqual(keys[keys.length - 1].pose)
   })
 
-  it('has a move for every verb of the journey, the pyre to the peak', () => {
-    const journey = ['torch', 'gather', 'give', 'reel', 'shove', 'throw', 'catch', 'stoop', 'row', 'raise', 'see', 'haul', 'chop', 'heave', 'drum', 'clinch', 'knee', 'elbow', 'kneel', 'walk']
-    expect([...MOVE_NAMES].sort()).toEqual([...journey].sort())
+  it('has a move for every verb of the run, the storm sea to the mountain of the gods', () => {
+    const run = ['walk', 'roll', 'swing', 'thrust', 'leap', 'haul', 'horn', 'climb', 'crank', 'open', 'guard', 'draw', 'wrench', 'shoulder', 'clinch', 'knee', 'tear', 'glide', 'raise']
+    expect([...MOVE_NAMES].sort()).toEqual([...run].sort())
   })
 
   it('poses a move between two keys with every joint between their angles', () => {
-    const keys = resolveKeys('elbow')
+    const keys = resolveKeys('swing')
     const [a, b] = [keys[1], keys[2]]
-    const pose = poseAt('elbow', (a.at + b.at) / 2)
+    const pose = poseAt('swing', (a.at + b.at) / 2)
     JOINTS.forEach((joint) => {
       expect(pose[joint]).toBeGreaterThanOrEqual(Math.min(a.pose[joint], b.pose[joint]))
       expect(pose[joint]).toBeLessThanOrEqual(Math.max(a.pose[joint], b.pose[joint]))

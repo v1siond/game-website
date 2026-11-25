@@ -22,7 +22,7 @@ const BandCard = memo(function BandCard({ slot }: { slot: BandSlot }) {
         <span className={`text-3xl text-[var(--myth-ink)] ${u.display}`}>{band.name.charAt(0)}</span>
       </div>
       <div className={`min-w-0 flex-1 p-4 ${u.dialogue}`}>
-        <h3 className={`text-lg leading-tight text-[var(--myth-frost)] ${u.display}`}>
+        <h3 className={`text-lg leading-tight text-[var(--myth-gold)] ${u.display}`}>
           {linkProps ? (
             <a {...linkProps} className="inline-flex min-h-[44px] items-center underline decoration-2 underline-offset-4">
               {band.name}
@@ -34,7 +34,7 @@ const BandCard = memo(function BandCard({ slot }: { slot: BandSlot }) {
         <p className="mt-1 text-base">{band.role}</p>
         {years && <p className="text-sm text-[var(--myth-bone-shade)]">{years}</p>}
         {release && (
-          <p className="mt-2 text-base italic text-[var(--myth-frost-core)]">
+          <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">
             <span className={`mr-2 text-sm not-italic text-[var(--myth-bone-shade)] ${u.display}`}>{release.label}</span>
             {release.title}
           </p>
@@ -50,7 +50,7 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
   return (
     <div className="grid gap-8">
       <div className={`p-5 ${u.panel} ${u.reveal}`}>
-        <p className={`text-lg text-[var(--myth-frost)] ${u.display}`}>{drumsSince(musician, years)}</p>
+        <p className={`text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
       </div>
       <div data-stage-items="">

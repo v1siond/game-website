@@ -1,7 +1,7 @@
 
 // His joints and every move he makes, as plain data, so the figure, its test and the scenes all read one
-// source. He is drawn in three quarter profile facing right: the near arm (the axe hand) in front of the
-// chest, the far arm behind it, both swinging forward and back in the picture plane. Every limb
+// source. He is drawn in three quarter profile facing right: the near arm (a blade in each hand) in front
+// of the chest, the far arm behind it, both swinging forward and back in the picture plane. Every limb
 // is drawn hanging straight down and the pose turns it round its joint, in degrees, clockwise on screen
 // (y grows down):
 // - shoulder and hip: negative swings the limb forward (towards +x), -180 is straight up;
@@ -67,25 +67,24 @@ export interface Pose extends Angles {
 
 export type Move =
   | 'walk'
-  | 'torch'
-  | 'gather'
-  | 'give'
-  | 'reel'
-  | 'shove'
-  | 'throw'
-  | 'catch'
-  | 'stoop'
-  | 'row'
-  | 'raise'
-  | 'see'
+  | 'roll'
+  | 'swing'
+  | 'thrust'
+  | 'leap'
   | 'haul'
-  | 'chop'
-  | 'heave'
-  | 'drum'
+  | 'horn'
+  | 'climb'
+  | 'crank'
+  | 'open'
+  | 'guard'
+  | 'draw'
+  | 'wrench'
+  | 'shoulder'
   | 'clinch'
   | 'knee'
-  | 'elbow'
-  | 'kneel'
+  | 'tear'
+  | 'glide'
+  | 'raise'
 
 /** A key: when it falls in the move (0 to 1) and the joints it changes; the others hold from the key before. */
 export interface Key {
@@ -102,16 +101,38 @@ const LEGS_SET = { thighNear: -16, shinNear: 8, thighFar: 14, shinFar: 10 }
 // The clinch: both hands round the head before him, the chest in.
 const CLINCH: Partial<Pose> = { armNear: -120, foreNear: -70, armFar: -115, foreFar: -75, chest: 14, head: 6, thighNear: -24, shinNear: 16, thighFar: 14, shinFar: 10 }
 
+// The lunge the blades are thrown from: the near leg forward and bent, the far leg long behind.
+const LUNGE: Partial<Pose> = { thighNear: -40, shinNear: 30, thighFar: 24, shinFar: 8 }
+
+// Down low: the knees deep, the chest over them.
+const LOW: Partial<Pose> = { chest: 30, head: 8, thighNear: -70, shinNear: 95, thighFar: -12, shinFar: 80 }
+
+// The crank's two ends: the weight driven into the bar, then the bar pushed out at arm's length.
+const CRANK_IN: Partial<Pose> = { armNear: -80, foreNear: -30, armFar: -75, foreFar: -35, chest: 30, thighNear: -50, shinNear: 40, thighFar: 30, shinFar: 10 }
+const CRANK_OUT: Partial<Pose> = { armNear: -100, foreNear: -4, armFar: -95, foreFar: -8, chest: 34, thighNear: -30, shinNear: 20, thighFar: 40, shinFar: 6 }
+
+// A hand over hand climb: one hand high on the chain, the other a reach lower, the legs gripping in turn.
+const CLIMB_A: Partial<Pose> = { armNear: -175, foreNear: -10, armFar: -140, foreFar: -40, chest: -4, head: -10, thighNear: -50, shinNear: 60, thighFar: 0, shinFar: 30 }
+const CLIMB_B: Partial<Pose> = { armNear: -140, foreNear: -40, armFar: -175, foreFar: -10, thighNear: 0, shinNear: 30, thighFar: -50, shinFar: 60 }
+
 const ZERO: Pose = { chest: 0, head: 0, armFar: 0, foreFar: 0, armNear: 0, foreNear: 0, thighFar: 0, shinFar: 0, thighNear: 0, shinNear: 0, x: 0, y: 0 }
 
-// How he stands: the axe held low and forward with the elbow bent, the far hand loose before the
-// chest, the knees a little bent.
+// How he stands: a blade in each hand held low and forward, the elbows bent, the knees a little bent.
 export const REST: Pose = { ...ZERO, ...LEGS_SET, chest: 6, head: -4, armNear: -25, foreNear: -55, armFar: -30, foreFar: -70 }
+
+/** The legs sat astride the winged horse; a scene lays them over any move of the arms. */
+export const ASTRIDE: Partial<Pose> = { thighNear: -80, shinNear: 80, thighFar: -75, shinFar: 75 }
 
 const back = (rest: Pose): Key => ({ at: 1, pose: rest })
 
+/** Holds `pose` from `at` to the end. */
+const hold = (at: number, pose: Partial<Pose>): Key[] => [
+  { at, pose },
+  { at: 1, pose },
+]
+
 export const MOVES: Record<Move, MoveSpec> = {
-  // the stride: each leg reaches forward straight and swings back bent, the axe arm counter swinging
+  // the stride: each leg reaches forward straight and swings back bent, the near arm counter swinging
   walk: {
     keys: (r) => [
       { at: 0, pose: { thighNear: -24, shinNear: 6, thighFar: 22, shinFar: 16, armNear: r.armNear + 16 } },
@@ -121,132 +142,111 @@ export const MOVES: Record<Move, MoveSpec> = {
       { at: 1, pose: { thighNear: -24, shinNear: 6, thighFar: 22, shinFar: 16, armNear: r.armNear + 16 } },
     ],
   },
-  // the torch set to the pyre: he leans in, the near arm down and forward to the wood, and holds it there
-  torch: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.5, pose: { armNear: -60, foreNear: -20, chest: 16, head: 6, thighNear: -30, shinNear: 30 } },
-      { at: 1, pose: { armNear: -60, foreNear: -20, chest: 16, head: 6, thighNear: -30, shinNear: 30 } },
-    ],
-  },
-  // the gathering: down on his heels by the cold pyre, the near hand sweeps the ash in to the far hand
-  gather: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.35, pose: { chest: 30, head: 10, thighNear: -75, shinNear: 95, thighFar: -20, shinFar: 90, armNear: -20, foreNear: -40, armFar: -10, foreFar: -50 } },
-      { at: 0.7, pose: { armNear: 10, foreNear: -20 } },
-      { at: 1, pose: { armNear: -30, foreNear: -70 } },
-    ],
-  },
-  // the handing over: the near arm held out at the chest, the pouch in the hand, the head bowed to her
-  give: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.5, pose: { armNear: -80, foreNear: -30, chest: 8, head: 8 } },
-      { at: 1, pose: { armNear: -80, foreNear: -30, chest: 8, head: 8 } },
-    ],
-  },
-  // struck: the chest and the head thrown back, the arms loose, a step back, then he gathers himself
-  reel: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.3, pose: { chest: -20, head: -24, armNear: 20, foreNear: -60, armFar: 30, foreFar: -40, x: -30 } },
-      { at: 1, pose: { chest: -6, head: -8, armNear: -25, foreNear: -55, armFar: -30, foreFar: -70, x: -20 } },
-    ],
-  },
-  // the shove: both hands drawn in to the chest, then driven forward with the weight behind them, held
-  shove: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.35, pose: { armNear: -30, foreNear: -110, armFar: -30, foreFar: -110, chest: -4, x: -10 } },
-      { at: 0.6, pose: { armNear: -88, foreNear: -6, armFar: -84, foreFar: -8, chest: 24, thighNear: -40, shinNear: 30, thighFar: 24, shinFar: 6, x: 30 } },
-      { at: 1, pose: { armNear: -88, foreNear: -6, armFar: -84, foreFar: -8, chest: 24, thighNear: -40, shinNear: 30, thighFar: 24, shinFar: 6, x: 30 } },
-    ],
-  },
-  // the axe throw: wound back over the near shoulder, then whipped forward and let go at arm's length, the
-  // weight on the near leg, the arm held out after it
-  throw: {
-    keys: () => [
-      { at: 0, pose: {} },
-      { at: 0.45, pose: { armNear: -200, foreNear: -70, chest: -10, head: -6, thighNear: -20, shinNear: 10 } },
-      { at: 0.65, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
-      { at: 1, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
-    ],
-  },
-  // the recall: the near hand held out open for the axe, the jolt as it lands in the palm, back to his guard
-  catch: {
+  // the dodge roll: tucked tight, the blades in to the chest, then up again in his stance (the scene turns him
+  // over as he goes)
+  roll: {
     keys: (r) => [
-      { at: 0, pose: { armNear: -80, foreNear: -8, chest: 18, thighNear: -36, shinNear: 26, thighFar: 20, shinFar: 8 } },
-      { at: 0.4, pose: { armNear: -95, foreNear: -12, chest: -2, head: -6, thighNear: -20, shinNear: 12, thighFar: 16, shinFar: 8 } },
-      { at: 0.75, pose: { armNear: -70, foreNear: -40, chest: -10, head: -10, x: -8 } },
+      { at: 0, pose: {} },
+      { at: 0.25, pose: { chest: 34, head: 20, thighNear: -110, shinNear: 140, thighFar: -100, shinFar: 140, armNear: -70, foreNear: -120, armFar: -60, foreFar: -120 } },
+      { at: 0.75, pose: { chest: 34, head: 20, thighNear: -110, shinNear: 140, thighFar: -100, shinFar: 140, armNear: -70, foreNear: -120, armFar: -60, foreFar: -120 } },
       back(r),
     ],
   },
-  // the stoop: bent low at the waist and the knees to pass under the raised gate, held while he goes
-  stoop: {
+  // the blades thrown out on their chains: wound up over the near shoulder and back, then whipped forward from
+  // the lunge with both arms long, held while the arcs of fire run out
+  swing: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 0.5, pose: { chest: 34, head: 12, thighNear: -60, shinNear: 80, thighFar: -5, shinFar: 70 } },
-      { at: 1, pose: { chest: 34, head: 12, thighNear: -60, shinNear: 80, thighFar: -5, shinFar: 70 } },
+      { at: 0.35, pose: { armNear: -205, foreNear: -40, armFar: 50, foreFar: -30, chest: -14, head: -8, thighNear: -20, shinNear: 10 } },
+      { at: 0.6, pose: { armNear: -75, foreNear: -4, armFar: -110, foreFar: -6, chest: 22, head: 4, ...LUNGE } },
+      { at: 1, pose: { armNear: -75, foreNear: -4, armFar: -110, foreFar: -6, chest: 22, head: 4, ...LUNGE } },
     ],
   },
-  // a stroke of the oars sat in the boat: the arms reach forward with the chest, then pull back to the chest
-  // as he leans back, and reach again
-  row: {
-    keys: () => [
-      { at: 0, pose: { thighNear: -85, shinNear: 85, thighFar: -80, shinFar: 80, chest: 20, armNear: -80, foreNear: -20, armFar: -75, foreFar: -20 } },
-      { at: 0.5, pose: { chest: -12, armNear: -25, foreNear: -110, armFar: -20, foreFar: -110 } },
-      { at: 1, pose: { chest: 20, armNear: -80, foreNear: -20, armFar: -75, foreFar: -20 } },
-    ],
-  },
-  // the heft: the new edge lifted straight over his head and held there while he looks it over
-  raise: {
+  // driving a thing down with both hands: both arms high over the head, then down with the whole body behind
+  thrust: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 0.4, pose: { armNear: -195, foreNear: -8, armFar: -40, foreFar: -60, chest: -8, head: -14 } },
-      { at: 1, pose: { armNear: -195, foreNear: -8, armFar: -40, foreFar: -60, chest: -8, head: -14 } },
+      { at: 0.4, pose: { armNear: -195, foreNear: -20, armFar: -185, foreFar: -24, chest: -12, head: -12, thighNear: -14, shinNear: 6 } },
+      ...hold(0.7, { armNear: -40, foreNear: -10, armFar: -45, foreFar: -12, chest: 34, head: 10, thighNear: -70, shinNear: 80, thighFar: 10, shinFar: 60 }),
     ],
   },
-  // the vision: he stands in the light, the head up to the walls, the arms fallen at his sides
-  see: {
+  // the jump: down into the knees with the arms back, then up and out, the arms reaching forward and up
+  leap: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 1, pose: { head: -20, chest: -8, armNear: 10, foreNear: -10, armFar: 20, foreFar: -10 } },
+      { at: 0.3, pose: { chest: 22, armNear: 30, foreNear: -20, armFar: 40, foreFar: -20, thighNear: -60, shinNear: 90, thighFar: -10, shinFar: 80 } },
+      ...hold(0.6, { chest: -6, head: -8, armNear: -150, foreNear: -10, armFar: -140, foreFar: -12, thighNear: -40, shinNear: 60, thighFar: 20, shinFar: 70 }),
     ],
   },
-  // the haul: hand over hand down the chain over his head, the chest working with each pull
+  // hauling a weight up from below him: bent over it with both hands down, then back on his heels pulling it in
   haul: {
     keys: () => [
-      { at: 0, pose: { armNear: -170, foreNear: -10, armFar: -150, foreFar: -30, chest: -6, head: -14 } },
-      { at: 0.5, pose: { armNear: -60, foreNear: -80, armFar: -170, foreFar: -10, chest: 12 } },
-      { at: 1, pose: { armNear: -170, foreNear: -10, armFar: -150, foreFar: -30, chest: -6 } },
+      { at: 0, pose: { armNear: -60, foreNear: -10, armFar: -55, foreFar: -12, ...LOW } },
+      { at: 0.5, pose: { armNear: -20, foreNear: -120, armFar: -15, foreFar: -120, chest: -14, head: -8, thighNear: -30, shinNear: 20, thighFar: 20, shinFar: 10, x: -14 } },
+      { at: 1, pose: { armNear: -40, foreNear: -100, armFar: -35, foreFar: -100, chest: -6, head: -4, thighNear: -20, shinNear: 12, thighFar: 16, shinFar: 10, x: -10 } },
     ],
   },
-  // the chop: the axe up over the near shoulder, then down through the rope with the weight behind it
-  chop: {
+  // the horn set to the mouth with the near hand, the head back, the far hand loose
+  horn: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 0.4, pose: { armNear: -205, foreNear: -50, chest: -10 } },
-      { at: 0.65, pose: { armNear: -50, foreNear: -6, chest: 26, thighNear: -40, shinNear: 40 } },
-      { at: 1, pose: { armNear: -50, foreNear: -6, chest: 26, thighNear: -40, shinNear: 40 } },
+      ...hold(0.35, { armNear: -110, foreNear: -135, armFar: -30, foreFar: -60, head: -16, chest: -10 }),
     ],
   },
-  // the lift: he crouches with his hands under the hearth stone and heaves it up over his head
-  heave: {
+  // up the chain hand over hand
+  climb: {
+    keys: () => [
+      { at: 0, pose: CLIMB_A },
+      { at: 0.5, pose: CLIMB_B },
+      { at: 1, pose: CLIMB_A },
+    ],
+  },
+  // one push of the great lever: the weight in, the bar out, the weight in again
+  crank: {
+    keys: () => [
+      { at: 0, pose: CRANK_IN },
+      { at: 0.5, pose: CRANK_OUT },
+      { at: 1, pose: CRANK_IN },
+    ],
+  },
+  // the lid lifted: crouched with both hands under it, then up and over the head, the face turned up
+  open: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 0.35, pose: { chest: 26, head: 6, armNear: -45, foreNear: -25, armFar: -40, foreFar: -25, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 } },
-      { at: 1, pose: { chest: -6, head: -8, armNear: -170, foreNear: -15, armFar: -165, foreFar: -15, thighNear: -14, shinNear: 6, thighFar: 12, shinFar: 8 } },
+      { at: 0.4, pose: { armNear: -50, foreNear: -10, armFar: -45, foreFar: -12, ...LOW } },
+      ...hold(0.8, { armNear: -190, foreNear: -10, armFar: -165, foreFar: -10, chest: -12, head: -16, thighNear: -10, shinNear: 5, thighFar: 10, shinFar: 5 }),
     ],
   },
-  // the rowers' time on the drum: the mallets come down one after the other, twice each
-  drum: {
+  // the great sword held across high against a blow, the jolt as it lands, held braced
+  guard: {
     keys: () => [
-      { at: 0, pose: { armNear: -150, foreNear: -60, armFar: -40, foreFar: -90, chest: 4 } },
-      { at: 0.25, pose: { armNear: -50, foreNear: -60, armFar: -150, foreFar: -60 } },
-      { at: 0.5, pose: { armNear: -150, foreNear: -60, armFar: -40, foreFar: -90 } },
-      { at: 0.75, pose: { armNear: -50, foreNear: -60, armFar: -150, foreFar: -60 } },
-      { at: 1, pose: { armNear: -150, foreNear: -60, armFar: -40, foreFar: -90 } },
+      { at: 0, pose: {} },
+      { at: 0.35, pose: { armNear: -140, foreNear: -60, armFar: -120, foreFar: -70, chest: 10, head: 4, ...LUNGE } },
+      { at: 0.55, pose: { chest: -12, head: -10, x: -24 } },
+      { at: 1, pose: { chest: 8, head: 2, x: -16 } },
+    ],
+  },
+  // the blade drawn up out of the stone: bent over the hilt, then up straight with both hands over the head
+  draw: {
+    keys: () => [
+      { at: 0, pose: {} },
+      { at: 0.3, pose: { armNear: -60, foreNear: -20, armFar: -55, foreFar: -22, ...LOW } },
+      ...hold(0.75, { armNear: -200, foreNear: -6, armFar: -195, foreFar: -8, chest: -10, head: -16, thighNear: -14, shinNear: 6, thighFar: 14, shinFar: 8 }),
+    ],
+  },
+  // a grip torn back: both hands forward on the thing, then thrown back on his heels with it
+  wrench: {
+    keys: () => [
+      { at: 0, pose: {} },
+      { at: 0.35, pose: { armNear: -100, foreNear: -10, armFar: -95, foreFar: -12, chest: 22, ...LUNGE } },
+      ...hold(0.7, { armNear: -30, foreNear: -125, armFar: -25, foreFar: -120, chest: -18, head: -10, thighNear: -10, shinNear: 10, thighFar: 40, shinFar: 30, x: -24 }),
+    ],
+  },
+  // a weight laid on the near shoulder, the hand up by the ear, standing tall
+  shoulder: {
+    keys: () => [
+      { at: 0, pose: {} },
+      ...hold(0.6, { armNear: -150, foreNear: -150, armFar: -30, foreFar: -70, chest: -4, head: -6 }),
     ],
   },
   // the clinch: both hands up round the head before him, the chest in, the near leg set
@@ -264,20 +264,26 @@ export const MOVES: Record<Move, MoveSpec> = {
       { at: 1, pose: CLINCH },
     ],
   },
-  // the falling elbow: the near elbow up high, then down with the whole body behind it, held low
-  elbow: {
+  // the wings torn off: from the clinch both arms flung wide, the near forward and up, the far back
+  tear: {
     keys: () => [
       { at: 0, pose: CLINCH },
-      { at: 0.4, pose: { armNear: -190, foreNear: -150, chest: -12, head: -10 } },
-      { at: 0.7, pose: { armNear: -70, foreNear: -150, chest: 34, head: 10, thighNear: -80, shinNear: 90, thighFar: 20, shinFar: 110 } },
-      { at: 1, pose: { armNear: -70, foreNear: -150, chest: 34, head: 10, thighNear: -80, shinNear: 90, thighFar: 20, shinFar: 110 } },
+      { at: 0.3, pose: { armNear: -100, foreNear: -20, armFar: -95, foreFar: -24, chest: 20 } },
+      ...hold(0.65, { armNear: -160, foreNear: -10, armFar: 70, foreFar: -10, chest: -16, head: -12, thighNear: -20, shinNear: 30, thighFar: 30, shinFar: 50 }),
     ],
   },
-  // down on one knee, the far shin flat on the ground, the head bowed
-  kneel: {
+  // gliding: both hands up on the wings' bones over him, the legs trailing
+  glide: {
     keys: () => [
       { at: 0, pose: {} },
-      { at: 1, pose: { thighNear: -90, shinNear: 90, thighFar: 10, shinFar: 100, chest: 10, head: 6, armNear: -30, foreNear: -40 } },
+      ...hold(0.5, { armNear: -170, foreNear: -10, armFar: -165, foreFar: -12, chest: 12, head: -10, thighNear: 20, shinNear: 40, thighFar: 30, shinFar: 60 }),
+    ],
+  },
+  // both blades raised over his head to call the mountain
+  raise: {
+    keys: () => [
+      { at: 0, pose: {} },
+      ...hold(0.5, { armNear: -185, foreNear: -15, armFar: -170, foreFar: -25, chest: -8, head: -12, ...LUNGE }),
     ],
   },
 }

@@ -1,5 +1,5 @@
 /*
- * Mythic, the northern journey: every look and every motion of the world except his sprite
+ * Mythic, the Greek war god games: every look and every motion of the world except his sprite
  * (sprite.module.css). Colours are the palette's --myth-* variables, set once on the root (paletteVars).
  * Motion is transform and opacity only; shadows, borders and gradients are fixed, never animated. Each
  * block names the component that uses it. Nothing loops (BD29): every motion plays a bounded number of
@@ -11,8 +11,8 @@
 /* ---------------------------------------------------------------- page */
 
 .root {
-  /* The keyboard focus ring (globals.css) in the pale frost of its own ring, 18.1:1 on the hall. */
-  --focus-ring: var(--myth-frost-core);
+  /* The keyboard focus ring (globals.css) in the pale gold of its own ring, 15:1 on the hall. */
+  --focus-ring: var(--myth-gold-pale);
   /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
   --focus-halo: var(--myth-hall-high);
   background: var(--myth-hall-high);
@@ -28,25 +28,25 @@
   text-transform: uppercase;
 }
 
-/* The page the skip link lands on shows where the keyboard landed with the frost ring; every control
+/* The page the skip link lands on shows where the keyboard landed with the gold ring; every control
    keeps the global ring (globals.css) in the --focus-ring set above. */
 .root main:focus-visible {
-  outline: 3px solid var(--myth-frost-core);
+  outline: 3px solid var(--myth-gold-pale);
   outline-offset: 3px;
 }
 
-/* A board of dark wood: near black, an iron rim and a thin inner line of frost. */
+/* A dark board: near black, a bronze rim and a thin inner line of gold. */
 .panel {
   background: linear-gradient(180deg, var(--myth-panel) 0%, var(--myth-ink) 100%);
-  border: 2px solid var(--myth-iron);
-  box-shadow: inset 0 0 0 4px var(--myth-panel), inset 0 0 0 5px color-mix(in srgb, var(--myth-frost) 45%, transparent), 0 10px 30px rgb(0 0 0 / 45%);
+  border: 2px solid var(--myth-gold-deep);
+  box-shadow: inset 0 0 0 4px var(--myth-panel), inset 0 0 0 5px color-mix(in srgb, var(--myth-gold) 45%, transparent), 0 10px 30px rgb(0 0 0 / 45%);
 }
 
-/* The pages of his journal of the realms: the codex and the runestone's facts, dark ink on them. */
+/* Parchment: the codex, the headline and the prophecy's facts, dark ink on them. */
 .parchment {
   background: linear-gradient(170deg, var(--myth-marble) 0%, var(--myth-marble-shade) 100%);
   color: var(--myth-ink);
-  border: 2px solid var(--myth-iron);
+  border: 2px solid var(--myth-gold-deep);
   box-shadow: 0 10px 26px rgb(0 0 0 / 40%);
 }
 
@@ -68,55 +68,67 @@
   transition: opacity 1.1s ease;
 }
 
-.root[data-zone='wood'] .zoneWood,
-.root[data-zone='road'] .zoneRoad,
-.root[data-zone='lake'] .zoneLake,
-.root[data-zone='light'] .zoneLight,
-.root[data-zone='mountain'] .zoneMountain,
-.root[data-zone='dead'] .zoneDead,
-.root[data-zone='shore'] .zoneShore,
-.root[data-zone='peak'] .zonePeak {
+.root[data-zone='sea'] .zoneSea,
+.root[data-zone='athens'] .zoneAthens,
+.root[data-zone='desert'] .zoneDesert,
+.root[data-zone='temple'] .zoneTemple,
+.root[data-zone='storm'] .zoneStorm,
+.root[data-zone='rhodes'] .zoneRhodes,
+.root[data-zone='sky'] .zoneSky,
+.root[data-zone='bog'] .zoneBog,
+.root[data-zone='chasm'] .zoneChasm,
+.root[data-zone='olympus'] .zoneOlympus {
   opacity: 1;
 }
 
-.zoneWood {
-  background: radial-gradient(ellipse at 50% 30%, rgb(255 211 107 / 18%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-wood-high) 0%, var(--myth-wood-low) 100%);
+.zoneSea {
+  background: radial-gradient(ellipse at 50% 30%, rgb(201 216 204 / 12%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-sea-high) 0%, var(--myth-sea-low) 100%);
 }
 
-.zoneRoad {
+.zoneAthens {
+  background: radial-gradient(ellipse at 50% 30%, rgb(255 138 42 / 28%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-athens-high) 0%, var(--myth-athens-low) 100%);
+}
+
+.zoneDesert {
+  background: radial-gradient(ellipse at 50% 30%, rgb(255 240 200 / 30%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-sand-high) 0%, var(--myth-sand-low) 100%);
+}
+
+.zoneTemple {
+  background: radial-gradient(ellipse at 50% 30%, rgb(255 211 107 / 26%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-temple-high) 0%, var(--myth-temple-low) 100%);
+}
+
+.zoneStorm {
   background: radial-gradient(ellipse at 50% 30%, rgb(230 237 242 / 10%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-wood-high) 0%, var(--myth-wood-low) 100%);
+    linear-gradient(180deg, var(--myth-storm-high) 0%, var(--myth-storm-low) 100%);
 }
 
-.zoneLake {
-  background: radial-gradient(ellipse at 50% 30%, rgb(230 237 242 / 20%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-lake-high) 0%, var(--myth-lake-low) 100%);
+.zoneRhodes {
+  background: radial-gradient(ellipse at 50% 30%, rgb(159 232 255 / 18%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-rhodes-high) 0%, var(--myth-rhodes-low) 100%);
 }
 
-.zoneLight {
-  background: radial-gradient(ellipse at 50% 30%, rgb(255 255 240 / 50%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-light-low) 0%, var(--myth-light-high) 100%);
-}
-
-.zoneMountain {
-  background: radial-gradient(ellipse at 50% 30%, rgb(255 154 58 / 12%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-mountain-high) 0%, var(--myth-mountain-low) 100%);
-}
-
-.zoneDead {
-  background: radial-gradient(ellipse at 50% 30%, rgb(230 237 242 / 8%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-dead-high) 0%, var(--myth-dead-low) 100%);
-}
-
-.zoneShore {
-  background: radial-gradient(ellipse at 50% 30%, rgb(255 211 107 / 30%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-shore-high) 0%, var(--myth-shore-low) 100%);
-}
-
-.zonePeak {
+.zoneSky {
   background: radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 40%) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-peak-high) 0%, var(--myth-peak-low) 100%);
+    linear-gradient(180deg, var(--myth-sky-high) 0%, var(--myth-sky-low) 100%);
+}
+
+.zoneBog {
+  background: radial-gradient(ellipse at 50% 30%, rgb(168 192 160 / 16%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-bog-high) 0%, var(--myth-bog-low) 100%);
+}
+
+.zoneChasm {
+  background: radial-gradient(ellipse at 50% 30%, rgb(247 221 146 / 10%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-chasm-high) 0%, var(--myth-chasm-low) 100%);
+}
+
+.zoneOlympus {
+  background: radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 45%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-olympus-high) 0%, var(--myth-olympus-low) 100%);
 }
 
 /* The far and near art of a region drift against the pointer at two depths. */
@@ -130,16 +142,16 @@
 
 /* ---------------------------------------------------------------- stage and section title (stage.tsx) */
 
-/* The title is cut into a stone with a rune knot each side, the stone bound by an iron band. */
+/* The title is cut into a marble stone with a key pattern each side, the stone bound by a bronze band. */
 .plate {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 1.4rem 0.45rem;
-  background: linear-gradient(180deg, var(--myth-stone) 0%, var(--myth-stone-shade) 100%);
+  background: linear-gradient(180deg, var(--myth-marble) 0%, var(--myth-marble-shade) 100%);
   color: var(--myth-ink);
   border: 2px solid var(--myth-ink);
-  box-shadow: inset 0 0 0 3px var(--myth-iron), 0 6px 0 var(--myth-ink);
+  box-shadow: inset 0 0 0 3px var(--myth-gold-deep), 0 6px 0 var(--myth-ink);
   clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
 }
 
@@ -181,24 +193,24 @@
 .btn:focus-visible { transform: translate3d(0, -2px, 0); }
 .btn:active { transform: translate3d(0, 3px, 0); }
 
-.btnFrost {
-  background: linear-gradient(180deg, var(--myth-frost-core) 0%, var(--myth-frost) 100%);
+.btnGold {
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 100%);
   color: var(--myth-ink);
 }
 
 .btnBlood {
   background: linear-gradient(180deg, var(--myth-blood-plate) 0%, var(--myth-terracotta-deep) 100%);
   color: var(--myth-bone);
-  border-color: var(--myth-iron);
+  border-color: var(--myth-gold-deep);
 }
 
 .btnStone {
   background: var(--myth-panel);
   color: var(--myth-bone);
-  border-color: var(--myth-iron);
+  border-color: var(--myth-gold-deep);
 }
 
-/* ---------------------------------------------------------------- the great hall (hero.tsx) */
+/* ---------------------------------------------------------------- the hero (hero.tsx) */
 
 .hall {
   min-height: 92vh;
@@ -206,12 +218,12 @@
 
 /* ---------------------------------------------------------------- the altar's plates (altar.tsx) */
 
-/* A stone: dark when idle, its frost lit face when picked; a new pick turns it over. */
+/* A stone: dark when idle, its gold lit face when picked; a new pick turns it over. */
 .talent {
   min-height: 44px;
   cursor: pointer;
   background: var(--myth-panel);
-  border: 2px solid var(--myth-iron);
+  border: 2px solid var(--myth-gold-deep);
   color: var(--myth-bone);
   transition: transform 0.2s ease;
 }
@@ -220,7 +232,7 @@
 .talent:focus-visible { transform: translate3d(0, -3px, 0); }
 
 .talent[aria-checked='true'] {
-  background: linear-gradient(180deg, var(--myth-frost-core) 0%, var(--myth-frost) 100%);
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 100%);
   color: var(--myth-ink);
   border-color: var(--myth-ink);
 }
@@ -238,8 +250,8 @@
 /* ---------------------------------------------------------------- votives (votives.tsx) */
 
 .slot {
-  background: radial-gradient(ellipse at 50% 40%, var(--myth-iron) 0%, var(--myth-iron-deep) 80%);
-  border: 2px solid var(--myth-iron);
+  background: radial-gradient(ellipse at 50% 40%, var(--myth-gold-deep) 0%, var(--myth-bronze-shade) 80%);
+  border: 2px solid var(--myth-gold-deep);
   box-shadow: inset 0 6px 16px rgb(0 0 0 / 60%);
 }
 
@@ -247,14 +259,14 @@
 
 .portrait {
   background: radial-gradient(ellipse at 50% 35%, var(--myth-ely-light) 0%, var(--myth-ely-low) 70%);
-  border: 3px solid var(--myth-frost);
+  border: 3px solid var(--myth-gold);
   box-shadow: inset 0 0 0 2px var(--myth-ink);
 }
 
 .dialogue {
   background: rgb(10 5 8 / 88%);
-  border: 2px solid var(--myth-iron);
-  border-top: 4px solid var(--myth-frost);
+  border: 2px solid var(--myth-gold-deep);
+  border-top: 4px solid var(--myth-gold);
 }
 
 .bandCard {
@@ -266,7 +278,7 @@
   transform: translate3d(0, -4px, 0);
 }
 
-/* ---------------------------------------------------------------- the runestone (runestones.tsx) */
+/* ---------------------------------------------------------------- the prophecies (prophecies.tsx) */
 
 .fulfilled {
   opacity: 0;
@@ -275,12 +287,12 @@
   transition-delay: calc(0.4s + var(--i) * 0.25s);
 }
 
-/* Struck, the stamp goes from the blood it is cut in to the frost of a deed done (ink on frost, 11.4:1),
+/* Struck, the stamp goes from the blood it is cut in to the gold of a deed done (ink on gold, 9:1),
    just after it lands. It is set here over its utility class, which only gives the colour it is struck in. */
 [data-on] .fulfilled {
   opacity: 1;
   transform: scale(1) rotate(-10deg);
-  background-color: var(--myth-frost);
+  background-color: var(--myth-gold);
   color: var(--myth-ink);
   transition:
     opacity 0.2s ease calc(0.4s + var(--i) * 0.25s),
@@ -289,11 +301,11 @@
     color 0.3s ease calc(0.75s + var(--i) * 0.25s);
 }
 
-/* ---------------------------------------------------------------- the realm door (gate.tsx) */
+/* ---------------------------------------------------------------- the temple doors (gate.tsx) */
 
 .gateScene {
-  background: linear-gradient(180deg, var(--myth-iron-deep) 0%, var(--myth-ink) 100%);
-  border: 2px solid var(--myth-iron);
+  background: linear-gradient(180deg, var(--myth-bronze-shade) 0%, var(--myth-ink) 100%);
+  border: 2px solid var(--myth-gold-deep);
 }
 
 .dawn {
@@ -345,11 +357,11 @@
     transform: none !important;
   }
 
-  /* The fulfilled stamp's end frame is its tilt at full size in the frost of a deed done, not the scale(2)
+  /* The fulfilled stamp's end frame is its tilt at full size in the gold of a deed done, not the scale(2)
      and blood it is struck from. */
   .fulfilled {
     transform: rotate(-10deg) !important;
-    background-color: var(--myth-frost) !important;
+    background-color: var(--myth-gold) !important;
     color: var(--myth-ink) !important;
   }
 }
@@ -366,53 +378,61 @@
   animation-delay: calc(-1 * (var(--era-lead, 0s) + var(--era-t, 1) * var(--era-len, 4.8s)));
 }
 
-/* the snow falling on the wood and the road: each flake falls the height of the place, drifting, out of step */
-.snow {
-  animation: snow-fall 4.8s linear;
+/* the rain at sea and the grit falling in the chasm: each streak falls the height of the place, out of step */
+.rain,
+.grit {
+  animation: fall 4.8s linear;
   --era-lead: calc(var(--i, 0) * 0.7s);
 }
-@keyframes snow-fall {
+@keyframes fall {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(calc(var(--drift, 0) * 1px), 1100px, 0); }
 }
-/* the mist over the lake and the shore, and the fog on the dead sea: each band drifts across and back once */
-.mist,
-.fog {
+/* the embers rising over burning Athens and off the temple's torches */
+.embers {
+  animation: rise 4.8s ease-out;
+  --era-lead: calc(var(--i, 0) * 0.6s);
+}
+@keyframes rise {
+  from { transform: translate3d(0, 1100px, 0); opacity: 0; }
+  20% { opacity: 0.9; }
+  to { transform: translate3d(calc(var(--drift, 0) * 1px), 300px, 0); opacity: 0; }
+}
+/* the sand blowing across the desert and the mist over the bog: each band drifts across and back once */
+.blow {
   animation: drift 4.8s ease-in-out;
   --era-lead: calc(var(--i, 0) * 0.8s);
 }
 @keyframes drift {
   0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(90px, 0, 0); }
+  50% { transform: translate3d(120px, 0, 0); }
 }
-/* the light breathing in the ring: it swells once and settles lit */
-.breathe {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  opacity: 0.35;
-  animation: breathe 4.8s ease-in-out;
-}
-@keyframes breathe {
-  0% { transform: scale(0.6); opacity: 0.1; }
-  60% { transform: scale(1.15); opacity: 0.55; }
-  100% { transform: scale(1); opacity: 0.35; }
-}
-/* the black smoke rolling off the mountain, and the wind streaming over the peak */
-.smokeRoll {
-  animation: roll 4.8s ease-in-out;
-  --era-lead: calc(var(--i, 0) * 0.6s);
-}
-@keyframes roll {
-  from { transform: translate3d(-140px, 20px, 0); }
-  to { transform: translate3d(60px, 0, 0); }
-}
-.wind {
-  animation: wind 4.8s ease-out;
+/* the clouds over the island and under the mountain, streaming in once */
+.clouds {
+  animation: stream 4.8s ease-out;
   --era-lead: calc(var(--i, 0) * 0.5s);
 }
-@keyframes wind {
+@keyframes stream {
   from { transform: translate3d(-300px, 0, 0); }
   to { transform: translate3d(0, 0, 0); }
+}
+/* the lightning over the last duel and over Rhodes: two flashes, then dark */
+.flash {
+  animation: flash 4.8s linear;
+}
+@keyframes flash {
+  0%, 18%, 26%, 60%, 66%, 100% { opacity: 0; }
+  20%, 62% { opacity: 0.55; }
+}
+/* the mountain's rays turning into place */
+.rays {
+  transform-box: view-box;
+  transform-origin: 600px 120px;
+  animation: rays 4.8s ease-out;
+}
+@keyframes rays {
+  from { transform: rotate(-20deg); opacity: 0; }
+  to { transform: rotate(0deg); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
