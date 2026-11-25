@@ -1,118 +1,128 @@
+import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { Cage, Crate, Dust, RaiderCar, Raider, Runner, SaltCamp, Waveform } from '../cast'
-import { HOURS } from '../desert'
 import { flung } from '../bandit'
+import { Baron, Raider } from '../cast/foes'
+import { Barrel } from '../cast/road'
+import { Chest, Lift, SaltDeck } from '../cast/props'
+import { LANDS } from '../desert'
+import { Callout, Hits, Tag, TitleCard, cardWriter, hitsWriter, popWriter, type Hit } from '../hud'
 import { CEL } from '../palette'
 import { stopsPlace } from '../place'
-import { DRIVE, kick, rest } from '../pose'
+import { drum, rest } from '../pose'
 
-// Bands, the drummer's stretch on the salt flats (notes L58 to L59, L112 to L114, L163, [1] [16]): he drives
-// through the patrol cars and they flip into the salt. The elevator cage lifts him into the camp on its
-// stilts, and wave on wave of guards comes over the wall on the beat, a drum line he kicks back in time.
-// Then he kicks the chest open: it is empty, and only static crackles at his ear.
+// Bands, the drummer's stretch: the camp on the salt flats (research notes, the story 14, the bosses 6, [16]
+// [1]): the lift's cage carries him up the stilts to the camp's deck, and there BARON SALTWELL stands by his
+// chest and the frame freezes on his card. The baron's raiders come at him across the deck; he drums two oil
+// barrels with his sticks and every second stroke sends a ring of shock down the deck that throws a raider off
+// it, a number off each. The baron bolts, the last ring knocks the chest's lid open, and the chest is empty:
+// the last piece was a lie.
 
-const CAMP = { x: 40, high: 300 }
-const CAGE = 0
+const HIGH = 230
+const DECK = -HIGH - 22
+const DRUMS = [70, 130]
+const RAIDERS = [
+  { from: 600, at: 240, hit: 0.69 },
+  { from: 680, at: 330, hit: 0.77 },
+  { from: 760, at: 420, hit: 0.85 },
+]
+const BARON = 500
 const CHEST = 300
-const PATROL = 300
-// He drives in from the left, sat at the wheel.
-const DRIVES = { from: -420, seat: 60 }
-const WAVES = [0, 1, 2]
-const WALL = CAMP.x + 380
+const CARD = { x: 270, y: -700 }
+const EMPTY = { x: CHEST, y: DECK - 260 }
+
+/** How high the lift has carried him at `t`, slow off the ground, up to the deck's top. */
+const rideAt = (t: number): number => -DECK * ramp(t, 0.04, 0.26) ** 1.4
+
+const HITS: readonly Hit[] = RAIDERS.map(({ at, hit }, i) => ({ x: at, y: DECK - 230, value: ['57', '61', '144'][i], at: hit, crit: i === 2 }))
 
 export const bands = stopsPlace({
-  hour: HOURS.dusk,
-  // a step right of the usual place on a wide screen, so the cage rides up clear of the cards
-  at: (phone) => (phone ? 600 : 920),
-  // on a phone the cage ride ends high on the stilts, so the stop stands low enough to keep him, the cage and
-  // the camp whole under the header
-  phoneDrop: 300,
-  script: [1500, 1300, 2000],
-  ends: [0.28, 0.5, 1],
+  land: LANDS.salt,
+  phoneDrop: 140,
+  script: [1500, 1600, 1900],
+  ends: [0.3, 0.62, 1],
   back: () => (
     <>
-      <rect x={-1200} y={-6} width={2600} height={40} fill={CEL.paper} data-bare />
-      <g data-fx="camp" opacity="0" transform={`translate(${CAMP.x} 0)`}>
-        <SaltCamp high={CAMP.high} />
+      <SaltDeck high={HIGH} />
+      <g transform={`translate(${CHEST} ${DECK})`}>
+        <Chest name="chest" color={CEL.legendary} />
       </g>
-      <g data-fx="chest" opacity="0" transform={`translate(${CHEST} ${-CAMP.high - 20})`}>
-        <Crate name="chest" />
+      <g data-fx="baron" transform={`translate(${BARON} ${DECK})`}>
+        <Baron />
+        <Tag name="baron-tag" label="BARON" level={30} y={-300} />
       </g>
-      {WAVES.map((i) => (
-        <g key={i} data-fx={`guard-${i}`} opacity="0">
+      {RAIDERS.map(({ from }, i) => (
+        <g key={from} data-fx={`raider-${i}`} opacity="0" transform={`translate(${from} ${DECK})`}>
           <Raider />
+          <Tag name={`raider-${i}-tag`} label="RAIDER" level={28} y={-230} />
         </g>
       ))}
-      <g data-fx="patrol" transform={`translate(${PATROL} 0) scale(-1 1)`}>
-        <RaiderCar />
+      <g data-fx="cage">
+        <Lift />
       </g>
-      <g data-fx="ride" transform={`translate(${DRIVES.from} 0)`}>
-        <Runner />
-      </g>
-      <g data-fx="dust" opacity="0">
-        <Dust />
-      </g>
-      <g transform={`translate(${CAGE} 0)`}>
-        <g data-fx="cage-wrap" opacity="0">
-          <Cage />
+      {DRUMS.map((x, i) => (
+        <g key={x} data-fx={`drum-${i}`} transform={`translate(${x} ${DECK}) scale(0.62)`}>
+          <Barrel />
         </g>
+      ))}
+      <g data-fx="ring" opacity="0">
+        <ellipse cx={0} cy={0} rx={60} ry={18} fill="none" stroke={CEL.holo} strokeWidth="10" data-bare />
+        <ellipse cx={0} cy={0} rx={60} ry={18} fill="none" stroke={CEL.white} strokeWidth="4" data-bare />
       </g>
-      <g data-fx="static" opacity="0" transform={`translate(60 ${-CAMP.high - 300})`}>
-        <Waveform name="static" />
+      <g data-fx="moth" opacity="0">
+        <path d="M0 0 L-14 -12 L-4 0 L-14 12 Z M0 0 L14 -12 L4 0 L14 12 Z" fill={CEL.paperShade} />
       </g>
     </>
   ),
+  front: () => (
+    <>
+      <Hits name="hit" hits={HITS} />
+      <Callout name="empty" x={EMPTY.x} y={EMPTY.y} text="EMPTY?!" fill={CEL.sun} size={64} />
+      <TitleCard name="card" x={CARD.x} y={CARD.y} title="BARON SALTWELL" joke="OWNS THE FLATS. AND THE SALT." />
+    </>
+  ),
   move: (profession, t) => {
-    if (t < 0.28) {
-      const drive = ramp(t, 0, 0.24)
-      return { pose: DRIVE, ahead: DRIVES.from + 20 + (20 - DRIVES.from) * drive, lift: DRIVES.seat }
-    }
-    if (t < 0.5) {
-      const out = ramp(t, 0.28, 0.34)
-      const up = ramp(t, 0.36, 0.5)
-      return { pose: out < 1 ? DRIVE : rest(profession), ahead: 20 - 20 * out, lift: DRIVES.seat * (1 - out) + CAMP.high * up }
-    }
-    // three waves on the beat, each kicked back, then the chest kicked open
-    const beat = WAVES.findIndex((i) => t < 0.66 + 0.12 * i)
-    const kickAt = beat === -1 ? 0.88 : 0.54 + 0.12 * beat
-    const pose = kick(profession, Math.sin(Math.PI * ramp(t, kickAt, kickAt + 0.08)))
-    const ahead = t < 0.84 ? 120 : 120 + 60 * ramp(t, 0.84, 0.88)
-    return { pose, ahead, lift: CAMP.high + 20 }
+    const lift = rideAt(t)
+    if (t < 0.62) return { pose: rest(profession), ahead: 0, lift }
+    return { pose: t < 0.9 ? drum(ramp(t, 0.62, 0.9), 6) : mix(drum(1, 6), rest(profession), ramp(t, 0.9, 0.96)), ahead: 0, lift }
   },
   reply: (stage) => {
-    const patrol = fx(stage, 'patrol')
-    const ride = fx(stage, 'ride')
-    const dust = fx(stage, 'dust')
-    const camp = fx(stage, 'camp')
     const cage = fx(stage, 'cage')
-    const wrap = fx(stage, 'cage-wrap')
-    const chest = fx(stage, 'chest')
+    const card = cardWriter(stage, 'card', CARD.x, CARD.y, 0.3, 0.42)
+    const raiders = RAIDERS.map((_, i) => fx(stage, `raider-${i}`))
+    const baron = fx(stage, 'baron')
+    const ring = fx(stage, 'ring')
+    const drums = DRUMS.map((_, i) => fx(stage, `drum-${i}`))
+    const hits = hitsWriter(stage, 'hit', HITS)
     const lid = fx(stage, 'chest-lid')
-    const guards = WAVES.map((i) => fx(stage, `guard-${i}`))
-    const noise = fx(stage, 'static')
-    const bars = [0, 1, 2, 3, 4].map((i) => fx(stage, `static-${i}`))
+    const moth = fx(stage, 'moth')
+    const empty = popWriter(stage, 'empty', EMPTY.x, EMPTY.y, 0.92)
     return (t) => {
-      const drive = ramp(t, 0, 0.24)
-      transformTo(ride, `translate(${(DRIVES.from + (0 - DRIVES.from) * drive).toFixed(1)} 0)`)
-      fadeTo(ride, 1 - ramp(t, 0.34, 0.38))
-      transformTo(patrol, `translate(${PATROL} 0) ${flung(ramp(t, 0.16, 0.3), 500, 220)} scale(-1 1)`)
-      fadeTo(patrol, 1 - ramp(t, 0.26, 0.3))
-      fadeTo(dust, Math.sin(Math.PI * ramp(t, 0.14, 0.3)))
-      transformTo(dust, `translate(${PATROL - 40} -60) scale(1.6)`)
-      fadeTo(camp, ramp(t, 0.26, 0.32))
-      fadeTo(wrap, ramp(t, 0.3, 0.34))
-      transformTo(cage, `translate(0 ${(-(CAMP.high + 20) * ramp(t, 0.36, 0.5)).toFixed(1)})`)
-      fadeTo(chest, ramp(t, 0.44, 0.5))
-      WAVES.forEach((i) => {
-        const over = ramp(t, 0.5 + 0.12 * i, 0.56 + 0.12 * i)
-        const back = ramp(t, 0.58 + 0.12 * i, 0.64 + 0.12 * i)
-        transformTo(guards[i], `translate(${(WALL - 160 * over).toFixed(1)} ${(-CAMP.high - 20 - 40 * (1 - over)).toFixed(1)}) ${flung(back, 360, 160)}`)
-        fadeTo(guards[i], over > 0 && back < 1 ? 1 : 0)
+      transformTo(cage, `translate(0 ${(-rideAt(t)).toFixed(1)})`)
+      card(t)
+      RAIDERS.forEach(({ from, at, hit }, i) => {
+        const come = ramp(t, 0.44 + 0.03 * i, 0.6)
+        const thrown = ramp(t, hit, hit + 0.08)
+        transformTo(raiders[i], `translate(${(from + (at - from) * come).toFixed(1)} ${DECK}) ${thrown > 0 ? flung(thrown, 360, 160) : ''}`)
+        fadeTo(raiders[i], ramp(t, 0.44, 0.47) * (1 - ramp(t, hit + 0.05, hit + 0.08)))
       })
-      transformTo(lid, `rotate(${(-120 * ramp(t, 0.9, 0.94)).toFixed(1)} -70 -100)`)
-      fadeTo(noise, ramp(t, 0.94, 0.98))
-      bars.forEach((bar, i) => transformTo(bar, `scale(1 ${(0.2 + 0.8 * Math.abs(Math.sin(t * 160 + 2 * i))).toFixed(3)})`))
+      // each shock ring rolls down the deck from the drums on the beat
+      const beat = RAIDERS.findIndex(({ hit }) => t >= hit - 0.06 && t < hit + 0.02)
+      const roll = beat < 0 ? 0 : ramp(t, RAIDERS[beat].hit - 0.06, RAIDERS[beat].hit + 0.02)
+      transformTo(ring, `translate(${(100 + (RAIDERS[Math.max(beat, 0)].at - 100) * roll).toFixed(1)} ${DECK}) scale(${(1 + roll).toFixed(3)})`)
+      fadeTo(ring, beat < 0 ? 0 : Math.sin(Math.PI * roll))
+      drums.forEach((node, i) => transformTo(node, `translate(${DRUMS[i]} ${DECK}) scale(0.62 ${(0.62 - 0.04 * Math.abs(Math.sin(Math.PI * 6 * ramp(t, 0.62, 0.9) + i))).toFixed(3)})`))
+      hits(t)
+      // the baron bolts off the far end of the deck
+      const bolt = ramp(t, 0.86, 0.92)
+      transformTo(baron, `translate(${(BARON + 300 * bolt).toFixed(1)} ${DECK})`)
+      fadeTo(baron, 1 - ramp(t, 0.89, 0.92))
+      // the last ring knocks the lid open: nothing in it but a moth
+      transformTo(lid, `rotate(${(110 * ramp(t, 0.86, 0.9)).toFixed(1)} 70 -104)`)
+      const flutter = ramp(t, 0.9, 1)
+      transformTo(moth, `translate(${(CHEST + 40 * flutter).toFixed(1)} ${(DECK - 110 - 160 * flutter).toFixed(1)}) scale(1 ${(0.4 + 0.6 * Math.abs(Math.sin(40 * flutter))).toFixed(3)})`)
+      fadeTo(moth, ramp(t, 0.9, 0.92))
+      empty(t)
     }
   },
 })

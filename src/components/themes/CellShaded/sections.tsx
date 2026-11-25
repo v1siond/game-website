@@ -11,13 +11,13 @@ import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { Stage } from '../shared/theatre/Stage'
 import { BossCard, Branch, LootCard, MakersPlate, Notice, ORANGE_POINTS, ServicePaper } from './cards'
-import { LAYER_MOTION, type CelScene } from './scenes'
+import { LAYER_MOTION, SCRIM_CLASS, SIDE_CLASS, type CelScene } from './scenes'
 import cel from './cel.module.css'
 import page from './page.module.css'
 
-// One section per place of the desert's day: a tall head that first shows the place alone and then brings
-// up the section's title on its ink slab, then the cards, then a screen of the place alone before it goes
-// dark. The cards a place counts sit inside an element marked data-stage-items, which the theatre measures
+// One section per stop of the hunt: a tall head that first shows the stop alone and then brings up the
+// section's title on its ink slab, then the cards, then a screen of the stop alone before it goes dark; from
+// lg the cards sit on the side away from the half the stop plays on. The cards a place counts sit inside an element marked data-stage-items, which the theatre measures
 // for the reading line that sets his act. Every field comes from the shared lists and the card view models.
 
 const STACK = 'flex flex-col gap-6'
@@ -173,8 +173,8 @@ export function PlaceSection({ scene, still }: { scene: CelScene & { slot: Secti
   const Cards = CARDS[scene.slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const headingId = `cel-${scene.id}`
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={page.level}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby={headingId} className={`${page.level} ${SIDE_CLASS[scene.side]}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={SCRIM_CLASS[scene.side]} />}
       <header className={page.head}>
         <SectionTitle id={headingId} title={sections[scene.slot.titleKey]} />
       </header>

@@ -5,14 +5,14 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { initialsOf } from '@/lib/cv/nameWords'
 import { Stage } from '../shared/theatre/Stage'
 import { ContactActions } from './buttons'
-import { LAYER_MOTION, type CelScene } from './scenes'
+import { LAYER_MOTION, SCRIM_CLASS, SIDE_CLASS, type CelScene } from './scenes'
 import { SectionTitle } from './sections'
 import cel from './cel.module.css'
 import page from './page.module.css'
 
 // The page's fixed top bar and its end. The bar is an ink strip with his initials in the sun lettering,
-// the way back to the top. The end is the station at night: the contact panel with his line in the sun
-// lettering and the ways to reach him, over the pad that builds him.
+// the way back to the top. The end is the night under the satellite: the contact panel with his line in the
+// sun lettering and the ways to reach him, on the side away from the half its stop plays on.
 
 /** The top bar: his initials, back to the top of the page. */
 export function TopBar({ anchor }: { anchor: string }) {
@@ -27,13 +27,13 @@ export function TopBar({ anchor }: { anchor: string }) {
   )
 }
 
-/** The end of the page: the contact panel, over the station that builds him. */
+/** The end of the page: the contact panel, over the night under the satellite. */
 export function StationContact({ scene, still }: { scene: CelScene; still: boolean }) {
   const { sections } = useLabels()
   const { contact } = useCVData()
   return (
-    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="cel-contact" className={page.goal}>
-      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+    <section id={scene.anchor} data-scene={scene.id} aria-labelledby="cel-contact" className={`${page.goal} ${SIDE_CLASS[scene.side]}`}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={SCRIM_CLASS[scene.side]} />}
       <div className={page.goalCopy}>
         <SectionTitle id="cel-contact" title={sections.contact} />
         <div className={`mt-8 p-5 sm:p-8 ${cel.darkPaper}`}>

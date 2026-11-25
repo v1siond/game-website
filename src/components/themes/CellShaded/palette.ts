@@ -1,9 +1,11 @@
-// Cell Shaded's palette, every colour of the world once: the inked desert drawn like a comic. Flat
-// saturated fills under one black ink line, hatching in the shadows: the teal noon sky over ochre dunes
-// and rust mesas, the dusk and the night the page crosses, the bounty board's wood, the rarity ladder of
-// the loot (white, green, blue, purple, orange), the red of the flavour text and the achievement stars,
-// the station's hologram blue. The SVG art reads the constants; the root sets
-// them all as --cel-<key> (paletteVars), so cel.module.css and the class strings paint the same values.
+// Cell Shaded's palette, every colour of the world once: the wasteland drawn like a comic book in thick ink
+// with hatching, the way the looter shooter it comes from looks in its footage (research notes, Look): dusty
+// tan, ochre and rust under a washed out sky in the badlands, cold purple and blue at the dig and on the scrap
+// coast, salt white on the flats, snow white and steel grey at the vault, and the night over it. Over that, the
+// game's own colours: the rarity ladder of the loot (white, green, blue, purple, orange), the red of the boss
+// cards and the damage numbers' sun, the shield blue of the voice and the digital build. The SVG art reads the
+// constants; the root sets them all as --cel-<key> (paletteVars), so cel.module.css and the class strings
+// paint the same values.
 
 export const CEL = {
   // The ink line round every shape and the paper the cards are printed on
@@ -19,35 +21,71 @@ export const CEL = {
   skyDeep: '#1d6fa8',
   sun: '#ffd23f',
   orange: '#ff7a1a',
-  magenta: '#e8318a',
-  night: '#24214a',
   red: '#e2362c',
-  // The red's cel shadow side: his tee, his Muay Thai shorts and the heavy bag
+  // The red's cel shadow side: his tee, his Muay Thai shorts
   redShade: '#9e2219',
   sand: '#f2c66d',
   steel: '#8a93a6',
   steelDark: '#4d5466',
+  steelLight: '#c3c9d4',
 
-  // The sky per hour, high to low: noon over the desert, dusk over the loot chests, night at the station
-  noonHigh: '#2a9fb0',
-  noonMid: '#5cc4c9',
-  noonLow: '#8fe0d8',
-  // The town's afternoon sky over the sand and the orange
-  townHigh: '#3b8fb0',
-  duskHigh: '#5b2b5e',
-  duskLow: '#f2793a',
-  nightHigh: '#0f1230',
-  nightLow: '#3a2f6e',
-
-  // The desert: dunes, mesas and their shadow sides, the scrub
-  dune: '#e8b86a',
-  duneShade: '#c98a46',
-  mesa: '#c4612f',
-  mesaShade: '#8d3b20',
+  // The badlands: the washed out sky, the haze on the horizon, the rust ridges, the ochre dunes, the tan
+  // ground and their shadow sides
+  dustSky: '#9fb2bb',
+  haze: '#e7d6ae',
+  mesa: '#b0673a',
+  mesaShade: '#7a4126',
+  dune: '#cfa66a',
+  duneShade: '#a77b46',
+  ground: '#d8b57f',
+  groundShade: '#b08654',
   rock: '#6b3a26',
-  scrub: '#6f8a3a',
+  scrub: '#6f7a3a',
   // The scrub olive in shadow: his plate carrier's shadow side and its mag pouches
   scrubShade: '#4c5a3a',
+  // The rust on sheet metal and wrecks
+  rust: '#8e4a24',
+  sheet: '#9a9488',
+  sheetShade: '#6c675f',
+
+  // The afternoon over the mine
+  noonDust: '#c2ad8c',
+  noonHaze: '#ecc58c',
+  // The dig at dusk
+  duskSky: '#6c5a86',
+  duskHaze: '#e39a64',
+  duskRidge: '#7a4a5a',
+  duskRidgeShade: '#4e2f40',
+  duskGround: '#b98a62',
+  duskGroundShade: '#8c6243',
+  // The scrap coast, cold
+  coastSky: '#5d6f8f',
+  coastHaze: '#aab5c2',
+  coastRidge: '#4f5a6e',
+  coastRidgeShade: '#343d4f',
+  coastGround: '#8d8a7d',
+  coastGroundShade: '#66645b',
+  // The salt flats
+  saltSky: '#a6bfcc',
+  saltHaze: '#eef0ea',
+  saltRidge: '#9aa3b1',
+  saltRidgeShade: '#737c8b',
+  salt: '#f1efe6',
+  saltShade: '#cfd2d2',
+  // The vault in the snow
+  vaultSky: '#7487a6',
+  vaultHaze: '#d9e1ea',
+  vaultRidge: '#5e6b80',
+  vaultRidgeShade: '#414b5c',
+  snow: '#f4f6f8',
+  snowShade: '#c7d0dc',
+  // The night at the end
+  night: '#24214a',
+  nightHigh: '#0f1230',
+  nightLow: '#3a2f6e',
+  nightRidge: '#2a2448',
+  nightGround: '#4a3d5e',
+  nightGroundShade: '#352b47',
 
   // The bounty board's planks and its paper notices
   plank: '#a8743f',
@@ -58,6 +96,15 @@ export const CEL = {
   // The musician's jeans and their shadow side
   denim: '#2c3a5c',
   denimShade: '#1b2440',
+
+  // The raiders' sack hoods and their stitching
+  sack: '#c9b089',
+  sackShade: '#97805d',
+  // The flesh of the hive and the beasts' hides
+  flesh: '#e3c3b0',
+  fleshShade: '#b98f7d',
+  hide: '#8a6a4a',
+  hideShade: '#5e4630',
 
   // The loot rarity ladder, lowest to highest
   common: '#f4f4f0',
@@ -72,8 +119,13 @@ export const CEL = {
   // stamp's frame keeps flavour.
   flavourText: '#861108',
   crit: '#ff2a1a',
+  // The boss card: its name's red, the hot orange it fades to
+  bossRed: '#c3161b',
+  bossHot: '#f3801f',
 
-  // The station's hologram and its glow
+  // The shield blue of the voice, the scope's glass and the digital build
   holo: '#38d6ff',
   holoDeep: '#0c6f9a',
+  // The vault's purple: its weak points and the monster's glow
+  eldritch: '#b43df0',
 } as const

@@ -17,7 +17,7 @@ import { StationContact, TopBar } from './CellShaded/chrome'
 import { IntroHero } from './CellShaded/hero'
 import { HatchDefs } from './CellShaded/ink'
 import { CEL } from './CellShaded/palette'
-import { LAYER_MOTION, scenesOf, type CelScene } from './CellShaded/scenes'
+import { LAYER_MOTION, SCRIM_CLASS, scenesOf, type CelScene } from './CellShaded/scenes'
 import { PlaceSection } from './CellShaded/sections'
 import page from './CellShaded/page.module.css'
 
@@ -26,23 +26,28 @@ const celFace = Bangers({ weight: '400', subsets: ['latin'], display: 'swap', va
 
 const ROOT_VARS = paletteVars('cel', CEL)
 
-// A phone frames the desert from higher up, so the sand stays clear of the cards (desert.tsx).
+// A phone frames the wasteland from higher up, so the ground stays clear of the cards (desert.tsx).
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the scene sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
-// Cell Shaded: his CV as one run through an inked desert, drawn like a comic in flat saturated fills under one
-// black ink line, the way its looter shooter tells its story. The page keeps the rhythm of the Rockstar VI
-// site: a big hero (the intro card, his name in sun letters, the outfit lockers where he picks a profession),
-// then every section of the shown profession is one full screen stop of the run that rises from dark, holds
-// while its cards scroll over it, and goes dark while the next one rises. He steps off the bus at noon and our
-// small robot guide leads him to the town gate as the raider cars tear past and a voice crackles at his ear;
-// he blows the gully open and guns down the first boss's beasts; one long shot drops a raider for the part a
-// station needs to build his car; he takes a second wind under the mine boss and lifts a strange relic; the
-// relic shows a door, a count and a key's three slots; two pieces click in and far off the great door opens
-// for someone else; at night the voice's satellite crosses the sky and the map lights with new doors. He is
-// side on, facing right, in every action. Every motion is a function of the scroll position
-// (the shared theatre on useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and
-// it plays back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from
-// its first frame.
+// Cell Shaded: his CV as the hunt for the vault in the looter shooter it comes from, told in the game's order
+// and drawn the way it looks, a comic book in thick ink with hatching over a dusty wasteland (research notes,
+// What makes it unique). The page keeps the rhythm of the Rockstar VI site: a big hero (the intro card, his
+// name in sun letters, the outfit lockers where he picks a profession), then every section of the shown
+// profession is one full screen stop of the hunt that rises from dark, holds while its cards scroll over it,
+// and goes dark while the next one rises. From lg the stops take turns, the first right of its cards, the next
+// left of them, up to the contact. He steps off the bus and our little robot leads him on; runner cars tear
+// past the town gate and a bounty comes in over the voice; he blows the gully, guns down the hounds and the
+// first boss, whose card freezes the frame, and catches a green gun with its stat card; through the scope he
+// drops the raider with the station's part and drives off in a car built in light; the mine boss lays him
+// down and a kill brings him back up, and the relic floats out of the chest; the relic shows the vault and
+// its key; two pieces click in; on the salt flats the drummer drums the raiders off the deck and finds the
+// chest empty; at the vault the fighter breaks its monster; at night the voice turns out to be a satellite and
+// the map lights with more vaults. Damage numbers fly off every hit. Every motion is a function of the
+// scene's playhead (the shared theatre), drawn with the settle: stop and it comes to rest, scroll up and it
+// plays back. The text is plain HTML in the page flow over the fixed theatre of pictures, opaque from its
+// first frame.
 //
 // Under reduced motion there is no theatre and no scrub: each section carries its own picture, still, at
 // its settled frame.
@@ -56,9 +61,10 @@ export default function CellShadedTheme() {
   const labels = useLabels()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone),
-    [view, cv, labels, active, phone],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split),
+    [view, cv, labels, active, phone, split],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
@@ -71,7 +77,7 @@ export default function CellShadedTheme() {
       {!reduced && (
         <Theatre theatreRef={theatreRef} className={page.theatre}>
           {scenes.map((scene) => (
-            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={page.scrim} />
+            <Stage key={scene.id} scene={scene} layers={scene.layers} motion={LAYER_MOTION} className={SCRIM_CLASS[scene.side]} />
           ))}
         </Theatre>
       )}

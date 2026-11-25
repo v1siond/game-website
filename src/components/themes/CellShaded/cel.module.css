@@ -54,6 +54,26 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* The scene's cast and land in the comic's heavy line: thick on the outside of every silhouette (the stroke
+   sits under the fill, so half of it shows), the hero's own finer line left as it is. */
+.heavy :is(path, rect, circle, ellipse, polygon):not([data-bare]) {
+  stroke-width: 6px;
+}
+
+/* The words drawn in a scene (the damage numbers, a boss card, a loot card, a sign): the display face, the ink
+   line under the fill. */
+.lettering {
+  font-family: var(--cel-face), Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  stroke: var(--cel-ink);
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+/* The white line round a boss's name, drawn under its ink line. */
+.halo {
+  stroke: var(--cel-white);
+}
+
 /* ---- buttons (buttons.tsx) ---- */
 
 .inkButton {

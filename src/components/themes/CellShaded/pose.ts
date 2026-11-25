@@ -4,7 +4,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { opacityTo, rigJoints, type RigJoints, setRigPose } from '../shared/rig'
 import s from './sprite.module.css'
 
-// The stranger posed by his scene's playhead, on the shared rig (rigPose, ../shared/rig): his limbs as the
+// The hunter posed by his scene's playhead, on the shared rig (rigPose, ../shared/rig): his limbs as the
 // rig's numbers, plus the rifle in his hands and its muzzle flash, each 0 to 1. He stands side on facing
 // right in every action, so a negative turn swings an arm or a thigh forward and a positive one folds a shin
 // back; his near side (the shoulder pad, the rifle hand) is the rig's right, his far side its left. His thigh
@@ -48,11 +48,13 @@ const fire = (t: number, from = 0.4, to = 0.7): Pick<CelPose, 'muzzle' | 'foreRi
   return { muzzle: shot, foreRight: -6 * shot }
 }
 
-/** Aim and fire standing: the rifle off his back into his hands, up on the target, the burst through
- *  `from` to `to`, then held on it. */
-export function shoot(t: number, from = 0.4, to = 0.7): CelPose {
-  const aimed = mix(STAND, pose({ ...AIM, thighRight: -10, thighLeft: 10, lean: -2 }), ramp(t, 0, 0.2))
-  return { ...aimed, ...fire(t, from, to), rifle: ramp(t, 0, 0.1) }
+/** Aim and fire standing: the rifle off his back into his hands, up on the target `raise` degrees over level,
+ *  the burst through `from` to `to`, then held on it. */
+export function shoot(t: number, from = 0.4, to = 0.7, raise = 0): CelPose {
+  const aim = { ...AIM, armRight: AIM.armRight - raise, armLeft: AIM.armLeft - raise }
+  const aimed = mix(STAND, pose({ ...aim, thighRight: -10, thighLeft: 10, lean: -2 - raise / 10 }), ramp(t, 0, 0.2))
+  const kick = fire(t, from, to)
+  return { ...aimed, muzzle: kick.muzzle, foreRight: aimed.foreRight + kick.foreRight, rifle: ramp(t, 0, 0.1) }
 }
 
 /** One long shot from one knee: down, the rifle up, a single flash at `at`, held. */
@@ -103,19 +105,37 @@ const LID = pose({ ...KNEEL, armRight: -55, foreRight: -25, armLeft: -45, foreLe
 const HOLD_UP = pose({ armRight: -140, foreRight: -20, armLeft: -135, foreLeft: -25, lean: -4 })
 export const pry = (t: number): CelPose => (t < 0.45 ? mix(STAND, LID, ramp(t, 0, 0.25)) : mix(LID, HOLD_UP, ramp(t, 0.5, 0.75)))
 
-/** The rifle butt swung up and across at what dives at him, `t` of one swing. */
-const SWING_BACK = pose({ armRight: 30, foreRight: -60, armLeft: 20, foreLeft: -50, rifle: 1, lean: -6 })
-const SWING_THROUGH = pose({ armRight: -150, foreRight: -40, armLeft: -140, foreLeft: -40, rifle: 1, lean: 10 })
-export const swat = (t: number): CelPose => mix(SWING_BACK, SWING_THROUGH, Math.sin(Math.PI * t))
-
-/** Tucked in a roll along the sand, the knees to his chest. */
-export const ROLL = pose({ rise: 40, thighRight: -120, shinRight: 140, thighLeft: -110, shinLeft: 135, armRight: -100, foreRight: -100, armLeft: -90, foreLeft: -100, lean: 30 })
-
 /** Leaning back with the head up at the sky, the arms loose. */
 export const LOOK_UP = pose({ lean: -12, armRight: 8, armLeft: -6 })
 
 /** A map opened before him in both hands, held up to read. */
 export const MAP = pose({ armRight: -100, foreRight: -50, armLeft: -95, foreLeft: -55, lean: -2 })
+
+/** The sticks on two drums before him, `beats` strokes over `t`, the hands taking turns: each stroke lifts a
+ *  stick high and brings it down on the beat. */
+const STICK_UP = { arm: -75, fore: -125 }
+export function drum(t: number, beats: number): CelPose {
+  const kit = KIT.drummer
+  const played = Math.min(t, 0.999) * beats
+  const lift = t > 0 && t < 1 ? Math.sin(Math.PI * (played % 1)) : 0
+  const right = Math.floor(played) % 2 === 0
+  return {
+    ...kit,
+    lean: 6,
+    armRight: right ? kit.armRight + (STICK_UP.arm - kit.armRight) * lift : kit.armRight,
+    foreRight: right ? kit.foreRight + (STICK_UP.fore - kit.foreRight) * lift : kit.foreRight,
+    armLeft: right ? kit.armLeft : kit.armLeft + (STICK_UP.arm - kit.armLeft) * lift,
+    foreLeft: right ? kit.foreLeft : kit.foreLeft + (STICK_UP.fore - kit.foreLeft) * lift,
+  }
+}
+
+/** The flying knee: the near knee driven up high before him, the far leg trailing, the guard kept, `t` of the
+ *  way. */
+const KNEE = pose({ thighRight: -115, shinRight: 135, thighLeft: 20, shinLeft: 50, lean: -10 })
+export function flyingKnee(profession: Profession, t: number): CelPose {
+  const kit = KIT[profession]
+  return mix(kit, { ...KNEE, armRight: kit.armRight, foreRight: kit.foreRight, armLeft: kit.armLeft, foreLeft: kit.foreLeft, rifle: 0, muzzle: 0 }, t)
+}
 
 /** The near knee chambered high (`t` to 0.45), then the leg kicked out straight before him, leaning back
  *  off it, the guard held. */
@@ -126,9 +146,6 @@ export function kick(profession: Profession, t: number): CelPose {
   const legs = t < 0.45 ? mix(kit, CHAMBER, t / 0.45) : mix(CHAMBER, KICK, ramp(t, 0.45, 0.65))
   return { ...kit, thighRight: legs.thighRight, shinRight: legs.shinRight, lean: legs.lean }
 }
-
-/** The rising uppercut, the near fist driven high as he springs up, `t` of the way. */
-export const uppercut = (profession: Profession, t: number): CelPose => mix(KIT[profession], UP, t)
 
 /** A crouch in his kit, `t` of the way down. */
 export const crouch = (profession: Profession, t: number): CelPose => mix(KIT[profession], { ...KIT[profession], rise: 30, thighRight: -60, shinRight: 100, thighLeft: -50, shinLeft: 95, lean: 10 }, t)

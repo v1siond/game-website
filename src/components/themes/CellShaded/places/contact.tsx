@@ -1,43 +1,40 @@
 import { mix } from '@/lib/motion/rigPose'
 import { ramp } from '@/lib/scroll/stage'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
-import { CliffDoor, PINS, Pad, Robot, Satellite, Waveform, WorldMap } from '../cast'
-import { HOURS } from '../desert'
+import { PINS, Satellite, VaultDoor, WorldMap } from '../cast/props'
+import { Robot } from '../cast/road'
+import { LANDS } from '../desert'
+import { Waveform, voiceWriter } from '../hud'
 import { stopsPlace } from '../place'
 import { LOOK_UP, MAP, rest } from '../pose'
 
-// Contact, the voice's source, at night (notes L65 to L66, L79, [1] [2]): the door in the cliff behind him is
-// sealed again, the respawn pad glows nearby. The crackle comes once more and he looks up: a satellite's
-// light crosses the stars and the waveform at his ear pulses in time with it. Our small robot rolls up and
-// stops beside him with a bump. He opens a map held out before him, and point after point of new doors lights across it in orange, the rarest
-// colour: the next job, which the contact card offers.
+// Contact, the voice's source, at night (research notes, the story 18 and 19, the sequel's last line of
+// the story, [1] [2]): the vault's door stands sealed in its cliff behind him. The voice crackles once more and
+// he looks up: a satellite's light crosses the stars, and the waveform at his ear pulses in time with it. Our
+// little robot rolls up out of the dark and bumps his leg. He opens a map before him, and point after point of
+// new vaults lights across it in orange, the rarest colour: the next job, which the contact card offers.
 
-const DOOR = -160
-const PAD = 380
-const ROBOT = { from: 600, at: 390 }
-const SKY = { from: { x: 520, y: -720 }, to: { x: -200, y: -640 } }
-const EAR = { x: 70, y: -300 }
+const DOOR = { x: 430, scale: 0.55 }
+const ROBOT = { from: 560, at: 340 }
+const SKY = { from: { x: 540, y: -720 }, to: { x: 60, y: -640 } }
+const EAR = { x: 70, y: -310 }
 const MAP_AT = { x: 175, y: -210 }
 
 export const contact = stopsPlace({
-  hour: HOURS.night,
-  at: (phone) => (phone ? 700 : 1040),
-  // on a phone the contact card covers the sand line, so the stop stands low, in the band under it
+  land: LANDS.night,
+  // on a phone the contact card covers the ground line, so the stop stands low, in the band under it
   phoneDrop: 560,
   script: [1700, 1300, 1700],
   ends: [0.36, 0.62, 1],
   back: () => (
     <>
-      <g transform={`translate(${DOOR} 0) scale(0.8)`}>
-        <CliffDoor />
-      </g>
-      <g transform={`translate(${PAD} 0)`}>
-        <Pad />
+      <g transform={`translate(${DOOR.x} 0) scale(${DOOR.scale})`}>
+        <VaultDoor />
       </g>
       <g data-fx="satellite" opacity="0">
         <Satellite />
       </g>
-      <g data-fx="robot" transform={`translate(${ROBOT.from} 0) scale(0.8)`}>
+      <g data-fx="robot" transform={`translate(${ROBOT.from} 0) scale(0.85)`}>
         <Robot name="robot" />
       </g>
     </>
@@ -61,8 +58,7 @@ export const contact = stopsPlace({
   },
   reply: (stage) => {
     const satellite = fx(stage, 'satellite')
-    const voice = fx(stage, 'voice')
-    const bars = [0, 1, 2, 3, 4].map((i) => fx(stage, `voice-${i}`))
+    const voice = voiceWriter(stage, 'voice')
     const robot = fx(stage, 'robot')
     const wrap = fx(stage, 'map-wrap')
     const map = fx(stage, 'map')
@@ -72,11 +68,10 @@ export const contact = stopsPlace({
       transformTo(satellite, `translate(${(SKY.from.x + (SKY.to.x - SKY.from.x) * cross).toFixed(1)} ${(SKY.from.y + (SKY.to.y - SKY.from.y) * cross).toFixed(1)})`)
       fadeTo(satellite, cross > 0 ? 1 : 0)
       // the voice pulses in time with the satellite's light while it crosses
-      fadeTo(voice, ramp(t, 0.04, 0.08) * (1 - ramp(t, 0.36, 0.42)))
-      bars.forEach((bar, i) => transformTo(bar, `scale(1 ${(0.2 + 0.8 * Math.abs(Math.sin(t * 60 + i))).toFixed(3)})`))
+      voice(t, ramp(t, 0.04, 0.08) * (1 - ramp(t, 0.36, 0.42)))
       const roll = ramp(t, 0.38, 0.52)
       const bump = Math.sin(Math.PI * ramp(t, 0.52, 0.6))
-      transformTo(robot, `translate(${(ROBOT.from + (ROBOT.at - ROBOT.from) * roll - 20 * bump).toFixed(1)} ${(-12 * bump).toFixed(1)}) scale(0.8)`)
+      transformTo(robot, `translate(${(ROBOT.from + (ROBOT.at - ROBOT.from) * roll - 20 * bump).toFixed(1)} ${(-12 * bump).toFixed(1)}) scale(0.85)`)
       fadeTo(wrap, ramp(t, 0.64, 0.68))
       transformTo(map, `scale(${ramp(t, 0.64, 0.76).toFixed(3)} 1)`)
       pins.forEach((pin, i) => fadeTo(pin, ramp(t, 0.78 + 0.03 * i, 0.8 + 0.03 * i)))
