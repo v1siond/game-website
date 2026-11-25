@@ -16,7 +16,7 @@ import u from './underworld.module.css'
 // off that flag. While it is in view it hands its place to the page, which fades the fixed depths (depths.tsx)
 // to that place. Under reduced motion the section carries its own scene drawn settled (StillStages).
 
-/** The places of the run, in the order the page walks them: God of War, then God of War II. */
+/** The places of the run, in the order the page walks them: the first Greek war god game, then the second. */
 export type Zone = 'sea' | 'athens' | 'desert' | 'temple' | 'storm' | 'rhodes' | 'sky' | 'bog' | 'chasm' | 'olympus'
 
 /** The place each part of the page stands in: the storm sea of the first game to the mountain of the gods. */

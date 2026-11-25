@@ -20,7 +20,7 @@ import { ZONE_OF, type Side, type Zone } from './stage'
 import s from './sprite.module.css'
 
 // His scenes on the shared theatre, one per part of the page, over the fixed places of the run (depths.tsx):
-// God of War and God of War II told in their order, one beat a section (score/C75/story.md,
+// The first and second Greek war god games told in their order, one beat a section (score/C75/story.md,
 // research/2026-11-25-deep-gow12/notes.md). Each scene is one to three actions played by the shared scene
 // player (src/lib/scroll/player.ts) at the scene's own pace, back on the way up, the end frame held; he is
 // drawn once in every scene, small against monsters that fill the screen, and every boss ends on the
