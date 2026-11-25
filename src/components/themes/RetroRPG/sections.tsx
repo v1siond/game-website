@@ -14,11 +14,11 @@ import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard, SAID_LINES } from './cards'
 import { BODY, Box, Mark, SectionHeader } from './panels'
 import { MONO, PIXEL } from './palette'
-import type { Scene } from './scenes'
+import type { Scene, Side } from './scenes'
 import { RpgStage } from './stage'
 
 // One section per scene: a tall head that first shows the place alone and then brings the title up on
-// its black plate, then the cards (the genre's hard white bordered windows), then a screen of the place
+// its black plate, then the cards, on the side away from the scene (the genre's hard white bordered windows), then a screen of the place
 // alone before it sinks. The cards a scene counts sit in an element marked data-stage-items, which the
 // shared theatre measures for the reading line that plays each card's beat.
 
@@ -166,6 +166,12 @@ const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } =
   muayThai: RecordCards,
 }
 
+/** Where a section's title and cards sit from lg: left of a scene on the right, right of a scene on the left. */
+const CARDS_SIDE: Record<Side, { head: string; column: string }> = {
+  right: { head: '', column: '' },
+  left: { head: 'lg:justify-end', column: 'lg:ml-auto' },
+}
+
 interface SceneSectionProps {
   scene: Scene
   slot: SectionSlot
@@ -181,10 +187,10 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-label={label} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <RpgStage scene={scene} settled />}
-      <header className="relative flex min-h-[90svh] items-end pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
+      <header className={`relative flex min-h-[90svh] items-end pb-4 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] ${CARDS_SIDE[scene.layout.side].head}`}>
         <SectionHeader title={title} />
       </header>
-      <div className="relative max-w-[42rem]">
+      <div className={`relative max-w-[42rem] ${CARDS_SIDE[scene.layout.side].column}`}>
         <Cards slot={slot} />
       </div>
     </section>

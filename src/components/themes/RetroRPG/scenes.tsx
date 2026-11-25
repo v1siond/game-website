@@ -38,7 +38,16 @@ import { GROUND, PX, type Zone } from './zones'
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
-type Layout = PropLayout
+/** The half of the screen a scene plays on: right of its section's cards, or left of them. */
+export type Side = 'right' | 'left'
+
+/** The screen a scene is drawn for: side by side with the cards, or a phone's stacked band. */
+type Mode = 'wide' | 'phone'
+
+/** The props' layout, the side the scene plays on and the room's origin: where `dx` 0 of its places lands. */
+type Layout = PropLayout & { side: Side; origin: number }
+
+const modeOf = ({ phone }: Pick<Layout, 'phone'>): Mode => (phone ? 'phone' : 'wide')
 
 /** Him in a frame: where his feet are, his size, his sprite frame and how visible he is. */
 export type WalkerState = FigureState<Frame>
@@ -57,10 +66,25 @@ export interface SceneDef {
   /** The battle screen the scene cuts to, drawn over the whole room, him and what stands in front of him. */
   screen?: (layout: Layout) => ReactNode
   bind: (stage: StageNodes, layout: Layout) => FigureWriter<Frame>
+  /** Where the room's `dx` 0 lands, where it differs from ORIGIN for a screen and side. */
+  origin?: Partial<Record<Mode, Partial<Record<Side, number>>>>
 }
 
-// The middle of the band the scenes play in: right of the text column on a wide screen, the middle a phone shows.
-const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [880, 1300], phone: [580, 860] }
+// The band the battle box sits in the middle of: beside the cards on the scene's side on a wide screen; on a
+// phone the middle it shows, as the cut to the battle screen fills its width on either side.
+const BAND: Record<Mode, Record<Side, readonly [number, number]>> = {
+  wide: { right: [880, 1300], left: [240, 660] },
+  phone: { right: [580, 860], left: [580, 860] },
+}
+
+// Where the room's `dx` 0 lands: on a wide screen right of the cards, or as far left of them when they sit on
+// the right, so every room keeps its order of places (he walks in from the left to what waits on his right)
+// and plays clear of the cards; on a phone, whose half size room is drawn round x 720, the room shifts toward
+// the half its section names, so his own places sit in that half of the stacked band.
+const ORIGIN: Record<Mode, Record<Side, number>> = {
+  wide: { right: 900, left: 260 },
+  phone: { right: 640, left: 480 },
+}
 
 /** His size: a sprite pixel is 1.4 grid pixels, so he stands about a quarter of the screen. */
 const K = 1.4 * PX
@@ -78,9 +102,8 @@ const share = ({ action, t }: Playhead, i: number): number => (action > i ? 1 : 
  *  (stage.tsx), so the same room as on a wide screen fits its narrow view (about x 580 to 860). */
 export const PHONE_PIVOT = { x: 720, y: GROUND, scale: 0.5 } as const
 
-/** A place in the room `dx` from where he starts: right of the text on a wide screen; on a phone the same
- *  spacing, centred so the half size room lands in its view. */
-const roomX = ({ phone }: Layout, dx: number): number => (phone ? 610 : 900) + dx
+/** A place in the room `dx` from the room's origin, the one spacing on every screen and side. */
+const roomX = ({ origin }: Layout, dx: number): number => origin + dx
 
 const walker = (x: number, frame: Frame, opacity = 1, k = K, y = GROUND): WalkerState => ({ x, y, k, pose: frame, opacity })
 
@@ -597,6 +620,7 @@ const TECH = { tiles: [30, 80, 130, 180] as const, from: -30, stop: 220, bridge:
 const ICICLES = 3
 
 const tech: SceneDef = {
+  origin: { phone: { right: 614 } },
   zone: 'snow',
   kit: 'engineer',
   script: [1600, 1800, 1400],
@@ -938,26 +962,38 @@ const ventures: SceneDef = {
 // fill at his kit and the meter jumps. The screen cuts to the battle: his heart turns yellow, flips over, and
 // shoots up at the showman's speakers. Back on stage the meter passes the top, the phones in the cardboard
 // audience light up, and the showman takes his bow.
-const BANDS = { kit: 60, him: 10, showman: 300, meter: 180 }
+// The showman's stage two ways round: him at his kit with the showman across the stage on his right, or, where
+// he plays in the right half of a phone's band, the showman on his left, the meter and the audience with him.
+const BANDS_AT = {
+  ahead: { kit: 60, him: 10, showman: 300, meter: 180, audience: -40 },
+  behind: { kit: 60, him: 10, showman: -190, meter: -80, audience: -300 },
+} as const
+const BANDS_SIDE: Record<Mode, Record<Side, keyof typeof BANDS_AT>> = {
+  wide: { right: 'ahead', left: 'ahead' },
+  phone: { right: 'behind', left: 'ahead' },
+}
+const bandsOf = (layout: Layout) => BANDS_AT[BANDS_SIDE[modeOf(layout)][layout.side]]
 const PHONES = 6
 const SHOTS = 4
 
 const bands: SceneDef = {
+  origin: { phone: { right: 734 } },
   zone: 'volcano',
   kit: 'drummer',
   script: [1600, 1800, 1400],
   back: (layout) => {
-    const meterX = roomX(layout, BANDS.meter)
+    const at = bandsOf(layout)
+    const meterX = roomX(layout, at.meter)
     return (
       <>
         <rect x={-200} y={r1(GROUND - 4)} width={1840} height={20} fill={RPG.basaltLit} />
-        {[BANDS.kit, BANDS.showman].map((dx) => (
+        {[at.kit, at.showman].map((dx) => (
           <path key={dx} d={`M${r1(roomX(layout, dx) - 20)} 0 L${r1(roomX(layout, dx) + 20)} 0 L${r1(roomX(layout, dx) + 110)} ${GROUND} L${r1(roomX(layout, dx) - 110)} ${GROUND} Z`} fill={RPG.gold} opacity={0.12} />
         ))}
-        <g transform={`translate(${r1(roomX(layout, BANDS.kit))} ${GROUND})`}>
+        <g transform={`translate(${r1(roomX(layout, at.kit))} ${GROUND})`}>
           <Kit />
         </g>
-        <g data-fx="showman" transform={`translate(${r1(roomX(layout, BANDS.showman))} ${GROUND})`}>
+        <g data-fx="showman" transform={`translate(${r1(roomX(layout, at.showman))} ${GROUND})`}>
           <Sprite sprite={SHOWMAN} />
         </g>
         <g transform={`translate(${r1(meterX - 90)} ${r1(GROUND - 300)})`}>
@@ -980,7 +1016,7 @@ const bands: SceneDef = {
   front: (layout) => (
     <>
       {Array.from({ length: PHONES }, (_, i) => (
-        <g key={i} transform={`translate(${r1(roomX(layout, -40 + i * 75))} ${r1(GROUND + 70 + (i % 2) * 14)})`}>
+        <g key={i} transform={`translate(${r1(roomX(layout, bandsOf(layout).audience + i * 75))} ${r1(GROUND + 70 + (i % 2) * 14)})`}>
           <Phone />
           <rect data-fx={`screen-${i}`} x={r1(-2 * U)} y={r1(-11 * U)} width={r1(4 * U)} height={r1(6 * U)} fill={RPG.night} />
         </g>
@@ -994,7 +1030,8 @@ const bands: SceneDef = {
     const showman = fx(stage, 'showman')
     const shots = Array.from({ length: SHOTS }, (_, i) => fx(stage, `shot-${i}`))
     const screens = Array.from({ length: PHONES }, (_, i) => fx(stage, `screen-${i}`))
-    const [himX, showmanX] = [BANDS.him, BANDS.showman].map((dx) => roomX(layout, dx))
+    const at = bandsOf(layout)
+    const [himX, showmanX] = [at.him, at.showman].map((dx) => roomX(layout, dx))
     const heartX = (fought: number): number => box.bx + box.w * 0.6 * Math.sin(fought * Math.PI * 2)
     return (_p, _f, play = START) => {
       const drummed = share(play, 0)
@@ -1031,6 +1068,7 @@ const BOLTS = 8
 const FRIEND_LIGHTS = [RPG.robe, RPG.scarf, RPG.owl, RPG.visor, RPG.weaver, RPG.jukebox] as const
 
 const muayThai: SceneDef = {
+  origin: { phone: { right: 582 } },
   zone: 'royal',
   kit: 'fighter',
   script: [1800, 1800, 1400],
@@ -1126,10 +1164,14 @@ const muayThai: SceneDef = {
 // coming up behind him, walks to the save star and touches it; the save box opens over it with a full bar,
 // and the scene goes still.
 const CONTACT = { from: -20, star: 300, reach: 240 }
-// Where the friends stand: past the star on a wide screen, clear of the contact card in the middle; on a
-// phone behind him on the left, inside its narrower view.
-const FRIENDS_DX = { wide: [340, 372, 404, 436, 468], phone: [-120, -70, -20, 30, 80] } as const
-const friendX = (layout: Layout, i: number): number => roomX(layout, FRIENDS_DX[layout.phone ? 'phone' : 'wide'][i])
+// Where the friends stand: past the star when the room has room on that side (right of the cards on a wide
+// screen, the left half of a phone), else behind him, away from the cards or the edge of the view.
+const FRIENDS_DX = { ahead: [340, 372, 404, 436, 468], behind: [-70, -35, 0, 35, 70] } as const
+const FRIENDS_AT: Record<Mode, Record<Side, keyof typeof FRIENDS_DX>> = {
+  wide: { right: 'ahead', left: 'behind' },
+  phone: { right: 'behind', left: 'ahead' },
+}
+const friendX = (layout: Layout, i: number): number => roomX(layout, FRIENDS_DX[FRIENDS_AT[modeOf(layout)][layout.side]][i])
 
 /** The friends of each page's run: the creatures met in the sections that profession's page shows. */
 const FRIENDS: Record<Profession, readonly PixelSprite[]> = {
@@ -1142,6 +1184,7 @@ const FRIENDS: Record<Profession, readonly PixelSprite[]> = {
 const saveBoxAt = (x: number, phone: boolean): { x: number; y: number; size: number } => (phone ? { x: x - 120, y: 360, size: 1 } : { x, y: 430, size: 0.55 })
 
 const contact: SceneDef = {
+  origin: { phone: { right: 620, left: 460 } },
   zone: 'surface',
   kit: null,
   script: [1800, 1600],
@@ -1180,7 +1223,7 @@ const contact: SceneDef = {
     const save = fx(stage, 'save')
     const bar = fx(stage, 'save-bar')
     const dark = fx(stage, 'dark')
-    const friends = FRIENDS_DX.wide.map((_, i) => fx(stage, `friend-${i}`))
+    const friends = FRIENDS_DX.ahead.map((_, i) => fx(stage, `friend-${i}`))
     const [from, reachX] = [CONTACT.from, CONTACT.reach].map((dx) => roomX(layout, dx))
     return (_p, _f, play = START) => {
       const climbed = share(play, 0)
@@ -1219,14 +1262,27 @@ type RecordWords = Pick<Labels, 'record' | 'years'>
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean, name: string): Scene => {
+/** The side of the section at `index` of the page (0 the first after the hero): the first plays right of its
+ *  cards, the next left of them, and so on up to the contact. */
+const sideOf = (index: number): Side => (index % 2 === 0 ? 'right' : 'left')
+
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean, side: Side, name: string): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot, name }
+  const mode = modeOf({ phone })
+  const origin = def.origin?.[mode]?.[side] ?? ORIGIN[mode][side]
+  return { id, def, layout: { ...propLayout(items, BAND[mode][side], phone), side, origin }, kit: def.kit ?? profession, slot, name }
 }
 
-/** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
-export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, highlights: number, labels: RecordWords, name: string): Scene[] => [
-  sceneOf('hero', null, NO_ITEMS, profession, phone, name),
-  ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, phone, name)),
-  sceneOf('contact', null, NO_ITEMS, profession, phone, name),
-]
+/**
+ * The page as scenes: the hero, one per section the profession shows in reading order, the contact. With the
+ * cards beside the scene (`split`) or on a phone the sections take turns, right of their cards then left; a
+ * screen between the two keeps every scene on the right. The hero keeps its own place.
+ */
+export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, split: boolean, highlights: number, labels: RecordWords, name: string): Scene[] => {
+  const side = (index: number): Side => (phone || split ? sideOf(index) : 'right')
+  return [
+    sceneOf('hero', null, NO_ITEMS, profession, phone, 'right', name),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, phone, side(i), name)),
+    sceneOf('contact', null, NO_ITEMS, profession, phone, side(slots.length), name),
+  ]
+}

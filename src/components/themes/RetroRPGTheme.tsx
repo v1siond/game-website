@@ -27,6 +27,8 @@ import { LAYER_MOTION, RpgStage, theatreScene } from './RetroRPG/stage'
 import world from './RetroRPG/world.module.css'
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+// From lg the cards and the scene sit side by side, so there the sections take turns: cards left, then right.
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 // Retro RPG, after the 16 bit style role playing game it comes from. The hero is the encounter screen: him
 // on the battle field, the window with his name and lines, the stats line, and the command window that
@@ -61,9 +63,10 @@ export default function RetroRPGTheme() {
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels, view.hero.name),
-    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels, view.hero.name],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, split, highlights.length, labels, view.hero.name),
+    [view.sections, professionalSummary.bio, active, phone, split, highlights.length, labels, view.hero.name],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)

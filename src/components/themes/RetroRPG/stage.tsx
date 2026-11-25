@@ -32,8 +32,10 @@ const WALKER_RIG: FigureRig<(frame: string) => void, Frame> = {
   pose: (show, frame) => show(frame),
 }
 
-/** The scene as the shared theatre runs it: the props' writer, then him placed and framed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, WALKER_RIG, scene.def.script)
+/** The scene as the shared theatre runs it: the props' writer on the scene's own layout, then him placed and
+ *  framed from what it returns. */
+export const theatreScene = (scene: Scene): TheatreScene =>
+  figureScene(scene.id, scene.layout, (stage) => scene.def.bind(stage, scene.layout), WALKER_RIG, scene.def.script)
 
 /** A layer's picture: the whole room from its foot on a wide screen; on a phone, the view from its top that
  *  keeps the floor half way down the screen (zones.tsx PHONE_VIEW). */
@@ -91,7 +93,10 @@ const layersOf = (scene: Scene): StageLayer[] => {
   ]
 }
 
+/** The scrim under the cards, on the side they sit (a scene on the right has them on the left). */
+const SCRIM: Record<Scene['layout']['side'], string> = { right: css.cardsLeft, left: css.cardsRight }
+
 /** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
 export const RpgStage = memo(function RpgStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.screen} />
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={`${css.screen} ${SCRIM[scene.layout.side]}`} />
 })

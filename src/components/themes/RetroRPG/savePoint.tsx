@@ -8,7 +8,7 @@ import { ActionOptions } from './actions'
 import { BODY, Box, Mark } from './panels'
 import { PIXEL, RPG } from './palette'
 import { Sparkles } from './walker'
-import type { Scene } from './scenes'
+import type { Scene, Side } from './scenes'
 import { RpgStage } from './stage'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -17,12 +17,16 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 // a save point sparkles in its room. Clicking it saves: the star flares once,
 // pixel sparks burst round it, the window flashes white and stays in its saved state (yellow border), and
 // the window shows the save line, his name beside the profession, over the contact line and the options.
-// On the stage behind (scenes.tsx) he walks up to the save star and touches it, and the save box opens.
+// On the stage behind (scenes.tsx) he walks up to the save star and touches it, and the save box opens; from lg
+// the window sits on the side away from him, as every section's cards do.
 //
 // Pattern: CSS loops for the pulse (steps(), opacity), one click state (data-saved) that plays the flare
 // and the flash once per click (the key replays them).
 
 const CONTACT_HEADING = headingId('rpg', 'Contact')
+
+/** From lg the closing window sits beside the scene, away from the side the surface plays on. */
+const CONTACT_SIDE: Record<Side, string> = { right: 'lg:ml-0', left: 'lg:mr-0' }
 
 /** The save point: a four point star of light over its glow, drawn for this page. */
 function SaveStar() {
@@ -43,9 +47,9 @@ export function SavePoint({ profession, scene, still }: { profession: Profession
   const saved = saves > 0
 
   return (
-    <section data-scene={scene.id} data-saved={saved} className="relative z-20 px-4 pb-8 pt-[60svh] motion-reduce:pt-16 max-md:pt-[130svh] sm:px-6" aria-labelledby={CONTACT_HEADING}>
+    <section data-scene={scene.id} data-saved={saved} className="relative z-20 px-4 pb-8 pt-[60svh] motion-reduce:pt-16 max-md:pt-[130svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
       {still && <RpgStage scene={scene} settled />}
-      <div className="relative mx-auto max-w-3xl">
+      <div className={`relative mx-auto max-w-3xl lg:max-w-[42rem] ${CONTACT_SIDE[scene.layout.side]}`}>
         <div className="relative mb-4 flex justify-center">
           <button
             type="button"
