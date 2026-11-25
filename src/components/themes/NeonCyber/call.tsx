@@ -8,7 +8,7 @@ import { ContactActions } from './actions'
 import { HeroSprite } from './figure'
 import { panelHeadingId } from './hud'
 import type { Scene } from './scenes'
-import { HudTitle } from './sections'
+import { HudTitle, READS_BESIDE } from './sections'
 import { NeonStage } from './stage'
 import world from './world.module.css'
 
@@ -19,16 +19,17 @@ import world from './world.module.css'
 
 export function IncomingCall({ scene, profession, number, still }: { scene: Scene; profession: Profession; number: number; still: boolean }) {
   const { cyber, sections } = useLabels()
+  const reads = READS_BESIDE[scene.side ?? 'right']
 
   return (
     <section data-scene="contact" className="relative px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]" aria-labelledby={panelHeadingId(sections.contact)}>
       {still && <NeonStage scene={scene} settled />}
-      <header className="flex min-h-[80svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
+      <header className={`flex min-h-[80svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] ${reads.title}`}>
         <HudTitle number={number} total={number} title={sections.contact} />
       </header>
       <RecruiterHero
         render={({ name, line, actions }) => (
-          <div className={`${world.panel} max-w-2xl p-5 sm:p-8`}>
+          <div className={`${world.panel} max-w-2xl p-5 sm:p-8 ${reads.column}`}>
             <p className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-[color:var(--neon-hud)]">
               <span className="block h-3 w-3 rounded-full bg-[color:var(--neon-hack)]" aria-hidden="true" />
               {cyber.incomingCall}

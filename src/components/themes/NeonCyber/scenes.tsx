@@ -57,7 +57,14 @@ export interface SceneDef {
   bind: (stage: StageNodes, layout: Layout) => FigureWriter<HeroPose>
 }
 
-// The band the scenes play in: right of the text column on a wide screen, the middle a phone shows.
+/** The half of a wide screen a section's scene plays in; its cards read on the other half. */
+export type SceneSide = 'right' | 'left'
+
+/** The side of the scene at `index` among the sections after the hero, the contact last: right, left, right... */
+const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left')
+
+// The band the scenes play in: right of the text column on a wide screen, the middle a phone shows. A scene on
+// the left half plays in the same band drawn further left (stage.tsx).
 const BAND: Record<'wide' | 'phone', readonly [number, number]> = { wide: [820, 1380], phone: [640, 960] }
 
 const K = 1.6
@@ -839,20 +846,22 @@ export interface Scene {
   kit: Profession
   /** The section's slot; the hero and the contact have none. */
   slot: SectionSlot | null
+  /** The half its scene plays in from lg, its cards on the other; none for the hero, on its own layout. */
+  side: SceneSide | null
 }
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean): Scene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean, side: SceneSide | null): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot }
+  return { id, def, layout: propLayout(items, BAND[phone ? 'phone' : 'wide'], phone), kit: def.kit ?? profession, slot, side }
 }
 
 const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 
-/** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
+/** The page as scenes: the hero, one per section the profession shows in reading order, the contact, sides alternating. */
 export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, aboutTags: number, labels: RecordWords): Scene[] => [
-  sceneOf('hero', null, NO_ITEMS, profession, phone),
-  ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, aboutTags), profession, phone)),
-  sceneOf('contact', null, NO_ITEMS, profession, phone),
+  sceneOf('hero', null, NO_ITEMS, profession, phone, null),
+  ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, aboutTags), profession, phone, sideOf(i))),
+  sceneOf('contact', null, NO_ITEMS, profession, phone, sideOf(slots.length)),
 ]

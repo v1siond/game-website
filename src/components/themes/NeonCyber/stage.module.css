@@ -20,3 +20,31 @@
       linear-gradient(to top, color-mix(in srgb, var(--neon-ink) 70%, transparent), color-mix(in srgb, var(--neon-ink) 0%, transparent) 55%);
   }
 }
+
+/* A section whose scene plays on the left half (stage.tsx PLAYS): from lg its figure layer is drawn 720 units
+   left, the band x 820 to 1380 becoming x 100 to 660, so what a scene throws past the band's right end (the
+   guard the takedown drops, up to x 1480) still lands left of the cards on the right (from x 762 at 1440), and
+   the scrim darkens the right half under them. Below md, where the cards read under the picture, the
+   figure layer leans 50 units (about 35 px) to the half the section names. SVG user units. */
+@media (min-width: 1024px) {
+  .playsLeft {
+    transform: translateX(-720px);
+  }
+
+  .visor.cardsRight::after {
+    background:
+      repeating-linear-gradient(0deg, transparent 0 2px, color-mix(in srgb, black 22%, transparent) 2px 3px),
+      radial-gradient(circle at 40% 45%, transparent 45%, color-mix(in srgb, var(--neon-ink) 80%, transparent) 100%),
+      linear-gradient(to left, color-mix(in srgb, var(--neon-ink) 60%, transparent), color-mix(in srgb, var(--neon-ink) 0%, transparent) 50%);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .leansRight {
+    transform: translateX(50px);
+  }
+
+  .leansLeft {
+    transform: translateX(-50px);
+  }
+}

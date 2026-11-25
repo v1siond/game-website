@@ -7,7 +7,7 @@ import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { DISTRICT_ART, Far, Mid, Near, PHONE_VIEW, Rain, VIEW } from './city'
 import { HeroFigure } from './figure'
 import { heroJoints, setHeroPose } from './pose'
-import { GROUND, type Scene } from './scenes'
+import { GROUND, type Scene, type SceneSide } from './scenes'
 import { NO_NODES, figureScene, figureTransform } from '../shared/figureScene'
 import css from './stage.module.css'
 
@@ -15,6 +15,16 @@ import css from './stage.module.css'
 // the rain, the scene's props and him in the figure layer. The shared engine fades each stage and pushes
 // its layers in; the scene's writer moves its props and the camera over the figure layer, and hands back his
 // place and pose, written here.
+//
+// The sections alternate sides: a scene on the left half has its figure layer (him, his props, the camera)
+// drawn on the left half from lg and its scrim under the cards on the right (stage.module.css); below md, where
+// cards and picture are stacked, the figure layer leans to the half the section names. The city stays put.
+
+/** The figure layer's place and the scrim per side; the hero keeps its own. */
+const PLAYS: Record<SceneSide, { figure: string; visor: string }> = {
+  right: { figure: css.leansRight, visor: '' },
+  left: { figure: `${css.playsLeft} ${css.leansLeft}`, visor: css.cardsRight },
+}
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -62,11 +72,13 @@ const layersOf = (scene: Scene): StageLayer[] => {
     {
       name: 'figure',
       node: plane(
-        <g data-fx="camera">
-          <ellipse cx={scene.layout.cx} cy={GROUND + 6} rx={360} ry={18} fill="var(--neon-magenta)" opacity={0.08} />
-          {scene.def.back(scene.layout)}
-          <Hero scene={scene} />
-          {scene.def.front(scene.layout)}
+        <g className={scene.side ? PLAYS[scene.side].figure : undefined}>
+          <g data-fx="camera">
+            <ellipse cx={scene.layout.cx} cy={GROUND + 6} rx={360} ry={18} fill="var(--neon-magenta)" opacity={0.08} />
+            {scene.def.back(scene.layout)}
+            <Hero scene={scene} />
+            {scene.def.front(scene.layout)}
+          </g>
         </g>,
         phone,
       ),
@@ -77,5 +89,6 @@ const layersOf = (scene: Scene): StageLayer[] => {
 
 /** A scene's stage in the theatre or, `settled`, still at the top of its own section under reduced motion. */
 export const NeonStage = memo(function NeonStage({ scene, settled = false }: { scene: Scene; settled?: boolean }) {
-  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={css.visor} />
+  const visor = scene.side ? PLAYS[scene.side].visor : ''
+  return <Stage scene={theatreScene(scene)} layers={layersOf(scene)} motion={LAYER_MOTION} settled={settled} className={`${css.visor} ${visor}`} />
 })

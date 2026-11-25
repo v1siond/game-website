@@ -14,7 +14,7 @@ import { BandDeck } from './bands'
 import { ProjectFiles } from './projects'
 import { JobTimeline } from './timeline'
 import { DATA_CHIPS, panelHeadingId } from './hud'
-import type { Scene } from './scenes'
+import type { Scene, SceneSide } from './scenes'
 import { NeonStage } from './stage'
 import world from './world.module.css'
 
@@ -182,6 +182,12 @@ export function HudTitle({ number, total, title }: { number: number; total: numb
   )
 }
 
+/** Where a section's title and cards read from lg: on the half its scene leaves free. */
+export const READS_BESIDE: Record<SceneSide, { title: string; column: string }> = {
+  right: { title: '', column: '' },
+  left: { title: 'lg:justify-end', column: 'lg:ml-auto' },
+}
+
 interface SceneSectionProps {
   scene: Scene
   slot: SectionSlot
@@ -195,13 +201,14 @@ export function SceneSection({ scene, slot, number, total, still }: SceneSection
   const { sections } = useLabels()
   const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
   const title = sections[slot.titleKey]
+  const reads = READS_BESIDE[scene.side ?? 'right']
   return (
     <section data-scene={scene.id} aria-labelledby={panelHeadingId(title)} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <NeonStage scene={scene} settled />}
-      <header className="flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh]">
+      <header className={`flex min-h-[90svh] items-end pb-10 motion-reduce:min-h-[70svh] max-md:min-h-[130svh] ${reads.title}`}>
         <HudTitle number={number} total={total} title={title} />
       </header>
-      <div className="max-w-[42rem]">
+      <div className={`max-w-[42rem] ${reads.column}`}>
         <Cards slot={slot} />
       </div>
     </section>
