@@ -44,13 +44,12 @@ export const RPG = {
   wraps: '#f0b030',
   stickWood: '#efe0b0',
   snare: '#c43a3a',
-  // The cast he meets (npcs.ts): the keeper's coat and the portrait's.
+  // The portrait in the job boxes (npcs.ts).
   coatGreen: '#3f8a4a',
-  coatGold: '#c89a30',
   villagerHair: '#6a4a2a',
   // The places of the underground the page runs through (zones.tsx), in the source game's order and
   // colours: the violet brick ruins with their red leaves, the snow forest among the pines, the dark blue
-  // cave of glowing water plants, the hot lab country over its lava, the town with its awnings.
+  // cave of glowing water plants, the hot lab country over its lava.
   stone: '#6a4f8c',
   stoneLit: '#8a6aae',
   stoneDark: '#3a2a54',
@@ -74,14 +73,46 @@ export const RPG = {
   ash: '#5a4a48',
   lava: '#ff3a1a',
   lavaCore: '#ffd23c',
-  townGrass: '#8fbf5a',
-  townWall: '#efe0c0',
+  // The weaver's stall in the hot country: its posts, the stripes of its roof and the awning.
   townBeam: '#6a4428',
   townRoof: '#a8402a',
   awning: '#d8c870',
-  // The counters' wood: warm boards and their dark seams.
+  // The stall's counter: warm boards and their dark seams.
   shopWood: '#ae853b',
   shopDark: '#73553b',
+  // The grey royal city before the barrier, and the wall of light itself.
+  royalSky: '#24242c',
+  royalWall: '#5e5e6a',
+  royalLit: '#8e8e9c',
+  royalDark: '#3a3a44',
+  barrier: '#e8f4ff',
+  // The surface at sunset, seen from the cliff at the end of the run.
+  sunsetHigh: '#3a2a6a',
+  sunsetMid: '#c8583a',
+  sunsetLow: '#f0a040',
+  cliff: '#4a3428',
+  cliffLit: '#7a5438',
+  duskGrass: '#3e5a30',
+  // The cast he meets on the way (npcs.ts), each drawn for this page.
+  lantern: '#f0c060',
+  lanternRim: '#a83a2a',
+  robe: '#5a46a8',
+  robeTrim: '#e8d8a0',
+  helmet: '#c8c8d8',
+  scarf: '#d83a3a',
+  guardSuit: '#3a5a9a',
+  owl: '#8a6a48',
+  owlWing: '#5a422e',
+  armour: '#4a5a7a',
+  visor: '#40ffff',
+  weaver: '#8a4ab0',
+  weaverDress: '#4a2a68',
+  chrome: '#b8b8c8',
+  jukebox: '#c83a5a',
+  champion: '#7a7a88',
+  cape: '#8a1e2a',
+  kidShirt: '#3a8ac8',
+  straw: '#d8b860',
 } as const
 
 /** The palette as CSS variables (--rpg-void, --rpg-gold and so on), set once on the world's root. */

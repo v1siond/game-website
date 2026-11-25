@@ -1,11 +1,12 @@
 import type { ComponentType, ReactNode } from 'react'
 import { RPG } from './palette'
 
-// The five places of the run, each as the layers of a scene's stage (stage.tsx): the ruins (a violet brick
-// wall, its broken columns and arch, red leaves on the flagstones), the snow forest (pines, the log houses,
-// the drifts), the dark blue cave (the rock strata, the glowing crystal clusters, the stalagmites, the rock
-// floor), the hot lab country (the cones and their smoke, the basalt shelf, the lava channel) and the town
-// (sky, the timbered house fronts, the awnings of the stalls, the lawn and the road). Every layer is drawn
+// The six places of the run in the game's order, each as the layers of a scene's stage (stage.tsx): the
+// ruins (a violet brick wall, its broken columns and arch, red leaves on the flagstones), the snow forest
+// (pines, the log houses, the drifts), the dark marsh cave (the rock strata, the glowing crystal clusters,
+// the stalagmites, the rock floor), the hot lab country (the cones and their smoke, the basalt shelf, the lava
+// channel), the grey royal city (its tall windows, columns and capsules, the wall of light at its end) and the
+// surface at sunset (the sky, the far hills, the cliff he climbs out onto). Every layer is drawn
 // on the genre's 320 by 180 grid of hard pixels and blown up to the 1440 by 810 canvas, so a pixel is 4.5
 // canvas units and the art stays crisp at any width.
 
@@ -22,7 +23,7 @@ export const PICTURE_BOTTOM = 810
 /** One grid pixel in canvas units. */
 export const PX = 4.5
 
-export type Zone = 'ruins' | 'snow' | 'cave' | 'volcano' | 'town'
+export type Zone = 'ruins' | 'snow' | 'cave' | 'volcano' | 'royal' | 'surface'
 
 export interface ZoneArt {
   sky: ComponentType
@@ -283,63 +284,110 @@ function VolcanoNear() {
   )
 }
 
-// ---------------------------------------------------------------- the market town
+// ---------------------------------------------------------------- the royal city and the barrier
 
-const FRONTS = [0, 90, 180, 270]
+const WINDOWS = [24, 88, 152, 216, 280]
 
-function TownSky() {
+function RoyalSky() {
   return (
     <Grid>
-      <rect width="320" height="180" fill={RPG.townGrass} />
-      <rect width="320" height="60" fill={RPG.sky} />
-    </Grid>
-  )
-}
-
-function TownFar() {
-  return (
-    <Grid>
-      {FRONTS.map((x) => (
+      <rect width="320" height="180" fill={RPG.royalSky} />
+      {WINDOWS.map((x) => (
         <g key={x}>
-          <path d={`M${x + 4} 46 L${x + 46} 24 L${x + 88} 46 Z`} fill={RPG.townRoof} />
-          <rect x={x + 10} y="46" width="72" height="70" fill={RPG.townWall} />
-          <rect x={x + 10} y="46" width="72" height="2" fill={RPG.townBeam} />
-          <rect x={x + 10} y="80" width="72" height="2" fill={RPG.townBeam} />
-          <rect x={x + 10} y="46" width="2" height="70" fill={RPG.townBeam} />
-          <rect x={x + 80} y="46" width="2" height="70" fill={RPG.townBeam} />
-          <rect x={x + 22} y="56" width="12" height="14" fill={RPG.lavaCore} />
-          <rect x={x + 58} y="56" width="12" height="14" fill={RPG.lavaCore} />
-          <rect x={x + 38} y="88" width="16" height="28" fill={RPG.townBeam} />
+          <rect x={x} y="14" width="16" height="70" fill={RPG.royalDark} />
+          <rect x={x + 2} y="16" width="12" height="66" fill={RPG.barrier} opacity={0.16} />
+          <path d={`M${x} 14 a8 8 0 0 1 16 0 Z`} fill={RPG.royalDark} />
         </g>
       ))}
     </Grid>
   )
 }
 
-function TownMid() {
+function RoyalFar() {
   return (
     <Grid>
-      {[60, 240].map((x) => (
+      {[8, 72, 136, 200, 264].map((x) => (
         <g key={x}>
-          <rect x={x} y="96" width="40" height="6" fill={RPG.awning} />
-          {[0, 10, 20, 30].map((dx) => (
-            <rect key={dx} x={x + dx} y="96" width="5" height="6" fill={RPG.townRoof} />
-          ))}
-          <rect x={x + 2} y="102" width="2" height="22" fill={RPG.townBeam} />
-          <rect x={x + 36} y="102" width="2" height="22" fill={RPG.townBeam} />
-          <rect x={x} y="114" width="40" height="4" fill={RPG.shopWood} />
+          <rect x={x} y="12" width="8" height="104" fill={RPG.royalWall} />
+          <rect x={x - 2} y="10" width="12" height="4" fill={RPG.royalLit} />
+          <rect x={x + 6} y="14" width="2" height="102" fill={RPG.royalDark} />
         </g>
+      ))}
+      <rect x="296" y="0" width="24" height="124" fill={RPG.barrier} opacity={0.7} />
+      <rect x="292" y="0" width="4" height="124" fill={RPG.barrier} opacity={0.35} />
+    </Grid>
+  )
+}
+
+function RoyalMid() {
+  return (
+    <Grid>
+      {[40, 104, 168, 232].map((x) => (
+        <g key={x}>
+          <rect x={x} y="94" width="14" height="22" fill={RPG.royalDark} />
+          <rect x={x + 3} y="98" width="8" height="12" fill={RPG.royalLit} opacity={0.6} />
+        </g>
+      ))}
+      <rect y="116" width="320" height="3" fill={RPG.royalDark} />
+    </Grid>
+  )
+}
+
+function RoyalNear() {
+  return (
+    <Grid>
+      <rect y="119" width="320" height="61" fill={RPG.royalWall} />
+      {[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300].map((x) => (
+        <rect key={x} x={x} y="119" width="1" height="61" fill={RPG.royalDark} />
+      ))}
+      {[134, 152, 170].map((y) => (
+        <rect key={y} y={y} width="320" height="1" fill={RPG.royalDark} />
       ))}
     </Grid>
   )
 }
 
-function TownNear() {
+// ---------------------------------------------------------------- the surface at sunset
+
+function SurfaceSky() {
   return (
     <Grid>
-      <rect y="124" width="320" height="56" fill={RPG.townGrass} />
-      <rect y="160" width="320" height="20" fill={RPG.borderShade} />
-      <rect y="169" width="320" height="2" fill={RPG.townWall} />
+      <rect width="320" height="180" fill={RPG.sunsetLow} />
+      <rect width="320" height="70" fill={RPG.sunsetMid} />
+      <rect width="320" height="34" fill={RPG.sunsetHigh} />
+      <rect x="226" y="88" width="24" height="12" fill={RPG.gold} />
+      <rect x="222" y="92" width="32" height="6" fill={RPG.gold} />
+    </Grid>
+  )
+}
+
+function SurfaceFar() {
+  return (
+    <Grid>
+      <path d="M0 108 L40 86 L76 100 L120 78 L168 98 L212 84 L262 100 L320 88 V120 H0 Z" fill={RPG.sunsetHigh} />
+      <path d="M0 118 L60 104 L130 114 L200 102 L270 112 L320 106 V124 H0 Z" fill={RPG.hillFar} />
+    </Grid>
+  )
+}
+
+function SurfaceMid() {
+  return (
+    <Grid>
+      <rect y="124" width="320" height="56" fill={RPG.cliff} />
+      <rect y="124" width="320" height="4" fill={RPG.duskGrass} />
+    </Grid>
+  )
+}
+
+function SurfaceNear() {
+  return (
+    <Grid>
+      {[146, 160, 172].map((y) => (
+        <rect key={y} y={y} width="320" height="1" fill={RPG.cliffLit} />
+      ))}
+      {[[12, 130], [70, 136], [150, 132], [236, 138], [300, 131]].map(([x, y]) => (
+        <rect key={x} x={x} y={y} width="6" height="2" fill={RPG.duskGrass} />
+      ))}
     </Grid>
   )
 }
@@ -349,5 +397,6 @@ export const ZONE_ART: Record<Zone, ZoneArt> = {
   snow: { sky: SnowSky, far: SnowFar, mid: SnowMid, near: SnowNear, floor: RPG.snow },
   cave: { sky: CaveSky, far: CaveFar, mid: CaveMid, near: CaveNear, floor: RPG.caveFloor },
   volcano: { sky: VolcanoSky, far: VolcanoFar, mid: VolcanoMid, near: VolcanoNear, floor: RPG.basalt },
-  town: { sky: TownSky, far: TownFar, mid: TownMid, near: TownNear, floor: RPG.borderShade },
+  royal: { sky: RoyalSky, far: RoyalFar, mid: RoyalMid, near: RoyalNear, floor: RPG.royalWall },
+  surface: { sky: SurfaceSky, far: SurfaceFar, mid: SurfaceMid, near: SurfaceNear, floor: RPG.cliff },
 }

@@ -30,11 +30,12 @@ const PHONE_QUERY = '(max-width: 767.98px)'
 
 // Retro RPG, after the 16 bit style role playing game it comes from. The hero is the encounter screen: him
 // on the battle field, the window with his name and lines, the stats line, and the command window that
-// switches the profession. Then every section of the active profession is one full screen room of the run
+// switches the profession. Then every section of the active profession is one room of a merciful run
 // through the underground (./RetroRPG/scenes), in the game's order of places: the violet ruins, the snow
-// forest, the dark glowing cave, the hot lab country, a town and the battle screen, each with its own short
-// script of actions the scroll plays forward and back at the scene's own speed. Contact is the last save
-// star, which he walks up to and touches. All of it runs on the shared theatre (./shared/theatre).
+// forest, the dark marsh, the hot country and the grey royal city at the barrier, each a beat of the story
+// with its own short script of actions the scroll plays forward and back at the scene's own speed, the
+// battle screen cutting in where the beat is a fight he ends with mercy. Contact is the surface at sunset
+// and the run's one save star. All of it runs on the shared theatre (./shared/theatre).
 // Under reduced motion there is no theatre: each section carries its own picture, still, at its settled
 // frame.
 //
@@ -61,8 +62,8 @@ export default function RetroRPGTheme() {
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
-    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels, view.hero.name),
+    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels, view.hero.name],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)

@@ -7,14 +7,15 @@ import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform, type FigureRig } from '../shared/figureScene'
 import { frames } from '../shared/stageNodes'
 import { StageFigure, type Frame } from './walker'
-import type { Scene } from './scenes'
+import { PHONE_PIVOT, type Scene } from './scenes'
 import { PHONE_VIEW, PICTURE_BOTTOM, VIEW, ZONE_ART } from './zones'
 import css from './stage.module.css'
 
 // One scene's picture on the shared theatre (../shared/theatre): the place's layers from its back wall to
-// the floor he walks on, then the scene's stops and him in the figure layer, in one camera group the view
-// pushes in with, all on the genre's hard pixel grid. The shared engine fades each stage and pushes its
-// layers in; the scene's writer moves its props at the playhead and hands back his place and frame.
+// the floor he walks on, then the scene's cast and props, him, what stands in front of him (the marsh's tall
+// grass) and over all of it the battle screen when the scene cuts to one, in the figure layer, in one camera
+// group the view pushes in with, all on the genre's hard pixel grid. The shared engine fades each stage and pushes its layers in; the scene's writer moves its props at
+// the playhead and hands back his place and frame.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -41,6 +42,10 @@ const plane = (children: ReactNode, phone: boolean): ReactNode => (
     {children}
   </svg>
 )
+
+/** On a phone the room is drawn at half size round the middle of its floor, so he and the one he meets both
+ *  fit the narrow view whole; the battle screen over it keeps its own phone size. */
+const PHONE_ROOM = `translate(${PHONE_PIVOT.x} ${PHONE_PIVOT.y}) scale(${PHONE_PIVOT.scale}) translate(${-PHONE_PIVOT.x} ${-PHONE_PIVOT.y})`
 
 /** Him at his first frame's place. */
 function Walker({ scene }: { scene: Scene }) {
@@ -73,8 +78,12 @@ const layersOf = (scene: Scene): StageLayer[] => {
       name: 'figure',
       node: plane(
         <g data-fx="camera">
-          {scene.def.back(scene.layout)}
-          <Walker scene={scene} />
+          <g transform={phone ? PHONE_ROOM : undefined}>
+            {scene.def.back(scene.layout, scene.kit, scene.name)}
+            <Walker scene={scene} />
+            {scene.def.front?.(scene.layout)}
+          </g>
+          {scene.def.screen?.(scene.layout)}
         </g>,
         phone,
       ),
