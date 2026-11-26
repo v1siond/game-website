@@ -163,7 +163,9 @@ export function ContactTerminal({ scene, still }: { scene: Scene; still: boolean
   return (
     <section data-scene="contact" aria-labelledby={atomicId(title)} className="relative scroll-mt-24 px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <AtomicStage scene={scene} settled />}
-      <div className="min-h-[60svh] motion-reduce:min-h-[50svh]" />
+      {/* the walk to the post plays before the terminal comes up: on a phone, as a section's head, the screen
+          and a third over it, so the terminal scrolls over a scene that has ended */}
+      <div className="min-h-[60svh] motion-reduce:min-h-[50svh] max-md:motion-safe:min-h-[130svh]" />
       <div className={`relative max-w-5xl p-3 sm:p-5 lg:max-w-[min(56rem,62vw)] ${READS_BESIDE[scene.side].column} ${atomic.device}`} data-on="">
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
           <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />

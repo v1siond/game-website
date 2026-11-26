@@ -93,8 +93,8 @@ export interface SceneInput {
   phone: boolean
   /** From lg the scene plays on the left half, its section's cards reading on the right (sideOf). */
   left: boolean
-  /** On a phone the place is drawn the other way round about the middle of the view, so he ends in the half
-   *  his section names (turnedOf). */
+  /** The place is drawn the other way round about the middle: on a phone so he ends in the half his section
+   *  names, from lg where it turns for the right half (turnedOf). */
   turned: boolean
   kit: Profession
 }
@@ -123,6 +123,9 @@ export interface SceneDef {
   /** How far right of his usual spot he stands, on a wide screen and on a phone (the hero: clear of the wide
    *  wrist computer, and his dogs in a phone's view). */
   shift?: { wide: number; phone: number }
+  /** From lg, on the right it is drawn as its left composition turned round the middle, so all of it plays
+   *  right of the cards (the contact: he and the pack come in from the right edge to the terminal). */
+  turnsRight?: boolean
   /** The place's art round his spot (x 0 his spot, y 0 the ground), behind him and in front of him. */
   back: (input: SceneInput) => ReactNode
   front?: (input: SceneInput) => ReactNode
@@ -145,11 +148,11 @@ const spotOf = ({ phone, left }: Pick<SceneInput, 'phone' | 'left'>): number => 
 /** On a phone's narrow view the place round his spot, and he, are drawn at this share of their size. */
 export const placeScale = (phone: boolean): number => (phone ? 0.8 : 1)
 
-/** The middle of a phone's view of the canvas, the line a turned place is drawn round. */
-const PHONE_MIDDLE = 720
+/** The middle of the canvas, and of a phone's view of it: the line a turned place is drawn round. */
+const MIDDLE = 720
 
-/** The transform that draws a turned place the other way round about the middle of a phone's view. */
-export const MIRROR = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
+/** The transform that draws a turned place the other way round about the middle. */
+export const MIRROR = `translate(${2 * MIDDLE} 0) scale(-1 1)`
 
 /** Before the section arrives a scene shows its first frame. */
 const START: Playhead = { action: 0, t: 0, done: false }
@@ -171,7 +174,7 @@ const blend = (a: DwellerPose, b: DwellerPose, t: number, from: number, to: numb
  *  canvas point, as an SVG transform, so it holds on a phone's view as on the wide one. */
 function cameraWriter(stage: StageNodes, { turned }: Pick<SceneInput, 'turned'>): (x: number, y: number, zoom: number) => void {
   const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`))
-  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, zoom > 1 ? focusOn(turned ? 2 * PHONE_MIDDLE - x : x, y, zoom) : ''))
+  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, zoom > 1 ? focusOn(turned ? 2 * MIDDLE - x : x, y, zoom) : ''))
 }
 
 // How far the camera pushes in on the target for the slowed shot.
@@ -833,6 +836,7 @@ const contact: SceneDef = {
   kit: null,
   script: [1800, 1400],
   ends: [0.55, 1],
+  turnsRight: true,
   back: () => (
     <>
       <g transform={`translate(${TERMINAL} 0)`}>
@@ -883,6 +887,8 @@ export interface Scene {
   side: SceneSide
   /** It plays on the left half now: a left side on a screen of lg or wider. */
   left: boolean
+  /** It plays on the right half from lg as its left composition turned (SceneDef turnsRight). */
+  wideTurn: boolean
 }
 
 /** The scene's writer: the place's reply and his frame at the scene's playhead, him placed at his spot. */
@@ -903,16 +909,18 @@ export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<D
 }
 
 /** Where he stands in a scene: his usual spot, shifted right where the scene asks. */
-export const sceneSpot = ({ def, layout, left }: Scene): number => spotOf({ phone: layout.phone, left }) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
+export const sceneSpot = ({ def, layout, left, wideTurn }: Scene): number => spotOf({ phone: layout.phone, left: left || wideTurn }) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
 
 const NAMED: Record<SceneSide, number> = { right: 1, left: -1 }
 
 /** On a phone a section's place is turned round the middle of the view where he would end in the half it does
- *  not name: he then plays it facing the other way, the place on his other side, and ends in the named half. */
+ *  not name: he then plays it facing the other way, the place on his other side, and ends in the named half;
+ *  from lg one that turns for the right half (wideTurn) is. */
 const turnedOf = (scene: Scene): boolean => {
+  if (scene.wideTurn) return true
   if (scene.id === 'hero' || !scene.layout.phone) return false
   const end = sceneSpot(scene) + scene.def.move(scene.kit, 1).ahead * placeScale(true)
-  return (end - PHONE_MIDDLE) * NAMED[scene.side] < 0
+  return (end - MIDDLE) * NAMED[scene.side] < 0
 }
 
 /** The input the scene's art reads. */
@@ -933,7 +941,7 @@ export interface Screen {
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, screen: Screen, side: SceneSide): Scene => {
   const def = SCENE_DEFS[id]
-  return { id, def, layout: propLayout(items, BAND, screen.phone), kit: def.kit ?? profession, slot, side, left: screen.wide && side === 'left' }
+  return { id, def, layout: propLayout(items, BAND, screen.phone), kit: def.kit ?? profession, slot, side, left: screen.wide && side === 'left', wideTurn: screen.wide && side === 'right' && Boolean(def.turnsRight) }
 }
 
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact, sides alternating. */

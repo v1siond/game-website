@@ -17,7 +17,7 @@ import css from './stage.module.css'
 // each stage and pushes its layers in; the scene's writer plays the place and hands back his frame. Each
 // plane's art sits in a group (data-fx="cam-<layer>") the targeting shot's camera pushes in on. On a phone the
 // planes show a taller view from higher up the canvas, the ground half way down the screen, and the near
-// plane carries the floor on below the canvas; a place a phone turns (scenes.tsx turnedOf) is drawn the other
+// plane carries the floor on below the canvas; a turned place (scenes.tsx turnedOf) is drawn the other
 // way round in the figure plane only, the one that holds him and what he meets.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
