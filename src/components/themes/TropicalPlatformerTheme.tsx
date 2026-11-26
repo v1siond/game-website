@@ -64,6 +64,7 @@ const ROOT_VARS = { ...PALETTE_VARS, ...TONE_VARS.jungle }
 // hidden: hidden would make the root a scroll container and break the fixed canopy.
 
 const PHONE_QUERY = '(max-width: 767.98px)'
+const SPLIT_QUERY = '(min-width: 1024px)'
 
 const CONTACT_HEADING = headingId('jungle', 'Contact')
 
@@ -82,9 +83,10 @@ export default function TropicalPlatformerTheme() {
   const { highlights } = useAboutBlock()
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
+  const split = useMediaQuery(SPLIT_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, highlights.length, labels),
-    [view.sections, professionalSummary.bio, active, phone, highlights.length, labels],
+    () => scenesOf(sectionPlan(view.sections, professionalSummary.bio), active, phone, split, highlights.length, labels),
+    [view.sections, professionalSummary.bio, active, phone, split, highlights.length, labels],
   )
   const staged = useMemo(() => scenes.map(theatreScene), [scenes])
   const { theatreRef, textRef } = useTheatre(staged, LAYER_MOTION, reduced)

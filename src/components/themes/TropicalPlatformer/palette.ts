@@ -23,10 +23,9 @@ export const COLORS = {
   trainers: '#e8e2d4',
   vest: '#262322',
   blackJeans: '#3a3533',
-  // the worlds list's secondary, the lagoon's water light to deep, and the temple's stone
+  // the worlds list's secondary, the lagoon's water, and the temple's stone
   lagoon: '#00CED1',
   water: '#2b8fb0',
-  waterDeep: '#155a78',
   stone: '#8d8a7a',
   stoneDark: '#55534a',
   // the coconut's husk and the gem inside it

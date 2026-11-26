@@ -45,6 +45,9 @@ export type HeroState = FigureState<FigurePose>
 // middle about a tenth further out.
 const WIDE_FREE: Record<SceneSide, number> = { right: 1045, left: 398 }
 const WIDE_ROOM = 550
+// Between a phone and lg the cards read most of the width and no half is free: the place stands as far right as
+// it still shows whole on a 768 wide screen (the canvas seen from about x 260 to 1180).
+const BETWEEN_MIDDLE = 900
 // The middle of a phone's view (zones.tsx PHONE_VIEW, x 480 to 1040), how wide a place may be in it, and how far
 // into the half the section names the spot he ends on sits.
 const PHONE_MIDDLE = 760
@@ -82,6 +85,8 @@ export interface Scene {
   slot: SectionSlot | null
   /** The half of a wide screen it plays in. */
   side: SceneSide
+  /** Cards and scene side by side, from lg. */
+  split: boolean
 }
 
 /** The lemur's frame in a scene `t` of the way: the place's, or away. */
@@ -115,16 +120,16 @@ export interface Placing {
   mirrored: boolean
 }
 
-/** Where he stands in a scene: the place's stretch centred in the free half of a wide screen; in a phone's view
- *  centred, drawn the other way round where he would end in the half the section does not name (he then goes
- *  the other way, facing it, nothing lettered in it), and leant toward the named half as far as the place still
- *  shows whole; the hero at its own spot. */
+/** Where he stands in a scene: the place's stretch centred in the free half from lg, as far right as it shows
+ *  whole below it; in a phone's view centred, drawn the other way round where he would end in the half the
+ *  section does not name (he then goes the other way, facing it, nothing lettered in it), and leant toward the
+ *  named half as far as the place still shows whole; the hero at its own spot. */
 export const placingOf = (scene: Scene): Placing => {
   const { def, layout, side, kit } = scene
   if (def.spot) return { spot: layout.phone ? def.spot.phone : def.spot.wide, mirrored: false }
   const [from, to] = def.span
   const size = placeScale(scene)
-  if (!layout.phone) return { spot: WIDE_FREE[side] - ((from + to) / 2) * size, mirrored: false }
+  if (!layout.phone) return { spot: (scene.split ? WIDE_FREE[side] : BETWEEN_MIDDLE) - ((from + to) / 2) * size, mirrored: false }
   const centred = PHONE_MIDDLE - ((from + to) / 2) * size
   const end = centred + def.move(kit, 1).ahead * size
   const named = side === 'right' ? 1 : -1
@@ -151,15 +156,27 @@ const NO_ITEMS: StageItems = { lead: 0, count: 0 }
 // The theatre reads only the count of a scene's layout; its band is not drawn on.
 const BAND = [0, 0] as const
 
-const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, phone: boolean, side: SceneSide): Scene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, items: StageItems, profession: Profession, screen: Screen, side: SceneSide): Scene => {
   const def: SceneDef = PLACES[id]
-  return { id, def, layout: propLayout(items, BAND, phone), kit: def.kit ?? profession, slot, side }
+  return { id, def, layout: propLayout(items, BAND, screen.phone), kit: def.kit ?? profession, slot, side, split: screen.split }
+}
+
+/** The screen a page is drawn for: a phone (below md), or wide enough for cards and scene side by side (lg). */
+interface Screen {
+  phone: boolean
+  split: boolean
 }
 
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact; the
- *  sections after the hero taking turns right and left. */
-export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, highlights: number, labels: RecordWords): Scene[] => [
-  sceneOf('hero', null, NO_ITEMS, profession, phone, 'right'),
-  ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, phone, sideOf(i))),
-  sceneOf('contact', null, NO_ITEMS, profession, phone, sideOf(slots.length)),
-]
+ *  sections after the hero taking turns right and left on a phone and from lg (`split`, cards and scene side
+ *  by side). */
+export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, split: boolean, highlights: number, labels: RecordWords): Scene[] => {
+  // Between a phone and lg the cards read full width on the left, so every scene plays right of them.
+  const side = (index: number): SceneSide => (phone || split ? sideOf(index) : 'right')
+  const screen = { phone, split }
+  return [
+    sceneOf('hero', null, NO_ITEMS, profession, screen, 'right'),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, screen, side(i))),
+    sceneOf('contact', null, NO_ITEMS, profession, screen, side(slots.length)),
+  ]
+}
