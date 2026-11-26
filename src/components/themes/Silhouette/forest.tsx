@@ -48,12 +48,34 @@ export type Side = 'right' | 'left'
 const WIDE_HOLD: Record<Side, number> = { right: HOLD, left: 420 }
 const PHONE_HOLD: Record<Side, number> = { right: HOLD, left: HOLD - 130 }
 
+// An lg screen narrower than 6:5 (`tall`) cuts the canvas to its height and shows only its middle, x 425 to 1175
+// on a 3:4 tablet, so there his centre is kept where he stands whole on that screen: every spot the camera holds
+// him at, and wherever he runs ahead of the camera or falls behind it in mid action (cameraWindowOf). Any other
+// screen from lg shows the canvas wide enough for every hold and leaves the camera open.
+const TALL_WINDOW: readonly [number, number] = [470, 1125]
+const OPEN: readonly [number, number] = [-Infinity, Infinity]
+
+/** `x` kept inside what a tall screen shows of the canvas, as it is on any other. */
+const onScreen = (x: number, tall: boolean): number => (tall ? Math.min(TALL_WINDOW[1], Math.max(TALL_WINDOW[0], x)) : x)
+
+/** How far he lies head first to the left of where he wakes, in the grass the page opens on. */
+const LYING = 110
+
+/** Where he wakes: on a tall screen far enough in from its edge that he lies whole on it. */
+const wakeOf = (tall: boolean): number => (tall ? Math.max(WAKE_X, TALL_WINDOW[0] + LYING) : WAKE_X)
+
 /** Where the camera holds him at a stretch's end on its side: a stretch beside the cards may hold him where
  *  its own `split` says, so what it leaves behind him (or has ahead of him) stays clear of the cards. */
-export const holdOf = (side: Side, phone: boolean, split?: Partial<Record<Side, number>>): number => (phone ? PHONE_HOLD[side] : (split?.[side] ?? WIDE_HOLD[side]))
+export const holdOf = (side: Side, phone: boolean, tall: boolean, split?: Partial<Record<Side, number>>): number => {
+  if (phone) return PHONE_HOLD[side]
+  return onScreen(split?.[side] ?? WIDE_HOLD[side], tall)
+}
 
 /** Where the hero starts him on screen and where the camera holds him at its end. */
-export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: wakes && !phone ? WAKE_X : HOLD, hold: HOLD })
+export const framingOf = (wakes: boolean, phone: boolean, tall: boolean): Framing => ({
+  start: wakes && !phone ? wakeOf(tall) : HOLD,
+  hold: onScreen(HOLD, tall),
+})
 
 // The phone's slice: 460 wide round the hold, him a little right of its middle so what he has just crossed
 // shows behind him, and by default its top 550 above the ground, so the ground sits a little below the middle
@@ -75,8 +97,12 @@ const PHONE_WINDOW: Record<Side, readonly [number, number]> = {
   left: [PHONE_LEFT + FIGURE_W, PHONE_MID - FIGURE_W / 2],
 }
 
-/** The window his centre stays in on a phone, on the stretch's side. */
-export const phoneWindowOf = (side: Side): readonly [number, number] => PHONE_WINDOW[side]
+/** The window his centre stays in on the screen: on a phone the half the stretch's side names, on a tall screen
+ *  what it shows of the canvas, elsewhere anywhere. */
+export const cameraWindowOf = (side: Side, phone: boolean, tall: boolean): readonly [number, number] => {
+  if (phone) return PHONE_WINDOW[side]
+  return tall ? TALL_WINDOW : OPEN
+}
 
 export function Canvas({ children }: { children: ReactNode }) {
   const phone = useContext(PhoneView)

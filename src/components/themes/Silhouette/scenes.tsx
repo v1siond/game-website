@@ -109,12 +109,12 @@ export const SIDE_CLASS: Record<Side, string> = { right: '', left: page.cardsRig
 
 /** Each stretch's framing: the hero's from where he wakes, every other from where the one before held him
  *  to its own side's hold, the camera's swing between the two its turn. */
-function framingsOf(planned: readonly Planned[], phone: boolean, split: boolean) {
-  const hero = framingOf(true, phone)
+function framingsOf(planned: readonly Planned[], phone: boolean, split: boolean, tall: boolean) {
+  const hero = framingOf(true, phone, tall)
   return planned.reduce<{ start: number; hold: number; turn: number }[]>((framings, { id, side }, i) => {
     if (i === 0) return [{ ...hero, turn: 0 }]
     const start = framings[i - 1].hold
-    const hold = holdOf(side, phone, split ? PLACES[id].splitHold : undefined)
+    const hold = holdOf(side, phone, tall, split ? PLACES[id].splitHold : undefined)
     return [...framings, { start, hold, turn: start - hold }]
   }, [])
 }
@@ -123,8 +123,9 @@ function framingsOf(planned: readonly Planned[], phone: boolean, split: boolean)
  * Every scene of the page in order, each its stretch of the one level and what its picture is built from.
  * With the cards beside the scene (`split`, from lg) or on a phone the sections take turns, right of their
  * cards then left; a screen between the two keeps every stretch on the right. The hero keeps its own place.
+ * On a `tall` screen side by side every hold is kept where that screen shows him whole.
  */
-export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean, split: boolean): ShadeScene[] {
+export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession, phone: boolean, split: boolean, tall: boolean): ShadeScene[] {
   const side = (index: number): Side => (phone || split ? sideOf(index) : 'right')
   const planned: Planned[] = [
     { id: 'hero', slot: null, count: 0, side: 'right' },
@@ -134,7 +135,7 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
     }),
     { id: 'contact', slot: null, count: 0, side: side(slots.length) },
   ]
-  const framings = framingsOf(planned, phone, split)
+  const framings = framingsOf(planned, phone, split, tall)
   // the hero's run also crosses the screen from where he wakes to the hold
   const lengths = planned.map(({ id }, i) => PLACES[id].length + (i === 0 ? framings[0].hold - framings[0].start : 0))
   const stretches = stretchesOf(lengths)
@@ -145,7 +146,7 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
   return planned.map(({ id, slot, count, side }, i) => {
     const place = PLACES[id]
     const light = id === 'hero' ? 'dawn' : PROFESSION_LIGHT[profession]
-    const input = { profession, light: LIGHTS[light], phone, side }
+    const input = { profession, light: LIGHTS[light], phone, side, tall }
     const run: Run = { ...framings[i], side, from: stretches[i].from, length: lengths[i], region: place.region, regionAt }
     return {
       id,

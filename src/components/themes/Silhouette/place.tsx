@@ -7,7 +7,7 @@ import { setRigPose } from '../shared/rig'
 import { fx, lerp, transformTo, translateTo } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
 import { ramp } from '@/lib/scroll/stage'
-import { FLOOR, Figure, PAN, figureAt, phoneWindowOf, type Gap, type Region, type Run, type Side } from './forest'
+import { FLOOR, Figure, PAN, cameraWindowOf, figureAt, type Gap, type Region, type Run, type Side } from './forest'
 import type { Light } from './palette'
 import { rest, run, shadeJoints } from './pose'
 
@@ -29,6 +29,8 @@ export interface PlaceInput {
   phone: boolean
   /** The side the stretch plays on: beside the cards from lg, the half of a phone's band it names. */
   side: Side
+  /** Whether the cards stand beside the canvas on a screen narrower than 6:5, which shows only its middle. */
+  tall: boolean
 }
 
 /** His frame in a move: his pose, how far along the stretch he is, how high above the ground, how far he
@@ -105,9 +107,9 @@ const turnAt = (t: number): number => {
   return u * u * (3 - 2 * u)
 }
 
-/** The camera at `camera` moved just enough that his centre at `x` stands in the phone's window on `side`. */
-const keptInWindow = (camera: number, x: number, side: Side): number => {
-  const [low, high] = phoneWindowOf(side)
+/** The camera at `camera` moved just enough that his centre at `x` stands in the screen's window. */
+const keptInWindow = (camera: number, x: number, { side, phone, tall }: PlaceInput): number => {
+  const [low, high] = cameraWindowOf(side, phone, tall)
   return Math.min(x - low, Math.max(x - high, camera))
 }
 
@@ -134,9 +136,10 @@ export function bindStretch(place: Place, run: Run, stage: ParentNode, input: Pl
     // the camera follows him, and over his first steps swings him across to the stretch's side
     const follow = cameraAt(Math.min(1, Math.max(0, frame.ahead / run.length)), run.length, { start: run.start - run.turn, hold: run.hold })
     const eased = follow + run.turn * turnAt(t) + (place.lead?.(t, input) ?? 0)
-    // on a phone, once the swing to the stretch's side is under way, the camera keeps him in its window
+    // once the swing to the stretch's side is under way, the camera keeps him in the screen's window (a phone's
+    // half, a tall screen's middle; open elsewhere, where the camera is left as it eased)
     const x = run.start + frame.ahead
-    const camera = input.phone ? lerp(eased, keptInWindow(eased, x, input.side), turnAt(t)) : eased
+    const camera = lerp(eased, keptInWindow(eased, x, input), turnAt(t))
     for (const [node, share] of layers) translateTo(node, -share * camera, 0)
     reply?.(t)
     transformTo(root, figureAt(x, frame.lift, frame.over, frame.back))

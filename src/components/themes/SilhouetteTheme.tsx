@@ -37,6 +37,8 @@ import page from './Silhouette/page.module.css'
 const PHONE_QUERY = '(max-width: 767.98px)'
 // From lg the cards and the level sit side by side, so there the sections take turns: cards left, then right.
 const SPLIT_QUERY = '(min-width: 1024px)'
+// Side by side on a screen narrower than 6:5 the level shows only its middle (Silhouette/forest onScreen).
+const TALL_QUERY = '(min-width: 1024px) and (max-aspect-ratio: 6/5)'
 
 const hasSlot = (scene: ShadeScene): scene is ShadeScene & { slot: SectionSlot } => scene.slot !== null
 
@@ -48,9 +50,10 @@ export default function SilhouetteTheme() {
   const reduced = useReducedMotion()
   const phone = useMediaQuery(PHONE_QUERY)
   const split = useMediaQuery(SPLIT_QUERY)
+  const tall = useMediaQuery(TALL_QUERY)
   const scenes = useMemo(
-    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split),
-    [view, cv, labels, active, phone, split],
+    () => scenesOf(sectionPlan(view.sections, cv.professionalSummary.bio), labels, cv.professionalSummary.highlights.length, active, phone, split, tall),
+    [view, cv, labels, active, phone, split, tall],
   )
   const { theatreRef, textRef } = useTheatre(scenes, LAYER_MOTION, reduced)
   const hero = scenes[0]
