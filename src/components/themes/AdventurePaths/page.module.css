@@ -284,9 +284,10 @@
     width: 100%;
   }
 
-  /* The run through the goal plays a full screen on its own before the contact comes up over it. */
+  /* The run through the goal plays on its own before the contact comes up over it: as a level's head, the
+     screen and a third over it, so the card reaches his run only once it has ended. */
   .goal {
-    padding-top: 100svh;
+    padding-top: 130svh;
   }
 }
 
