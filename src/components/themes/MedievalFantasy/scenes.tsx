@@ -76,6 +76,16 @@ const FIELD = { width: 1920, height: 1080 }
 const FLOOR = 1000
 const ANCHOR: Record<Side | 'hero', number> = { right: 1392, left: 470, hero: 1150 }
 
+// A scene too wide for half a phone (About, Tech, Projects) is drawn twice: its field layout, where his action
+// stands left of the frame's middle, and a phone layout that stands him right of it. On a phone a section on the
+// right takes the phone layout and one on the left the field's, so he plays in the half his section names
+// whichever index the section lands on once an empty one drops out of the page (sectionPlan).
+type Layout = 'field' | 'phone'
+const PHONE_LAYOUT: Record<Side | 'hero', Layout> = { right: 'phone', left: 'field', hero: 'field' }
+
+/** The layout a scene drawn twice stands in: its phone one on a phone section on the right, else the field's. */
+const layoutOf = ({ phone, side }: { phone: boolean; side: Side | 'hero' }): Layout => (phone ? PHONE_LAYOUT[side] : 'field')
+
 /** How big a unit stands at depth y: the near edge full size, the far ground half. */
 const depth = (y: number): number => 0.5 + 0.5 * clamp01((y - 500) / 500)
 
@@ -230,7 +240,7 @@ type SceneWriter = (play: Playhead) => void
 interface SceneSpec {
   /** Where his action is in the scene's frame: the point a stacked screen keeps on the half the section names. */
   lead: number
-  /** The lead on a phone, where the scene stands its cast another way round for the narrow screen. */
+  /** The lead of its phone layout (layoutOf), where the scene stands its cast another way round for the narrow screen. */
   phoneLead?: number
   land: () => ReactNode
   script: SceneScript
@@ -339,13 +349,13 @@ const ABOUT = {
   runners: [{ x: -60, y: 760 }, { x: 10, y: 800 }],
   advance: 230,
 }
-// His charge: on a phone he waits at the head of his line right of the screen's middle, the half the section
-// names, so the raid plays beside him and the charge is short.
+// His charge: in the phone layout (layoutOf) he waits at the head of his line right of the screen's middle, the
+// half a section on the right names, so the raid plays beside him and the charge is short.
 const ABOUT_HIM = {
   field: { x: -200, y: 960, to: 60 },
   phone: { x: -40, y: 960, to: 60 },
 }
-const aboutHimOf = ({ phone }: RealmScene) => ABOUT_HIM[phone ? 'phone' : 'field']
+const aboutHimOf = (scene: RealmScene) => ABOUT_HIM[layoutOf(scene)]
 
 /** A farmstead from above at an angle: walls, a thatched roof, the fire on it in `${name}-fire`. */
 function Farmstead({ name }: { name: string }) {
@@ -572,13 +582,13 @@ const TECH = {
   townsfolk: [{ x: 120, y: 700 }, { x: 200, y: 720 }],
   knights: [{ x: -230, y: 920 }, { x: -110, y: 1010 }],
 }
-// His road away: on a phone it starts nearer the gate and ends sooner, so the band can stand far enough left
-// that the prince at the gate is whole on the screen while he ends right of its middle.
+// His road away: in the phone layout (layoutOf) it starts nearer the gate and ends sooner, so the band can stand
+// far enough left that the prince at the gate is whole on the screen while he ends right of its middle.
 const TECH_HIM = {
   field: { x: -170, y: 960, away: -300, awayY: 1010 },
   phone: { x: -100, y: 960, away: -180, awayY: 1010 },
 }
-const techHimOf = ({ phone }: RealmScene) => TECH_HIM[phone ? 'phone' : 'field']
+const techHimOf = (scene: RealmScene) => TECH_HIM[layoutOf(scene)]
 
 function CityWall() {
   const { x, y } = TECH.gate
@@ -847,9 +857,10 @@ const services: SceneSpec = {
 // ranks; he sweeps the blade, a ring of frost rolls out and the footmen with the knight commander freeze and
 // shatter while he holds behind his shield; then the frost king climbs into his throne and its crown lights. The
 // end frame is the frost king on the throne, the steed at its foot, the dead in ranks, him alone before them.
-// From the left the field is too wide for half a phone, so there the realm stands the other way round: the
-// throne deep in the middle with the steed at its left foot, the dead coming up toward him, and him with his
-// footmen on the right half, facing them; `face` is the way he and his footmen face, `deadFace` the dead's.
+// The field stands him on its left, which a phone section on the left keeps; for one on the right the field is
+// too wide for half a phone, so its phone layout (layoutOf) stands the realm the other way round: the throne
+// deep in the middle with the steed at its left foot, the dead coming up toward him, and him with his footmen on
+// the right half, facing them; `face` is the way he and his footmen face, `deadFace` the dead's.
 const PROJECTS_AT = {
   field: {
     throne: { x: 150, y: 760, size: 0.56 },
@@ -888,7 +899,7 @@ const PROJECTS_AT = {
     deadFace: 1,
   },
 } as const
-const projectsOf = ({ phone }: RealmScene) => PROJECTS_AT[phone ? 'phone' : 'field']
+const projectsOf = (scene: RealmScene) => PROJECTS_AT[layoutOf(scene)]
 
 const projects: SceneSpec = {
   lead: -200,
@@ -1455,8 +1466,8 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
   ]
 }
 
-/** The lead a scene's band stands on: its phone lead on a phone, where it has one. */
-const leadOf = ({ lead, phoneLead = lead }: SceneSpec, phone: boolean): number => (phone ? phoneLead : lead)
+/** The lead a scene's band stands on: its phone lead in its phone layout, where it has one. */
+const leadOf = ({ lead, phoneLead = lead }: SceneSpec, scene: RealmScene): number => (layoutOf(scene) === 'phone' ? phoneLead : lead)
 
 /** The band a scene's cast stands in (world.module.css), by its side. */
 const BAND: Record<Side | 'hero', string> = { right: look.bandRight, left: look.bandLeft, hero: look.bandHero }
@@ -1465,7 +1476,7 @@ const BAND: Record<Side | 'hero', string> = { right: look.bandRight, left: look.
 function Field({ scene }: { scene: RealmScene }) {
   return (
     <svg className="block h-full w-full" viewBox={`0 0 ${FIELD.width} ${FIELD.height}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-      <g className={BAND[scene.side]} style={{ '--lead': leadOf(SCENES[scene.id], scene.phone) } as CSSProperties}>
+      <g className={BAND[scene.side]} style={{ '--lead': leadOf(SCENES[scene.id], scene) } as CSSProperties}>
         <g transform={`translate(${ANCHOR[scene.side]} 0)`}>{SCENES[scene.id].figure(scene)}</g>
       </g>
     </svg>
