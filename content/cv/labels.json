@@ -142,12 +142,6 @@
         "beaten": "Knocked out: {achievement}",
         "allBeaten": "Every challenger knocked out"
       },
-      "myth": {
-        "fulfilled": "Fulfilled",
-        "openGate": "Open the gate",
-        "gateOpen": "The gate is open",
-        "returnHall": "Back to the great hall"
-      },
       "souls": {
         "kindled": "Fire kindled",
         "rest": "Rest at the fire",
@@ -436,12 +430,6 @@
         "beaten": "Noqueado: {achievement}",
         "allBeaten": "Todos los rivales noqueados"
       },
-      "myth": {
-        "fulfilled": "Cumplida",
-        "openGate": "Abrir la puerta",
-        "gateOpen": "La puerta está abierta",
-        "returnHall": "Volver al gran salón"
-      },
       "souls": {
         "kindled": "Hoguera encendida",
         "rest": "Descansar junto al fuego",
@@ -694,12 +682,6 @@
         "fightAgain": "Combatti di nuovo il round",
         "beaten": "Al tappeto: {achievement}",
         "allBeaten": "Tutti gli sfidanti al tappeto"
-      },
-      "myth": {
-        "fulfilled": "Compiuta",
-        "openGate": "Apri il cancello",
-        "gateOpen": "Il cancello è aperto",
-        "returnHall": "Torna alla grande sala"
       },
       "souls": {
         "kindled": "Falò acceso",

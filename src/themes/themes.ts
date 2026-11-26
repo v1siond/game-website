@@ -7,7 +7,6 @@ import { NOIR } from '@/components/themes/BoldNoir/palette'
 import { CEL } from '@/components/themes/CellShaded/palette'
 import { FS } from '@/components/themes/FighterSelect/palette'
 import { REALM } from '@/components/themes/MedievalFantasy/palette'
-import { MYTH } from '@/components/themes/Mythic/palette'
 import { NEON } from '@/components/themes/NeonCyber/palette'
 import { PORTAL } from '@/components/themes/NeonPortals/palette'
 import { ATOMIC_COLORS } from '@/components/themes/RetroAtomic/palette'
@@ -356,28 +355,7 @@ export const themes: Theme[] = [
     font: 'sans-serif',
   },
 
-  // 15. Mythic - a northern journey with an apprentice painted in ink over colour, from the snow wood up to the peak
-  {
-    id: 'mythic',
-    name: 'Mythic',
-    description: 'A northern journey with an apprentice, drawn in ink over colour',
-    colors: {
-      background: MYTH.sky,
-      backgroundGradient: `linear-gradient(to bottom, ${MYTH.sky}, ${MYTH.hallLow})`,
-      accent: MYTH.gold,
-      text: MYTH.bone,
-      textMuted: MYTH.boneShade,
-      secondary: MYTH.terracotta,
-      highlight: MYTH.goldPale,
-      border: MYTH.goldDeep,
-      borderHover: MYTH.gold,
-      surface: MYTH.panel,
-      surfaceHover: MYTH.panelEdge,
-    },
-    font: 'serif',
-  },
-
-  // 16. Tropical Platformer - a jungle platformer from sunset to night, climbing, swinging and swimming through it
+  // 15. Tropical Platformer - a jungle platformer from sunset to night, climbing, swinging and swimming through it
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
@@ -398,7 +376,7 @@ export const themes: Theme[] = [
     font: 'sans-serif',
   },
 
-  // 17. Medieval Fantasy - a real time strategy kingdom in gold and stone
+  // 16. Medieval Fantasy - a real time strategy kingdom in gold and stone
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',

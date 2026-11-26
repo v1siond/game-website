@@ -36,7 +36,6 @@ const WORLD_IMPORTS: Record<string, readonly string[]> = {
   'neon-cyber': ['@/components/themes/NeonCyberTheme'],
   'cell-shaded': ['@/components/themes/CellShadedTheme'],
   'silhouette': ['@/components/themes/SilhouetteTheme'],
-  'mythic': ['@/components/themes/MythicTheme'],
   'tropical-platformer': ['@/components/themes/TropicalPlatformerTheme'],
   'medieval-fantasy': ['@/components/themes/MedievalFantasyTheme', '@/components/themes/shared/professionStage'],
 }

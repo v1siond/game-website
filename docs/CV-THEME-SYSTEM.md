@@ -1,6 +1,6 @@
 # CV theme system
 
-The site shows Alexander's CV inside one of 18 game styled worlds, or as a plain page at `/cv`. Every world
+The site shows Alexander's CV inside one of 17 game styled worlds, or as a plain page at `/cv`. Every world
 reads the same CV content (Decap files in `content/cv/`) and the same shared scroll, hero and text pieces; a
 world only adds its own look: its palette, its art and its scenes. The default world is Era Postcards.
 
@@ -26,17 +26,17 @@ world only adds its own look: its palette, its art and its scenes. The default w
   opens on the engineer.
 - `/cv` is the plain CV in English, Spanish or Italian, with a PDF download.
 
-## The 18 worlds
+## The 17 worlds
 
 Era Postcards (default), Dark Fantasy, Survival Horror, Neon Portals, Soul Map, Adventure Paths, Rubber Hose, Retro RPG,
-Bold Noir, Fighter Select, Art Deco, Retro Atomic, Neon Cyber, Cell Shaded, Silhouette, Mythic, Tropical
-Platformer, Medieval Fantasy. The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
+Bold Noir, Fighter Select, Art Deco, Retro Atomic, Neon Cyber, Cell Shaded, Silhouette, Tropical Platformer,
+Medieval Fantasy. The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
 Artistic.
 
 ## The worlds launcher and its hint
 
 - `WorldsLauncher` (`src/components/worlds/`) sits top right on the homepage and the blog, and names
-  itself with the count from the registry: "18 worlds" (stacked "18" over "worlds" under 640 px, so it
+  itself with the count from the registry: "17 worlds" (stacked "17" over "worlds" under 640 px, so it
   clears a world's own top bar; Dark Fantasy keeps 64 px and 144 px free for it). It opens `WorldsModal`.
   The CV pages (`/cv`, `/es/cv`, `/it/cv`) mount neither: their layouts pass `worldsPicker={false}` to
   `RootShell`, so the CV is just the CV.
@@ -67,7 +67,7 @@ Artistic.
   every world seen it offers the one after the current world.
 - Seen worlds are kept in localStorage under `portfolio-worlds-seen` and this visit's in sessionStorage
   under `portfolio-worlds-visit` (a world counts after 1.5 s on screen).
-- The picker (`WorldsModal`) remembers them: "You have seen n of 18 worlds" over 18 dots, then the worlds in
+- The picker (`WorldsModal`) remembers them: "You have seen n of 17 worlds" over 17 dots, then the worlds in
   `orderForPicker` order: the next unseen world first as the wide up next card (`WorldCard`), then the
   other unseen worlds, the seen ones in grey and the current one, "You are here". On open the focus goes
   to the up next "Enter <name>" button, Tab stays inside, and on close it goes back to the control that
@@ -87,14 +87,14 @@ Artistic.
   his figure `data-worlds-figure` (the capture crops it) and its hero section `data-worlds-hero` (the
   launcher watches it).
 - The launcher's face (`useWorldsNudge`, `launcherFace` in `src/lib/worlds/lens.ts`): while the hero is in
-  view it reads "18 worlds". Once the `data-worlds-hero` element has left the screen (an
+  view it reads "17 worlds". Once the `data-worlds-hero` element has left the screen (an
   IntersectionObserver; a page with none, such as the blog, counts as scrolled 1.5 s after it opened, so a
   world still loading its chunk does not) the face shows him in the `nextInTour` world, the world the hint
-  names, with that world's name, and the button's name becomes "Next world: <name>. Open all 18 worlds". The
+  names, with that world's name, and the button's name becomes "Next world: <name>. Open all 17 worlds". The
   first time in a visit (sessionStorage `portfolio-worlds-face-turned`) it turns over in `FACE_TURN_MS` (2600,
   2.6 s: 0.3 s over, 2 s lifted, 0.3 s settled), rotateX, scale and opacity only; on a phone, where the button
   holds only the portrait, a 172 px face with the name grows left from it for those 2.6 s and folds back.
-  Under reduced motion it swaps with no turn. Back at the hero it reads "18 worlds" again with no
+  Under reduced motion it swaps with no turn. Back at the hero it reads "17 worlds" again with no
   animation. The first turn waits while the hint card is open, so the two never meet. A click or a tap
   still opens the picker.
 - The lens (`src/components/worlds/WorldLens.tsx`): a mouse over the launcher, the keyboard's focus on it, or
@@ -133,7 +133,7 @@ Artistic.
   Once every world's shots are written it writes `stamp.json`, per world a sha256 of its hero
   sources; a run that exits 1 leaves it as it was. It refuses to start while another headless Chromium
   runs, closes its own, and exits 1 naming any world with no figure to crop. It takes about 6 minutes for
-  the 18 worlds.
+  the whole set.
 - Refresh them after changing a hero: run the capture and commit the previews and `stamp.json` with the
   hero. `node scripts/check-world-previews.mjs` (`npm run check:previews`, run as `prebuild`) hashes each
   world's hero sources again (everything under `src/components/themes/<World>/`, its `<World>Theme.tsx` and
@@ -182,8 +182,7 @@ from `year`, plus any current entry and any entry with the `highlight` toggle on
 record are always whole. `/cv` reads the full CV on the server and shows everything. A world reads
 `WorldCV` (`worldCV` in `src/lib/cv/content.ts`: the CV without what only `/cv` prints) through
 `useCVData()`, and its view through `useWorldView()`, both from `src/components/cv/CVDataProvider.tsx`,
-which runs `viewFor` once for the picked profession and the year from `useYearNow`. `ProfessionSectionsView`
-picks the world's section component for the shown profession from the world's map.
+which runs `viewFor` once for the picked profession and the year from `useYearNow`.
 
 The ventures (`companies`) come in one order everywhere: `venturesFor` in `cvView.ts` puts his own products
 first (the `featured` toggle in companies.json, Nebulith and Sillabo), then the rest, each group in file
@@ -203,25 +202,25 @@ medal in Art Deco.
 | jobCard, projectCard, ventureCard, aboutBlock | `src/lib/cv/cvView.ts` | The card view models: every field of a job, project, venture or the About block whole, with its strings formatted, so each world renders the same content in its own look. |
 | VentureList | `src/components/cv/VentureList.tsx` | The ventures without a look, in `viewFor`'s order, each with its link props (address, new tab, rel) and `nameFor(word)` for a link that reads a word ("Website of Lumi"). A link that wraps the card or reads the venture's name carries no `aria-label`: it is named by its own text plus `newTabHint` in an sr-only span. A featured venture's item takes `featuredItemClassName` in place of `itemClassName`, so it carries one column span. |
 | TechList | `src/components/cv/TechList.tsx` | The tech stack without a look: one masonry item per category with its heading, icon and named list; the world passes its classes and draws each technology with `renderItem`, and may time each category with `categoryStyle(index)`, CSS variables only, which the list writes through `cssVars`. |
-| MarkedLines | `src/components/cv/MarkedLines.tsx` | A job's highlights, a project's details and the About highlights without a look: nothing when the list is empty, one named list (`cards.keyAchievements` or `cards.details`), each line behind the world's marker. The world passes a `MarkedLinesLook` (list, line and text classes, its marker, a heading class when it titles the list with the label) and may add a class, a CSS variable or a data flag per line with `lineProps(index)` (Retro RPG's spoken delay). All 18 worlds use it; a world never maps a highlight or detail list itself. |
-| useAboutBlock, AboutFacts, aboutFacts | `src/components/cv/AboutFacts.tsx`, `src/lib/cv/cvView.ts` | The About block every About frame reads: `useAboutBlock()` gives the bio, the summary highlights and the facts, his education then his languages, each under its `labels.about` label, one Decap stores empty left out (`aboutFacts`). `AboutFacts` draws the facts as one description list in the world's `AboutFactsLook` (list, fact, term and value classes, and `termEnd: ': '` for a world that runs the value on after its label). Adventure Paths, Art Deco, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Mythic, Neon Portals, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map, Survival Horror and Tropical Platformer draw their facts with it; Neon Cyber reads the facts for its scan tags. A world never reads `professionalSummary` for its About frame or writes an education or languages label itself. |
-| ImpactLabel | `src/components/cv/ImpactLabel.tsx` | The "Impact: " a screen reader hears before a project's impact line where the card shows the impact with no visible label (`cards.impact`, kept for screen readers only). Adventure Paths, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Mythic, Neon Cyber, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map and Survival Horror put it first in their impact line; Art Deco, Neon Portals and Tropical Platformer show the label. A world never types the hidden impact label itself. |
-| TagList | `src/components/cv/TagList.tsx` | A card's tags without a look: a job's skills (`cards.skillsUsed`), a project's technologies (`cards.technologiesUsed`), a venture's services (`sections.services`), every one, nothing when the list is empty, the list named by its label. The world passes a `TagListLook` (list and tag classes, and a marker for a world whose tags carry one, Adventure Paths' coin). All 18 worlds use it; a world never maps a skill, technology or service tag list itself. |
+| MarkedLines | `src/components/cv/MarkedLines.tsx` | A job's highlights, a project's details and the About highlights without a look: nothing when the list is empty, one named list (`cards.keyAchievements` or `cards.details`), each line behind the world's marker. The world passes a `MarkedLinesLook` (list, line and text classes, its marker, a heading class when it titles the list with the label) and may add a class, a CSS variable or a data flag per line with `lineProps(index)` (Retro RPG's spoken delay). All 17 worlds use it; a world never maps a highlight or detail list itself. |
+| useAboutBlock, AboutFacts, aboutFacts | `src/components/cv/AboutFacts.tsx`, `src/lib/cv/cvView.ts` | The About block every About frame reads: `useAboutBlock()` gives the bio, the summary highlights and the facts, his education then his languages, each under its `labels.about` label, one Decap stores empty left out (`aboutFacts`). `AboutFacts` draws the facts as one description list in the world's `AboutFactsLook` (list, fact, term and value classes, and `termEnd: ': '` for a world that runs the value on after its label). Adventure Paths, Art Deco, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Neon Portals, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map, Survival Horror and Tropical Platformer draw their facts with it; Neon Cyber reads the facts for its scan tags. A world never reads `professionalSummary` for its About frame or writes an education or languages label itself. |
+| ImpactLabel | `src/components/cv/ImpactLabel.tsx` | The "Impact: " a screen reader hears before a project's impact line where the card shows the impact with no visible label (`cards.impact`, kept for screen readers only). Adventure Paths, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Neon Cyber, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map and Survival Horror put it first in their impact line; Art Deco, Neon Portals and Tropical Platformer show the label. A world never types the hidden impact label itself. |
+| TagList | `src/components/cv/TagList.tsx` | A card's tags without a look: a job's skills (`cards.skillsUsed`), a project's technologies (`cards.technologiesUsed`), a venture's services (`sections.services`), every one, nothing when the list is empty, the list named by its label. The world passes a `TagListLook` (list and tag classes, and a marker for a world whose tags carry one, Adventure Paths' coin). All 17 worlds use it; a world never maps a skill, technology or service tag list itself. |
 | ContactLink, useSiteLinks, siteLinks | `src/components/cv/SiteLinks.tsx`, `src/lib/cv/siteLinks.ts` | The contact links without a look: the hero's email and LinkedIn slots and the CV and engine slots. `useSiteLinks(word)` gives the CV link (`/cv`) and the engine link (new tab, an accessible name that holds the visible word); the world picks the engine word (`engine`, `engineShort`, `portfolio`, `play`, `enter`) and passes `ContactLink` its class per link id. |
-| sectionViews, SectionFrames, sectionPlan | `src/components/cv/SectionPlanView.tsx`, `src/lib/cv/sectionPlan.ts` | The section plan: `sectionPlan` decides which sections a profession shows and in which order (about, work, tech, services, projects, ventures for the engineer, each left out when empty; bands; Muay Thai). A world writes one frame per section id and exports `SECTION_VIEWS = sectionViews(FRAMES)` for `ProfessionSectionsView`. |
-| RecruiterHero, ProfessionSwitch, ProfessionSectionsView | `src/components/cv/` | The hero, the profession switch, the per profession dispatch. |
-| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage, useYearNow | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it, the year a footer prints (the server's until hydration, then the visitor's, in UTC). The zone lives in a store outside React state: the page makes it with `useZoneStore`, the backdrop that draws the zone reads it with `useStoreValue`, and a root that only needs `data-zone` writes it with `useZoneAttribute`, so a zone crossing re-renders nothing else. |
+| SectionFrames, sectionPlan | `src/components/cv/SectionPlanView.tsx`, `src/lib/cv/sectionPlan.ts` | The section plan: `sectionPlan` decides which sections a profession shows and in which order (about, work, tech, services, projects, ventures for the engineer, each left out when empty; bands; Muay Thai). A world writes one frame per section id in a `SectionFrames` map and draws the frame of each slot the plan gives. |
+| RecruiterHero, ProfessionSwitch | `src/components/cv/` | The hero and the profession switch. |
+| useReducedMotion, useScrollScene, useSectionTrigger, useYearNow | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the year a footer prints (the server's until hydration, then the visitor's, in UTC). |
 | useScrollStage, stage math | `src/hooks/useScrollStage.ts`, `src/lib/scroll/stage.ts` | The scroll stage engine: full screen stages that rise from dark, hold while their section's text scrolls over them and sink again, every value a function of the scroll so they play backwards on the way up. One passive scroll listener and one requestAnimationFrame loop that runs only while the drawn position settles towards the scroll (`SETTLE_TAU_MS`, 100 ms: within a few pixels half a second after the scroll stops) and stops at rest; `measure` reads the layout on mount, resize and font load, `draw(position, lag)` only writes transforms and opacity. The math (`stageState`, `heroState`, `itemsReached`, `settleStep`, `jumpStart`, `HANDOVER`) is pure and tested. Era Postcards runs on it. |
 | everySection | `src/lib/cv/sectionPlan.ts` | Every profession's sections on one page, each profession's world view of the year, in reading order (engineer, musician, martial artist), for a world that shows all three at once (Era Postcards). |
 | useOnChange | `src/hooks/` | A call on each change of a value after the first render, before or after paint. |
-| useLatest | `src/hooks/useLatest.ts` | The latest value of a render held in a ref, which a layout effect writes (never the render itself), so a callback, timer, observer or effect reads the newest one without rerunning when it changes. Next 15's own React has no useEffectEvent, so this is the pattern it stands for. `useSectionTrigger`, `useOnChange`, the Adventure Paths hero, the Mythic sprite and turn queue and the Fighter Select bout read their callbacks through it. A component that needs the latest callback calls `useLatest`; it never writes its own ref and layout effect. |
+| useLatest | `src/hooks/useLatest.ts` | The latest value of a render held in a ref, which a layout effect writes (never the render itself), so a callback, timer, observer or effect reads the newest one without rerunning when it changes. Next 15's own React has no useEffectEvent, so this is the pattern it stands for. `useSectionTrigger`, `useOnChange`, the Adventure Paths hero and the Fighter Select bout read their callbacks through it. A component that needs the latest callback calls `useLatest`; it never writes its own ref and layout effect. |
 | usePointerVars | `src/hooks/usePointerVars.ts` | The one pointer follower: it writes `--mx` and `--my` (-1 to 1 from the viewport centre) on the element its ref is set on, from one passive listener and at most one write a frame, while `enabled` is true. `mouseOnly: true` follows a mouse only, so a finger or a pen dragging across a tablet leaves the vars where they are (Dark Fantasy's interactive layer). Most worlds use it for their parallax; each passes `!reducedMotion` and decides its motion from the vars in CSS. |
-| ProfessionRegion | `src/components/cv/ProfessionRegion.tsx` | The shown profession's sections as one labelled region ("System Engineer details", from `navigation.professionDetails`), so a screen reader's landmark list reads the same in every world. Adventure Paths, Art Deco, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Mythic, Neon Cyber, Neon Portals, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map, Survival Horror and Tropical Platformer wrap their sections in it, each with its own class or none. A world names its profession sections through it and never builds that label itself. |
-| turnAbout | `src/lib/motion/turnAbout.ts` | A point turned by some degrees about a pivot, y down, so a positive turn is clockwise on screen: the step a jointed figure takes to find where a hand or an elbow ends up. Mythic's rig and Survival Horror's gait and survivor use it. A world with a jointed figure turns its points with it and keeps no rotation math of its own. |
-| nextIn | `src/lib/nextIn.ts` | The item after the last one in a list, wrapping round, and the first when nothing came before: the way a combo or a strike order cycles. Mythic's fates and Fighter Select's moves use it. A cycle through a list reads its next item from here. |
+| ProfessionRegion | `src/components/cv/ProfessionRegion.tsx` | The shown profession's sections as one labelled region ("System Engineer details", from `navigation.professionDetails`), so a screen reader's landmark list reads the same in every world. Adventure Paths, Art Deco, Bold Noir, Cell Shaded, Dark Fantasy, Fighter Select, Medieval Fantasy, Neon Cyber, Neon Portals, Retro Atomic, Retro RPG, Rubber Hose, Silhouette, Soul Map, Survival Horror and Tropical Platformer wrap their sections in it, each with its own class or none. A world names its profession sections through it and never builds that label itself. |
+| turnAbout | `src/lib/motion/turnAbout.ts` | A point turned by some degrees about a pivot, y down, so a positive turn is clockwise on screen: the step a jointed figure takes to find where a hand or an elbow ends up. Survival Horror's gait and survivor use it. A world with a jointed figure turns its points with it and keeps no rotation math of its own. |
+| nextIn | `src/lib/nextIn.ts` | The item after the last one in a list, wrapping round, and the first when nothing came before: the way a combo or a strike order cycles. Fighter Select's moves use it. A cycle through a list reads its next item from here. |
 | mix | `src/lib/color.ts` | One colour moved toward another by a share from 0 to 1, each channel rounded on its own, as `#rrggbb`. The shared profession stage mixes its palette with it and Tropical Platformer shades its character with it. A colour a world derives in code comes from `mix`, never from a local copy. |
 | cssVars | `src/lib/cssVars.ts` | CSS custom properties for an element's `style`, the one inline style the site writes, with the one cast to `CSSProperties`. |
-| InView, heldUntil | `src/components/themes/shared/held.tsx` | The one wait for a section: every animation on an element and inside it holds on its first frame (an important pause, so no world rule can set it running) until the flag turns true, then plays from its start. `InView` is a block with its own section trigger (`threshold`, 0.15 when left out); `heldUntil(flag)` is the class for a scene whose wait reads a flag of its own (a zone stage's `on`, a boot, a phase, the zone on show). A scene that waits for its section uses one of these two; a world never writes its own `:not([data-on]) *` pause or cue wrapper. |
+| InView, heldUntil | `src/components/themes/shared/held.tsx` | The one wait for a section: every animation on an element and inside it holds on its first frame (an important pause, so no world rule can set it running) until the flag turns true, then plays from its start. `InView` is a block with its own section trigger (`threshold`, 0.15 when left out); `heldUntil(flag)` is the class for a scene whose wait reads a flag of its own (a boot, a phase, the zone on show). A scene that waits for its section uses one of these two; a world never writes its own `:not([data-on]) *` pause or cue wrapper. |
 | PixelRuns | `src/components/themes/shared/PixelRuns.tsx` | A pixel sprite's runs (`src/lib/pixelRuns.ts`) drawn as 1 px tall rects, coloured by key; the world wraps them in its own svg. |
 | staggerAt | `src/components/themes/shared/stagger.ts` | The stagger class of the item at an index (`[--i:0]` to `[--i:7]`), which a world's keyframes turn into a delay. |
 | SkipLink | `src/components/themes/shared/SkipLink.tsx` | The first Tab stop of a world, "Skip to content" (`navigation.skipToContent`), to the `main-content` main every world root marks. It wears the shared `skip-link` look (globals.css); Adventure Paths, Retro RPG and Rubber Hose pass their own focused look as `className`. A world never writes its own skip link. |
@@ -309,8 +308,8 @@ for him is `HERO_IDENTITY`. The bar is Dark Fantasy's `KnightCharacter.tsx` and 
    `WORLDS_WITH_OWN_STAGE`, or skip that to use the shared `GlobalProfessionStage`.
 4. Load the world's lettering through `next/font/google` in `<Name>Theme.tsx`, set its `variable` class on
    the root and read the variable from the world's css.
-5. Write `sections.tsx`: one frame per section id and `SECTION_VIEWS = sectionViews(FRAMES)` for
-   `ProfessionSectionsView`, text from `sectionText.ts`, wrapped in `ScrollScene` or `FadeInScene`.
+5. Write `sections.tsx`: one frame per section id in a `SectionFrames` map, drawn for each slot of
+   `sectionPlan`, text from `sectionText.ts`, wrapped in `ScrollScene` or `FadeInScene`.
 6. Write `<Name>Theme.tsx`: read `useWorldView()`, render `RecruiterHero`, `ProfessionSwitch` and the
    sections, set the palette on the root with `paletteVars`.
 7. Register it: an entry in `src/themes/themes.ts` that reads the palette, and one in `src/themes/worlds.ts`

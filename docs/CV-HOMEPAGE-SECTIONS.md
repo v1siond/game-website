@@ -12,8 +12,8 @@ picked profession, then a contact corner. What the sections hold comes from `vie
    and to the engine.
 2. **Profession switch** (`ProfessionSwitch`, `src/components/cv/ProfessionSwitch.tsx`): Musician, System
    Engineer, Martial Artist, in that order, the engineer in the centre and opened by default.
-3. **Profession sections** (`ProfessionSectionsView`, `src/components/cv/ProfessionSectionsView.tsx`): the
-   world's component for the shown profession, from its `SECTION_VIEWS` map in `<Name>/sections.tsx`.
+3. **Profession sections** (`sectionPlan`, `src/lib/cv/sectionPlan.ts`): the shown profession's sections in
+   the plan's order, each drawn by the world's frame for it in `<Name>/sections.tsx`.
 4. **Latest posts** (Art Deco and Tropical Platformer for now): the newest 3 posts of the blog, each its
    title linked to `/blog/<slug>` and its date, then an All posts link to `/blog`. The world wraps it in
    `PostsGate`, so with no post the section is not on the page.

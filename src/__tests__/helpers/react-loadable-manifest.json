@@ -67,13 +67,6 @@
       "static/chunks/7975.0f4dd6dce0a55165.js"
     ]
   },
-  "themes/worlds.ts -> @/components/themes/MythicTheme": {
-    "id": 29240,
-    "files": [
-      "static/css/9c6b28ce564aa8d1.css",
-      "static/chunks/9240.53fab133e06c23a2.js"
-    ]
-  },
   "themes/worlds.ts -> @/components/themes/NeonCyberTheme": {
     "id": 84269,
     "files": [

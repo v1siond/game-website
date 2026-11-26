@@ -70,10 +70,10 @@ describe('lensFocus', () => {
   it('centres on the middle of the hero when the capture found no figure', () => {
     expect(lensFocus({}, 'neon-portals', 1440)).toEqual({ x: 720, y: 360 })
     expect(lensFocus({ 'neon-portals': { 1440: [760, 300] } }, 'neon-portals', 390)).toEqual({ x: 195, y: 338 })
-    expect(lensFocus(null, 'mythic', 390)).toEqual({ x: 195, y: 338 })
+    expect(lensFocus(null, 'tropical-platformer', 390)).toEqual({ x: 195, y: 338 })
   })
 
   it('ignores a focus entry that is not a pair of numbers', () => {
-    expect(lensFocus({ mythic: { 1440: ['a', 3] } }, 'mythic', 1440)).toEqual({ x: 720, y: 360 })
+    expect(lensFocus({ 'tropical-platformer': { 1440: ['a', 3] } }, 'tropical-platformer', 1440)).toEqual({ x: 720, y: 360 })
   })
 })

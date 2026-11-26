@@ -18,7 +18,6 @@ jest.mock('@/components/themes/RetroAtomicTheme', () => ({ __esModule: true, def
 jest.mock('@/components/themes/NeonCyberTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-neon-cyber" /> }))
 jest.mock('@/components/themes/CellShadedTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-cell-shaded" /> }))
 jest.mock('@/components/themes/SilhouetteTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-silhouette" /> }))
-jest.mock('@/components/themes/MythicTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-mythic" /> }))
 jest.mock('@/components/themes/TropicalPlatformerTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-tropical-platformer" /> }))
 jest.mock('@/components/themes/MedievalFantasyTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-medieval-fantasy" /> }))
 
@@ -41,7 +40,7 @@ describe('Home page (boot into a world)', () => {
 
   it('renders only the active world, not the others', () => {
     render(<WorldRenderer />)
-    expect(screen.queryByTestId('theme-mythic')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('theme-tropical-platformer')).not.toBeInTheDocument()
     expect(screen.queryByTestId('theme-dark-fantasy')).not.toBeInTheDocument()
   })
 })

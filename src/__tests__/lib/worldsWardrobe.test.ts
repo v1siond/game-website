@@ -6,9 +6,9 @@ describe('outfitPlace', () => {
     expect(outfitPlace(TOUR_ORDER[0])).toBe(1)
   })
 
-  it('counts the last world of the tour as outfit 18, the size of the tour', () => {
+  it('counts the last world of the tour as outfit 17, the size of the tour', () => {
     expect(outfitPlace(TOUR_ORDER[TOUR_ORDER.length - 1])).toBe(TOUR_ORDER.length)
-    expect(TOUR_ORDER.length).toBe(18)
+    expect(TOUR_ORDER.length).toBe(17)
   })
 
   it('gives every world of the tour its own place, in tour order', () => {

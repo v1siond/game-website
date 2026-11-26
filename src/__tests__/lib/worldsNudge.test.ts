@@ -139,7 +139,7 @@ describe('followingInTour and previousInTour', () => {
     expect(followingInTour('medieval-fantasy')).toBe('neon-portals')
     expect(previousInTour('neon-portals')).toBe('medieval-fantasy')
     expect(followingInTour('retro-atomic')).toBe('silhouette')
-    expect(previousInTour('retro-atomic')).toBe('mythic')
+    expect(previousInTour('retro-atomic')).toBe('cell-shaded')
   })
 
   it('go round the tour in a circle at both ends', () => {

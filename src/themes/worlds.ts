@@ -24,7 +24,6 @@ const RetroAtomicTheme = dynamic(() => import('@/components/themes/RetroAtomicTh
 const NeonCyberTheme = dynamic(() => import('@/components/themes/NeonCyberTheme'))
 const CellShadedTheme = dynamic(() => import('@/components/themes/CellShadedTheme'))
 const SilhouetteTheme = dynamic(() => import('@/components/themes/SilhouetteTheme'))
-const MythicTheme = dynamic(() => import('@/components/themes/MythicTheme'))
 const TropicalPlatformerTheme = dynamic(() => import('@/components/themes/TropicalPlatformerTheme'))
 // Medieval Fantasy is the one world under the shared profession stage (ClientProviders), so its chunk
 // arrives with the stage's and the stage never shows a beat after the world.
@@ -49,7 +48,6 @@ const COMPONENT_BY_ID: Record<string, ComponentType> = {
   'neon-cyber': NeonCyberTheme,
   'cell-shaded': CellShadedTheme,
   'silhouette': SilhouetteTheme,
-  'mythic': MythicTheme,
   'tropical-platformer': TropicalPlatformerTheme,
   'medieval-fantasy': MedievalFantasyTheme,
 }

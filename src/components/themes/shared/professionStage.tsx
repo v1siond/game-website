@@ -760,7 +760,7 @@ function paletteFromColors(c: { background: string; accent: string; secondary: s
 
 // Worlds that draw their own profession stages (Dark Fantasy's hand tuned set, the scroll scene worlds' own
 // scenes); the shared stage would double them, so it stays out of these.
-const WORLDS_WITH_OWN_STAGE = new Set(['era-postcards', 'dark-fantasy', 'neon-cyber', 'neon-portals', 'retro-atomic', 'art-deco', 'adventure-paths', 'tropical-platformer', 'cell-shaded', 'fighter-select', 'silhouette', 'bold-noir', 'survival-horror', 'soul-map', 'retro-rpg', 'rubber-hose', 'mythic'])
+const WORLDS_WITH_OWN_STAGE = new Set(['era-postcards', 'dark-fantasy', 'neon-cyber', 'neon-portals', 'retro-atomic', 'art-deco', 'adventure-paths', 'tropical-platformer', 'cell-shaded', 'fighter-select', 'silhouette', 'bold-noir', 'survival-horror', 'soul-map', 'retro-rpg', 'rubber-hose'])
 
 // The CV pages are a plain document: no world scenery behind them, in their margins or under the text.
 const CV_PAGE_PATHS = new Set<string>(Object.values(CV_PATHS))

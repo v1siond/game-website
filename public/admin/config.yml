@@ -459,15 +459,6 @@ collections:
                   - { <<: *text, label: "Map name", name: mapOf, hint: 'Keep {name}' }
                   - { <<: *text, label: "Standing at", name: standingAt, hint: 'Keep {place}' }
                   - { <<: *text, label: "Secret exit", name: secretExit }
-              - label: Underworld world (mythic)
-                name: myth
-                widget: object
-                i18n: true
-                fields:
-                  - { <<: *text, label: "Prophecy fulfilled stamp", name: fulfilled }
-                  - { <<: *text, label: "Open the gate", name: openGate }
-                  - { <<: *text, label: "Gate open status", name: gateOpen }
-                  - { <<: *text, label: "Back to the great hall", name: returnHall }
               - label: Bonfire world (soul-map)
                 name: souls
                 widget: object

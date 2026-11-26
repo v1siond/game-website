@@ -42,16 +42,16 @@ describe('worldPreloads', () => {
   })
 
   it('stops the build naming the import the manifest lacks', () => {
-    const mythic = 'themes/worlds.ts -> @/components/themes/MythicTheme'
-    const rest = Object.fromEntries(Object.entries(BUILT).filter(([key]) => key !== mythic))
-    expect(() => worldPreloads(rest)).toThrow(mythic)
+    const tropical = 'themes/worlds.ts -> @/components/themes/TropicalPlatformerTheme'
+    const rest = Object.fromEntries(Object.entries(BUILT).filter(([key]) => key !== tropical))
+    expect(() => worldPreloads(rest)).toThrow(tropical)
   })
 })
 
 describe('readWorldPreloads', () => {
   it('reads the manifest the production build wrote', async () => {
     const preloads = await readWorldPreloads('production', HELPERS)
-    expect(preloads['mythic']).toEqual([href('static/css/9c6b28ce564aa8d1.css'), href('static/chunks/9240.53fab133e06c23a2.js')])
+    expect(preloads['tropical-platformer']).toEqual([href('static/css/c2dc02536488152a.css'), href('static/chunks/5444.910584c4288ae406.js')])
     expect(preloads).toEqual(worldPreloads(BUILT))
   })
 
@@ -78,13 +78,14 @@ describe('world preload script', () => {
 
   it('preloads nothing for a stored value that is no world, an inherited key included', () => {
     expect(preloadsFor('no-such-world')).toEqual([])
+    expect(preloadsFor('mythic')).toEqual([])
     expect(preloadsFor('__proto__')).toEqual([])
   })
 
   it('preloads the capture link\'s world over the stored one', () => {
-    expect(preloadsFor('bold-noir', '?capture=mythic')).toEqual([
-      `style ${href('static/css/9c6b28ce564aa8d1.css')}`,
-      `script ${href('static/chunks/9240.53fab133e06c23a2.js')}`,
+    expect(preloadsFor('bold-noir', '?capture=tropical-platformer')).toEqual([
+      `style ${href('static/css/c2dc02536488152a.css')}`,
+      `script ${href('static/chunks/5444.910584c4288ae406.js')}`,
     ])
   })
 

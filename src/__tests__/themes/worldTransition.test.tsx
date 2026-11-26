@@ -12,7 +12,7 @@ function Probe() {
     <div>
       <span data-testid="current">{theme.id}</span>
       <span data-testid="transitioning">{String(isTransitioning)}</span>
-      <button onClick={() => selectWorld('mythic')}>go-mythic</button>
+      <button onClick={() => selectWorld('tropical-platformer')}>go-tropical-platformer</button>
       <button onClick={() => selectWorld(DEFAULT_THEME_ID)}>go-current</button>
     </div>
   )
@@ -52,7 +52,7 @@ describe('WorldTransition (portal)', () => {
     setup()
 
     act(() => {
-      screen.getByText('go-mythic').click()
+      screen.getByText('go-tropical-platformer').click()
     })
     // Cover phase has begun, but the world hasn't swapped yet.
     expect(screen.getByTestId('transitioning')).toHaveTextContent('true')
@@ -62,8 +62,8 @@ describe('WorldTransition (portal)', () => {
     act(() => {
       jest.advanceTimersByTime(1000)
     })
-    expect(screen.getByTestId('current')).toHaveTextContent('mythic')
-    expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-theme', 'mythic')
+    expect(screen.getByTestId('current')).toHaveTextContent('tropical-platformer')
+    expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-theme', 'tropical-platformer')
     expect(window.scrollTo).toHaveBeenCalledWith(0, 0)
 
     // Reveal finishes -> overlay clears.

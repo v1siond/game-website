@@ -170,7 +170,7 @@ function OutfitLabel({ id, name }: { id: string; name: string }) {
  * right or ArrowLeft to the one before, in a circle. On the first visit his previous, current and next
  * outfits fan out of the plate for WARDROBE_FAN_MS (never under reduced motion). The look per world is
  * wardrobe.css (.c-wardrobe--<world id>) over the colours the hero passes from its palette. A click or a key
- * inside the plate stops there, so a hero that skips its intro on any click or key (Mythic, Cell Shaded)
+ * inside the plate stops there, so a hero that skips its intro on any click or key (Cell Shaded)
  * never sees the plate's own presses.
  */
 export default function Wardrobe({ look, className = '', ready = true }: WardrobeProps) {

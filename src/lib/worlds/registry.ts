@@ -30,7 +30,6 @@ export interface World {
 const CATEGORY_BY_ID: Record<string, WorldCategory> = {
   'dark-fantasy': 'Fantasy',
   'medieval-fantasy': 'Fantasy',
-  'mythic': 'Fantasy',
   'soul-map': 'Fantasy',
   'adventure-paths': 'Fantasy',
   'retro-rpg': 'Retro',

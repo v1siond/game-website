@@ -415,16 +415,6 @@
   box-shadow: inset 0 0 0 3px var(--wd-plate), inset 0 0 0 4px var(--wd-ring), 0 0 0 2px var(--wd-ring), 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
-/* Mythic: a gilded plaque, carved display capitals, a double gold rim. */
-.c-wardrobe--mythic {
-  --wd-radius: 4px;
-  --wd-key-radius: 4px;
-  --wd-case: uppercase;
-  --wd-track: 0.1em;
-  --wd-weight: 400;
-}
-.c-wardrobe--mythic .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 0 5px var(--wd-plate), 0 0 0 6px var(--wd-ring); }
-
 /* Neon Cyber: a visor readout, clipped corners drawn by the HUD yellow edge, cyan outer line. */
 .c-wardrobe--neon-cyber {
   --wd-radius: 0;

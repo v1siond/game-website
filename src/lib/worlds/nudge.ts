@@ -27,7 +27,6 @@ export const TOUR_ORDER: readonly string[] = [
   'bold-noir',
   'fighter-select',
   'cell-shaded',
-  'mythic',
   'retro-atomic',
   'silhouette',
   'adventure-paths',
