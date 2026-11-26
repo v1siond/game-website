@@ -80,10 +80,12 @@ export interface Scene extends SceneDef {
 }
 
 // Where he stands once his era moves to its side. From lg, right of the cards he keeps his own place, or is
-// moved right to RIGHT_FROM when it would sit under them; left of them he stands at LEFT_AT, his era's order
-// of things unchanged and clear of the cards. In a phone's stacked band he stands in the half the section
-// names: right of PHONE_RIGHT_FROM or at PHONE_LEFT_AT.
-const RIGHT_FROM = 930
+// moved right to RIGHT_FROM when it would sit under them: his cape trails about 210 behind his feet, and the
+// section's title plate, wider than the cards (to x 770 on a 1440 wide screen for Tech Stack), rises past him
+// as the section comes in. Left of them he stands at LEFT_AT, his era's order of things unchanged and clear of
+// the cards. In a phone's stacked band he stands in the half the section names: right of PHONE_RIGHT_FROM or
+// at PHONE_LEFT_AT.
+const RIGHT_FROM = 1000
 const LEFT_AT = 330
 const PHONE_RIGHT_FROM = 860
 const PHONE_LEFT_AT = 740

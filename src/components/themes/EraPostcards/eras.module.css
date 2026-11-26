@@ -64,6 +64,15 @@
     linear-gradient(to right, color-mix(in srgb, var(--ep-scrim) 55%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 50%);
 }
 
+/* From lg a scene that plays left of its cards has them on the right: its scrim lies there instead. */
+@media (min-width: 1024px) {
+  .shadeRight::after {
+    background:
+      linear-gradient(to top, color-mix(in srgb, var(--ep-scrim) 82%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 46%),
+      linear-gradient(to left, color-mix(in srgb, var(--ep-scrim) 55%, transparent), color-mix(in srgb, var(--ep-scrim) 0%, transparent) 50%);
+  }
+}
+
 @media (max-width: 767.98px) {
   .stage::after,
   .settled::after {
