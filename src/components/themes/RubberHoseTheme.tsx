@@ -147,7 +147,9 @@ export default function RubberHoseTheme() {
             ))}
           </ProfessionRegion>
 
-          <section data-scene={contact.id} className="relative px-2 pb-8 pt-[60svh] max-md:pt-[130svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
+          {/* At least a screen tall, so by the page's end its top has reached the top of the screen and the
+              knockout's stage has risen whole over the last section's, whose fight would sit under this card. */}
+          <section data-scene={contact.id} className="relative min-h-[100svh] px-2 pb-8 pt-[60svh] max-md:pt-[130svh] sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
             {reduced && <HoseStage scene={contact} settled />}
             <RecruiterHero
               render={({ line, actions }) => (

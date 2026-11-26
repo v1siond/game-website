@@ -36,23 +36,32 @@ export interface Layout {
   boss: number
   bossK: number
   k: number
-  /** The trapezes' spacing over the pit. */
+  /** The trapezes' spacing over the pit, and where the middle one hangs. */
   gap: number
+  wire: number
+  /** The furthest left he and what flies at him go: right of the cards' edge where they read on his left,
+   *  else anywhere. */
+  clear: number
   /** The side the scene plays on. */
   side: Side
   /** The fight turned round the middle of a phone's view: the boss on the left, him on the right facing it. */
   turned: boolean
 }
 
-const WIDE: Layout = { phone: false, him: 740, boss: 1130, bossK: 1.05, k: 1.25, gap: 150, side: 'right', turned: false }
-const PHONE: Layout = { phone: true, him: 560, boss: 840, bossK: 0.78, k: 1.05, gap: 95, side: 'right', turned: false }
+const ANYWHERE = Number.NEGATIVE_INFINITY
+
+const WIDE: Layout = { phone: false, him: 740, boss: 1130, bossK: 1.05, k: 1.25, gap: 150, wire: 740, clear: ANYWHERE, side: 'right', turned: false }
+const PHONE: Layout = { phone: true, him: 560, boss: 840, bossK: 0.78, k: 1.05, gap: 95, wire: 560, clear: ANYWHERE, side: 'right', turned: false }
 
 // The hero keeps its own place. A section's fight plays right of its cards, clear of their edge, or as far
-// left of them when they sit on the right, the same distance apart. A phone's view is too narrow to move the fight, so in its left
-// half he stands left facing the boss on the right, and in its right half the whole fight is turned round the
-// view's middle (PHONE_MIDDLE): the boss on the left and him on the right facing it, nothing lettered turned.
+// left of them when they sit on the right, the boss's shadow short of them. Right of the cards nothing he does
+// or meets goes left of `clear` (the cards end at x 718 of a 1440 wide screen; his back reaches about 40 behind
+// his feet), and the trapezes hang closer, between the cards' edge and the organ. A phone's view is too narrow to
+// move the fight, so in its left half he stands left facing the boss on the right, and in its right half the
+// whole fight is turned round the view's middle (PHONE_MIDDLE): the boss on the left and him on the right
+// facing it, nothing lettered turned.
 const LAYOUTS: Record<'wide' | 'phone', Record<Side, Layout>> = {
-  wide: { right: { ...WIDE, him: 800, boss: 1190 }, left: { ...WIDE, him: 110, boss: 500, side: 'left' } },
+  wide: { right: { ...WIDE, him: 800, boss: 1190, gap: 110, wire: 920, clear: 770 }, left: { ...WIDE, him: 110, boss: 480, wire: 110, side: 'left' } },
   phone: { right: { ...PHONE, turned: true }, left: { ...PHONE, side: 'left' } },
 }
 
@@ -101,6 +110,12 @@ const BOW = posed({ squash: 0.35, rise: 6, lean: 30, armRight: 30, foreRight: 40
 const run = (phase: number): ToonPose => posed(walk(phase, 1))
 
 const him = (layout: Layout, x: number, pose: ToonPose, lift = 0): ToonState => ({ x, y: GROUND - lift, k: layout.k, pose, opacity: 1 })
+
+/** x, kept right of the layout's clear line. */
+const clearOf = (layout: Layout, x: number): number => Math.max(layout.clear, x)
+
+/** Where trapeze `i` (0 to 2, left to right) hangs over the pit. */
+const barX = (layout: Layout, i: number): number => layout.wire + (i - 1) * layout.gap
 
 /** Where his near hand is when it points at the boss: the shots leave from here. */
 const handOf = (layout: Layout, x: number, lift = 0): [number, number] => [x + 42 * layout.k, GROUND - lift - 78 * layout.k]
@@ -469,7 +484,7 @@ const about: SceneDef = {
       const front = bossFront(layout, 0)
       if (action === 0) {
         const running = within(t, 0, 0.35)
-        const x = lerp(layout.him - 160, layout.him, running)
+        const x = lerp(clearOf(layout, layout.him - 160), layout.him, running)
         const firing = within(t, 0.35, 1)
         volley(e, handOf(layout, x), front, firing)
         hide(e.ball)
@@ -477,8 +492,8 @@ const about: SceneDef = {
         return him(layout, x, running < 1 ? run(running * 3) : SHOOT)
       }
       volley(e, handOf(layout, layout.him), front, 0)
-      const ballX = lerp(front[0], layout.him - 420, t)
-      place(e.ball, ballX, GROUND - 48, t < 0.95 ? 1 : 0, -t * 900)
+      const ballX = lerp(front[0], clearOf(layout, layout.him - 420), t)
+      place(e.ball, ballX, GROUND - 48, 1 - within(t, 0.8, 0.95), -t * 900)
       writeBoss(boss, layout, { ...CALLIOPE, seq: within(t, 0, 0.3) })
       const jump = within(t, 0.32, 0.72)
       const lift = hop(jump, 190)
@@ -504,7 +519,7 @@ const work: SceneDef = {
         const sweep = Math.sin(Math.PI * t)
         writeBoss(boss, layout, { ...CALLIOPE, arm: lerp(ARM_REST, -38, sweep) })
         const dash = within(t, 0.25, 0.75)
-        const x = lerp(layout.him - 90, past, dash)
+        const x = lerp(clearOf(layout, layout.him - 90), past, dash)
         place(e.speed, x, GROUND - 40 * layout.k, bump(dash), 0, layout.k)
         hide(e.note, e.flash)
         return him(layout, x, dash > 0 && dash < 1 ? DASH : READY)
@@ -551,7 +566,7 @@ const tech: SceneDef = {
       const notes = [0, 1, 2]
       notes.forEach((i) => {
         const u = within(t, i * 0.12, 0.5 + i * 0.12)
-        const land = layout.him - 120 + i * 210
+        const land = clearOf(layout, layout.him - 120 + i * 210)
         place(e.shot[i], lerp(layout.boss, land, u), lerp(GROUND - 520 * layout.bossK, GROUND - 20, u) - 200 * bump(u), u > 0 && u < 1 ? 1 : 0, u * 600, 1.8)
         place(e.burst[i], land, GROUND - 24, bump(within(t, 0.5 + i * 0.12, 0.7 + i * 0.12)), 0, 0.9)
       })
@@ -606,12 +621,12 @@ const services: SceneDef = {
 function HighWire({ layout, open }: { layout: Layout; open: boolean }) {
   return (
     <>
-      <ellipse cx={layout.him + layout.gap * 0.2} cy={GROUND + 40} rx={layout.gap * 2.4} ry={70} fill={INK} />
+      <ellipse cx={layout.wire + layout.gap * 0.2} cy={GROUND + 40} rx={layout.gap * 2.4} ry={70} fill={INK} />
       <g data-fx="floor" opacity={open ? 0 : 1}>
-        <ellipse cx={layout.him + layout.gap * 0.2} cy={GROUND + 40} rx={layout.gap * 2.4} ry={70} fill={HOSE.footlight} stroke={INK} strokeWidth={4} />
+        <ellipse cx={layout.wire + layout.gap * 0.2} cy={GROUND + 40} rx={layout.gap * 2.4} ry={70} fill={HOSE.footlight} stroke={INK} strokeWidth={4} />
       </g>
-      {[-1, 0, 1].map((i) => (
-        <g key={i} data-fx={`trapeze-${i + 1}`} transform={`translate(${layout.him + i * layout.gap} ${open ? TRAPEZE_Y : -200})`}>
+      {[0, 1, 2].map((i) => (
+        <g key={i} data-fx={`trapeze-${i + 1}`} transform={`translate(${barX(layout, i)} ${open ? TRAPEZE_Y : -200})`}>
           <path d={`M-40 0 L-40 ${-TRAPEZE_Y - 260} M40 0 L40 ${-TRAPEZE_Y - 260}`} stroke={INK} strokeWidth={4} />
           <rect x={-48} y={-6} width={96} height={14} rx={6} fill={HOSE.gold} stroke={INK} strokeWidth={4} />
         </g>
@@ -622,6 +637,10 @@ function HighWire({ layout, open }: { layout: Layout; open: boolean }) {
 
 /** The trapeze bars hang at this height; he stands on them. */
 const TRAPEZE_Y = GROUND - 230
+
+/** How far the trapezes swing as they settle, in degrees about their tops: 2 carries a bar about 33 to
+ *  either side, which keeps the first one right of the cards. */
+const SWAY = 2
 
 /** Phase 3: the organ stamps and the ring floor drops into the pit; trapezes come down and he leaps from
  *  bar to bar while fire puffs sweep under them. */
@@ -635,7 +654,7 @@ const projects: SceneDef = {
     const e = effectNodes(stage)
     const floor = fx(stage, 'floor')
     const bars = [1, 2, 3].map((i) => fx(stage, `trapeze-${i}`))
-    const barX = (i: number): number => layout.him + (i - 1) * layout.gap
+    const bar = (i: number): number => barX(layout, i)
     const lift = GROUND - TRAPEZE_Y + 8
     return ({ action, t }) => {
       if (action === 0) {
@@ -645,23 +664,23 @@ const projects: SceneDef = {
         transformTo(floor, `translate(0 ${r1(240 * fall ** 2)})`)
         fadeTo(floor, 1 - fall)
         const down = within(t, 0.35, 0.8)
-        bars.forEach((bar, i) => translateTo(bar, barX(i), lerp(-200, TRAPEZE_Y, down)))
+        bars.forEach((node, i) => translateTo(node, bar(i), lerp(-200, TRAPEZE_Y, down)))
         // he leaps up onto the first bar as the floor goes
         const leap = within(t, 0.55, 1)
-        const x = lerp(layout.him, barX(0), leap)
+        const x = lerp(layout.him, bar(0), leap)
         hide(e.cloud)
         return him(layout, x, leap <= 0 ? READY : leap >= 1 ? CROUCH : LEAP, leap >= 1 ? lift : hop(leap, lift + 90) + lift * leap)
       }
       writeBoss(boss, layout, { ...ORGAN, steam: bump(t) })
       fadeTo(floor, 0)
-      bars.forEach((bar, i) => transformTo(bar, `translate(${barX(i)} ${TRAPEZE_Y}) ${turnAbout(5 * Math.sin(t * 6 + i) * (1 - t), 0, -TRAPEZE_Y - 260)}`))
+      bars.forEach((node, i) => transformTo(node, `translate(${bar(i)} ${TRAPEZE_Y}) ${turnAbout(SWAY * Math.sin(t * 6 + i) * (1 - t), 0, -TRAPEZE_Y - 260)}`))
       // fire puffs sweep along under the bars, right to left
-      place(e.cloud, lerp(layout.boss - 100, layout.him - 2 * layout.gap, t), GROUND + 20, 0.9 * bump(t), 0, 0.45)
+      place(e.cloud, lerp(layout.boss - 100, clearOf(layout, layout.wire - 2 * layout.gap), t), GROUND + 20, 0.9 * bump(t), 0, 0.45)
       // a leap to the middle bar, then a hop in place as the fire passes under it
       const first = within(t, 0.1, 0.5)
       const second = within(t, 0.6, 0.9)
       const jumping = (first > 0 && first < 1) || (second > 0 && second < 1)
-      return him(layout, lerp(barX(0), barX(1), first), jumping ? LEAP : CROUCH, lift + hop(first, 120) + hop(second, 90))
+      return him(layout, lerp(bar(0), bar(1), first), jumping ? LEAP : CROUCH, lift + hop(first, 120) + hop(second, 90))
     }
   },
 }
@@ -677,15 +696,15 @@ const ventures: SceneDef = {
     const boss = bossNodes(stage)
     const e = effectNodes(stage)
     const lift = GROUND - TRAPEZE_Y + 8
-    const barX = (i: number): number => layout.him + (i - 1) * layout.gap
+    const bar = (i: number): number => barX(layout, i)
     const heartAt = (): [number, number] => [layout.boss + 40 * layout.bossK, GROUND - (160 + RISE) * layout.bossK]
     return ({ action, t }) => {
       const [hx, hy] = heartAt()
-      const hand = handOf(layout, barX(1), lift)
+      const hand = handOf(layout, bar(1), lift)
       if (action === 0) {
         writeBoss(boss, layout, { ...ORGAN, doors: t, heart: within(t, 0.3, 1) })
         hide(e.beam, e.cloud, ...e.star)
-        return him(layout, barX(1), mix(CROUCH, CHARGE, within(t, 0.5, 1)), lift)
+        return him(layout, bar(1), mix(CROUCH, CHARGE, within(t, 0.5, 1)), lift)
       }
       if (action === 1) {
         const grow = within(t, 0, 0.35)
@@ -700,13 +719,13 @@ const ventures: SceneDef = {
         })
         writeBoss(boss, layout, { ...ORGAN, doors: 1, heart: 1, crack: within(t, 0.5, 0.8), shake: 9 * Math.sin(t * 60) * bump(t) })
         pushIn(e, hx, hy, bump(t))
-        return him(layout, barX(1), mix(CHARGE, RECOIL, bump(t)), lift)
+        return him(layout, bar(1), mix(CHARGE, RECOIL, bump(t)), lift)
       }
       hide(e.beam, ...e.star)
       writeBoss(boss, layout, { ...ORGAN, doors: 1, heart: 1, crack: 1, steam: 1 })
-      place(e.cloud, lerp(hx - 80, barX(0), t), lerp(hy, TRAPEZE_Y - 80, t), 0.85 * bump(t), 0, 0.6 + 0.4 * t)
+      place(e.cloud, lerp(hx - 80, bar(0), t), lerp(hy, TRAPEZE_Y - 80, t), 0.85 * bump(t), 0, 0.6 + 0.4 * t)
       const dash = within(t, 0.3, 0.7)
-      const x = lerp(barX(1), barX(2), dash)
+      const x = lerp(bar(1), bar(2), dash)
       place(e.speed, x, TRAPEZE_Y - 40 * layout.k, bump(dash), 0, layout.k)
       return him(layout, x, dash > 0 && dash < 1 ? DASH : READY, lift)
     }
@@ -737,7 +756,7 @@ const bands: SceneDef = {
         writeBoss(boss, layout, CALLIOPE)
         rings.forEach((ring, i) => {
           const u = within(t, i * 0.4, 0.6 + i * 0.4)
-          place(ring, lerp(drumX, layout.him - 300, u), GROUND - 10, u > 0 && u < 1 ? 1 : 0, 0, 1 + u)
+          place(ring, lerp(drumX, clearOf(layout, layout.him - 300), u), GROUND - 10, u > 0 && u < 1 ? 1 : 0, 0, 1 + u)
         })
         // each ring reaches him at about a third of the way; he hops it
         const lift = hop(within(t, 0.12, 0.42), 150) + hop(within(t, 0.52, 0.82), 150)
@@ -780,7 +799,7 @@ const muayThai: SceneDef = {
         const lunge = bump(within(t, 0, 0.9))
         writeBoss(boss, layout, { ...CALLIOPE, spring: lunge })
         const dash = within(t, 0.25, 0.7)
-        const x = lerp(layout.him - 60, under, dash)
+        const x = lerp(clearOf(layout, layout.him - 60), under, dash)
         place(e.speed, x, GROUND - 40 * layout.k, bump(dash), 0, layout.k)
         hide(e.flash)
         return him(layout, x, dash > 0 && dash < 1 ? DASH : READY)
