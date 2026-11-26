@@ -17,14 +17,19 @@ export interface CaseInput {
   /** Where he holds on a wider screen: the hero's own spot, or the half of the screen a section's step plays
    *  in from lg (scenes.tsx sideOf). */
   hold: Hold
+  /** On a phone the step is drawn the other way round about the middle of the view, so he ends in the half
+   *  his section names (scenes.tsx turnedOf). */
+  turned: boolean
 }
 
 /** A scene's picture as the theatre runs it: its light, its script, an optional set of its own between the
  *  skyline and the wall, its own wall and pavement when it is not the street's, what stands on its floor (him
- *  among it), and the binder that finds the nodes it moves once and returns the writer for a playhead. */
+ *  among it), how far ahead of his hold he ends, and the binder that finds the nodes it moves once and returns
+ *  the writer for a playhead. */
 export interface Place {
   light: string
   script: SceneScript
+  ends?: number
   set?: (input: CaseInput) => ReactNode
   mid?: (input: CaseInput) => ReactNode
   near?: (input: CaseInput) => ReactNode
@@ -58,7 +63,15 @@ export const holdX = ({ phone, hold }: Pick<CaseInput, 'phone' | 'hold'>): numbe
 
 // A phone's view is too narrow for a step at full size, so there the whole step, him with it, is drawn
 // smaller round his feet, what he works at nearer him in the same proportion.
-const PHONE_SCALE = 0.72
+export const PHONE_SCALE = 0.72
+
+/** The middle of a phone's view of the canvas (x 570 to 1030), the line a turned step is drawn round. */
+export const PHONE_MIDDLE = 800
+
+const TURN = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
+
+/** Where he is seen to hold: his hold, or its mirror across a phone's view when the step is turned. */
+export const shownX = (input: CaseInput): number => (input.turned ? 2 * PHONE_MIDDLE - holdX(input) : holdX(input))
 const stepScale = (input: CaseInput): string | undefined => {
   if (!input.phone) return undefined
   const x = holdX(input)
@@ -70,6 +83,8 @@ const stepScale = (input: CaseInput): string | undefined => {
 export interface Step {
   light: string
   script: SceneScript
+  /** How far ahead of his hold he ends, at the end frame, where a step moves him. */
+  ends?: number
   set?: (input: CaseInput) => ReactNode
   mid?: (input: CaseInput) => ReactNode
   near?: (input: CaseInput) => ReactNode
@@ -79,19 +94,22 @@ export interface Step {
 }
 
 /** A step as a place: what is behind him, him, what is in front, all in one camera group a step can push in
- *  on. */
+ *  on, turned round on a phone where his section names the other half. */
 export const stepPlace = (step: Step): Place => ({
   light: step.light,
   script: step.script,
+  ends: step.ends,
   set: step.set,
   mid: step.mid,
   near: step.near,
   floor: (input) => (
-    <g transform={stepScale(input)}>
-      <g data-fx="camera">
-        <g transform={`translate(${holdX(input)} ${FLOOR})`}>{step.back(input)}</g>
-        <Sleuth x={holdX(input)} profession={input.profession} />
-        {step.front && <g transform={`translate(${holdX(input)} ${FLOOR})`}>{step.front(input)}</g>}
+    <g transform={input.turned ? TURN : undefined}>
+      <g transform={stepScale(input)}>
+        <g data-fx="camera">
+          <g transform={`translate(${holdX(input)} ${FLOOR})`}>{step.back(input)}</g>
+          <Sleuth x={holdX(input)} profession={input.profession} />
+          {step.front && <g transform={`translate(${holdX(input)} ${FLOOR})`}>{step.front(input)}</g>}
+        </g>
       </g>
     </g>
   ),

@@ -5,7 +5,7 @@ import { stageItems } from '@/lib/cv/stageItems'
 import { sceneEnd } from '@/lib/scroll/player'
 import type { StageLayer } from '../shared/theatre/Stage'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
-import type { CaseInput, Hold, Place } from './case'
+import { PHONE_MIDDLE, PHONE_SCALE, holdX, type CaseInput, type Hold, type Place } from './case'
 import { about } from './places/about'
 import { bands } from './places/bands'
 import { contact } from './places/contact'
@@ -38,6 +38,17 @@ export type SceneId = 'hero' | SectionId | 'contact'
 const holdOf = (id: SceneId, side: SceneSide, wide: boolean): Hold => {
   if (id === 'hero') return 'hero'
   return wide ? side : 'right'
+}
+
+const NAMED: Record<SceneSide, number> = { right: 1, left: -1 }
+
+/** On a phone a section's step is turned round the middle of the view where he would end in the half it does
+ *  not name: he then works facing the other way, what he works at on his other side (nothing in it is
+ *  lettered), and ends in the named half. */
+const turnedOf = (id: SceneId, side: SceneSide, place: Place, input: Omit<CaseInput, 'turned'>): boolean => {
+  if (id === 'hero' || !input.phone) return false
+  const end = holdX(input) + (place.ends ?? 0) * PHONE_SCALE
+  return (end - PHONE_MIDDLE) * NAMED[side] < 0
 }
 
 interface SceneDef {
@@ -79,7 +90,8 @@ const layersOf = ({ light, set, mid, near, floor }: Place, input: CaseInput): St
 
 const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, profession: Profession, screen: Screen, side: SceneSide): NoirScene => {
   const { place, ...def } = SCENE_DEFS[id]
-  const input = { profession, phone: screen.phone, hold: holdOf(id, side, screen.wide) }
+  const held = { profession, phone: screen.phone, hold: holdOf(id, side, screen.wide) }
+  const input: CaseInput = { ...held, turned: turnedOf(id, side, place, held) }
   return {
     ...def,
     id,

@@ -50,6 +50,7 @@ function Lot() {
 export const projects = stepPlace({
   light: NOIR.paper,
   script: [1400, 1700, 1500],
+  ends: KNEEL_AT,
   back: () => (
     <>
       <Lot />

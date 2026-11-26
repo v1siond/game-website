@@ -2,7 +2,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { elapsedOf } from '@/lib/scroll/player'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { NOIR } from '../palette'
-import { holdX, share, still, stepPlace } from '../case'
+import { shownX, share, still, stepPlace } from '../case'
 import { Canvas, FLOOR } from '../street'
 import { RoomFloor, RoomWall } from '../room'
 import { crash, drum } from '../pose'
@@ -61,7 +61,7 @@ export const bands = stepPlace({
             </g>
           ))}
         </g>
-        <g data-fx="spot" transform={`translate(${holdX(input)} 0)`}>
+        <g data-fx="spot" transform={`translate(${shownX(input)} 0)`}>
           <polygon points={`-60,0 60,0 360,${FLOOR} -360,${FLOOR}`} fill={NOIR.paper} opacity="0.16" />
         </g>
     </Canvas>
@@ -72,7 +72,7 @@ export const bands = stepPlace({
     const bulbs = fx(stage, 'bulbs')
     const spot = fx(stage, 'spot')
     const cymbal = fx(stage, 'cymbal')
-    const x = holdX(input)
+    const x = shownX(input)
     return (play) => {
       const hit = share(play, 1)
       const close = ramp(hit, 0.5, 0.9)

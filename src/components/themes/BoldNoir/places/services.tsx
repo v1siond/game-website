@@ -2,8 +2,8 @@ import { ramp } from '@/lib/scroll/stage'
 import { actionLengths, elapsedOf } from '@/lib/scroll/player'
 import { fadeTo, fx, r1, transformTo } from '../../shared/stageNodes'
 import { NOIR } from '../palette'
-import { share, stepPlace, type Frame } from '../case'
-import { SEDAN, Sedan } from '../sedan'
+import { share, stepPlace, type Frame, type Hold } from '../case'
+import { BEAM_FAR, SEDAN, Sedan } from '../sedan'
 import { DRIVE } from '../pose'
 
 // Services: the drive. He is at the wheel of his car side on, the roof light turning red, and the street
@@ -14,6 +14,9 @@ const SCRIPT = [2200, 1400]
 // He sits this far right of his place, so the car clears the text column.
 const AHEAD = 160
 const CAR_X = AHEAD - SEDAN.driver
+// Beside cards on the right of a wide screen the headlight lights only the kerb ahead, so its beam ends short of
+// them (his hold at 240, the cards from about x 880 of the canvas).
+const BEAM: Record<Hold, number> = { hero: BEAM_FAR, right: BEAM_FAR, left: 760 }
 // The street goes by at this speed at full pace (canvas units per ms), after this run up.
 const PACE = 0.9
 const RUN_UP_MS = 600
@@ -53,10 +56,11 @@ function Passing() {
 export const services = stepPlace({
   light: NOIR.red,
   script: SCRIPT,
+  ends: AHEAD,
   back: () => <Passing />,
-  front: () => (
+  front: ({ phone, hold }) => (
     <g data-fx="drive-car" transform={`translate(${CAR_X} 0)`}>
-      <Sedan name="drive" />
+      <Sedan name="drive" beam={phone ? BEAM_FAR : BEAM[hold]} />
     </g>
   ),
   bind: (stage) => {

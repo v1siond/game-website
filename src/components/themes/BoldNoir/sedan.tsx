@@ -4,7 +4,11 @@ import { NOIR } from './palette'
 // the rounded fenders over the wheels, the fastback roof with the red roof light on it, the chrome strip
 // and the headlight. Drawn from its rear bumper (x 0) on the ground (y 0), SEDAN.length long. Its window is
 // cut out of the body, so a driver drawn behind it shows through. The roof light's glow is
-// `data-fx="{name}-beacon"`, the headlight's beam `{name}-beam`, both at rest dark.
+// `data-fx="{name}-beacon"`, the headlight's beam `{name}-beam`, both at rest dark; the beam reaches to x
+// `beam` ahead of the bumper.
+
+/** How far ahead the headlight's beam reaches when nothing stands in its way. */
+export const BEAM_FAR = 1200
 
 export const SEDAN = { length: 560, wheelR: 40, rearWheel: 120, frontWheel: 450, driver: 300 }
 
@@ -13,12 +17,18 @@ const BODY =
   // the window, cut out (even odd)
   'M214 -150 Q236 -222 300 -224 L336 -222 Q372 -216 392 -152 Z'
 
-export function Sedan({ name }: { name: string }) {
+/** Where the beam leaves the headlight. */
+const LAMP_X = 552
+
+/** The height of a beam edge at x, the edge running from `from` at the headlight to `to` at BEAM_FAR. */
+const beamEdge = (x: number, from: number, to: number): number => Math.round(from + ((to - from) * (x - LAMP_X)) / (BEAM_FAR - LAMP_X))
+
+export function Sedan({ name, beam = BEAM_FAR }: { name: string; beam?: number }) {
   const { wheelR, rearWheel, frontWheel } = SEDAN
   return (
     <g>
       <g data-fx={`${name}-beam`} opacity="0">
-        <polygon points="552,-96 1200,-170 1200,10 552,-60" fill={NOIR.paper} opacity="0.14" />
+        <polygon points={`${LAMP_X},-96 ${beam},${beamEdge(beam, -96, -170)} ${beam},${beamEdge(beam, -60, 10)} ${LAMP_X},-60`} fill={NOIR.paper} opacity="0.14" />
       </g>
       <path d={BODY} fill={NOIR.ink} fillRule="evenodd" stroke={NOIR.ash} strokeWidth="4" strokeLinejoin="round" />
       <path d="M40 -86 H530" stroke={NOIR.fog} strokeWidth="4" />
