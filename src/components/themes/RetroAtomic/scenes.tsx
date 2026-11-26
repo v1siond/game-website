@@ -93,6 +93,9 @@ export interface SceneInput {
   phone: boolean
   /** From lg the scene plays on the left half, its section's cards reading on the right (sideOf). */
   left: boolean
+  /** On a phone the place is drawn the other way round about the middle of the view, so he ends in the half
+   *  his section names (turnedOf). */
+  turned: boolean
   kit: Profession
 }
 
@@ -142,6 +145,12 @@ const spotOf = ({ phone, left }: Pick<SceneInput, 'phone' | 'left'>): number => 
 /** On a phone's narrow view the place round his spot, and he, are drawn at this share of their size. */
 export const placeScale = (phone: boolean): number => (phone ? 0.8 : 1)
 
+/** The middle of a phone's view of the canvas, the line a turned place is drawn round. */
+const PHONE_MIDDLE = 720
+
+/** The transform that draws a turned place the other way round about the middle of a phone's view. */
+export const MIRROR = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
+
 /** Before the section arrives a scene shows its first frame. */
 const START: Playhead = { action: 0, t: 0, done: false }
 
@@ -160,9 +169,9 @@ const blend = (a: DwellerPose, b: DwellerPose, t: number, from: number, to: numb
 
 /** The camera of the scene: every plane's group (stage.tsx marks each data-fx="cam-<layer>") pushed in on one
  *  canvas point, as an SVG transform, so it holds on a phone's view as on the wide one. */
-function cameraWriter(stage: StageNodes): (x: number, y: number, zoom: number) => void {
+function cameraWriter(stage: StageNodes, { turned }: Pick<SceneInput, 'turned'>): (x: number, y: number, zoom: number) => void {
   const planes = ['sky', 'far', 'mid', 'near', 'figure'].map((name) => fx(stage, `cam-${name}`))
-  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, zoom > 1 ? focusOn(x, y, zoom) : ''))
+  return (x, y, zoom) => planes.forEach((plane) => transformTo(plane, zoom > 1 ? focusOn(turned ? 2 * PHONE_MIDDLE - x : x, y, zoom) : ''))
 }
 
 // How far the camera pushes in on the target for the slowed shot.
@@ -171,14 +180,15 @@ const PUSH = 0.35
 /** The targeting freeze: the place washed in the wrist screen's green while the shot is lined up. */
 const Freeze = () => <rect data-fx="freeze" x={-1600} y={-1200} width={4000} height={2600} fill={PHOSPHOR} opacity={0} />
 
-/** A targeting box round a part with its hit percent on a dark tab. */
-function Target({ name, x, y, size, odds }: { name: string; x: number; y: number; size: number; odds: number }) {
+/** A targeting box round a part with its hit percent on a dark tab; in a turned place the percent is turned
+ *  back round its own middle, so it reads. */
+function Target({ name, x, y, size, odds, turned }: { name: string; x: number; y: number; size: number; odds: number; turned: boolean }) {
   const h = size / 2
   return (
     <g data-fx={name} opacity={0} transform={`translate(${x} ${y})`}>
       <path d={`M${-h} ${-h + 10} V${-h} H${-h + 10} M${h - 10} ${-h} H${h} V${-h + 10} M${h} ${h - 10} V${h} H${h - 10} M${-h + 10} ${h} H${-h} V${h - 10}`} fill="none" stroke={PHOSPHOR} strokeWidth={4} />
       <rect x={h + 6} y={-14} width={58} height={28} rx={3} fill={INK} />
-      <text x={h + 35} y={7} textAnchor="middle" fontFamily="monospace" fontSize={20} fontWeight={700} fill={PHOSPHOR}>
+      <text x={h + 35} y={7} transform={turned ? `translate(${2 * (h + 35)} 0) scale(-1 1)` : undefined} textAnchor="middle" fontFamily="monospace" fontSize={20} fontWeight={700} fill={PHOSPHOR}>
         {odds}%
       </text>
     </g>
@@ -438,12 +448,12 @@ const work: SceneDef = {
       </g>
     </>
   ),
-  front: () => (
+  front: ({ turned }) => (
     <>
       <Wreck />
       <Freeze />
-      <Target name="aim-head" x={workTarget.x} y={workTarget.y} size={70} odds={62} />
-      <Target name="aim-body" x={WORK_FOE - 30} y={-200} size={90} odds={88} />
+      <Target name="aim-head" x={workTarget.x} y={workTarget.y} size={70} odds={62} turned={turned} />
+      <Target name="aim-body" x={WORK_FOE - 30} y={-200} size={90} odds={88} turned={turned} />
       <Round to={workTarget} />
     </>
   ),
@@ -462,7 +472,7 @@ const work: SceneDef = {
     const freeze = fx(stage, 'freeze')
     const head = fx(stage, 'aim-head')
     const body = fx(stage, 'aim-body')
-    const camera = cameraWriter(stage)
+    const camera = cameraWriter(stage, input)
     const shot = roundWriter(stage, MUZZLE, workTarget)
     return (t) => {
       // the mutant rises from behind the wreck; the place goes green and stops on the targeting boxes
@@ -764,7 +774,7 @@ const muayThai: SceneDef = {
       ))}
     </>
   ),
-  front: () => (
+  front: ({ turned }) => (
     <>
       <Mutant x={DUEL.foe} />
       <path
@@ -777,7 +787,7 @@ const muayThai: SceneDef = {
         opacity={0}
       />
       <Freeze />
-      <Target name="aim-head" x={duelTarget.x} y={duelTarget.y} size={64} odds={95} />
+      <Target name="aim-head" x={duelTarget.x} y={duelTarget.y} size={64} odds={95} turned={turned} />
     </>
   ),
   // his turn: a hex step and the knee; the foe's turn: the block; the last: the kick in slow time
@@ -797,7 +807,7 @@ const muayThai: SceneDef = {
     const burst = fx(stage, 'burst')
     const freeze = fx(stage, 'freeze')
     const head = fx(stage, 'aim-head')
-    const camera = cameraWriter(stage)
+    const camera = cameraWriter(stage, input)
     return (t) => {
       const kneed = bell(t, 0.14, 0.3)
       const swing = bell(t, 0.32, 0.55)
@@ -895,8 +905,18 @@ export function sceneWriter(scene: Scene): (stage: StageNodes) => FigureWriter<D
 /** Where he stands in a scene: his usual spot, shifted right where the scene asks. */
 export const sceneSpot = ({ def, layout, left }: Scene): number => spotOf({ phone: layout.phone, left }) + (def.shift?.[layout.phone ? 'phone' : 'wide'] ?? 0)
 
+const NAMED: Record<SceneSide, number> = { right: 1, left: -1 }
+
+/** On a phone a section's place is turned round the middle of the view where he would end in the half it does
+ *  not name: he then plays it facing the other way, the place on his other side, and ends in the named half. */
+const turnedOf = (scene: Scene): boolean => {
+  if (scene.id === 'hero' || !scene.layout.phone) return false
+  const end = sceneSpot(scene) + scene.def.move(scene.kit, 1).ahead * placeScale(true)
+  return (end - PHONE_MIDDLE) * NAMED[scene.side] < 0
+}
+
 /** The input the scene's art reads. */
-export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, left: scene.left, kit: scene.kit })
+export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, left: scene.left, turned: turnedOf(scene), kit: scene.kit })
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 

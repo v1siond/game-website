@@ -7,7 +7,7 @@ import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform } from '../shared/figureScene'
 import { DWELLER_VIEW, DwellerFigure } from './dweller'
 import { dwellerJoints, setDwellerPose } from './pose'
-import { inputOf, placeScale, sceneSpot, sceneWriter, type Scene } from './scenes'
+import { MIRROR, inputOf, placeScale, sceneSpot, sceneWriter, type Scene } from './scenes'
 import { GROUND, PHONE_VIEW, VIEW, ZONE_ART, ZONE_FLOOR } from './zones'
 import { POSTER_INK } from './palette'
 import css from './stage.module.css'
@@ -17,7 +17,8 @@ import css from './stage.module.css'
 // each stage and pushes its layers in; the scene's writer plays the place and hands back his frame. Each
 // plane's art sits in a group (data-fx="cam-<layer>") the targeting shot's camera pushes in on. On a phone the
 // planes show a taller view from higher up the canvas, the ground half way down the screen, and the near
-// plane carries the floor on below the canvas.
+// plane carries the floor on below the canvas; a place a phone turns (scenes.tsx turnedOf) is drawn the other
+// way round in the figure plane only, the one that holds him and what he meets.
 
 /** Each layer's push in across its scene: the far layers move least, which gives the depth. */
 export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
@@ -79,12 +80,12 @@ const layersOf = (scene: Scene): StageLayer[] => {
       node: plane(
         'figure',
         phone,
-        <>
+        <g transform={input.turned ? MIRROR : undefined}>
           <ellipse cx={spot + 60} cy={GROUND[zone] + 4} rx={300} ry={14} fill={POSTER_INK} opacity={0.12} />
           <g transform={at}>{back(input)}</g>
           <Dweller scene={scene} />
           {front && <g transform={at}>{front(input)}</g>}
-        </>,
+        </g>,
       ),
     },
   ]
