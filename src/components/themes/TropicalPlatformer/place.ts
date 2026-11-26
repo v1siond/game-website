@@ -10,9 +10,11 @@ import type { Zone } from './zones'
 // round his spot, his move and the lemur's, and the place's reply to them. x 0 is his spot and y 0 the ground
 // in the art; his frame and the lemur's give how far ahead and how high.
 
-/** What a place's art and writers read: the phone's narrower view and the kit he wears. */
+/** What a place's art and writers read: the phone's narrower view, the left half from lg, and the kit he wears. */
 export interface SceneInput {
   phone: boolean
+  /** From lg it plays on the left half, its cards on the right. */
+  left: boolean
   kit: Profession
 }
 

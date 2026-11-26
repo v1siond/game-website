@@ -230,13 +230,15 @@ interface SceneSectionProps {
 }
 
 /** The column a section's sign and cards read in: from lg on the half its scene leaves free (a scene on the
- *  right reads its cards on the left, and the other way round), below lg the whole width over the scene. */
+ *  right reads its cards on the left, and the other way round), below lg centred, after the scene. */
 const READS_BESIDE: Record<SceneSide, string> = {
-  right: 'max-w-[42rem]',
-  left: 'max-w-[42rem] lg:ml-auto',
+  right: 'mx-auto max-w-3xl lg:ml-0 lg:mr-auto lg:max-w-[min(42rem,44vw)]',
+  left: 'mx-auto max-w-3xl lg:ml-auto lg:mr-0 lg:max-w-[min(42rem,44vw)]',
 }
 
-/** One level of the page; under reduced motion its own stage sits still behind its head. */
+/** One level of the page; under reduced motion its own stage sits still behind its head. Below lg the head
+ *  holds the scene alone until it has played (the theatre plays it over half a screen of scroll on a phone,
+ *  over 1.2 screens wider), so the sign and cards come up over an ended scene. */
 export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   const { sections } = useLabels()
   const Cards = CARDS[slot.id] as (props: { slot: SectionSlot }) => ReactNode
@@ -246,7 +248,7 @@ export function SceneSection({ scene, slot, still }: SceneSectionProps) {
   return (
     <section data-scene={scene.id} aria-labelledby={id} className="relative px-4 pb-[60svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
       {still && <JungleStage scene={scene} settled />}
-      <header className={`relative flex min-h-[90svh] items-end justify-center pb-6 max-md:min-h-[130svh] motion-reduce:min-h-[70svh] ${column}`}>
+      <header className={`relative flex min-h-[90svh] items-end justify-center pb-6 max-md:min-h-[130svh] md:max-lg:motion-safe:min-h-[220svh] motion-reduce:min-h-[70svh] ${column}`}>
         <LevelSign id={id} title={title} />
       </header>
       <div className={`relative ${column}`}>

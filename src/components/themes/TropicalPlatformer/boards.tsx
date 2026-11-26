@@ -66,10 +66,12 @@ export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
 export function VentureBoard({ companies }: { companies: CVData['companies'] }) {
   const { links, cards, sections } = useLabels()
 
+  // Two featured to a row and three others; between lg and xl the cards' column is under half the screen, so
+  // there every card takes half a row.
   return (
     <ul className="grid gap-5 md:grid-cols-6">
       {companies.map(ventureCard).map((company) => (
-        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
+        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2 lg:max-xl:col-span-3'}>
           <a
             href={company.url}
             target="_blank"

@@ -9,7 +9,8 @@ import { COVER, Flash } from './kit'
 // Ventures: the haunted castle's boss (research/2026-11-25-deep-dk64 §3: the cardboard likeness of the king
 // on the rampart in the constant storm, worked by two soldiers, hit by an ape fired from a barrel cannon as it
 // passes). On the rampart in the rain he climbs into the barrel cannon as the king's cardboard likeness rolls
-// in on its stand, pushed by two snappers; the cannon fires him through it, he lands beyond, it falls in two,
+// in on its stand, pushed by two snappers (from lg on the left half it rolls in out of the dark, so it is never
+// seen on the cards' side); the cannon fires him through it, he lands beyond, it falls in two,
 // the snappers run, and the key lies on the stones. He stands on the rampart in the rain, the broken likeness
 // and the key beside him.
 
@@ -90,7 +91,7 @@ export const ventures: SceneDef = {
     </g>
   ),
   move: (_kit, t) => move(t),
-  reply: (stage) => {
+  reply: (stage, input) => {
     const cut = fx(stage, 'cut')
     const left = fx(stage, 'cut-left')
     const right = fx(stage, 'cut-right')
@@ -104,7 +105,9 @@ export const ventures: SceneDef = {
     const lightning = fx(stage, 'lightning')
     return (t) => {
       const x = cutAt(t)
+      const shown = input.left ? ramp(t, 0.2, 0.3) : 1
       transformTo(cut, `translate(${r1(x)} 0)`)
+      fadeTo(cut, shown)
       // the board breaks where he went through: the two halves lean apart about their feet and sag
       const fall = ease(ramp(t, HIT, HIT + 0.16))
       transformTo(left, `translate(${r1(-30 * fall)} 0) rotate(${r1(-28 * fall)} -46 -40)`)
@@ -113,7 +116,7 @@ export const ventures: SceneDef = {
       const run = ramp(t, HIT + 0.04, 0.9)
       pushers.forEach((pusher, i) => {
         transformTo(pusher, `translate(${r1(x + PUSHERS[i] + 600 * run * run)} ${r1(-6 * Math.abs(Math.sin(t * 50 + i)))}) scale(${run > 0 ? -1 : 1} 1)`)
-        fadeTo(pusher, 1 - ramp(run, 0.6, 1))
+        fadeTo(pusher, shown * (1 - ramp(run, 0.6, 1)))
       })
       // the cannon bucks as he climbs in and fires
       const fired = bell(t, FIRE - 0.02, FIRE + 0.08)

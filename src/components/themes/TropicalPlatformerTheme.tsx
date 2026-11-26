@@ -53,9 +53,9 @@ const ROOT_VARS = { ...PALETTE_VARS, ...TONE_VARS.jungle }
 // off it; he drops from his treehouse in the morning and slams the ground. Then every section of the active
 // profession is one full screen world of the run in the game's order (./TropicalPlatformer/places) that rises
 // from dark, holds while its sign and boards scroll over it, and sinks back into dark while the next one rises,
-// its one to three actions played by the scroll on the shared scene player. From lg the sections take turns:
+// its one to three actions played by the scroll on the shared scene player. The sections take turns: from lg
 // the first after the hero reads its cards on the left beside its scene on the right, the next the other way
-// round, and so on to Contact, the ride home. Every motion is a function of the scroll position, on the shared
+// round, and so on to Contact, the ride home; below lg each plays in the half it names before its cards come up. Every motion is a function of the scroll position, on the shared
 // theatre (./shared/theatre) and its settle: scroll up and it plays back. Under reduced motion there is no
 // theatre: each section carries its own picture, still, at its end frame.
 //
@@ -70,8 +70,8 @@ const CONTACT_HEADING = headingId('jungle', 'Contact')
 
 // The contact's posts and card: centred below lg, from lg on the half its scene leaves free, as a section's.
 const CONTACT_BESIDE: Record<SceneSide, string> = {
-  right: 'mx-auto max-w-3xl lg:ml-0 lg:mr-auto lg:max-w-[42rem]',
-  left: 'mx-auto max-w-3xl lg:ml-auto lg:mr-0 lg:max-w-[42rem]',
+  right: 'mx-auto max-w-3xl lg:ml-0 lg:mr-auto lg:max-w-[min(42rem,44vw)]',
+  left: 'mx-auto max-w-3xl lg:ml-auto lg:mr-0 lg:max-w-[min(42rem,44vw)]',
 }
 
 export default function TropicalPlatformerTheme() {
@@ -150,9 +150,9 @@ export default function TropicalPlatformerTheme() {
           </ProfessionRegion>
 
           {/* The space over and under the contact card lets its scene, the gentle giant freed and the troop riding
-            him home, play out before the page ends; on a phone the space over it is taller, so the posts board and
+            him home, play out before the page ends; below lg the space over it is taller, so the posts board and
             the card come up only once he is on his way. From lg the card reads on the half its scene leaves free. */}
-          <section data-scene={contact.id} className="relative px-4 pb-[70svh] pt-[60svh] max-md:motion-safe:pt-[110svh] motion-reduce:pb-8 motion-reduce:pt-16 sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
+          <section data-scene={contact.id} className="relative px-4 pb-[70svh] pt-[60svh] max-md:motion-safe:pt-[110svh] md:max-lg:motion-safe:pt-[220svh] motion-reduce:pb-8 motion-reduce:pt-16 sm:px-6 lg:px-[6vw]" aria-labelledby={CONTACT_HEADING}>
             {reduced && <JungleStage scene={contact} settled />}
             <PostsGate>
               <div className={`relative ${CONTACT_BESIDE[contact.side]}`}>

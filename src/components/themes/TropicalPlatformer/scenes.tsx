@@ -40,14 +40,16 @@ const sideOf = (index: number): SceneSide => (index % 2 === 0 ? 'right' : 'left'
 export type HeroState = FigureState<FigurePose>
 
 // The middle of the half a section leaves free on a 1440 by 1080 canvas drawn 1:1 on a wide screen, and how
-// wide a place may be in it: right of the cards' column (x 86 to 758) or left of it (x 682 to 1354), inside the
-// canopy's fronds at both edges, and measured before the layers' push in, which carries what is far from the
+// wide a place may be in it: right of the cards' column (x 86 to 720, 44% of the width, so it still ends short
+// of the middle at 1024) or left of it (x 720 to 1354), inside the canopy's fronds at both edges, and measured before the layers' push in, which carries what is far from the
 // middle about a tenth further out.
 const WIDE_FREE: Record<SceneSide, number> = { right: 1045, left: 398 }
 const WIDE_ROOM = 550
-// Between a phone and lg the cards read most of the width and no half is free: the place stands as far right as
-// it still shows whole on a 768 wide screen (the canvas seen from about x 260 to 1180).
-const BETWEEN_MIDDLE = 900
+// Between a phone and lg the section stacks as on a phone: the scene plays first in the whole screen and the
+// cards come after it, full width. The place stands in the half the section names, whole on a 768 wide screen
+// (the canvas seen from about x 260 to 1180, its middle 720), and is never wider than that half.
+const STACKED_FREE: Record<SceneSide, number> = { right: 950, left: 490 }
+const STACKED_ROOM = 440
 // The middle of a phone's view (zones.tsx PHONE_VIEW, x 480 to 1040), how wide a place may be in it, and how far
 // into the half the section names the spot he ends on sits.
 const PHONE_MIDDLE = 760
@@ -58,11 +60,15 @@ const widthOf = (def: SceneDef): number => def.span[1] - def.span[0]
 
 /** A place, he and the troop are drawn at the place's size, on a phone's narrow view at this share of it, less
  *  for a place that asks for it, and never wider than the room its half or the phone's view has. */
-export const placeScale = ({ def, layout }: Scene): number => {
+export const placeScale = (scene: Scene): number => {
+  const { def, layout } = scene
   const size = (def.size ?? 1) * (layout.phone ? 0.8 * (def.phoneSize ?? 1) : 1)
   if (def.spot) return size
-  return Math.min(size, (layout.phone ? PHONE_ROOM : WIDE_ROOM) / widthOf(def))
+  return Math.min(size, roomOf(scene) / widthOf(def))
 }
+
+/** How wide a place may be: in a phone's view, in the half a stacked section names, or in the free half. */
+const roomOf = ({ layout, split }: Scene): number => (layout.phone ? PHONE_ROOM : split ? WIDE_ROOM : STACKED_ROOM)
 
 /** Before the section arrives a scene shows its first frame. */
 const START: Playhead = { action: 0, t: 0, done: false }
@@ -120,8 +126,8 @@ export interface Placing {
   mirrored: boolean
 }
 
-/** Where he stands in a scene: the place's stretch centred in the free half from lg, as far right as it shows
- *  whole below it; in a phone's view centred, drawn the other way round where he would end in the half the
+/** Where he stands in a scene: the place's stretch centred in the free half from lg, in the half the section
+ *  names between a phone and lg; in a phone's view centred, drawn the other way round where he would end in the half the
  *  section does not name (he then goes the other way, facing it, nothing lettered in it), and leant toward the
  *  named half as far as the place still shows whole; the hero at its own spot. */
 export const placingOf = (scene: Scene): Placing => {
@@ -129,7 +135,7 @@ export const placingOf = (scene: Scene): Placing => {
   if (def.spot) return { spot: layout.phone ? def.spot.phone : def.spot.wide, mirrored: false }
   const [from, to] = def.span
   const size = placeScale(scene)
-  if (!layout.phone) return { spot: (scene.split ? WIDE_FREE[side] : BETWEEN_MIDDLE) - ((from + to) / 2) * size, mirrored: false }
+  if (!layout.phone) return { spot: (scene.split ? WIDE_FREE : STACKED_FREE)[side] - ((from + to) / 2) * size, mirrored: false }
   const centred = PHONE_MIDDLE - ((from + to) / 2) * size
   const end = centred + def.move(kit, 1).ahead * size
   const named = side === 'right' ? 1 : -1
@@ -147,7 +153,7 @@ export const sceneSpot = (scene: Scene): number => placingOf(scene).spot
 export const MIRROR = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
 
 /** The input the scene's art reads. */
-export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, kit: scene.kit })
+export const inputOf = (scene: Scene): SceneInput => ({ phone: scene.layout.phone, left: scene.split && scene.side === 'left', kit: scene.kit })
 
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
@@ -168,15 +174,13 @@ interface Screen {
 }
 
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact; the
- *  sections after the hero taking turns right and left on a phone and from lg (`split`, cards and scene side
- *  by side). */
+ *  sections after the hero taking turns right and left at every width, beside their cards from lg (`split`),
+ *  in the half they name above their cards below it. */
 export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, split: boolean, highlights: number, labels: RecordWords): Scene[] => {
-  // Between a phone and lg the cards read full width on the left, so every scene plays right of them.
-  const side = (index: number): SceneSide => (phone || split ? sideOf(index) : 'right')
   const screen = { phone, split }
   return [
     sceneOf('hero', null, NO_ITEMS, profession, screen, 'right'),
-    ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, screen, side(i))),
-    sceneOf('contact', null, NO_ITEMS, profession, screen, side(slots.length)),
+    ...slots.map((slot, i) => sceneOf(slot.id, slot, stageItems(slot, labels, highlights), profession, screen, sideOf(i))),
+    sceneOf('contact', null, NO_ITEMS, profession, screen, sideOf(slots.length)),
   ]
 }
