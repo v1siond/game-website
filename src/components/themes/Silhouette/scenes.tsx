@@ -109,12 +109,12 @@ export const SIDE_CLASS: Record<Side, string> = { right: '', left: page.cardsRig
 
 /** Each stretch's framing: the hero's from where he wakes, every other from where the one before held him
  *  to its own side's hold, the camera's swing between the two its turn. */
-function framingsOf(planned: readonly Planned[], phone: boolean) {
+function framingsOf(planned: readonly Planned[], phone: boolean, split: boolean) {
   const hero = framingOf(true, phone)
-  return planned.reduce<{ start: number; hold: number; turn: number }[]>((framings, { side }, i) => {
+  return planned.reduce<{ start: number; hold: number; turn: number }[]>((framings, { id, side }, i) => {
     if (i === 0) return [{ ...hero, turn: 0 }]
     const start = framings[i - 1].hold
-    const hold = holdOf(side, phone)
+    const hold = holdOf(side, phone, split ? PLACES[id].splitHold : undefined)
     return [...framings, { start, hold, turn: start - hold }]
   }, [])
 }
@@ -134,7 +134,7 @@ export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highligh
     }),
     { id: 'contact', slot: null, count: 0, side: side(slots.length) },
   ]
-  const framings = framingsOf(planned, phone)
+  const framings = framingsOf(planned, phone, split)
   // the hero's run also crosses the screen from where he wakes to the hold
   const lengths = planned.map(({ id }, i) => PLACES[id].length + (i === 0 ? framings[0].hold - framings[0].start : 0))
   const stretches = stretchesOf(lengths)

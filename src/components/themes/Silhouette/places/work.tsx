@@ -109,6 +109,8 @@ function feetAt(t: number, his: number, body: Point): Point[] {
 }
 
 export const work: Place = {
+  // from lg held further left, so the spider's far legs planted ahead of him stay clear of the cards
+  splitHold: { left: 350 },
   region: 'forest',
   length: TRAP,
   script: [1700, 1600, 1500],

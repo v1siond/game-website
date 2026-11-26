@@ -48,8 +48,9 @@ export type Side = 'right' | 'left'
 const WIDE_HOLD: Record<Side, number> = { right: HOLD, left: 420 }
 const PHONE_HOLD: Record<Side, number> = { right: HOLD, left: HOLD - 130 }
 
-/** Where the camera holds him at a stretch's end on its side. */
-export const holdOf = (side: Side, phone: boolean): number => (phone ? PHONE_HOLD : WIDE_HOLD)[side]
+/** Where the camera holds him at a stretch's end on its side: a stretch beside the cards may hold him where
+ *  its own `split` says, so what it leaves behind him (or has ahead of him) stays clear of the cards. */
+export const holdOf = (side: Side, phone: boolean, split?: Partial<Record<Side, number>>): number => (phone ? PHONE_HOLD[side] : (split?.[side] ?? WIDE_HOLD[side]))
 
 /** Where the hero starts him on screen and where the camera holds him at its end. */
 export const framingOf = (wakes: boolean, phone: boolean): Framing => ({ start: wakes && !phone ? WAKE_X : HOLD, hold: HOLD })

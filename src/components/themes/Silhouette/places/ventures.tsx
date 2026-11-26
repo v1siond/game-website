@@ -82,6 +82,9 @@ function Panel({ i, light }: { i: number; light: Light }) {
 }
 
 export const ventures: Place = {
+  // from lg held near the screen's left edge, so the dome he drops onto, ahead of him all through the sign,
+  // stays clear of the cards
+  splitHold: { left: 220 },
   region: 'city',
   length: DOME.x,
   script: [1600, 1500, 1500],

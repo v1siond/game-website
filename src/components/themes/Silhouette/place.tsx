@@ -52,6 +52,9 @@ export interface Place {
   ends: readonly number[]
   /** On a phone, how far above the ground the view's top sits (forest PHONE_TOP when unset). */
   phoneTop?: number
+  /** Beside the cards (from lg), where the camera holds him at the stretch's end on a side, where it differs
+   *  from forest's WIDE_HOLD: what the stretch has behind or ahead of him is wider than that hold leaves free. */
+  splitHold?: Partial<Record<Side, number>>
   /** Where the ground is open, in run units. */
   gaps?: readonly Gap[]
   /** The obstacle and whatever else stands on the stretch, in run units. */

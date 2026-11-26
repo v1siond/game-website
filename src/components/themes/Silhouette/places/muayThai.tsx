@@ -75,6 +75,8 @@ function Gun({ x, facing, name }: { x: number; facing: 1 | -1; name: string }) {
 }
 
 export const muayThai: Place = {
+  // from lg held further right, so the near gun on the room's far side from him stays clear of the cards
+  splitHold: { right: 1260 },
   region: 'machine',
   length: LAND,
   // the camera looks across the room while the near gun fires, so on a phone both guns are in the frame

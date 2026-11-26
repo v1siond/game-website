@@ -13,14 +13,18 @@ import { CROUCH, TUCK, rest } from '../pose'
 // nods with its beat, once, twice; on the off beat he runs under the presses as they rise; he jumps onto a
 // tooth of the gear, which carries him up and over to the gantry, the presses still beating below.
 
-const PRESSES = [150, 230] as const
-const WAIT = 90
+// The presses stand close before the gear, so from lg, held right of the cards on the gantry, he still has
+// them in the free half behind him.
+const PRESSES = [215, 290] as const
+const WAIT = 140
 const PRESS = { w: 70, up: -190 }
 const GEAR = { x: 510, y: 40, r: 140 }
 const BOARD = 205
 const OFF = 290
 const LOOK_AHEAD = 70
 const GANTRY = { from: 650, to: 800, h: 170 }
+// Where he lands on the gantry, a little in from its end over the gear.
+const LANDING = GANTRY.from + 20
 
 /** How far down the presses are at t, 0 up to 1 slammed: four beats over the count, then held up for the
  *  run under them, then beating on. */
@@ -59,13 +63,14 @@ function move(profession: Profession, t: number): Frame {
   }
   const off = rimAt(OFF + 30)
   const jump = ramp(t, 0.86, 0.94)
-  if (jump < 1) return { pose: mix(TUCK, CROUCH, ramp(jump, 0.7, 1)), ahead: lerp(off.x, GANTRY.from + 40, jump), lift: off.lift + arc(jump, 30, GANTRY.h - off.lift), over: 0 }
-  return { pose: mix(CROUCH, rest(profession), ramp(t, 0.94, 1)), ahead: GANTRY.from + 40, lift: GANTRY.h, over: 0 }
+  if (jump < 1) return { pose: mix(TUCK, CROUCH, ramp(jump, 0.7, 1)), ahead: lerp(off.x, LANDING, jump), lift: off.lift + arc(jump, 30, GANTRY.h - off.lift), over: 0 }
+  return { pose: mix(CROUCH, rest(profession), ramp(t, 0.94, 1)), ahead: LANDING, lift: GANTRY.h, over: 0 }
 }
 
 export const bands: Place = {
   region: 'machine',
-  length: GANTRY.from + 40,
+  length: LANDING,
+  splitHold: { right: 1300 },
   script: [1600, 1300, 1800],
   ends: [0.32, 0.5, 1],
   // the camera looks ahead to the presses while he counts and runs under them
@@ -100,7 +105,7 @@ export const bands: Place = {
       <circle cx={GEAR.x} cy={GEAR.y} r={GEAR.r * 0.32} fill={light.far} opacity={0.4} />
       <path d={`M${GEAR.x - GEAR.r * 1.05} ${GEAR.y - GEAR.r * 0.4} A${GEAR.r * 1.12} ${GEAR.r * 1.12} 0 0 1 ${GEAR.x + GEAR.r * 0.4} ${GEAR.y - GEAR.r * 1.05}`} stroke={light.rim} strokeOpacity={0.35} strokeWidth={3} fill="none" />
       <rect x={GANTRY.from} y={-GANTRY.h} width={GANTRY.to - GANTRY.from} height={GANTRY.h + 4} fill={SHADE.black} />
-      <path d={`M${GANTRY.from + 20} ${-GANTRY.h} V${-GANTRY.h - 40} M${GANTRY.from + 20} ${-GANTRY.h - 40} h40`} stroke={SHADE.black} strokeWidth={6} />
+      <path d={`M${GANTRY.from + 70} ${-GANTRY.h} V${-GANTRY.h - 40} M${GANTRY.from + 70} ${-GANTRY.h - 40} h40`} stroke={SHADE.black} strokeWidth={6} />
     </>
   ),
   move,

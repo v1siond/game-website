@@ -84,6 +84,8 @@ function spiderFrame(t: number) {
 }
 
 export const tech: Place = {
+  // from lg held a little further right, so the spider's legs reaching back over him stay clear of the cards
+  splitHold: { right: 1190 },
   region: 'forest',
   length: THROWN,
   script: [1600, 1700, 1500],
