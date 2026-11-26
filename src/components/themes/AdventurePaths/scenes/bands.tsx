@@ -4,7 +4,7 @@ import { fadeTo, fx, lerp, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { BLOCK, Cloud, GROUND, Sky, Stars, rigOf } from './kit'
 import { levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, clearOf, phase, reach, startX, type Level, type LevelInput } from './level'
 import { DrumPad, FilledBlock, Note } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -45,8 +45,13 @@ function NoteBlock({ i, x, big = false }: { i: number; x: number; big?: boolean 
   )
 }
 
+/** The drum on the stage, past the row of note blocks, and where he lands to play it. */
+const drumAt = (input: LevelInput): number => startX(input) + reach(input, 260) + 40
+const drumOf = (input: LevelInput): number => drumAt(input) - 60
+
 export const bands: Level = {
   script: [MAP_MS, 1600, 1900],
+  end: drumOf,
   layers: (input) => {
     const x = startX(input)
     const step = reach(input, 130)
@@ -94,7 +99,8 @@ export const bands: Level = {
     const blockX = (i: number) => x0 + ROW + i * step + (i === BIG ? 20 : 0)
     const topOf = (i: number) => GROUND - SIZE * (i === BIG ? 1.4 : 1)
     const middle = (i: number) => blockX(i) + (SIZE * (i === BIG ? 1.4 : 1)) / 2
-    const drumX = x0 + reach(input, 260) + 40
+    const drumX = drumAt(input)
+    const start = clearOf(input, x0 - reach(input, 120))
     return (play) => {
       const walked = phase(play, 0)
       map({ walk: ramp(walked, 0, 0.6), open: ramp(walked, 0.55, 1) })
@@ -115,18 +121,18 @@ export const bands: Level = {
       })
       if (launching > 0) {
         const fly = ramp(launching, 0, 0.5)
-        const x = lerp(middle(BIG), drumX - 60, fly)
+        const x = lerp(middle(BIG), drumOf(input), fly)
         const y = lerp(topOf(BIG), STAGE_Y - 20, fly) - hop(fly, 260)
         const beat = Math.floor(ramp(launching, 0.55, 1) * 8) % 2 === 0
         hero(x, y, fly < 1 ? 'jump' : launching >= 1 ? 'cheer' : beat ? 'stomp' : 'stand', false, fly < 1 ? fly * 720 : 0)
         return
       }
       // from his start onto the first block, then block to block
-      const from = on === 0 ? x0 - reach(input, 120) : middle(on - 1)
+      const from = on === 0 ? start : middle(on - 1)
       const fromY = on === 0 ? GROUND : topOf(on - 1)
       const x = lerp(from, middle(on), u)
       const y = lerp(fromY, topOf(on), u) - hop(u, 150)
-      hero(bouncing <= 0 ? x0 - reach(input, 120) : x, bouncing <= 0 ? GROUND : y, bouncing <= 0 ? 'stand' : 'jump')
+      hero(bouncing <= 0 ? start : x, bouncing <= 0 ? GROUND : y, bouncing <= 0 ? 'stand' : 'jump')
     }
   },
 }

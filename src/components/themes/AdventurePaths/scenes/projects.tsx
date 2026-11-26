@@ -5,7 +5,7 @@ import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../sh
 import { TRAIL } from '../palette'
 import { BLOCK, GROUND, HERO_TALL, Sky, TileGround, rigOf } from './kit'
 import { levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level, type LevelInput } from './level'
+import { MAP_MS, clearOf, phase, reach, startX, type Level, type LevelInput } from './level'
 import { Coin, Rock } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -26,6 +26,9 @@ const SHORE = 315
 // 1030 at 390 wide, a little less at 360), and how far left of the door he lands, clear of it.
 const DOOR = 150
 const BESIDE_DOOR = 90
+
+/** Where he ends: up on the shore ledge, beside its door. */
+const ashoreOf = (input: LevelInput): number => startX(input) + reach(input, SHORE) + reach(input, DOOR) - BESIDE_DOOR
 
 // Where his feet go under water: the depth he dives to, the deepest point of his swim (over the sleeper) and
 // where he ends it; how far a stroke lifts him and how many he takes.
@@ -63,7 +66,7 @@ interface Swimmer {
 /** Where his feet are at point s (0 to 1) of the swim, and how far through a stroke he is. */
 function swimAt(input: LevelInput, s: number): Swimmer {
   const x0 = startX(input)
-  const x = lerp(x0 - reach(input, 100), x0 + reach(input, 150), s)
+  const x = lerp(clearOf(input, x0 - reach(input, 100)), x0 + reach(input, 150), s)
   if (s < DIVE_IN) return { x, y: SURFACE - 40 + drop(s / DIVE_IN, DIVE_Y - SURFACE + 40), stroke: 0 }
   const v = ramp(s, DIVE_IN, 1)
   const base = v < 0.5 ? lerp(DIVE_Y, DEEP_Y, v * 2) : lerp(DEEP_Y, SWIM_END_Y, (v - 0.5) * 2)
@@ -214,6 +217,7 @@ function Lake({ to }: { to: number }): ReactNode {
 
 export const projects: Level = {
   script: [MAP_MS, 2200, 1600],
+  end: ashoreOf,
   layers: (input) => {
     const x0 = startX(input)
     const shore = x0 + reach(input, SHORE)
@@ -294,7 +298,6 @@ export const projects: Level = {
     const bubble = fx(stage, 'bubble')
     const spray = fx(stage, 'spray')
     const x0 = startX(input)
-    const shore = x0 + reach(input, SHORE)
     const exitX = x0 + reach(input, 230)
     const bed = bedOf(input)
     const end = swimAt(input, 1)
@@ -355,7 +358,7 @@ export const projects: Level = {
           hero(lerp(end.x, exitX, climb), lerp(end.y, OUT_Y, climb) - strokeLift(stroke) * (1 - climb), stroke < 0.25 ? 'strokeA' : 'strokeB', false, stroke < 0.25 ? -10 : 0)
           return
         }
-        hero(lerp(exitX, shore + reach(input, DOOR) - BESIDE_DOOR, out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 150), out < 1 ? 'jump' : 'stand')
+        hero(lerp(exitX, ashoreOf(input), out), lerp(OUT_Y, SHORE_Y, out) - hop(out, 150), out < 1 ? 'jump' : 'stand')
         return
       }
 

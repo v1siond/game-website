@@ -6,7 +6,8 @@ import { about } from './scenes/about'
 import { bands } from './scenes/bands'
 import { goal } from './scenes/goal'
 import { hub } from './scenes/hub'
-import type { Level } from './scenes/level'
+import type { Level, LevelInput } from './scenes/level'
+import { PHONE_MIDDLE } from './scenes/frame'
 import type { SpotId } from './scenes/worldMap'
 import { sceneEnd, type Playhead, type SceneScript } from '@/lib/scroll/player'
 import { muayThai } from './scenes/muayThai'
@@ -68,9 +69,19 @@ export interface TrailScene extends TheatreScene, Omit<SceneDef, 'level'> {
 /** A scene's spot on the world map: the hero's is his house. */
 const spotOf = (id: SceneId): SpotId => (id === 'hero' ? 'home' : id)
 
+const NAMED: Record<SceneSide, number> = { right: 1, left: -1 }
+
+/** On a phone a level is turned round the middle of the view where he would end in the half its section does
+ *  not name: he then runs it the other way, facing the way he goes, and ends in the named half. */
+const turnedOf = ({ end }: Level, side: SceneSide, input: LevelInput): boolean => {
+  if (!end || !input.phone) return false
+  return (end(input) - PHONE_MIDDLE) * NAMED[side] < 0
+}
+
 const sceneOf = (id: SceneId, slot: SectionSlot | null, before: SceneId, profession: Profession, screen: Screen, side: SceneSide): TrailScene => {
   const { level, ...def } = SCENE_DEFS[id]
-  const input = { profession, phone: screen.phone, left: screen.wide && side === 'left', from: spotOf(before), at: spotOf(id) }
+  const placed: LevelInput = { profession, phone: screen.phone, left: screen.wide && side === 'left', turned: false, from: spotOf(before), at: spotOf(id) }
+  const input: LevelInput = { ...placed, turned: turnedOf(level, side, placed) }
   return {
     ...def,
     id,

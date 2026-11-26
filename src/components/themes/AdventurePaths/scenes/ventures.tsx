@@ -4,7 +4,7 @@ import { fadeTo, fx, lerp, r1, transformTo, translateTo } from '../../shared/sta
 import { TRAIL } from '../palette'
 import { GROUND, TileGround, rigOf, runFrame } from './kit'
 import { Foe, foeOf, levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, clearOf, phase, reach, startX, type Level, type LevelInput } from './level'
 import { GoldBlock } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -19,6 +19,11 @@ const CRUSHER = 130
 const UP = 360
 // The castle's platform: its middle past his start, its half width and its height over the lava.
 const PIVOT = 220
+/** His spot on the deck, back from its pivot, where each stomp starts and the fight ends. */
+const SPOT = -80
+
+/** Where he ends: at his spot on the tipped deck. */
+const deckOf = (input: LevelInput): number => startX(input) + reach(input, PIVOT) + SPOT
 const HALF = 260
 const DECK_Y = GROUND - 200
 const TILTS = [0, 9, 18, 30]
@@ -64,6 +69,7 @@ function Armour() {
 
 export const ventures: Level = {
   script: [MAP_MS, 1500, 1900],
+  end: deckOf,
   layers: (input) => {
     const x = startX(input)
     const pivot = x + reach(input, PIVOT)
@@ -145,7 +151,7 @@ export const ventures: Level = {
         translateTo(node, xs[i], UP + down * (GROUND - CRUSHER - UP))
       })
       if (!inCastle) {
-        const x = lerp(x0 - reach(input, 160), x0 + reach(input, 480), ramp(running, 0.1, 1))
+        const x = lerp(clearOf(input, x0 - reach(input, 160)), x0 + reach(input, 480), ramp(running, 0.1, 1))
         hero(x, GROUND, running > 0.1 && running < 1 ? runFrame(x) : 'stand')
         return
       }
@@ -159,15 +165,14 @@ export const ventures: Level = {
       const off = ramp(fighting, 0.85, 1)
       boss(pivot + bossDx + 120 * off, onDeck(bossDx, tilt) + drop(off, 260), landed > 0 && u < 0.7 ? 'critterFlat' : 'critterA', 30 * off, 1 - off)
       // each stomp: from his spot up onto the boss's back, then a bounce back to his spot
-      const spot = -80
       if (fighting >= 1) {
-        hero(pivot + spot, onDeck(spot, tilt), 'cheer')
+        hero(deckOf(input), onDeck(SPOT, tilt), 'cheer')
         return
       }
       const going = ramp(u, 0, 0.55)
       const back = ramp(u, 0.55, 1)
       const target = 80 + 50 * stomp
-      const dx = u < 0.55 ? lerp(spot, target, going) : lerp(target, spot, back)
+      const dx = u < 0.55 ? lerp(SPOT, target, going) : lerp(target, SPOT, back)
       const y = onDeck(dx, tilt) - BACK * (u < 0.55 ? going : 1 - back) - (u < 0.55 ? hop(going, 220) : hop(back, 120))
       hero(pivot + dx, y, u < 0.45 ? 'jump' : u < 0.65 ? 'stomp' : 'jump')
     }

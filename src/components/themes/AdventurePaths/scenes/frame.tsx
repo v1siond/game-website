@@ -7,8 +7,8 @@ import type { LevelInput } from './level'
 import { WorldMap } from './worldMap'
 
 // The layers every level stacks on the shared canvas, back to front: its sky, far and mid hills, the
-// ground, the things he plays with and him (in one camera group), the foreground, and the world map the
-// level opens from. A foe is a FoeRig facing him, placed and framed by its writer.
+// ground, the things he plays with and him (in one camera group, drawn the other way round in a level a phone
+// turns), the foreground, and the world map the level opens from. A foe is a FoeRig facing him, placed and framed by its writer.
 
 export interface LevelArt {
   sky: ReactNode
@@ -22,6 +22,11 @@ export interface LevelArt {
   fg?: ReactNode
 }
 
+/** The middle of a phone's view of the canvas (x 570 to 1030), the line a turned level is drawn round. */
+export const PHONE_MIDDLE = 800
+
+const TURN = `translate(${2 * PHONE_MIDDLE} 0) scale(-1 1)`
+
 export function levelLayers(art: LevelArt, input: LevelInput, map = true): StageLayer[] {
   const layers: StageLayer[] = [
     { name: 'sky', node: <Canvas>{art.sky}</Canvas> },
@@ -32,10 +37,12 @@ export function levelLayers(art: LevelArt, input: LevelInput, map = true): Stage
       name: 'figure',
       node: (
         <Canvas>
-          <g data-fx="camera">
-            {art.things}
-            <HeroRig profession={input.profession} />
-            {art.front}
+          <g transform={input.turned ? TURN : undefined}>
+            <g data-fx="camera">
+              {art.things}
+              <HeroRig profession={input.profession} />
+              {art.front}
+            </g>
           </g>
         </Canvas>
       ),

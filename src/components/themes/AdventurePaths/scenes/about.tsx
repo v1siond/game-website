@@ -4,7 +4,7 @@ import { fadeTo, frames, fx, lerp, r1, transformTo, translateTo } from '../../sh
 import { TRAIL } from '../palette'
 import { BLOCK, Bush, Cloud, DomeHills, GROUND, GrassGround, HERO_TALL, PillHills, Placed, Sky, critterStep, rigOf, runFrame } from './kit'
 import { Foe, foeOf, levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, clearOf, phase, reach, startX, type Level, type LevelInput } from './level'
 import { Coin, ItemBox, OpenBox } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -39,8 +39,12 @@ export function tapeOf(stage: ParentNode, name: string): (t: number) => void {
   }
 }
 
+/** Where he ends: through the tape, past the walker. */
+const pastOf = (input: LevelInput): number => startX(input) + reach(input, 520)
+
 export const about: Level = {
   script: [MAP_MS, 1300, 1700],
+  end: pastOf,
   layers: (input) => {
     const x = startX(input)
     return levelLayers(
@@ -96,7 +100,7 @@ export const about: Level = {
     const x0 = startX(input)
     const boxY = GROUND - HERO_TALL - BOX_GAP - SIZE
     const stompAt = x0 + reach(input, 230)
-    const past = x0 + reach(input, 520)
+    const past = pastOf(input)
     return (play) => {
       const walked = phase(play, 0)
       map({ walk: ramp(walked, 0, 0.6), open: ramp(walked, 0.55, 1) })
@@ -125,7 +129,7 @@ export const about: Level = {
         hero(x, GROUND - lift, dash > 0 ? (dash < 1 ? runFrame(x) : 'stand') : leap < 1 ? 'jump' : bounce < 1 ? 'stomp' : 'stand')
         return
       }
-      const x = lerp(x0 - reach(input, 140), x0 + reach(input, 20), run)
+      const x = lerp(clearOf(input, x0 - reach(input, 140)), x0 + reach(input, 20), run)
       hero(x, GROUND - hop(jump, BOX_GAP + 10), jump > 0 && jump < 1 ? 'jump' : run > 0 && run < 1 ? runFrame(x) : 'stand')
     }
   },

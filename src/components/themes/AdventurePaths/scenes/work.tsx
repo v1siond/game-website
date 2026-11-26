@@ -18,6 +18,9 @@ const SIZE = 24 * BLOCK
 const fenceAt = ({ phone }: LevelInput): number => (phone ? 160 : 380)
 const foeAt = ({ phone }: LevelInput): number => (phone ? 110 : 300)
 const FENCE_W = 150
+
+/** Where he ends: on the ledge past the fence's top. */
+const ledgeOf = (input: LevelInput): number => startX(input) + fenceAt(input) + FENCE_W - 10
 const LEDGE_Y = GROUND - 420
 
 /** A stone block, grey with a bevel. */
@@ -64,6 +67,7 @@ function TileRow() {
 
 export const work: Level = {
   script: [MAP_MS, 1500, 1700],
+  end: ledgeOf,
   layers: (input) => {
     const x = startX(input)
     return levelLayers(
@@ -124,7 +128,7 @@ export const work: Level = {
       const up = ramp(climbing, 0.25, 0.85)
       const over = ramp(climbing, 0.85, 1)
       if (climbing > 0) {
-        const x = go < 1 ? lerp(x0, fenceX + 30, go) : lerp(fenceX + 30, fenceX + FENCE_W - 10, over)
+        const x = go < 1 ? lerp(x0, fenceX + 30, go) : lerp(fenceX + 30, ledgeOf(input), over)
         const y = go < 1 ? GROUND - hop(ramp(go, 0.6, 1), 80) - 80 * ramp(go, 0.8, 1) : lerp(GROUND - 80, LEDGE_Y, up) - hop(over, 40)
         const climbStep = Math.floor(up * 8) % 2 === 1
         hero(x, y, over >= 1 ? 'stand' : go < 0.6 ? runFrame(x) : over > 0 ? 'jump' : 'grab', climbStep)

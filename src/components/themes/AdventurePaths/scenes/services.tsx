@@ -4,7 +4,7 @@ import { fx, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { BLOCK, GROUND, TileGround, rigOf } from './kit'
 import { levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, phase, reach, startX, type Level, type LevelInput } from './level'
 import { FilledBlock } from './pieces'
 import { mapWriter } from './worldMap'
 
@@ -16,6 +16,9 @@ const SIZE = 24 * BLOCK
 // The giant switch: two blocks wide, its plate on top, past his start.
 const SWITCH = 120
 const SWITCH_W = 2 * SIZE
+
+/** Where he ends: on the switch's plate. */
+const switchOf = (input: LevelInput): number => startX(input) + reach(input, SWITCH)
 const PLATE_H = 40
 
 function Room() {
@@ -47,8 +50,8 @@ function GiantSwitch({ x }: { x: number }) {
 
 export const services: Level = {
   script: [MAP_MS, 1300, 1700],
+  end: switchOf,
   layers: (input) => {
-    const x = startX(input)
     return levelLayers(
       {
         sky: <Room />,
@@ -57,7 +60,7 @@ export const services: Level = {
             <FilledBlock fill={TRAIL.BLOCK} />
           </TileGround>
         ),
-        things: <GiantSwitch x={x + reach(input, SWITCH)} />,
+        things: <GiantSwitch x={switchOf(input)} />,
       },
       input,
     )
@@ -66,7 +69,7 @@ export const services: Level = {
     const map = mapWriter(stage, input)
     const hero = rigOf(stage, 'hero', 'stand')
     const plate = fx(stage, 'plate')
-    const x = startX(input) + reach(input, SWITCH)
+    const x = switchOf(input)
     const top = GROUND - SIZE - PLATE_H
     return (play) => {
       const walked = phase(play, 0)

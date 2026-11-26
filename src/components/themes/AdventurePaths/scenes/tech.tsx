@@ -4,7 +4,7 @@ import { fx, lerp, r1, transformTo, translateTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { Cloud, GROUND, HERO_TALL, PillHills, Sky, rigOf } from './kit'
 import { Foe, foeOf, levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, clearOf, phase, reach, startX, type Level, type LevelInput } from './level'
 import { mapWriter } from './worldMap'
 
 // Level 3, the sky, which scrolls on its own: from the map he walks onto the third spot. He rides a row
@@ -16,6 +16,13 @@ import { mapWriter } from './worldMap'
 const DECK = GROUND - 120
 const PLANK = 200
 const GAP = 260
+
+/** Where the course starts, his first deck: his start, or, beside cards on the left of a wide screen, far enough
+ *  right that the first deck, scrolled a deck along as he leaves it, still ends clear of them. */
+const courseOf = (input: LevelInput): number => clearOf(input, startX(input) - reach(input, GAP), PLANK / 2) + reach(input, GAP)
+
+/** Where he ends: off the spikes, over the second deck once the course has scrolled a deck along. */
+const landOf = (input: LevelInput): number => courseOf(input) + reach(input, GAP)
 
 /** A moving platform: a plank of gold blocks with a dark edge. */
 function Platform({ name, x }: { name: string; x: number }) {
@@ -42,8 +49,9 @@ function Spikes() {
 
 export const tech: Level = {
   script: [MAP_MS, 1700, 1500],
+  end: landOf,
   layers: (input) => {
-    const x = startX(input)
+    const x = courseOf(input)
     return levelLayers(
       {
         sky: <Sky id="ap-tech-sky" top={TRAIL.SKY_HIGH} low={TRAIL.SKY_LOW} />,
@@ -83,7 +91,7 @@ export const tech: Level = {
     const clouds = fx(stage, 'clouds')
     const floor = fx(stage, 'floor')
     const decks = [0, 1, 2].map((i) => fx(stage, `deck-${i}`))
-    const x0 = startX(input)
+    const x0 = courseOf(input)
     const gap = reach(input, GAP)
     const scroll = gap
     return (play) => {
@@ -108,7 +116,7 @@ export const tech: Level = {
       }
       // the spin jump: up off the deck, down onto the spikes and off them, spinning, high above
       const startSpin = x0 + gap - scroll
-      const footX = lerp(startSpin, x0 + 2 * gap - scroll, ramp(spinning, 0, 0.5))
+      const footX = lerp(startSpin, landOf(input), ramp(spinning, 0, 0.5))
       const lift = spinning < 0.5 ? hop(spinning * 2, 180) : 240 * ramp(spinning, 0.5, 1) ** 0.6
       hero(footX, DECK + bob(1) - lift - (spinning >= 0.5 ? HERO_TALL * 0.2 : 0), 'jump', false, spinning * 1080)
     }

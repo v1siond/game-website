@@ -4,7 +4,7 @@ import { fadeTo, fx, lerp, r1, transformTo } from '../../shared/stageNodes'
 import { TRAIL } from '../palette'
 import { BLOCK, DomeHills, GROUND, GrassGround, PillHills, Sky, critterStep, rigOf, runFrame } from './kit'
 import { Foe, foeOf, levelLayers } from './frame'
-import { MAP_MS, phase, reach, startX, type Level } from './level'
+import { MAP_MS, phase, reach, startX, type Level, type LevelInput } from './level'
 import { mapWriter } from './worldMap'
 
 // The Martial Artist's level, a field of charging foes: from the map he walks onto its spot. A charger in
@@ -14,6 +14,9 @@ import { mapWriter } from './worldMap'
 const SIZE = 24 * BLOCK
 // The wall: how far past his start, three bricks tall; each brick breaks into its four quarters.
 const WALL = 330
+
+/** Where he ends: the kick at the wall's foot. */
+const kickOf = (input: LevelInput): number => startX(input) + reach(input, WALL) - 60
 const BRICKS = 3
 const QUARTER = SIZE / 2
 
@@ -44,6 +47,7 @@ function Wall({ x }: { x: number }) {
 
 export const muayThai: Level = {
   script: [MAP_MS, 1500, 1600],
+  end: kickOf,
   layers: (input) => {
     const x = startX(input)
     return levelLayers(
@@ -96,7 +100,7 @@ export const muayThai: Level = {
       )
       if (kicking > 0) {
         const run = ramp(kicking, 0, 0.35)
-        const x = lerp(meet, wall - 60, run)
+        const x = lerp(meet, kickOf(input), run)
         hero(x, GROUND, run < 1 ? runFrame(x) : 'kick')
         return
       }
